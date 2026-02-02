@@ -1,0 +1,66 @@
+/**
+ * API Route: Get Public Map
+ * GET /api/maps/public/[slug]
+ */
+
+import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import { db } from '@/lib/db';
+
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ slug: string }> }
+) {
+  try {
+    const { slug } = await params;
+    const session = await getServerSession(authOptions);
+
+    const list = await db.list.findFirst({
+      where: {
+        slug,
+        published: true, // Only show published maps
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+        locations: {
+          orderBy: { orderIndex: 'asc' },
+        },
+      },
+    });
+
+    if (!list) {
+      return NextResponse.json(
+        { error: 'Map not found' },
+        { status: 404 }
+      );
+    }
+
+    // Check if current user is the owner
+    const isOwner = session?.user?.id === list.userId;
+
+    return NextResponse.json({
+      success: true,
+      data: {
+        ...list,
+        creatorName: list.user.name || list.user.email.split('@')[0], // Use name or email prefix
+        isOwner, // Include ownership flag
+      },
+    });
+  } catch (error) {
+    console.error('Error fetching public map:', error);
+    return NextResponse.json(
+      {
+        error: 'Failed to fetch map',
+        details: error instanceof Error ? error.message : 'Unknown error',
+      },
+      { status: 500 }
+    );
+  }
+}

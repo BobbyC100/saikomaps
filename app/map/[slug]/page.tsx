@@ -7,6 +7,8 @@ import { Loader } from '@googlemaps/js-api-loader';
 import { Pencil, X } from 'lucide-react';
 import { getMapTemplate, type MapTemplate } from '@/lib/map-templates';
 import { EditLocationModal } from './components/EditLocationModal';
+import { MapHeader } from './components/MapHeader';
+import { TitleCard } from './components/TitleCard';
 
 interface Location {
   id: string;
@@ -31,6 +33,10 @@ interface MapData {
   slug: string;
   templateType: string;
   userId: string;
+  creatorName?: string;
+  coverImageUrl?: string | null;
+  createdAt: string | Date;
+  updatedAt: string | Date;
   isOwner?: boolean;
   locations: Location[];
 }
@@ -60,10 +66,7 @@ function parseLatLng(lat: number | string | null, lng: number | string | null): 
 export default function PublicMapPage({ params }: { params: Promise<{ slug: string }> }) {
   const [mapData, setMapData] = useState<MapData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [copied, setCopied] = useState(false);
-  const [shareOpen, setShareOpen] = useState(false);
   const [mobileView, setMobileView] = useState<'list' | 'map'>('list');
-  const sharePanelRef = useRef<HTMLDivElement>(null);
   const [activeCardIndex, setActiveCardIndex] = useState<number>(0);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const cardsScrollRef = useRef<HTMLDivElement>(null);
@@ -75,35 +78,6 @@ export default function PublicMapPage({ params }: { params: Promise<{ slug: stri
   const template: MapTemplate = getMapTemplate(mapData?.templateType);
   const locations = mapData?.locations ?? [];
   const hasValidLocations = locations.some((loc) => parseLatLng(loc.latitude, loc.longitude));
-
-  const copyShareLink = () => {
-    if (typeof window === 'undefined') return;
-    navigator.clipboard.writeText(window.location.href).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    });
-  };
-
-  const shareToTwitter = () => {
-    if (typeof window === 'undefined') return;
-    const url = encodeURIComponent(window.location.href);
-    const text = mapData
-      ? encodeURIComponent(`${mapData.title} — a map made with Saiko Maps`)
-      : '';
-    window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank', 'noopener,noreferrer,width=550,height=420');
-  };
-
-  // Close share panel on outside click
-  useEffect(() => {
-    if (!shareOpen) return;
-    const handleClick = (e: MouseEvent) => {
-      if (sharePanelRef.current && !sharePanelRef.current.contains(e.target as Node)) {
-        setShareOpen(false);
-      }
-    };
-    document.addEventListener('click', handleClick);
-    return () => document.removeEventListener('click', handleClick);
-  }, [shareOpen]);
 
   const scrollToCard = useCallback((index: number) => {
     setMobileView('list');
@@ -385,107 +359,65 @@ export default function PublicMapPage({ params }: { params: Promise<{ slug: stri
       className={`min-h-screen ${template.fontClass}`}
       style={{ backgroundColor: template.bg, color: template.text }}
     >
-      {/* Header */}
-      <header
-        className={`border-b ${template.headerClass}`}
-        style={{
-          borderColor: template.bg === '#1A1A1A' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
-        }}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center justify-between flex-wrap gap-4">
-            <Link href="/" className="flex items-center gap-3">
-              <Image src="/saiko-logo.png" alt="Saiko Maps" width={40} height={40} />
-              <span className="font-bold text-xl tracking-tight" style={{ color: template.text }}>SAIKO MAPS</span>
-            </Link>
-            <div className="flex items-center gap-3">
-              <div className="relative" ref={sharePanelRef}>
-                <button
-                  type="button"
-                  onClick={() => setShareOpen((o) => !o)}
-                  className="px-4 py-2 rounded-lg font-medium text-sm transition-colors flex items-center gap-2"
-                  style={{
-                    backgroundColor: template.bg === '#1A1A1A' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)',
-                    color: template.text,
-                  }}
-                >
-                  Share
-                </button>
-                {shareOpen && (
-                  <div
-                    className="absolute right-0 top-full mt-2 py-2 min-w-[180px] rounded-lg shadow-lg z-50 border"
-                    style={{
-                      backgroundColor: template.bg === '#1A1A1A' ? '#2A2A2A' : '#fff',
-                      borderColor: template.bg === '#1A1A1A' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
-                    }}
-                  >
-                    <button
-                      type="button"
-                      onClick={() => {
-                        copyShareLink();
-                      }}
-                      className="w-full px-4 py-2.5 text-left text-sm font-medium hover:opacity-80 flex items-center gap-2"
-                      style={{ color: template.text }}
-                    >
-                      {copied ? '✓ Copied!' : '📋 Copy link'}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        shareToTwitter();
-                      }}
-                      className="w-full px-4 py-2.5 text-left text-sm font-medium hover:opacity-80 flex items-center gap-2"
-                      style={{ color: template.text }}
-                    >
-                      Share to X (Twitter)
-                    </button>
-                  </div>
-                )}
-              </div>
-              <Link
-                href="/create"
-                className="px-5 py-2 rounded-lg font-bold text-sm transition-colors text-white"
-                style={{ backgroundColor: template.accent }}
-              >
-                Create Your Own
-              </Link>
-            </div>
-          </div>
-          <h1 className="text-4xl lg:text-5xl font-bold mt-6 mb-2" style={{ color: template.text }}>
-            {mapData.title}
-          </h1>
-          {mapData.subtitle && (
-            <p className="text-xl mb-2" style={{ color: template.textMuted }}>{mapData.subtitle}</p>
-          )}
-          <p style={{ color: template.textMuted }}>{mapData.locations.length} locations</p>
+      {/* Minimal Header - Logo only */}
+      <MapHeader template={template} />
 
-          {/* Mobile toggle */}
-          <div className="flex lg:hidden gap-2 mt-4">
-            <button
-              type="button"
-              onClick={() => setMobileView('list')}
-              className={`px-4 py-2 rounded-lg font-medium text-sm ${mobileView === 'list' ? 'text-white' : ''}`}
-              style={{
-                backgroundColor: mobileView === 'list' ? template.accent : (template.bg === '#1A1A1A' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)'),
-                color: mobileView === 'list' ? (template.bg === '#1A1A1A' ? '#1A1A1A' : '#fff') : template.text,
-              }}
-            >
-              List
-            </button>
-            <button
-              type="button"
-              onClick={() => setMobileView('map')}
-              className={`px-4 py-2 rounded-lg font-medium text-sm ${mobileView === 'map' ? 'text-white' : ''}`}
-              style={{
-                backgroundColor: mobileView === 'map' ? template.accent : (template.bg === '#1A1A1A' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)'),
-                color: mobileView === 'map' ? (template.bg === '#1A1A1A' ? '#1A1A1A' : '#fff') : template.text,
-              }}
-            >
-              Map
-            </button>
-          </div>
-        </div>
-      </header>
+      {/* Split layout: cards left, map right (desktop); toggle (mobile) */}
+      <div className="flex flex-col lg:flex-row lg:h-[calc(100vh-8rem)]">
+        {/* Left: scrollable cards */}
+        <div
+          ref={cardsScrollRef}
+          className={`flex-1 overflow-y-auto map-cards-scroll ${mobileView === 'map' ? 'hidden lg:block' : ''}`}
+          style={{ maxHeight: '100%' }}
+        >
+          <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-6">
+            {/* Title Card */}
+            {mapData && (
+              <TitleCard
+                mapData={{
+                  title: mapData.title,
+                  subtitle: mapData.subtitle,
+                  coverImageUrl: mapData.coverImageUrl,
+                  creatorName: mapData.creatorName || 'Unknown',
+                  createdAt: mapData.createdAt,
+                  updatedAt: mapData.updatedAt,
+                  locations: mapData.locations,
+                  slug: mapData.slug,
+                }}
+                isOwner={isOwner}
+                template={template}
+                onEdit={() => {
+                  // TODO: Navigate to edit page or open edit modal
+                  console.log('Edit map');
+                }}
+              />
+            )}
+
+            {/* Mobile toggle */}
+            <div className="flex lg:hidden gap-2 mb-6">
+              <button
+                type="button"
+                onClick={() => setMobileView('list')}
+                className={`px-4 py-2 rounded-lg font-medium text-sm ${mobileView === 'list' ? 'text-white' : ''}`}
+                style={{
+                  backgroundColor: mobileView === 'list' ? template.accent : (template.bg === '#1A1A1A' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)'),
+                  color: mobileView === 'list' ? (template.bg === '#1A1A1A' ? '#1A1A1A' : '#fff') : template.text,
+                }}
+              >
+                List
+              </button>
+              <button
+                type="button"
+                onClick={() => setMobileView('map')}
+                className={`px-4 py-2 rounded-lg font-medium text-sm ${mobileView === 'map' ? 'text-white' : ''}`}
+                style={{
+                  backgroundColor: mobileView === 'map' ? template.accent : (template.bg === '#1A1A1A' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)'),
+                  color: mobileView === 'map' ? (template.bg === '#1A1A1A' ? '#1A1A1A' : '#fff') : template.text,
+                }}
+              >
+                Map
+              </button>
+            </div>
 
       {/* Split layout: cards left, map right (desktop); toggle (mobile) */}
       <div className="flex flex-col lg:flex-row lg:h-[calc(100vh-12rem)]">
@@ -723,20 +655,13 @@ export default function PublicMapPage({ params }: { params: Promise<{ slug: stri
         />
       )}
 
-      {/* Footer */}
+      {/* Minimal Footer */}
       <footer
-        className="border-t py-12 mt-auto"
+        className="border-t py-6 mt-auto"
         style={{ borderColor: template.bg === '#1A1A1A' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)' }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p className="text-sm mb-4" style={{ color: template.textMuted }}>Made with Saiko Maps</p>
-          <Link
-            href="/create"
-            className="inline-block px-6 py-3 rounded-lg font-bold text-white transition-colors"
-            style={{ backgroundColor: template.accent }}
-          >
-            Create Your Own Map
-          </Link>
+          <p className="text-xs" style={{ color: template.textMuted }}>Saiko Maps</p>
         </div>
       </footer>
     </div>
