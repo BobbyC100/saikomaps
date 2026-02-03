@@ -1,15 +1,19 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
-import Image from 'next/image';
-import { Share2, Pencil } from 'lucide-react';
-import { getMapTemplate, type MapTemplate } from '@/lib/map-templates';
+import { useState, useCallback, useEffect } from 'react';
+import { Instagram, Link2, Pencil, RefreshCw } from 'lucide-react';
+import { type MapTemplate } from '@/lib/map-templates';
 
 interface TitleCardProps {
   mapData: {
+    id?: string;
     title: string;
     subtitle?: string | null;
+    description?: string | null;
+    descriptionSource?: string | null;
     coverImageUrl?: string | null;
+    /** 3-photo collage from different places (when map has 3+ places). Takes precedence over coverImageUrl. */
+    coverImageUrls?: string[];
     creatorName: string;
     createdAt: string | Date;
     updatedAt: string | Date;
@@ -19,12 +23,71 @@ interface TitleCardProps {
   isOwner: boolean;
   template: MapTemplate;
   onEdit?: () => void;
+  onDescriptionUpdate?: (description: string | null, descriptionSource: string | null) => void;
+  /** Dev only: pass X-Dev-Owner header for API calls when acting as owner without login */
+  devOwner?: boolean;
 }
 
-export function TitleCard({ mapData, isOwner, template, onEdit }: TitleCardProps) {
-  const [shareOpen, setShareOpen] = useState(false);
+export function TitleCard({ mapData, isOwner, template, onEdit, onDescriptionUpdate, devOwner }: TitleCardProps) {
   const [copied, setCopied] = useState(false);
-  const sharePanelRef = useRef<HTMLDivElement>(null);
+  const [isEditingDescription, setIsEditingDescription] = useState(false);
+  const [editDescriptionValue, setEditDescriptionValue] = useState(mapData.description ?? '');
+  const [isSavingDescription, setIsSavingDescription] = useState(false);
+  const [isRegenerating, setIsRegenerating] = useState(false);
+
+  const saveDescription = useCallback(
+    async (value: string) => {
+      const trimmed = value.trim();
+      if (!onDescriptionUpdate || !mapData.id) return;
+      setIsSavingDescription(true);
+      try {
+        const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+        if (devOwner) headers['X-Dev-Owner'] = '1';
+        const res = await fetch(`/api/maps/${mapData.id}`, {
+          method: 'PATCH',
+          headers,
+          body: JSON.stringify({
+            description: trimmed || null,
+            descriptionSource: trimmed ? 'edited' : null,
+          }),
+        });
+        if (res.ok) {
+          onDescriptionUpdate(trimmed || null, trimmed ? 'edited' : null);
+        }
+      } catch (err) {
+        console.error('Failed to save description:', err);
+      } finally {
+        setIsSavingDescription(false);
+        setIsEditingDescription(false);
+      }
+    },
+    [mapData.id, onDescriptionUpdate, devOwner]
+  );
+
+  const handleRegenerate = useCallback(async () => {
+    if (!mapData.id || !onDescriptionUpdate) return;
+    setIsRegenerating(true);
+    try {
+      const headers: Record<string, string> = {};
+      if (devOwner) headers['X-Dev-Owner'] = '1';
+      const res = await fetch(`/api/maps/${mapData.id}/regenerate-description`, {
+        method: 'POST',
+        headers,
+      });
+      const json = await res.json();
+      if (res.ok && json?.data != null) {
+        onDescriptionUpdate(json.data.description ?? null, json.data.descriptionSource ?? 'ai');
+      }
+    } catch (err) {
+      console.error('Failed to regenerate description:', err);
+    } finally {
+      setIsRegenerating(false);
+    }
+  }, [mapData.id, onDescriptionUpdate, devOwner]);
+
+  useEffect(() => {
+    if (!isEditingDescription) setEditDescriptionValue(mapData.description ?? '');
+  }, [mapData.description, isEditingDescription]);
 
   // Get most common category from locations
   const category = mapData.locations
@@ -50,73 +113,148 @@ export function TitleCard({ mapData, isOwner, template, onEdit }: TitleCardProps
     ? `${window.location.origin}/map/${mapData.slug}`
     : '';
 
-  const copyShareLink = () => {
+  const handleCopyLink = async () => {
     if (shareUrl) {
-      navigator.clipboard.writeText(shareUrl);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-      setShareOpen(false);
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } catch (err) {
+        console.error('Failed to copy link:', err);
+      }
     }
   };
 
-  const shareToInstagram = () => {
-    // Instagram doesn't support direct URL sharing
-    // Open modal with instructions or generate shareable image
-    alert('To share on Instagram:\n1. Copy the link below\n2. Post it in your story or caption\n3. Or download a shareable image (coming soon)');
-    copyShareLink();
-    setShareOpen(false);
+  const handleInstagramShare = () => {
+    // TODO: Implement Instagram story image generation
+    console.log('Share to Instagram');
   };
 
-  // Close share dropdown when clicking outside
-  useEffect(() => {
-    const handleClick = (e: MouseEvent) => {
-      if (sharePanelRef.current && !sharePanelRef.current.contains(e.target as Node)) {
-        setShareOpen(false);
-      }
-    };
-    document.addEventListener('click', handleClick);
-    return () => document.removeEventListener('click', handleClick);
-  }, []);
-
+  // Always use coral color for title card, regardless of template
+  const coralAccent = '#E07A5F';
+  
+  // Wavy divider component
+  const WavyDivider = () => (
+    <svg width="100" height="8" viewBox="0 0 100 8" fill="none" style={{ margin: '0 auto 24px' }}>
+      <path
+        d="M0 4C8 4 8 1 16 1C24 1 24 7 32 7C40 7 40 1 48 1C56 1 56 7 64 7C72 7 72 1 80 1C88 1 88 4 100 4"
+        stroke={coralAccent}
+        strokeWidth="2"
+        strokeLinecap="round"
+        fill="none"
+      />
+    </svg>
+  );
+  
   return (
     <div
       className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 mb-8"
       style={{
-        border: `1px solid ${template.accent}40`, // Coral accent with opacity
-        borderRadius: '12px',
-        padding: '32px',
-        backgroundColor: template.bg === '#1A1A1A' ? '#2A2A2A' : template.bg === '#FDF6E3' ? '#FFFFFF' : template.bg === '#F5F0E1' ? '#FFFFFF' : 'rgba(255,255,255,0.6)',
+        backgroundColor: '#FFFFFF',
+        borderTop: '4px solid #E07A5F',
+        boxShadow: '0 4px 12px rgba(224, 122, 95, 0.15), 0 2px 4px rgba(0,0,0,0.04)',
+        padding: '36px 44px',
         textAlign: 'center',
+        borderRadius: '2px',
+        position: 'relative',
+        zIndex: 1,
       }}
     >
-      {/* Cover Image */}
-      {mapData.coverImageUrl && (
-        <div className="mb-6 flex justify-center">
+      {/* Cover Image — single or 2–3 photo collage when map has 3+ places */}
+      {(mapData.coverImageUrls && mapData.coverImageUrls.length >= 2 ? (
+        <div
+          style={{
+            marginBottom: '20px',
+            width: '100%',
+            maxWidth: '400px',
+            marginLeft: 'auto',
+            marginRight: 'auto',
+          }}
+        >
           <div
             style={{
-              width: '120px',
-              height: '120px',
-              borderRadius: '50%',
+              display: 'grid',
+              gridTemplateColumns: '2fr 1fr',
+              gridTemplateRows: mapData.coverImageUrls.length >= 3 ? '1fr 1fr' : '1fr',
+              gap: '4px',
+              borderRadius: '12px',
               overflow: 'hidden',
-              border: `2px solid ${template.accent}`,
+              aspectRatio: '16/9',
             }}
           >
-            <Image
-              src={mapData.coverImageUrl}
+            <img
+              src={mapData.coverImageUrls[0]}
               alt={mapData.title}
-              width={120}
-              height={120}
-              className="w-full h-full object-cover"
+              style={{
+                gridRow: mapData.coverImageUrls.length >= 3 ? 'span 2' : 'span 1',
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                minHeight: 0,
+              }}
             />
+            <img
+              src={mapData.coverImageUrls[1]}
+              alt=""
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                minHeight: 0,
+              }}
+            />
+            {mapData.coverImageUrls[2] && (
+              <img
+                src={mapData.coverImageUrls[2]}
+                alt=""
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  minHeight: 0,
+                }}
+              />
+            )}
           </div>
         </div>
-      )}
+      ) : mapData.coverImageUrl ? (
+        <div
+          style={{
+            marginBottom: '20px',
+            width: '100%',
+            maxWidth: '400px',
+            marginLeft: 'auto',
+            marginRight: 'auto',
+          }}
+        >
+          <img
+            src={mapData.coverImageUrl}
+            alt={mapData.title}
+            style={{
+              width: '100%',
+              maxWidth: '400px',
+              height: 'auto',
+              aspectRatio: '16/9',
+              objectFit: 'cover',
+              borderRadius: '12px',
+              margin: '0 auto',
+              display: 'block',
+            }}
+          />
+        </div>
+      ) : null)}
 
-      {/* Category */}
+      {/* Category (optional) */}
       {topCategory && (
         <div
-          className="mb-3 text-xs font-bold uppercase tracking-wider"
-          style={{ color: '#E8998D' }} // Coral color
+          style={{
+            fontSize: '11px',
+            fontWeight: 500,
+            color: '#E07A5F',
+            letterSpacing: '0.1em',
+            textTransform: 'uppercase',
+            marginBottom: '12px',
+          }}
         >
           {topCategory}
         </div>
@@ -124,89 +262,271 @@ export function TitleCard({ mapData, isOwner, template, onEdit }: TitleCardProps
 
       {/* Title */}
       <h1
-        className="text-4xl lg:text-5xl font-bold mb-3"
-        style={{ color: template.text }}
+        style={{
+          fontSize: '32px',
+          fontWeight: 400,
+          fontFamily: '"Playfair Display", Georgia, serif',
+          fontStyle: 'italic',
+          color: '#1A1A1A',
+          margin: '0 0 14px 0',
+          lineHeight: 1.1,
+        }}
       >
         {mapData.title}
       </h1>
 
-      {/* Description */}
-      {mapData.subtitle && (
+      {/* Map description (AI-generated or edited) */}
+      {(mapData.description || isEditingDescription || (isOwner && !mapData.description)) && (
+        <div style={{ marginBottom: '20px', maxWidth: '400px', marginLeft: 'auto', marginRight: 'auto' }}>
+          {isEditingDescription ? (
+            <textarea
+              value={editDescriptionValue}
+              onChange={(e) => setEditDescriptionValue(e.target.value)}
+              onBlur={() => saveDescription(editDescriptionValue)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  (e.target as HTMLTextAreaElement).blur();
+                }
+              }}
+              placeholder="Add a description..."
+              autoFocus
+              disabled={isSavingDescription}
+              style={{
+                width: '100%',
+                minHeight: '60px',
+                fontSize: '15px',
+                fontFamily: '"DM Sans", sans-serif',
+                fontStyle: 'italic',
+                color: '#8a8580',
+                lineHeight: 1.5,
+                border: '1px solid #E5E5E5',
+                borderRadius: '8px',
+                padding: '10px 12px',
+                resize: 'vertical',
+                backgroundColor: '#FAFAFA',
+              }}
+            />
+          ) : (
+            <div
+              onClick={() => {
+                if (isOwner && onDescriptionUpdate) {
+                  setEditDescriptionValue(mapData.description ?? '');
+                  setIsEditingDescription(true);
+                }
+              }}
+              style={{
+                cursor: isOwner ? 'text' : 'default',
+                display: 'flex',
+                alignItems: 'flex-start',
+                justifyContent: 'center',
+                gap: '8px',
+              }}
+            >
+              <p
+                style={{
+                  fontSize: '15px',
+                  fontFamily: '"DM Sans", sans-serif',
+                  fontStyle: 'italic',
+                  color: '#8a8580',
+                  lineHeight: 1.55,
+                  margin: 0,
+                  flex: 1,
+                }}
+              >
+                {mapData.description || (isOwner ? 'Click to add a description...' : '')}
+              </p>
+              {isOwner && (mapData.description || mapData.locations.length >= 2) && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleRegenerate();
+                  }}
+                  disabled={isRegenerating}
+                  title={mapData.description ? 'Regenerate description' : 'Generate description'}
+                  style={{
+                    flexShrink: 0,
+                    width: '28px',
+                    height: '28px',
+                    borderRadius: '50%',
+                    border: '1px solid #E5E5E5',
+                    background: 'transparent',
+                    cursor: isRegenerating ? 'wait' : 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#E07A5F',
+                  }}
+                >
+                  <RefreshCw size={14} className={isRegenerating ? 'animate-spin' : ''} />
+                </button>
+              )}
+            </div>
+          )}
+          {mapData.descriptionSource === 'ai' && mapData.description && !isEditingDescription && (
+            <p
+              style={{
+                fontSize: '11px',
+                fontFamily: '"DM Sans", sans-serif',
+                fontStyle: 'italic',
+                color: '#c0b9b2',
+                margin: '4px 0 0 0',
+              }}
+            >
+              written by the map
+            </p>
+          )}
+        </div>
+      )}
+
+      {/* Legacy subtitle (optional) */}
+      {mapData.subtitle && !mapData.description && (
         <p
-          className="text-lg mb-4"
-          style={{ color: template.textMuted }}
+          style={{
+            fontSize: '14px',
+            color: '#6B6B6B',
+            lineHeight: 1.55,
+            margin: '0 auto 20px auto',
+            maxWidth: '320px',
+          }}
         >
           {mapData.subtitle}
         </p>
       )}
 
-      {/* Metadata */}
+      {/* Wavy Divider */}
+      <WavyDivider />
+
+      {/* Author */}
       <div
-        className="text-sm mb-6 space-y-1"
-        style={{ color: template.textMuted }}
+        style={{
+          fontSize: '14px',
+          color: '#1A1A1A',
+          marginBottom: '4px',
+        }}
       >
-        <div>by {mapData.creatorName}</div>
-        <div>{dateText}</div>
-        <div>{mapData.locations.length} location{mapData.locations.length !== 1 ? 's' : ''}</div>
+        by <strong style={{ fontWeight: 600, fontStyle: 'italic' }}>{mapData.creatorName}</strong>
+      </div>
+
+      {/* Meta */}
+      <div
+        style={{
+          fontSize: '12px',
+          color: '#9A9A9A',
+          marginBottom: '24px',
+        }}
+      >
+        {dateText} · {mapData.locations.length} location{mapData.locations.length !== 1 ? 's' : ''}
       </div>
 
       {/* Actions */}
-      <div className="flex items-center justify-center gap-3">
-        {/* Share Button */}
-        <div className="relative" ref={sharePanelRef}>
-          <button
-            type="button"
-            onClick={() => setShareOpen((o) => !o)}
-            className="px-4 py-2 rounded-lg font-medium text-sm transition-colors flex items-center gap-2"
-            style={{
-              backgroundColor: template.bg === '#1A1A1A' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)',
-              color: template.text,
-            }}
-          >
-            <Share2 size={16} />
-            Share
-          </button>
-          {shareOpen && (
-            <div
-              className="absolute left-1/2 -translate-x-1/2 top-full mt-2 py-2 min-w-[180px] rounded-lg shadow-lg z-50 border"
-              style={{
-                backgroundColor: template.bg === '#1A1A1A' ? '#2A2A2A' : '#fff',
-                borderColor: template.bg === '#1A1A1A' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
-              }}
-            >
-              <button
-                type="button"
-                onClick={copyShareLink}
-                className="w-full px-4 py-2.5 text-left text-sm font-medium hover:opacity-80 flex items-center gap-2"
-                style={{ color: template.text }}
-              >
-                {copied ? '✓ Copied!' : '📋 Copy link'}
-              </button>
-              <button
-                type="button"
-                onClick={shareToInstagram}
-                className="w-full px-4 py-2.5 text-left text-sm font-medium hover:opacity-80 flex items-center gap-2"
-                style={{ color: template.text }}
-              >
-                📷 Share to Instagram
-              </button>
-            </div>
-          )}
-        </div>
+      <div
+        style={{
+          display: 'flex',
+          gap: '10px',
+          justifyContent: 'center',
+          alignItems: 'center',
+          position: 'relative',
+          zIndex: 10,
+        }}
+      >
+        {/* Instagram Share */}
+        <button
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            handleInstagramShare();
+          }}
+          title="Share to Instagram"
+          style={{
+            width: '38px',
+            height: '38px',
+            borderRadius: '50%',
+            backgroundColor: 'transparent',
+            border: '1px solid #E5E5E5',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#E07A5F',
+            transition: 'border-color 150ms ease',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.borderColor = '#E07A5F'
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.borderColor = '#E5E5E5'
+          }}
+        >
+          <Instagram size={17} strokeWidth={1.5} />
+        </button>
 
-        {/* Edit Button (Owner only) */}
+        {/* Copy Link */}
+        <button
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            handleCopyLink();
+          }}
+          title={copied ? 'Link copied!' : 'Copy link'}
+          aria-label={copied ? 'Link copied!' : 'Copy link'}
+          style={{
+            width: '38px',
+            height: '38px',
+            borderRadius: '50%',
+            backgroundColor: 'transparent',
+            border: '1px solid #E5E5E5',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#E07A5F',
+            transition: 'border-color 150ms ease',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.borderColor = '#E07A5F'
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.borderColor = '#E5E5E5'
+          }}
+        >
+          <Link2 size={17} strokeWidth={1.5} />
+        </button>
+
+        {/* Edit (owner only) */}
         {isOwner && onEdit && (
           <button
             type="button"
-            onClick={onEdit}
-            className="px-4 py-2 rounded-lg font-medium text-sm transition-colors flex items-center gap-2"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onEdit();
+            }}
+            title="Edit map"
             style={{
-              backgroundColor: template.bg === '#1A1A1A' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)',
-              color: template.text,
+              width: '38px',
+              height: '38px',
+              borderRadius: '50%',
+              backgroundColor: 'transparent',
+              border: '1px solid #E5E5E5',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#E07A5F',
+              transition: 'border-color 150ms ease',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = '#E07A5F'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = '#E5E5E5'
             }}
           >
-            <Pencil size={16} />
-            Edit
+            <Pencil size={17} strokeWidth={1.5} />
           </button>
         )}
       </div>

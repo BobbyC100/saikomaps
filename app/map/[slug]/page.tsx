@@ -1,35 +1,71 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
 import { Loader } from '@googlemaps/js-api-loader';
-import { Pencil, X } from 'lucide-react';
-import { getMapTemplate, type MapTemplate } from '@/lib/map-templates';
+import { MarkerClusterer } from '@googlemaps/markerclusterer';
+import { Pencil, X, MapPin, Phone, Globe, Instagram, ExternalLink, Clock } from 'lucide-react';
+import { getMapTemplate, MAP_TEMPLATES, type MapTemplate } from '@/lib/map-templates';
+import { DEV_SHOW_ALL_UI } from '@/lib/config';
+import { saikoMapStyle } from '@/lib/mapStyle';
+import { getGooglePhotoUrl, getPhotoRefFromStored } from '@/lib/google-places';
+import { getMarkerIcon } from '@/lib/categoryMapping';
 import { EditLocationModal } from './components/EditLocationModal';
 import { MapHeader } from './components/MapHeader';
 import { TitleCard } from './components/TitleCard';
+import { GlobalFooter } from '@/components/layouts/GlobalFooter';
+import { LocationCard } from '@/components/LocationCard';
 
 interface Location {
   id: string;
+  placeSlug?: string;
   name: string;
   address: string | null;
   category: string | null;
   phone: string | null;
   website: string | null;
+  instagram: string | null;
+  hours: Record<string, string> | null;
   description: string | null;
+  descriptor?: string | null; // Curator's editorial (MapPlace)
   userNote: string | null;
   latitude: number | string | null;
   longitude: number | string | null;
   userPhotos: string[];
-  googlePhotos: unknown; // Json: array of { photo_reference } or similar
+  googlePhotos: unknown;
   orderIndex: number;
+}
+
+interface MapPlaceWithPlace {
+  id: string;
+  descriptor: string | null;
+  userNote: string | null;
+  userPhotos: string[];
+  orderIndex: number;
+  place: {
+    id: string;
+    slug: string;
+    name: string;
+    address: string | null;
+    category: string | null;
+    phone: string | null;
+    website: string | null;
+    instagram: string | null;
+    hours: unknown;
+    description: string | null;
+    latitude: unknown;
+    longitude: unknown;
+    googlePhotos: unknown;
+  };
 }
 
 interface MapData {
   id: string;
   title: string;
   subtitle: string | null;
+  description?: string | null;
+  descriptionSource?: string | null;
   slug: string;
   templateType: string;
   userId: string;
@@ -38,21 +74,67 @@ interface MapData {
   createdAt: string | Date;
   updatedAt: string | Date;
   isOwner?: boolean;
-  locations: Location[];
+  mapPlaces?: MapPlaceWithPlace[];
+  locations?: Location[]; // Computed from mapPlaces for compatibility
 }
 
 const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '';
 
-function getLocationPhotoUrl(loc: Location): string | null {
+function getLocationPhotoUrl(loc: Location, maxWidth: number = 400): string | null {
   if (loc.userPhotos?.length) return loc.userPhotos[0];
   if (loc.googlePhotos && Array.isArray(loc.googlePhotos) && loc.googlePhotos.length) {
-    const first = loc.googlePhotos[0] as { photo_reference?: string };
-    const ref = first?.photo_reference;
+    const ref = getPhotoRefFromStored(loc.googlePhotos[0] as { photo_reference?: string; photoReference?: string; name?: string });
     if (ref && GOOGLE_MAPS_API_KEY) {
-      return `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${ref}&key=${GOOGLE_MAPS_API_KEY}`;
+      try {
+        return getGooglePhotoUrl(ref, maxWidth);
+      } catch {
+        return null;
+      }
     }
   }
   return null;
+}
+
+/** Get up to 3 photo URLs for gallery: main (400px) + 2 thumbs (200px). */
+function getLocationPhotoGallery(loc: Location): {
+  mainUrl: string | null;
+  thumbUrls: string[];
+  totalCount: number;
+} {
+  if (loc.userPhotos?.length) {
+    return {
+      mainUrl: loc.userPhotos[0],
+      thumbUrls: loc.userPhotos.slice(1, 3),
+      totalCount: loc.userPhotos.length,
+    };
+  }
+  const arr = loc.googlePhotos && Array.isArray(loc.googlePhotos) ? loc.googlePhotos : [];
+  if (!arr.length || !GOOGLE_MAPS_API_KEY) {
+    return { mainUrl: null, thumbUrls: [], totalCount: 0 };
+  }
+  const mainRef = getPhotoRefFromStored(arr[0] as { photo_reference?: string; photoReference?: string; name?: string });
+  const mainUrl = mainRef ? (() => { try { return getGooglePhotoUrl(mainRef, 400); } catch { return null; } })() : null;
+  const thumbUrls: string[] = [];
+  for (let i = 1; i < Math.min(3, arr.length); i++) {
+    const ref = getPhotoRefFromStored(arr[i] as { photo_reference?: string; photoReference?: string; name?: string });
+    if (ref) {
+      try {
+        const url = getGooglePhotoUrl(ref, 200);
+        if (url) thumbUrls.push(url);
+      } catch { /* skip */ }
+    }
+  }
+  return { mainUrl, thumbUrls, totalCount: arr.length };
+}
+
+/** Get 3 hero photos from first 3 places (for collage when map has 3+ places). */
+function getHeroCollageUrls(locations: Location[]): string[] {
+  const urls: string[] = [];
+  for (let i = 0; i < Math.min(3, locations.length); i++) {
+    const u = getLocationPhotoUrl(locations[i], 600);
+    if (u) urls.push(u);
+  }
+  return urls;
 }
 
 function parseLatLng(lat: number | string | null, lng: number | string | null): { lat: number; lng: number } | null {
@@ -64,26 +146,60 @@ function parseLatLng(lat: number | string | null, lng: number | string | null): 
 }
 
 export default function PublicMapPage({ params }: { params: Promise<{ slug: string }> }) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const devOwner = searchParams.get('devOwner') === '1';
   const [mapData, setMapData] = useState<MapData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [mobileView, setMobileView] = useState<'list' | 'map'>('list');
   const [activeCardIndex, setActiveCardIndex] = useState<number>(0);
-  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const cardRefs = useRef<(HTMLAnchorElement | null)[]>([]);
   const cardsScrollRef = useRef<HTMLDivElement>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<google.maps.Map | null>(null);
   const markersRef = useRef<google.maps.Marker[]>([]);
+  const clustererRef = useRef<MarkerClusterer | null>(null);
   const googleMapsRef = useRef<typeof google | null>(null);
 
-  const template: MapTemplate = getMapTemplate(mapData?.templateType);
-  const locations = mapData?.locations ?? [];
+  let template: MapTemplate = getMapTemplate(mapData?.templateType);
+  // Flatten mapPlaces to locations (place + mapPlace curator data)
+  const locations: Location[] = (mapData?.mapPlaces ?? mapData?.locations ?? []).map((mp: MapPlaceWithPlace | Location) => {
+    if ('place' in mp && mp.place) {
+      const p = mp.place;
+      return {
+        id: mp.id,
+        placeSlug: p.slug,
+        name: p.name,
+        address: p.address,
+        category: p.category,
+        phone: p.phone,
+        website: p.website,
+        instagram: p.instagram,
+        hours: (p.hours as Record<string, string>) ?? null,
+        description: p.description,
+        descriptor: mp.descriptor,
+        userNote: mp.userNote,
+        latitude: p.latitude,
+        longitude: p.longitude,
+        userPhotos: mp.userPhotos ?? [],
+        googlePhotos: p.googlePhotos,
+        orderIndex: mp.orderIndex,
+      } as Location;
+    }
+    return mp as Location;
+  });
   const hasValidLocations = locations.some((loc) => parseLatLng(loc.latitude, loc.longitude));
+  
+  // Override black/yellow monocle template to use postcard colors instead
+  if (template.id === 'monocle') {
+    template = MAP_TEMPLATES.postcard;
+  }
 
   const scrollToCard = useCallback((index: number) => {
     setMobileView('list');
+    setActiveCardIndex(index);
     setTimeout(() => {
-      cardRefs.current[index]?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      setActiveCardIndex(index);
+      cardRefs.current[index]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 100);
   }, []);
 
@@ -99,19 +215,26 @@ export default function PublicMapPage({ params }: { params: Promise<{ slug: stri
     const locationId = editingLocation.id;
     
     try {
-      // Optimistic update
+      // Optimistic update (mapPlaces)
       setMapData((prev) => {
-        if (!prev) return null;
+        if (!prev?.mapPlaces) return prev;
         return {
           ...prev,
-          locations: prev.locations.map((l) =>
-            l.id === locationId ? { ...l, ...updatedData } : l
+          mapPlaces: prev.mapPlaces.map((mp) =>
+            mp.id === locationId
+              ? {
+                  ...mp,
+                  descriptor: updatedData.descriptor ?? mp.descriptor,
+                  userNote: updatedData.userNote ?? mp.userNote,
+                  userPhotos: updatedData.userPhotos ?? mp.userPhotos,
+                }
+              : mp
           ),
         };
       });
 
-      // Save to API
-      const response = await fetch(`/api/locations/${locationId}`, {
+      // Save to API (mapPlace id)
+      const response = await fetch(`/api/map-places/${locationId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updatedData),
@@ -126,11 +249,18 @@ export default function PublicMapPage({ params }: { params: Promise<{ slug: stri
     } catch (error) {
       // Rollback on error
       setMapData((prev) => {
-        if (!prev) return null;
+        if (!prev?.mapPlaces) return prev;
         return {
           ...prev,
-          locations: prev.locations.map((l) =>
-            l.id === locationId ? originalLocation : l
+          mapPlaces: prev.mapPlaces.map((mp) =>
+            mp.id === locationId
+              ? {
+                  ...mp,
+                  descriptor: originalLocation.descriptor ?? mp.descriptor,
+                  userNote: originalLocation.userNote ?? mp.userNote,
+                  userPhotos: originalLocation.userPhotos ?? mp.userPhotos,
+                }
+              : mp
           ),
         };
       });
@@ -150,17 +280,17 @@ export default function PublicMapPage({ params }: { params: Promise<{ slug: stri
     setDeletingLocationId(locationId);
     
     try {
-      // Optimistic update - remove from UI immediately
+      // Optimistic update - remove from UI immediately (mapPlaces)
       setMapData((prev) => {
         if (!prev) return null;
         return {
           ...prev,
-          locations: prev.locations.filter((l) => l.id !== locationId),
+          mapPlaces: (prev.mapPlaces ?? []).filter((mp) => mp.id !== locationId),
         };
       });
 
-      // Delete from API
-      const response = await fetch(`/api/locations/${locationId}`, {
+      // Delete from API (mapPlace id - removes from map, does not delete Place)
+      const response = await fetch(`/api/map-places/${locationId}`, {
         method: 'DELETE',
       });
 
@@ -196,7 +326,7 @@ export default function PublicMapPage({ params }: { params: Promise<{ slug: stri
   useEffect(() => {
     let cancelled = false;
     params.then((p) => {
-      fetch(`/api/maps/public/${p.slug}`)
+      fetch(`/api/maps/public/${p.slug}${devOwner ? '?devOwner=1' : ''}`)
         .then((res) => (res.ok ? res.json() : null))
         .then((json) => {
           if (!cancelled && json?.data) {
@@ -215,7 +345,7 @@ export default function PublicMapPage({ params }: { params: Promise<{ slug: stri
         });
     });
     return () => { cancelled = true; };
-  }, [params]);
+  }, [params, devOwner]);
 
   // Init Google Map (desktop: right panel; mobile: when view is 'map')
   useEffect(() => {
@@ -233,19 +363,29 @@ export default function PublicMapPage({ params }: { params: Promise<{ slug: stri
     });
 
     let map: google.maps.Map | null = null;
-    const markers: google.maps.Marker[] = [];
+    let clusterer: MarkerClusterer | null = null;
 
     loader.load().then((g) => {
       googleMapsRef.current = g;
       if (!mapContainerRef.current) return;
+      
+      // Clear existing markers and clusterer
+      if (clustererRef.current) {
+        clustererRef.current.clearMarkers();
+        clustererRef.current = null;
+      }
+      markersRef.current.forEach((m) => m.setMap(null));
+      markersRef.current = [];
+
       map = new g.maps.Map(mapContainerRef.current, {
         center: points[0],
         zoom: 12,
-        disableDefaultUI: false,
+        disableDefaultUI: true,
         zoomControl: true,
         mapTypeControl: false,
         streetViewControl: false,
         fullscreenControl: true,
+        styles: saikoMapStyle,
       });
       mapInstanceRef.current = map;
 
@@ -253,50 +393,131 @@ export default function PublicMapPage({ params }: { params: Promise<{ slug: stri
       points.forEach((p) => bounds.extend(p));
       if (points.length > 1) map.fitBounds(bounds, 48);
 
-      points.forEach((point, i) => {
+      // Create markers with category SVG icons (no numbers)
+      const markers = points.map((point, i) => {
+        const loc = locations[i];
+        const category = loc?.category || 'eat';
         const marker = new g.maps.Marker({
           position: point,
-          map,
-          label: { text: String(i + 1), color: 'white', fontWeight: 'bold' },
           icon: {
-            path: g.maps.SymbolPath.CIRCLE,
-            scale: 22,
-            fillColor: template.accent,
-            fillOpacity: 1,
-            strokeColor: template.bg === '#1A1A1A' ? '#fff' : '#333',
-            strokeWeight: 2,
+            url: getMarkerIcon(category),
+            scaledSize: new g.maps.Size(36, 36),
+            anchor: new g.maps.Point(18, 18),
           },
         });
         marker.addListener('click', () => scrollToCard(i));
-        markers.push(marker);
+        return marker;
       });
+
+      // Smooth zoom function
+      const smoothZoom = (targetZoom: number, targetCenter?: google.maps.LatLng) => {
+        if (!map) return;
+        
+        const currentZoom = map.getZoom() || 10;
+        const zoomDiff = targetZoom - currentZoom;
+        if (Math.abs(zoomDiff) < 0.1) return; // Already at target zoom
+        
+        const steps = Math.abs(zoomDiff) * 4; // More steps = smoother
+        const duration = 400; // Total animation time in ms
+        const stepDuration = duration / steps;
+        
+        let step = 0;
+        
+        // Ease to center first if provided
+        if (targetCenter) {
+          map.panTo(targetCenter);
+        }
+        
+        const interval = setInterval(() => {
+          if (!map) return;
+          step++;
+          const progress = step / steps;
+          // Ease-out cubic for smooth deceleration
+          const eased = 1 - Math.pow(1 - progress, 3);
+          const newZoom = currentZoom + (zoomDiff * eased);
+          
+          map.setZoom(newZoom);
+          
+          if (step >= steps) {
+            clearInterval(interval);
+            map.setZoom(targetZoom); // Ensure exact final zoom
+          }
+        }, stepDuration);
+      };
+
+      // Create clusterer with custom coral styling
+      clusterer = new MarkerClusterer({
+        map,
+        markers,
+        renderer: {
+          render: ({ count, position }) => {
+            return new g.maps.Marker({
+              position,
+              icon: {
+                path: g.maps.SymbolPath.CIRCLE,
+                fillColor: '#E07A5F',
+                fillOpacity: 1,
+                strokeColor: '#FFFFFF',
+                strokeWeight: 2,
+                scale: 20,
+              },
+              label: {
+                text: String(count),
+                color: 'white',
+                fontWeight: 'bold',
+                fontSize: '12px',
+              },
+              zIndex: Number(g.maps.Marker.MAX_ZINDEX) + count,
+            });
+          },
+        },
+      });
+
+      // Add smooth zoom on cluster click
+      clusterer.addListener('click', (event: any) => {
+        if (!map) return;
+        const clusterCenter = event.position as google.maps.LatLng;
+        const currentZoom = map.getZoom() || 10;
+        const maxZoom = 18;
+        const targetZoom = Math.min(currentZoom + 2, maxZoom);
+        smoothZoom(targetZoom, clusterCenter);
+      });
+
       markersRef.current = markers;
-    }).catch(() => {});
+      clustererRef.current = clusterer;
+    }).catch((error) => {
+      console.error('Error loading Google Maps:', error);
+    });
 
     return () => {
+      if (clustererRef.current) {
+        clustererRef.current.clearMarkers();
+        clustererRef.current = null;
+      }
       markersRef.current.forEach((m) => m.setMap(null));
       markersRef.current = [];
       mapInstanceRef.current = null;
     };
   }, [mapData?.id, hasValidLocations, template.accent, template.bg, scrollToCard]);
 
-  // Highlight active marker when card is in viewport
+  // Highlight active marker when card is in viewport (scale up category icon)
   useEffect(() => {
     const g = googleMapsRef.current;
-    if (!g || markersRef.current.length === 0) return;
+    if (!g || markersRef.current.length === 0 || !clustererRef.current) return;
     const markers = markersRef.current;
     markers.forEach((marker, i) => {
       const isActive = i === activeCardIndex;
+      const loc = locations[i];
+      const category = loc?.category || 'eat';
+      const size = isActive ? 44 : 36;
       marker.setIcon({
-        path: g.maps.SymbolPath.CIRCLE,
-        scale: isActive ? 26 : 22,
-        fillColor: template.accent,
-        fillOpacity: 1,
-        strokeColor: template.bg === '#1A1A1A' ? '#fff' : '#333',
-        strokeWeight: isActive ? 3 : 2,
+        url: getMarkerIcon(category),
+        scaledSize: new g.maps.Size(size, size),
+        anchor: new g.maps.Point(size / 2, size / 2),
       });
     });
-  }, [activeCardIndex, template.accent, template.bg]);
+    clustererRef.current.render();
+  }, [activeCardIndex, template.accent, template.bg, locations]);
 
   // IntersectionObserver: set active card when scrolling (desktop)
   useEffect(() => {
@@ -307,7 +528,7 @@ export default function PublicMapPage({ params }: { params: Promise<{ slug: stri
       (entries) => {
         entries.forEach((entry) => {
           if (!entry.isIntersecting) return;
-          const idx = refs.indexOf(entry.target as HTMLDivElement);
+          const idx = refs.indexOf(entry.target as HTMLAnchorElement);
           if (idx >= 0) setActiveCardIndex(idx);
         });
       },
@@ -335,72 +556,99 @@ export default function PublicMapPage({ params }: { params: Promise<{ slug: stri
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: template.bg }}>
-        <div className="text-lg" style={{ color: template.text }}>Loading...</div>
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#FFFFFF' }}>
+        <div className="text-lg" style={{ color: '#1A1A1A' }}>Loading...</div>
       </div>
     );
   }
 
   if (!mapData) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#1A1A1A' }}>
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#FFFFFF' }}>
         <div className="text-center">
-          <div className="text-white text-2xl mb-4">Map not found</div>
-          <Link href="/" className="text-[#89B4C4] hover:underline">Go home</Link>
+          <div className="text-[#1A1A1A] text-2xl mb-4">Map not found</div>
+          <Link href="/" className="text-[#E07A5F] hover:underline">Go home</Link>
         </div>
       </div>
     );
   }
 
   const isOwner = mapData?.isOwner ?? false;
+  const showOwnerUI = DEV_SHOW_ALL_UI || isOwner;
+  
+  // Always use white background
+  const pageBg = '#FFFFFF';
   
   return (
     <div
       className={`min-h-screen ${template.fontClass}`}
-      style={{ backgroundColor: template.bg, color: template.text }}
+      style={{ backgroundColor: pageBg, color: template.text }}
     >
       {/* Minimal Header - Logo only */}
       <MapHeader template={template} />
 
-      {/* Split layout: cards left, map right (desktop); toggle (mobile) */}
-      <div className="flex flex-col lg:flex-row lg:h-[calc(100vh-8rem)]">
-        {/* Left: scrollable cards */}
+      {/* Split layout: below 768px stack (map top 300px, cards below); above 768px ~55% cards / 45% map */}
+      <div className="flex flex-col md:flex-row md:h-[calc(100vh-8rem)]">
+        {/* Map: below 768px on top (300px when list, 70vh when map view); above 768px right panel ~42% */}
+        <div
+          className={`flex-shrink-0 w-full md:flex-[0_0_42%] md:h-full md:min-h-[400px] md:sticky md:top-0 order-first md:order-last ${mobileView === 'map' ? 'h-[70vh]' : 'h-[300px]'} md:h-full`}
+        >
+          {GOOGLE_MAPS_API_KEY && hasValidLocations ? (
+            <div ref={mapContainerRef} className="w-full h-full min-h-[300px]" />
+          ) : (
+            <div
+              className="w-full h-full flex items-center justify-center text-center p-8"
+              style={{ backgroundColor: 'rgba(0,0,0,0.04)', color: template.textMuted }}
+            >
+              {!GOOGLE_MAPS_API_KEY
+                ? 'Set NEXT_PUBLIC_GOOGLE_MAPS_API_KEY to show the map.'
+                : 'Add locations with coordinates to see the map.'}
+            </div>
+          )}
+        </div>
+
+        {/* Left: scrollable cards ~58% width */}
         <div
           ref={cardsScrollRef}
-          className={`flex-1 overflow-y-auto map-cards-scroll ${mobileView === 'map' ? 'hidden lg:block' : ''}`}
-          style={{ maxHeight: '100%' }}
+          className={`flex-1 overflow-y-auto map-cards-scroll md:min-w-0 md:flex-[1_1_58%] order-last md:order-first ${mobileView === 'map' ? 'hidden md:block' : ''}`}
+          style={{ maxHeight: '100%', backgroundColor: '#FFFFFF' }}
         >
-          <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-6">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-6" style={{ backgroundColor: '#FFFFFF' }}>
             {/* Title Card */}
             {mapData && (
               <TitleCard
                 mapData={{
+                  id: mapData.id,
                   title: mapData.title,
                   subtitle: mapData.subtitle,
-                  coverImageUrl: mapData.coverImageUrl,
+                  description: mapData.description,
+                  descriptionSource: mapData.descriptionSource,
+                  coverImageUrl: mapData.coverImageUrl || (locations.length > 0 ? getLocationPhotoUrl(locations[0], 600) : null),
+                  coverImageUrls: locations.length >= 3 ? getHeroCollageUrls(locations) : undefined,
                   creatorName: mapData.creatorName || 'Unknown',
                   createdAt: mapData.createdAt,
                   updatedAt: mapData.updatedAt,
-                  locations: mapData.locations,
+                  locations,
                   slug: mapData.slug,
                 }}
-                isOwner={isOwner}
+                isOwner={showOwnerUI}
                 template={template}
-                onEdit={() => {
-                  // TODO: Navigate to edit page or open edit modal
-                  console.log('Edit map');
+                onEdit={mapData.id ? () => router.push(`/maps/${mapData.id}/edit`) : undefined}
+                onDescriptionUpdate={(desc, source) => {
+                  setMapData((prev) => prev ? { ...prev, description: desc, descriptionSource: source } : null);
                 }}
+                devOwner={devOwner}
               />
             )}
 
-            {/* Mobile toggle */}
-            <div className="flex lg:hidden gap-2 mb-6">
+            {/* Mobile toggle (below 768px) */}
+            <div className="flex md:hidden gap-2 mb-6">
               <button
                 type="button"
                 onClick={() => setMobileView('list')}
                 className={`px-4 py-2 rounded-lg font-medium text-sm ${mobileView === 'list' ? 'text-white' : ''}`}
                 style={{
-                  backgroundColor: mobileView === 'list' ? template.accent : (template.bg === '#1A1A1A' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)'),
+                  backgroundColor: mobileView === 'list' ? (template.accent === '#FFD500' ? '#E8998D' : template.accent) : (template.bg === '#1A1A1A' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)'),
                   color: mobileView === 'list' ? (template.bg === '#1A1A1A' ? '#1A1A1A' : '#fff') : template.text,
                 }}
               >
@@ -419,233 +667,51 @@ export default function PublicMapPage({ params }: { params: Promise<{ slug: stri
               </button>
             </div>
 
-      {/* Split layout: cards left, map right (desktop); toggle (mobile) */}
-      <div className="flex flex-col lg:flex-row lg:h-[calc(100vh-12rem)]">
-        {/* Left: scrollable cards */}
-        <div
-          ref={cardsScrollRef}
-          className={`flex-1 overflow-y-auto map-cards-scroll ${mobileView === 'map' ? 'hidden lg:block' : ''}`}
-          style={{ maxHeight: '100%' }}
-        >
-          <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-6 space-y-6">
-            {locations.map((loc, index) => {
-              const photoUrl = getLocationPhotoUrl(loc);
-              const latLng = parseLatLng(loc.latitude, loc.longitude);
-              const description = loc.description || loc.userNote || null;
-              
-              // Ensure name is never empty or a URL
-              // Check for various URL patterns
-              const isUrl = loc.name && (
-                loc.name.startsWith('http://') ||
-                loc.name.startsWith('https://') ||
-                loc.name.startsWith('www.') ||
-                loc.name.includes('google.com/maps') ||
-                loc.name.includes('maps.google.com') ||
-                loc.name.match(/^https?:\/\//) // Catch any http/https pattern
-              );
-              
-              // If name is a URL, try to extract a meaningful name
-              let displayName = 'Untitled Location';
-              if (loc.name && !isUrl) {
-                displayName = loc.name.trim();
-              } else if (isUrl && loc.name) {
-                // Try to extract name from Google Maps URL
-                const urlMatch = loc.name.match(/\/place\/([^/?]+)/);
-                if (urlMatch) {
-                  displayName = decodeURIComponent(urlMatch[1].replace(/\+/g, ' '));
-                }
-              }
-              
-              // Final fallback
-              if (!displayName || displayName.length === 0) {
-                displayName = 'Untitled Location';
-              }
-
-              return (
-                <div
-                  key={loc.id}
-                  ref={(el) => {
-                    if (cardRefs.current.length <= index) cardRefs.current.length = index + 1;
-                    cardRefs.current[index] = el;
-                  }}
-                  className={`p-6 ${template.cardClass} transition-shadow relative`}
-                  style={{
-                    backgroundColor: template.bg === '#1A1A1A' ? '#2A2A2A' : template.bg === '#FDF6E3' ? '#FFFFFF' : template.bg === '#F5F0E1' ? '#FFFFFF' : 'rgba(255,255,255,0.6)',
-                    borderColor: template.bg === '#1A1A1A' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
-                    boxShadow: template.id === 'postcard' ? '0 4px 14px rgba(0,0,0,0.08)' : undefined,
-                    color: template.text,
-                    position: 'relative', // Ensure relative positioning for absolute children
-                  }}
-                >
-                  {/* Edit and Delete buttons - top right corner (owner only) */}
-                  {isOwner && (
-                    <div className="absolute top-2 right-2 flex gap-2 z-30" style={{ pointerEvents: 'auto' }}>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          e.preventDefault();
-                          setEditingLocation(loc);
-                        }}
-                        className="rounded-lg hover:opacity-80 transition-opacity shadow-lg"
-                        style={{ 
-                          backgroundColor: 'transparent',
-                          border: `2px solid ${template.accent}`,
-                          color: template.accent,
-                          width: '30px',
-                          height: '30px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          cursor: 'pointer',
-                          flexShrink: 0,
-                          padding: 0,
-                        }}
-                        title="Edit location"
-                        aria-label="Edit location"
-                      >
-                        <Pencil size={14} strokeWidth={2.5} />
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          e.preventDefault();
-                          handleDeleteLocation(loc.id);
-                        }}
-                        disabled={deletingLocationId === loc.id}
-                        className="rounded-lg hover:opacity-80 transition-opacity shadow-lg"
-                        style={{ 
-                          backgroundColor: 'transparent',
-                          border: '2px solid #E88B7C',
-                          color: '#E88B7C',
-                          width: '30px',
-                          height: '30px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          cursor: deletingLocationId === loc.id ? 'wait' : 'pointer',
-                          opacity: deletingLocationId === loc.id ? 0.6 : 1,
-                          flexShrink: 0,
-                          padding: 0,
-                        }}
-                        title="Delete location"
-                        aria-label="Delete location"
-                      >
-                        <X size={14} strokeWidth={2.5} />
-                      </button>
-                    </div>
-                  )}
-                  
-                  <div className="flex gap-4">
-                    <div
-                      className="w-12 h-12 flex-shrink-0 rounded-lg flex items-center justify-center font-bold text-lg text-white"
-                      style={{ backgroundColor: template.accent }}
-                    >
-                      {index + 1}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h2 className="text-xl font-bold mb-1" style={{ color: template.text }}>
-                        {displayName}
-                      </h2>
-                      {loc.category && (
-                        <span
-                          className="inline-block px-2 py-0.5 text-xs font-medium rounded mb-2"
-                          style={{ backgroundColor: `${template.accent}22`, color: template.accent }}
-                        >
-                          {loc.category}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  {photoUrl && (
-                    <div className="mt-4 rounded-lg overflow-hidden aspect-video max-h-48">
-                      <img
-                        src={photoUrl}
-                        alt={loc.name}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  )}
-                  {description && (
-                    <p className="mt-4 text-base leading-relaxed" style={{ color: template.textMuted }}>
-                      {description}
-                    </p>
-                  )}
-                  <div className="mt-4 space-y-2 text-sm">
-                    {loc.address && !loc.address.startsWith('http') && !loc.address.startsWith('https') && !loc.address.includes('google.com/maps') && (
-                      <div className="flex gap-2">
-                        <span style={{ color: template.textMuted }}>📍</span>
-                        <a
-                          href={latLng ? `https://www.google.com/maps/search/?api=1&query=${latLng.lat},${latLng.lng}` : '#'}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="hover:underline"
-                          style={{ color: template.text }}
-                        >
-                          {loc.address}
-                        </a>
-                      </div>
-                    )}
-                    {loc.phone && (
-                      <div className="flex gap-2">
-                        <span style={{ color: template.textMuted }}>📞</span>
-                        <a href={`tel:${loc.phone}`} className="hover:underline" style={{ color: template.text }}>{loc.phone}</a>
-                      </div>
-                    )}
-                    {loc.website && (
-                      <div className="flex gap-2">
-                        <span style={{ color: template.textMuted }}>🌐</span>
-                        <a href={loc.website} target="_blank" rel="noopener noreferrer" className="hover:underline truncate" style={{ color: template.text }}>
-                          Visit Website
-                        </a>
-                      </div>
-                    )}
-                    {!loc.website && !loc.phone && (!loc.address || loc.address.startsWith('http') || loc.address.includes('google.com/maps')) && !latLng && (
-                      <div className="text-xs italic" style={{ color: template.textMuted }}>
-                        Additional details will be available after location enrichment
-                      </div>
-                    )}
-                    {latLng && (
-                      <div className="pt-2 border-t" style={{ borderColor: template.bg === '#1A1A1A' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)' }}>
-                        <a
-                          href={`https://www.google.com/maps/search/?api=1&query=${latLng.lat},${latLng.lng}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-xs font-medium hover:underline"
-                          style={{ color: template.textMuted }}
-                        >
-                          Open in Google Maps →
-                        </a>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
+            {/* Location Cards */}
+            <div className="space-y-6">
+              {locations.map((loc, index) => {
+                const gallery = getLocationPhotoGallery(loc);
+                
+                return (
+                  <LocationCard
+                    key={loc.id}
+                    location={{
+                      id: loc.id,
+                      placeSlug: loc.placeSlug,
+                      name: loc.name,
+                      address: loc.address,
+                      phone: loc.phone,
+                      website: loc.website,
+                      instagram: loc.instagram,
+                      hours: loc.hours,
+                      imageUrl: gallery.mainUrl,
+                      photoGallery: gallery,
+                      latitude: loc.latitude,
+                      longitude: loc.longitude,
+                    }}
+                    index={index}
+                    isActive={activeCardIndex === index}
+                    isOwner={showOwnerUI}
+                    onEdit={showOwnerUI ? ((loc) => {
+                      const fullLocation = locations.find(l => l.id === loc.id);
+                      if (fullLocation) setEditingLocation(fullLocation);
+                    }) : undefined}
+                    onDelete={showOwnerUI ? handleDeleteLocation : undefined}
+                    cardRef={(el) => {
+                      if (cardRefs.current.length <= index) cardRefs.current.length = index + 1;
+                      cardRefs.current[index] = el;
+                    }}
+                  />
+                );
+              })}
+            </div>
           </div>
         </div>
 
-        {/* Right: sticky map (desktop) or full-screen (mobile when Map selected) */}
-        <div
-          className={`flex-shrink-0 w-full lg:w-1/2 lg:min-h-[400px] lg:sticky lg:top-0 ${mobileView === 'list' ? 'hidden lg:block' : ''}`}
-          style={{ height: mobileView === 'map' ? '70vh' : '100%' }}
-        >
-          {GOOGLE_MAPS_API_KEY && hasValidLocations ? (
-            <div ref={mapContainerRef} className="w-full h-full min-h-[300px]" />
-          ) : (
-            <div
-              className="w-full h-full flex items-center justify-center text-center p-8"
-              style={{ backgroundColor: template.bg === '#1A1A1A' ? '#252525' : 'rgba(0,0,0,0.04)', color: template.textMuted }}
-            >
-              {!GOOGLE_MAPS_API_KEY
-                ? 'Set NEXT_PUBLIC_GOOGLE_MAPS_API_KEY to show the map.'
-                : 'Add locations with coordinates to see the map.'}
-            </div>
-          )}
-        </div>
       </div>
 
       {/* Edit Location Modal */}
-      {editingLocation && isOwner && (
+      {editingLocation && showOwnerUI && (
         <EditLocationModal
           location={editingLocation}
           template={template}
@@ -656,14 +722,7 @@ export default function PublicMapPage({ params }: { params: Promise<{ slug: stri
       )}
 
       {/* Minimal Footer */}
-      <footer
-        className="border-t py-6 mt-auto"
-        style={{ borderColor: template.bg === '#1A1A1A' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)' }}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p className="text-xs" style={{ color: template.textMuted }}>Saiko Maps</p>
-        </div>
-      </footer>
+      <GlobalFooter variant="minimal" />
     </div>
   );
 }
