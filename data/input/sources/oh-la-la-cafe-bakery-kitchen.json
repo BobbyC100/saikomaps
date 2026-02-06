@@ -1,0 +1,23 @@
+{
+  "place_slug": "oh-la-la-cafe-bakery-kitchen",
+  "sources": [
+    {
+      "source_id": "src_eater_la_2023",
+      "publication": "Eater LA",
+      "title": "Favorite Best Dishes LA – Eater Editors' 2023",
+      "url": "https://la.eater.com/23783864/favorite-best-dishes-la-los-angeles-eater-editors-2023-3",
+      "published_at": "2023",
+      "trust_level": "editorial",
+      "content": "[PAYWALLED]"
+    },
+    {
+      "source_id": "src_eater_la_2023",
+      "publication": "Eater LA",
+      "title": "Oh La La Bakery Pasadena Opening",
+      "url": "https://la.eater.com/2023/6/22/23743172/oh-la-la-bakery-pasadena-los-angeles-french-best-croissants-bread",
+      "published_at": "2023-06-22",
+      "trust_level": "editorial",
+      "content": "[PAYWALLED]"
+    }
+  ]
+}

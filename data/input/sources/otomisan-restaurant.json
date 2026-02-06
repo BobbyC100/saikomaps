@@ -1,0 +1,50 @@
+{
+  "place_slug": "otomisan-restaurant",
+  "sources": [
+    {
+      "source_id": "src_laist_2025",
+      "publication": "LAist",
+      "title": "At Boyle Heights' Otomisan, a new owner continues the legacy of homestyle Japanese cooking",
+      "url": "https://laist.com/news/food/at-boyle-heights-otomisan-a-new-owner-continues-the-legacy-of-homestyle-japanese-cooking",
+      "published_at": "2025-04-04",
+      "trust_level": "editorial",
+      "content": "Located just two miles from Little Tokyo in downtown L.A., Otomisan symbolizes a time when working-class Japanese, Mexican, Armenian, Italian, Russian and African-American residents coexisted in an affordable neighborhood free of racist housing covenants. Under the ownership of Jeffrey Ige, the beloved Japanese restaurant stays true to its heritage, serving comfort food that has connected generations of LA residents. Jeffrey Ige took over as Otomisan's owner in July 2024. Ready to retire, Watanabe was eager to find someone just as passionate about preserving Japanese culture in Boyle Heights."
+    },
+    {
+      "source_id": "src_boyle_heights_beat_2025",
+      "publication": "Boyle Heights Beat",
+      "title": "A new owner continues the legacy of Boyle Heights' Otomisan",
+      "url": "https://boyleheightsbeat.com/boyle-heights-otomisan-new-owner-japanese-restaurant-los-angeles/",
+      "published_at": "2025-04-01",
+      "trust_level": "editorial",
+      "content": "Stepping inside the slender, pale yellow restaurant that is Otomisan, you're instantly transported back to a time when streetcars and Jewish delis lined a multicultural Boyle Heights. Four red booths and a Formica counter for five greet you as you enter this tiny time capsule, which has been a fixture on 1st Street for 69 years. The oldest continuously operating Japanese restaurant in L.A., Otomisan was originally named Otemo Sushi Cafe when it first opened in 1956. After a change in ownership, it was renamed Otomisan in the 1970s. When Yayoi Watanabe and her close friend took over the business in 2005, their goal was to keep alive the Japanese ties to Boyle Heights. Now under the ownership of Jeffrey Ige, the tiny, nostalgic eatery continues to serve homestyle Japanese dishes while preserving its rich cultural legacy."
+    },
+    {
+      "source_id": "src_janm_blog_2018",
+      "publication": "JANM Blog (Japanese American National Museum)",
+      "title": "A Visit to Otomisan, the Last Japanese Restaurant in Boyle Heights",
+      "url": "https://blog.janm.org/2018/03/01/a-visit-to-otomisan-the-last-japanese-restaurant-in-boyle-heights/",
+      "published_at": "2018-03-01",
+      "trust_level": "editorial",
+      "content": "The history of Otomisan Restaurant in Los Angeles's Boyle Heights neighborhood is well documented in the press. It was first opened in 1956 as Otomi Café, by a couple who are remembered today only as Mr. and Mrs. Seto. At that time, Boyle Heights was a melting pot of diverse, working-class immigrant groups that included Jews, Russians, Armenians, Japanese, and Mexicans. A Los Angeles Times profile from 2007 offers this account of the restaurant's bustling business during its first decade. Otomisan is located at 2506-1/2 East 1st Street in Boyle Heights. A group of JANM staffers recently paid a visit to this historic restaurant. It still sits in its original location on First Street near Soto. The place is remarkably small; there are only three booths and a handful of stools at a short bar. Walking into it does feel like going back in time; the furnishings look original, and vintage pictures and knickknacks are pleasantly cluttered everywhere."
+    },
+    {
+      "source_id": "src_culinary_backstreets_2024",
+      "publication": "Culinary Backstreets",
+      "title": "Otomisan: A Slice of L.A. Japanese History",
+      "url": "https://culinarybackstreets.com/stories/los-angeles/otomisan-a-slice-of-l-a-japanese-history",
+      "published_at": "",
+      "trust_level": "editorial",
+      "content": "Otomisan's famous tempura and homey interior are just a few of the reasons to visit L.A.'s oldest Japanese restaurant."
+    },
+    {
+      "source_id": "src_mariana_in_la_2025",
+      "publication": "Mariana in LA",
+      "title": "Otomisan — The Oldest Japanese Restaurant in LA (Boyle Heights)",
+      "url": "https://marianainla.com/2025/07/08/otomisan-the-oldest-japanese-restaurant-in-la-boyle-heights/",
+      "published_at": "2025-07-08",
+      "trust_level": "editorial",
+      "content": "Otomisan was founded in 1956, and not only is it the oldest Japanese restaurant in Los Angeles, but it's also the last Japanese restaurant in Boyle Heights. Otomisan is a reflection of the cultural mosaic of Los Angeles. Did you know that Boyle Heights, besides being a Mexican food enclave, once had the largest Japanese community in LA? But there are a few remnants that indicate otherwise, like the Japanese Hospital, which opened in 1915 and is right around the block from Otomisan. Once I was seated, I was able to fully take in the space. The knick-knacks, the old photographs, the messy stack of receipts, and Judy running frantically from one place to another only enhanced my experience at Otomisan, which feels frozen in time."
+    }
+  ]
+}

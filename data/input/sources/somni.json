@@ -1,0 +1,50 @@
+{
+  "place_slug": "somni",
+  "sources": [
+    {
+      "source_id": "src_michelin_2025",
+      "publication": "Michelin Guide",
+      "title": "Somni – West Hollywood - a MICHELIN Guide Restaurant",
+      "url": "https://guide.michelin.com/us/en/california/west-hollywood/restaurant/somni",
+      "published_at": "2025-06-25",
+      "trust_level": "editorial",
+      "content": "Chef Aitor Zabala and his dedicated team have awakened Somni, Catalan for \"dream,\" from a long sleep and have fashioned this revamped iteration as a distinctly personal and unique dining experience. Tucked away just off Santa Monica Avenue, the dining room's soothing, creamy palette with light wood and glass is marked by a colorful bull's head from the original spot, hinting at the Spanish-inflected cuisine. A procession of small bites is meticulously arranged and endlessly creative, sating diners with an abundance of rich flavors and textural interplay (think mussel escabeche, gazpacho, or the iconic shiso tartare tempura). All the while, the kitchen and service teams are in lockstep as they create and serve these arresting dishes."
+    },
+    {
+      "source_id": "src_michelin_2025_ceremony",
+      "publication": "Michelin Guide",
+      "title": "California's Somni Gets a Three Star Surprise",
+      "url": "https://guide.michelin.com/us/en/article/michelin-guide-ceremony/california-somni-gets-a-three-star-surprise",
+      "published_at": "2025-06-26",
+      "trust_level": "editorial",
+      "content": "Somni may be Catalan for dream, but Chef Aitor Zabala and his dedicated team are not waking from a dream; they're realizing one. The West Hollywood restaurant, only seven months old, was awarded Three MICHELIN Stars, the highest distinction in the culinary world, at The MICHELIN Guide California ceremony in Sacramento on June 25th. Somni joins an exclusive club; there are only seven other restaurants with Three Stars in California."
+    },
+    {
+      "source_id": "src_timeout_la_2025",
+      "publication": "Time Out LA",
+      "title": "Review: Somni is L.A.'s most expensive restaurant. Here's why it's worth it.",
+      "url": "https://www.timeout.com/los-angeles/news/review-l-a-s-most-expensive-restaurant-is-unfortunately-worth-it-042825",
+      "published_at": "2025-05-15",
+      "trust_level": "editorial",
+      "content": "Six months after reopening, Somni is undisputedly L.A.'s most dazzling, destination-worthy fine dining experience. Playful, elegant and downright delicious, the Spanish-influenced meal is full of avant-garde delights and insider nods to now-closed Michelin giants like Spain's famous El Bullí—where Zabala worked for many years—and Manresa up north in Los Gatos. It's a strong, promising start for the Catalan-born chef, who helped launch the original Somni alongside celebrity chef José Andrés as a 10-seat tasting counter inside the SLS Beverly Hills back in 2018. It's also, as of writing, the most expensive restaurant in Los Angeles. And while I do think the impeccable artisanry at every level justifies the steep cost of admission, I don't consider it an essential L.A. dining experience. Starting at $645 per person, a meal at the new Somni is nearly twice the price of several of L.A.'s top tasting menus."
+    },
+    {
+      "source_id": "src_infatuation_la_2025",
+      "publication": "The Infatuation",
+      "title": "Somni serves the best—and most expensive—tasting menu in LA - Review",
+      "url": "https://www.infatuation.com/los-angeles/reviews/somni",
+      "published_at": "2025-11-07",
+      "trust_level": "editorial",
+      "content": "Somni is a Spanish-leaning tasting menu spot in West Hollywood that's incredible—and at $645 per person—incredibly expensive, too. But here's the cold water. Somni is not only the most expensive restaurant in Los Angeles, it's also one of the most expensive in the country. The tasting menu starts at $600 per person—$745 actually, but we'll get to that. Add in tax and tip, and you're dealing with a meal that can cost as much as a family trip to Disneyland. A meal at this theatrical tasting menu spot is nothing short of incredible—just know it's incredibly expensive, too. The tasting starts with a round of small, cheeky bites served in the restaurant's tranquil outdoor courtyard, including leaf-shaped crackers with anchovy butter, parmesan crisp feathers, and \"fried almonds\" that look like you might crack a tooth on them, but are actually crunchy candied shells filled with almond cream."
+    },
+    {
+      "source_id": "src_timeout_la_michelin_2024",
+      "publication": "Time Out LA",
+      "title": "The 10 hottest L.A. restaurant openings to look forward to this fall",
+      "url": "https://www.timeout.com/los-angeles/news/the-10-hottest-l-a-restaurant-openings-to-look-forward-to-this-fall-090524",
+      "published_at": "2024-09-06",
+      "trust_level": "editorial",
+      "content": "As first reported in 2022 by the Los Angeles Times, previously two Michelin-starred Somni will reopen in West Hollywood, albeit with significant delay. Located at 9045 Nemo Street, the slightly larger space will feature a still-intimate 14 seats. Expect the same irreverent-meets-highbrow fine dining that once earned Somni glowing reviews. While the restaurant won't seat diners until December (or November, if repair schedules allow), Somni will release reservations via its website this Friday, September 6, at noon Pacific Time. If you're interested in snagging a reservation, we suggest setting an alarm—the first round of seats are likely to book out within minutes."
+    }
+  ]
+}

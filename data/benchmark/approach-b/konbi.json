@@ -1,0 +1,50 @@
+{
+  "place_slug": "konbi",
+  "sources": [
+    {
+      "source_id": "src_sprudge_2018",
+      "publication": "Sprudge",
+      "title": "Konbi: The Next Great LA Cafe Is A Japanese Lunch Counter",
+      "url": "https://sprudge.com/konbi-the-next-great-la-cafe-is-a-japanese-lunch-counter-138997.html",
+      "published_at": "2018",
+      "trust_level": "editorial",
+      "content": "Blink as you drive by and you might miss it—hit the United Oil station and you've gone too far—but tucked onto a corner of Sunset Boulevard as it winds its way through Echo Park is Konbi, an extraordinary new Japanese sandwich and coffee shop. This part of the city is no stranger to good coffee; the original LA location of Intelligentsia is just down the way, and within a few miles either direction there are spots like Dinosaur Coffee, Winsome, Eightfold, Triniti, Dayglow, Woodcat, FrankieLucy Bakeshop, and many more, not to mention the Go Get Em Tiger on Hollywood, just past where Sunset curves west. And yet here, in this tiny little narrow room that feels flown in wholesale from Japan, owners Akira Akuto and Nick Montgomery have created a unique concept that's already doing the rarest thing in spoilt-for-choice Los Angeles: drawing a crowd.\n\nThe first thing one notices walking in is the size. Much like the famous konbinis of Japan this cafe is long and narrow, pleasantly streamlined to keep the focus on the meal. Guests sit at a low lunch counter, facing into a long galley kitchen where the food is prepared. Coffee service at the front window is achieved in an incredibly efficient space. Their under-counter Mavam Espresso machine, Mahlkönig EK43 grinder, and Curtis brewer are all perfectly staged to minimize movement for the barista and keep the focus on customer needs as well as barista comfort. It's like a tiny, efficient little miracle that this place works at all—and yet it does.\n\nAfter the design, the second thing one notices is how quiet Konbi is. Even during the lunch rush, refrigerator doors don't slam, kitchen wares don't bang together, voices stay pleasant, and the atmosphere remains tranquil.\n\nThe menu at Konbi is tautly focused. Sandwiches take center stage, including the rightly lauded (and heavily Instagram'd) pork katsu sandwich, which pairs perfectly with a small cup of miso soup. I actually preferred the egg salad sandwich—fluffy, ethereal, served on perfectly light bread from Bub and Grandma's. Williamsburg Japanese tea stars Kettl Tea provides the shop's range of tea offerings, including iced sencha and a stand-out houjicha latte, a tea-based steamed milk drink which lands somewhere in the realm of a chai latte, albeit less sweet and more roundly complex, with earthy, toasty notes. Coffee service at Konbi comes courtesy of Camber Coffee, a boutique roaster based in Bellingham, WA and featured previously on Sprudge. Beverage Director Jacqueline Vaca vows to only serve coffees that are approachable—high quality drinks with accessibility at the forefront.\n\nAkuto and Montgomery both have strong restaurant backgrounds. They've worked as chefs in both LA and New York (including at Momofuku), but neither had worked in specialty coffee. Nevertheless, they intended to hold the beverage program to the same standards of excellence and knew they needed someone from the industry to helm it. They brought on Vaca as their Beverage Director, who first learned coffee in Melbourne 10 years ago. Today, there are only three full-time baristas on staff, and together they have an astounding 30+ years combined experience serving coffee, but they aren't resting on their laurels."
+    },
+    {
+      "source_id": "src_michelin_2021",
+      "publication": "Michelin Guide",
+      "title": "New Additions: Los Angeles Restaurants",
+      "url": "https://guide.michelin.com/us/en/article/news-and-views/new-michelin-restaurants-los-angeles",
+      "published_at": "2021-09-23",
+      "trust_level": "editorial",
+      "content": "Konbi (Hollywood) Cuisine: Fusion Konbi is the brainchild of Chefs Nick Montgomery and Akira Akuto, who present a unique menu of Japanese sandwiches, product-focused small plates and Proustian pastries."
+    },
+    {
+      "source_id": "src_theinfatuation_2022",
+      "publication": "The Infatuation",
+      "title": "Konbi Ni - Review - Echo Park - Los Angeles",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/konbi",
+      "published_at": "2022-12-07",
+      "trust_level": "editorial",
+      "content": "Echo Park sandwich shop Konbi is now Konbi Ni—a retooled breakfast and lunch concept with an eight-seat counter in their original space on Sunset. Mornings here are dedicated to traditional Japanese breakfast sets, and you'll have to make a prepaid reservation to try them. The three-course menu goes for $46 and includes things like charcoal-grilled fish, miso soup, fluffy tamago, and a few kinds of pickles. The steelhead salmon is particularly great, with crunchy skin, a charred bottom, and moist, flaky meat in between. Since the whole room is only about 500 square feet, you're better off dining solo—relax at the long wooden bar, sip some oolong tea, and watch the chefs assemble your breakfast. Konbi Ni also does lunch service for walk-ins starting at 12pm, with a short menu of Japanese-French bistro dishes like steak frites and brothy beans with clams."
+    },
+    {
+      "source_id": "src_newyorktimes_2019",
+      "publication": "New York Times",
+      "title": "The Egg Salad Sandwich That Drew Eyes on Instagram",
+      "url": "https://cooking.nytimes.com/recipes/1019941-konbis-egg-salad-sandwich",
+      "published_at": "2019-01-28",
+      "trust_level": "editorial",
+      "content": "This famous egg salad sandwich comes from Konbi, the tiny Los Angeles cafe run by the co-chefs Akira Akuto and Nick Montgomery. It's not always the case that sensational, Instagram-famous dishes are carefully calibrated to taste so good, but this one breaks the mold: It's as pretty as it is delicious. The egg salad is brightened with a touch of rice wine vinegar and mustard and bound with Kewpie mayonnaise. When making it at home, be careful not to undercook the eggs or you'll cross that fine line between jammy and runny."
+    },
+    {
+      "source_id": "src_eater_la_2022",
+      "publication": "Eater LA",
+      "title": "Echo Park's Japanese Sandwich Star Konbi Shuffles to Culver City Next",
+      "url": "https://www.eater.com/restaurants/22270261/konbi-culver-city-los-angeles",
+      "published_at": "2021-09-23",
+      "trust_level": "editorial",
+      "content": "The tiny takeaway restaurant on Sunset Boulevard, named Bon Appétit's best new restaurant in America in 2019, will open next to Go Get Em Tiger at the One Culver development on Culver Boulevard."
+    }
+  ]
+}

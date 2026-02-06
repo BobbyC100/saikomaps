@@ -1,0 +1,23 @@
+{
+  "place_slug": "lilys-bar",
+  "sources": [
+    {
+      "source_id": "src_timeout_la_2022",
+      "publication": "Time Out LA",
+      "title": "Lily's Bar | Bars in Hollywood, Los Angeles",
+      "url": "https://www.timeout.com/los-angeles/bars/lilys-bar",
+      "published_at": "2022-11-03",
+      "trust_level": "editorial",
+      "content": "Faux-retro styling and casual ambience once made this tiny Hollywood bar a favorite among locals, but Clark Street Bakery's Zack Hall has taken the old MiniBar to the next level with craft cocktails and a shiny new disco ball. Open since May, bartender Sean Stewart takes a page from his former haunt the Roger Room with showy cocktails like the Mandela Effect (vodka, Aperol and peach purée), plus a couple of hard-to-find absinthe-based drinks. With an under-the-radar vibe and minimal space, this bar is best categorized as a \"show me\" bar, in Hall's own words. \"Ever been to Lily's? Gosh, I've got to show it to ya.\""
+    },
+    {
+      "source_id": "src_infatuation_2025",
+      "publication": "The Infatuation",
+      "title": "Franklin Lounge - Review - Hollywood - Los Angeles",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/lilys-bar",
+      "published_at": "2025-11-20",
+      "trust_level": "editorial",
+      "content": "Formerly Lily's Bar (which was formerly MiniBar), the tiny drinking hole maintains the look and feel of a membership-only airport lounge in the 1960s—there's a dark, wrap-around bar, a drinks menu filled with every classic cocktail in the book, and the ever-present possibility that you might go home with a pilot. OK, there are probably zero pilots at Franklin Lounge, but it's fun to dream. If you're looking for a sexy (but not too sexy) midweek drink date spot, keep Franklin Lounge in your back pocket."
+    }
+  ]
+}

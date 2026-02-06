@@ -1,0 +1,41 @@
+{
+  "place_slug": "cara-hotel",
+  "sources": [
+    {
+      "source_id": "src_michelin_2026",
+      "publication": "Michelin Guide",
+      "title": "Cara Hotel - Los Angeles Area",
+      "url": "https://guide.michelin.com/us/en/hotels-stays/los-angeles-area/cara-hotel-11700",
+      "published_at": "",
+      "trust_level": "editorial",
+      "content": "Just east of Hollywood and south of Griffith Park, on the border between the idyllic, largely residential Los Feliz and the busy, urban Thai Town, there's a little oasis: a mid-century courtyard motel that's been very thoroughly transformed into the stylish and quietly luxurious Cara Hotel. Rumor has it it's the first of a new luxury-boutique brand, and if they carry on in the same style in which they've started, we can predict we'll be bringing more of their hotels to your attention. This one is notable for its transformative atmosphere, which owes much to the courtyard restaurant, also called Cara, which serves the sort of simple farm-fresh fare for which California is justifiably famous, tempered with a welcome Italian accent. The rooms, too, are oases of cloudlike calm, full of subtle luxuries like parquet floors, Frette linens, smart TVs with streaming services, and handsome limestone bathrooms."
+    },
+    {
+      "source_id": "src_rue_2026",
+      "publication": "Rue Magazine",
+      "title": "Cara Hotel: A Los Feliz Retreat That Embodies California Comfort",
+      "url": "https://ruemag.com/home-tour-2/cara-hotel-a-los-feliz-retreat-that-embodies-california-comfort",
+      "published_at": "2026-01-14",
+      "trust_level": "editorial",
+      "content": "Its name is a subtle nod to the Gaelic translation of Cara, meaning \"friend,\" and the Cara Hotel in Los Angeles is the type of friend we love to have — it embodies the calm and comforting California spirit we're so fond of. Located just down the street from Rue HQ in Los Feliz, the 60-room hotel was originally built as a 1950s-era motel. Over 18 months, the property was lovingly restored and transformed. Though it's close to the hustle and bustle of Hollywood, stepping inside feels as though you've been transported to a small boutique hotel in the Spanish countryside. The interior and exterior spaces, including the addition of a dining venue, expansive outdoor seating areas, and a tranquility pool, feature an unfussy palette composed of neutral tones and textures: light oak herringbone and limestone floors, cream-colored textiles, and handcrafted elements from local artists, including photography by Natalie Obradovich and Isabelle Aubin. The hotel aims to be a destination for out-of-towners (the central location, just at the base of Griffith Park, makes it easy to enjoy all that Los Angeles has to offer) as well as a welcome hangout for locals. \"As a California native, it is clear that the essence of what makes the area so special and inviting has been effortlessly captured in all elements of Cara – from the highest level of warmth and hospitality to the thoughtful design of the property,\" Shane Forster, General Manager of Cara, shared in a recent press release. \"We are devoted to fostering experiences grounded in the beauty of our surroundings.\" With this approach, guests and visitors alike will leave feeling revived by their time at Cara, which is exactly what this year needs."
+    },
+    {
+      "source_id": "src_timeout_la_2025",
+      "publication": "Time Out LA",
+      "title": "Cara Restaurant | Restaurants in Thai Town, Los Angeles",
+      "url": "https://www.timeout.com/los-angeles/restaurants/cara-at-the-cara-hotel",
+      "published_at": "2025-04-22",
+      "trust_level": "editorial",
+      "content": "With a stunning reflective pool, olive and palm trees and an open-air skylight, this trendy Los Feliz-ish hotel restaurant will transport you far, far away from the chaos of Thai Town, located just a few minutes' walk around the corner. Come nightfall, the space's mood lighting transforms Cara's coastal Mediterranean design from merely breezy to downright romantic. Book a reservation to snag a seat by the pool and order from a crowd-pleasing, straightforward menu, including a tasty prosciutto and burrata starter paired with grilled sourdough from Santa Monica's Jyan Isaac Bread. Walk-ins are likely to end up in the front patio and bar area, where Wednesday salsa dancing and weekend DJs liven the space up for an impromptu date night. Throw in the solid food and cocktails, and it's no wonder Cara has become a shoo-in for anniversary dinners and other special occasions."
+    },
+    {
+      "source_id": "src_infatuation_2025",
+      "publication": "The Infatuation",
+      "title": "Cara - Review - Los Feliz - Los Angeles",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/cara",
+      "published_at": "2025-08-06",
+      "trust_level": "editorial",
+      "content": "Cara is a buzzy hotel restaurant on the border of Hollywood and Los Feliz that you've probably seen photos of. The open-air dining space looks great, and we can almost guarantee you'll see several strangers posing poolside while dining under the palm trees lining their photogenic courtyard. Unfortunately, Cara's impressive atmosphere is the only notable thing about it. The loosely Italian food here is thoroughly underwhelming, and that's before you factor in long weekend waits for egg white frittatas and overcooked pasta. We'd recommend steering clear entirely, but if you do end up at Cara, stick to the cocktail menu and enjoy some people-watching."
+    }
+  ]
+}

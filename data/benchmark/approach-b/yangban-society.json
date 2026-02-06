@@ -1,0 +1,41 @@
+{
+  "place_slug": "yangban-society",
+  "sources": [
+    {
+      "source_id": "src_michelin_guide_2024",
+      "publication": "Michelin Guide",
+      "title": "Yangban Society – Los Angeles - a MICHELIN Guide Restaurant",
+      "url": "https://guide.michelin.com/ca/en/california/us-los-angeles/restaurant/yangban-society",
+      "published_at": "2024",
+      "trust_level": "editorial",
+      "content": "Katianna and John Hong are behind Yangban Society, where black walls and dim lighting lend an industrial chicness to the space. It's softened by flowing paper shades covering the lights and plenty of greenery, including against the walls and grafted to tree stumps. Modern Korean-American cooking is given the spotlight here, with dishes like lush golden Hokkaido scallop toast that's indulgent thanks to a liberal slathering of brown butter and a surprising touch of grated egg. Then, delicate ocean trout in a terrific beurre blanc balanced with white kimchi is offset by hand-torn dumplings for a dish that delights. Yangban wings are double fried for an exquisitely crispy crust that's boosted with a sweet glaze."
+    },
+    {
+      "source_id": "src_theinfatuation_2024",
+      "publication": "The Infatuation",
+      "title": "Yangban - Review - Arts District - Los Angeles - The Infatuation",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/yangban-society",
+      "published_at": "2024-04-16",
+      "trust_level": "editorial",
+      "content": "Since it opened in 2021, this Arts District spot has reinvented itself on two (three?) occasions, with each iteration inching closer to the upscale Korean-American restaurant it is today. Yangban is simply a restaurant disguised as a dark, brooding art gallery, with a coat of black paint and modern art installations that look like charred trees and floating plastic bags. Despite the highbrow makeover, the menu at Yangban still includes many of the restaurant's earliest hit dishes—which is a good thing. These Ghosts of Yangbans Past make up the bulk of the highlights, like the crunchy, twice-fried soy-garlic wings, the creamy smoked trout dip with big lumps of fish, and a pot pie filled with lobster and savory congee. And then there's newer dishes, which make use of Korean ingredients like perilla leaf, gochujang, and kimchi in clever ways, but with varying results. The makgeolli-marinated scallop toast bathed in brown butter and tangy \"golden sauce\" is so good we suggest ordering one per person, but the delicate gochujang-braised cod is all heat, no flavor. Generally speaking, inconsistent seasoning is our biggest critique of Yangban 3.0, with many entrees and seasonal banchan missing a pinch (or two) of salt. We'd be lying if we said we didn't miss Yangban's casual days when you could leisurely show up on a weeknight for soft serve and beer. But dwelling on that would detract from how gracefully this restaurant has evolved. The experience might be different, but the food at Yangban continues to expand what Korean-American cooking can look and taste like in our city. And that by itself makes it an LA restaurant worth visiting."
+    },
+    {
+      "source_id": "src_timeout_la_2025",
+      "publication": "Time Out LA",
+      "title": "Yangban | Restaurants in Downtown Arts District, Los Angeles",
+      "url": "https://www.timeout.com/los-angeles/restaurants/yangban",
+      "published_at": "2025-05-06",
+      "trust_level": "editorial",
+      "content": "Initially just open for lunch, Katianna and John Hong's critically acclaimed Korean-ish deli eatery has found its groove at dinnertime by blending high-low culinary traditions in the Arts District. Unlike other places on this list, Yangban Society takes the dyed-in-the-wool definition of Korean cuisine and shoves it, and that's exactly why we love the place. Early favorites like the congee pot pie and twice-fried chicken wings are fast becoming classics for devoted fans, and after initially shying away from tasting menus (the couple previously worked in Napa), the restaurant's Yangban-style spread has offered a gentle, and worthwhile, introduction to new-school Korean American cuisine. Within the bright blue walls of the stylish, industrially inflected dining room, there's always something new and interesting to try."
+    },
+    {
+      "source_id": "src_nytimes_2022",
+      "publication": "New York Times",
+      "title": "Food Is Identity. For Korean Chefs Who Were Adopted, It's Complicated.",
+      "url": "https://www.nytimes.com/2022/07/31/food/korean-adoptee-chefs.html",
+      "published_at": "2022-07-31",
+      "trust_level": "editorial",
+      "content": "Katianna Hong is tinkering with her grandmother's matzo ball soup for a second time. The first time, she adapted it for a staff meal while she was executive chef at the Charter Oak in the Napa Valley. But here at Yangban Society, the Los Angeles restaurant she opened in January with her husband, John Hong, she's making even more ambitious changes to the recipe, and in the process reimagining the cooking of the Korean diaspora. Instead of the mirepoix of carrots, celery and onions her grandmother called for, Mrs. Hong opts for what she calls \"Korean mirepoix\" — potatoes and hobak, a sweet Korean squash — cooked slowly in chicken fat until translucent. At Yangban Society, Mrs. Hong combines jajangmyeon sauce with the classic Bolognese she picked up while working at an Italian restaurant, and serves the black-bean-spiked ragù over rice. This isn't fusion food that lifts flavors and techniques from different cuisines and lumps them together devoid of context. It is food that is deeply rooted, encapsulating Mrs. Hong's identity as a Korean woman adopted and raised by a German Jewish father and an Irish Catholic mother. \"The food we are doing is stuff that is authentic to us,\" Mrs. Hong, 39, said as she prepared the matzo batter. As Korean food continues to influence American dining, with Korean fried chicken and bibimbap appearing on all types of menus, a variation on that interplay is unfolding in the kitchens of chefs with backgrounds like Mrs. Hong — Korean adoptees who came to the United States in the 1970s and '80s. These chefs are coming to terms with a heritage they didn't grow up with. And they are enthusiastically expressing it through the very public, and sometimes precarious, act of cooking for others."
+    }
+  ]
+}

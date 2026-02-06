@@ -1,0 +1,41 @@
+{
+  "place_slug": "guisados",
+  "sources": [
+    {
+      "source_id": "src_michelin_2025",
+      "publication": "Michelin Guide",
+      "title": "Guisados – Los Angeles",
+      "url": "https://guide.michelin.com/us/en/california/us-los-angeles/restaurant/guisados",
+      "published_at": "2025-06-25",
+      "trust_level": "editorial",
+      "content": "Guisados · 8 · 2100 E. Cesar E. Chavez Ave., Los Angeles, CA, 90033, USA · $ · Mexican, Regional Cuisine · Eat like a local. Set on a busy corner with an unassuming façade, this may be a humble storefront, but it's all heart with an inimitable taste of home. This clean, airy and family-owned spot is open all day, so pop in when the mood strikes to sample their daily specials. Consult the chalkboards for the latest update, then snag a seat at one of the few tables with a view of the grill. It's all about their skillfully prepared tacos and expect to make a mess, as the sauce and juice drip while you're eating. Steak picado tacos with stewed flank steak served over black beans, or their cochinita pibil, with shredded pork braised with achiote and topped with pickled onions, are two favorites."
+    },
+    {
+      "source_id": "src_infatuation_2025",
+      "publication": "The Infatuation",
+      "title": "Guisados - Review - Hermosa Beach - Los Angeles",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/guisados",
+      "published_at": "2025-04-08",
+      "trust_level": "editorial",
+      "content": "If you're looking for tacos near the Hermosa Pier, the sampler at reliable local mini-chain Guisados is the best move. A plate of six mini tacos, it lets you try several guisados in one go, from spicy chicken tinga to mole poblano. Each palm-sized corn tortilla is made fresh, the meats are juicy, and the sampler only costs $12. Guisados opens at 9am daily, so you can also drop by for a breakfast burrito before a morning waterfront stroll. This order-at-the-counter spot has a lot out front with ample free parking (a rare commodity in these parts), so you won't have to stress about zig-zagging through the tourist crowds to eat here."
+    },
+    {
+      "source_id": "src_infatuation_2023",
+      "publication": "The Infatuation",
+      "title": "The Best Places To Have Dinner For Around $30 In Echo Park",
+      "url": "https://www.theinfatuation.com/los-angeles/guides/best-cheap-eats-affordable-restaurants-echo-park",
+      "published_at": "2023-01-24",
+      "trust_level": "editorial",
+      "content": "If you haven't picked up a half dozen tacos from Guisados and eaten them at Echo Park Lake, you simply haven't lived. And even if you have, it'll only cost you $9.50 to do it all over again."
+    },
+    {
+      "source_id": "src_infatuation_2021",
+      "publication": "The Infatuation",
+      "title": "9 LA Chefs & Restaurateurs Pick Their Favorite Tacos",
+      "url": "https://www.theinfatuation.com/los-angeles/features/9-la-chefs-restaurateurs-pick-their-favorite-tacos",
+      "published_at": "2021-09-15",
+      "trust_level": "editorial",
+      "content": "My son and I visit Guisados every time we make it out to Echo Park, whether for leisure or business. Nothing better than grabbing a half dozen tacos from Guisados and proceeding to enjoy them by the Echo Park lake!"
+    }
+  ]
+}

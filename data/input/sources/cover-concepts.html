@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Saiko Maps — Cover Concepts</title>
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background-color: #1a1a1a;
+      padding: 40px;
+      min-height: 100vh;
+    }
+
+    .concepts {
+      display: flex;
+      flex-direction: column;
+      gap: 60px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .concept-label {
+      color: #666;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 16px;
+    }
+
+    /* ========== CONCEPT 1: TYPOGRAPHY ========== */
+    .cover-typography {
+      background-color: #F5F0E1;
+      border-radius: 16px;
+      padding: 60px 48px;
+      max-width: 480px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cover-typography::before {
+      content: '';
+      position: absolute;
+      top: -100px;
+      right: -100px;
+      width: 300px;
+      height: 300px;
+      background: linear-gradient(135deg, #C3B091 0%, transparent 60%);
+      border-radius: 50%;
+      opacity: 0.3;
+    }
+
+    .cover-typography .category {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      color: #C3B091;
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .cover-typography .title {
+      font-family: 'Libre Baskerville', Georgia, serif;
+      font-size: 42px;
+      font-weight: 400;
+      font-style: italic;
+      color: #36454F;
+      line-height: 1.15;
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .cover-typography .description {
+      font-family: 'Libre Baskerville', Georgia, serif;
+      font-size: 15px;
+      line-height: 1.7;
+      color: #36454F;
+      opacity: 0.8;
+      margin-bottom: 32px;
+      max-width: 340px;
+      position: relative;
+    }
+
+    .cover-typography .meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: relative;
+    }
+
+    .cover-typography .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #36454F, #4a5d6a);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .cover-typography .byline {
+      font-size: 13px;
+      color: #36454F;
+    }
+
+    .cover-typography .byline strong {
+      font-weight: 600;
+    }
+
+    .cover-typography .byline span {
+      color: #C3B091;
+    }
+
+    .cover-typography .place-count {
+      position: absolute;
+      bottom: 48px;
+      right: 48px;
+      font-family: 'Libre Baskerville', Georgia, serif;
+      font-size: 64px;
+      font-weight: 700;
+      color: #36454F;
+      opacity: 0.08;
+    }
+
+    /* ========== CONCEPT 2: COLLAGE ========== */
+    .cover-collage {
+      background-color: #F5F0E1;
+      border-radius: 16px;
+      max-width: 480px;
+      overflow: hidden;
+    }
+
+    .collage-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: repeat(2, 80px);
+      gap: 2px;
+    }
+
+    .collage-grid .photo {
+      background-size: cover;
+      background-position: center;
+      filter: saturate(0.85) contrast(1.05);
+    }
+
+    .collage-grid .photo:nth-child(1) {
+      grid-column: span 2;
+      grid-row: span 2;
+      background-image: url('https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=400&fit=crop');
+    }
+    .collage-grid .photo:nth-child(2) {
+      background-image: url('https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=200&h=200&fit=crop');
+    }
+    .collage-grid .photo:nth-child(3) {
+      background-image: url('https://images.unsplash.com/photo-1552566626-52f8b828add9?w=200&h=200&fit=crop');
+    }
+    .collage-grid .photo:nth-child(4) {
+      background-image: url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=200&h=200&fit=crop');
+    }
+    .collage-grid .photo:nth-child(5) {
+      background-image: url('https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?w=200&h=200&fit=crop');
+    }
+
+    .cover-collage .content {
+      padding: 28px 32px 36px;
+    }
+
+    .cover-collage .title {
+      font-family: 'Libre Baskerville', Georgia, serif;
+      font-size: 28px;
+      font-weight: 400;
+      font-style: italic;
+      color: #36454F;
+      margin-bottom: 10px;
+    }
+
+    .cover-collage .description {
+      font-family: 'Libre Baskerville', Georgia, serif;
+      font-size: 14px;
+      line-height: 1.6;
+      color: #36454F;
+      opacity: 0.75;
+      margin-bottom: 20px;
+    }
+
+    .cover-collage .meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .cover-collage .byline {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .cover-collage .avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #36454F, #4a5d6a);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .cover-collage .author {
+      font-size: 12px;
+      color: #36454F;
+    }
+
+    .cover-collage .count {
+      font-size: 11px;
+      color: #C3B091;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* ========== CONCEPT 3: MAP AS ART ========== */
+    .cover-map {
+      background-color: #36454F;
+      border-radius: 16px;
+      max-width: 480px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .map-visual {
+      height: 220px;
+      position: relative;
+      background: linear-gradient(180deg, #2d3a42 0%, #36454F 100%);
+      overflow: hidden;
+    }
+
+    /* Abstract map lines */
+    .map-visual::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image: 
+        linear-gradient(90deg, rgba(195,176,145,0.03) 1px, transparent 1px),
+        linear-gradient(rgba(195,176,145,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+
+    /* Pins */
+    .pin {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background-color: #F5F0E1;
+      border-radius: 50%;
+      box-shadow: 0 0 0 3px rgba(245,240,225,0.2);
+    }
+
+    .pin::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 4px;
+      height: 4px;
+      background-color: #36454F;
+      border-radius: 50%;
+    }
+
+    .pin.large {
+      width: 16px;
+      height: 16px;
+      box-shadow: 0 0 0 4px rgba(245,240,225,0.25), 0 0 20px rgba(245,240,225,0.15);
+    }
+
+    .pin.large::after {
+      width: 6px;
+      height: 6px;
+    }
+
+    /* Pin positions - clustered like LA eastside */
+    .pin:nth-child(1) { top: 35%; left: 55%; }
+    .pin:nth-child(2) { top: 42%; left: 62%; }
+    .pin:nth-child(3) { top: 50%; left: 58%; }
+    .pin:nth-child(4) { top: 38%; left: 48%; }
+    .pin:nth-child(5) { top: 55%; left: 52%; }
+    .pin:nth-child(6) { top: 45%; left: 70%; }
+    .pin:nth-child(7) { top: 60%; left: 65%; }
+    .pin:nth-child(8) { top: 30%; left: 42%; }
+    .pin:nth-child(9) { top: 65%; left: 45%; }
+    .pin:nth-child(10) { top: 48%; left: 40%; }
+
+    /* Connection lines */
+    .map-visual svg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0.15;
+    }
+
+    .cover-map .content {
+      padding: 28px 32px 36px;
+      position: relative;
+    }
+
+    .cover-map .title {
+      font-family: 'Libre Baskerville', Georgia, serif;
+      font-size: 28px;
+      font-weight: 400;
+      font-style: italic;
+      color: #F5F0E1;
+      margin-bottom: 10px;
+    }
+
+    .cover-map .description {
+      font-family: 'Libre Baskerville', Georgia, serif;
+      font-size: 14px;
+      line-height: 1.6;
+      color: #F5F0E1;
+      opacity: 0.7;
+      margin-bottom: 20px;
+    }
+
+    .cover-map .meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .cover-map .byline {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .cover-map .avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #F5F0E1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #36454F;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .cover-map .author {
+      font-size: 12px;
+      color: #F5F0E1;
+      opacity: 0.8;
+    }
+
+    .cover-map .count {
+      font-size: 11px;
+      color: #C3B091;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* Glow effect on map */
+    .map-glow {
+      position: absolute;
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, rgba(195,176,145,0.15) 0%, transparent 70%);
+      top: 30%;
+      left: 45%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="concepts">
+
+    <!-- CONCEPT 1: Typography-driven -->
+    <div>
+      <div class="concept-label">Concept 1 — Typography</div>
+      <div class="cover-typography">
+        <div class="category">Wine Bars</div>
+        <h1 class="title">Silver Lake Natural Wine</h1>
+        <p class="description">The spots where the list is good and nobody's pretentious about it. All eastside, all walkable from each other.</p>
+        <div class="meta">
+          <div class="avatar">B</div>
+          <div class="byline">
+            <strong>Bobby</strong> <span>· 10 places</span>
+          </div>
+        </div>
+        <div class="place-count">10</div>
+      </div>
+    </div>
+
+    <!-- CONCEPT 2: Photo Collage -->
+    <div>
+      <div class="concept-label">Concept 2 — Collage</div>
+      <div class="cover-collage">
+        <div class="collage-grid">
+          <div class="photo"></div>
+          <div class="photo"></div>
+          <div class="photo"></div>
+          <div class="photo"></div>
+          <div class="photo"></div>
+        </div>
+        <div class="content">
+          <h1 class="title">Silver Lake Natural Wine</h1>
+          <p class="description">The spots where the list is good and nobody's pretentious about it.</p>
+          <div class="meta">
+            <div class="byline">
+              <div class="avatar">B</div>
+              <span class="author">Bobby</span>
+            </div>
+            <span class="count">10 places</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONCEPT 3: Map as Art -->
+    <div>
+      <div class="concept-label">Concept 3 — Map as Art</div>
+      <div class="cover-map">
+        <div class="map-visual">
+          <div class="map-glow"></div>
+          <svg viewBox="0 0 480 220">
+            <path d="M 264 77 Q 290 90 298 92" stroke="#C3B091" stroke-width="1" fill="none"/>
+            <path d="M 278 110 Q 260 100 264 77" stroke="#C3B091" stroke-width="1" fill="none"/>
+            <path d="M 230 84 Q 250 90 264 77" stroke="#C3B091" stroke-width="1" fill="none"/>
+            <path d="M 250 121 Q 260 110 278 110" stroke="#C3B091" stroke-width="1" fill="none"/>
+            <path d="M 336 99 Q 310 100 298 92" stroke="#C3B091" stroke-width="1" fill="none"/>
+          </svg>
+          <div class="pin large" style="top: 35%; left: 55%;"></div>
+          <div class="pin" style="top: 42%; left: 62%;"></div>
+          <div class="pin" style="top: 50%; left: 58%;"></div>
+          <div class="pin" style="top: 38%; left: 48%;"></div>
+          <div class="pin" style="top: 55%; left: 52%;"></div>
+          <div class="pin" style="top: 45%; left: 70%;"></div>
+          <div class="pin" style="top: 60%; left: 65%;"></div>
+          <div class="pin large" style="top: 30%; left: 42%;"></div>
+          <div class="pin" style="top: 65%; left: 45%;"></div>
+          <div class="pin" style="top: 48%; left: 40%;"></div>
+        </div>
+        <div class="content">
+          <h1 class="title">Silver Lake Natural Wine</h1>
+          <p class="description">The spots where the list is good and nobody's pretentious about it.</p>
+          <div class="meta">
+            <div class="byline">
+              <div class="avatar">B</div>
+              <span class="author">Bobby</span>
+            </div>
+            <span class="count">10 places</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

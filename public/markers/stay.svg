@@ -1,0 +1,21 @@
+<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <pattern id="grain" patternUnits="userSpaceOnUse" width="40" height="40">
+      <rect width="40" height="40" fill="#E07A5F"/>
+      <line x1="0" y1="6" x2="40" y2="7" stroke="#C86A50" stroke-width="0.5" opacity="0.4"/>
+      <line x1="0" y1="15" x2="40" y2="14" stroke="#D4705A" stroke-width="0.4" opacity="0.35"/>
+      <line x1="0" y1="24" x2="40" y2="25" stroke="#C86A50" stroke-width="0.6" opacity="0.4"/>
+      <line x1="0" y1="35" x2="40" y2="34" stroke="#D4705A" stroke-width="0.5" opacity="0.3"/>
+    </pattern>
+    <filter id="rough" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="4" result="noise" seed="10"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.5" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+  </defs>
+  <circle cx="20" cy="20" r="18" fill="url(#grain)" filter="url(#rough)"/>
+  <g stroke="#FFF8F0" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.95">
+    <path d="M10 22 L20 13 L30 22" fill="none"/>
+    <rect x="14" y="22" width="12" height="8" fill="none"/>
+    <rect x="18" y="24" width="4" height="6" fill="none"/>
+  </g>
+</svg>

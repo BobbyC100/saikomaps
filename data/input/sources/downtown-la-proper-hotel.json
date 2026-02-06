@@ -1,0 +1,50 @@
+{
+  "place_slug": "downtown-la-proper-hotel",
+  "sources": [
+    {
+      "source_id": "src_michelin_guide_2022",
+      "publication": "Michelin Guide",
+      "title": "Downtown L.A. Proper Hotel - Los Angeles Area",
+      "url": "https://guide.michelin.com/us/en/hotels-stays/los-angeles-area/downtown-la-proper-hotel-9122",
+      "published_at": "",
+      "trust_level": "editorial",
+      "content": "In recent years L.A.'s once-overlooked downtown district has come roaring back, and its renaissance continues with the advent of the Proper Hotel Downtown L.A., a 148-room luxury boutique hotel by the team that includes star designer Kelly Wearstler among its creative minds. Like the original Proper Hotel in San Francisco, it begins with the rehabilitation of a classic building, in this case a 1926-vintage Renaissance Revival building at the corner of 11th and Broadway. As with all of the Proper hotels — and all of Ms. Wearstler's previous interior work — the design is singular and unmistakable, a riot of patterns and colors that nevertheless feels cool and composed, never busy. The combination of Southern California sunshine and near-full-length windows makes for light-filled spaces, and the comforts are luxurious, especially the spa-like tiled showers. The most impressive, however, might be the rooftop lounge, complete with its own restaurant and bar, spanning some 5,000 square feet with views over the Los Angeles skyline in every direction."
+    },
+    {
+      "source_id": "src_timeout_2022",
+      "publication": "Time Out LA",
+      "title": "Downtown L.A. Proper Hotel",
+      "url": "https://www.timeout.com/los-angeles/hotels/downtown-l-a-proper-hotel",
+      "published_at": "2022-01-06",
+      "trust_level": "editorial",
+      "content": "A handsome, contemporary hotel in a revived 20th-century space, this DTLA boutique hotel boasts two restaurants from lauded duo Suzanne Goin and Caroline Styne, Caldo Verde and the rooftop Cara Cara lounge."
+    },
+    {
+      "source_id": "src_infatuation_2025",
+      "publication": "The Infatuation",
+      "title": "The 14 Best Hotel Bars In LA",
+      "url": "https://www.theinfatuation.com/los-angeles/guides/the-best-hotel-bars-in-la",
+      "published_at": "2025-11-12",
+      "trust_level": "editorial",
+      "content": "Perched atop the Proper Hotel, this splashy spot has an indoor lounge, a poolside patio, and curved couches that you can rent out for more privacy."
+    },
+    {
+      "source_id": "src_infatuation_rooftops_2025",
+      "publication": "The Infatuation",
+      "title": "The Best Rooftop Restaurants & Bars In LA",
+      "url": "https://www.theinfatuation.com/los-angeles/guides/best-rooftop-bars-los-angeles",
+      "published_at": "2025-10-28",
+      "trust_level": "editorial",
+      "content": "Cara Cara is the rooftop restaurant at the Santa Monica Proper Hotel."
+    },
+    {
+      "source_id": "src_infatuation_cocktails_2025",
+      "publication": "The Infatuation",
+      "title": "9 LA Restaurants With Great Cocktails",
+      "url": "https://www.theinfatuation.com/los-angeles/guides/14-restaurants-with-great-cocktails",
+      "published_at": "2025-07-02",
+      "trust_level": "editorial",
+      "content": "The best way to experience this slightly silly Santa Monica rooftop restaurant at the Proper Hotel is at the bar, where the sound of cocktail shakers is just slightly louder than the music, and creates a soothing ASMR effect."
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "place_slug": "the-douglas",
+  "sources": [
+    {
+      "source_id": "src_infatuation_2022",
+      "publication": "The Infatuation",
+      "title": "The Douglas - Review - Echo Park",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/the-douglas",
+      "published_at": "2022-08-18",
+      "trust_level": "editorial",
+      "content": "Resting in the shadows of Dodger Stadium, The Douglas is the perfect place to pre-game, post-game, or just hang out whenever the weather's nice. This dive bar doesn't have much space—mostly just a few tables inside and on the sidewalk—but the energy is always relaxed, there's a draft beer special for $5, and there's a surprisingly varied food menu for when game day drinks turn into a craving for fried things. There are vegan falafels, buttermilk fried chicken sandwiches as big as your head, Old Bay tater tots, and a weekly rotating sweet treat. Get the weekly rotating sweet treat."
+    },
+    {
+      "source_id": "src_infatuation_2024",
+      "publication": "The Infatuation",
+      "title": "The Best Bars In Echo Park",
+      "url": "https://www.theinfatuation.com/los-angeles/guides/the-best-bars-in-echo-park",
+      "published_at": "2024-10-16",
+      "trust_level": "editorial",
+      "content": "Resting in the shadows of Dodger Stadium, The Douglas is the perfect place to pre-game, post-game, or just hang out whenever the weather's nice. This dive bar doesn't have much space—mostly just a few tables inside and on the sidewalk—but the energy is always relaxed, there's a draft beer special for $5, and there's a surprisingly varied food menu for when game day drinks turn into a craving for fried things. There are vegan falafels, buttermilk fried chicken sandwiches as big as your head, Old Bay tater tots, and a weekly rotating sweet treat. Get the weekly rotating sweet treat."
+    },
+    {
+      "source_id": "src_infatuation_2025",
+      "publication": "The Infatuation",
+      "title": "The 15 Best Restaurants & Bars Near Dodger Stadium",
+      "url": "https://www.theinfatuation.com/los-angeles/guides/bars-restaurants-near-dodger-stadium",
+      "published_at": "2025-10-16",
+      "trust_level": "editorial",
+      "content": "Resting in the shadows of Dodger Stadium, The Douglas is the closest walkable bar to the Sunset Gate, but we'd send you here for more than just proximity reasons. Though a bit small on space—there's just a few tables inside and some seats on the sidewalk—the energy is always relaxed, there's draft beer specials, and the [content truncated in source]"
+    }
+  ]
+}

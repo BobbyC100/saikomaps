@@ -1,0 +1,50 @@
+{
+  "place_slug": "the-garland",
+  "sources": [
+    {
+      "source_id": "src_michelin_2024",
+      "publication": "Michelin Guide",
+      "title": "The Garland - Los Angeles Area",
+      "url": "https://guide.michelin.com/us/en/hotels-stays/los-angeles-area/the-garland-8231",
+      "published_at": "",
+      "trust_level": "editorial",
+      "content": "This is that rare Los Angeles hotel that's cool and practical — it's close to the Hollywood Bowl, and Universal Studios — with a generous dose of retro glamour. All rooms come with private balconies and flat-screen TVs; some also have dining nooks and bunk beds for kids. It's also that the Garland, in the old-school tradition, offers an array of family activities and public spaces for socializing. The Front Yard does casual breakfasts and lunches under the trees, with an adjacent bar specializing in craft cocktails, all made with local and seasonal ingredients. There's a hosted happy hour (and a handy late-night \"reverse happy hour\" by the outdoor fireplace), guided walks around the neighborhood that take you past the Brady Bunch house, wine tastings, board games, yoga classes, and poolside film screenings."
+    },
+    {
+      "source_id": "src_timeout_la_2017",
+      "publication": "Time Out LA",
+      "title": "The Garland",
+      "url": "https://www.timeout.com/los-angeles/hotels/the-garland",
+      "published_at": "2017-11-13",
+      "trust_level": "editorial",
+      "content": "Don't let the Garland's proximity to L.A.'s most popular tourist attractions trick you into thinking it's a faceless chain—the 1970s bungalow-inspired boutique hotel has plenty of character, including kitschy decor, a full-sized pool and an extensive complimentary guest services and amenities. Balancing a retro aesthetic with thoroughly modern amenities, Studio City's Garland Hotel is an urban oasis in the form of a freeway-adjacent respite from nearby tourist attractions like Universal Studios and Hollywood's Walk of Fame. The overall vibe is cheeky and cheerful, from the building's pinwheel painted facade to the delightfully chintzy mix-and-match lobby furniture. The Garland is great for tourists looking to supplement their Universal Studios visit with some citywide sightseeing. Couples and solo travelers can take advantage of the bar and the hotel's proximity to hip hangs like Eagle Rock and Echo Park, but the garland is just as, if not more, open to families—the hotel even offers partitioned-off \"kids rooms\" in their family suites."
+    },
+    {
+      "source_id": "src_infatuation_la_2023",
+      "publication": "The Infatuation",
+      "title": "The Front Yard",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/the-front-yard",
+      "published_at": "2023-11-23",
+      "trust_level": "editorial",
+      "content": "The Front Yard is the all-day restaurant inside the Garland Hotel that shouldn't be written off as another sleepy lobby cafe. The sprawling courtyard space is one of the Valley's best patios filled with a healthy mix of studio workers sipping wine during their lunch hours and retirees getting day drunk because they can. And on top of all that, the food is solid too. Weekend brunch is the most popular meal here, but cruising up to the bar and ordering the TFY patty melt made with a juicy short rib patty and a gin martini is an ideal midweek lunch."
+    },
+    {
+      "source_id": "src_discover_los_angeles_2025",
+      "publication": "Discover Los Angeles",
+      "title": "Discover The Garland Hotel",
+      "url": "https://www.discoverlosangeles.com/hotels/discover-the-garland-hotel",
+      "published_at": "2025-10-17",
+      "trust_level": "editorial",
+      "content": "You wake up in The Garland and for a second, thanks to the cheerful retro decor, it feels like 1972. That's the year that TV actress Beverly Garland (My Three Sons) opened her namesake hotel. The leafy, relaxing oasis is a seven-acre sanctuary in the San Fernando Valley, located a couple of miles from the hustle and bustle of Hollywood. The Garland's builder and main driving force was Beverly's husband, real estate developer Fillmore Crank. Hollywood cowboy John Wayne attended the grand opening, and legend has it that Beverly, a firm believer in the personal touch, would change lightbulbs herself on the property. Since its $20-million revamp in 2015, the garland's classic California vintage vibe remains with additional 21st century chic."
+    },
+    {
+      "source_id": "src_qantas_travel_2023",
+      "publication": "Qantas Travel Insider",
+      "title": "The Garland – Hotel Review",
+      "url": "https://www.qantas.com/travelinsider/en/explore/north-america/usa/los-angeles/the-garland-hotel-review.html",
+      "published_at": "2023",
+      "trust_level": "editorial",
+      "content": "Located in North Hollywood, The Garland hotel impresses with beautifully designed rooms, a sprawling pool and impressive restaurants. Originally built in 1972 by actress Beverly Garland (My Three Sons, 7th Heaven) and her husband, The Garland employs elements of the Spanish Colonial and Mission Revival styles along with fixtures and artwork that'll delight Mid-century aficionados. Sympathetically renovated in 2015, it has the feel of a cool resort hotel, with a popular onsite restaurant and a heated pool and sundeck. It's particularly family-friendly, with a weekly updated list of daily activities, including lawn games, urban walks, arts and crafts, face painting and pop-up street food."
+    }
+  ]
+}

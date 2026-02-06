@@ -1,0 +1,59 @@
+{
+  "place_slug": "loqui",
+  "sources": [
+    {
+      "source_id": "src_theinfatuation_2024",
+      "publication": "The Infatuation",
+      "title": "Loqui - Review - Culver City",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/loqui",
+      "published_at": "2024-10-03",
+      "trust_level": "editorial",
+      "content": "Located inside Culver City's upmarket mini-mall The Platform, Loqui is often used as a pitstop between shopping for high-end hand soap and designer furniture. In the least rude way possible, we see Loqui as a bougier alternative to Chipotle. A cool fast-casual space for great tacos on the Westside. Yes, you read that correctly—the Westside."
+    },
+    {
+      "source_id": "src_theinfatuation_2024_arts_district",
+      "publication": "The Infatuation",
+      "title": "Loqui Arts District - Review - Arts District",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/loqui-arts-district",
+      "published_at": "2024-08-27",
+      "trust_level": "editorial",
+      "content": "Loqui Arts District is the second location of the affordable Mexican spot famous for their flour tortillas. The second location of Culver City's great taco spot Loqui is a lot like the original: You order at the counter, there's a nice little patio, and they've got utterly fantastic flour tortillas, made in-house. You should always opt for them over the corn ones, especially if you order one of Loqui's combo plates, because then you can use the soft, Frisbee-sized tortillas to scoop up the rice, guacamole, protein (our favorite is the chicken), and pinto beans. When you're in the Arts District and want something affordable - but also want to be able to sit down and maybe have a beer while you eat - Loqui is a great option. Just make sure to get a pack of tortillas to go."
+    },
+    {
+      "source_id": "src_theinfatuation_2025_westside_mexican",
+      "publication": "The Infatuation",
+      "title": "The 18 Best Mexican Restaurants On The Westside",
+      "url": "https://www.theinfatuation.com/los-angeles/guides/the-best-mexican-food-on-the-westside",
+      "published_at": "2025-07-22",
+      "trust_level": "editorial",
+      "content": "Located inside Culver City's upmarket mini-mall The Platform, Loqui is often used as a pit stop between shopping for high-end hand soap and designer furniture. In the least rude way possible, we see Loqui as a bougier alternative to Chipotle. This casual counter-service spot assembles tacos and bowls, both of which feature Loqui's braised meats, like zippy cochinita pibil and marinated chicken that packs an unexpected kick."
+    },
+    {
+      "source_id": "src_theinfatuation_2020_outdoor_dining",
+      "publication": "The Infatuation",
+      "title": "Outdoor Dining In Culver City, Palms, And Mar Vista",
+      "url": "https://www.theinfatuation.com/los-angeles/guides/culver-city-outdoor-dining-patios-la",
+      "published_at": "2020-11-13",
+      "trust_level": "editorial",
+      "content": "Home to some of our favorite tacos in town, both locations of Loqui (Culver City and the Arts District) have large patios filled with picnic tables and umbrellas."
+    },
+    {
+      "source_id": "src_theinfatuation_2021_lunch_outside",
+      "publication": "The Infatuation",
+      "title": "Where To Have Lunch Outside In LA",
+      "url": "https://www.theinfatuation.com/los-angeles/guides/where-to-have-lunch-outside-in-la",
+      "published_at": "2021-04-09",
+      "trust_level": "editorial",
+      "content": "Instead, it's become our absolute go-to place for tacos on the Westside. The flour tortillas are thick and chewy, and if you go with the chicken option, the spicy meat provides a nice kick that also doesn't overpower the rest of the taco."
+    },
+    {
+      "source_id": "src_timeout_2017",
+      "publication": "Time Out LA",
+      "title": "Loqui 1 year anniversary",
+      "url": "https://www.timeout.com/los-angeles/restaurants/loqui-1-year-anniversary",
+      "published_at": "2017-03-30",
+      "trust_level": "editorial",
+      "content": "The weekly pop-up from San Francisco opened its first store in Culver City's modern Platform space a year ago and has been serving up their tasty Mexican food and handmade tortillas ever since. Loqui will be celebrating its 1 year anniversary in true Mexican style with live mariachi, churros, tacos and $3 modelos."
+    }
+  ]
+}

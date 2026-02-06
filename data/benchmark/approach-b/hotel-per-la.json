@@ -1,0 +1,41 @@
+{
+  "place_slug": "hotel-per-la",
+  "sources": [
+    {
+      "source_id": "src_michelin_2025",
+      "publication": "Michelin Guide",
+      "title": "Hotel Per La - Los Angeles Area",
+      "url": "https://guide.michelin.com/us/en/hotels-stays/los-angeles-area/hotel-per-la-8703",
+      "published_at": "",
+      "trust_level": "editorial",
+      "content": "One of Downtown L.A.'s original architectural characters, the Giannini Building was once home to the Bank of Italy, and its 1922-vintage Art Deco style was a perfect fit for the golden age of Hollywood glamour. It's this era, and the Italian connection, that inspires the Hotel Per LA, a hotel that successfully transplants the dolce vita of the Mediterranean to the rooftops of Los Angeles. It's not just the gloriously restored double-height lobby space with its blue-and-gold Italianate-style ceiling, or the orchard-like atmosphere by the poolside at the rooftop Bar Clara. It's also the in-room décor, which is full of vibrant detail and European accents, and feels curiously timeless, somehow nostalgic and modern at the same time. Rooms come with terrazzo tiled showers and pedestal baths, as well as Argan bath products, Bellino linens, and the full complement of modern gadgetry. Ristorante Per L'Ora serves coastal Italian cuisine with local L.A. influences, while Café Ora is specifically Venetian-inspired; the rooftop Bar Clara is for poolside Mediterranean fare with views of Downtown."
+    },
+    {
+      "source_id": "src_sleeper_2022",
+      "publication": "Sleeper Magazine",
+      "title": "Downtown LA welcomes Hotel Per La",
+      "url": "https://www.sleepermagazine.com/stories/projects/downtown-la-welcomes-hotel-per-la/",
+      "published_at": "2022-10-18",
+      "trust_level": "editorial",
+      "content": "Hotel Per La Los Angeles, a new lifestyle property in Downtown Los Angeles, has officially opened its doors. Housed in the former Giannini Building built in 1922, which was originally the headquarters of the Bank of Italy, the hotel is the result of a reimagining by HN Capital Partners, and Sage Hospitality Group. The project comprises 241 guestrooms and suites, as well as grand public spaces, including 10,000ft2 of event space, a main restaurant and bar, a daytime café, and a rooftop bar offering poolside drinks and dramatic views of the LA skyline. A nod to the building's storied beginning as a bank for the people, the Per La name translates to \"for the\" in Italian. Its founder, Amadeo Pietro Giannini, believed in the dignity and abilities of those commonly overlooked, signifying the hotel's inclusive spirit and name, essentially meaning \"for Los Angeles, and people like you.\" Much of the building's Neoclassical style, such as its Doric columns, ornate gold and blue ceiling and marble floors, have been preserved in Hotel Per La's public spaces and incorporated alongside a new playful and approachable design reflective of the city's diversity of cultures and characters. Reimagined by local Los Angeles interior designer Jaqui Seerman, contemporary furnishings, airy linens, amorphic lighting and pops of bright colours that feel distinctively LA are woven throughout the open public spaces and flooded by California sunshine. The space features commissioned art, while many of the furnishings and décor were sourced from local LA artisans, including decorative wall lighting from Downtown LA's Edition Modern, hand-painted pots by Pasadena-based artist Jill Spector, and hand-thrown ceiling lights created by LA-based ceramist and lighting designer Neptune Glass. The rooms also feature a marble writing desk with settee, Tivoli Bluetooth radio clocks, and large flat screen televisions, while the European-style bathrooms are complete with Terrazzo floored walk-in showers with luxury bath amenities from Argan Perfume d'arganier, with many rooms also featuring freestanding pedestal bathtubs. Per L'Ora, the hotel's neighbourhood restaurant, introduces Italian cuisine through a lens of Los Angeles culture and flavours. With spirited, easy-going Italian light bites and dishes, Per L'Ora offers an inviting space, evoking the comforting familiarity of feeling at home, while anchored in restaurant traditions of an old-school lobby rendered with a modern twist."
+    },
+    {
+      "source_id": "src_afar_2023",
+      "publication": "AFAR Magazine",
+      "title": "Review of Hotel Per La",
+      "url": "https://www.afar.com/hotels/review-of-hotel-per-la-los-angeles",
+      "published_at": "2023-12-01",
+      "trust_level": "editorial",
+      "content": "Hotel Per La took over the hotel that was formerly the NOMAD in Downtown Los Angeles. With the re-opening came a new Italian restaurant, Per L'Ora, and rooftop bar, Bar Clara. In the lobby of the landmarked building, much of the original Neoclassical style, such as the Doric columns, coffered ceiling, and marble floors, was preserved, complemented by the addition of floral textiles in rich jewel tones. Even the original vault, which once housed 12,000 safety deposit boxes, and its 50-ton door were kept intact. The color palette across the 241 lavish rooms draws from the exquisitely maintained gold-and-blue Italianate lobby ceiling. It's a place to see and be seen by locals and out-of-towners alike, whether at the shimmering rooftop pool, the rooftop bar, or the restaurant and bar."
+    },
+    {
+      "source_id": "src_dtla_weekly_2025",
+      "publication": "DTLA Weekly",
+      "title": "Hotel Per La - Class & Hospitality",
+      "url": "https://dtlaweekly.com/hotel-per-la-bar-clara/",
+      "published_at": "2025-06-05",
+      "trust_level": "editorial",
+      "content": "After closing in 2020, a collaborative effort between HN Capital Partners, an active investor, owner, and operator of upscale, lifestyle, and luxury hotels, and award-winning Sage Hospitality, the once-Bank of Italy, reopened the property with newly designed public spaces as Hotel Per La. As new-age hotels continue to erect themselves in downtown Los Angeles, bringing their ghastly brand of new-age hospitality relying on gimmicks with multiple rooms filled with cheap entertainment, where guests are barely treated, let alone treated like they are actually welcomed, it's good to know there are a few downtown hotels that exist because of their uniquely elegant style, class, and traditional ways of patiently catering to each guest. Hotel Per La is just such a hotel. Instead, Hotel Per La has mastered the concept of hospitality with competent valets and welcoming guest services who gift room keys to doors that expose jaw-dropping superior interior design, classic room accommodations, mesmerizing views, and access to delicately prepared cuisine all in one prime location. From the rooftop to the basement, no detail is left unpresentable. Open to guests of the hotel and to the public, inside the hotel's mammoth 3500-square-foot ground-floor dining room lies a cafe, full bar, and fine dining restaurant offering spirited Italian flavors elevated with a vibrant Los Angeles flair, paying tribute to the historic building's rich history and local community."
+    }
+  ]
+}

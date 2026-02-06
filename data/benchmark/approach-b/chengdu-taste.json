@@ -1,0 +1,41 @@
+{
+  "place_slug": "chengdu-taste",
+  "sources": [
+    {
+      "source_id": "src_michelin_2025",
+      "publication": "Michelin Guide",
+      "title": "Chengdu Taste – Alhambra - a MICHELIN Guide Restaurant",
+      "url": "https://guide.michelin.com/us/en/california/alhambra/restaurant/chengdu-taste",
+      "published_at": "2025-06-25",
+      "trust_level": "editorial",
+      "content": "Chengdu Taste – a Bib Gourmand: good quality, good value cooking restaurant in the 2025 MICHELIN Guide USA. Some Sichuan kitchens temper their heat levels depending on what they think the customer can handle. Not this one. This long-standing veteran has never been one to hold anyone's hand and their widespread success has not at all cooled their approach. Expect nothing less than the full-throttle Sichuan experience where tongue-numbing, lip-tingling dishes arrive coated in heavy spices, garnished with sliced chilis and, often, doused in fire-engine red chili oil. Toothpick lamb is the house signature, but the crispy-crusted beef is a formidable rival. Fish with mom's preserved chili sauce is unapologetically sinus-clearing. Even vegetables like the arden lettuce are a powerhouse of stir-fried garlic excellence. Swing by for lunch to avoid the lines."
+    },
+    {
+      "source_id": "src_theinfatuation_la_2022",
+      "publication": "The Infatuation",
+      "title": "Chengdu Taste - Review - Alhambra - Los Angeles",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/chengdu-taste",
+      "published_at": "2022-11-07",
+      "trust_level": "editorial",
+      "content": "Chengdu Taste serves some incredibly spicy food, but this Szechuan spot is one of the best restaurants in Los Angeles. Located in Alhambra in the San Gabriel Valley, Chengdu Taste is not some diamond in the rough. In an area known for having some of the best Asian restaurants in the country, Chengdu Taste is royalty. Chengdu Taste specializes in Szechuan cuisine, which generally involves a type of peppercorn that will make your face go numb and stay numb. But this family-run Chinese restaurant isn't in the business of searing off your tastebuds. They're in the business of cooking some of the most insanely flavorful dishes you'll ever eat. The key to a meal at Chengdu Taste is knowing how to balance the spicy dishes with the non-spicy dishes. The toothpick lamb with cumin, the couple's sliced beef, and the best dan dan noodles in the world all fall in the non-spicy category, and should be the cornerstones of your meal. From there, add the spice: the mapo tofu, the boiled fish with green pepper sauce, and the mung bean jelly noodles. These dishes will clear out your sinuses in one bite, but they'll also simultaneously warm your ice cold heart. When spicy is done as well as it is here, it cures you. Chengdu Taste is one of LA's great restaurants - not just because the food is spicy, but because it's incredible. And when you're sitting in their big, casual dining room surrounded by all your friends, eating everything in sight, that becomes abundantly clear."
+    },
+    {
+      "source_id": "src_timeout_la_2025",
+      "publication": "Time Out LA",
+      "title": "Chengdu Taste | Restaurants in Alhambra, Los Angeles",
+      "url": "https://www.timeout.com/los-angeles/restaurants/chengdu-taste",
+      "published_at": "2025-03-01",
+      "trust_level": "editorial",
+      "content": "We're fortunate enough these days to have dozens of different interpretations of Sichuan cuisine, but it's still hard to beat Chengdu Taste, the trailblazing Alhambra restaurant that first put mala ('numbing and spicy') on the culinary map for most Angelenos. Fiery Sichuan dishes fill tables with intoxicating smells and an overarching red hue that often indicates an intimidating level of spice. Along with featuring a lighter, yet still spicy style of Chengdu cooking, one of its signature dishes is the hearty diced rabbit with 'younger sister's secret recipe.' Other must-tries are the Sichuan-style mung bean jelly noodles with chili sauce; the always comforting mapo tofu; and, my personal favorite, toothpick lamb with cumin. They've also got a second location in Rowland Heights, so those further east can get their spice fix, too."
+    },
+    {
+      "source_id": "src_laist_2021",
+      "publication": "LAist",
+      "title": "Chengdu Taste, LA's Premier Sichuan Restaurant, Fights To Survive",
+      "url": "https://laist.com/news/food/chengdu-taste-restaurants-coronavirus-san-gabriel-valley-struggle",
+      "published_at": "2021-11-19",
+      "trust_level": "editorial",
+      "content": "Sean Xie had big plans for 2020. In March, he and his business partner were going to bring the first Chengdu Taste — the beloved Sichuan restaurant they founded in Alhambra in 2013 — to Seattle. With the world on hold, Xie and his business partner are spending their downtime planning for the future. They secured rent breaks from the landlords at all of their spaces. They struck out on their application for a federal stimulus loan to small businesses and are now waiting for Congress to approve a second round of funding. At the time, Xie was in his hometown of Chengdu, where he experienced the seriousness of the situation firsthand. No one went out, everything was closed. He ended up spending some 20 days with his parents and family behind closed doors. He also started talking to his business partner about contingency plans for the dozen restaurants they own in the San Gabriel Valley and beyond. Besides Chengdu Taste and MIAN, they also operate XiaoLongKan, a popular hot pot brand they imported from China."
+    }
+  ]
+}

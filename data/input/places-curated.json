@@ -1,0 +1,1058 @@
+[
+  {
+    "slug": "bestia",
+    "name": "Bestia",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "1",
+    "notes": "Arts District Italian - perennial every-list staple"
+  },
+  {
+    "slug": "bavel",
+    "name": "Bavel",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "1",
+    "notes": "Arts District Middle Eastern - same owners as Bestia"
+  },
+  {
+    "slug": "republique",
+    "name": "Republique",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "1",
+    "notes": "La Brea - Eater/LAT/Infatuation fixture"
+  },
+  {
+    "slug": "gjelina",
+    "name": "Gjelina",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "1",
+    "notes": "Venice institution - Eater all-time 38"
+  },
+  {
+    "slug": "osteria-mozza",
+    "name": "Osteria Mozza",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "1",
+    "notes": "Michelin star - Nancy Silverton"
+  },
+  {
+    "slug": "pizzeria-mozza",
+    "name": "Pizzeria Mozza",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "1",
+    "notes": "Nancy Silverton pizza empire"
+  },
+  {
+    "slug": "chi-spacca",
+    "name": "Chi Spacca",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "1",
+    "notes": "Nancy Silverton meat-focused"
+  },
+  {
+    "slug": "jon-vinnys",
+    "name": "Jon & Vinny's",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "1",
+    "notes": "Fairfax - massive editorial coverage"
+  },
+  {
+    "slug": "holbox",
+    "name": "Holbox",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "1",
+    "notes": "Mercado La Paloma - #1 on LA Times 101 2025"
+  },
+  {
+    "slug": "langers-delicatessen",
+    "name": "Langer's Delicatessen",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "1",
+    "notes": "Iconic pastrami - Jonathan Gold Hall of Fame"
+  },
+  {
+    "slug": "musso-frank-grill",
+    "name": "Musso & Frank Grill",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "1",
+    "notes": "Hollywood institution since 1919"
+  },
+  {
+    "slug": "howlin-rays",
+    "name": "Howlin' Ray's",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "1",
+    "notes": "Hot chicken - huge editorial footprint"
+  },
+  {
+    "slug": "somni",
+    "name": "Somni",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "2-michelin",
+    "notes": "3 Michelin stars - one of only two in LA"
+  },
+  {
+    "slug": "nnaka",
+    "name": "n/naka",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "2-michelin",
+    "notes": "2 Michelin stars - kaiseki"
+  },
+  {
+    "slug": "hayato",
+    "name": "Hayato",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "2-michelin",
+    "notes": "2 Michelin stars - Japanese"
+  },
+  {
+    "slug": "vespertine",
+    "name": "Vespertine",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "2-michelin",
+    "notes": "2 Michelin stars - Jordan Kahn"
+  },
+  {
+    "slug": "melisse",
+    "name": "Mélisse",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "2-michelin",
+    "notes": "2 Michelin stars - Santa Monica"
+  },
+  {
+    "slug": "camphor",
+    "name": "Camphor",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "2-michelin",
+    "notes": "1 Michelin star - Arts District French"
+  },
+  {
+    "slug": "orsa-winston",
+    "name": "Orsa & Winston",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "2-michelin",
+    "notes": "1 Michelin star - Italian-Japanese DTLA"
+  },
+  {
+    "slug": "restaurant-ki",
+    "name": "Restaurant Ki",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "2-michelin",
+    "notes": "1 Michelin star - first Korean starred in LA (2025)"
+  },
+  {
+    "slug": "mori-nozomi",
+    "name": "Mori Nozomi",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "2-michelin",
+    "notes": "1 Michelin star - new 2025"
+  },
+  {
+    "slug": "gucci-osteria-da-massimo-bottura",
+    "name": "Gucci Osteria da Massimo Bottura",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "2-michelin",
+    "notes": "1 Michelin star - Beverly Hills"
+  },
+  {
+    "slug": "q-sushi",
+    "name": "Q Sushi",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "2-michelin",
+    "notes": "1 Michelin star - Edomae sushi"
+  },
+  {
+    "slug": "citrin",
+    "name": "Citrin",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "2-michelin",
+    "notes": "1 Michelin star - Santa Monica"
+  },
+  {
+    "slug": "baby-bistro",
+    "name": "Baby Bistro",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "3-hot2025",
+    "notes": "Restaurant of the year contender - Echo Park"
+  },
+  {
+    "slug": "rasarumah",
+    "name": "Rasarumah",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "3-hot2025",
+    "notes": "Malaysian - new Michelin Bib Gourmand 2025"
+  },
+  {
+    "slug": "kuya-lord",
+    "name": "Kuya Lord",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "3-hot2025",
+    "notes": "James Beard winner - Filipino"
+  },
+  {
+    "slug": "berenjak",
+    "name": "Berenjak",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "3-hot2025",
+    "notes": "Persian from London - Arts District buzzy"
+  },
+  {
+    "slug": "comedor",
+    "name": "Comedor",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "3-hot2025",
+    "notes": "Ray Garcia comeback - Westside"
+  },
+  {
+    "slug": "88-club",
+    "name": "88 Club",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "3-hot2025",
+    "notes": "Mei Lin (Top Chef winner)"
+  },
+  {
+    "slug": "tomat",
+    "name": "Tomat",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "3-hot2025",
+    "notes": "Farm-to-table - Michelin recommended 2025"
+  },
+  {
+    "slug": "alba-los-angeles",
+    "name": "Alba Los Angeles",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "3-hot2025",
+    "notes": "Italian open-air - West Hollywood"
+  },
+  {
+    "slug": "vin-folk",
+    "name": "Vin Folk",
+    "city": "Los Angeles",
+    "category": "wine bar",
+    "tier": "3-hot2025",
+    "notes": "New Michelin Bib Gourmand - natural wine"
+  },
+  {
+    "slug": "betsy",
+    "name": "Betsy",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "3-hot2025",
+    "notes": "Altadena hearth cooking - Tyler Wells comeback"
+  },
+  {
+    "slug": "gjusta",
+    "name": "Gjusta",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "4-iconic",
+    "notes": "Venice bakery/deli - Gjelina family"
+  },
+  {
+    "slug": "bub-grandmas",
+    "name": "Bub & Grandma's",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "4-iconic",
+    "notes": "Pizza cult following"
+  },
+  {
+    "slug": "jitlada",
+    "name": "Jitlada",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "4-iconic",
+    "notes": "Thai Town legend"
+  },
+  {
+    "slug": "anajak-thai",
+    "name": "Anajak Thai",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "4-iconic",
+    "notes": "Sherman Oaks - massively acclaimed"
+  },
+  {
+    "slug": "coniseafood",
+    "name": "Coni'Seafood",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "4-iconic",
+    "notes": "Nayarit-style seafood - Inglewood"
+  },
+  {
+    "slug": "mariscos-jalisco",
+    "name": "Mariscos Jalisco",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "4-iconic",
+    "notes": "Iconic seafood truck"
+  },
+  {
+    "slug": "chengdu-taste",
+    "name": "Chengdu Taste",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "4-iconic",
+    "notes": "SGV Sichuan essential"
+  },
+  {
+    "slug": "lasa",
+    "name": "Lasa",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "4-iconic",
+    "notes": "Filipino - Chinatown"
+  },
+  {
+    "slug": "zankou-chicken",
+    "name": "Zankou Chicken",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "4-iconic",
+    "notes": "Iconic LA chain"
+  },
+  {
+    "slug": "portos-bakery-cafe",
+    "name": "Porto's Bakery & Cafe",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "4-iconic",
+    "notes": "Beloved Cuban bakery institution"
+  },
+  {
+    "slug": "alta-adams",
+    "name": "Alta Adams",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "4-iconic",
+    "notes": "Keith Corbin - South LA"
+  },
+  {
+    "slug": "kismet",
+    "name": "Kismet",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "4-iconic",
+    "notes": "Los Feliz Middle Eastern"
+  },
+  {
+    "slug": "nsoto",
+    "name": "N/Soto",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "4-iconic",
+    "notes": "Japanese - highly rated"
+  },
+  {
+    "slug": "yangban-society",
+    "name": "Yangban Society",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "4-iconic",
+    "notes": "Korean-American - Arts District"
+  },
+  {
+    "slug": "konbi",
+    "name": "Konbi",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "4-iconic",
+    "notes": "Cult Japanese bakery"
+  },
+  {
+    "slug": "rustic-canyon",
+    "name": "Rustic Canyon",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "4-iconic",
+    "notes": "Santa Monica farm-to-table"
+  },
+  {
+    "slug": "sapp-coffee-shop",
+    "name": "Sapp Coffee Shop",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "4-iconic",
+    "notes": "Thai Town essential"
+  },
+  {
+    "slug": "roasted-duck-by-pa-ord",
+    "name": "Roasted Duck by Pa Ord",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "4-iconic",
+    "notes": "Thai Town - new Eater 38 addition"
+  },
+  {
+    "slug": "hms-bounty",
+    "name": "HMS Bounty",
+    "city": "Los Angeles",
+    "category": "bar",
+    "tier": "4-iconic",
+    "notes": "Koreatown dive - new Eater 38 addition"
+  },
+  {
+    "slug": "mercado-la-paloma",
+    "name": "Mercado La Paloma",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "4-iconic",
+    "notes": "Food hall - LA Times #1 2025"
+  },
+  {
+    "slug": "augustine-wine-bar",
+    "name": "Augustine Wine Bar",
+    "city": "Los Angeles",
+    "category": "wine bar",
+    "tier": "5-wine-bar",
+    "notes": "Sherman Oaks"
+  },
+  {
+    "slug": "bar-covell",
+    "name": "Bar Covell",
+    "city": "Los Angeles",
+    "category": "wine bar",
+    "tier": "5-wine-bar",
+    "notes": "Los Feliz"
+  },
+  {
+    "slug": "tabula-rasa",
+    "name": "Tabula Rasa",
+    "city": "Los Angeles",
+    "category": "wine bar",
+    "tier": "5-wine-bar",
+    "notes": "East Hollywood"
+  },
+  {
+    "slug": "esters-wine-shop-bar",
+    "name": "Esters Wine Shop & Bar",
+    "city": "Los Angeles",
+    "category": "wine bar",
+    "tier": "5-wine-bar",
+    "notes": "Santa Monica"
+  },
+  {
+    "slug": "go-get-em-tiger",
+    "name": "Go Get Em Tiger",
+    "city": "Los Angeles",
+    "category": "coffee",
+    "tier": "6-coffee",
+    "notes": "Multiple locations"
+  },
+  {
+    "slug": "intelligentsia-coffee",
+    "name": "Intelligentsia Coffee",
+    "city": "Los Angeles",
+    "category": "coffee",
+    "tier": "6-coffee",
+    "notes": "Silverlake/Pasadena"
+  },
+  {
+    "slug": "verve-coffee-roasters",
+    "name": "Verve Coffee Roasters",
+    "city": "Los Angeles",
+    "category": "coffee",
+    "tier": "6-coffee",
+    "notes": "DTLA/WeHo"
+  },
+  {
+    "slug": "endorffeine",
+    "name": "Endorffeine",
+    "city": "Los Angeles",
+    "category": "coffee",
+    "tier": "6-coffee",
+    "notes": "Arts District"
+  },
+  {
+    "slug": "pizzeria-sei",
+    "name": "Pizzeria Sei",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "3-hot2025",
+    "notes": "Tokyo-Neapolitan pizza - Pico-Robertson - Resy pick"
+  },
+  {
+    "slug": "rvr",
+    "name": "RVR",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "3-hot2025",
+    "notes": "Cal-izakaya - Venice - Travis Lett - Infatuation #6"
+  },
+  {
+    "slug": "lucia",
+    "name": "Lucia",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "3-hot2025",
+    "notes": "Caribbean fine dining - Fairfax - Art Deco space"
+  },
+  {
+    "slug": "sushi-masuyoshi",
+    "name": "Sushi Masuyoshi",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "3-hot2025",
+    "notes": "Culver City omakase - Infatuation #4 - $210 value"
+  },
+  {
+    "slug": "beethoven-market",
+    "name": "Beethoven Market",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "3-hot2025",
+    "notes": "Mar Vista Italian - Infatuation #10 - neighborhood gem"
+  },
+  {
+    "slug": "camelia",
+    "name": "Camélia",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "3-hot2025",
+    "notes": "French-Japanese - Bon Appétit 2025"
+  },
+  {
+    "slug": "santa-canela",
+    "name": "Santa Canela",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "3-hot2025",
+    "notes": "Highland Park bakery - Eater Award winner"
+  },
+  {
+    "slug": "mustards-bagels",
+    "name": "Mustard's Bagels",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "3-hot2025",
+    "notes": "Culver City bagel pop-up - Infatuation #7"
+  },
+  {
+    "slug": "wagyu-butcher",
+    "name": "Wagyu Butcher",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "3-hot2025",
+    "notes": "Torrance yakiniku - Infatuation #8"
+  },
+  {
+    "slug": "angels-tijuana-tacos",
+    "name": "Angel's Tijuana Tacos",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "3-hot2025",
+    "notes": "Al pastor specialist - Resy pick"
+  },
+  {
+    "slug": "chateau-marmont",
+    "name": "Chateau Marmont",
+    "city": "Los Angeles",
+    "category": "hotel",
+    "tier": "hotel-iconic",
+    "notes": "Legendary Hollywood escape - old-world glamour"
+  },
+  {
+    "slug": "the-beverly-hills-hotel",
+    "name": "The Beverly Hills Hotel",
+    "city": "Los Angeles",
+    "category": "hotel",
+    "tier": "hotel-iconic",
+    "notes": "Dorchester Collection - the Pink Palace"
+  },
+  {
+    "slug": "hotel-bel-air",
+    "name": "Hotel Bel-Air",
+    "city": "Los Angeles",
+    "category": "hotel",
+    "tier": "hotel-iconic",
+    "notes": "Dorchester Collection - secluded Westwood luxury"
+  },
+  {
+    "slug": "sunset-tower-hotel",
+    "name": "Sunset Tower Hotel",
+    "city": "Los Angeles",
+    "category": "hotel",
+    "tier": "hotel-iconic",
+    "notes": "Classic Art Deco glam - West Hollywood icon"
+  },
+  {
+    "slug": "the-peninsula-beverly-hills",
+    "name": "The Peninsula Beverly Hills",
+    "city": "Los Angeles",
+    "category": "hotel",
+    "tier": "hotel-iconic",
+    "notes": "Beverly Hills - top-tier luxury - 19.8 rating"
+  },
+  {
+    "slug": "the-hollywood-roosevelt",
+    "name": "The Hollywood Roosevelt",
+    "city": "Los Angeles",
+    "category": "hotel",
+    "tier": "hotel-iconic",
+    "notes": "Historic Hollywood landmark - old-school glam meets modern"
+  },
+  {
+    "slug": "palihouse-west-hollywood",
+    "name": "Palihouse West Hollywood",
+    "city": "Los Angeles",
+    "category": "hotel",
+    "tier": "hotel-boutique",
+    "notes": "Design-forward West Hollywood classic - 18.8 rating"
+  },
+  {
+    "slug": "downtown-la-proper-hotel",
+    "name": "Downtown L.A. Proper Hotel",
+    "city": "Los Angeles",
+    "category": "hotel",
+    "tier": "hotel-boutique",
+    "notes": "Kelly Wearstler design - DTLA - 19.5 rating"
+  },
+  {
+    "slug": "the-west-hollywood-edition",
+    "name": "The West Hollywood EDITION",
+    "city": "Los Angeles",
+    "category": "hotel",
+    "tier": "hotel-boutique",
+    "notes": "Ian Schrager - West Hollywood - 19.9 rating"
+  },
+  {
+    "slug": "cara-hotel",
+    "name": "Cara Hotel",
+    "city": "Los Angeles",
+    "category": "hotel",
+    "tier": "hotel-boutique",
+    "notes": "Laid-back modern boutique - Los Feliz near Griffith Park"
+  },
+  {
+    "slug": "hotel-covell",
+    "name": "Hotel Covell",
+    "city": "Los Angeles",
+    "category": "hotel",
+    "tier": "hotel-boutique",
+    "notes": "Intimate Los Feliz gem - bespoke design"
+  },
+  {
+    "slug": "the-hoxton-downtown-la",
+    "name": "The Hoxton Downtown LA",
+    "city": "Los Angeles",
+    "category": "hotel",
+    "tier": "hotel-boutique",
+    "notes": "European-inspired DTLA boutique - 19.3 rating"
+  },
+  {
+    "slug": "short-stories-hotel",
+    "name": "Short Stories Hotel",
+    "city": "Los Angeles",
+    "category": "hotel",
+    "tier": "hotel-boutique",
+    "notes": "Fairfax District - intimate feel and design details"
+  },
+  {
+    "slug": "petit-ermitage",
+    "name": "Petit Ermitage",
+    "city": "Los Angeles",
+    "category": "hotel",
+    "tier": "hotel-boutique",
+    "notes": "West Hollywood hideaway - secluded rooftop pool"
+  },
+  {
+    "slug": "silver-lake-pool-inn",
+    "name": "Silver Lake Pool & Inn",
+    "city": "Los Angeles",
+    "category": "hotel",
+    "tier": "hotel-boutique",
+    "notes": "Relaxed organic vibe - Silver Lake essential"
+  },
+  {
+    "slug": "the-prospect-hollywood",
+    "name": "The Prospect Hollywood",
+    "city": "Los Angeles",
+    "category": "hotel",
+    "tier": "hotel-boutique",
+    "notes": "Residential feel - great outdoor spaces - 19.5 rating"
+  },
+  {
+    "slug": "santa-monica-proper",
+    "name": "Santa Monica Proper",
+    "city": "Los Angeles",
+    "category": "hotel",
+    "tier": "hotel-boutique",
+    "notes": "Kelly Wearstler design - rooftop - ocean adjacent"
+  },
+  {
+    "slug": "gold-diggers",
+    "name": "Gold Diggers",
+    "city": "Los Angeles",
+    "category": "hotel",
+    "tier": "hotel-boutique",
+    "notes": "East Hollywood - music venue/bar/hotel hybrid - 18.4 rating"
+  },
+  {
+    "slug": "the-line-la",
+    "name": "The LINE LA",
+    "city": "Los Angeles",
+    "category": "hotel",
+    "tier": "hotel-neighborhood",
+    "notes": "Koreatown - Greenhouse restaurant - strong bar scene"
+  },
+  {
+    "slug": "ace-hotel-downtown-los-angeles",
+    "name": "Ace Hotel Downtown Los Angeles",
+    "city": "Los Angeles",
+    "category": "hotel",
+    "tier": "hotel-neighborhood",
+    "notes": "Restored historic DTLA building - rooftop"
+  },
+  {
+    "slug": "freehand-los-angeles",
+    "name": "Freehand Los Angeles",
+    "city": "Los Angeles",
+    "category": "hotel",
+    "tier": "hotel-neighborhood",
+    "notes": "DTLA - youthful artsy vibe - rooftop bar - from $140"
+  },
+  {
+    "slug": "the-garland",
+    "name": "The Garland",
+    "city": "Los Angeles",
+    "category": "hotel",
+    "tier": "hotel-neighborhood",
+    "notes": "North Hollywood - mid-century resort vibe - 18.7 rating"
+  },
+  {
+    "slug": "hotel-june-west-la",
+    "name": "Hotel June West LA",
+    "city": "Los Angeles",
+    "category": "hotel",
+    "tier": "hotel-neighborhood",
+    "notes": "Near airport - stylish beach-adjacent - 18.6 rating"
+  },
+  {
+    "slug": "hotel-figueroa",
+    "name": "Hotel Figueroa",
+    "city": "Los Angeles",
+    "category": "hotel",
+    "tier": "hotel-neighborhood",
+    "notes": "DTLA historic design - Unbound Collection by Hyatt"
+  },
+  {
+    "slug": "the-sun-rose",
+    "name": "The Sun Rose",
+    "city": "Los Angeles",
+    "category": "hotel",
+    "tier": "hotel-boutique",
+    "notes": "West Hollywood - 19.8 rating - intimate luxury"
+  },
+  {
+    "slug": "hotel-per-la",
+    "name": "Hotel Per La",
+    "city": "Los Angeles",
+    "category": "hotel",
+    "tier": "hotel-boutique",
+    "notes": "Downtown - Italian-inspired design hotel"
+  },
+  {
+    "slug": "kodo-hotel",
+    "name": "kodō hotel",
+    "city": "Los Angeles",
+    "category": "hotel",
+    "tier": "hotel-boutique",
+    "notes": "Downtown - new Japanese-inspired design hotel"
+  },
+  {
+    "slug": "the-aster",
+    "name": "The Aster",
+    "city": "Los Angeles",
+    "category": "hotel",
+    "tier": "hotel-neighborhood",
+    "notes": "Hollywood - 19.3 rating - neighborhood stay"
+  },
+  {
+    "slug": "soho-warehouse-dtla",
+    "name": "Soho Warehouse DTLA",
+    "city": "Los Angeles",
+    "category": "hotel",
+    "tier": "hotel-boutique",
+    "notes": "Downtown - Soho House aesthetic - 19.0 rating"
+  },
+  {
+    "slug": "the-maybourne-beverly-hills",
+    "name": "The Maybourne Beverly Hills",
+    "city": "Los Angeles",
+    "category": "hotel",
+    "tier": "hotel-iconic",
+    "notes": "Beverly Hills - ultra-luxury - from $1246"
+  },
+  {
+    "slug": "lermitage-beverly-hills",
+    "name": "L'Ermitage Beverly Hills",
+    "city": "Los Angeles",
+    "category": "hotel",
+    "tier": "hotel-iconic",
+    "notes": "Beverly Hills - 19.3 rating - discreet luxury"
+  },
+  {
+    "slug": "sonoratown",
+    "name": "Sonoratown",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "4-iconic",
+    "notes": "Sonora-style mesquite tacos - famous flour tortillas - DTLA - on every list"
+  },
+  {
+    "slug": "villas-tacos",
+    "name": "Villa's Tacos",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "4-iconic",
+    "notes": "Highland Park + Grand Central Market - blue corn - Dodger culture icon"
+  },
+  {
+    "slug": "guisados",
+    "name": "Guisados",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "4-iconic",
+    "notes": "Braised taco specialist - handmade tortillas - multiple locations"
+  },
+  {
+    "slug": "tacos-los-cholos",
+    "name": "Tacos Los Cholos",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "4-iconic",
+    "notes": "Huntington Park - mesquite charcoal - Infatuation 9.0 #1 taco"
+  },
+  {
+    "slug": "tire-shop-taqueria",
+    "name": "Tire Shop Taqueria",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "4-iconic",
+    "notes": "Tijuana-style from a parking lot - every serious taco list"
+  },
+  {
+    "slug": "carnitas-el-momo",
+    "name": "Carnitas El Momo",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "4-iconic",
+    "notes": "Boyle Heights - consensus best carnitas in LA"
+  },
+  {
+    "slug": "los-cinco-puntos",
+    "name": "Los Cinco Puntos",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "4-iconic",
+    "notes": "Boyle Heights market institution - Infatuation 8.8"
+  },
+  {
+    "slug": "carnitas-los-gabrieles",
+    "name": "Carnitas Los Gabrieles",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "4-iconic",
+    "notes": "DTLA Piñata District sidewalk stand - best Michoacan carnitas"
+  },
+  {
+    "slug": "teddys-red-tacos",
+    "name": "Teddy's Red Tacos",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "4-iconic",
+    "notes": "Birria specialist - East LA truck - Reddit/local favorite"
+  },
+  {
+    "slug": "birrieria-nochistlan",
+    "name": "Birrieria Nochistlan",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "4-iconic",
+    "notes": "One of America's original birrierias - deep LA institution"
+  },
+  {
+    "slug": "rickys-fish-tacos",
+    "name": "Ricky's Fish Tacos",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "4-iconic",
+    "notes": "Fish tacos near Los Feliz/Griffith Park - neighborhood essential"
+  },
+  {
+    "slug": "mexicali-taco-co",
+    "name": "Mexicali Taco & Co",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "4-iconic",
+    "notes": "Baja-style tacos - national food press coverage"
+  },
+  {
+    "slug": "buzz-wine-beer-shop",
+    "name": "Buzz Wine Beer Shop",
+    "city": "Los Angeles",
+    "category": "wine bar",
+    "tier": "5-wine-bar",
+    "notes": "DTLA natural wine shop/bar hybrid"
+  },
+  {
+    "slug": "lilys-bar",
+    "name": "Lily's Bar",
+    "city": "Los Angeles",
+    "category": "wine bar",
+    "tier": "5-wine-bar",
+    "notes": "Hollywood natural wine bar"
+  },
+  {
+    "slug": "wine-eggs",
+    "name": "Wine & Eggs",
+    "city": "Los Angeles",
+    "category": "wine shop",
+    "tier": "5-wine-bar",
+    "notes": "Atwater Village - natural-leaning wine shop"
+  },
+  {
+    "slug": "flask-field",
+    "name": "Flask & Field",
+    "city": "Los Angeles",
+    "category": "wine shop",
+    "tier": "5-wine-bar",
+    "notes": "DTLA wine shop hybrid"
+  },
+  {
+    "slug": "heavens-market",
+    "name": "Heaven's Market",
+    "city": "Los Angeles",
+    "category": "wine shop",
+    "tier": "5-wine-bar",
+    "notes": "Chinatown - natural wine shop"
+  },
+  {
+    "slug": "vin-on-rose",
+    "name": "Vin on Rose",
+    "city": "Los Angeles",
+    "category": "wine shop",
+    "tier": "5-wine-bar",
+    "notes": "Venice - natural wine shop"
+  },
+  {
+    "slug": "all-time",
+    "name": "All Time",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "4-iconic",
+    "notes": "Los Feliz - strong natural wine program - beloved neighborhood spot"
+  },
+  {
+    "slug": "cosa-buona",
+    "name": "Cosa Buona",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "4-iconic",
+    "notes": "Echo Park - Italian with natural wine focus"
+  },
+  {
+    "slug": "majordomo",
+    "name": "Majordōmo",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "1",
+    "notes": "Chinatown - David Chang - strong wine program"
+  },
+  {
+    "slug": "ronan",
+    "name": "Ronan",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "4-iconic",
+    "notes": "West Hollywood - pizza + natural wine"
+  },
+  {
+    "slug": "sqirl",
+    "name": "Sqirl",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "4-iconic",
+    "notes": "Los Feliz - brunch icon + natural wine"
+  },
+  {
+    "slug": "tilda",
+    "name": "Tilda",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "3-hot2025",
+    "notes": "Hollywood - strong natural wine program"
+  },
+  {
+    "slug": "night-market-song",
+    "name": "Night + Market Song",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "4-iconic",
+    "notes": "Silver Lake - Thai + killer natural wine list"
+  },
+  {
+    "slug": "night-market-sahm",
+    "name": "Night + Market Sahm",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "4-iconic",
+    "notes": "Venice - Thai + natural wine"
+  },
+  {
+    "slug": "kobawoo-house",
+    "name": "Kobawoo House",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "4-iconic",
+    "notes": "Koreatown - Korean classic"
+  },
+  {
+    "slug": "highland-park-wine",
+    "name": "Highland Park Wine",
+    "city": "Los Angeles",
+    "category": "wine bar",
+    "tier": "5-wine-bar",
+    "notes": "Highland Park - wine bar + bottle shop"
+  },
+  {
+    "slug": "gra",
+    "name": "Grá",
+    "city": "Los Angeles",
+    "category": "restaurant",
+    "tier": "5-wine-bar",
+    "notes": "Echo Park - wine-forward restaurant"
+  }
+]

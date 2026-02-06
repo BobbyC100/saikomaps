@@ -1,0 +1,23 @@
+{
+  "place_slug": "nicks-cafe",
+  "sources": [
+    {
+      "source_id": "src_theinfatuation_2024",
+      "publication": "The Infatuation",
+      "title": "Nick's Cafe - Review - Chinatown - Los Angeles",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/nicks-cafe",
+      "published_at": "2024-05-02",
+      "trust_level": "editorial",
+      "content": "Nick's Cafe in Chinatown is an LA institution where you can get a classic diner breakfast and do some quality people watching. The nearly 70-year-old Chinatown diner is a flat-out institution, and the kind of greasy spoon spot where you post up at their U-shaped counter, eat some ham and eggs, and listen to the two guys next to you talk about their issues with Nixon. You head to Nick's completely for the experience, but walk out thinking the food was pretty d*mn good too. No surprise: cash only."
+    },
+    {
+      "source_id": "src_timeout_la_2016",
+      "publication": "Time Out LA",
+      "title": "Nick's Cafe | Restaurants in Chinatown, Los Angeles",
+      "url": "https://www.timeout.com/los-angeles/restaurants/nicks-cafe",
+      "published_at": "2016-07-15",
+      "trust_level": "editorial",
+      "content": "Across from LA State Historic Park sits a little diner—unassuming, unadorned and totally delicious. It's been open at the same spot on Spring Street since 1968, which should tell you something."
+    }
+  ]
+}

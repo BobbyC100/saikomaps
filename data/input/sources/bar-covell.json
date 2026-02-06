@@ -1,0 +1,41 @@
+{
+  "place_slug": "bar-covell",
+  "sources": [
+    {
+      "source_id": "src_punch_2015",
+      "publication": "PUNCH",
+      "title": "Bar Covell",
+      "url": "https://punchdrink.com/venues/bar-covell/",
+      "published_at": "2015-08-28",
+      "trust_level": "editorial",
+      "content": "Probably the most well-known and popular wine bar in Los Angeles, Covell came on the scene in 2010 at just the right time. The city was full of young wine drinkers with nowhere to go for a casual hang and glass of wine. Enter owner Dustin Lancaster and wine director Matthew Kaner, formerly of Café Stella and Silverlake Wine, respectively, to save the day. While the bar's bespoke style of service—there is no printed wine list, just knowledgeable bartenders eager to introduce you to something new—might seem nonsensical, it's exactly what's made Covell popular. There are dozens of wines open at a time and the staff is always willing to take you through several before you find something you like. As such, Covell has become as much a laid-back wine bar as it is a place to learn about wine. Wine from the Finger Lakes, Central Coast, Australia and beyond (sometimes older vintages and large format) as well as a nice selection of craft beer on tap."
+    },
+    {
+      "source_id": "src_the_infatuation_2024",
+      "publication": "The Infatuation",
+      "title": "Bar Covell - Review - Los Feliz",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/bar-covell",
+      "published_at": "2024-08-27",
+      "trust_level": "editorial",
+      "content": "Many of us know absolutely nothing about wine and have simply perfected the art of pointing at things with confidence. So the notion of a wine bar with over 150 rare bottles generally induces waves of anxiety. But here's the catch—at Bar Covell, there are no menus. You simply tell the people behind the counter what you're in the mood for (to the best of your ability) and they choose for you. And they usually get it exactly right. Also, the snacks menu is quite strong, and you and your date should definitely be splitting that charcuterie board."
+    },
+    {
+      "source_id": "src_the_infatuation_2021",
+      "publication": "The Infatuation",
+      "title": "The Best Wine Bars In Los Angeles",
+      "url": "https://www.theinfatuation.com/los-angeles/guides/best-wine-bars-la",
+      "published_at": "2021-12-02",
+      "trust_level": "editorial",
+      "content": "Many of us know absolutely nothing about wine and have simply perfected the art of pointing at things with confidence. So the notion of a wine bar with over 150 rare bottles generally induces waves of anxiety. But here's the catch - at Bar Covell, there are no menus. You simply tell the people behind the counter what you're in the mood for (to the best of your ability) and they choose for you. And they usually get it exactly right. Also, the snacks menu is quite strong, and you and your date should definitely be splitting that charcuterie board. This Highland Park spot is run by the same people as the equally excellent Bar Covell in Los Feliz, which means you can expect a tremendous wine list, solid bar snacks, and bartenders who'll happily let you taste-test until you find the right glass. Bonus: There's a front sidewalk patio that's entirely dog-friendly."
+    },
+    {
+      "source_id": "src_punch_2015_wine_bar",
+      "publication": "PUNCH",
+      "title": "The Essential Guide to Drinking in Los Angeles",
+      "url": "https://punchdrink.com/city-guide/where-to-drink-wine-cocktails-beer-best-bars-in-los-angeles/",
+      "published_at": "2022-11-07",
+      "trust_level": "editorial",
+      "content": "LA's wine scene has proven itself to have a style all its own—from Bar Covell's redefinition of the wine bar to quirky wine lists at restaurants like Bestia and Marvin."
+    }
+  ]
+}

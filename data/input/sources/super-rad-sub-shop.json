@@ -1,0 +1,41 @@
+{
+  "place_slug": "super-rad-sub-shop",
+  "sources": [
+    {
+      "source_id": "src_timeout_la_2025",
+      "publication": "Time Out LA",
+      "title": "Super Rad Sub Shop | Restaurants in West Hollywood, Los Angeles",
+      "url": "https://www.timeout.com/los-angeles/restaurants/super-rad-sub-shop",
+      "published_at": "2025-05-13",
+      "trust_level": "editorial",
+      "content": "The Sunset Strip might be known for a lot of things, but it hasn't been known for its amazing sandwiches—at least until now. Run out of the Naughty Pig, Super Rad Sub Shop is a destination-worthy East Coast-style artisanal sandwich shop. Not only does the window make a mean bodega-style breakfast sandwich, Super Rad offers ultra-focused, delicious takes on chopped cheese, chicken Parm, beef-and-cheddar and the classic Italian sub (the Grecco). Each gut-busting creation brims with flavor in every bite, and while you can't go wrong with Super Rad's heavier sandwiches, they also sling a killer turkey roll made with housemade roast meat and a vegetarian-friendly mix of veggies and pimento cheese (My Cousin Jeff)."
+    },
+    {
+      "source_id": "src_laist_2025",
+      "publication": "LAist",
+      "title": "The challenge: can you get a great sandwich in LA for less than $12?",
+      "url": "https://laist.com/news/food/can-you-get-a-great-sandwich-in-la-for-less-than-12",
+      "published_at": "2025-02-19",
+      "trust_level": "editorial",
+      "content": "Along the Sunset Strip, a tiny window serves inspired East Coast meets West Coast sandwiches. Owners Shanna Lynn Milazzo, from Queens, New York, and partner and chef Chris Olsefsky, from L.A., have blended their styles in Super Rad Sub Shop. For the most bang for the buck, look no further than the Bodega Egg & Cheese ($12). It contains a soft scrambled egg, American cheese, and crispy bacon with just the right chew smothered in ketchup on a pillowy-soft sesame brioche bun. It feels so universal, designed for anyone to enjoy, and it's a current favorite when I'm on the go. Location: 8264 Sunset Blvd., West Hollywood, 90046 Hours: Thursday through Sunday, 11 a.m. to 4 p.m."
+    },
+    {
+      "source_id": "src_laist_2024",
+      "publication": "LAist",
+      "title": "Cheap Fast Eats visits West Hollywood for superstar bites at a garage band price",
+      "url": "https://laist.com/news/food/cheap-fast-eats-visits-west-hollywood-for-some-superstar-bites-at-a-garage-band-price",
+      "published_at": "2024-10-11",
+      "trust_level": "editorial",
+      "content": "Along the Sunset Strip, a tiny window serves inspired East Coast meets West Coast sandwiches. Owners Shanna Lynn Milazzo, from Queens, New York, and partner and chef Chris Olsefsky, from L.A., have blended their styles in Super Rad Sub Shop. It's allowed the pair to create quirky combinations of flavors, such as their take on NYC export The Chopped Cheese sandwich ($16.50), made with caramelized onions, American cheese, and a white sauce that Olsefsky modeled after the secret sauce at Del Taco. Another is 'Nobody Likes Turkey Roll' ($16.50), named after the famed Seinfeld scene where Jerry struggles to break things off with a male friend. You won't want to end with this sandwich, made with house-brined turkey breast, finely shredded sharp cheddar, and jalapeño mayo, providing a spike of creamy heat that illuminates the rest of the contents."
+    },
+    {
+      "source_id": "src_sfgate_2024",
+      "publication": "SFGATE",
+      "title": "One of NYC's most famous foods has found new fans in California",
+      "url": "https://www.sfgate.com/la/article/bodega-chopped-cheese-super-rad-sub-shop-la-19724191.php",
+      "published_at": "2024-09-04",
+      "trust_level": "editorial",
+      "content": "Restaurant vets Shanna Lynn Milazzo and Chris Olsefsky opened Super Rad Sub Shop in West Hollywood in February. The sandwiches they serve are a mash-up of her Queens upbringing and his California roots; many of the menu items are named after family members. Their creations are thoughtful, with plenty of cheffy touches: The duo serves their substantial bodega BEC on a toasted sesame roll. The scrambled eggs are super fluffy, thanks to a whipping with an immersion blender, and the bacon is applewood-smoked. The chopped cheese, meanwhile, has a few nontraditional twists. The ground beef is seasoned with a blend of fish sauce and soy sauce, for instance, and the sandwich is finished with heirloom tomatoes and Olsefsky's white sauce, his take on Del Taco's chicken taco sauce. That said, the goal is familiarity. When people tell me one of our sandwiches tastes like home, it makes me really happy, Milazzo said."
+    }
+  ]
+}

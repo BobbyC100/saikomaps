@@ -1,0 +1,23 @@
+{
+  "place_slug": "olivia-restaurant",
+  "sources": [
+    {
+      "source_id": "src_time_out_2022",
+      "publication": "Time Out LA",
+      "title": "Olivia",
+      "url": "https://www.timeout.com/los-angeles/restaurants/olivia",
+      "published_at": "2022-05-05",
+      "trust_level": "editorial",
+      "content": "Led by former Gracias Madre head chef Mario Alberto, this adorable strip mall eatery in Koreatown features Asian-inspired vegetarian cuisine and some of the best non-alcoholic drink options in town."
+    },
+    {
+      "source_id": "src_infatuation_2022",
+      "publication": "The Infatuation",
+      "title": "Olivia - Review",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/olivia",
+      "published_at": "2022-08-17",
+      "trust_level": "editorial",
+      "content": "We can't think of a better option for a vegan date night than Olivia. This Koreatown spot has leather banquettes, bistro tables, and a menu of shareable dishes that are a bit more upscale and inventive than your average plant-based cafe. Olivia is a solid dinner option for vegans in Koreatown."
+    }
+  ]
+}

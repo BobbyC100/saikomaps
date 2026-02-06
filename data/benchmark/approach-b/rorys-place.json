@@ -1,0 +1,50 @@
+{
+  "place_slug": "rorys-place",
+  "sources": [
+    {
+      "source_id": "src_michelin_2025",
+      "publication": "Michelin Guide",
+      "title": "Rory's Place – Ojai - a MICHELIN Guide Restaurant",
+      "url": "https://guide.michelin.com/us/en/california/ojai/restaurant/rory-s-place",
+      "published_at": "2025-06-25",
+      "trust_level": "editorial",
+      "content": "Sisters Rory and Meave McAuliffe run this charming Ojai spot with rustic, feel-good vibes. Wide plank wood floors lend warmth while exposed ducts keep things trendy. There is a little bit of everything here, from a local produce-driven menu and terrific raw bar offerings to a natural wine list and a provisions counter up front. Some dishes seem simple but deliver in spades. A stunning salad of avocado, baby beets and citrus served on a wide, oval plate is a riot of colors. Then, an herb-laced broth bobbing with Aleppo sausage, spring garlic, potatoes and steamed countneck clams offers a refined take on stew. Then, a classic Pavlova is topped with a citrus custard and fresh blood and cara cara oranges, grapefruit and kumquat for a bright finish."
+    },
+    {
+      "source_id": "src_michelin_2023",
+      "publication": "Michelin Guide",
+      "title": "MICHELIN is in the Blood for These Chefs",
+      "url": "https://guide.michelin.com/us/en/article/features/michelin-guide-related-chefs-rory-s-place-heritage-california-green-star",
+      "published_at": "2023-08-30",
+      "trust_level": "editorial",
+      "content": "For Meave and Rory McAuliffe, restaurants, and family businesses, are in their blood. We grew up in our mom's bakery and restaurant and each one was owned with a different sister, explains Rory, the youngest of the family. The two spent plenty of time in the bakery, stopping by on the way to school and playing in flour bins as big as we were. Still, the two didn't plan to follow in their mother's and aunts' footsteps—at least initially. Our dad had an art gallery and I always thought I'd do that, says Rory. Indeed, she did, spending years working in film and art. Meave immediately gravitated to the kitchen, working as chef in a number of restaurants. While Meave was living on the East Coast and working on a business plan for a place in New York's Hudson Valley, Rory sent her a plan for a wine bar. It had no chef and she has no restaurant experience, says Meave. Meave also believes the two sisters blended their interests in art and food when they opened Rory's Place. Restaurants and cooking are inherently a creative endeavor. From the design of our space to the plating of the food, it is a deeply personal form of artistic expression."
+    },
+    {
+      "source_id": "src_theinfatuation_2024",
+      "publication": "The Infatuation",
+      "title": "Rory's Place - Review - Ojai - Los Angeles",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/los-angeles-reviews-rorys-place",
+      "published_at": "2024-07-10",
+      "trust_level": "editorial",
+      "content": "Run by two sisters, Rory's Place is a jack-of-all-trades restaurant and wine bar right on the edge of the town's main strip. There are crudos, gem salads, and wood-fired vegetables, but many of the familiar dishes get new, successful, and fun twists here—the roast chicken is topped with blackberries and the broiled oysters come with fermented chili butter, for example. There's also a happening back patio, solid cocktails and natural wines, and a raw bar that's an attraction unto itself. If you're looking for a lively Ojai dinner spot with very good food, Rory's is where you want to be. Truly Excellent: An 8 should be on your must-try list, because 8s are great. These spots are worth making an effort or crossing town for."
+    },
+    {
+      "source_id": "src_sunset_2022",
+      "publication": "Sunset Magazine",
+      "title": "Two Sisters Are Harnessing Ojai's Bounty to Create the California Restaurant of Our Dreams",
+      "url": "https://www.sunset.com/food-wine/restaurants/ojai-restaurant-rorys-place",
+      "published_at": "2022-02-10",
+      "trust_level": "editorial",
+      "content": "The restaurant, situated in an old theater on the western edge of the tiny town's main drag, has been several years in the making, knocked off track like so many restaurants by the pandemic. It's a beautiful space with soaring ceilings, a bar hewn from local timber, and ceramic sconces made by Meave, who also made many of the serving dishes. During the shutdown, the McAuliffe sisters also threw backyard pop-ups with wood-fired dishes and lots of oysters, sold arty T-shirts, gained a little Instagram following, and fine-tuned the recipes that will end up at the restaurant: steak topped with compound butter enriched with a friend's domestic bottarga, grilled vegetables dressed with a lemony aïoli, sides of salmon marinated and seasoned with wild local herbs, all on the menu today. The sisters know a thing or two about California cuisine. They grew up helping their mom with her bakery in Los Angeles. Meave went on to chef around the country, opened Venice's Gjelina, and ran the kitchen at Saltwater Oyster Depot up in Inverness. Rory, a former film producer, did stints working front of house in restaurants and bars and dreamed of opening her own bar. The two felt the pull of rural Ojai, decided to join forces, and here we are today."
+    },
+    {
+      "source_id": "src_remodelista_2022",
+      "publication": "Remodelista",
+      "title": "A Family Affair: Rory's Place, a New Sister-Owned Restaurant in Ojai, CA",
+      "url": "https://www.remodelista.com/posts/rorys-restaurant-ojai-ca/",
+      "published_at": "2022-02-09",
+      "trust_level": "editorial",
+      "content": "Rory's Place is a collaboration between us—sisters Rory and Meave McAuliffe, Rory says. We grew up playing in the kitchen of our mom's bakery in Santa Monica in the 1990s, and we've been cooking together ever since. Above: Roni Ginach, an importer and distributor of natural wines, oversees the list at Rory's. Above: A vintage copper tub holds a selection of wines. Above: Cooking with fire is an integral part of the culinary program, Above: The talented and passionate team."
+    }
+  ]
+}

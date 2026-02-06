@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Saiko Maps — Merchant Page v2</title>
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #1a1a1a;
+      padding: 24px;
+      min-height: 100vh;
+      color: #ccc;
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .page-title {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      color: #888;
+      margin-bottom: 8px;
+    }
+    .page-subtitle {
+      font-family: 'Libre Baskerville', Georgia, serif;
+      font-size: 18px;
+      font-style: italic;
+      color: #C3B091;
+    }
+
+    .variants {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .variant-col {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .variant-label {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #666;
+      padding: 6px 10px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 4px;
+      text-align: center;
+    }
+
+    /* ================================================================
+       CSS CUSTOM PROPERTIES (Field Notes palette)
+       ================================================================ */
+    .merchant-page {
+      --fn-parchment: #F5F0E1;
+      --fn-khaki: #C3B091;
+      --fn-olive: #6B7F59;
+      --fn-leather: #8B4513;
+      --fn-burnt-orange: #CC5500;
+      --fn-charcoal: #36454F;
+      --fn-white: #FFFDF7;
+      --fn-open-green: #4A7C59;
+      --fn-closed: #36454F;
+    }
+
+    .merchant-page {
+      background: var(--fn-parchment);
+      border-radius: 8px;
+      overflow: hidden;
+      max-width: 420px;
+    }
+
+    .merchant-page.dark {
+      background: #152030;
+    }
+
+    /* Hero + meta */
+    .merchant-hero {
+      position: relative;
+      height: 180px;
+      background: linear-gradient(135deg, #EDE8D8 0%, #E2DCC8 100%);
+    }
+    .merchant-page.dark .merchant-hero {
+      background: linear-gradient(135deg, #1B2A3D 0%, #1E2F44 100%);
+    }
+    .merchant-hero img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .merchant-meta {
+      padding: 16px 20px 12px;
+      border-bottom: 1px solid rgba(195,176,145,0.2);
+    }
+    .merchant-page.dark .merchant-meta {
+      border-bottom-color: rgba(137,180,196,0.1);
+    }
+    .merchant-category {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--fn-khaki);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .merchant-name {
+      font-family: 'Libre Baskerville', Georgia, serif;
+      font-size: 24px;
+      font-style: italic;
+      color: var(--fn-charcoal);
+      line-height: 1.2;
+    }
+    .merchant-page.dark .merchant-name {
+      color: rgba(255,255,255,0.95);
+    }
+    .merchant-meta-line {
+      font-size: 12px;
+      color: rgba(54,69,79,0.7);
+      margin-top: 6px;
+    }
+    .merchant-page.dark .merchant-meta-line {
+      color: rgba(255,255,255,0.6);
+    }
+
+    /* Bento grid */
+    .bento-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 3px;
+      padding: 4px;
+    }
+    .bento-block {
+      padding: 12px 14px;
+      border-radius: 4px;
+      background: var(--fn-white);
+      border: 1px solid rgba(195,176,145,0.15);
+    }
+    .merchant-page.dark .bento-block {
+      background: rgba(27,42,61,0.6);
+      border-color: rgba(137,180,196,0.08);
+    }
+    .block-label {
+      font-size: 9px;
+      font-weight: 600;
+      color: var(--fn-khaki);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .merchant-page.dark .block-label {
+      color: rgba(195,176,145,0.8);
+    }
+
+    /* Contact — flat chips, space-evenly */
+    .contact-block {
+      display: flex;
+      align-items: center;
+      justify-content: space-evenly;
+      gap: 8px;
+    }
+    .contact-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--fn-charcoal);
+      text-decoration: none;
+      opacity: 0.85;
+      transition: opacity 150ms ease;
+    }
+    .merchant-page.dark .contact-chip {
+      color: rgba(255,255,255,0.9);
+    }
+    .contact-chip:hover {
+      opacity: 1;
+    }
+    .contact-chip svg {
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
+    }
+
+    /* Field note (curator) */
+    .field-note-block .block-label {
+      margin-bottom: 6px;
+    }
+    .field-note-text {
+      font-family: 'Libre Baskerville', Georgia, serif;
+      font-size: 14px;
+      font-style: italic;
+      color: var(--fn-charcoal);
+      line-height: 1.55;
+      opacity: 0.9;
+    }
+    .merchant-page.dark .field-note-text {
+      color: rgba(255,255,255,0.9);
+    }
+    .field-note-attribution {
+      font-size: 11px;
+      color: rgba(54,69,79,0.65);
+      margin-top: 12px;
+    }
+    .merchant-page.dark .field-note-attribution {
+      color: rgba(255,255,255,0.5);
+    }
+
+    /* Photo collage — bento */
+    .gallery-collage {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: 140px 80px;
+      gap: 3px;
+      padding: 4px;
+      border-radius: 8px;
+    }
+    .gallery-tile {
+      border-radius: 8px;
+      overflow: hidden;
+      background: rgba(195,176,145,0.15);
+    }
+    .merchant-page.dark .gallery-tile {
+      background: rgba(0,0,0,0.2);
+    }
+    .gallery-tile img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .gallery-tile.hero {
+      grid-column: 1 / -1;
+    }
+    .gallery-tile.more {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--fn-khaki);
+    }
+    .merchant-page.dark .gallery-tile.more {
+      color: rgba(195,176,145,0.7);
+    }
+
+    /* Excerpt — provenance clip */
+    .excerpt-block {
+      background: rgba(195,176,145,0.06);
+      border-left: 2px solid rgba(195,176,145,0.65);
+      padding: 12px 14px;
+      font-family: system-ui, sans-serif;
+      font-size: 13px;
+      font-style: normal;
+      color: var(--fn-charcoal);
+      opacity: 0.78;
+      line-height: 1.5;
+    }
+    .merchant-page.dark .excerpt-block {
+      background: rgba(195,176,145,0.08);
+      border-left-color: rgba(195,176,145,0.5);
+      color: rgba(255,255,255,0.85);
+    }
+
+    /* Vibe — inline italic, dot separators */
+    .vibe-block .block-label {
+      margin-bottom: 6px;
+    }
+    .vibe-tags {
+      font-family: 'Libre Baskerville', Georgia, serif;
+      font-size: 15px;
+      font-style: italic;
+      opacity: 0.7;
+      color: var(--fn-charcoal);
+    }
+    .merchant-page.dark .vibe-tags {
+      color: rgba(255,255,255,0.85);
+    }
+    .vibe-tags span:not(:last-child)::after {
+      content: ' · ';
+      opacity: 0.8;
+    }
+
+    /* Hours */
+    .hours-status {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 2px;
+      display: inline-block;
+      margin-bottom: 8px;
+    }
+    .hours-status.open {
+      background: var(--fn-open-green);
+      color: white;
+    }
+    .hours-status.closed {
+      background: var(--fn-closed);
+      color: rgba(255,255,255,0.9);
+    }
+    .merchant-page.dark .hours-status.closed {
+      background: rgba(54,69,79,0.8);
+    }
+    .hours-today {
+      font-size: 13px;
+      color: var(--fn-charcoal);
+    }
+    .merchant-page.dark .hours-today {
+      color: rgba(255,255,255,0.8);
+    }
+    .hours-full {
+      font-size: 11px;
+      color: rgba(54,69,79,0.7);
+      margin-top: 8px;
+      line-height: 1.7;
+    }
+    .merchant-page.dark .hours-full {
+      color: rgba(255,255,255,0.6);
+    }
+
+    /* Coverage (was Featured In) */
+    .coverage-item {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      padding: 4px 0;
+      transition: opacity 150ms ease;
+    }
+    .coverage-item:hover {
+      opacity: 0.85;
+    }
+    .coverage-item .pub {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--fn-charcoal);
+    }
+    .merchant-page.dark .coverage-item .pub {
+      color: rgba(255,255,255,0.9);
+    }
+    .coverage-item .title {
+      font-size: 12px;
+      color: rgba(54,69,79,0.7);
+      margin-top: 1px;
+    }
+    .merchant-page.dark .coverage-item .title {
+      color: rgba(255,255,255,0.6);
+    }
+
+    /* Map */
+    .map-block {
+      padding: 0;
+      overflow: hidden;
+      min-height: 120px;
+    }
+    .map-placeholder {
+      width: 100%;
+      height: 140px;
+      background: rgba(195,176,145,0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: var(--fn-khaki);
+    }
+    .merchant-page.dark .map-placeholder {
+      background: rgba(0,0,0,0.3);
+      color: rgba(195,176,145,0.5);
+    }
+    .map-address {
+      padding: 8px 12px;
+      font-size: 11px;
+      color: rgba(54,69,79,0.7);
+    }
+    .merchant-page.dark .map-address {
+      color: rgba(255,255,255,0.6);
+    }
+    .map-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      color: var(--fn-khaki);
+      text-decoration: none;
+      margin-top: 4px;
+    }
+    .map-link:hover {
+      text-decoration: underline;
+    }
+
+    /* Tips */
+    .tips-block ul {
+      list-style: none;
+      font-size: 12px;
+      color: var(--fn-charcoal);
+      line-height: 1.6;
+    }
+    .merchant-page.dark .tips-block ul {
+      color: rgba(255,255,255,0.85);
+    }
+    .tips-block li::before {
+      content: '• ';
+      color: var(--fn-khaki);
+    }
+
+    /* Best For — light mode fix */
+    .best-for-block {
+      background: var(--fn-white);
+      border: 1px solid rgba(195,176,145,0.22);
+      font-family: 'Libre Baskerville', Georgia, serif;
+      font-size: 14px;
+      font-style: italic;
+      color: var(--fn-charcoal);
+      opacity: 0.82;
+      line-height: 1.55;
+    }
+    .merchant-page.dark .best-for-block {
+      background: rgba(27,42,61,0.8);
+      border-color: rgba(137,180,196,0.15);
+      color: rgba(255,255,255,0.9);
+    }
+
+    /* Spans */
+    .span-6 { grid-column: span 6; }
+    .span-4 { grid-column: span 4; }
+    .span-3 { grid-column: span 3; }
+    .span-2 { grid-column: span 2; }
+
+    /* Sparse: map full-width, no empty blocks */
+    .merchant-page.sparse .map-block {
+      grid-column: span 6 !important;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="page-header">
+    <div class="page-title">Merchant Page v2 — Reference Mockup</div>
+    <div class="page-subtitle">Light · Dark · Sparse variants</div>
+  </div>
+
+  <div class="variants">
+    <!-- LIGHT MODE — Rich data -->
+    <div class="variant-col">
+      <div class="variant-label">Light mode (rich data)</div>
+      <div class="merchant-page">
+        <div class="merchant-hero">
+          <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=880&h=400&fit=crop" alt="">
+        </div>
+        <div class="merchant-meta">
+          <div class="merchant-category">Coffee · Surf · Breakfast</div>
+          <h1 class="merchant-name">Biarritz Coffee Club</h1>
+          <div class="merchant-meta-line">Silver Lake · $$ · Walk-in</div>
+        </div>
+        <div class="bento-grid">
+          <div class="bento-block contact-block span-6">
+            <a href="tel:+33559241234" class="contact-chip">📞 +33 5 59 24 12 34</a>
+            <a href="#" class="contact-chip">🌐 biarritzcoffeeclub.com</a>
+            <a href="#" class="contact-chip">📷 @biarritzcoffeeclub</a>
+          </div>
+          <div class="bento-block field-note-block span-6">
+            <div class="block-label">Field note</div>
+            <p class="field-note-text">Tiny spot run by two Aussie expats who know their coffee. Grab a seat outside and watch the surf check parade.</p>
+            <div class="field-note-attribution">— Bobby Biarritz</div>
+          </div>
+          <div class="bento-block span-6" style="padding:4px;">
+            <div class="gallery-collage">
+              <div class="gallery-tile hero"><img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=880&h=400&fit=crop" alt=""></div>
+              <div class="gallery-tile"><img src="https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=400&h=300&fit=crop" alt=""></div>
+              <div class="gallery-tile"><img src="https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=400&h=300&fit=crop" alt=""></div>
+              <div class="gallery-tile more">+more</div>
+            </div>
+          </div>
+          <div class="bento-block excerpt-block span-3">
+            "The best flat white in Biarritz." — Eater
+          </div>
+          <div class="bento-block vibe-block span-3">
+            <div class="block-label">Vibe</div>
+            <div class="vibe-tags"><span>Low-key</span><span>Surf crowd</span><span>Standing room</span></div>
+          </div>
+          <div class="bento-block span-3">
+            <div class="block-label">Hours</div>
+            <span class="hours-status open">Open</span>
+            <div class="hours-today">7:00 AM – 4:00 PM today</div>
+            <div class="hours-full">M–F 7–4 · Sat 8–5 · Sun 8–3</div>
+          </div>
+          <div class="bento-block span-3">
+            <div class="block-label">Coverage</div>
+            <a href="#" class="coverage-item"><span class="pub">Eater</span><span class="title">Best Coffee in Biarritz</span></a>
+            <a href="#" class="coverage-item"><span class="pub">SW France Surf Trip</span><span class="title">Bobby Biarritz</span></a>
+          </div>
+          <div class="bento-block map-block span-4">
+            <div class="map-placeholder">[Map]</div>
+            <div class="map-address">12 Rue du Port Vieux, Biarritz</div>
+            <a href="#" class="map-link">Open in Maps ↗</a>
+          </div>
+          <div class="bento-block tips-block span-2">
+            <div class="block-label">Tips</div>
+            <ul>
+              <li>Go early for a seat</li>
+              <li>Cash only</li>
+            </ul>
+          </div>
+          <div class="bento-block best-for-block span-6">
+            Best for a quick flat white before hitting the waves. The outdoor seating is prime for people-watching.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DARK MODE — Rich data -->
+    <div class="variant-col">
+      <div class="variant-label">Dark mode (rich data)</div>
+      <div class="merchant-page dark">
+        <div class="merchant-hero">
+          <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=880&h=400&fit=crop" alt="">
+        </div>
+        <div class="merchant-meta">
+          <div class="merchant-category">Coffee · Surf · Breakfast</div>
+          <h1 class="merchant-name">Biarritz Coffee Club</h1>
+          <div class="merchant-meta-line">Silver Lake · $$ · Walk-in</div>
+        </div>
+        <div class="bento-grid">
+          <div class="bento-block contact-block span-6">
+            <a href="tel:+33559241234" class="contact-chip">📞 +33 5 59 24 12 34</a>
+            <a href="#" class="contact-chip">🌐 biarritzcoffeeclub.com</a>
+            <a href="#" class="contact-chip">📷 @biarritzcoffeeclub</a>
+          </div>
+          <div class="bento-block field-note-block span-6">
+            <div class="block-label">Field note</div>
+            <p class="field-note-text">Tiny spot run by two Aussie expats who know their coffee. Grab a seat outside and watch the surf check parade.</p>
+            <div class="field-note-attribution">— Bobby Biarritz</div>
+          </div>
+          <div class="bento-block span-6" style="padding:4px;">
+            <div class="gallery-collage">
+              <div class="gallery-tile hero"><img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=880&h=400&fit=crop" alt=""></div>
+              <div class="gallery-tile"><img src="https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=400&h=300&fit=crop" alt=""></div>
+              <div class="gallery-tile"><img src="https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=400&h=300&fit=crop" alt=""></div>
+              <div class="gallery-tile more">+more</div>
+            </div>
+          </div>
+          <div class="bento-block excerpt-block span-3">
+            "The best flat white in Biarritz." — Eater
+          </div>
+          <div class="bento-block vibe-block span-3">
+            <div class="block-label">Vibe</div>
+            <div class="vibe-tags"><span>Low-key</span><span>Surf crowd</span><span>Standing room</span></div>
+          </div>
+          <div class="bento-block span-3">
+            <div class="block-label">Hours</div>
+            <span class="hours-status open">Open</span>
+            <div class="hours-today">7:00 AM – 4:00 PM today</div>
+            <div class="hours-full">M–F 7–4 · Sat 8–5 · Sun 8–3</div>
+          </div>
+          <div class="bento-block span-3">
+            <div class="block-label">Coverage</div>
+            <a href="#" class="coverage-item"><span class="pub">Eater</span><span class="title">Best Coffee in Biarritz</span></a>
+            <a href="#" class="coverage-item"><span class="pub">SW France Surf Trip</span><span class="title">Bobby Biarritz</span></a>
+          </div>
+          <div class="bento-block map-block span-4">
+            <div class="map-placeholder">[Map]</div>
+            <div class="map-address">12 Rue du Port Vieux, Biarritz</div>
+            <a href="#" class="map-link">Open in Maps ↗</a>
+          </div>
+          <div class="bento-block tips-block span-2">
+            <div class="block-label">Tips</div>
+            <ul>
+              <li>Go early for a seat</li>
+              <li>Cash only</li>
+            </ul>
+          </div>
+          <div class="bento-block best-for-block span-6">
+            Best for a quick flat white before hitting the waves. The outdoor seating is prime for people-watching.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SPARSE DATA -->
+    <div class="variant-col">
+      <div class="variant-label">Sparse data (minimal enrichment)</div>
+      <div class="merchant-page sparse">
+        <div class="merchant-hero">
+          <div style="width:100%;height:100%;background:rgba(195,176,145,0.2);display:flex;align-items:center;justify-content:center;font-family:'Libre Baskerville',serif;font-size:48px;font-style:italic;color:rgba(195,176,145,0.4);">B</div>
+        </div>
+        <div class="merchant-meta">
+          <div class="merchant-category">Coffee</div>
+          <h1 class="merchant-name">Local Roasters</h1>
+          <div class="merchant-meta-line">Downtown · Walk-in</div>
+        </div>
+        <div class="bento-grid">
+          <div class="bento-block contact-block span-6">
+            <a href="tel:+15551234567" class="contact-chip">📞 +1 555 123 4567</a>
+            <a href="#" class="contact-chip">🌐 localroasters.com</a>
+          </div>
+          <div class="bento-block span-3">
+            <div class="block-label">Hours</div>
+            <span class="hours-status closed">Closed</span>
+            <div class="hours-today">Opens 7 AM tomorrow</div>
+          </div>
+          <div class="bento-block map-block span-4">
+            <div class="map-placeholder">[Map]</div>
+            <div class="map-address">123 Main St, Downtown</div>
+            <a href="#" class="map-link">Open in Maps ↗</a>
+          </div>
+          <div class="bento-block best-for-block span-6">
+            A neighborhood coffee shop with solid pour-overs.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,23 @@
+{
+  "place_slug": "say-cheese",
+  "sources": [
+    {
+      "source_id": "src_theinfatuation_2021",
+      "publication": "The Infatuation",
+      "title": "Say Cheese - Review - Silver Lake - Los Angeles",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/say-cheese",
+      "published_at": "2021-08-13",
+      "trust_level": "editorial",
+      "content": "Whether you're headed to a picnic at Silver Lake Meadow or just want to bathe yourself in vintage goudas, Say Cheese has all the dairy, charcuterie, and freshly baked bread your heart could ever desire. The cheese menu here is tremendous, filled with over 60 different choices, including harder-to-find options like bright-orange Shropshire Blues or smoky, French cheeses that have been aged for nearly two years. There are also pickles stuffed with anchovies, baked sandwiches made to order, and custom gift baskets that have been curated by the shop owner himself."
+    },
+    {
+      "source_id": "src_timeout_los_angeles_2016",
+      "publication": "Time Out Los Angeles",
+      "title": "Say Cheese | Shopping in Silver Lake, Los Angeles",
+      "url": "https://www.timeout.com/los-angeles/shopping/say-cheese",
+      "published_at": "2016-09-23",
+      "trust_level": "editorial",
+      "content": "Owner Glenn Harrell is one of the nicest men you'll ever meet behind a cheese counter. He knows his stuff and wants you to learn, too—stop in to pick something up for a dinner party or picnic and you'll likely walk out with lots of newfound knowledge (and a few extra rounds of cheese). The experience isn't rushed here—you'll be asked where you're going, what you like, and get into discussions about consistency and odor. The shop has run smoothly for just over 35 years—an impressive feat in such a fast-changing neighborhood, and a testament to Harrell's dedication to (the cheese lovers of) the community."
+    }
+  ]
+}

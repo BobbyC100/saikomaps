@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Saiko Maps — Sharing Images (Approved)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #F5F5F5;
+      padding: 40px;
+      min-height: 100vh;
+    }
+
+    :root {
+      --color-background: #FFFFFF;
+      --color-text-primary: #1A1A1A;
+      --color-text-secondary: #6B6B6B;
+      --color-text-tertiary: #9A9A9A;
+      --color-accent: #E07A5F;
+      --color-border-subtle: #F0F0F0;
+      --font-title: "Playfair Display", Georgia, serif;
+    }
+
+    h1 {
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin-bottom: 32px;
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #9A9A9A;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .section {
+      margin-bottom: 48px;
+    }
+
+    .flex-row {
+      display: flex;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+
+    .spec-box {
+      margin-top: 16px;
+      padding: 16px;
+      background: white;
+      border: 1px solid #E5E5E5;
+      border-radius: 2px;
+      font-size: 12px;
+      color: var(--color-text-secondary);
+      line-height: 1.8;
+    }
+
+    .spec-box strong {
+      color: var(--color-text-primary);
+    }
+
+    /* ========================================
+       INSTAGRAM STORY IMAGE (1080×1920)
+       Shown at 25% scale = 270×480
+       ======================================== */
+    .story-card {
+      width: 270px;
+      height: 480px;
+      background-color: #FFFFFF;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .story-card__photo {
+      height: 55%;
+      background-color: #F0F0F0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .story-card__photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .story-card__photo::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 50%;
+      background: linear-gradient(transparent, rgba(0,0,0,0.3));
+    }
+
+    .story-card__content {
+      flex: 1;
+      padding: 20px 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background-color: #FFFFFF;
+      position: relative;
+    }
+
+    .story-card__accent {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background-color: var(--color-accent);
+    }
+
+    .story-card__category {
+      font-size: 8px;
+      font-weight: 600;
+      color: var(--color-accent);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      margin-top: 8px;
+    }
+
+    .story-card__name {
+      font-size: 20px;
+      font-weight: 400;
+      font-family: var(--font-title);
+      font-style: italic;
+      color: var(--color-text-primary);
+      margin: 0 0 8px 0;
+      line-height: 1.15;
+    }
+
+    .story-card__desc {
+      font-size: 10px;
+      color: var(--color-text-secondary);
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    .story-card__location {
+      font-size: 9px;
+      color: var(--color-text-tertiary);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .story-card__location svg {
+      width: 10px;
+      height: 10px;
+    }
+
+    .story-card__footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 12px;
+      border-top: 1px solid var(--color-border-subtle);
+    }
+
+    .story-card__brand {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      letter-spacing: 0.02em;
+    }
+
+    .story-card__url {
+      font-size: 8px;
+      color: var(--color-accent);
+      font-weight: 500;
+    }
+
+    /* ========================================
+       OPEN GRAPH IMAGE (1200×630)
+       Shown at 33% scale = 400×210
+       ======================================== */
+    .og-card {
+      width: 400px;
+      background-color: #FFFFFF;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+      border: 1px solid #E5E5E5;
+    }
+
+    .og-card__image {
+      height: 210px;
+      display: flex;
+    }
+
+    .og-card__photo {
+      width: 45%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .og-card__photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .og-card__info {
+      width: 55%;
+      height: 100%;
+      background-color: #FFFFFF;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      border-left: 4px solid var(--color-accent);
+    }
+
+    .og-card__category {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--color-accent);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .og-card__name {
+      font-size: 18px;
+      font-weight: 400;
+      font-family: var(--font-title);
+      font-style: italic;
+      color: var(--color-text-primary);
+      line-height: 1.2;
+      margin: 0 0 8px 0;
+    }
+
+    .og-card__desc {
+      font-size: 11px;
+      color: var(--color-text-secondary);
+      line-height: 1.4;
+      margin: 0 0 12px 0;
+    }
+
+    .og-card__location {
+      font-size: 10px;
+      color: var(--color-text-tertiary);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .og-card__location svg {
+      width: 10px;
+      height: 10px;
+    }
+
+    .og-card__brand {
+      margin-top: auto;
+      padding-top: 12px;
+      font-size: 9px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      letter-spacing: 0.02em;
+    }
+
+    /* OG Preview Footer (how iMessage shows it) */
+    .og-card__preview-footer {
+      padding: 12px 16px;
+      border-top: 1px solid var(--color-border-subtle);
+    }
+
+    .og-card__preview-domain {
+      font-size: 11px;
+      color: var(--color-text-tertiary);
+      margin-bottom: 2px;
+    }
+
+    .og-card__preview-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--color-text-primary);
+    }
+
+    /* Code block */
+    .code-block {
+      margin-top: 16px;
+      padding: 16px;
+      background: #1A1A1A;
+      border-radius: 2px;
+      font-size: 11px;
+      font-family: 'Monaco', 'Menlo', monospace;
+      color: #A0A0A0;
+      line-height: 1.8;
+      overflow-x: auto;
+    }
+
+    .code-block .tag {
+      color: #E07A5F;
+    }
+
+    .code-block .attr {
+      color: #9A9A9A;
+    }
+
+    .code-block .val {
+      color: #7EC699;
+    }
+
+    .code-block .comment {
+      color: #6B6B6B;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Sharing Images — Approved</h1>
+
+  <div class="flex-row">
+
+    <!-- Instagram Story Image -->
+    <div class="section">
+      <div class="section-label">Instagram Story Image (1080×1920)</div>
+      
+      <div class="story-card">
+        <div class="story-card__photo">
+          <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=540&h=528&fit=crop" alt="Coffee">
+        </div>
+        <div class="story-card__content">
+          <div class="story-card__accent"></div>
+          <div>
+            <div class="story-card__category">Coffee · Surf</div>
+            <h1 class="story-card__name">Biarritz Coffee Club</h1>
+            <p class="story-card__desc">The best flat white in Biarritz. Tiny spot run by two Aussie expats.</p>
+          </div>
+          <div>
+            <div class="story-card__location">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+              12 Rue du Port Vieux, Biarritz
+            </div>
+            <div class="story-card__footer">
+              <div class="story-card__brand">SAIKO MAPS</div>
+              <div class="story-card__url">saikomaps.com/place/...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="spec-box" style="width: 270px;">
+        <strong>Specs</strong><br>
+        Size: 1080 × 1920px<br>
+        Format: PNG<br>
+        Background: White<br>
+        Photo: Top 55%, from Google Places<br>
+        Accent: 3px coral bar<br>
+        URL: Visible for Link Sticker
+      </div>
+    </div>
+
+    <!-- Open Graph Image -->
+    <div class="section">
+      <div class="section-label">Open Graph Preview (1200×630)</div>
+      
+      <div class="og-card">
+        <div class="og-card__image">
+          <div class="og-card__photo">
+            <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=360&h=420&fit=crop" alt="Coffee">
+          </div>
+          <div class="og-card__info">
+            <div class="og-card__category">Coffee · Surf</div>
+            <h1 class="og-card__name">Biarritz Coffee Club</h1>
+            <p class="og-card__desc">The best flat white in Biarritz. Tiny spot run by two Aussie expats.</p>
+            <div class="og-card__location">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+              Biarritz, France
+            </div>
+            <div class="og-card__brand">SAIKO MAPS</div>
+          </div>
+        </div>
+        <div class="og-card__preview-footer">
+          <div class="og-card__preview-domain">saikomaps.com</div>
+          <div class="og-card__preview-title">Biarritz Coffee Club — Saiko Maps</div>
+        </div>
+      </div>
+
+      <div class="spec-box" style="width: 400px;">
+        <strong>OG Image Specs</strong><br>
+        Size: 1200 × 630px (1.91:1 ratio)<br>
+        Format: PNG or JPG<br>
+        Layout: Split — photo left, info right<br>
+        Accent: 4px coral left border on info panel<br>
+        Generated: Server-side per merchant
+      </div>
+
+      <div class="code-block" style="width: 400px;">
+        <span class="comment">&lt;!-- Open Graph Meta Tags --&gt;</span><br>
+        <span class="tag">&lt;meta</span> <span class="attr">property=</span><span class="val">"og:title"</span><br>
+        &nbsp;&nbsp;<span class="attr">content=</span><span class="val">"Biarritz Coffee Club"</span> <span class="tag">/&gt;</span><br>
+        <span class="tag">&lt;meta</span> <span class="attr">property=</span><span class="val">"og:description"</span><br>
+        &nbsp;&nbsp;<span class="attr">content=</span><span class="val">"The best flat white..."</span> <span class="tag">/&gt;</span><br>
+        <span class="tag">&lt;meta</span> <span class="attr">property=</span><span class="val">"og:image"</span><br>
+        &nbsp;&nbsp;<span class="attr">content=</span><span class="val">"https://...og/place/xxx.png"</span> <span class="tag">/&gt;</span><br>
+        <span class="tag">&lt;meta</span> <span class="attr">property=</span><span class="val">"og:image:width"</span> <span class="attr">content=</span><span class="val">"1200"</span> <span class="tag">/&gt;</span><br>
+        <span class="tag">&lt;meta</span> <span class="attr">property=</span><span class="val">"og:image:height"</span> <span class="attr">content=</span><span class="val">"630"</span> <span class="tag">/&gt;</span><br>
+        <span class="tag">&lt;meta</span> <span class="attr">property=</span><span class="val">"og:url"</span><br>
+        &nbsp;&nbsp;<span class="attr">content=</span><span class="val">"https://saikomaps.com/place/xxx"</span> <span class="tag">/&gt;</span><br>
+        <span class="tag">&lt;meta</span> <span class="attr">property=</span><span class="val">"og:type"</span> <span class="attr">content=</span><span class="val">"place"</span> <span class="tag">/&gt;</span><br>
+        <span class="tag">&lt;meta</span> <span class="attr">property=</span><span class="val">"og:site_name"</span> <span class="attr">content=</span><span class="val">"Saiko Maps"</span> <span class="tag">/&gt;</span>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

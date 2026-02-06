@@ -1,0 +1,50 @@
+{
+  "place_slug": "gwen",
+  "sources": [
+    {
+      "source_id": "src_michelin_guide_2025",
+      "publication": "Michelin Guide",
+      "title": "Gwen – Los Angeles - a MICHELIN Guide Restaurant",
+      "url": "https://guide.michelin.com/us/en/california/us-los-angeles/restaurant/gwen",
+      "published_at": "2025-06-25",
+      "trust_level": "editorial",
+      "content": "Gwen – a One Star: High quality cooking restaurant in the 2025 MICHELIN Guide USA. During the day, this enticingly arranged butcher shop sells humanely raised meats from local partner farms. By night, Gwen opens into a glowing dining room showcasing the same upscale cuts à la carte and on its multicourse tasting. Named for their beloved grandmother, this collaboration between Chef Curtis Stone and his brother, Luke, conjures Art Deco glamour with crystal chandeliers and a roaring fireplace. The menu is concise and stars house-made charcuterie and wood-fire grilled steaks. Watch from the chef's counter as the crew deftly cooks high quality meat, perhaps a Blackmore Wagyu New York strip, to perfection. Save room for dessert, like a round of cheesecake nestled in a mound of graham cracker crumbs and topped with a quenelle of mango lime sorbet."
+    },
+    {
+      "source_id": "src_infatuation_2022",
+      "publication": "The Infatuation",
+      "title": "Gwen - Review - Hollywood - Los Angeles - The Infatuation",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/gwen",
+      "published_at": "2022-01-21",
+      "trust_level": "editorial",
+      "content": "When Gwen opened in 2016, it was a big moment in Hollywood dining. The upscale Art Deco steakhouse run by a famous handsome-slash-Australian TV chef marked a return to a more opulent style of dining that the neighborhood hadn't seen much of since, well, the Rat Pack was getting hammered at Musso's. These days, however, things have changed—Hollywood is brimming with flashy, big-name restaurants jockeying for diners with deep pockets and corporate cards. But even with all the new options, Gwen is still the most consistent high-end dinner spot in Hollywood and a place where spending $200 on a hunk of meat feels worth it. If it's unclear what kind of food Gwen serves, you'll know immediately once you walk inside. Near the door is a long glass case of sausages, sirloins, and short rib (Gwen functions as a butcher shop during the day). As you round the corner into the dining room, floor-to-ceiling lockers with even larger cuts of meat glow like a beefy trophy case. Though the menu changes seasonally, you can generally expect dishes like hearty charcuterie boards arranged like a meaty painter's palette, parmesan risotto with a marrow-filled bone towering from the center, and some of the best steaks in Los Angeles. You're probably going to spend at least a hundred dollars per person eating at Gwen, but in an epic environment like this, it's easy to pretend (at least for two hours) that you're someone who collects vintage champagne for sport."
+    },
+    {
+      "source_id": "src_timeout_la_2025",
+      "publication": "Time Out LA",
+      "title": "L.A. steakhouse Gwen was just ranked one of the best in the world.",
+      "url": "https://www.timeout.com/los-angeles/news/this-l-a-steakhouse-was-just-voted-one-of-the-best-in-the-world-050525",
+      "published_at": "2025-05-06",
+      "trust_level": "editorial",
+      "content": "Gwen, located on Sunset Boulevard in the heart of Hollywood, has already earned a Michelin star for its high-quality cooking and is now number 43 on the World's 101 Best Steak Restaurants list, an accolade of the highest order in the steak ecosphere. This trusted annual catalog uses quality-driven ranking criteria to determine which eateries should earn a coveted spot at the top. Part butcher shop, part fine dining restaurant, Gwen is a carnivore's dream. Perhaps it's the meat lockers where hanging cuts are on full display, showing discerning diners that there's nothing to hide when it comes to your meal. Or maybe it's the elegant dining room with ambient lighting and curved architectural details. Could it be the duck-washed dirty martinis that you spot on tables or the head sommelier floating around the room with a wine bottle in hand? Whatever it is, it's a vibe. Start with house-made charcuterie, followed by aged cuts expertly prepared using a bespoke open fire grill. Or, if you're so inclined, choose the Chef's Carte Blanche Menu and let the experts drive the experience. No matter what you select, dining here is a full-sensory primeval experience."
+    },
+    {
+      "source_id": "src_timeout_la_2022",
+      "publication": "Time Out LA",
+      "title": "Gwen Butcher Shop & Restaurant | Restaurants in Hollywood, Los Angeles",
+      "url": "https://www.timeout.com/los-angeles/restaurants/gwen-butcher-shop-restaurant",
+      "published_at": "2022-12-07",
+      "trust_level": "editorial",
+      "content": "Curtis Stone's gorgeous L.A. sophomore project—the sibling to Beverly Hills' Maude—greets you with a butcher case as soon as you open the door, where you can buy coils of lamb sausage or hefty cuts of steak to take home. But not everyone is a wiz when it comes to cooking their own meat, which is why the stunning full-service restaurant is worth a visit all on its own. At lunch, find some of the city's best-kept sandwich secrets—made from the butcher case's exquisite cuts—plus salads, roast chicken and other delectable day fare. At dinner, find a range of meaty, slow-roasted items cooked over an open fire, as well as small plates, handmade pasta, shellfish and of course Gwen's expert house-made charcuterie. This Hollywood gem also features a tasting menu in Gwen's glitzy dining room, where chandeliers dangle above and that open fire pit separates diners from the kitchen for an entirely modern-elegant affair."
+    },
+    {
+      "source_id": "src_visitcalifornia_2023",
+      "publication": "Visit California (citing LA Times food critic Jonathan Gold)",
+      "title": "Chef Curtis Stone celebrates meat at L.A.'s Gwen restaurant",
+      "url": "https://www.visitcalifornia.com/experience/gwen-butcher-shop-restaurant/",
+      "published_at": "2023-07-27",
+      "trust_level": "editorial",
+      "content": "Curtis Stone and his brother Luke both began their culinary careers in an Australian butcher shop, so it makes sense that their joint venture, Gwen, is a meat-focused entity. Named after their maternal grandmother who lived on a farm near Melbourne, Gwen features a full-service butcher shop alongside a fine-dining restaurant that offers Wagyu beef, Kurobuta pork, and other carnivores' delights. \"The glassed-in counter could double as a museum of steaks,\" wrote Jonathan Gold, the late, lamented Los Angeles Times food critic who gave Gwen a rave review. \"Well-marbled tomahawks from Creekstone Farms in Kansas, pastured slabs of impossible-to-find rib-eye cap from Napa's renowned Five Dot Ranch and, most significantly, the spectacular, breathtakingly expensive Wagyu from Australia's Blackmore Farms, which the Stone brothers like so much that they set up an import company just so they could get the steaks in Los Angeles.\""
+    }
+  ]
+}

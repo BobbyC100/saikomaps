@@ -1,0 +1,41 @@
+{
+  "place_slug": "kismet",
+  "sources": [
+    {
+      "source_id": "src_michelin_2025",
+      "publication": "Michelin Guide",
+      "title": "Kismet – Los Angeles - a MICHELIN Guide Restaurant",
+      "url": "https://guide.michelin.com/us/en/california/us-los-angeles/restaurant/kismet",
+      "published_at": "2025-06-25",
+      "trust_level": "editorial",
+      "content": "Kismet – a Bib Gourmand: good quality, good value cooking restaurant in the 2025 MICHELIN Guide USA.\n\nThis enduringly hip Los Feliz favorite is best experienced with friends, but we can't help feeling a tiny bit selfish when the chicken and pine nut pies wrapped in flaky phyllo arrive or when oyster mushroom skewers with a creamy onion and cashew sauce land on the table. And the Persian crispy rice with egg yolks? Do we have to share this one too? Such is the enduring charm of this Middle Eastern hotspot that prioritizes seasonal vegetables and bright flavors. Nothing feels heavy, ever, and even the most familiar of ingredients can surprise. The staff is equally charming, as cool as the cucumbers with rosewater labneh. Truly, in that eternal quest to find the quintessential neighborhood restaurant, Kismet meets the mark with flying colors."
+    },
+    {
+      "source_id": "src_infatuation_2024",
+      "publication": "The Infatuation",
+      "title": "Kismet - Review - Los Feliz - Los Angeles",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/kismet",
+      "published_at": "2024-03-22",
+      "trust_level": "editorial",
+      "content": "Kismet opened in 2017, but it feels like it's been around forever. Or maybe that's because Kismet is more famous than ever before. This modern Mediterranean/Middle Eastern restaurant in Los Feliz has since published a cookbook and opened a growing fast-casual chain called Kismet Rotisserie, which is great for a weekday lunch or post-hike pita. And while it might be easier to snag a last-minute table at the original restaurant these days, this casual spot is as excellent as ever.\n\nWe're not exaggerating when we say you could use Kismet for any dinner occasion, except maybe a funeral reception for your cat (the light and airy blonde wood space is probably not somber enough for that). Most tables are either casual dates or friends getting dinner to forget about work, even though they're still talking about work. Kismet is one of those warm, comforting spaces where anyone can find something to like, which is similar to how we feel about the food.\n\nThe menu has lots of vegetables and a general sense of health, and dishes change seasonally. That means the \"snacky & salady\" dishes might be different by the time you read this, but here's a taste of the veggie-focused creativity to expect at Kismet: lightly fried cauliflower with a salty caper yogurt, a fresh chicory salad dressed in tangy-sweet guava vinaigrette, and a straightforward persimmon carpaccio that gets a kiss of olive oil and salt to finish. Kismet does meat and fish very well, too, but the one must-order dish (that's always available) is the buttery Persian crispy rice. Crack open the tahdig like one of those plastic toy eggs to find hidden sweet currants and a golden egg yolk inside, which doubles as a sort of delicate sauce. Consider it a showstopper finale to a relatively simple but delicious meal.\n\nKismet's malawach is, indeed, flaky, but there's more to it. It tastes like butter, tears easily, and is light enough to snack on, so it doesn't fill you up. Order it with a side of the housemade labneh. These cauliflower get incinerated in a fryer until they're extra crispy and brown all over. But there's a cap on how interesting fried cauliflower can taste. (That's where the tangy, salty caper yogurt helps.) You should definitely start dinner with this cucumber and citrus salad. It tastes like a perfect 75º day—bright, fresh, and deeply satisfying. The subtle smooch of rosewater in the labneh is a pleasant surprise, too. We'd take down a whole rack of these crispy lamb ribs. They're grilled until nicely charred on both sides, then slathered in a tart, smoky plum sauce that's more nuanced than your standard BBQ sauce. One word: butter."
+    },
+    {
+      "source_id": "src_lamag_2017",
+      "publication": "Los Angeles Magazine",
+      "title": "At Middle Eastern-Inspired Kismet, the Future of Food is Female",
+      "url": "https://lamag.com/food/middle-eastern-inspired-kismet-future-food-female",
+      "published_at": "2017-03-28",
+      "trust_level": "editorial",
+      "content": "So the opening of the Middle Eastern-inspired Kismet in East Hollywood seems like, well, kismet. Renowned dude chefs Jon Shook and Vinny Dotolo (Animal, Jon & Vinny's) are partners, but this restaurant feels unapologetically female. (I'm going to employ a few controversial stereotypes now—bear with me.) It's pretty, for one, in that fresh-faced, Neutrogena-girl way, with white walls and blond wood and impossibly waifish glassware. Coffee comes in a dainty carafe with a daintier anise shortbread cookie. The menu features all sorts of noncommittal feminine terminology, like \"Salad-y,\" which denotes the shareable vegetable-based dishes that would elsewhere be called meze: marinated feta with squash; hunks of Persian cucumber with citrus, rosewater labneh, and za'atar. The \"Turkish-ish Breakfast\" is a spread of cold morning fare with a sesame-scattered wedge of Bub and Grandma's barbari bread.\n\nNot everything on the menu is sprinkled with pixie dust, however. There's a dome of crispy rice studded with currants and egg yolk that is tasty if eyebrow raising at $14, and I miss some of the deeper flavors that one finds in other parts of the eastern Mediterranean. But this food, which is rooted in the milder Israeli palette, is also exactly what L.A. calls for—and exactly what I want to be eating all day long."
+    },
+    {
+      "source_id": "src_timeout_2020",
+      "publication": "Time Out LA",
+      "title": "Kismet | Restaurants in Los Feliz, Los Angeles",
+      "url": "https://www.timeout.com/los-angeles/restaurants/kismet",
+      "published_at": "2020-01-16",
+      "trust_level": "editorial",
+      "content": "Though no longer groundbreaking as it once was, Sara Kramer and Sarah Hymanson's minimalist Middle Eastern-inspired restaurant still serves the best all-around dinner in Los Feliz. Signatures like Persian crispy rice and malawach, a type of Yemeni Jewish flatbread, complement the vegetarian-friendly menu. The menu is bright, hyper-seasonal and health-minded, all while still being delicious and not too fussy. Next door, you'll find the more casual, all-day Kismet Rotisserie, which also has locations in Culver City and Studio City."
+    }
+  ]
+}

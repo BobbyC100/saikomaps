@@ -1,0 +1,32 @@
+{
+  "place_slug": "lowboy",
+  "sources": [
+    {
+      "source_id": "src_theinfatuation_2024",
+      "publication": "The Infatuation",
+      "title": "Lowboy - Review - Echo Park",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/lowboy",
+      "published_at": "2024-05-17",
+      "trust_level": "editorial",
+      "content": "This spot on Sunset in Echo Park has been crowded since the day it opened, and it's a great place to meet people—they've got fun music, a mellow crowd, and a good beer list. They even have a surprisingly solid smashburger."
+    },
+    {
+      "source_id": "src_timeout_2025",
+      "publication": "Time Out LA",
+      "title": "Lowboy | Bars in Echo Park, Los Angeles",
+      "url": "https://www.timeout.com/los-angeles/bars/lowboy",
+      "published_at": "2025-07-31",
+      "trust_level": "editorial",
+      "content": "This is a neighborhood bar, through and through. Unpretentious but elevated, the handful of cocktails lean classic (we're talking mai tais, old-fashioneds and mules), while there's always craft beer and Bud Heavy on draft. Of course the real apple of our eye is the Lowburger, one of the absolute best smashburgers anywhere in town."
+    },
+    {
+      "source_id": "src_eater_la_2024",
+      "publication": "Eater LA",
+      "title": "The Best Dishes Eater Editors Ate This Week",
+      "url": "https://la.eater.com/where-to-eat/294684/the-best-dishes-eater-editors-ate-this-week-november-3",
+      "published_at": "",
+      "trust_level": "editorial",
+      "content": "As a fan of classic Los Angeles char-grilled patties, I was pleasantly surprised by the Fresh Burger here: a simpler build with American cheese, iceberg lettuce, sliced tomato, and shaved onion on a toasted potato bun, plus a swipe of garlic mayonnaise. The flavor instantly took me back to eating Charburgers at the Habit, and it stands up well to takeout, though the best move might be ordering it at the bar and pairing it with a High Life or natural wine and some fries. For context, the better-known Lowburger is a smashed patty slathered in 2000 Island dressing and red pepper jam, but the Fresh Burger's restraint is the draw."
+    }
+  ]
+}

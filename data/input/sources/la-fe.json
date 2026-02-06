@@ -1,0 +1,23 @@
+{
+  "place_slug": "la-fe",
+  "sources": [
+    {
+      "source_id": "src_theinfatuation_2023",
+      "publication": "The Infatuation",
+      "title": "La Fe - Review - Echo Park",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/la-fe-echo-park",
+      "published_at": "2023-12-18",
+      "trust_level": "editorial",
+      "content": "If you closed your eyes and pictured the ideal neighborhood bar, it might look something like La Fe in Echo Park. A candlelit room with an L-shaped bar and a handful of sidewalk tables on Sunset Blvd, this vaguely French cocktail and wine bar is our go-to alternative to all the overcrowded bars nearby. There's a plush jewel-toned banquette for lounging and a soft acoustic playlist that doesn't get too loud or hectic, so you can have an actual conversation. Come here when you need somewhere to hunker down with a friend, order a round of white negronis, and graze on some fancy bar snacks. La Fe is the cool, calm, and collected neighborhood bar you can rely on in Echo Park."
+    },
+    {
+      "source_id": "src_timeout_la_2024",
+      "publication": "Time Out LA",
+      "title": "La Fe | Bars in Hollywood, Los Angeles",
+      "url": "https://www.timeout.com/los-angeles/bars/la-fe",
+      "published_at": "2024-01-03",
+      "trust_level": "editorial",
+      "content": "La Fe flips the lighter digs of Ostrich Farm into a wine bar that feels like you're in an old movie with Vaseline on the lens. It slots in well with its neighbors, threading the needle between an elevated locals' experience and wanton gentrification. Beyond a well-curated wine selection, bartenders deftly mix up house cocktails as well as classics with a reverence that never feels pretentious. The Dreamy Boy balances gin with florals and earthy sumac while the Dulcinea satisfies a sweet tooth without being cloying. Once the sun sets, a romantic vibe fills the bar, but plush stools and a wall-length booth invite groups to carve out their own spaces. You can snack on Mediterranean bar bites in the evening or swing by for a light Sunday brunch with specialty cocktails to soothe any hangover."
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "place_slug": "sushi-kisen",
+  "sources": [
+    {
+      "source_id": "src_michelin_2025",
+      "publication": "Michelin Guide",
+      "title": "Sushi Kisen – Arcadia - a MICHELIN Guide Restaurant",
+      "url": "https://guide.michelin.com/us/en/california/arcadia/restaurant/sushi-kisen",
+      "published_at": "2025-06-25",
+      "trust_level": "editorial",
+      "content": "Sushi restaurants can be as expensive as a mortgage and as quiet as a library, but this casual Arcadia hotspot is a wonderfully refreshing change of pace. The setting is more like Tokyo's Shibuya Crossing, a frenetic intersection of customers lined up at the door, servers scurrying about, and chefs working like they are on a tight deadline. Counter seating or a table farther back? Omakase or a la carte? It doesn't matter. The rice for the nigiri is reliably generous and lush in texture, and fish flies in from Japan on Monday and on Thursday. For this reason, Friday is often packed, as regulars look to catch the freshest shipment. Efficient, fairly priced and friendly, Sushi Kisen meets all expectations in the most approachable of ways."
+    },
+    {
+      "source_id": "src_theinfatuation_2024",
+      "publication": "The Infatuation",
+      "title": "Sushi Kisen - Review - Arcadia - Los Angeles",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/sushi-kisen-arcadia",
+      "published_at": "2024-01-23",
+      "trust_level": "editorial",
+      "content": "If you don't live in the SGV, making the drive to Arcadia can be daunting. But strip mall spot Sushi Kisen warrants a trip. A relative newcomer, Kisen is run by a chef who spent years at Sushi Gen and Shiki in Beverly Hills. Dedication to detail is apparent in the perfectly vinegar-seasoned rice and pristine seafood that has been aged in traditional Edomae style, highlighting lots of seasonal fish like skipjack tuna and goldeneye snapper imported from Japan. There's an $80 minimum to sit at the blonde wood bar, but spending that much will get you a kingly meal and the focused attention of whichever skillful chef is slicing the goods that day. Otherwise, opt for the dine-in sushi sets that go for $35 at lunch and $50 at dinner. Both are fantastic deals. Truly Excellent: An 8 should be on your must-try list, because 8s are great. These spots are worth making an effort or crossing town for."
+    },
+    {
+      "source_id": "src_timeout_2025",
+      "publication": "Time Out LA",
+      "title": "Sushi Kisen | Restaurants in Arcadia, Los Angeles",
+      "url": "https://www.timeout.com/los-angeles/restaurants/sushi-kisen",
+      "published_at": "2025-03-04",
+      "trust_level": "editorial",
+      "content": "There are a half-dozen ways to cut a fine meal at Arcadia's Sushi Kisen, including the extremely affordable omakase experience at the counter, where I've enjoyed a dinner that rivals Sushi Kaneyoshi or Morihiro for less than half the price of either. Since the chef will tailor your meal to your preferences, I can't give you an exact cost, but unless you're especially hungry or ask for exclusively premium cuts like nodoguro (blackthroat sea perch) and fatty bluefin tuna, we're talking well under $200 per head to leave more than satisfied. Chef Hiro Yamada also stocks an extensive selection of raw fish, so if you know exactly what you're in the mood, you can also order a couple two-piece orders of those and call it a day. Either way, I recommend making a reservation for weekend evenings, though you can try calling the day of to see if there's availability at the bar. Sushi Kisen also does takeout and opens for lunch, if a midday omakase is more your speed."
+    }
+  ]
+}

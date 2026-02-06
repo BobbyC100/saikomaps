@@ -1,0 +1,23 @@
+{
+  "place_slug": "fatto-a-mano-the-pasta-shop",
+  "sources": [
+    {
+      "source_id": "src_eater_la_south_bay_guide",
+      "publication": "Eater LA",
+      "title": "Best Restaurants in Torrance, Gardena, Manhattan Beach, Redondo, Carson & South Bay Los Angeles",
+      "url": "https://la.eater.com/maps/best-restaurants-torrance-gardena-manhattan-beach-redondo-carson-south-bay-los-angeles",
+      "published_at": "",
+      "trust_level": "editorial",
+      "content": "\"Handmade is literally the namesake of this tiny but mighty Redondo Beach Italian spot with chef Marco Pacelli making big restaurant-level plates of pasta. First, pick a shape like pappardelle or spaghetti, then choose the sauce, such as carbonara, bolognese, or pomodoro. Though most of the food is optimized to take home, a few tables and counter seats make it possible to eat plates while they're still piping hot.\" - Matthew Kang"
+    },
+    {
+      "source_id": "src_eater_la_kid_friendly",
+      "publication": "Eater LA",
+      "title": "Best Kid-Friendly Restaurants Los Angeles",
+      "url": "https://la.eater.com/maps/best-kid-friendly-restaurants-los-angeles",
+      "published_at": "",
+      "trust_level": "editorial",
+      "content": "\"Kids and pasta go together like peas and carrots. Here at Fatto a Mano, kids can customize their meals with a variety of sauces and seven house-extruded pastas including pappardelle, spaghetti, and linguini.\" - Cathy Chaplin, Eater Staff"
+    }
+  ]
+}

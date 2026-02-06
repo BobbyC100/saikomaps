@@ -1,0 +1,24 @@
+{
+  "approach": "B-claude-native",
+  "timestamp": "2026-02-04T23:59:43.717Z",
+  "model": "claude-haiku-4-5-20251001",
+  "places": [
+    {
+      "slug": "yangban-society",
+      "sourcesFound": 5,
+      "timeMs": 54791,
+      "inputTokens": 265498,
+      "outputTokens": 3145,
+      "searchQueries": 0,
+      "file": "data/input/sources/yangban-society.json"
+    }
+  ],
+  "totals": {
+    "sources": 5,
+    "timeMs": 54791,
+    "inputTokens": 265498,
+    "outputTokens": 3145,
+    "searches": 0,
+    "estimatedCost": 0.843669
+  }
+}

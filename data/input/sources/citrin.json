@@ -1,0 +1,32 @@
+{
+  "place_slug": "citrin",
+  "sources": [
+    {
+      "source_id": "src_michelin_2025",
+      "publication": "Michelin Guide",
+      "title": "Citrin – Santa Monica - a MICHELIN Guide Restaurant",
+      "url": "https://guide.michelin.com/us/en/california/santa-monica/restaurant/citrin",
+      "published_at": "2025-06-25",
+      "trust_level": "editorial",
+      "content": "Citrin is a One Star: High quality cooking restaurant in the 2025 MICHELIN Guide USA.\n\nAlthough located in the same building as Chef Josiah Citrin's sister restaurant Mélisse, in lieu of its sibling's tasting menu-only format, the offerings here afford more choice, with a modest prix-fixe alongside à la carte options.\n\nChef Ken Takayama's cuisine sends forth signature combinations of French technique with an abundance of California's seasonal produce, focusing on updated takes on classically rooted flavors with modern, global touches.\n\nSpendthrifts will revel in the opulent caviar and truffle add-ons; but even without a dollop or shaving of luxury; the impressive cooking here, such as artichoke agnolotti with Comté and smoked barigoule is an indulgence, as is the crispy skin-on rouget served over bouillabaisse.\n\nA celebration of craftsmanship and culinary excellence."
+    },
+    {
+      "source_id": "src_theinfatuation_2024",
+      "publication": "The Infatuation",
+      "title": "Citrin - Review - Santa Monica - Los Angeles - The Infatuation",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/citrin-and-melisse",
+      "published_at": "2024-11-14",
+      "trust_level": "editorial",
+      "content": "Upscale spot Citrin - and the tasting counter in the back, Melisse - have reopened with an all-new, crossover restaurant in their recently-astroturfed parking lot.\n\nIn addition to a four-course, $145 tasting menu, they'll also have a la carte offerings like lobster Bolognese, lamb sugo, and truffle risotto.\n\nReservations available online."
+    },
+    {
+      "source_id": "src_timeout_2025",
+      "publication": "Time Out LA",
+      "title": "Citrin | Restaurants in Santa Monica, Los Angeles",
+      "url": "https://www.timeout.com/los-angeles/restaurants/citrin",
+      "published_at": "2025-11-06",
+      "trust_level": "editorial",
+      "content": "At his eponymous eatery, you'll find pitch-perfect roast chicken coated in garlic and breadcrumbs; refreshing oysters under sorrel and cucumber; and, of course, Josiah Citrin's cult-classic lobster bolognese under truffle foam."
+    }
+  ]
+}

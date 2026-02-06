@@ -1,0 +1,32 @@
+{
+  "place_slug": "cosa-buona",
+  "sources": [
+    {
+      "source_id": "src_michelin_2021",
+      "publication": "Michelin Guide",
+      "title": "Cosa Buona - Los Angeles",
+      "url": "https://guide.michelin.com/it/it/california/us-los-angeles/ristorante/cosa-buona",
+      "published_at": "2021-09-28",
+      "trust_level": "editorial",
+      "content": "Courtesy of the same owners behind the posh Alimento, this is a neighborhood pizza joint done right. Familiar items aside, the kitchen boasts a clear eye toward quality ingredients and careful presentations. For instance, hand-breaded mozzarella sticks with chunky marinara bring out the kid in all of us, while pizza reigns supreme at lunch and dinner. The latter features such adult inflections as fiery chilies alongside more typical trappings like pineapple on the Hawaiian. The Stepmother Italian sub is addictive and not unlike the salads, which are far from a tag-along, highlighting large portions with tasty blends. Desserts are somewhat limited but with a creatively rendered tiramisu and hefty wedge of cookies & cream semifreddo pie, who's complaining?"
+    },
+    {
+      "source_id": "src_timeout_2017",
+      "publication": "Time Out LA",
+      "title": "Alimento sister restaurant Cosa Buona to open in Echo Park tomorrow",
+      "url": "https://www.timeout.com/los-angeles/blog/alimento-sister-restaurant-cosa-buona-to-open-in-echo-park-tomorrow-052417",
+      "published_at": "2017-05-25",
+      "trust_level": "editorial",
+      "content": "Chef Zach Pollack of Silver Lake staple Alimento is finally pulling back the drapes on his long-awaited Echo Park newcomer, Cosa Buona. The casual Italian eatery is slated to open its doors Thursday, May 25, in the corner space on Sunset and Alvarado where Pizza Buona once operated. In this new space, the James Beard-nominated chef will roll out classic Italian-American cuisine, focusing on antipasti, salads and pizzas for dining in or takeout and delivery. Beginning on June 1, a selection of both classic and modern, playful interpretations of Italian sandwiches will also be on offer during lunch hours. Cosa Buona is meant to be a hearty, no-frills joint. \"I wanted to open the kind of restaurant that people go to or take out from because the food is very good and very satisfying, not because it's revolutionary cooking or a scene,\" says Pollack. \"You'll come here because you're craving great pizza, Caesar salad, eggplant parm, meatballs.\" Cosa Buona is located at 2100 W Sunset Boulevard in Echo Park. The restaurant is open from 5:30 to 10:30pm Sunday through Thursday and 5:30 to 11:30pm on Friday and Saturday, closed on Tuesdays. Starting June 1, lunch will begin daily from 11:30am to 2:30pm. Takeout and delivery will be available for both lunch and dinner service."
+    },
+    {
+      "source_id": "src_theinfatuation_2023",
+      "publication": "The Infatuation",
+      "title": "Cosa Buona - Review - Echo Park - Los Angeles",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/cosa-buona",
+      "published_at": "2023-06-22",
+      "trust_level": "editorial",
+      "content": "LA's pizza problem is not that we don't have any. The problem is that most of our good pizza lives in either high-end restaurants where you'll pay $75 a head, or hyper-popular places you can't get into for another two weeks. It's tough to find good, casual, walk-in neighborhood pizzerias in this town, but Cosa Buona is an excellent example of one. By neighborhood pizzeria, we mean the kind of spot that, no matter what day of the week it is, you know you can roll in with a few friends, get a table, drink some beer, and eat pizza until you can't see. And that's what Cosa Buona is. Don't be fooled by its pedigree (it's run by the Alimento crew) - this tiny spot on a corner in Echo Park is very low-key. It feels like the kind of place 90's sitcom characters congregate at the end of every episode to talk about their week. Unfortunately, we've yet to find Corey and Topanga huddled in a back booth, but you will find the rest of neighborhood here, enjoying a menu that goes far beyond just some classic pies. You can go to Cosa Buona, order a sausage or margherita pie, and walk out pleased with your evening. However, some of the best things here are in the appetizer section, and ordering them is an absolute requirement. The meatballs, with toasted focaccia and a tennis ball-sized dollop of burrata, are fantastic. The spicy potatoes diavola are covered in Italian fire and are ideal for passing around the table. But the real crown jewel of the appetizers, and probably the whole menu, are the housemade mozzarella sticks - perfect, deep-fried mozzarella accompanied by a marinara sauce for aggressive dipping. You won't have felt this alive since Kevin McCormick's 7th grade sleepover. There's nothing wrong with good pizza in big, fancy restaurants. However, there is something wrong when there's not enough bad pizza at the casual spots. Cosa Buona is here to change that with fantastic, affordable food, and a space you don't have to sell your soul (or entire night) to get into."
+    }
+  ]
+}

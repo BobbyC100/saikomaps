@@ -1,0 +1,23 @@
+{
+  "place_slug": "adams-wine-shop",
+  "sources": [
+    {
+      "source_id": "src_theinfatuation_2024",
+      "publication": "The Infatuation",
+      "title": "Adams Coffee Shop",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/adams-coffee-shop",
+      "published_at": "2024-05-06",
+      "trust_level": "editorial",
+      "content": "Located in a beautiful, foliage-covered patio (and perhaps the only place where we'd allow you to publicly propose to someone) Alta Adams' adjoining coffee and wine shop has everything to satisfy your outdoor dining needs - freshly brewed coffee, takeaway bowls of fried chicken and collard greens, and bottles of specialty wines produced by women and BIPOC, selected by their sommelier, Ruben Morancy. We haven't been here yet, but want you to know this spot exists."
+    },
+    {
+      "source_id": "src_theinfatuation_2023",
+      "publication": "The Infatuation",
+      "title": "The 14 Best Restaurants in West Adams",
+      "url": "https://www.theinfatuation.com/los-angeles/guides/the-best-restaurants-in-west-adams",
+      "published_at": "2023-02-02",
+      "trust_level": "editorial",
+      "content": "Anyone interested in learning more about women & BIPOC winemakers should also check out Adams Wine Shop right next door, run by the same people."
+    }
+  ]
+}

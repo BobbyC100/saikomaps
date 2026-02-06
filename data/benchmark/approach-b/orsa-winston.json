@@ -1,0 +1,41 @@
+{
+  "place_slug": "orsa-winston",
+  "sources": [
+    {
+      "source_id": "src_michelin_2025",
+      "publication": "Michelin Guide",
+      "title": "Orsa & Winston – Los Angeles - a MICHELIN Guide Restaurant",
+      "url": "https://guide.michelin.com/us/en/california/us-los-angeles/restaurant/orsa-winston",
+      "published_at": "2025-06-25",
+      "trust_level": "editorial",
+      "content": "One Star: High quality cooking. A counter and open kitchen showcase the culinary pyrotechnics of Chef Josef Centeno; and the deeply robust prix-fixe flaunts all the fireworks—think peak-season ingredients infused with wide-ranging flavors. The pescatarian menu is inspired by the culinary traditions of Japan and Italy. For starters, thin slices of tuna, flash-seared with sesame seeds and paired with pluots, citrus, and dill aioli, is both bright and balanced. Snapper is cooked impeccably, with crisp golden-brown skin on a bed of sweet corn polenta."
+    },
+    {
+      "source_id": "src_theinfatuation_2025",
+      "publication": "The Infatuation",
+      "title": "Orsa & Winston is a gem in need of a polish - Review - Los Angeles",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/orsa-winston",
+      "published_at": "2025-05-08",
+      "trust_level": "editorial",
+      "content": "The lone option for dinner is a five-course tasting menu for $150 per person, which is a reasonable deal compared to most fine dining spots, especially when you factor in the extra bites billed as \"gifts from the chef\" sent out between courses. The rest of the menu at Orsa & Winston changes frequently but generally marries Italian and Japanese traditions in elegant ways: black cod arancini dusted with black truffle, purple sweet potato tortellini highlighted by an equally sweet lobster cream, and bitter radicchio salad cut with a salty-funky miso-anchovy dressing. Occasionally, the same ingredients pop up in several dishes, as if the kitchen was trying to use up a stash in the pantry, but it mostly works, even if it's a bit boring at times. If you're going to splurge on fine dining, there are more exciting options in LA, but even with its lulling soft jazz soundtrack and somewhat stale ambiance, the food at Orsa & Winston is still genuinely interesting and enjoyable—and in the world of fine dining, that counts for something. This stunning dish is Orsa & Winston's signature, which you can order as a $49 add-on to your meal. It's sort of like congee but also risotto, and its subtle savoriness serves as a canvas for the bouquet of seafood on top. Get a big spoonful of everything, and all of these flavors come together like a satisfying plot resolution: funky parmesan, briny shrimp tomalley, and sweetness from the uni and grilled scallop."
+    },
+    {
+      "source_id": "src_timeout_la_2025",
+      "publication": "Time Out Los Angeles",
+      "title": "Orsa & Winston | Restaurants in Downtown Historic Core, Los Angeles",
+      "url": "https://www.timeout.com/los-angeles/restaurants/orsa-winston",
+      "published_at": "2025-02-11",
+      "trust_level": "editorial",
+      "content": "This Michelin-starred Japanese-Italian restaurant is the pride and joy of local chef Josef Centeno, who also runs nearby Tex-Mex joint Bar Amá. This reasonably priced five-course tasting menu ($150) offers the right mix of value and flair. The hyper-creative, genre-bending dishes might see spot prawns, scallops and uni in a flower-dotted rice porridge (a $49 supplement, meant to be split among two), or seasonal cucamelons and heirloom tomatoes with kanpachi. There's L.A. love, global inflection and a deep understanding of balance in these dishes that make every meal enjoyable."
+    },
+    {
+      "source_id": "src_latimes_2020",
+      "publication": "Los Angeles Times",
+      "title": "Josef Centeno's Orsa & Winston is The Times' Restaurant of the Year",
+      "url": "https://www.latimes.com/food/story/2020-07-30/restaurant-of-the-year-orsa-winston",
+      "published_at": "2020-07-30",
+      "trust_level": "editorial",
+      "content": "What does it mean to be an exceptional Los Angeles restaurant? None of us could have known how complex the question would become in 2020. But Josef Centeno's adaptive, graceful version of excellence in the maelstrom is one reassuring answer. On a culinary level, complexity has always defined his career. No one cuisine or style can express his hyperdrive creativity; his bio includes the poshest tasting menu settings as well as hidden barebone pubs. He runs four restaurants. Bar Amá downtown and Amacita in Culver City channel the Tex-Mex heritage of Centeno's native San Antonio. The cooking at Bäco Mercat in DTLA begins in the Mediterranean regions before pingponging around the globe. Then there is Orsa & Winston, which opened next door to Bar Amá in September 2013. With its 35 seats, the 1,200-square-foot restaurant has always functioned as a workshop for Centeno's evolution as a chef and leader. Orsa & Winston serves a multicourse menu that successfully bridges Japanese and Italian flavors; rice porridge pooled in Parmesan cream with seafood (perhaps uni or Hokkaido scallop) became a dish that synthesized his aims. Centeno constantly parses ingredient pairings to find the connections between the two cuisines — abalone grilled over binchotan charcoal with a Cal-Ital duo of kumquat and garlic leaf, duck with cherry blossom mostarda, a tart of ume and preserved apricot with yuzu curd — but he never contorts food into bizarre conflations in service of the restaurant's premise. If a berry clafouti or sardine escabeche finds its way into the mix — well? The fluidity between cuisines feels organic to Centeno's cooking and to the pluralism of Los Angeles. For the delicious ways it reflects the cultural mosaics of our city — and for the resilience of its chef-owner, whose warmth and ingenuity inspires when we need it most — Orsa & Winston is Restaurant of the Year."
+    }
+  ]
+}

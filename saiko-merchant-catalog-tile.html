@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Saiko — Merchant Catalog Tile (Whole Earth Inspired)</title>
+<style>
+  body{
+    background:#f4f3ee;
+    padding:40px;
+    font-family: Georgia, 'Times New Roman', serif;
+    color:#1c1917;
+  }
+
+  h2{
+    margin-bottom:20px;
+    font-weight: normal;
+  }
+
+  .tier3{
+    max-width: 980px;
+    margin: 0 auto;
+    display:grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap:10px;
+  }
+
+  .cell{
+    background:#fffdf7;
+    border-radius:12px;
+    padding:14px 16px 16px;
+    box-shadow: inset 0 0 0 1px rgba(87,83,78,.06);
+    font-size:13px;
+    line-height:1.45;
+  }
+
+  .label{
+    font-family: system-ui, -apple-system, sans-serif;
+    font-size:10px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:#78716c;
+    margin-bottom:6px;
+  }
+
+  /* Catalog tile */
+  .catalog{
+    grid-column: 1 / 4;
+    display:grid;
+    grid-template-columns: 120px 1fr;
+    gap:14px;
+    align-items:start;
+  }
+
+  .diagram{
+    width:120px;
+    height:120px;
+    border-radius:8px;
+    background:
+      linear-gradient(to right, rgba(120,113,108,.08) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(120,113,108,.08) 1px, transparent 1px);
+    background-size:16px 16px;
+    position:relative;
+  }
+
+  .diagram::after{
+    content:"";
+    position:absolute;
+    inset:20px;
+    border:1px solid rgba(120,113,108,.28);
+    transform: rotate(-6deg);
+  }
+
+  .catalog-title{
+    font-size:14px;
+    margin-bottom:4px;
+  }
+
+  .catalog-body{
+    font-size:13px;
+    color:#44403c;
+  }
+
+  .catalog-foot{
+    margin-top:8px;
+    font-size:11px;
+    color:#78716c;
+  }
+</style>
+</head>
+
+<body>
+
+<h2>Tier 3 — Merchant Catalog Tile Example</h2>
+
+<div class="tier3">
+
+  <div class="cell">
+    <div class="label">Hours</div>
+    Mon–Thu 5–11pm<br>
+    Fri 5–12am<br>
+    Sat 12–12am<br>
+    Sun 12–10pm
+  </div>
+
+  <div class="cell">
+    <div class="label">Call</div>
+    (323) 745-9288
+  </div>
+
+  <div class="cell">
+    <div class="label">Map</div>
+    3820 Sunset Blvd<br>
+    Los Angeles, CA
+  </div>
+
+  <div class="cell">
+    <div class="label">Coverage</div>
+    The Infatuation<br>
+    Time Out LA<br>
+    Eater LA
+  </div>
+
+  <!-- Merchant Catalog Tile -->
+  <div class="cell catalog">
+    <div class="diagram" aria-hidden="true"></div>
+    <div>
+      <div class="label">Catalog Entry</div>
+      <div class="catalog-title">Seco — Observed Rhythms</div>
+      <div class="catalog-body">
+        Evening activity peaks around 8pm on
+        weekdays and closer to 9pm on weekends.
+        Early arrival is common among regulars.
+      </div>
+      <div class="catalog-foot">
+        Filed under: Rhythm · Behavior
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,866 @@
+[
+  {
+    "slug": "bestia",
+    "status": "no_sources",
+    "sourcesFound": 0,
+    "timestamp": "2026-02-04T21:55:01.261Z"
+  },
+  {
+    "slug": "bestia",
+    "status": "no_sources",
+    "sourcesFound": 0,
+    "timestamp": "2026-02-04T21:56:18.706Z"
+  },
+  {
+    "slug": "bavel",
+    "status": "no_sources",
+    "sourcesFound": 0,
+    "timestamp": "2026-02-04T21:57:34.582Z"
+  },
+  {
+    "slug": "republique",
+    "status": "no_sources",
+    "sourcesFound": 0,
+    "timestamp": "2026-02-04T21:58:50.382Z"
+  },
+  {
+    "slug": "gjelina",
+    "status": "no_sources",
+    "sourcesFound": 0,
+    "timestamp": "2026-02-04T22:00:06.258Z"
+  },
+  {
+    "slug": "osteria-mozza",
+    "status": "no_sources",
+    "sourcesFound": 0,
+    "timestamp": "2026-02-04T22:01:22.759Z"
+  },
+  {
+    "slug": "pizzeria-mozza",
+    "status": "no_sources",
+    "sourcesFound": 0,
+    "timestamp": "2026-02-04T22:02:38.893Z"
+  },
+  {
+    "slug": "chi-spacca",
+    "status": "no_sources",
+    "sourcesFound": 0,
+    "timestamp": "2026-02-04T22:03:55.180Z"
+  },
+  {
+    "slug": "jon-vinnys",
+    "status": "no_sources",
+    "sourcesFound": 0,
+    "timestamp": "2026-02-04T22:05:11.453Z"
+  },
+  {
+    "slug": "holbox",
+    "status": "no_sources",
+    "sourcesFound": 0,
+    "timestamp": "2026-02-04T22:06:27.637Z"
+  },
+  {
+    "slug": "langers-delicatessen",
+    "status": "no_sources",
+    "sourcesFound": 0,
+    "timestamp": "2026-02-04T22:08:12.045Z"
+  },
+  {
+    "slug": "musso-frank-grill",
+    "status": "no_sources",
+    "sourcesFound": 0,
+    "timestamp": "2026-02-04T22:25:19.749Z"
+  },
+  {
+    "slug": "howlin-rays",
+    "status": "no_sources",
+    "sourcesFound": 0,
+    "timestamp": "2026-02-04T22:26:35.819Z"
+  },
+  {
+    "slug": "somni",
+    "status": "no_sources",
+    "sourcesFound": 0,
+    "timestamp": "2026-02-04T22:27:52.441Z"
+  },
+  {
+    "slug": "nnaka",
+    "status": "no_sources",
+    "sourcesFound": 0,
+    "timestamp": "2026-02-04T22:29:09.049Z"
+  },
+  {
+    "slug": "hayato",
+    "status": "no_sources",
+    "sourcesFound": 0,
+    "timestamp": "2026-02-04T22:30:25.330Z"
+  },
+  {
+    "slug": "bestia",
+    "status": "success",
+    "sourcesFound": 3,
+    "timestamp": "2026-02-04T22:31:34.322Z"
+  },
+  {
+    "slug": "bavel",
+    "status": "success",
+    "sourcesFound": 2,
+    "timestamp": "2026-02-04T22:33:22.437Z"
+  },
+  {
+    "slug": "republique",
+    "status": "success",
+    "sourcesFound": 3,
+    "timestamp": "2026-02-04T22:35:24.245Z"
+  },
+  {
+    "slug": "gjelina",
+    "status": "success",
+    "sourcesFound": 1,
+    "timestamp": "2026-02-04T22:37:12.037Z"
+  },
+  {
+    "slug": "osteria-mozza",
+    "status": "no_sources",
+    "sourcesFound": 0,
+    "timestamp": "2026-02-04T22:39:17.342Z"
+  },
+  {
+    "slug": "pizzeria-mozza",
+    "status": "success",
+    "sourcesFound": 5,
+    "timestamp": "2026-02-04T22:41:08.752Z"
+  },
+  {
+    "slug": "chi-spacca",
+    "status": "success",
+    "sourcesFound": 5,
+    "timestamp": "2026-02-04T22:43:08.815Z"
+  },
+  {
+    "slug": "jon-vinnys",
+    "status": "success",
+    "sourcesFound": 4,
+    "timestamp": "2026-02-04T22:45:27.974Z"
+  },
+  {
+    "slug": "holbox",
+    "status": "success",
+    "sourcesFound": 4,
+    "timestamp": "2026-02-04T23:02:17.526Z"
+  },
+  {
+    "slug": "langers-delicatessen",
+    "status": "success",
+    "sourcesFound": 4,
+    "timestamp": "2026-02-04T23:04:05.609Z"
+  },
+  {
+    "slug": "musso-frank-grill",
+    "status": "success",
+    "sourcesFound": 4,
+    "timestamp": "2026-02-04T23:05:56.763Z"
+  },
+  {
+    "slug": "howlin-rays",
+    "status": "success",
+    "sourcesFound": 5,
+    "timestamp": "2026-02-04T23:11:20.022Z"
+  },
+  {
+    "slug": "somni",
+    "status": "success",
+    "sourcesFound": 5,
+    "timestamp": "2026-02-04T23:21:51.602Z"
+  },
+  {
+    "slug": "nnaka",
+    "status": "success",
+    "sourcesFound": 5,
+    "timestamp": "2026-02-04T23:23:54.479Z"
+  },
+  {
+    "slug": "hayato",
+    "status": "success",
+    "sourcesFound": 2,
+    "timestamp": "2026-02-04T23:25:27.554Z"
+  },
+  {
+    "slug": "vespertine",
+    "status": "success",
+    "sourcesFound": 6,
+    "timestamp": "2026-02-04T23:27:46.413Z"
+  },
+  {
+    "slug": "melisse",
+    "status": "success",
+    "sourcesFound": 3,
+    "timestamp": "2026-02-04T23:29:27.964Z"
+  },
+  {
+    "slug": "camphor",
+    "status": "success",
+    "sourcesFound": 4,
+    "timestamp": "2026-02-04T23:31:14.476Z"
+  },
+  {
+    "slug": "orsa-winston",
+    "status": "success",
+    "sourcesFound": 4,
+    "timestamp": "2026-02-04T23:33:07.653Z"
+  },
+  {
+    "slug": "restaurant-ki",
+    "status": "success",
+    "sourcesFound": 5,
+    "timestamp": "2026-02-04T23:35:10.983Z"
+  },
+  {
+    "slug": "mori-nozomi",
+    "status": "success",
+    "sourcesFound": 4,
+    "timestamp": "2026-02-04T23:37:17.349Z"
+  },
+  {
+    "slug": "gucci-osteria-da-massimo-bottura",
+    "status": "success",
+    "sourcesFound": 4,
+    "timestamp": "2026-02-04T23:41:35.817Z"
+  },
+  {
+    "slug": "q-sushi",
+    "status": "success",
+    "sourcesFound": 3,
+    "timestamp": "2026-02-04T23:43:25.890Z"
+  },
+  {
+    "slug": "citrin",
+    "status": "success",
+    "sourcesFound": 3,
+    "timestamp": "2026-02-04T23:44:59.151Z"
+  },
+  {
+    "slug": "baby-bistro",
+    "status": "success",
+    "sourcesFound": 4,
+    "timestamp": "2026-02-04T23:46:54.388Z"
+  },
+  {
+    "slug": "rasarumah",
+    "status": "success",
+    "sourcesFound": 6,
+    "timestamp": "2026-02-04T23:49:09.585Z"
+  },
+  {
+    "slug": "kuya-lord",
+    "status": "success",
+    "sourcesFound": 5,
+    "timestamp": "2026-02-04T23:51:16.744Z"
+  },
+  {
+    "slug": "berenjak",
+    "status": "success",
+    "sourcesFound": 3,
+    "timestamp": "2026-02-04T23:53:09.089Z"
+  },
+  {
+    "slug": "comedor",
+    "status": "success",
+    "sourcesFound": 3,
+    "timestamp": "2026-02-04T23:54:56.295Z"
+  },
+  {
+    "slug": "88-club",
+    "status": "success",
+    "sourcesFound": 5,
+    "timestamp": "2026-02-04T23:56:58.980Z"
+  },
+  {
+    "slug": "tomat",
+    "status": "success",
+    "sourcesFound": 5,
+    "timestamp": "2026-02-04T23:59:19.067Z"
+  },
+  {
+    "slug": "alba-los-angeles",
+    "status": "success",
+    "sourcesFound": 5,
+    "timestamp": "2026-02-05T00:01:26.639Z"
+  },
+  {
+    "slug": "vin-folk",
+    "status": "success",
+    "sourcesFound": 4,
+    "timestamp": "2026-02-05T00:03:22.844Z"
+  },
+  {
+    "slug": "gjusta",
+    "status": "success",
+    "sourcesFound": 3,
+    "timestamp": "2026-02-05T00:05:19.515Z"
+  },
+  {
+    "slug": "bub-grandmas",
+    "status": "success",
+    "sourcesFound": 4,
+    "timestamp": "2026-02-05T00:07:17.580Z"
+  },
+  {
+    "slug": "jitlada",
+    "status": "success",
+    "sourcesFound": 4,
+    "timestamp": "2026-02-05T00:09:07.531Z"
+  },
+  {
+    "slug": "anajak-thai",
+    "status": "success",
+    "sourcesFound": 5,
+    "timestamp": "2026-02-05T00:11:11.850Z"
+  },
+  {
+    "slug": "coniseafood",
+    "status": "success",
+    "sourcesFound": 7,
+    "timestamp": "2026-02-05T00:13:13.741Z"
+  },
+  {
+    "slug": "mariscos-jalisco",
+    "status": "success",
+    "sourcesFound": 6,
+    "timestamp": "2026-02-05T00:15:09.666Z"
+  },
+  {
+    "slug": "chengdu-taste",
+    "status": "success",
+    "sourcesFound": 4,
+    "timestamp": "2026-02-05T00:17:06.000Z"
+  },
+  {
+    "slug": "lasa",
+    "status": "success",
+    "sourcesFound": 6,
+    "timestamp": "2026-02-05T00:19:04.414Z"
+  },
+  {
+    "slug": "zankou-chicken",
+    "status": "success",
+    "sourcesFound": 3,
+    "timestamp": "2026-02-05T00:20:53.917Z"
+  },
+  {
+    "slug": "portos-bakery-cafe",
+    "status": "success",
+    "sourcesFound": 7,
+    "timestamp": "2026-02-05T00:22:44.117Z"
+  },
+  {
+    "slug": "alta-adams",
+    "status": "success",
+    "sourcesFound": 4,
+    "timestamp": "2026-02-05T00:24:40.951Z"
+  },
+  {
+    "slug": "kismet",
+    "status": "success",
+    "sourcesFound": 4,
+    "timestamp": "2026-02-05T00:26:35.099Z"
+  },
+  {
+    "slug": "nsoto",
+    "status": "success",
+    "sourcesFound": 3,
+    "timestamp": "2026-02-05T00:28:29.228Z"
+  },
+  {
+    "slug": "yangban-society",
+    "status": "success",
+    "sourcesFound": 4,
+    "timestamp": "2026-02-05T00:30:20.135Z"
+  },
+  {
+    "slug": "konbi",
+    "status": "success",
+    "sourcesFound": 5,
+    "timestamp": "2026-02-05T00:32:11.951Z"
+  },
+  {
+    "slug": "rustic-canyon",
+    "status": "success",
+    "sourcesFound": 4,
+    "timestamp": "2026-02-05T00:33:54.387Z"
+  },
+  {
+    "slug": "sapp-coffee-shop",
+    "status": "success",
+    "sourcesFound": 2,
+    "timestamp": "2026-02-05T00:35:37.965Z"
+  },
+  {
+    "slug": "roasted-duck-by-pa-ord",
+    "status": "success",
+    "sourcesFound": 6,
+    "timestamp": "2026-02-05T00:38:02.836Z"
+  },
+  {
+    "slug": "hms-bounty",
+    "status": "success",
+    "sourcesFound": 3,
+    "timestamp": "2026-02-05T00:39:39.910Z"
+  },
+  {
+    "slug": "mercado-la-paloma",
+    "status": "success",
+    "sourcesFound": 5,
+    "timestamp": "2026-02-05T00:41:24.783Z"
+  },
+  {
+    "slug": "augustine-wine-bar",
+    "status": "success",
+    "sourcesFound": 2,
+    "timestamp": "2026-02-05T00:43:00.003Z"
+  },
+  {
+    "slug": "bar-covell",
+    "status": "success",
+    "sourcesFound": 4,
+    "timestamp": "2026-02-05T00:44:35.574Z"
+  },
+  {
+    "slug": "tabula-rasa",
+    "status": "success",
+    "sourcesFound": 3,
+    "timestamp": "2026-02-05T00:46:28.194Z"
+  },
+  {
+    "slug": "esters-wine-shop-bar",
+    "status": "success",
+    "sourcesFound": 3,
+    "timestamp": "2026-02-05T00:48:06.643Z"
+  },
+  {
+    "slug": "go-get-em-tiger",
+    "status": "success",
+    "sourcesFound": 6,
+    "timestamp": "2026-02-05T00:49:50.208Z"
+  },
+  {
+    "slug": "intelligentsia-coffee",
+    "status": "success",
+    "sourcesFound": 6,
+    "timestamp": "2026-02-05T00:51:51.766Z"
+  },
+  {
+    "slug": "verve-coffee-roasters",
+    "status": "success",
+    "sourcesFound": 4,
+    "timestamp": "2026-02-05T00:53:46.229Z"
+  },
+  {
+    "slug": "endorffeine",
+    "status": "success",
+    "sourcesFound": 3,
+    "timestamp": "2026-02-05T00:55:40.796Z"
+  },
+  {
+    "slug": "pizzeria-sei",
+    "status": "success",
+    "sourcesFound": 5,
+    "timestamp": "2026-02-05T00:58:11.333Z"
+  },
+  {
+    "slug": "rvr",
+    "status": "success",
+    "sourcesFound": 5,
+    "timestamp": "2026-02-05T01:00:20.056Z"
+  },
+  {
+    "slug": "lucia",
+    "status": "success",
+    "sourcesFound": 3,
+    "timestamp": "2026-02-05T01:02:10.044Z"
+  },
+  {
+    "slug": "sushi-masuyoshi",
+    "status": "success",
+    "sourcesFound": 3,
+    "timestamp": "2026-02-05T01:03:57.777Z"
+  },
+  {
+    "slug": "santa-canela",
+    "status": "success",
+    "sourcesFound": 4,
+    "timestamp": "2026-02-05T01:05:43.861Z"
+  },
+  {
+    "slug": "mustards-bagels",
+    "status": "success",
+    "sourcesFound": 2,
+    "timestamp": "2026-02-05T01:07:27.434Z"
+  },
+  {
+    "slug": "wagyu-butcher",
+    "status": "success",
+    "sourcesFound": 2,
+    "timestamp": "2026-02-05T01:09:14.766Z"
+  },
+  {
+    "slug": "angels-tijuana-tacos",
+    "status": "success",
+    "sourcesFound": 4,
+    "timestamp": "2026-02-05T01:11:01.182Z"
+  },
+  {
+    "slug": "chateau-marmont",
+    "status": "success",
+    "sourcesFound": 4,
+    "timestamp": "2026-02-05T01:13:14.240Z"
+  },
+  {
+    "slug": "the-beverly-hills-hotel",
+    "status": "success",
+    "sourcesFound": 4,
+    "timestamp": "2026-02-05T01:15:01.729Z"
+  },
+  {
+    "slug": "hotel-bel-air",
+    "status": "success",
+    "sourcesFound": 7,
+    "timestamp": "2026-02-05T01:16:58.648Z"
+  },
+  {
+    "slug": "sunset-tower-hotel",
+    "status": "success",
+    "sourcesFound": 6,
+    "timestamp": "2026-02-05T01:22:53.166Z"
+  },
+  {
+    "slug": "the-peninsula-beverly-hills",
+    "status": "success",
+    "sourcesFound": 5,
+    "timestamp": "2026-02-05T01:24:51.435Z"
+  },
+  {
+    "slug": "the-hollywood-roosevelt",
+    "status": "success",
+    "sourcesFound": 5,
+    "timestamp": "2026-02-05T01:26:46.716Z"
+  },
+  {
+    "slug": "palihouse-west-hollywood",
+    "status": "success",
+    "sourcesFound": 3,
+    "timestamp": "2026-02-05T01:28:19.930Z"
+  },
+  {
+    "slug": "downtown-la-proper-hotel",
+    "status": "success",
+    "sourcesFound": 5,
+    "timestamp": "2026-02-05T01:29:56.915Z"
+  },
+  {
+    "slug": "the-west-hollywood-edition",
+    "status": "success",
+    "sourcesFound": 6,
+    "timestamp": "2026-02-05T01:32:03.322Z"
+  },
+  {
+    "slug": "cara-hotel",
+    "status": "success",
+    "sourcesFound": 4,
+    "timestamp": "2026-02-05T01:33:50.112Z"
+  },
+  {
+    "slug": "hotel-covell",
+    "status": "success",
+    "sourcesFound": 4,
+    "timestamp": "2026-02-05T01:35:43.899Z"
+  },
+  {
+    "slug": "the-hoxton-downtown-la",
+    "status": "success",
+    "sourcesFound": 4,
+    "timestamp": "2026-02-05T01:37:32.028Z"
+  },
+  {
+    "slug": "short-stories-hotel",
+    "status": "success",
+    "sourcesFound": 3,
+    "timestamp": "2026-02-05T01:39:30.426Z"
+  },
+  {
+    "slug": "petit-ermitage",
+    "status": "success",
+    "sourcesFound": 5,
+    "timestamp": "2026-02-05T01:41:39.596Z"
+  },
+  {
+    "slug": "silver-lake-pool-inn",
+    "status": "success",
+    "sourcesFound": 5,
+    "timestamp": "2026-02-05T01:43:26.007Z"
+  },
+  {
+    "slug": "the-prospect-hollywood",
+    "status": "success",
+    "sourcesFound": 1,
+    "timestamp": "2026-02-05T01:45:07.067Z"
+  },
+  {
+    "slug": "santa-monica-proper",
+    "status": "success",
+    "sourcesFound": 5,
+    "timestamp": "2026-02-05T01:46:53.713Z"
+  },
+  {
+    "slug": "gold-diggers",
+    "status": "success",
+    "sourcesFound": 2,
+    "timestamp": "2026-02-05T01:48:29.452Z"
+  },
+  {
+    "slug": "the-line-la",
+    "status": "success",
+    "sourcesFound": 5,
+    "timestamp": "2026-02-05T01:50:29.848Z"
+  },
+  {
+    "slug": "ace-hotel-downtown-los-angeles",
+    "status": "success",
+    "sourcesFound": 4,
+    "timestamp": "2026-02-05T01:52:13.060Z"
+  },
+  {
+    "slug": "freehand-los-angeles",
+    "status": "success",
+    "sourcesFound": 3,
+    "timestamp": "2026-02-05T01:54:02.960Z"
+  },
+  {
+    "slug": "the-garland",
+    "status": "success",
+    "sourcesFound": 5,
+    "timestamp": "2026-02-05T01:55:44.071Z"
+  },
+  {
+    "slug": "hotel-june-west-la",
+    "status": "success",
+    "sourcesFound": 3,
+    "timestamp": "2026-02-05T01:57:35.487Z"
+  },
+  {
+    "slug": "hotel-figueroa",
+    "status": "success",
+    "sourcesFound": 6,
+    "timestamp": "2026-02-05T01:59:20.393Z"
+  },
+  {
+    "slug": "the-sun-rose",
+    "status": "success",
+    "sourcesFound": 1,
+    "timestamp": "2026-02-05T02:00:55.013Z"
+  },
+  {
+    "slug": "hotel-per-la",
+    "status": "success",
+    "sourcesFound": 4,
+    "timestamp": "2026-02-05T02:02:55.784Z"
+  },
+  {
+    "slug": "kodo-hotel",
+    "status": "success",
+    "sourcesFound": 3,
+    "timestamp": "2026-02-05T02:04:42.327Z"
+  },
+  {
+    "slug": "the-aster",
+    "status": "success",
+    "sourcesFound": 7,
+    "timestamp": "2026-02-05T02:06:35.199Z"
+  },
+  {
+    "slug": "soho-warehouse-dtla",
+    "status": "success",
+    "sourcesFound": 5,
+    "timestamp": "2026-02-05T02:08:40.038Z"
+  },
+  {
+    "slug": "the-maybourne-beverly-hills",
+    "status": "success",
+    "sourcesFound": 8,
+    "timestamp": "2026-02-05T02:10:34.390Z"
+  },
+  {
+    "slug": "lermitage-beverly-hills",
+    "status": "success",
+    "sourcesFound": 5,
+    "timestamp": "2026-02-05T02:12:32.636Z"
+  },
+  {
+    "slug": "sonoratown",
+    "status": "success",
+    "sourcesFound": 4,
+    "timestamp": "2026-02-05T02:14:15.268Z"
+  },
+  {
+    "slug": "villas-tacos",
+    "status": "success",
+    "sourcesFound": 5,
+    "timestamp": "2026-02-05T02:16:14.734Z"
+  },
+  {
+    "slug": "guisados",
+    "status": "success",
+    "sourcesFound": 4,
+    "timestamp": "2026-02-05T02:17:54.751Z"
+  },
+  {
+    "slug": "tacos-los-cholos",
+    "status": "success",
+    "sourcesFound": 3,
+    "timestamp": "2026-02-05T02:19:39.671Z"
+  },
+  {
+    "slug": "tire-shop-taqueria",
+    "status": "success",
+    "sourcesFound": 3,
+    "timestamp": "2026-02-05T02:21:19.620Z"
+  },
+  {
+    "slug": "carnitas-el-momo",
+    "status": "success",
+    "sourcesFound": 3,
+    "timestamp": "2026-02-05T02:23:03.427Z"
+  },
+  {
+    "slug": "los-cinco-puntos",
+    "status": "success",
+    "sourcesFound": 2,
+    "timestamp": "2026-02-05T02:24:47.632Z"
+  },
+  {
+    "slug": "carnitas-los-gabrieles",
+    "status": "success",
+    "sourcesFound": 2,
+    "timestamp": "2026-02-05T02:26:27.590Z"
+  },
+  {
+    "slug": "teddys-red-tacos",
+    "status": "success",
+    "sourcesFound": 3,
+    "timestamp": "2026-02-05T02:28:10.513Z"
+  },
+  {
+    "slug": "birrieria-nochistlan",
+    "status": "success",
+    "sourcesFound": 5,
+    "timestamp": "2026-02-05T02:29:59.302Z"
+  },
+  {
+    "slug": "rickys-fish-tacos",
+    "status": "success",
+    "sourcesFound": 2,
+    "timestamp": "2026-02-05T02:31:37.989Z"
+  },
+  {
+    "slug": "mexicali-taco-co",
+    "status": "success",
+    "sourcesFound": 3,
+    "timestamp": "2026-02-05T02:33:27.601Z"
+  },
+  {
+    "slug": "buzz-wine-beer-shop",
+    "status": "success",
+    "sourcesFound": 1,
+    "timestamp": "2026-02-05T02:34:59.707Z"
+  },
+  {
+    "slug": "lilys-bar",
+    "status": "success",
+    "sourcesFound": 2,
+    "timestamp": "2026-02-05T02:36:37.709Z"
+  },
+  {
+    "slug": "wine-eggs",
+    "status": "success",
+    "sourcesFound": 4,
+    "timestamp": "2026-02-05T02:38:21.148Z"
+  },
+  {
+    "slug": "flask-field",
+    "status": "success",
+    "sourcesFound": 5,
+    "timestamp": "2026-02-05T02:40:09.975Z"
+  },
+  {
+    "slug": "heavens-market",
+    "status": "success",
+    "sourcesFound": 1,
+    "timestamp": "2026-02-05T02:41:46.718Z"
+  },
+  {
+    "slug": "vin-on-rose",
+    "status": "success",
+    "sourcesFound": 1,
+    "timestamp": "2026-02-05T02:43:12.016Z"
+  },
+  {
+    "slug": "all-time",
+    "status": "success",
+    "sourcesFound": 4,
+    "timestamp": "2026-02-05T02:45:03.299Z"
+  },
+  {
+    "slug": "cosa-buona",
+    "status": "success",
+    "sourcesFound": 3,
+    "timestamp": "2026-02-05T02:46:46.168Z"
+  },
+  {
+    "slug": "majordomo",
+    "status": "success",
+    "sourcesFound": 5,
+    "timestamp": "2026-02-05T02:48:45.894Z"
+  },
+  {
+    "slug": "ronan",
+    "status": "success",
+    "sourcesFound": 3,
+    "timestamp": "2026-02-05T02:50:37.619Z"
+  },
+  {
+    "slug": "sqirl",
+    "status": "success",
+    "sourcesFound": 3,
+    "timestamp": "2026-02-05T02:52:26.086Z"
+  },
+  {
+    "slug": "tilda",
+    "status": "success",
+    "sourcesFound": 1,
+    "timestamp": "2026-02-05T02:53:56.130Z"
+  },
+  {
+    "slug": "night-market-song",
+    "status": "success",
+    "sourcesFound": 2,
+    "timestamp": "2026-02-05T02:55:33.762Z"
+  },
+  {
+    "slug": "night-market-sahm",
+    "status": "success",
+    "sourcesFound": 2,
+    "timestamp": "2026-02-05T02:57:09.999Z"
+  },
+  {
+    "slug": "kobawoo-house",
+    "status": "success",
+    "sourcesFound": 2,
+    "timestamp": "2026-02-05T02:58:46.879Z"
+  },
+  {
+    "slug": "highland-park-wine",
+    "status": "success",
+    "sourcesFound": 1,
+    "timestamp": "2026-02-05T03:00:12.860Z"
+  }
+]

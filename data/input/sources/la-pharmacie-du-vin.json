@@ -1,0 +1,23 @@
+{
+  "place_slug": "la-pharmacie-du-vin",
+  "sources": [
+    {
+      "source_id": "src_theinfatuation_2023",
+      "publication": "The Infatuation",
+      "title": "La Pharmacie du Vin - Review - Silver Lake - Los Angeles",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/la-pharmacie-du-vin-silver-lake-wine-bar-los-angeles",
+      "published_at": "2023-07-13",
+      "trust_level": "editorial",
+      "content": "La Pharmacie is the kind of place you bring a date (or a few friends you actually like), on a sunny afternoon when you don't need to rush. It's a wine shop smack dab in the middle of that rust-colored stucco complex near the Sunset Junction sign in Silver Lake and its outdoor area resembles a courtyard in a Spanish villa. Sit next to a blooming bush of roses and eat charcuterie all afternoon like an off-duty (read: unemployed) model. All the wine on the menu is for sale in the shop, where sommeliers wear navy lab coats and hundreds of bottles line dark, wood-paneled walls."
+    },
+    {
+      "source_id": "src_timeout_2023",
+      "publication": "Time Out LA",
+      "title": "La Pharmacie du Vin | Bars in Silver Lake, Los Angeles",
+      "url": "https://www.timeout.com/los-angeles/bars/la-pharmacie-du-vin",
+      "published_at": "2023-08-12",
+      "trust_level": "editorial",
+      "content": "Located right next to Cafe Stella, this ultra-cute daytime wine bar features a charming courtyard lined with flowers and café-style chairs. Inside, you'll find hundreds of bottles lining the walls (La Pharmacie du Vin also operates as a retail bottle shop) and a calendar with tastings that will take you on a journey to Austria, Italy, Spain and beyond. Foodwise, you can order charcuterie plates, sandwiches, salads and even pate—making it the perfect place in Silver Lake for a casual date or catching up with a friend."
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "place_slug": "buzz-wine-beer-shop",
+  "sources": [
+    {
+      "source_id": "src_timeout_la_2016",
+      "publication": "Time Out LA",
+      "title": "Buzz Wine Beer Shop | Shopping in Downtown Historic Core, Los Angeles",
+      "url": "https://www.timeout.com/los-angeles/shopping/buzz-wine-beer-shop",
+      "published_at": "2016-08-06",
+      "trust_level": "editorial",
+      "content": "The counter-culture destination for wines from small and obscure producers, the DTLA shop is known for an impressive, rotating stock of new and exciting craft beers from malts to beers aged in bourbon and Pinot Noir barrels. TOLA pick: Drink whatever Williams is drinking, like a BROC Luna Matta Vineyard 2009 Mourvedre ($31), a Central Coast Rhone varietal that pairs well with cold-weather foods like braised and smoked meats. For beer drinkers, try a something different like brews made from cranberries and cherries to go with turkey dinner."
+    }
+  ]
+}

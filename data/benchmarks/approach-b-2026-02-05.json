@@ -1,0 +1,24 @@
+{
+  "approach": "B-claude-native",
+  "timestamp": "2026-02-05T03:00:12.820Z",
+  "model": "claude-haiku-4-5-20251001",
+  "places": [
+    {
+      "slug": "highland-park-wine",
+      "sourcesFound": 1,
+      "timeMs": 10176,
+      "inputTokens": 49914,
+      "outputTokens": 689,
+      "searchQueries": 0,
+      "file": "data/input/sources/highland-park-wine.json"
+    }
+  ],
+  "totals": {
+    "sources": 1,
+    "timeMs": 10176,
+    "inputTokens": 49914,
+    "outputTokens": 689,
+    "searches": 0,
+    "estimatedCost": 0.160077
+  }
+}

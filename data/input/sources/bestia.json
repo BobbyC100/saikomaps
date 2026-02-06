@@ -1,0 +1,32 @@
+{
+  "place_slug": "bestia",
+  "sources": [
+    {
+      "source_id": "src_michelin_2025",
+      "publication": "Michelin Guide",
+      "title": "Bestia – Los Angeles - a MICHELIN Guide Restaurant",
+      "url": "https://guide.michelin.com/us/en/california/us-los-angeles/restaurant/bestia",
+      "published_at": "2025-06-25",
+      "trust_level": "editorial",
+      "content": "As cool and convivial as ever, this is the kind of place where both diners and staff seem perpetually at bliss. Inside, it all feels like a labor of love, thanks to the husband-and-wife team who make it their mission to bring fresh, rib-sticking food to this neighborhood. The space itself is warehouse-sized and rustic, with a copper bar, tulip-shaped pendant lights, booths that appear virtually suspended, and a flaming red-domed oven. However, it is the cooking that lures these crowds. To wit: a justifiably popular deboned and properly grilled whole fish stuffed with pea tendrils, fried herbs, and charred citrus. Desserts though are equally enticing, so save room for a rich and creamy chocolate budina tucked into a crisp tart with salted caramel."
+    },
+    {
+      "source_id": "src_infatuation_2022",
+      "publication": "The Infatuation",
+      "title": "At Bestia, the hype is still warranted - Review - Los Angeles - The Infatuation",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/bestia",
+      "published_at": "2022-01-21",
+      "trust_level": "editorial",
+      "content": "Bestia is a fantastic restaurant by any measure, but it's even more impressive when you consider this well-oiled Arts District machine hasn't lost a step since it opened. Our recommendation then remains the same now: if you don't mind a bit of pre-planning and come prepared to spend, Bestia is an essential destination for a splashy Italian dinner that's as fun as it is delicious. Once during dinner at Bestia, we witnessed a server pour wine down a hollowed-out beef bone, luge-style, into a woman's waiting mouth. That image alone should tell you a lot about this high-voltage Italian spot in the Arts District, which has been packed more or less every night of the week since it opened over a decade ago, with no signs of slowing. Even if you're not the type to waterfall pinot grigio out of a femur, it's too easy to find yourself swept up in Bestia's buzz. Chatter in the industrial-chic dining room drowns out its hip-hop playlist well past last call. Staff enthusiastically guide you through the menu with the skill of luxury concierges. Tables filled with double dates and birthday celebrations clink wine glasses and pick at elaborate salumi boards. Most impressive, though, is that Bestia's food still grabs the spotlight: a well-rounded mix of perfectly sauced pasta, blistered wood-fired pizzas, and antipasti that are bold and rich without being overwhelming. The selection of house-cured meats rotates, but there's always something special: spicy Spanish chorizo, peppercorn-laced soppressata that sends a flare of smoke up your nostrils, or rich white nduja smeared on bread. The blistered, charred crusts on Bestia's pizzas are so good, we dare say toppings take a backseat. But we like that even simpler pies have layered flavors, like the burrata one with dollops of runny cheese that cools down the fermented chiles, tangy tomato sauce, and roasted green olives. We've never found a wrong way to order at Bestia, but if there's one section of the menu we'd consider mandatory, it'd be the nicely al dente housemade pastas, like silky squid ink spaghetti with lobster, or ricotta cavatelli with truffles and sausage. The pizzas, blistered and slightly smoky from the oven and layered with tart pomodoro sauce, aren't far behind. Though if you're larger than a party of three, you'll want a table anyway—just plan to book a week or so in advance."
+    },
+    {
+      "source_id": "src_timeout_2025",
+      "publication": "Time Out LA",
+      "title": "Bestia | Restaurants in Downtown Arts District, Los Angeles",
+      "url": "https://www.timeout.com/los-angeles/restaurants/bestia",
+      "published_at": "2025-04-26",
+      "trust_level": "editorial",
+      "content": "Bestia is one of the city's best Italian restaurants, and one of L.A.'s busiests restaurants for a reason. Chef and co-owner Ori Menashe's rustic renditions of pizza, pasta and starters still manage to delight and impress, no matter how many times we've ordered them. Despite the decade and change since Bestia first opened in 2012 (and the fact owners Ori Menashe and Genevieve Gergis have opened two more restaurants), Bestia still requires a reservation on weekend evenings. The seasonal menu rotates slightly, but there's a couple of heavy hitters I always recommend, including the roasted bone marrow with spinach gnocchetti—one of the dishes that cemented my desire to write about food—and the chestnut and mushroom agnolotti. The latter consists of tiny mascarpone-stuffed pasta pockets topped with fried sage and fennel pollen; a combination these days that's no longer novel, but still shockingly good."
+    }
+  ]
+}

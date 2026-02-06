@@ -1,0 +1,23 @@
+{
+  "place_slug": "maru-coffee",
+  "sources": [
+    {
+      "source_id": "src_sprudge_2022",
+      "publication": "Sprudge",
+      "title": "Sprudge Maps Spotlight: Maru Coffee In Los Angeles, CA",
+      "url": "https://sprudge.com/sprudge-maps-spotlight-maru-coffee-in-los-angeles-ca-184840.html",
+      "published_at": "2022-06-15",
+      "trust_level": "editorial",
+      "content": "Paste the full article text here. Strip HTML, nav, ads. 2-5 articles per place is the sweet spot."
+    },
+    {
+      "source_id": "src_infatuation_losfeliz",
+      "publication": "The Infatuation",
+      "title": "Maru Coffee — Los Feliz Review",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/maru-coffee",
+      "published_at": "2024-06-20",
+      "trust_level": "editorial",
+      "content": "Paste the full article text here."
+    }
+  ]
+}

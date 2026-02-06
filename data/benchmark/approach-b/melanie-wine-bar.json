@@ -1,0 +1,23 @@
+{
+  "place_slug": "melanie-wine-bar",
+  "sources": [
+    {
+      "source_id": "src_theinfatuation_2024",
+      "publication": "The Infatuation",
+      "title": "Melanie - Review - Beverly Grove - Los Angeles",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/melanie",
+      "published_at": "2024-02-13",
+      "trust_level": "editorial",
+      "content": "At first glance, Melanie looks and feels like many other good wine bars around town. There's a well-curated list filled with mostly European biodynamic wines, a cute space that feels like a friends' living room right as the party is starting to peak, and a menu filled with snacks you want to be eating while drinking chilled Beaujolais. But what makes this Beverly Grove spot great are the actual people serving you the wine. Melanie is owned by the same crew behind Sushi Note and Augustine Wine Bar, two of our favorite places to drink wine in LA simply because the sommeliers know how to level with you. No question is a dumb question, even if you ask if orange wine is made from oranges. They'll also happily keep offering tastes until you find your match. As far as the food goes, the mussels are a standout. They're plump, buttery, and come bathed in a rich, savory vadouvan curry."
+    },
+    {
+      "source_id": "src_timeout_2021",
+      "publication": "Time Out LA",
+      "title": "Melanie Wine Bar | Bars in West Third Street, Los Angeles",
+      "url": "https://www.timeout.com/los-angeles/bars/melanie-wine-bar",
+      "published_at": "2021-09-29",
+      "trust_level": "editorial",
+      "content": "Housed in an intimate space along West 3rd Street, this newer no-reservation neighborhood wine bar comes from Andy Paxson and Dave Gibbs, the same pair behind Augustine, Mirabelle and Sushi Note, a Valley omakase bar well-known for its wine pairings. Every bottle available by the glass on a list that spans red, white, orange, rosé and sparkling. Delicious fare like mussels in a silky coconut milk broth and tender hanger steak make the transition from a drink to dinner quite easy, though the staff is more than happy to uncork a bottle if you're only looking for a casual drink."
+    }
+  ]
+}

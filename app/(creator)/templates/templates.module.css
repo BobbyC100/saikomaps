@@ -1,0 +1,530 @@
+/* Templates Page Styles - Saiko Maps Design System */
+
+/* ========================================
+   PAGE LAYOUT
+   ======================================== */
+.pageWrapper {
+  min-height: 100vh;
+  background: #FAF8F5;
+}
+
+.nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 40px;
+  background: #FFFFFF;
+  border-bottom: 1px solid #E8E3DC;
+}
+
+.navLeft {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #1A1A1A;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.navLeft:hover {
+  color: #5BA7A7;
+}
+
+/* ========================================
+   HERO SECTION
+   ======================================== */
+.hero {
+  text-align: center;
+  padding: 60px 40px;
+  background: #FAF8F5;
+}
+
+.heroTitle {
+  font-family: 'Source Serif 4', serif;
+  font-size: 48px;
+  font-weight: 700;
+  color: #1A1A1A;
+  letter-spacing: -0.01em;
+  margin-bottom: 16px;
+  line-height: 1.2;
+}
+
+.heroSubtitle {
+  font-size: 18px;
+  color: #6B6B6B;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* ========================================
+   CONTAINER
+   ======================================== */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 40px 80px;
+}
+
+/* ========================================
+   TEMPLATE GRID
+   ======================================== */
+.templateGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 32px;
+}
+
+/* ========================================
+   TEMPLATE CARD
+   ======================================== */
+.templateCard {
+  background: #FFFFFF;
+  border: 2px solid #E8E3DC;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+}
+
+.templateCard:hover {
+  border-color: #5BA7A7;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.10);
+  transform: translateY(-4px);
+}
+
+/* ========================================
+   IMAGE HEADER WITH OVERLAY
+   ======================================== */
+.templateHeader {
+  position: relative;
+  height: 240px;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 32px;
+}
+
+/* Subtle blur overlay */
+.templateHeader::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom, rgba(26, 26, 26, 0.3), rgba(26, 26, 26, 0.6));
+  backdrop-filter: blur(2px);
+  z-index: 1;
+}
+
+.templateHeaderContent {
+  position: relative;
+  z-index: 2;
+}
+
+.templateTitle {
+  font-family: 'Source Serif 4', serif;
+  font-size: 28px;
+  font-weight: 600;
+  color: #FFFFFF;
+  line-height: 1.2;
+  margin-bottom: 8px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.templateSubtitle {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #FFFFFF;
+  opacity: 0.9;
+}
+
+/* ========================================
+   CARD BODY
+   ======================================== */
+.cardBody {
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  flex-grow: 1;
+}
+
+.templateDescription {
+  font-size: 15px;
+  color: #6B6B6B;
+  line-height: 1.6;
+  flex-grow: 1;
+}
+
+/* ========================================
+   EXAMPLE SECTION
+   ======================================== */
+.exampleSection {
+  padding-top: 16px;
+  border-top: 1px solid #E8E3DC;
+}
+
+.exampleLabel {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #999999;
+  margin-bottom: 12px;
+}
+
+.exampleTitle {
+  font-family: 'Source Serif 4', serif;
+  font-size: 16px;
+  font-style: italic;
+  color: #1A1A1A;
+  margin-bottom: 16px;
+}
+
+.organizationLabel {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #999999;
+  margin-bottom: 12px;
+}
+
+.organizationList {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.organizationList li {
+  font-size: 14px;
+  color: #6B6B6B;
+  padding-left: 16px;
+  position: relative;
+}
+
+.organizationList li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: #5BA7A7;
+  font-weight: 700;
+}
+
+/* ========================================
+   SELECT BUTTON
+   ======================================== */
+.selectButton {
+  width: 100%;
+  padding: 14px 28px;
+  background: #5BA7A7;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  margin-top: 8px;
+}
+
+.selectButton:hover {
+  background: #4A9696;
+}
+
+/* ========================================
+   BOTTOM NOTE
+   ======================================== */
+.bottomNote {
+  text-align: center;
+  padding: 40px;
+  border-top: 1px solid #E8E3DC;
+  margin-top: 60px;
+}
+
+.bottomNote p {
+  font-size: 15px;
+  color: #6B6B6B;
+  line-height: 1.6;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.bottomNoteSubtitle {
+  font-size: 13px;
+  color: #999999;
+  margin-top: 8px;
+}
+
+/* ========================================
+   MODAL
+   ======================================== */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(26, 26, 26, 0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal {
+  background: #FFFFFF;
+  border: 2px solid #E8E3DC;
+  border-radius: 12px;
+  max-width: 600px;
+  width: 100%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  position: relative;
+  animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modalClose {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #6B6B6B;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+  z-index: 1;
+}
+
+.modalClose:hover {
+  color: #1A1A1A;
+}
+
+.modalHeader {
+  padding: 40px 40px 24px;
+  border-bottom: 2px solid #E8E3DC;
+}
+
+.modalTitle {
+  font-family: 'Source Serif 4', serif;
+  font-size: 32px;
+  font-weight: 600;
+  color: #1A1A1A;
+  margin-bottom: 8px;
+  line-height: 1.2;
+}
+
+.modalSubtitle {
+  font-size: 15px;
+  color: #6B6B6B;
+}
+
+.modalBody {
+  padding: 32px 40px;
+}
+
+.formGroup {
+  margin-bottom: 24px;
+}
+
+.formGroup:last-child {
+  margin-bottom: 0;
+}
+
+.formLabel {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #1A1A1A;
+  margin-bottom: 8px;
+}
+
+.required {
+  color: #E88B7C;
+}
+
+.formInput,
+.formTextarea {
+  width: 100%;
+  padding: 12px 16px;
+  background: #F5F1EC;
+  border: 2px solid #E8E3DC;
+  border-radius: 6px;
+  font-size: 16px;
+  font-family: 'Inter', sans-serif;
+  color: #1A1A1A;
+  transition: all 0.2s;
+}
+
+.formInput:focus,
+.formTextarea:focus {
+  outline: none;
+  border-color: #5BA7A7;
+  background: #FFFFFF;
+  box-shadow: 0 0 0 3px rgba(91, 167, 167, 0.1);
+}
+
+.formTextarea {
+  resize: vertical;
+  min-height: 80px;
+  line-height: 1.5;
+}
+
+.modalFooter {
+  padding: 24px 40px 32px;
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.btnCancel,
+.btnCreate {
+  padding: 12px 28px;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+  font-family: 'Inter', sans-serif;
+}
+
+.btnCancel {
+  background: #F5F1EC;
+  color: #1A1A1A;
+  border: 2px solid #E8E3DC;
+}
+
+.btnCancel:hover:not(:disabled) {
+  background: #E8E3DC;
+}
+
+.btnCancel:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btnCreate {
+  background: #5BA7A7;
+  color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.btnCreate:hover:not(:disabled) {
+  background: #4A9696;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  transform: translateY(-1px);
+}
+
+.btnCreate:disabled {
+  background: #E8E3DC;
+  color: #999999;
+  cursor: not-allowed;
+  opacity: 0.6;
+  box-shadow: none;
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+@media (max-width: 1024px) {
+  .templateGrid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .heroTitle {
+    font-size: 36px;
+  }
+
+  .container {
+    padding: 40px 24px 60px;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero {
+    padding: 40px 24px;
+  }
+
+  .heroTitle {
+    font-size: 32px;
+  }
+
+  .heroSubtitle {
+    font-size: 16px;
+  }
+
+  .templateHeader {
+    height: 200px;
+    padding: 24px;
+  }
+
+  .templateTitle {
+    font-size: 24px;
+  }
+
+  .cardBody {
+    padding: 24px;
+  }
+
+  .modal {
+    max-width: 100%;
+    margin: 0 16px;
+  }
+
+  .modalHeader {
+    padding: 32px 24px 20px;
+  }
+
+  .modalTitle {
+    font-size: 28px;
+  }
+
+  .modalBody {
+    padding: 24px;
+  }
+
+  .modalFooter {
+    padding: 20px 24px 24px;
+    flex-direction: column;
+  }
+
+  .btnCancel,
+  .btnCreate {
+    width: 100%;
+  }
+}

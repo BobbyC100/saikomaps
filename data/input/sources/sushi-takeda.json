@@ -1,0 +1,32 @@
+{
+  "place_slug": "sushi-takeda",
+  "sources": [
+    {
+      "source_id": "src_michelin_2025",
+      "publication": "Michelin Guide",
+      "title": "Sushi Takeda – Los Angeles - a MICHELIN Guide Restaurant",
+      "url": "https://guide.michelin.com/us/en/california/us-los-angeles/restaurant/sushi-takeda",
+      "published_at": "2025-06-25",
+      "trust_level": "editorial",
+      "content": "Located on the third floor of Weller Court in Little Tokyo, Sushi Takeda is fairly new to the scene but already has a loyal following. The fans are here for Chef Hide Takeda, who has worked at some of the city's top sushi dens. There are two nightly seatings for omakase (one helmed by Chef Takeda), or skip the splurge-worthy dinner and opt for the reasonably priced lunch omakase. The counter is certainly the best place to pull up a seat to savor such items as the signature iwashi, a sardine roll wrapped in pickled daikon and filled with ginger and shiso. Lean tuna from Japan is simply delicious while spear squid with fermented tuna intestine is an enjoyable bite. Discover a perfect morsel of striped jack or the sweet and creamy kelp-cured spotted prawns."
+    },
+    {
+      "source_id": "src_infatuation_2025",
+      "publication": "The Infatuation",
+      "title": "At Sushi Takeda, the subdued omakase makes a big impression",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/sushi-takeda",
+      "published_at": "2025-08-27",
+      "trust_level": "editorial",
+      "content": "Sushi Takeda is a serene, stripped-back spot run by a veteran sushi chef where you go to be left alone with delicate, dry-aged fish prepared with a jeweler's precision. Hidden on the third floor of Weller Court shopping mall, Takeda doesn't cater to Rolex-touting ballers ordering the most expensive bottle of sake, but rather delivers a nice moment of peace. This shoji-clad restaurant is so still you can eavesdrop on everyone's conversation and hear tempura bubbling in the back kitchen. But the meal never hits a lull, either—the Edo-style sushi is special enough to hold your attention the entire time. Sushi Takeda doesn't offer à la carte, but it does provide you with a few dinner options: an 18-course omakase for $150 that's more than sufficient for most occasions, or a blowout 25-course extravaganza for $300. You also have the option of ordering the 18-course omakase at one of Sushi Takeda's tables instead of the sushi bar for a $30 discount, but in our experience, the better service and intimate feel of sitting at the counter is worth full price. If there's one deal that's worth getting excited about at Takeda, though, it's the 15-course lunch omakase for $110 ($120 on weekends), which is a fantastic value considering the high quality of sushi involved. No matter which option you go with, Takeda's approach lets pristine seafood and sushi rice shine: sweet, kelp-cured snapper, sea bream brightened with a dot of yuzu kosho, and clean-tasting iwashi rolls wrapped with shiso and paper-thin daikon. Next time you're in the mood to splurge on memorable sushi without feeling like you're emptying your entire checking account, know that Sushi Takeda hits the sweet spot. Between Takeda's 25-course omakase for $300 and the 18-course for $180, the latter is Goldilock's porridge: just right. It offers a mix of Takeda's excellent nigiri and prepared dishes, including tender squid topped with a mound of funky karasumi, and briny Spanish mackerel brightened up with ginger and mirin. If you're still hungry at the end, the chef will let you add bonus courses, too. Served between 11:30am and 1:30pm, Takeda's lunch omakase is basically a slightly smaller version of the dinner omakase at a discounted price, with 12 pieces of nigiri and 3-4 small dishes for either $110 or $120, depending on the day of the week. It's a great deal, but also extremely popular, so be sure to book a reservation in advance (ideally the earliest time slot at 11:30am, which guarantees you a coveted sushi bar seat)."
+    },
+    {
+      "source_id": "src_timeout_la_2025",
+      "publication": "Time Out LA",
+      "title": "Sushi Takeda",
+      "url": "https://www.timeout.com/los-angeles/restaurants/sushi-takeda",
+      "published_at": "2025-03-04",
+      "trust_level": "editorial",
+      "content": "These days, most of L.A.'s very best Edomae-style omakase meals require setting an alarm to snag a difficult Tock reservation, plus the willingness to dine early or on a random, often inconvenient weekday. Not so at Sushi Takeda, which, as of writing, remains surprisingly easy to walk into on any given day for an amazing nigiri-only omakase ($180 per head at the bar, $150 at the table). Hidden away on the third floor of Little Tokyo's Weller Court, Hideyuki Takeda's tiny counter-and-table operation remains somewhat overlooked—even after a recent shout-out in the L.A. Times. Though it does typically require advance booking, the full signature omakase experience ($300)—only available at 6pm—rivals the city's very best with delectable kaiseki-style appetizers. The slightly more reasonable lunch offering ($110 per person Tue–Thu; $120 Fri, Sat) and openness to walk-ins also make Sushi Takeda a great high-end sushi experience for those who want to be a little spontaneous."
+    }
+  ]
+}

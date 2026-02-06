@@ -1,0 +1,213 @@
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif&family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap');
+@import "tailwindcss";
+
+/* ============================================
+   SAIKO MAPS DESIGN SYSTEM v2
+   Approved design tokens - February 2026
+   ============================================ */
+
+@theme {
+  --color-bg-primary: #FFFFFF;
+  --color-bg-secondary: #FFFFFF;
+  --color-bg-tertiary: #FAFAF9;
+  --color-text-primary: #1A1A1A;
+  --color-text-secondary: #6B6B6B;
+  --color-text-tertiary: #9A9A9A;
+  --color-accent-primary: #E07A5F;
+  --color-accent-secondary: #E07A5F;
+  --color-border-light: #E5E5E5;
+  --color-border-subtle: #F0F0F0;
+  --color-success: #2D8A4E;
+  --color-error: #C0392B;
+  --radius: 2px;
+}
+
+/* Google Maps marker label styling - remove blue square border */
+.gm-style .gm-style-iw-c,
+.gm-style .gm-style-iw-d {
+  border-radius: 0 !important;
+}
+
+/* Custom marker labels - coral circle with white border, no blue square */
+.gm-style .gm-style-cc,
+.gm-style .gm-style-iw-t::after {
+  background: transparent !important;
+}
+
+/* Override Google Maps default label background */
+div[style*="background-color: rgb(255, 255, 255)"][style*="border"] {
+  background-color: transparent !important;
+  border: none !important;
+}
+
+:root {
+  /* BACKGROUNDS */
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #FFFFFF;
+  --bg-tertiary: #FAFAF9;
+  
+  /* TEXT COLORS */
+  --text-primary: #1A1A1A;
+  --text-secondary: #6B6B6B;
+  --text-tertiary: #9A9A9A;
+  
+  /* PRIMARY ACCENT (Coral) */
+  --accent-primary: #E07A5F;
+  --accent-primary-hover: #D06A4F;
+  --accent-secondary: #E07A5F;
+  
+  /* BORDERS */
+  --border-light: #E5E5E5;
+  --border-color: #E5E5E5;
+  --border-subtle: #F0F0F0;
+  
+  /* STATUS COLORS */
+  --success: #2D8A4E;
+  --error: #C0392B;
+  
+  /* SHAPE */
+  --radius: 2px;
+  
+  /* SHADOWS */
+  --shadow: 0 4px 12px rgba(224, 122, 95, 0.15), 0 2px 4px rgba(0,0,0,0.04);
+  
+  /* TYPOGRAPHY */
+  --font-title: "Playfair Display", Georgia, serif;
+  --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+@layer base {
+  body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+  }
+}
+
+@layer utilities {
+  .bg-bg-primary { background-color: var(--bg-primary); }
+  .bg-bg-secondary { background-color: var(--bg-secondary); }
+  .bg-bg-tertiary { background-color: var(--bg-tertiary); }
+  .text-text-primary { color: var(--text-primary); }
+  .text-text-secondary { color: var(--text-secondary); }
+  .text-text-tertiary { color: var(--text-tertiary); }
+  .text-accent-primary { color: var(--accent-primary); }
+  .text-accent-secondary { color: var(--accent-secondary); }
+  .bg-accent-primary { background-color: var(--accent-primary); }
+  .bg-accent-secondary { background-color: var(--accent-secondary); }
+  .border-border-light { border-color: var(--border-light); }
+  .text-success { color: var(--success); }
+  .text-error { color: var(--error); }
+
+  /* Add Location Modal Animations */
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes sectionReveal {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-slideUp {
+    animation: slideUp 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .animate-sectionReveal {
+    animation: sectionReveal 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* Map view template fonts */
+  .font-template-postcard {
+    font-family: var(--font-nunito), sans-serif;
+  }
+  .font-template-fieldnotes {
+    font-family: var(--font-libre), serif;
+  }
+  .font-template-monocle {
+    font-family: var(--font-crimson), serif;
+  }
+}
+
+/* ============================================
+   FIELD NOTES TEMPLATE — Map Detail Page
+   Curated maps (7–15 places), editorial feel
+   ============================================ */
+.field-notes {
+  --fn-parchment: #F5F0E1;
+  --fn-charcoal: #36454F;
+  --fn-khaki: #C3B091;
+  --fn-green: #4A7C59;
+  --fn-white: #FFFFFF;
+  --fn-red: #D64541;
+  --fn-leather: #8B7355;
+  --fn-ocean: #89B4C4;
+  --fn-navy: #1B2A3D;
+  --fn-navy-surface: #1E2F44;
+}
+
+.field-notes.dark {
+  --fn-bg: var(--fn-navy);
+  --fn-card-bg: rgba(27, 42, 61, 0.9);
+  --fn-card-border: 1px solid rgba(137, 180, 196, 0.1);
+  --fn-text: var(--fn-parchment);
+  --fn-text-secondary: rgba(137, 180, 196, 0.5);
+  --fn-status-open: #6BBF8A;
+  --fn-status-closed: rgba(245, 240, 225, 0.35);
+}
+
+.field-notes:not(.dark) {
+  --fn-bg: var(--fn-parchment);
+  --fn-card-bg: var(--fn-white);
+  --fn-card-border: none;
+  --fn-text: var(--fn-charcoal);
+  --fn-text-secondary: var(--fn-khaki);
+  --fn-status-open: var(--fn-green);
+  --fn-status-closed: rgba(54, 69, 79, 0.5);
+}
+
+@keyframes fn-fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fn-popupEnter {
+  from { opacity: 0; transform: translateY(8px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Google Maps marker label styling - remove blue square border */
+/* Override default Google Maps label background */
+.gm-style .gm-style-iw-c,
+.gm-style .gm-style-iw-d {
+  border-radius: 0 !important;
+}
+
+/* Remove blue background from marker labels */
+.gm-style div[style*="background-color"] {
+  background-color: transparent !important;
+}
+
+/* Target Google Maps label elements specifically */
+.gm-style .gm-style-cc,
+.gm-style .gm-style-iw-t::after {
+  background: transparent !important;
+}

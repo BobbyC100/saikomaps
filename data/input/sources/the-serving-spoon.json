@@ -1,0 +1,23 @@
+{
+  "place_slug": "the-serving-spoon",
+  "sources": [
+    {
+      "source_id": "src_theinfatuation_2023",
+      "publication": "The Infatuation",
+      "title": "The Serving Spoon - Review - Inglewood - Los Angeles",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/the-serving-spoon",
+      "published_at": "2023-02-23",
+      "trust_level": "editorial",
+      "content": "The Serving Spoon is a classic diner in Inglewood that serves excellent Southern breakfast staples. Walking into this classic diner on Centinela is like walking into the center of the neighborhood - families, big groups of friends, and solo diners who have been coming every week for 35 years, all clamoring to get The Serving Spoon's Southern breakfast into their stomachs. No matter what day of the week you come here, expect lines out the door, but on the other side of that 45 minute wait are tremendous plates of fried catfish, chicken drumettes, and our favorite waffles in town. If you can snag a seat at the counter, do it and be treated to endless conversation with the waitstaff. Truly Excellent: An 8 should be on your must-try list, because 8s are great. These spots are worth making an effort or crossing town for."
+    },
+    {
+      "source_id": "src_timeout_2024",
+      "publication": "Time Out LA",
+      "title": "The Serving Spoon | Restaurants in Inglewood, Los Angeles",
+      "url": "https://www.timeout.com/los-angeles/restaurants/the-serving-spoon",
+      "published_at": "2024-03-14",
+      "trust_level": "editorial",
+      "content": "For almost four decades, this Inglewood eatery has served the neighborhood heaping breakfast platters, plus daily specials like smothered oxtails (Wednesdays) and chittlins (Fridays and Saturdays)."
+    }
+  ]
+}

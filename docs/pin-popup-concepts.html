@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Saiko Maps — Pin Popup Concepts</title>
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background-color: #111;
+      padding: 40px 40px 120px;
+      min-height: 100vh;
+    }
+
+    .page-title {
+      color: #555;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      margin-bottom: 60px;
+      text-align: center;
+    }
+
+    .concepts {
+      display: flex;
+      flex-direction: column;
+      gap: 80px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .concept-section {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .concept-label {
+      color: #666;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+    }
+
+    .concept-desc {
+      color: #888;
+      font-size: 13px;
+      line-height: 1.6;
+      max-width: 500px;
+    }
+
+    .popup-stage {
+      display: flex;
+      gap: 40px;
+      align-items: flex-start;
+    }
+
+    .map-context {
+      width: 500px;
+      height: 380px;
+      border-radius: 12px;
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .map-bg-light {
+      background: linear-gradient(135deg, #EDE8D8 0%, #F0ECE2 50%, #E6E0D4 100%);
+    }
+
+    .map-bg-dark {
+      background: linear-gradient(135deg, #172536 0%, #1E2F44 50%, #1B2A3D 100%);
+    }
+
+    /* Fake map grid lines */
+    .map-grid {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-image:
+        linear-gradient(90deg, rgba(195,176,145,0.08) 1px, transparent 1px),
+        linear-gradient(rgba(195,176,145,0.08) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+
+    .map-bg-dark .map-grid {
+      background-image:
+        linear-gradient(90deg, rgba(137,180,196,0.05) 1px, transparent 1px),
+        linear-gradient(rgba(137,180,196,0.05) 1px, transparent 1px);
+    }
+
+    /* Fake road lines */
+    .map-road {
+      position: absolute;
+      background: rgba(195,176,145,0.15);
+    }
+    .map-bg-dark .map-road {
+      background: rgba(137,180,196,0.08);
+    }
+    .road-h1 { top: 140px; left: 0; right: 0; height: 2px; }
+    .road-h2 { top: 240px; left: 0; right: 0; height: 1.5px; }
+    .road-v1 { top: 0; bottom: 0; left: 180px; width: 2px; }
+    .road-v2 { top: 0; bottom: 0; left: 340px; width: 1.5px; }
+    .road-d1 { top: 0; left: 80px; width: 400px; height: 1px; transform: rotate(25deg); transform-origin: top left; }
+
+    /* Pin on map */
+    .map-pin {
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      background: #D64541;
+      border-radius: 50%;
+      border: 2.5px solid #F5F0E1;
+      box-shadow: 0 2px 8px rgba(214,69,65,0.35);
+      z-index: 5;
+    }
+
+    .map-bg-dark .map-pin {
+      border-color: #1B2A3D;
+    }
+
+    .map-pin.active {
+      width: 18px;
+      height: 18px;
+      box-shadow: 0 2px 12px rgba(214,69,65,0.5);
+      z-index: 10;
+    }
+
+    .map-pin.ghost {
+      opacity: 0.4;
+    }
+
+    /* Pin connector line */
+    .pin-connector {
+      position: absolute;
+      z-index: 6;
+    }
+
+
+    /* ================================================================
+       CONCEPT A — JOURNAL ENTRY
+       Clean, editorial. Like a Field Notes annotation.
+       ================================================================ */
+    .popup-journal {
+      position: absolute;
+      width: 260px;
+      background: #FFFDF7;
+      border-radius: 10px;
+      box-shadow:
+        0 2px 8px rgba(139,115,85,0.1),
+        0 12px 36px rgba(139,115,85,0.12);
+      overflow: hidden;
+      z-index: 20;
+    }
+
+    .popup-journal .popup-photo {
+      width: 100%;
+      height: 110px;
+      background-size: cover;
+      background-position: center;
+      filter: saturate(0.88) contrast(1.05);
+      position: relative;
+    }
+
+    .popup-journal .popup-photo .status-dot {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 8px;
+      height: 8px;
+      background: #4A7C59;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.9);
+    }
+
+    .popup-journal .popup-body {
+      padding: 14px 16px 16px;
+    }
+
+    .popup-journal .popup-name {
+      font-family: 'Libre Baskerville', Georgia, serif;
+      font-size: 16px;
+      font-style: italic;
+      color: #36454F;
+      margin-bottom: 4px;
+      line-height: 1.25;
+    }
+
+    .popup-journal .popup-meta {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #C3B091;
+      margin-bottom: 10px;
+    }
+
+    .popup-journal .popup-divider {
+      width: 100%;
+      height: 1px;
+      background: rgba(195,176,145,0.25);
+      margin-bottom: 10px;
+    }
+
+    .popup-journal .popup-quote {
+      font-family: 'Libre Baskerville', Georgia, serif;
+      font-size: 12px;
+      font-style: italic;
+      line-height: 1.5;
+      color: #36454F;
+      opacity: 0.7;
+      border-left: 2px solid #C3B091;
+      padding-left: 10px;
+    }
+
+    .popup-journal .popup-action {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 12px;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #8B7355;
+      cursor: pointer;
+    }
+
+    .popup-journal .popup-action svg {
+      width: 12px;
+      height: 12px;
+    }
+
+    /* Notch / arrow */
+    .popup-journal::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 50%;
+      transform: translateX(-50%) rotate(45deg);
+      width: 12px;
+      height: 12px;
+      background: #FFFDF7;
+      box-shadow: 3px 3px 6px rgba(139,115,85,0.08);
+    }
+
+
+    /* ================================================================
+       CONCEPT B — BENTO CARD
+       Multi-zone layout. Photo, info, and action in a grid.
+       ================================================================ */
+    .popup-bento {
+      position: absolute;
+      width: 300px;
+      background: #FFFDF7;
+      border-radius: 12px;
+      box-shadow:
+        0 2px 8px rgba(139,115,85,0.1),
+        0 16px 48px rgba(139,115,85,0.14);
+      overflow: hidden;
+      z-index: 20;
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      grid-template-rows: auto auto;
+    }
+
+    .popup-bento .bento-photo {
+      grid-row: 1 / 3;
+      background-size: cover;
+      background-position: center;
+      filter: saturate(0.88) contrast(1.05);
+      min-height: 160px;
+    }
+
+    .popup-bento .bento-info {
+      padding: 14px 16px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .popup-bento .bento-name {
+      font-family: 'Libre Baskerville', Georgia, serif;
+      font-size: 15px;
+      font-style: italic;
+      color: #36454F;
+      line-height: 1.25;
+    }
+
+    .popup-bento .bento-meta {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #C3B091;
+    }
+
+    .popup-bento .bento-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 4px;
+    }
+
+    .popup-bento .bento-status .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #4A7C59;
+    }
+
+    .popup-bento .bento-status span {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #4A7C59;
+      font-weight: 600;
+    }
+
+    .popup-bento .bento-actions {
+      padding: 0 16px 14px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .popup-bento .bento-btn {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 5px 10px;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .popup-bento .btn-primary {
+      background: #36454F;
+      color: #F5F0E1;
+    }
+
+    .popup-bento .btn-secondary {
+      background: rgba(195,176,145,0.15);
+      color: #8B7355;
+    }
+
+    .popup-bento::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 50%;
+      transform: translateX(-50%) rotate(45deg);
+      width: 12px;
+      height: 12px;
+      background: #FFFDF7;
+      box-shadow: 3px 3px 6px rgba(139,115,85,0.08);
+    }
+
+
+    /* ================================================================
+       CONCEPT C — MINIMAL PILL
+       Tiny, stays out of the way. Just name + status.
+       ================================================================ */
+    .popup-pill {
+      position: absolute;
+      background: #FFFDF7;
+      border-radius: 20px;
+      box-shadow:
+        0 1px 4px rgba(139,115,85,0.1),
+        0 8px 24px rgba(139,115,85,0.1);
+      padding: 8px 16px 8px 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 20;
+      cursor: pointer;
+      transition: box-shadow 0.3s ease, transform 0.2s ease;
+    }
+
+    .popup-pill:hover {
+      box-shadow:
+        0 2px 8px rgba(195,176,145,0.2),
+        0 12px 32px rgba(139,115,85,0.15);
+      transform: translateY(-1px);
+    }
+
+    .popup-pill .pill-thumb {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background-size: cover;
+      background-position: center;
+      filter: saturate(0.88) contrast(1.05);
+      flex-shrink: 0;
+    }
+
+    .popup-pill .pill-text {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    .popup-pill .pill-name {
+      font-family: 'Libre Baskerville', Georgia, serif;
+      font-size: 13px;
+      font-style: italic;
+      color: #36454F;
+      line-height: 1.2;
+      white-space: nowrap;
+    }
+
+    .popup-pill .pill-detail {
+      font-size: 8px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #C3B091;
+      white-space: nowrap;
+    }
+
+    .popup-pill::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 50%;
+      transform: translateX(-50%) rotate(45deg);
+      width: 10px;
+      height: 10px;
+      background: #FFFDF7;
+      box-shadow: 2px 2px 4px rgba(139,115,85,0.06);
+    }
+
+
+    /* ================================================================
+       CONCEPT D — DARK BLUEPRINT
+       For dark mode maps. Technical, precise.
+       ================================================================ */
+    .popup-blueprint {
+      position: absolute;
+      width: 270px;
+      background: rgba(30, 47, 68, 0.95);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(137,180,196,0.12);
+      border-radius: 10px;
+      box-shadow:
+        0 4px 16px rgba(0,0,0,0.3),
+        0 0 0 1px rgba(137,180,196,0.05);
+      overflow: hidden;
+      z-index: 20;
+    }
+
+    .popup-blueprint .bp-photo {
+      width: 100%;
+      height: 100px;
+      background-size: cover;
+      background-position: center;
+      filter: saturate(0.75) contrast(1.1) brightness(0.85);
+      position: relative;
+    }
+
+    .popup-blueprint .bp-photo::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 40px;
+      background: linear-gradient(transparent, rgba(30,47,68,0.9));
+    }
+
+    .popup-blueprint .bp-body {
+      padding: 12px 16px 14px;
+    }
+
+    .popup-blueprint .bp-name {
+      font-family: 'Libre Baskerville', Georgia, serif;
+      font-size: 15px;
+      font-style: italic;
+      color: #F5F0E1;
+      line-height: 1.25;
+      margin-bottom: 6px;
+    }
+
+    .popup-blueprint .bp-coords {
+      font-family: 'Courier New', monospace;
+      font-size: 8px;
+      color: rgba(137,180,196,0.4);
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+
+    .popup-blueprint .bp-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .popup-blueprint .bp-meta {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: rgba(137,180,196,0.5);
+    }
+
+    .popup-blueprint .bp-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 8px;
+      background: rgba(74,124,89,0.15);
+    }
+
+    .popup-blueprint .bp-status .dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #6BBF8A;
+    }
+
+    .popup-blueprint .bp-status span {
+      font-size: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #6BBF8A;
+      font-weight: 600;
+    }
+
+    .popup-blueprint .bp-divider {
+      width: 100%;
+      height: 1px;
+      background: rgba(137,180,196,0.08);
+      margin: 10px 0;
+    }
+
+    .popup-blueprint .bp-action {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: rgba(137,180,196,0.45);
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .popup-blueprint .bp-action:hover {
+      color: #89B4C4;
+    }
+
+    .popup-blueprint .bp-action svg {
+      width: 11px;
+      height: 11px;
+    }
+
+    .popup-blueprint::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 50%;
+      transform: translateX(-50%) rotate(45deg);
+      width: 12px;
+      height: 12px;
+      background: rgba(30, 47, 68, 0.95);
+      border-right: 1px solid rgba(137,180,196,0.12);
+      border-bottom: 1px solid rgba(137,180,196,0.12);
+    }
+
+
+    /* ================================================================
+       DARK MODE VARIANTS (for A and B)
+       ================================================================ */
+    .popup-journal.dark {
+      background: rgba(30, 47, 68, 0.95);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(137,180,196,0.1);
+      box-shadow:
+        0 4px 16px rgba(0,0,0,0.25),
+        0 0 0 1px rgba(137,180,196,0.05);
+    }
+
+    .popup-journal.dark .popup-name { color: #F5F0E1; }
+    .popup-journal.dark .popup-meta { color: rgba(137,180,196,0.5); }
+    .popup-journal.dark .popup-divider { background: rgba(137,180,196,0.1); }
+    .popup-journal.dark .popup-quote { color: #F5F0E1; border-left-color: rgba(137,180,196,0.3); }
+    .popup-journal.dark .popup-action { color: rgba(137,180,196,0.5); }
+    .popup-journal.dark::after {
+      background: rgba(30, 47, 68, 0.95);
+      box-shadow: 3px 3px 6px rgba(0,0,0,0.2);
+    }
+
+    .popup-bento.dark {
+      background: rgba(30, 47, 68, 0.95);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(137,180,196,0.1);
+      box-shadow:
+        0 4px 16px rgba(0,0,0,0.25),
+        0 0 0 1px rgba(137,180,196,0.05);
+    }
+
+    .popup-bento.dark .bento-name { color: #F5F0E1; }
+    .popup-bento.dark .bento-meta { color: rgba(137,180,196,0.5); }
+    .popup-bento.dark .bento-status .dot { background: #6BBF8A; }
+    .popup-bento.dark .bento-status span { color: #6BBF8A; }
+    .popup-bento.dark .btn-primary { background: #F5F0E1; color: #1B2A3D; }
+    .popup-bento.dark .btn-secondary { background: rgba(137,180,196,0.1); color: rgba(137,180,196,0.6); }
+    .popup-bento.dark::after {
+      background: rgba(30, 47, 68, 0.95);
+      box-shadow: 3px 3px 6px rgba(0,0,0,0.2);
+    }
+
+
+    /* Comparison layout helper */
+    .mode-pair {
+      display: flex;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+
+    .mode-label {
+      position: absolute;
+      top: 12px;
+      left: 14px;
+      font-size: 8px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: rgba(195,176,145,0.5);
+      z-index: 2;
+    }
+
+    .map-bg-dark .mode-label {
+      color: rgba(137,180,196,0.3);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="page-title">Saiko Maps — Pin Popup Concepts · Field Notes Template</div>
+
+  <div class="concepts">
+
+    <!-- ============================================================
+         CONCEPT A — JOURNAL ENTRY
+         ============================================================ -->
+    <div class="concept-section">
+      <div class="concept-label">Concept A — Journal Entry</div>
+      <p class="concept-desc">
+        Clean editorial card. Photo up top, name and category below, optional quote.
+        Feels like a Field Notes annotation in the margin. Good default.
+      </p>
+      <div class="mode-pair">
+        <!-- Light -->
+        <div class="map-context map-bg-light">
+          <span class="mode-label">Light</span>
+          <div class="map-grid"></div>
+          <div class="map-road road-h1"></div>
+          <div class="map-road road-h2"></div>
+          <div class="map-road road-v1"></div>
+          <div class="map-road road-v2"></div>
+          <div class="map-road road-d1"></div>
+
+          <div class="map-pin ghost" style="top: 100px; left: 120px;"></div>
+          <div class="map-pin ghost" style="top: 200px; left: 380px;"></div>
+          <div class="map-pin ghost" style="top: 280px; left: 260px;"></div>
+          <div class="map-pin active" style="top: 210px; left: 200px;"></div>
+
+          <div class="popup-journal" style="top: 28px; left: 100px;">
+            <div class="popup-photo" style="background-image: url('https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=200&fit=crop');"></div>
+            <div class="popup-body">
+              <div class="popup-name">Seco</div>
+              <div class="popup-meta">Wine Bar · Silver Lake</div>
+              <div class="popup-divider"></div>
+              <div class="popup-quote">"The best natural wine list on the eastside."</div>
+              <div class="popup-action">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                View Details
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dark -->
+        <div class="map-context map-bg-dark">
+          <span class="mode-label">Dark</span>
+          <div class="map-grid"></div>
+          <div class="map-road road-h1"></div>
+          <div class="map-road road-h2"></div>
+          <div class="map-road road-v1"></div>
+          <div class="map-road road-v2"></div>
+
+          <div class="map-pin ghost" style="top: 100px; left: 120px;"></div>
+          <div class="map-pin ghost" style="top: 200px; left: 380px;"></div>
+          <div class="map-pin ghost" style="top: 280px; left: 260px;"></div>
+          <div class="map-pin active" style="top: 210px; left: 200px;"></div>
+
+          <div class="popup-journal dark" style="top: 28px; left: 100px;">
+            <div class="popup-photo" style="background-image: url('https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=200&fit=crop');"></div>
+            <div class="popup-body">
+              <div class="popup-name">Seco</div>
+              <div class="popup-meta">Wine Bar · Silver Lake</div>
+              <div class="popup-divider"></div>
+              <div class="popup-quote">"The best natural wine list on the eastside."</div>
+              <div class="popup-action">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                View Details
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ============================================================
+         CONCEPT B — BENTO CARD
+         ============================================================ -->
+    <div class="concept-section">
+      <div class="concept-label">Concept B — Bento Card</div>
+      <p class="concept-desc">
+        Side-by-side grid — photo on the left, info on the right. Mirrors the
+        featured card layout from the list view. Compact but rich. Actions
+        are visible without scrolling.
+      </p>
+      <div class="mode-pair">
+        <!-- Light -->
+        <div class="map-context map-bg-light">
+          <span class="mode-label">Light</span>
+          <div class="map-grid"></div>
+          <div class="map-road road-h1"></div>
+          <div class="map-road road-h2"></div>
+          <div class="map-road road-v1"></div>
+          <div class="map-road road-v2"></div>
+          <div class="map-road road-d1"></div>
+
+          <div class="map-pin ghost" style="top: 80px; left: 100px;"></div>
+          <div class="map-pin ghost" style="top: 300px; left: 400px;"></div>
+          <div class="map-pin ghost" style="top: 310px; left: 180px;"></div>
+          <div class="map-pin active" style="top: 240px; left: 250px;"></div>
+
+          <div class="popup-bento" style="top: 55px; left: 120px;">
+            <div class="bento-photo" style="background-image: url('https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=300&h=400&fit=crop');"></div>
+            <div class="bento-info">
+              <div class="bento-name">Seco</div>
+              <div class="bento-meta">Wine Bar · Silver Lake</div>
+              <div class="bento-status">
+                <div class="dot"></div>
+                <span>Open</span>
+              </div>
+            </div>
+            <div class="bento-actions">
+              <button class="bento-btn btn-primary">Details</button>
+              <button class="bento-btn btn-secondary">Directions</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dark -->
+        <div class="map-context map-bg-dark">
+          <span class="mode-label">Dark</span>
+          <div class="map-grid"></div>
+          <div class="map-road road-h1"></div>
+          <div class="map-road road-h2"></div>
+          <div class="map-road road-v1"></div>
+          <div class="map-road road-v2"></div>
+
+          <div class="map-pin ghost" style="top: 80px; left: 100px;"></div>
+          <div class="map-pin ghost" style="top: 300px; left: 400px;"></div>
+          <div class="map-pin ghost" style="top: 310px; left: 180px;"></div>
+          <div class="map-pin active" style="top: 240px; left: 250px;"></div>
+
+          <div class="popup-bento dark" style="top: 55px; left: 120px;">
+            <div class="bento-photo" style="background-image: url('https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=300&h=400&fit=crop');"></div>
+            <div class="bento-info">
+              <div class="bento-name">Seco</div>
+              <div class="bento-meta">Wine Bar · Silver Lake</div>
+              <div class="bento-status">
+                <div class="dot"></div>
+                <span>Open</span>
+              </div>
+            </div>
+            <div class="bento-actions">
+              <button class="bento-btn btn-primary">Details</button>
+              <button class="bento-btn btn-secondary">Directions</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ============================================================
+         CONCEPT C — MINIMAL PILL
+         ============================================================ -->
+    <div class="concept-section">
+      <div class="concept-label">Concept C — Minimal Pill</div>
+      <p class="concept-desc">
+        Tiny and unobtrusive. Just the name, category, and a thumbnail.
+        Click to expand or open the drawer card. Best for dense maps where
+        you don't want popups blocking half the view.
+      </p>
+      <div class="mode-pair">
+        <!-- Light -->
+        <div class="map-context map-bg-light">
+          <span class="mode-label">Light</span>
+          <div class="map-grid"></div>
+          <div class="map-road road-h1"></div>
+          <div class="map-road road-h2"></div>
+          <div class="map-road road-v1"></div>
+          <div class="map-road road-v2"></div>
+          <div class="map-road road-d1"></div>
+
+          <div class="map-pin ghost" style="top: 100px; left: 120px;"></div>
+          <div class="map-pin ghost" style="top: 280px; left: 350px;"></div>
+          <div class="map-pin ghost" style="top: 300px; left: 160px;"></div>
+          <div class="map-pin active" style="top: 190px; left: 230px;"></div>
+
+          <div class="popup-pill" style="top: 142px; left: 176px;">
+            <div class="pill-thumb" style="background-image: url('https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=100&h=100&fit=crop');"></div>
+            <div class="pill-text">
+              <div class="pill-name">Seco</div>
+              <div class="pill-detail">Wine Bar · Open</div>
+            </div>
+          </div>
+
+          <!-- Show a second pill for context -->
+          <div class="popup-pill" style="top: 52px; left: 66px; opacity: 0.6; transform: scale(0.9);">
+            <div class="pill-thumb" style="background-image: url('https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=100&h=100&fit=crop');"></div>
+            <div class="pill-text">
+              <div class="pill-name">Bar Covell</div>
+              <div class="pill-detail">Wine Bar · Open</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dark -->
+        <div class="map-context map-bg-dark">
+          <span class="mode-label">Dark</span>
+          <div class="map-grid"></div>
+          <div class="map-road road-h1"></div>
+          <div class="map-road road-h2"></div>
+          <div class="map-road road-v1"></div>
+          <div class="map-road road-v2"></div>
+
+          <div class="map-pin ghost" style="top: 100px; left: 120px;"></div>
+          <div class="map-pin ghost" style="top: 280px; left: 350px;"></div>
+          <div class="map-pin ghost" style="top: 300px; left: 160px;"></div>
+          <div class="map-pin active" style="top: 190px; left: 230px;"></div>
+
+          <!-- Dark pill uses blueprint style inline -->
+          <div class="popup-pill" style="top: 142px; left: 176px; background: rgba(30,47,68,0.95); backdrop-filter: blur(12px); border: 1px solid rgba(137,180,196,0.1); box-shadow: 0 4px 16px rgba(0,0,0,0.25);">
+            <div class="pill-thumb" style="background-image: url('https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=100&h=100&fit=crop'); filter: saturate(0.75) brightness(0.9);"></div>
+            <div class="pill-text">
+              <div class="pill-name" style="color: #F5F0E1;">Seco</div>
+              <div class="pill-detail" style="color: rgba(137,180,196,0.5);">Wine Bar · Open</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ============================================================
+         CONCEPT D — DARK BLUEPRINT (dark-only specialty)
+         ============================================================ -->
+    <div class="concept-section">
+      <div class="concept-label">Concept D — Blueprint Technical</div>
+      <p class="concept-desc">
+        Dark-mode specialty. Coordinates, technical typography, glass morphism.
+        Matches the blueprint constellation cover aesthetic. For when the map
+        feels like a mission briefing.
+      </p>
+      <div class="mode-pair">
+        <div class="map-context map-bg-dark">
+          <span class="mode-label">Dark</span>
+          <div class="map-grid"></div>
+          <div class="map-road road-h1"></div>
+          <div class="map-road road-h2"></div>
+          <div class="map-road road-v1"></div>
+          <div class="map-road road-v2"></div>
+
+          <div class="map-pin ghost" style="top: 80px; left: 100px;"></div>
+          <div class="map-pin ghost" style="top: 280px; left: 380px;"></div>
+          <div class="map-pin ghost" style="top: 310px; left: 200px;"></div>
+          <div class="map-pin active" style="top: 200px; left: 240px;"></div>
+
+          <div class="popup-blueprint" style="top: 20px; left: 130px;">
+            <div class="bp-photo" style="background-image: url('https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=200&fit=crop');"></div>
+            <div class="bp-body">
+              <div class="bp-name">Seco</div>
+              <div class="bp-coords">34.0862° N · 118.2660° W</div>
+              <div class="bp-row">
+                <div class="bp-meta">Wine Bar · Silver Lake</div>
+                <div class="bp-status">
+                  <div class="dot"></div>
+                  <span>Open</span>
+                </div>
+              </div>
+              <div class="bp-divider"></div>
+              <div class="bp-action">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                View Details
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

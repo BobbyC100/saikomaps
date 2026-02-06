@@ -1,0 +1,32 @@
+{
+  "place_slug": "q-sushi",
+  "sources": [
+    {
+      "source_id": "src_michelin_2025",
+      "publication": "Michelin Guide",
+      "title": "Q Sushi – Los Angeles - a MICHELIN Guide Restaurant",
+      "url": "https://guide.michelin.com/us/en/california/us-los-angeles/restaurant/q-sushi",
+      "published_at": "2025-06-25",
+      "trust_level": "editorial",
+      "content": "Authenticity and tradition are paramount in this little sushiya. From the moment you walk in, to the rapid succession of courses that follow, everything in this dining room seems steeped in a sense of calm. Chef Hiroyuki Naruke prepares every item and thoughtfully serves each diner. Edomae-style sushi arrives as an omakase of fish, while other courses may commence with sashimi and nigiri. Case in point—amberjack sashimi with onions and soy, where each morsel is sliced, seasoned and set before your eye. This may be tailed by nigiri such as Hokkaido scallops, kohada, and fatty tuna. The pleasure of dining here extends right to end with the simple, spongy, and fluffy block of tamago."
+    },
+    {
+      "source_id": "src_infatuation_2023",
+      "publication": "The Infatuation",
+      "title": "Q Sushi - Review - Downtown LA - Los Angeles - The Infatuation",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/q-sushi",
+      "published_at": "2023-05-18",
+      "trust_level": "editorial",
+      "content": "Q Sushi is a very traditional, omakase-only restaurant that's different from the 17 million other sushi restaurants in LA. Instead of a strip mall location, this place is on a busy stretch of 7th St. in DTLA, and instead of Robert Downey Jr. wearing sweatpants in the corner, you'll find businesspeople in suits and couples on anniversary dates. You'll also find incredibly high-end fish. Q sushi is ideal for when you want a big-time sushi experience involving simple cuts - not shrimp heads or still-moving scallops. The windowless room is quiet, calm, and pretty fancy. There are a couple of tables up front before you reach the 10-seat sushi bar - which is where you'll want to be sitting. Just one guy works behind the counter, slicing fish, patting rice, and handing you piece after piece of sushi. Overall, this place creates the impression that you've broken the space-time continuum and somehow ended up in a sushi bar in Tokyo. Dinner at Q requires some planning and emptying out your Mr. T piggy bank. There are only two seatings a night, and there's only one thing on the food menu - a $300 sushi omakase experience. That said, every morsel was absolutely overnighted from Japan or perhaps Santa Barbara, and you can also have a bit of a say in your meal here (if you want it) - the quiet, friendly chef is happy to accommodate an irrational fear of uni. Q is a worthy stop on your mission to conquer as much of LA's great sushi as possible. It's a huge step up from your neighborhood go-to, although the meal itself will not be quite as life-changing as places like Sushi Park, Nobu, or Go's Mart. We would only recommend coming here if you're working your way through an omakase bucket list, and have a committed appreciation for outstanding, simple fish. This is the only option at Q Sushi, which includes 19 or so courses of sashimi and sushi. What particular fish you get depends on what's at the market, but expect an oyster to start, three or so sashimi dishes, and then piece after piece of sushi ranging from bluefin tuna to sardine to trout, and most likely, some uni at the end."
+    },
+    {
+      "source_id": "src_kevineats_2013",
+      "publication": "Kevin Eats (Editorial Blog)",
+      "title": "kevinEats: Q Sushi (Los Angeles, CA)",
+      "url": "http://www.kevineats.com/2013/11/q-sushi-los-angeles-ca.html",
+      "published_at": "2013-11-22",
+      "trust_level": "editorial",
+      "content": "With apologies to Zo, the somewhat perplexingly-named Q (not to be confused with the mediocre Sushi Q on Sunset) just might be the most important sushi opening in LA this year. The Edomae-style restaurant is the work of a trio of lawyers from Quinn Emanuel Urquhart & Sullivan: Ryan Goldstein, Shon Morgan, and even firm Co-Founder/Managing Partner John B. Quinn. The saga of Q (yes, that's \"Q\" for Quinn) began five years ago when Quinn visited Japan and Tokyo office head Goldstein brought him to Nogizaka Sushi Yuki, a tiny six-seat, locals-only, off-the-radar sushi joint in Roppongi headed by one Hiroyuki Naruke. The two attorneys instantly became fans of the place, and Goldstein continued to visit the restaurant afterward, getting to know the Chef in the process. It is thus a true passion project of sorts, driven by the sole desire to create something unique in the LA sushi scene, to execute a vision of old-school, uncompromising sushi that's rarely encountered outside of Japan. Based on this early visit, I can only surmise that they're succeeding in that goal. Thanks to what I'm assuming are various curing, aging, and other techniques utilized by Hiro-san, the neta here just seemed much more nuanced, more much multifaceted than usual, but still unquestionably delicious. Add to that his no-sugar, room temperature shari, the smart wine list, spot-on service, and you get truly one of the most exciting, one-of-a-kind sushi experiences that I've ever had. Even though the place just opened, I have no doubt that Q belongs in the top echelon of sushi spots in Los Angeles, and for all you sushi enthusiasts out there, it is an absolute must visit--seriously, go make your reservations now!"
+    }
+  ]
+}

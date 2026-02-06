@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Saiko – Quiet Tile Variants + Promo Unit Sizes</title>
+  <style>
+    body{
+      background:#f4f3ee;
+      padding:40px;
+      font-family: system-ui, -apple-system, sans-serif;
+      color:#1c1917;
+    }
+
+    .wrap{ max-width: 1020px; margin: 0 auto; }
+
+    .hlabel{
+      font-size: 10px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: #78716c;
+      margin: 22px 0 10px;
+    }
+
+    /* Base grid */
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .card{
+      background:#fffdf7;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: inset 0 0 0 1px rgba(87,83,78,0.06);
+      font-size: 13px;
+      align-self: start;
+    }
+
+    .label{
+      font-size: 10px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: #78716c;
+      margin-bottom: 6px;
+    }
+
+    .full{ grid-column: 1 / -1; }
+    .span2{ grid-column: 1 / 3; }
+    .span2r{ grid-column: 3 / 5; }
+
+    /* Quiet Tile base */
+    .quiet{
+      position: relative;
+      padding: 0;
+      overflow: hidden;
+      box-shadow: inset 0 0 0 1px rgba(87,83,78,0.06);
+    }
+
+    /* Variant A: grid paper */
+    .quiet-grid::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        linear-gradient(to right, rgba(120,113,108,0.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(120,113,108,0.05) 1px, transparent 1px);
+      background-size: 18px 18px;
+      opacity: 0.35;
+    }
+
+    /* Variant B: map wash */
+    .quiet-map::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(circle at 30% 25%, rgba(59,130,246,0.07), transparent 55%),
+        radial-gradient(circle at 70% 70%, rgba(59,130,246,0.05), transparent 60%),
+        linear-gradient(to right, rgba(120,113,108,0.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(120,113,108,0.05) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 18px 18px, 18px 18px;
+      opacity: 0.7;
+    }
+
+    /* Variant C: textured (subtle noise + diagonal hatch) */
+    .quiet-texture::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        repeating-linear-gradient(135deg, rgba(120,113,108,0.06) 0 1px, transparent 1px 10px),
+        radial-gradient(circle at 18% 22%, rgba(120,113,108,0.05), transparent 55%),
+        radial-gradient(circle at 78% 68%, rgba(120,113,108,0.04), transparent 60%),
+        linear-gradient(to right, rgba(120,113,108,0.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(120,113,108,0.05) 1px, transparent 1px);
+      background-size: auto, 100% 100%, 100% 100%, 18px 18px, 18px 18px;
+      opacity: 0.55;
+    }
+
+    /* Variant 1 layout: single Quiet Tile in the 4th slot */
+    .quiet-tile{ min-height: 160px; }
+
+    /* Variant 2 layout: Quiet Band spanning 3 columns under Hours/Call/Map */
+    .quiet-band{ min-height: 110px; }
+
+    /* Tier 3 (two-row) container: uses explicit areas so you can see behavior */
+    .tier3{
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      grid-template-areas:
+        "hours call map cov"
+        "band  band band cov";
+    }
+    .ga-hours{ grid-area: hours; }
+    .ga-call{ grid-area: call; }
+    .ga-map{ grid-area: map; }
+    .ga-cov{ grid-area: cov; }
+    .ga-band{ grid-area: band; }
+
+    /* Promo Unit (3 fixed sizes) */
+    .promo{
+      background:#fffdf7;
+      border-radius: 12px;
+      box-shadow: inset 0 0 0 1px rgba(87,83,78,0.06);
+      display:grid;
+      grid-template-columns: 180px 1fr;
+      gap: 16px;
+      padding: 14px 16px;
+      align-items: center;
+      color:#57534e;
+    }
+    .promo-art{
+      height: 100%;
+      border-radius: 10px;
+      box-shadow: inset 0 0 0 1px rgba(87,83,78,0.06);
+      background:
+        radial-gradient(circle at 30% 25%, rgba(59,130,246,0.07), transparent 55%),
+        radial-gradient(circle at 70% 70%, rgba(59,130,246,0.05), transparent 60%),
+        linear-gradient(to right, rgba(120,113,108,0.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(120,113,108,0.05) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 18px 18px, 18px 18px;
+      opacity: 0.9;
+    }
+    .promo-copy{ display:flex; flex-direction:column; gap:6px; }
+    .promo-head{ font-size: 14px; color:#1c1917; letter-spacing: 0.01em; }
+    .promo-sub{ font-size: 12px; line-height: 1.35; color:#57534e; }
+
+    /* Fixed heights */
+    .promo-s{ height: 96px; }
+    .promo-m{ height: 132px; }
+    .promo-l{ height: 168px; }
+
+    .hint{
+      color:#78716c;
+      font-size:12px;
+      margin-top: 8px;
+      line-height: 1.35;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+
+    <div class="hlabel">Quiet Tile – Variant 1 (single tile in Tier 3 slot)</div>
+    <div class="grid">
+      <div class="card full"><div class="label">Hero</div>Hero image</div>
+      <div class="card full"><div class="label">Identity</div>Seco · Wine Bar · Silver Lake</div>
+      <div class="card span2"><div class="label">Curator Note</div>Thoughtful pours, relaxed crowd.</div>
+      <div class="card span2r"><div class="label">Coverage</div>Eater · NYT · Time Out · Infatuation<br><br>(intentionally tall)</div>
+
+      <div class="card"><div class="label">Hours</div>Mon 5–11<br>Tue 5–11<br>Wed 5–11<br><b>Thu 5–11</b><br>Fri 5–11</div>
+      <div class="card"><div class="label">Call</div>(323) 745-9288</div>
+      <div class="card"><div class="label">Map</div>3820 Sunset Blvd<br>Los Angeles, CA</div>
+      <div class="card quiet quiet-tile quiet-map" aria-hidden="true"></div>
+
+      <div class="card full"><div class="label">Also On</div>Pill links go here</div>
+    </div>
+
+    <div class="hlabel">Quiet Tile – Variant 2 (Quiet Band under Hours+Call+Map)</div>
+    <div class="grid">
+      <div class="card full"><div class="label">Hero</div>Hero image</div>
+      <div class="card full"><div class="label">Identity</div>Seco · Wine Bar · Silver Lake</div>
+      <div class="card span2"><div class="label">Curator Note</div>Thoughtful pours, relaxed crowd.</div>
+      <div class="card span2r"><div class="label">Coverage Quote</div>“A calm room with serious bottles.”<br><br>— Source</div>
+
+      <div class="tier3 full">
+        <div class="card ga-hours"><div class="label">Hours</div>Mon 5–11<br>Tue 5–11<br>Wed 5–11<br><b>Thu 5–11</b><br>Fri 5–11<br>Sat 12–11<br>Sun 12–10</div>
+        <div class="card ga-call"><div class="label">Call</div>(323) 745-9288</div>
+        <div class="card ga-map"><div class="label">Map</div>3820 Sunset Blvd<br>Los Angeles, CA</div>
+        <div class="card ga-cov"><div class="label">Coverage Links</div>
+          <div style="font-size:12px; line-height:1.45;">
+            Eater — Best wine bars<br>
+            NYT — A night in Silver Lake<br>
+            Time Out — Where to drink<br>
+            Infatuation — Date night picks<br>
+            Resy — New arrivals
+          </div>
+        </div>
+
+        <div class="card quiet quiet-band quiet-texture ga-band" aria-hidden="true"></div>
+      </div>
+
+      <div class="card full"><div class="label">Also On</div>Pill links go here</div>
+    </div>
+
+    <div class="hlabel">Promotion Unit – 3 fixed sizes (build content to spec)</div>
+    <div class="grid">
+      <div class="promo promo-s full">
+        <div class="promo-art"></div>
+        <div class="promo-copy">
+          <div class="promo-head">Support small places, quietly.</div>
+          <div class="promo-sub">Saiko is testing merchant-first promos that stay on-brand and calm.</div>
+        </div>
+      </div>
+
+      <div class="promo promo-m full">
+        <div class="promo-art"></div>
+        <div class="promo-copy">
+          <div class="promo-head">A better alternative to ads.</div>
+          <div class="promo-sub">Short-run promos designed to match the theme—no clutter, no bidding, no noise.</div>
+        </div>
+      </div>
+
+      <div class="promo promo-l full">
+        <div class="promo-art"></div>
+        <div class="promo-copy">
+          <div class="promo-head">Merchant-first promotion, by Saiko.</div>
+          <div class="promo-sub">We build the creative, keep it restrained, and make sure it looks good anywhere it appears.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hint">
+      Notes: Change the Quiet Tile class to compare styles (quiet-grid / quiet-map / quiet-texture). Promo sizes are fixed via promo-s (96px), promo-m (132px), promo-l (168px).
+    </div>
+
+  </div>
+</body>
+</html>

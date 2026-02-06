@@ -1,0 +1,59 @@
+{
+  "place_slug": "hotel-figueroa",
+  "sources": [
+    {
+      "source_id": "src_michelin_guide_2024",
+      "publication": "Michelin Guide",
+      "title": "Hotel Figueroa - Los Angeles Area",
+      "url": "https://guide.michelin.com/en/hotels-stays/los-angeles-area/hotel-figueroa-9001",
+      "published_at": "",
+      "trust_level": "editorial",
+      "content": "The hotel originally opened in 1926 as the first hotel funded and founded by women, and was later in life a Moroccan-themed events space. After a massive renovation, it's back to its original Twenties Spanish Colonial glory. Another part of downtown culture, of course, is food — here James Beard–nominated chef Casey Lane presides over a pair of restaurants, Breva and Veranda, which apply a Californian mindset to Mediterranean cuisine. Meanwhile Dushan Zaric pours inventive cocktails and well-selected spirits and beers at Bar Figueroa, Bar Alta, and Rick's, out by the unique coffin-shaped swimming pool. This is a side of Los Angeles that you'd do well to get acquainted with, if you aren't already."
+    },
+    {
+      "source_id": "src_timeout_2018",
+      "publication": "Time Out LA",
+      "title": "Hotel Figueroa | Hotels in South Park, Los Angeles",
+      "url": "https://www.timeout.com/los-angeles/hotels/hotel-figueroa",
+      "published_at": "2018-04-14",
+      "trust_level": "editorial",
+      "content": "This striking hotel was once a dramatic mix of Morocco and Mexico, but is now a sleek Spanish-colonial haven in 14-story luxury-hotel form. The hotel's airy lobby is a potpourri of leather seating, potted plants and wood beams. The rooms, which vary in size, are modern, spacious and leather- and brass-accented. Amenities are few and far between, but they're not really the point; besides, you'll be spending most of your time by that tiled pool on the roof, anyway."
+    },
+    {
+      "source_id": "src_timeout_2024",
+      "publication": "Time Out LA",
+      "title": "Sparrow at Hotel Figueroa",
+      "url": "https://www.timeout.com/los-angeles/restaurants/sparrow-at-hotel-figueroa",
+      "published_at": "2024-02-14",
+      "trust_level": "editorial",
+      "content": "Hotel Figueroa's brand-new flagship eatery is Sparrow, a stunningly good coastal Italian restaurant with a view of the historic hotel's coffin-shaped pool. Wow might be the only word to sum up a visit here, when each beautifully garnished dinner cocktail arrives with eye-catching flourishes and essentially every Southern Italian dish is well-made in its own right. Standouts include a briny, vegetarian-friendly puttanesca (a rarity on the city's Italian menus), a decadent A5 Wagyu beef and truffle carpaccio, and a crispy, perfectly sauced chicken parm."
+    },
+    {
+      "source_id": "src_timeout_best_bars_2018",
+      "publication": "Time Out LA",
+      "title": "L.A.'s Best Hotel Bars and Classiest Lobby Lounges",
+      "url": "https://www.timeout.com/los-angeles/bars/best-hotel-bars-las-classiest-lobby-lounges",
+      "published_at": "2018-08-14",
+      "trust_level": "editorial",
+      "content": "No, you're not at a poolside retreat in the Spanish Riviera—you're in the heart of Downtown, sitting just a block from the Staples Center, but you'd never know it at Rick's. The newly renovated Hotel Figueroa's poolside bar is the DTLA oasis we've been waiting for, with lush greenery, hanging lanterns, a fireplace and terrace seating that transports us to a world away. The Dushan Zaric-designed program offers frozen cocktails, plus micheladas, tiki-leaning concoctions and Cuban-style beers—perfect for sipping on the patio overlooking the whole scene."
+    },
+    {
+      "source_id": "src_infatuation_deme_2024",
+      "publication": "The Infatuation",
+      "title": "Deme - Review - Downtown LA",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/deme",
+      "published_at": "2024-12-17",
+      "trust_level": "editorial",
+      "content": "Deme serves one of the better meals we've eaten next to a hotel pool. This chic Eastern Mediterranean dinner spot inside DTLA's Hotel Figueroa doubles as a lounge for suited business guests who need a drink and some mezze after a day of shmoozing. You can lounge in a red velvet booth with a fig leaf-infused cocktail, take in the skyline, and snack on Greek and Turkish dishes, like lamb manti in tangy sheep's yogurt and taramasalata with a basket of warm pita. If you're looking for a laidback corner of Downtown to have a professional lunch or a catch-up over duck shawarma, Deme delivers."
+    },
+    {
+      "source_id": "src_infatuation_poolside_2025",
+      "publication": "The Infatuation",
+      "title": "The 10 Best Poolside Restaurants & Bars In LA",
+      "url": "https://www.theinfatuation.com/los-angeles/guides/best-poolside-dining-la",
+      "published_at": "2025-08-06",
+      "trust_level": "editorial",
+      "content": "This chic Mediterranean dinner spot by the pool at DTLA's Hotel Figueroa doubles as a lounge for business guests who need a drink and some mezze after a day of shmoozing. You sink into a red velvet booth with a fig leaf-infused cocktail, take in the skyline, and snack on Greek and Turkish dishes, like lamb manti in tangy sheep's yogurt and taramasalata with a basket of warm pita. And whether you plan to swim or not, the pool here is gorgeous to look at as well."
+    }
+  ]
+}

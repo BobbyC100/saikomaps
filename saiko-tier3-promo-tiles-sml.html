@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Saiko — Tier 3 Promo Tiles (S/M/L) — Merchant-Specific</title>
+<style>
+  :root{
+    --bg:#f4f3ee;
+    --paper:#fffdf7;
+    --ink:#1c1917;
+    --ink2:rgba(28,25,23,.72);
+    --rule:rgba(87,83,78,.18);
+    --rule2:rgba(87,83,78,.10);
+
+    /* Faded sign paint */
+    --red:#b55a52;
+    --blue:#3f6f9b;
+    --ochre:#b07a3b;
+    --green:#4d6a59;
+    --cream:#fff8eb;
+  }
+
+  *{ box-sizing:border-box; }
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family: ui-serif, Georgia, "Times New Roman", serif;
+    padding:40px 22px 70px;
+  }
+  .wrap{ max-width: 1040px; margin:0 auto; }
+  h1{ margin:0 0 10px; font-weight:400; font-size:20px; }
+  .sub{
+    margin:0 0 18px;
+    color:var(--ink2);
+    font-size:13px;
+    line-height:1.5;
+    max-width: 86ch;
+  }
+
+  /* Tier 3 grid */
+  .tier3{
+    display:grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap:10px;
+    align-items:start;
+  }
+
+  /* Shared cell base */
+  .cell{
+    background:var(--paper);
+    border-radius:12px;
+    box-shadow: inset 0 0 0 1px var(--rule2);
+    padding:14px 14px 16px;
+    position:relative;
+    overflow:hidden;
+  }
+
+  .label{
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    font-size:10px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:rgba(87,83,78,.78);
+    margin-bottom:8px;
+  }
+
+  .note{
+    margin: 18px 0 10px;
+    color: rgba(87,83,78,.78);
+    font-size: 12px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  }
+
+  /* ===== Promo tile (1960s billboard + 1970s catalog printing) ===== */
+  .promo{
+    padding:0;
+  }
+  .promo::before{
+    /* subtle “print grain + paint banding” */
+    content:"";
+    position:absolute;
+    inset:0;
+    background:
+      radial-gradient(circle at 20% 25%, rgba(0,0,0,.030), transparent 55%),
+      radial-gradient(circle at 85% 70%, rgba(0,0,0,.020), transparent 60%),
+      repeating-linear-gradient(90deg, rgba(0,0,0,.010) 0 1px, transparent 1px 7px),
+      repeating-linear-gradient(0deg, rgba(0,0,0,.008) 0 1px, transparent 1px 5px);
+    opacity:.70;
+    pointer-events:none;
+    mix-blend-mode:multiply;
+  }
+
+  .promo-inner{
+    position:relative;
+    padding:16px 16px 14px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    min-height: 100%;
+  }
+
+  .promo-rail{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding-bottom:10px;
+    border-bottom: 1px solid rgba(0,0,0,.12);
+  }
+
+  .promo-kicker{
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    font-size:10px;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    color:rgba(0,0,0,.60);
+    white-space:nowrap;
+  }
+
+  .promo-badge{
+    width:28px; height:28px;
+    border-radius:999px;
+    border:1px solid rgba(0,0,0,.18);
+    background: rgba(255,255,255,.55);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    font-size:12px;
+    color:rgba(0,0,0,.60);
+    flex:0 0 auto;
+  }
+
+  .promo-head{
+    margin:0;
+    font-size: 22px;
+    line-height:1.03;
+    letter-spacing:.01em;
+  }
+
+  .promo-body{
+    margin:0;
+    font-size: 13px;
+    line-height:1.45;
+    color: rgba(0,0,0,.78);
+    max-width: 68ch;
+  }
+
+  .promo-footer{
+    margin-top:auto;
+    padding-top:10px;
+    border-top: 1px solid rgba(0,0,0,.12);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+
+  .promo-fine{
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    font-size:11px;
+    letter-spacing:.06em;
+    color: rgba(0,0,0,.62);
+  }
+
+  .promo-chips{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+  .chip{
+    padding:5px 9px;
+    border-radius:999px;
+    border:1px solid rgba(0,0,0,.14);
+    background: rgba(255,255,255,.55);
+    font-size:12px;
+    color: rgba(0,0,0,.68);
+    white-space:nowrap;
+  }
+
+  /* colorways (swap className = relabeling within tech limits) */
+  .promo-red   { background: color-mix(in srgb, var(--red) 18%, var(--cream)); }
+  .promo-blue  { background: color-mix(in srgb, var(--blue) 18%, var(--cream)); }
+  .promo-ochre { background: color-mix(in srgb, var(--ochre) 18%, var(--cream)); }
+  .promo-green { background: color-mix(in srgb, var(--green) 18%, var(--cream)); }
+
+  /* “calm” saturation (Saiko-safe) */
+  .promo-calm { filter:saturate(.86); }
+
+  /* ===== Sizes: the 3 most useful bento fillers =====
+     S = 1 col (single hole)
+     M = 2 col (half-row gap)
+     L = 3 col (classic slack when Coverage is tall)
+  */
+  .size-s{ grid-column: span 1; }
+  .size-m{ grid-column: span 2; }
+  .size-l{ grid-column: span 3; }
+
+  /* Size-specific typography & density */
+  .size-s .promo-head{ font-size: 18px; }
+  .size-s .promo-body{ display:none; } /* keep S extremely cheap + clean */
+  .size-s .promo-footer{ gap:8px; }
+  .size-s .chip{ padding:4px 8px; }
+
+  .size-m .promo-head{ font-size: 20px; }
+  .size-m .promo-body{ font-size: 13px; max-width: 52ch; }
+
+  .size-l .promo-head{ font-size: 22px; }
+  .size-l .promo-body{ font-size: 13px; max-width: 64ch; }
+
+  /* Responsive: single column stack */
+  @media (max-width: 920px){
+    body{ padding:22px 18px 60px; }
+    .tier3{ grid-template-columns: 1fr; }
+    .size-s,.size-m,.size-l{ grid-column: 1 / -1; }
+  }
+</style>
+</head>
+
+<body>
+  <div class="wrap">
+    <h1>Tier 3 Promo Tiles — 3 Sizes (S / M / L)</h1>
+    <p class="sub">
+      These are merchant-specific “ads” (really: signage) designed to be the lowest-priority filler *inside Tier 3*.
+      They’re intentionally low-fidelity (1970s tools), billboard-simple (1960s), and cheap to generate: just text + CSS.
+      Swap <code>size-*</code> and <code>promo-*</code> classes to fit whatever gap the grid produces.
+    </p>
+
+    <div class="note">Reference Tier 3 context (Hours / Call / Map / Coverage). Promo tiles below are alternatives, not all at once in production.</div>
+    <div class="tier3" style="margin-bottom:16px;">
+      <div class="cell">
+        <div class="label">Hours</div>
+        Mon–Thu 5–11<br>Fri 5–12<br>Sat 12–12<br>Sun 12–10
+      </div>
+      <div class="cell">
+        <div class="label">Call</div>
+        (323) 745-9288
+      </div>
+      <div class="cell">
+        <div class="label">Map</div>
+        3820 Sunset Blvd<br>Los Angeles, CA
+      </div>
+      <div class="cell">
+        <div class="label">Coverage</div>
+        The Infatuation<br>Time Out LA<br>Resy<br>Eater LA<br><br>
+        <span style="color:rgba(87,83,78,.65); font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;">
+          (tall card causes slack)
+        </span>
+      </div>
+    </div>
+
+    <div class="note">SIZE L (3 columns) — fills classic slack under Hours+Call+Map when Coverage is tall.</div>
+    <div class="tier3" style="margin-bottom:16px;">
+      <section class="cell promo promo-blue promo-calm size-l" data-size="L" data-merchant="Seco">
+        <div class="promo-inner">
+          <div class="promo-rail">
+            <div class="promo-kicker">Saiko helps places like Seco</div>
+            <div class="promo-badge">L</div>
+          </div>
+          <h2 class="promo-head">TONIGHT: WALK IN, SIT AT THE BAR</h2>
+          <p class="promo-body">
+            Seco’s the kind of spot where one glass turns into two.
+            If you’re going, aim for <strong>8pm</strong> on weeknights — it’s calmer, easier, and you’ll actually hear your friend.
+          </p>
+          <div class="promo-footer">
+            <div class="promo-fine">Built by Saiko · no pay-to-play</div>
+            <div class="promo-chips">
+              <span class="chip">independent</span>
+              <span class="chip">good lighting</span>
+              <span class="chip">no ads sold</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Placeholder to indicate where Coverage often sits -->
+      <div class="cell size-s" style="opacity:.70;">
+        <div class="label">Coverage (placeholder)</div>
+        Tall card lives here.
+      </div>
+    </div>
+
+    <div class="note">SIZE M (2 columns) — for a 2-column gap in Tier 3.</div>
+    <div class="tier3" style="margin-bottom:16px;">
+      <section class="cell promo promo-ochre promo-calm size-m" data-size="M" data-merchant="Seco">
+        <div class="promo-inner">
+          <div class="promo-rail">
+            <div class="promo-kicker">Merchant notice</div>
+            <div class="promo-badge">M</div>
+          </div>
+          <h2 class="promo-head">SECO IS STILL A SMALL PLACE</h2>
+          <p class="promo-body">
+            Please be kind to the room. Small staff, tight bar, big hearts.
+            If it’s packed, grab one nearby and come back.
+          </p>
+          <div class="promo-footer">
+            <div class="promo-fine">A gentle sign, not an ad</div>
+            <div class="promo-chips">
+              <span class="chip">locals first</span>
+              <span class="chip">walk-ins</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="cell size-m" style="opacity:.70;">
+        <div class="label">Other Tier 3 cells</div>
+        Remaining content fills here in real layout.
+      </div>
+    </div>
+
+    <div class="note">SIZE S (1 column) — for a single hole. Keep it extremely cheap + readable.</div>
+    <div class="tier3">
+      <section class="cell promo promo-green promo-calm size-s" data-size="S" data-merchant="Seco">
+        <div class="promo-inner">
+          <div class="promo-rail">
+            <div class="promo-kicker">Little sign</div>
+            <div class="promo-badge">S</div>
+          </div>
+          <h2 class="promo-head">SUPPORT SECO</h2>
+          <div class="promo-footer">
+            <div class="promo-fine">order a glass · tip well</div>
+            <div class="promo-chips">
+              <span class="chip">independent</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="cell size-l" style="opacity:.70;">
+        <div class="label">Slack area (example)</div>
+        In production, this would be occupied by other Tier 3 cells.
+      </div>
+    </div>
+
+    <div class="note" style="margin-top:18px;">Implementation note (within typical tech limits)</div>
+    <div class="cell" style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace; font-size:12px; color:rgba(28,25,23,.75);">
+      Render exactly ONE promo tile in Tier 3, as lowest priority.<br>
+      Choose size by gap: S=1 col, M=2 col, L=3 col. Choose color by theme (promo-blue / promo-ochre / promo-green / promo-red).<br>
+      Copy is just strings; chips are an array; hide chips if empty. No images required.
+    </div>
+  </div>
+</body>
+</html>

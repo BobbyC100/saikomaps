@@ -1,0 +1,50 @@
+{
+  "place_slug": "clark-street-echo-park",
+  "sources": [
+    {
+      "source_id": "src_theinfatuation_2023",
+      "publication": "The Infatuation",
+      "title": "Clark Street - Echo Park - Review",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/clark-street-echo-park",
+      "published_at": "2023-02-09",
+      "trust_level": "editorial",
+      "content": "When one of our favorite stalls at the Grand Central Market announced that they were opening a stand-alone bakery, we wondered if they were bready for an expansion. But a bigger space just means that Clark Street Bakery has more room to do what they do best - namely, incredible pastries and baked goods. Their new outpost on Glendale Blvd. is still compact, but doesn't feel small, thanks to high ceilings and a wide patio. The pastries are exceptional, specifically the kouign-amann, which is basically a caramelized croissant. But if you're looking for something a little heartier, our favorite menu addition is the Nordic Breakfast, a massive platter that comes with a sourdough roll, Comté cheese, ham, butter, jam, and a hardboiled egg. This is the kind of simple, filling meal that makes you feel like you're on a picnic in the Scandinavian countryside, or living the life of a humble farmhand - which, no offense, is kind of the best way to start the day. Unrated: This is a restaurant we want to re-visit before rating, or it's a coffee shop, bar, or dessert shop. We only rate spots where you can eat a full meal."
+    },
+    {
+      "source_id": "src_timeout_2020",
+      "publication": "Time Out LA",
+      "title": "Clark Street Echo Park | Restaurants in Historic Filipinotown, Los Angeles",
+      "url": "https://www.timeout.com/los-angeles/restaurants/clark-street-echo-park",
+      "published_at": "2020-01-03",
+      "trust_level": "editorial",
+      "content": "Zack Hall's homespun bakery now has a full-on café where you can still find Clark Street's phenomenal croissants, cookies and loaves of bread, as well as bagels, soft-boiled eggs, Nordic-inspired breakfast plates and plenty of lox."
+    },
+    {
+      "source_id": "src_theinfatuation_2022",
+      "publication": "The Infatuation",
+      "title": "The 14 Best Restaurants In Echo Park - Los Angeles",
+      "url": "https://www.theinfatuation.com/los-angeles/guides/best-restaurants-Echo-Park",
+      "published_at": "2022-01-21",
+      "trust_level": "editorial",
+      "content": "Clark Street, a stretch we're dubbing Cutesy Neighborhood Hangout Row (we're still workshopping it). At lunchtime, this tiny cafe from a Chi Spacca alum serves sandwiches on house ciabatta, including a standout mushroom dip."
+    },
+    {
+      "source_id": "src_theinfatuation_2020",
+      "publication": "The Infatuation",
+      "title": "The Eastside Hit List: The Best New Restaurants On The Eastside - Los Angeles",
+      "url": "https://www.theinfatuation.com/los-angeles/guides/the-eastside-hit-list-best-new-restaurants-eastside-los-angeles",
+      "published_at": "2020-02-26",
+      "trust_level": "editorial",
+      "content": "If you're like us, and love the baked goods at Clark Street Bread, but don't always feel up to braving Grand Central Market to get them, we have good news: They've just opened a full-blown bakery in Echo Park. And not only did they keep the things that we liked about their original outpost - namely, a very caramelized, very buttery kouign-amann pastry - but they've also added a few new things to the menu. Our favorite addition is the Nordic Breakfast, a massive platter of sourdough bread, Comté, ham, jam, and a hard boiled egg, which is the kind of hearty, simple breakfast you thought only existed in your daydreams of life on a self-sustaining farm."
+    },
+    {
+      "source_id": "src_theinfatuation_2020_bakeries",
+      "publication": "The Infatuation",
+      "title": "LA Bakeries To Order From After You Screw Up Your Sourdough",
+      "url": "https://www.theinfatuation.com/los-angeles/guides/la-bakeries-delivery-takeout",
+      "published_at": "2020-05-12",
+      "trust_level": "editorial",
+      "content": "The Echo Park outpost of GCM's Clark Street Bread is even better than the original. The pastries are the best things here - our favorite (if they haven't sold out) is the Kouign-Amann, coated and filled with caramelized sugar and butter. The breads are also worth your time (especially the Danish rye), and right now, they're giving out sourdough starter with any purchase - and providing step-by-step baking instructions, too - so maybe you can re-try that recipe you screwed up last week. Open 7:30am-3pm daily for local delivery and pick-up."
+    }
+  ]
+}

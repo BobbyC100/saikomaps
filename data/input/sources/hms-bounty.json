@@ -1,0 +1,32 @@
+{
+  "place_slug": "hms-bounty",
+  "sources": [
+    {
+      "source_id": "src_punch_2014",
+      "publication": "Punch",
+      "title": "HMS Bounty",
+      "url": "https://punchdrink.com/venues/hms-bounty/",
+      "published_at": "2014-11-27",
+      "trust_level": "editorial",
+      "content": "Situated on the ground floor of the historic Gaylord Hotel, the HMS Bounty has changed both hands and names over the years, but its cozy, kitschy interior and charming nautical theme have remained solidly intact. Back in the day this was a regular hangout for the standard Hollywood elite, but also for the more politically-minded heavy hitters such as Winston Churchill and William Randolph Hearst. Now it's a reliable option for cheap drinks, greasy bar food and the knowledge that you're hanging out in a bar where they shot a few scenes of Mad Men. The Salty Dog is a venerable blend of vodka and grapefruit juice with a salt rim that might trick you into thinking you're closer to the ocean than Koreatown actually is."
+    },
+    {
+      "source_id": "src_punch_2017",
+      "publication": "Punch",
+      "title": "How to Find Your Local Bar, Anywhere",
+      "url": "https://punchdrink.com/articles/how-to-find-your-local-bar-hms-bounty-la-bar-basso-milan/",
+      "published_at": "2017-04-27",
+      "trust_level": "editorial",
+      "content": "The Bounty is located in the ground floor of an apartment complex called the Gaylord, which was considered rather glamorous when it was built in 1924 but today it shows its age with Olde English-style neon signage and sagging floral print furniture. In 1962, after a few name changes, it morphed into the HMS Bounty, and, if this long-winded but fascinating account from the original owner's son is to be believed (the current owner was not available for comment), it became known as a power lunch destination and pick-up spot for the many single ladies who had moved into newly constructed apartments nearby. By the 1990s, the bar had fallen into a state of mild disrepair but retained a loyal older crowd that, in recent years, has mixed with local hipsters to create something of a renaissance, albeit a low-key one. I went to the Bounty about once a week during my stint as a transient Angelino. I remember one of my final nights at the Bounty, flipping through the jukebox while nursing a cheap whiskey and Coke and admiring the clientele: cranky old-timers silently sucking their beers, fresh-faced twenty-somethings marveling at the black-and-white photos of bygone celebs and the Deadhead lady, who was happy to chat with anyone who'd listen. A perfect cross-section of Angelinos, I thought, as I allowed myself a few minutes to daydream about joining them permanently. The Bounty is located in the ground floor of an apartment complex called the Gaylord, which was considered rather glamorous when it was built in 1924 but today it shows its age with Olde English-style neon signage and sagging floral print furniture. The Deadhead lady lived in the building and came downstairs so often that she'd taken to furnishing the jukebox with her own CDs. She was clearly a regular at the sort of bar that practically demanded routine commitment. I loved the nautical tchotchkes and the deep leather banquettes at HMS, the cheap drinks and the antique cash register the bartender, Annie, rang them up on. My affection deepened when I learned of its storied past (more on that in a minute). Why is it that the places we root ourselves to when we're in an unfamiliar place so often take the shape of a bar? Bars reflect their surroundings—camping out in one, especially the same one multiple times, is an easy way to take the temperature of a place, to get to know its particular people and customs. It's also a way to establish familiarity when you feel like a stranger, which carries with it an element of fantasy: As I returned to the Bounty week after week, I entertained a vision of what my life might be like if it were my true local."
+    },
+    {
+      "source_id": "src_timeout_la_2016",
+      "publication": "Time Out LA",
+      "title": "HMS Bounty",
+      "url": "https://www.timeout.com/los-angeles/bars/hms-bounty",
+      "published_at": "2016-08-02",
+      "trust_level": "editorial",
+      "content": "Naturally enough, L.A.'s best nautical-themed bar sits fully 15 miles from the water. Located in Koreatown, this agreeably egalitarian bar is famed for the warmth of its welcome and the cheapness of its drinks, characteristics that are embraced by everyone from visiting rockers to residents of the Gaylord apartment hotel directly above the taproom. Saddle up to the bar or stake out a red leather booth where well-seasoned waitresses serve up dishes—don't miss the Famous Baseball steak—from a traditional American menu."
+    }
+  ]
+}

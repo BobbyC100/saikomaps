@@ -1,0 +1,50 @@
+{
+  "place_slug": "bar-etoile",
+  "sources": [
+    {
+      "source_id": "src_michelin_2025",
+      "publication": "Michelin Guide",
+      "title": "Bar Etoile – Los Angeles - a MICHELIN Guide Restaurant",
+      "url": "https://guide.michelin.com/us/en/california/us-los-angeles/restaurant/bar-etoile",
+      "published_at": "2025-06-25",
+      "trust_level": "editorial",
+      "content": "It's not just about (really) great wine at Bar Etoile, though their expansive list with a French focus is certainly a winner. It's also about their product-driven cooking presenting simple dishes that allow ingredients to shine. Chef Travis Hayden's menu may be streamlined but there's something for everyone in this comfortable spot. Appetizers like snap peas served over a bed of lightly smoked ricotta and dressed with nettle gremolata and pickled coriander are proof that this spot looks to the market for its influences. Perfectly moist striped bass with a crispy skin and topped with salsa macha over caramelized sunchoke is a hit, as is the chocolate tart with passion fruit chantilly."
+    },
+    {
+      "source_id": "src_michelin_2025_article",
+      "publication": "Michelin Guide",
+      "title": "March 2025: New Additions to The MICHELIN Guide California",
+      "url": "https://guide.michelin.com/us/en/article/dining-out/michelin-guide-california-new-additions-restaurants",
+      "published_at": "2025-03-19",
+      "trust_level": "editorial",
+      "content": "From the French-focused wine list and streamlined menu at Bar Etoile to edomae-style sushi at Mori Nozomi, those in Los Angeles are in for a delicious treat with seven new additions. It's not just about (really) great wine at Bar Etoile, though their expansive list with a French focus is certainly a winner. It's also about their product-driven cooking presenting simple dishes that allow ingredients to shine. Chef Travis Hayden's menu may be streamlined but there's something for everyone in this comfortable spot. Appetizers like snap peas served over a bed of lightly smoked ricotta and dressed with nettle gremolata and pickled coriander are proof that this spot looks to the market for its influences. Perfectly moist striped bass with a crispy skin and topped with salsa macha over caramelized sunchoke is a hit, as is the chocolate tart with passion fruit chantilly."
+    },
+    {
+      "source_id": "src_infatuation_2025",
+      "publication": "The Infatuation",
+      "title": "Bar Etoile - Review - East Hollywood - Los Angeles",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/bar-etoile",
+      "published_at": "2025-01-21",
+      "trust_level": "editorial",
+      "content": "Bar Etoile is a cozy French spot in East Hollywood with a massive wine list and excellent steak frites. Everything about this stylish bistro on Western Avenue feels designed to put you at ease. It works just as well for a steak frites pop-in on the way home as it does for hanging out with a $55 bottle of cab franc for two hours while talking with the bartender about your must-watch HBO shows. Unlike Étra, however, this French-ish eatery in East Hollywood offers much more than just vibes; head chef Travis Hayden, formerly of Voodoo Vin, serves a delicious bistro-inspired menu that sticks the landing from start to finish. The restaurant takes the same approach with the classic bistro formula. Don't expect a reinvention of haute cuisine or long-winded terroir monologues, just satisfying French-leaning food done well in a comfortable space that's never a battle to get into. An ideal steak frites. The crisp shoestring fries, medium-rare beef, and herb-enriched butter tend to seep into each other as you dig in, making each bite more decadent (and messier) than the last."
+    },
+    {
+      "source_id": "src_infatuation_guide_2025",
+      "publication": "The Infatuation",
+      "title": "The 15 Best Restaurants In East Hollywood",
+      "url": "https://www.theinfatuation.com/los-angeles/guides/best-restaurants-east-hollywood-thai-town",
+      "published_at": "2025-10-07",
+      "trust_level": "editorial",
+      "content": "Bar Etoile is sexy, snuggly, and a fine place to burrow into a banquette and eat classic French dishes with non-classic twists, like endive salad with shards of savory meringue and a gooey gruyere tart that looks like cheesecake. At this cozy-cool French spot, you'll hear soft jazz and see well-dressed dates sipping gimlets at the horseshoe-shaped bar. A row of fancy wine fridges illuminates the back wall. Finish with the perfect plate to go splitsies on: crispy fries, medium-rare steak, and a scoop of herby cornichon butter."
+    },
+    {
+      "source_id": "src_timeout_2025",
+      "publication": "Time Out LA",
+      "title": "Bar Etoile | Restaurants in East Hollywood, Los Angeles",
+      "url": "https://www.timeout.com/los-angeles/restaurants/bar-etoile",
+      "published_at": "2025-03-13",
+      "trust_level": "editorial",
+      "content": "Unlike Étra, however, this French-ish eatery in East Hollywood offers much more than just vibes; head chef Travis Hayden, formerly of Voodoo Vin, serves a delicious bistro-inspired menu that sticks the landing from start to finish."
+    }
+  ]
+}

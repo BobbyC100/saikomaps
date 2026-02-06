@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Saiko Maps — Bento Card Variants</title>
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background-color: #0a0a0a;
+      padding: 40px 40px 120px;
+      min-height: 100vh;
+      color: #ccc;
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+
+    .page-title {
+      color: #444;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      margin-bottom: 12px;
+    }
+
+    .page-subtitle {
+      color: #C3B091;
+      font-family: 'Libre Baskerville', Georgia, serif;
+      font-size: 18px;
+      font-style: italic;
+      margin-bottom: 8px;
+    }
+
+    .page-desc {
+      color: #555;
+      font-size: 12px;
+      max-width: 520px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    .concepts {
+      display: flex;
+      flex-direction: column;
+      gap: 80px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .concept-section {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .concept-label {
+      color: #C3B091;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+    }
+
+    .concept-desc {
+      color: #777;
+      font-size: 13px;
+      line-height: 1.7;
+      max-width: 560px;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      max-width: 760px;
+    }
+
+    .card-grid .full-width {
+      grid-column: 1 / -1;
+    }
+
+    /* Divider between sections */
+    .section-divider {
+      width: 40px;
+      height: 1px;
+      background: rgba(195,176,145,0.2);
+      margin: 20px 0;
+    }
+
+
+    /* ================================================================
+       CURRENT STATE — What exists now (for comparison)
+       ================================================================ */
+    .card-current {
+      background: #FFFDF7;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .card-current .card-photo {
+      width: 100%;
+      height: 200px;
+      background-size: cover;
+      background-position: center;
+      filter: saturate(0.88) contrast(1.05);
+    }
+
+    .card-current .card-info {
+      padding: 16px 20px 24px;
+    }
+
+    .card-current .card-name {
+      font-family: 'Libre Baskerville', Georgia, serif;
+      font-size: 18px;
+      font-style: italic;
+      color: #36454F;
+      margin-bottom: 6px;
+    }
+
+    .card-current .card-category {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #6B7F59;
+      margin-bottom: 8px;
+    }
+
+    .card-current .card-badge {
+      display: inline-block;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #4A7C59;
+      font-weight: 600;
+      padding: 3px 10px;
+      border: 1px solid rgba(74,124,89,0.25);
+      border-radius: 20px;
+      margin-bottom: 8px;
+    }
+
+    .card-current .card-price {
+      font-size: 12px;
+      color: #C3B091;
+      letter-spacing: 1px;
+    }
+
+
+    /* ================================================================
+       VARIANT A — Compact Single Row
+       Category · Neighborhood · $$ · Open all on one line
+       Info section shrinks way down
+       ================================================================ */
+    .card-a {
+      background: #FFFDF7;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .card-a .card-photo {
+      width: 100%;
+      height: 200px;
+      background-size: cover;
+      background-position: center;
+      filter: saturate(0.88) contrast(1.05);
+    }
+
+    .card-a .card-info {
+      padding: 14px 18px 16px;
+    }
+
+    .card-a .card-name {
+      font-family: 'Libre Baskerville', Georgia, serif;
+      font-size: 17px;
+      font-style: italic;
+      color: #36454F;
+      margin-bottom: 6px;
+      line-height: 1.25;
+    }
+
+    .card-a .card-meta-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .card-a .meta-tag {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: #6B7F59;
+    }
+
+    .card-a .meta-dot {
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: #C3B091;
+      flex-shrink: 0;
+    }
+
+    .card-a .meta-area {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: #C3B091;
+    }
+
+    .card-a .meta-price {
+      font-size: 10px;
+      color: #C3B091;
+      letter-spacing: 0.5px;
+    }
+
+    .card-a .meta-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .card-a .meta-status .dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #4A7C59;
+    }
+
+    .card-a .meta-status span {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #4A7C59;
+      font-weight: 600;
+    }
+
+
+    /* ================================================================
+       VARIANT B — Compact + Creator Note
+       Same compressed meta row, but adds a 2-line note
+       The note fills the space meaningfully instead of padding
+       ================================================================ */
+    .card-b {
+      background: #FFFDF7;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .card-b .card-photo {
+      width: 100%;
+      height: 190px;
+      background-size: cover;
+      background-position: center;
+      filter: saturate(0.88) contrast(1.05);
+    }
+
+    .card-b .card-info {
+      padding: 14px 18px 16px;
+    }
+
+    .card-b .card-name {
+      font-family: 'Libre Baskerville', Georgia, serif;
+      font-size: 17px;
+      font-style: italic;
+      color: #36454F;
+      margin-bottom: 5px;
+      line-height: 1.25;
+    }
+
+    .card-b .card-meta-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .card-b .meta-tag {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: #6B7F59;
+    }
+
+    .card-b .meta-dot {
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: #C3B091;
+      flex-shrink: 0;
+    }
+
+    .card-b .meta-area {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: #C3B091;
+    }
+
+    .card-b .meta-price {
+      font-size: 10px;
+      color: #C3B091;
+      letter-spacing: 0.5px;
+    }
+
+    .card-b .meta-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .card-b .meta-status .dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #4A7C59;
+    }
+
+    .card-b .meta-status span {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #4A7C59;
+      font-weight: 600;
+    }
+
+    .card-b .card-note {
+      font-family: 'Libre Baskerville', Georgia, serif;
+      font-size: 12px;
+      font-style: italic;
+      line-height: 1.55;
+      color: #36454F;
+      opacity: 0.6;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      border-top: 1px solid rgba(195,176,145,0.2);
+      padding-top: 10px;
+    }
+
+
+    /* ================================================================
+       VARIANT C — Overlay Name on Photo
+       Name + badge float on bottom of photo with gradient scrim
+       Info section is JUST the meta row + optional note
+       ================================================================ */
+    .card-c {
+      background: #FFFDF7;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .card-c .card-photo-wrap {
+      position: relative;
+      width: 100%;
+      height: 220px;
+    }
+
+    .card-c .card-photo {
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      filter: saturate(0.88) contrast(1.05);
+    }
+
+    .card-c .card-photo-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 40px 18px 14px;
+      background: linear-gradient(transparent, rgba(0,0,0,0.55));
+    }
+
+    .card-c .card-name {
+      font-family: 'Libre Baskerville', Georgia, serif;
+      font-size: 18px;
+      font-style: italic;
+      color: #FFFDF7;
+      line-height: 1.25;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+    }
+
+    .card-c .card-info {
+      padding: 10px 18px 14px;
+    }
+
+    .card-c .card-meta-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .card-c .meta-tag {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: #6B7F59;
+    }
+
+    .card-c .meta-dot {
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: #C3B091;
+      flex-shrink: 0;
+    }
+
+    .card-c .meta-area {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: #C3B091;
+    }
+
+    .card-c .meta-price {
+      font-size: 10px;
+      color: #C3B091;
+      letter-spacing: 0.5px;
+    }
+
+    .card-c .meta-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .card-c .meta-status .dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #4A7C59;
+    }
+
+    .card-c .meta-status span {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #4A7C59;
+      font-weight: 600;
+    }
+
+    .card-c .card-note {
+      font-family: 'Libre Baskerville', Georgia, serif;
+      font-size: 12px;
+      font-style: italic;
+      line-height: 1.55;
+      color: #36454F;
+      opacity: 0.6;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+
+    /* ================================================================
+       VARIANT D — Horizontal Bento (side-by-side)
+       Photo left, all info right. Most compact vertically.
+       Good for dense lists or smaller viewports.
+       ================================================================ */
+    .card-d {
+      background: #FFFDF7;
+      border-radius: 12px;
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      min-height: 150px;
+    }
+
+    .card-d .card-photo {
+      background-size: cover;
+      background-position: center;
+      filter: saturate(0.88) contrast(1.05);
+    }
+
+    .card-d .card-info {
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .card-d .card-name {
+      font-family: 'Libre Baskerville', Georgia, serif;
+      font-size: 16px;
+      font-style: italic;
+      color: #36454F;
+      line-height: 1.25;
+    }
+
+    .card-d .card-meta-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .card-d .meta-tag {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: #6B7F59;
+    }
+
+    .card-d .meta-dot {
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: #C3B091;
+      flex-shrink: 0;
+    }
+
+    .card-d .meta-area {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: #C3B091;
+    }
+
+    .card-d .meta-price {
+      font-size: 9px;
+      color: #C3B091;
+      letter-spacing: 0.5px;
+    }
+
+    .card-d .meta-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .card-d .meta-status .dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #4A7C59;
+    }
+
+    .card-d .meta-status span {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #4A7C59;
+      font-weight: 600;
+    }
+
+    .card-d .card-note {
+      font-family: 'Libre Baskerville', Georgia, serif;
+      font-size: 11px;
+      font-style: italic;
+      line-height: 1.5;
+      color: #36454F;
+      opacity: 0.55;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+
+
+    /* ================================================================
+       VARIANT E — Compact + Note, No Border
+       Like B but the note area uses the same cream bg as page
+       Feels less "card" and more "listing in a journal"
+       ================================================================ */
+    .card-e {
+      background: #F5F0E1;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .card-e .card-photo {
+      width: 100%;
+      height: 190px;
+      background-size: cover;
+      background-position: center;
+      filter: saturate(0.88) contrast(1.05);
+      border-radius: 12px 12px 0 0;
+    }
+
+    .card-e .card-info {
+      padding: 12px 18px 14px;
+    }
+
+    .card-e .card-top-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 6px;
+    }
+
+    .card-e .card-name {
+      font-family: 'Libre Baskerville', Georgia, serif;
+      font-size: 16px;
+      font-style: italic;
+      color: #36454F;
+      line-height: 1.25;
+      flex: 1;
+    }
+
+    .card-e .card-price-badge {
+      font-size: 11px;
+      color: #C3B091;
+      letter-spacing: 0.5px;
+      flex-shrink: 0;
+      padding-top: 4px;
+    }
+
+    .card-e .card-meta-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+
+    .card-e .meta-tag {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: #6B7F59;
+    }
+
+    .card-e .meta-dot {
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: #C3B091;
+      flex-shrink: 0;
+    }
+
+    .card-e .meta-area {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: #C3B091;
+    }
+
+    .card-e .meta-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .card-e .meta-status .dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #4A7C59;
+    }
+
+    .card-e .meta-status span {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #4A7C59;
+      font-weight: 600;
+    }
+
+    .card-e .card-note {
+      font-family: 'Libre Baskerville', Georgia, serif;
+      font-size: 12px;
+      font-style: italic;
+      line-height: 1.55;
+      color: #36454F;
+      opacity: 0.55;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* page bg to match cards */
+    .on-cream {
+      background: #F5F0E1;
+      border-radius: 16px;
+      padding: 24px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="page-header">
+    <div class="page-title">Saiko Maps — Field Notes Template</div>
+    <div class="page-subtitle">Bento Card Variants</div>
+    <p class="page-desc">
+      Five approaches to compressing the info section and filling it with
+      useful detail instead of dead space.
+    </p>
+  </div>
+
+  <div class="concepts">
+
+    <!-- ============================================================
+         CURRENT STATE
+         ============================================================ -->
+    <div class="concept-section">
+      <div class="concept-label">Current State — For Reference</div>
+      <p class="concept-desc">
+        What exists now. Info section is tall with stacked fields and lots
+        of vertical padding. The white area feels empty.
+      </p>
+      <div class="card-grid">
+        <div class="card-current">
+          <div class="card-photo" style="background-image: url('https://images.unsplash.com/photo-1552566626-52f8b828add9?w=500&h=400&fit=crop');"></div>
+          <div class="card-info">
+            <div class="card-name">The Breakers Palm Beach</div>
+            <div class="card-category">EAT</div>
+            <div class="card-badge">Open</div>
+            <div class="card-price">$$$</div>
+          </div>
+        </div>
+        <div class="card-current">
+          <div class="card-photo" style="background-image: url('https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=500&h=400&fit=crop');"></div>
+          <div class="card-info">
+            <div class="card-name">Bar Leather Apron</div>
+            <div class="card-category">DRINKS</div>
+            <div class="card-badge">Open</div>
+            <div class="card-price">$$$$</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ============================================================
+         VARIANT A — COMPACT SINGLE ROW
+         ============================================================ -->
+    <div class="concept-section">
+      <div class="concept-label">Variant A — Compact Single Row</div>
+      <p class="concept-desc">
+        Everything on one meta row: category · neighborhood · price · status dot.
+        Info section drops from ~100px to ~55px. Minimal, scannable.
+      </p>
+      <div class="card-grid">
+        <div class="card-a">
+          <div class="card-photo" style="background-image: url('https://images.unsplash.com/photo-1552566626-52f8b828add9?w=500&h=400&fit=crop');"></div>
+          <div class="card-info">
+            <div class="card-name">The Breakers Palm Beach</div>
+            <div class="card-meta-row">
+              <span class="meta-tag">Eat</span>
+              <span class="meta-dot"></span>
+              <span class="meta-area">Palm Beach</span>
+              <span class="meta-dot"></span>
+              <span class="meta-price">$$$</span>
+              <span class="meta-dot"></span>
+              <span class="meta-status"><span class="dot"></span> <span>Open</span></span>
+            </div>
+          </div>
+        </div>
+        <div class="card-a">
+          <div class="card-photo" style="background-image: url('https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=500&h=400&fit=crop');"></div>
+          <div class="card-info">
+            <div class="card-name">Bar Leather Apron</div>
+            <div class="card-meta-row">
+              <span class="meta-tag">Drinks</span>
+              <span class="meta-dot"></span>
+              <span class="meta-area">Chinatown</span>
+              <span class="meta-dot"></span>
+              <span class="meta-price">$$$$</span>
+              <span class="meta-dot"></span>
+              <span class="meta-status"><span class="dot"></span> <span>Open</span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ============================================================
+         VARIANT B — COMPACT + CREATOR NOTE
+         ============================================================ -->
+    <div class="concept-section">
+      <div class="concept-label">Variant B — Compact + Creator Note</div>
+      <p class="concept-desc">
+        Same compressed meta row as A, but adds the creator's note below a
+        thin divider. The note fills the space with actual useful content
+        instead of padding. Same total card height, way more information.
+      </p>
+      <div class="card-grid">
+        <div class="card-b">
+          <div class="card-photo" style="background-image: url('https://images.unsplash.com/photo-1552566626-52f8b828add9?w=500&h=400&fit=crop');"></div>
+          <div class="card-info">
+            <div class="card-name">The Breakers Palm Beach</div>
+            <div class="card-meta-row">
+              <span class="meta-tag">Eat</span>
+              <span class="meta-dot"></span>
+              <span class="meta-area">Palm Beach</span>
+              <span class="meta-dot"></span>
+              <span class="meta-price">$$$</span>
+              <span class="meta-dot"></span>
+              <span class="meta-status"><span class="dot"></span> <span>Open</span></span>
+            </div>
+            <div class="card-note">"Old-money Florida at its best. Sunday brunch in the Circle room is the move — live music, ocean breeze, unlimited champagne."</div>
+          </div>
+        </div>
+        <div class="card-b">
+          <div class="card-photo" style="background-image: url('https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=500&h=400&fit=crop');"></div>
+          <div class="card-info">
+            <div class="card-name">Bar Leather Apron</div>
+            <div class="card-meta-row">
+              <span class="meta-tag">Drinks</span>
+              <span class="meta-dot"></span>
+              <span class="meta-area">Chinatown</span>
+              <span class="meta-dot"></span>
+              <span class="meta-price">$$$$</span>
+              <span class="meta-dot"></span>
+              <span class="meta-status"><span class="dot"></span> <span>Open</span></span>
+            </div>
+            <div class="card-note">"Speakeasy with no sign on the door. Justin makes the best old fashioned on the island. Reservations recommended."</div>
+          </div>
+        </div>
+
+        <!-- Show one without a note to prove graceful collapse -->
+        <div class="card-b">
+          <div class="card-photo" style="background-image: url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=500&h=400&fit=crop');"></div>
+          <div class="card-info">
+            <div class="card-name">Taormina Sicilian Cuisine</div>
+            <div class="card-meta-row">
+              <span class="meta-tag">Eat</span>
+              <span class="meta-dot"></span>
+              <span class="meta-area">Waikiki</span>
+              <span class="meta-dot"></span>
+              <span class="meta-price">$$$$</span>
+              <span class="meta-dot"></span>
+              <span class="meta-status"><span class="dot"></span> <span>Open</span></span>
+            </div>
+            <!-- No note — collapses cleanly -->
+          </div>
+        </div>
+        <div class="card-b">
+          <div class="card-photo" style="background-image: url('https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?w=500&h=400&fit=crop');"></div>
+          <div class="card-info">
+            <div class="card-name">Magokoro</div>
+            <div class="card-meta-row">
+              <span class="meta-tag">Eat</span>
+              <span class="meta-dot"></span>
+              <span class="meta-area">Kailua</span>
+              <span class="meta-dot"></span>
+              <span class="meta-price">$$</span>
+              <span class="meta-dot"></span>
+              <span class="meta-status"><span class="dot"></span> <span>Open</span></span>
+            </div>
+            <div class="card-note">"Tiny Japanese spot in a strip mall. Don't sleep on the tonkatsu curry. Cash only."</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ============================================================
+         VARIANT C — OVERLAY NAME ON PHOTO
+         ============================================================ -->
+    <div class="concept-section">
+      <div class="concept-label">Variant C — Name Overlays Photo</div>
+      <p class="concept-desc">
+        Place name floats on the photo with a gradient scrim. Info section
+        is just the meta row + optional note — barely any "white section" at all.
+        Photo does more work. More editorial, less card-y.
+      </p>
+      <div class="card-grid">
+        <div class="card-c">
+          <div class="card-photo-wrap">
+            <div class="card-photo" style="background-image: url('https://images.unsplash.com/photo-1552566626-52f8b828add9?w=500&h=400&fit=crop');"></div>
+            <div class="card-photo-overlay">
+              <div class="card-name">The Breakers Palm Beach</div>
+            </div>
+          </div>
+          <div class="card-info">
+            <div class="card-meta-row">
+              <span class="meta-tag">Eat</span>
+              <span class="meta-dot"></span>
+              <span class="meta-area">Palm Beach</span>
+              <span class="meta-dot"></span>
+              <span class="meta-price">$$$</span>
+              <span class="meta-dot"></span>
+              <span class="meta-status"><span class="dot"></span> <span>Open</span></span>
+            </div>
+            <div class="card-note">"Old-money Florida at its best. Sunday brunch in the Circle room is the move."</div>
+          </div>
+        </div>
+        <div class="card-c">
+          <div class="card-photo-wrap">
+            <div class="card-photo" style="background-image: url('https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=500&h=400&fit=crop');"></div>
+            <div class="card-photo-overlay">
+              <div class="card-name">Bar Leather Apron</div>
+            </div>
+          </div>
+          <div class="card-info">
+            <div class="card-meta-row">
+              <span class="meta-tag">Drinks</span>
+              <span class="meta-dot"></span>
+              <span class="meta-area">Chinatown</span>
+              <span class="meta-dot"></span>
+              <span class="meta-price">$$$$</span>
+              <span class="meta-dot"></span>
+              <span class="meta-status"><span class="dot"></span> <span>Open</span></span>
+            </div>
+            <div class="card-note">"Speakeasy with no sign on the door. Justin makes the best old fashioned on the island."</div>
+          </div>
+        </div>
+
+        <!-- Featured / full-width card -->
+        <div class="card-c full-width">
+          <div class="card-photo-wrap" style="height: 280px;">
+            <div class="card-photo" style="background-image: url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&h=400&fit=crop');"></div>
+            <div class="card-photo-overlay">
+              <div class="card-name">Taormina Sicilian Cuisine</div>
+            </div>
+          </div>
+          <div class="card-info">
+            <div class="card-meta-row">
+              <span class="meta-tag">Eat</span>
+              <span class="meta-dot"></span>
+              <span class="meta-area">Waikiki</span>
+              <span class="meta-dot"></span>
+              <span class="meta-price">$$$$</span>
+              <span class="meta-dot"></span>
+              <span class="meta-status"><span class="dot"></span> <span>Open</span></span>
+            </div>
+            <div class="card-note">"Feels like you flew to Sicily. The burrata is unreal. Sit outside if you can."</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ============================================================
+         VARIANT D — HORIZONTAL BENTO
+         ============================================================ -->
+    <div class="concept-section">
+      <div class="concept-label">Variant D — Horizontal Bento</div>
+      <p class="concept-desc">
+        Photo on the left, all info on the right. Most space-efficient layout.
+        Cards take up less vertical space so you can see more places at once.
+        Works well for dense guides with 20+ places.
+      </p>
+      <div class="card-grid">
+        <div class="card-d full-width">
+          <div class="card-photo" style="background-image: url('https://images.unsplash.com/photo-1552566626-52f8b828add9?w=400&h=400&fit=crop');"></div>
+          <div class="card-info">
+            <div class="card-name">The Breakers Palm Beach</div>
+            <div class="card-meta-row">
+              <span class="meta-tag">Eat</span>
+              <span class="meta-dot"></span>
+              <span class="meta-area">Palm Beach</span>
+              <span class="meta-dot"></span>
+              <span class="meta-price">$$$</span>
+              <span class="meta-dot"></span>
+              <span class="meta-status"><span class="dot"></span> <span>Open</span></span>
+            </div>
+            <div class="card-note">"Old-money Florida at its best. Sunday brunch in the Circle room is the move — live music, ocean breeze."</div>
+          </div>
+        </div>
+        <div class="card-d full-width">
+          <div class="card-photo" style="background-image: url('https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=400&fit=crop');"></div>
+          <div class="card-info">
+            <div class="card-name">Bar Leather Apron</div>
+            <div class="card-meta-row">
+              <span class="meta-tag">Drinks</span>
+              <span class="meta-dot"></span>
+              <span class="meta-area">Chinatown</span>
+              <span class="meta-dot"></span>
+              <span class="meta-price">$$$$</span>
+              <span class="meta-dot"></span>
+              <span class="meta-status"><span class="dot"></span> <span>Open</span></span>
+            </div>
+            <div class="card-note">"Speakeasy with no sign on the door. Justin makes the best old fashioned on the island."</div>
+          </div>
+        </div>
+        <div class="card-d full-width">
+          <div class="card-photo" style="background-image: url('https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?w=400&h=400&fit=crop');"></div>
+          <div class="card-info">
+            <div class="card-name">Magokoro</div>
+            <div class="card-meta-row">
+              <span class="meta-tag">Eat</span>
+              <span class="meta-dot"></span>
+              <span class="meta-area">Kailua</span>
+              <span class="meta-dot"></span>
+              <span class="meta-price">$$</span>
+              <span class="meta-dot"></span>
+              <span class="meta-status"><span class="dot"></span> <span>Open</span></span>
+            </div>
+            <div class="card-note">"Tiny Japanese spot in a strip mall. Don't sleep on the tonkatsu curry. Cash only."</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ============================================================
+         VARIANT E — JOURNAL LISTING (on cream bg)
+         ============================================================ -->
+    <div class="concept-section">
+      <div class="concept-label">Variant E — Journal Listing</div>
+      <p class="concept-desc">
+        Cards match the page background (cream) instead of white. Feels less
+        like separated "cards" and more like entries in a journal. Price
+        floats to the right of the name. More editorial, less UI.
+      </p>
+      <div class="on-cream">
+        <div class="card-grid">
+          <div class="card-e">
+            <div class="card-photo" style="background-image: url('https://images.unsplash.com/photo-1552566626-52f8b828add9?w=500&h=400&fit=crop');"></div>
+            <div class="card-info">
+              <div class="card-top-row">
+                <div class="card-name">The Breakers Palm Beach</div>
+                <div class="card-price-badge">$$$</div>
+              </div>
+              <div class="card-meta-row">
+                <span class="meta-tag">Eat</span>
+                <span class="meta-dot"></span>
+                <span class="meta-area">Palm Beach</span>
+                <span class="meta-dot"></span>
+                <span class="meta-status"><span class="dot"></span> <span>Open</span></span>
+              </div>
+              <div class="card-note">"Old-money Florida at its best. Sunday brunch in the Circle room is the move."</div>
+            </div>
+          </div>
+          <div class="card-e">
+            <div class="card-photo" style="background-image: url('https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=500&h=400&fit=crop');"></div>
+            <div class="card-info">
+              <div class="card-top-row">
+                <div class="card-name">Bar Leather Apron</div>
+                <div class="card-price-badge">$$$$</div>
+              </div>
+              <div class="card-meta-row">
+                <span class="meta-tag">Drinks</span>
+                <span class="meta-dot"></span>
+                <span class="meta-area">Chinatown</span>
+                <span class="meta-dot"></span>
+                <span class="meta-status"><span class="dot"></span> <span>Open</span></span>
+              </div>
+              <div class="card-note">"Speakeasy with no sign on the door. Justin makes the best old fashioned on the island."</div>
+            </div>
+          </div>
+          <div class="card-e full-width">
+            <div class="card-photo" style="height: 250px; background-image: url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&h=400&fit=crop');"></div>
+            <div class="card-info">
+              <div class="card-top-row">
+                <div class="card-name">Taormina Sicilian Cuisine</div>
+                <div class="card-price-badge">$$$$</div>
+              </div>
+              <div class="card-meta-row">
+                <span class="meta-tag">Eat</span>
+                <span class="meta-dot"></span>
+                <span class="meta-area">Waikiki</span>
+                <span class="meta-dot"></span>
+                <span class="meta-status"><span class="dot"></span> <span>Open</span></span>
+              </div>
+              <div class="card-note">"Feels like you flew to Sicily. The burrata is unreal. Sit outside if you can."</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

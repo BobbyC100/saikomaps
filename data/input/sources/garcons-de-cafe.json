@@ -1,0 +1,41 @@
+{
+  "place_slug": "garcons-de-cafe",
+  "sources": [
+    {
+      "source_id": "src_the_infatuation_2022",
+      "publication": "The Infatuation",
+      "title": "Garcons De Cafe - Review - Downtown LA",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/garcons-de-cafe",
+      "published_at": "2022-09-14",
+      "trust_level": "editorial",
+      "content": "There are a lot of things French people do better than us, and one of them is wine. So Garçons de Café, a little wine shop and bar in the Spring Arcade, is always an excellent choice. The wine list is mostly French with some bottles from Italy, US, Lebanon, and Mexico, so if you're feeling overwhelmed, try one of the wine flights. Accessorize with a cheese and charcuterie platter, a Parisian sandwich, or some crème brûlée—berets are optional (but suggested). 541 S Spring St, Los Angeles, CA 90013."
+    },
+    {
+      "source_id": "src_timeout_la_2023",
+      "publication": "Time Out LA",
+      "title": "Garçons de Café | Bars in Downtown Historic Core, Los Angeles",
+      "url": "https://www.timeout.com/los-angeles/bars/garcons-de-cafe",
+      "published_at": "2023-06-15",
+      "trust_level": "editorial",
+      "content": "Planted firmly but quietly in the Spring Arcade Building, Garçons de Café is a Francophile haven, and an oft overlooked one. This cozy, classic wine bar gives off strong bistro vibes with tables for two, a long marble bar, and tile inlay on that industrial-chic concrete floor. But the undeniable star is the wines, often organic, and hailing from Loire, Rhône, Bordeaux and even Roussillon, to name but a few. With more than 60 options—with a couple of inexpensive options thrown in—you'll be there awhile. Better settle in and order one of their impressive charcuterie boards."
+    },
+    {
+      "source_id": "src_ladowntownnews_2024",
+      "publication": "LA Downtown News",
+      "title": "L'Appart and Garcons de Café: New gallic merger at Spring Arcade",
+      "url": "https://www.ladowntownnews.com/business/l-appart-and-garcons-de-caf-new-gallic-merger-at-spring-arcade/article_24c5ceac-fea1-11ee-85f2-7f82d927dc39.html",
+      "published_at": "2024-04-22",
+      "trust_level": "editorial",
+      "content": "The adventure most recently culminated in the merger and move of L'Appart, the popular DTLA bistro run by chef Thierry Babet and partner Marc Moubarak, with Garcons de Café, Mathieu Giraud's lively wine bar around the corner at Spring Arcade. L'Appart moved into the vacant space next to Garcons de Café in January. The operations have combined forces to launch a formidable alloy of sensibilities, featuring authentic contemporary bistro fare with a mindfully curated wine selection. The conceptual mélange is comfortably informal and presented at reasonably accessible price points. Garcons de Café opened in 2016 under the original owners, Thomas Choulot and Sofian Ketfi. Giraud took over ownership and operation from them in November 2021. On that note, Giraud also hosts jazz nights from 8 to 10 p.m. Wednesdays. There are regular wine flight tastings, and the team will offer a Sunday brunch buffet beginning this month."
+    },
+    {
+      "source_id": "src_ladowntownnews_2016",
+      "publication": "LA Downtown News",
+      "title": "Two Wine Bars Open in Historic Core",
+      "url": "http://www.ladowntownnews.com/restaurants/two-wine-bars-open-in-historic-core/article_8b9669f4-065a-11e6-af79-17bba09c6f5c.html",
+      "published_at": "2016-04-19",
+      "trust_level": "editorial",
+      "content": "Those thirsty for new wine options are in luck, as two wine bars debuted in the Historic Core last month. A few blocks away, inside the Spring Arcade Building, is Garçons de Café, which specializes in all things French. Garçons de Café is at 541 S. Spring St. The bar features a warm interior and an intimate patio area. Garçons de Café specializes in all things French."
+    }
+  ]
+}

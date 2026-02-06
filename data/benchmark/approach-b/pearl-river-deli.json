@@ -1,0 +1,50 @@
+{
+  "place_slug": "pearl-river-deli",
+  "sources": [
+    {
+      "source_id": "src_latimes_2022",
+      "publication": "LA Times / Spectrum News1",
+      "title": "Pearl River Deli serves innovative Cantonese dishes",
+      "url": "https://spectrumnews1.com/ca/southern-california/la-times-today/2022/08/30/pearl-river-deli-serves-innovative-cantonese-dishes",
+      "published_at": "2022-08-30",
+      "trust_level": "editorial",
+      "content": "Chef Johnny Lee has fond memories of the Cantonese food of his youth and is putting Cantonese cuisine front and center once again with the Pearl River Deli in Chinatown. Cantonese food is specifically food from the southern region of China. PUBLISHED 4:30 PM PT Aug. 30, 2022. Once upon a time, Cantonese restaurants reigned supreme in Los Angeles. But in the past two decades, many were replaced by Sichuan, Shanghai and Northern Chinese establishments. Chef Johnny Lee has fond memories of the Cantonese food of his youth and is putting Cantonese cuisine front and center once again with the Pearl River Deli in Chinatown. Cantonese food is specifically food from the southern region of China. Lee talked about the staples of the cuisine and how he makes it his own. \"It is mostly based on a lot of seafood, a lot of vegetables, and mostly rice. Cantonese cuisine tends to be a little bit easier on the spices. It relies mostly on naturally flavorful ingredients and minimal seasoning, so it has natural flavor. We're always about trying to make everything look as traditional as possible, but behind the scenes, we do sometimes apply our own modern techniques and twists to get it the idealized version.\" Pastry Chef Laura Hoang said, \"I really felt moved by the first time I ate here. It just felt so comforting. It crushed all my expectations when handing over money for food. I feel like the food in LA, you're always just taking a gamble. Is this something that's beautiful on Instagram? Does it taste really good in real life? We're doing this because of Johnny Lee and his motivations to feed as many people good Chinese-American food.\" Lee shared how owning his own kitchen has allowed him freedom to create dishes on his own terms. \"There are obvious things you can make that people will like that are simple and easy, but not exciting to make. Then there are times when you really want to make something, but you're not sure if it really has marketability. Being an independent operator allows you the freedom to make fast changes in case you feel things aren't working out... instead of having to go back and forth and maybe take a month to make a decision.\" Pearl River Deli is open Wednesdays through Sundays."
+    },
+    {
+      "source_id": "src_infatuation_2025",
+      "publication": "The Infatuation",
+      "title": "Pearl River Deli - Review",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/pearl-river-deli",
+      "published_at": "2025-04-09",
+      "trust_level": "editorial",
+      "content": "Pearl River Deli makes the best Hainan chicken in Los Angeles, period. Fragrant, juicy, and served over garlic rice that's been cooked in chicken stock, this dish is on par with the genius of Beethoven or The Princess Diaries 2: Royal Engagement. In addition to the poached chicken, Pearl River Deli's limited menu includes char siu and glossy gailan—both of which are available Friday to Sunday from 11-3pm (or whenever they sell out). You can pre-order on their website or head straight to the counter inside their dining room, right next to Thank You Coffee and Sesame in Chinatown. Although most people take their poultry to go, there are plenty of wooden tables here for a great, informal lunch. Unrated: This is a restaurant we want to re-visit before rating, or it's a coffee shop, bar, or dessert shop. We only rate spots where you can eat a full meal."
+    },
+    {
+      "source_id": "src_infatuation_2020",
+      "publication": "The Infatuation",
+      "title": "Meet LA's 'Prince of Poultry' - Johnny Lee of Pearl River Deli",
+      "url": "https://www.theinfatuation.com/los-angeles/features/pearl-river-deli-eggslut-chef-johnny-lee-los-angeles",
+      "published_at": "2020-10-22",
+      "trust_level": "editorial",
+      "content": "Johnny Lee doesn't love being known as the Prince of Poultry, but that's kind of what happens when your resume includes stints at Eggslut and Side Chick, and your current gig - chef and owner of Pearl River Deli in Chinatown - involves making the best Hainan chicken in Los Angeles. Yet despite the nickname we here at The Infatuation singlehandedly foisted upon him, Lee was still gracious enough to speak with us about his rise to fame, the challenges of churning out 1,000 chickens a month, and the inner-workings of basic quail economics. Oh, and he also answered so many questions about birds that, if this whole \"world-class chef\" thing doesn't pan out, he could definitely launch a career as an amateur ornithologist. Here's our chat with LA's Chancellor of Chicken (sorry, Johnny). Infatuation LA: We've referred to you as \"The Prince of Poultry\" in our Instagram stories and throughout the website."
+    },
+    {
+      "source_id": "src_timeout_2024",
+      "publication": "Time Out LA",
+      "title": "Pearl River Deli | Restaurants in Chinatown, Los Angeles",
+      "url": "https://www.timeout.com/los-angeles/restaurants/pearl-river-deli",
+      "published_at": "2024-02-05",
+      "trust_level": "editorial",
+      "content": "One of L.A.'s best pop-ups is now one of L.A.'s best restaurants, complete with dine-in seating at their newly opened Hill Street location. Johnny Lee is the underground king of char siu, and after a stint in Chicago, the pop-up chef came back and reprised his Cantonese comfort-food concept, Pearl River Deli (formerly Pearl River Delta)—and now, you can find it in Chinatown kitty-corner from adorable Asian American minimart Sesame LA. In addition to chef Johnny Lee's gorgeously lacquered char siu and an always-popular Hainan chicken rice, PRD also offers other regional specialties of the Chinese diaspora: think Chinese-Japanese crab omurice, a Macau-style fried pork chop sandwich and Singaporean nasi lemak."
+    },
+    {
+      "source_id": "src_timeout_2020",
+      "publication": "Time Out LA",
+      "title": "15 Best New Los Angeles Restaurants in 2020",
+      "url": "https://www.timeout.com/los-angeles/restaurants/the-15-best-new-los-angeles-restaurants-of-2020",
+      "published_at": "2020-12-20",
+      "trust_level": "editorial",
+      "content": "What was once one of L.A.'s best pop-ups became one of the city's best permanent restaurants when chef Johnny Lee's casual Cantonese-leaning concept decided to call Far East Plaza home. High-fashion meets taquerias meets world-class sushi skill in this year's best new restaurants, right when we needed it most."
+    }
+  ]
+}

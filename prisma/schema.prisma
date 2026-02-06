@@ -1,0 +1,362 @@
+// Saiko Maps Database Schema
+// Based on TECHNICAL_ARCHITECTURE.md
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// USER MANAGEMENT
+// ============================================
+
+model User {
+  id                String   @id @default(uuid())
+  email             String   @unique
+  name              String?
+  passwordHash      String?  @map("password_hash")
+  avatarUrl         String?  @map("avatar_url")
+  subscriptionTier  String   @default("free") @map("subscription_tier") // free, personal, business
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  lists             List[]
+  viewerBookmarks   ViewerBookmark[]
+  importJobs        ImportJob[]
+
+  @@index([email])
+  @@map("users")
+}
+
+// ============================================
+// MAP STATUS & ORGANIZING LOGIC
+// ============================================
+
+enum OrganizingLogic {
+  TIME_BASED
+  NEIGHBORHOOD_BASED
+  ROUTE_BASED
+  PURPOSE_BASED
+  LAYERED
+}
+
+enum MapStatus {
+  DRAFT
+  READY
+  PUBLISHED
+  ARCHIVED
+}
+
+// ============================================
+// LISTS (MAPS / GUIDES)
+// ============================================
+
+model List {
+  id              String   @id @default(uuid())
+  userId          String   @map("user_id")
+  
+  // Content
+  title           String
+  subtitle        String?
+  description     String?  @db.Text
+  descriptionSource String?  @map("description_source") // 'ai' | 'edited' | 'manual'
+  slug            String   @unique
+  introText       String?  @map("intro_text") @db.Text
+  
+  // Map Creation Fields
+  functionType         String?  @map("function_type")
+  functionContext      String?  @map("function_context")
+  scopeGeography       String?  @map("scope_geography")
+  scopePlaceTypes      String[] @map("scope_place_types")
+  scopeExclusions      String[] @map("scope_exclusions")
+  organizingLogic      OrganizingLogic? @map("organizing_logic")
+  organizingLogicNote  String?  @map("organizing_logic_note")
+  notes                String?  @db.Text
+  status               MapStatus @default(DRAFT)
+  publishedAt          DateTime? @map("published_at")
+  
+  // Template & Design
+  templateType    String   @default("city_guide") @map("template_type") // city_guide, travel_itinerary, minimalist
+  coverImageUrl   String?  @map("cover_image_url")
+  primaryColor    String   @default("#5BA7A7") @map("primary_color")
+  secondaryColor  String   @default("#7FA5A5") @map("secondary_color")
+  
+  // Access Control
+  accessLevel     String   @default("public") @map("access_level") // public, password, private
+  passwordHash    String?  @map("password_hash")
+  allowedEmails   String[] @map("allowed_emails")
+  
+  // Metadata
+  published       Boolean  @default(false)
+  viewCount       Int      @default(0) @map("view_count")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  user            User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  locations       Location[]
+  mapPlaces       MapPlace[]
+  importJobs      ImportJob[]
+
+  @@index([userId])
+  @@index([slug])
+  @@index([published])
+  @@index([status])
+  @@map("lists")
+}
+
+// ============================================
+// LOCATIONS
+// ============================================
+
+model Location {
+  id              String   @id @default(uuid())
+  listId          String   @map("list_id")
+  
+  // Google Places Data
+  googlePlaceId   String?  @map("google_place_id")
+  name            String
+  address         String?  @db.Text
+  latitude        Decimal? @db.Decimal(10, 8)
+  longitude       Decimal? @db.Decimal(11, 8)
+  phone           String?
+  website         String?  @db.Text
+  instagram       String?  // Instagram handle (e.g., "handle" or "@handle")
+  hours           Json?    // Store as JSON: {"monday": "9am-5pm", ...}
+  description     String?  @db.Text
+  googleTypes     String[] @default([]) @map("google_types")  // Raw Google Places types array
+  priceLevel      Int?     @map("price_level")   // Google price level 0-4
+  neighborhood    String?  // Reverse geocoded neighborhood name
+  
+  // Google Photos
+  googlePhotos    Json?    @map("google_photos") // Array of photo references
+  
+  // User-Added Data
+  userPhotos      String[] @map("user_photos") // Array of uploaded image URLs
+  userNote        String?  @map("user_note") @db.Text
+  category        String?  // Food, Drinks, Coffee, Sights, etc.
+  descriptor      String?  // Creator's editorial description, max 120 chars
+  
+  // Organization
+  orderIndex      Int      @default(0) @map("order_index")
+  
+  // Cache Management
+  placesDataCachedAt DateTime? @map("places_data_cached_at")
+  
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  list            List             @relation(fields: [listId], references: [id], onDelete: Cascade)
+
+  @@index([listId])
+  @@index([googlePlaceId])
+  @@index([listId, orderIndex])
+  @@index([listId, category])
+  @@map("locations")
+}
+
+// ============================================
+// PLACES (canonical entity)
+// ============================================
+
+model Place {
+  id                 String   @id @default(uuid())
+  slug               String   @unique
+
+  // Google Places Data
+  googlePlaceId      String?  @unique @map("google_place_id")
+  name               String
+  address            String?  @db.Text
+  latitude           Decimal? @db.Decimal(10, 8)
+  longitude          Decimal? @db.Decimal(11, 8)
+  phone              String?
+  website            String?  @db.Text
+  instagram          String?
+  hours              Json?
+  description        String?  @db.Text
+
+  // Google Photos & Types
+  googlePhotos       Json?    @map("google_photos")
+  googleTypes        String[] @map("google_types") @default([])
+  priceLevel         Int?     @map("price_level")
+  neighborhood       String?
+  cuisineType        String?  @map("cuisine_type")
+  category           String?
+  sources            Json?    @map("editorial_sources")
+
+  // Voice Engine v1.1 — Tagline fields
+  tagline            String?
+  taglineCandidates  String[] @map("tagline_candidates") @default([])
+  taglinePattern     String?  @map("tagline_pattern") // "food" | "neighborhood" | "vibe" | "authority"
+  taglineGenerated   DateTime? @map("tagline_generated")
+  taglineSignals     Json?    @map("tagline_signals") // Snapshot of merchant signals at generation time
+
+  // Voice Engine v1.1 — Ad unit fields
+  adUnitType         String?  @map("ad_unit_type") // "A" | "B" | "D" | "E"
+  adUnitOverride     Boolean  @default(false) @map("ad_unit_override")
+
+  // Voice Engine v1.1 — Editorial pull quote fields
+  pullQuote          String?  @map("pull_quote") @db.Text
+  pullQuoteSource    String?  @map("pull_quote_source")
+  pullQuoteAuthor    String?  @map("pull_quote_author")
+  pullQuoteUrl       String?  @map("pull_quote_url") @db.Text
+  pullQuoteType      String?  @map("pull_quote_type") // "editorial" | "owner" | "self"
+
+  // Cache Management
+  placesDataCachedAt DateTime? @map("places_data_cached_at")
+
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  mapPlaces          MapPlace[]
+  viewerBookmarks    ViewerBookmark[]
+
+  @@index([googlePlaceId])
+  @@index([category])
+  @@index([neighborhood])
+  @@map("places")
+}
+
+// ============================================
+// MAP PLACES (join table: Place <-> List)
+// ============================================
+
+model MapPlace {
+  id          String   @id @default(uuid())
+  mapId       String   @map("map_id")
+  placeId     String   @map("place_id")
+
+  // Curator-specific data (per map)
+  descriptor  String?  @db.VarChar(120)
+  userNote    String?  @map("user_note") @db.Text
+  userPhotos  String[] @map("user_photos")
+  orderIndex  Int      @default(0) @map("order_index")
+
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  map         List     @relation(fields: [mapId], references: [id], onDelete: Cascade)
+  place       Place    @relation(fields: [placeId], references: [id])
+
+  @@unique([mapId, placeId])
+  @@index([mapId])
+  @@index([placeId])
+  @@index([mapId, orderIndex])
+  @@map("map_places")
+}
+
+// ============================================
+// VIEWER BOOKMARKS
+// ============================================
+
+model ViewerBookmark {
+  id            String   @id @default(uuid())
+  viewerUserId  String?  @map("viewer_user_id")
+  placeId       String   @map("place_id")
+  
+  visited       Boolean  @default(false)
+  personalNote  String?  @map("personal_note") @db.Text
+  
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  viewerUser    User?    @relation(fields: [viewerUserId], references: [id], onDelete: Cascade)
+  place         Place    @relation(fields: [placeId], references: [id], onDelete: Cascade)
+
+  @@unique([viewerUserId, placeId])
+  @@index([viewerUserId])
+  @@index([placeId])
+  @@map("viewer_bookmarks")
+}
+
+// ============================================
+// ACTIVITY SPOTS (Skate, Surf, etc.)
+// ============================================
+
+enum LayerType {
+  SKATE
+  SURF
+}
+
+enum SpotSource {
+  OSM
+  CITY_DATA
+  EDITORIAL
+  COMMUNITY
+}
+
+model ActivitySpot {
+  id          String     @id @default(cuid())
+  name        String
+  slug        String?    @unique
+  latitude    Float
+  longitude   Float
+  layerType   LayerType  @map("layer_type")
+  city        String?
+  region      String?    // e.g. "South Bay", "Venice", "East LA"
+  country     String     @default("US")
+
+  // Type + metadata (layer-specific)
+  spotType    String?    @map("spot_type")   // skate: "park" | "street" | "plaza" · surf: "beach" | "reef" | "point"
+  tags        String[]                     // skate: ["ledge", "rail", "bowl"] · surf: ["hollow", "mellow", "long paddle"]
+  surface     String?    // skate-specific: "smooth" | "rough" | "mixed"
+  skillLevel  String?    @map("skill_level") // "beginner" | "intermediate" | "advanced" | "all"
+  exposure    String?    // surf-specific: primary swell direction
+
+  // Editorial
+  description String?   @db.Text
+  seasonality String?   // surf: "best sept–feb" · skate: could note rain/heat
+  isPublic    Boolean   @default(true) @map("is_public")
+
+  // Source tracking
+  source      SpotSource
+  sourceId    String?   @map("source_id")   // OSM node ID, city dataset ID, etc.
+  sourceUrl   String?   @map("source_url")  @db.Text
+
+  // Lifecycle
+  verified    Boolean   @default(false)
+  enabled     Boolean   @default(true)
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  @@index([layerType, city])
+  @@index([layerType, latitude, longitude])
+  @@index([source, sourceId])
+  @@map("activity_spots")
+}
+
+// ============================================
+// IMPORT JOBS
+// ============================================
+
+model ImportJob {
+  id                  String    @id @default(uuid())
+  userId              String    @map("user_id")
+  listId              String?   @map("list_id")
+  
+  status              String    @default("processing") // processing, completed, failed
+  totalLocations      Int?      @map("total_locations")
+  processedLocations  Int       @default(0) @map("processed_locations")
+  failedLocations     Int       @default(0) @map("failed_locations")
+  errorLog            Json?     @map("error_log")
+  
+  createdAt           DateTime  @default(now()) @map("created_at")
+  completedAt         DateTime? @map("completed_at")
+
+  // Relations
+  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  list                List?     @relation(fields: [listId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([status])
+  @@map("import_jobs")
+}

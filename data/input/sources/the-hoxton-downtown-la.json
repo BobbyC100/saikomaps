@@ -1,0 +1,41 @@
+{
+  "place_slug": "the-hoxton-downtown-la",
+  "sources": [
+    {
+      "source_id": "src_michelin_guide_2024",
+      "publication": "Michelin Guide",
+      "title": "The Hoxton, Downtown LA - Los Angeles Area",
+      "url": "https://guide.michelin.com/us/en/hotels-stays/los-angeles-area/the-hoxton-downtown-la-9448",
+      "published_at": "",
+      "trust_level": "editorial",
+      "content": "The building is a 1922 Beaux-Arts beauty, and its interiors are appropriately ornamented with delicate molding, chevron floors, and printed wallpapers — produced, in East London style, by House of Hackney. But even the coziest don't feel cramped, thanks to thoughtful layouts and luxe touches like Marshall bedside radios and hand-selected books. As in all the Hoxton hotels, there's a decided emphasis on the public spaces. In L.A. they're crafted with help from AIME Studios, and the results are impressive: Moonlark's Dinette takes the classic American diner to a much more stylish place, while Cabra, on the rooftop, serves Peruvian-inspired bites with a bar that spills out onto the terrace by the pool."
+    },
+    {
+      "source_id": "src_timeout_la_2019",
+      "publication": "Time Out LA",
+      "title": "The Hoxton",
+      "url": "https://www.timeout.com/los-angeles/hotels/the-hoxton",
+      "published_at": "2019-10-29",
+      "trust_level": "editorial",
+      "content": "This chic boutique hotel chain with outposts in London, Amsterdam and New York touches down in Los Angeles with a 10-story Beaux-Arts building and 170-plus rooms, not to mention an all-day diner and a romantic rooftop restaurant and bar."
+    },
+    {
+      "source_id": "src_au_review_2024",
+      "publication": "The AU Review",
+      "title": "The Hoxton Downtown Los Angeles Review: A hotel gem in the heart of the all",
+      "url": "https://www.theaureview.com/travel/the-hoxton-downtown-los-angeles-review/",
+      "published_at": "2024-09-17",
+      "trust_level": "editorial",
+      "content": "Debuting in October 2019, The Hoxton Downtown Los Angeles sits as one of 16 Hoxton properties around the world. With locations in Edinburgh and Florence coming later this year, and Melbourne and Oslo due in 2027 – making the boutique chain's Australian and Scandinavian debuts, respectively – it's a brand you're bound to encounter soon enough, if you haven't already. The concept of the hotel is \"open-house\", a place you can visit whether you're staying there or not, where any type of guest is made welcome. The design and inclusions of each Hoxton branch are unique to the destination, drawing inspiration from their surroundings. This is not unlike Hotel Indigo, however their push towards a trendy-yet-independent, laid-back-yet-luxurious atmosphere pushes them closer to Soho House than the IHG brand. Their Downtown Los Angeles location is no exception, combining the history and grit of the downtown area, with the luxury of Hollywood. All in a stunning building from the early 1920s. The Hoxton sits on Broadway in Downtown Los Angeles' Fashion District. Though the area was a bustling in the early 1900s, with architecture to match, by the end of the century, this was a part of town that had fallen into disrepair and disrepute. But in the last two decades, this has seen rapid change. Originally the home of L.A. Railway, the ten-story building that now calls The Hoxton home, had since been everything from a garment factory to a grocery story. Now, the renovated building sits amongst a revitalised part of the city, filled with hotels, apartment buildings, theatres and entertainment venues, with intent to restore the area to its former glory. The Hoxton is surely becoming one of the most reliable hotel brands in the world, and Los Angeles is no exception. It's in a fantastic location, at the heart of everything that's happening in the vibrant Downtown area. They've done an incredible job on the renovation of the gorgeous building, making sure that you have ample opportunity to appreciate its history in stunning comfort. While I didn't try their rooftop restaurant, their lobby diner, Moonlarks was spectacular and is worth a visit alone. The staff were fantastic, and even with the outside world feeling so close, I have rarely slept better in Los Angeles. They have comfort levels cranked up to eleven. With a vibe to match."
+    },
+    {
+      "source_id": "src_the_infatuation_2024",
+      "publication": "The Infatuation",
+      "title": "Moonlark Dinette - Review",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/moonlark-dinette",
+      "published_at": "2024-01-31",
+      "trust_level": "editorial",
+      "content": "Moonlark's Dinette is a kitschy all-day American spot on the ground floor of The Hoxton in Downtown, and somewhere you can slouch into a leather booth for pancakes and coffee. Out of all the restaurants that have previously occupied the ground floor of The Hoxton, Moonlark's Dinette is the best fit. This Midwest-inspired diner is an all-day spot in Downtown that's open seven days a week, and somewhere you can slouch into a leather booth for pancakes and coffee. It's also conveniently open until 10pm. The best time to go is during brunch, when Moonlark's kitschy, old-school Americana is on full display and Downtown traffic zooms by while servers in pink uniforms top off your coffee. The menu reads like an homage to chain restaurants of the past, with classics like a shrimp cocktail, monte cristo sandwiches, and chicken tortilla soup. Our favorites, however, are the chilaquiles that come in a tart salsa verde and the golden latkes with creme fraîche, lox, and a light cucumber relish. And if there's room, order a single hot cake on the side—they're light and fluffy."
+    }
+  ]
+}

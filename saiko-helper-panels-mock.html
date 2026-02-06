@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Saiko — Helper Panels (Bottom-of-Page) Mocks</title>
+<style>
+  :root{
+    --bg: #f4f3ee;
+    --paper: #fffdf7;
+    --ink: #1c1917;
+    --ink-soft: rgba(28,25,23,.72);
+    --rule: rgba(87,83,78,.18);
+
+    /* Faded “sign paint” palette — restrained */
+    --sign-red: #b55a52;
+    --sign-blue: #3f6f9b;
+    --sign-ochre: #b07a3b;
+    --sign-green: #4d6a59;
+    --sign-cream: #fff8eb;
+  }
+
+  *{ box-sizing: border-box; }
+  body{
+    margin:0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: ui-serif, Georgia, "Times New Roman", serif;
+  }
+
+  .page{
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 40px 22px 70px;
+  }
+
+  .mock-header{
+    margin-bottom: 18px;
+  }
+  .mock-title{
+    margin: 0 0 8px;
+    font-weight: 400;
+    font-size: 18px;
+    letter-spacing: .01em;
+  }
+  .mock-sub{
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--ink-soft);
+    max-width: 72ch;
+  }
+
+  /* Pretend merchant bottom section context */
+  .also-on{
+    margin-top: 26px;
+    background: var(--paper);
+    border-radius: 14px;
+    padding: 16px;
+    box-shadow: inset 0 0 0 1px rgba(87,83,78,.08);
+  }
+  .also-on .label{
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    font-size: 10px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: rgba(87,83,78,.75);
+    margin-bottom: 10px;
+  }
+  .pills{
+    display:flex;
+    gap:10px;
+    flex-wrap: wrap;
+  }
+  .pill{
+    padding: 8px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(87,83,78,.18);
+    background: rgba(255,255,255,.40);
+    font-size: 13px;
+  }
+
+  /* ============ Helper Panel ============
+     Implementation constraints:
+     - pure HTML/CSS
+     - easy to relabel via className / data-attr
+     - content is just text nodes (Sensei can generate copy)
+  */
+  .helper-panel{
+    margin-top: 12px;
+    border-radius: 16px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: inset 0 0 0 1px rgba(87,83,78,.10);
+  }
+
+  /* subtle paint grain */
+  .helper-panel::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:
+      radial-gradient(circle at 20% 25%, rgba(0,0,0,.035), transparent 55%),
+      radial-gradient(circle at 80% 70%, rgba(0,0,0,.025), transparent 60%),
+      repeating-linear-gradient(90deg, rgba(0,0,0,.010) 0 1px, transparent 1px 7px);
+    opacity: .55;
+    pointer-events:none;
+    mix-blend-mode: multiply;
+  }
+
+  .hp-inner{
+    position: relative;
+    padding: 18px 18px 16px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  /* Top “sign rail” */
+  .hp-rail{
+    display:flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(0,0,0,.12);
+  }
+
+  .hp-kicker{
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    font-size: 10px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: rgba(0,0,0,.60);
+    white-space: nowrap;
+  }
+
+  .hp-mark{
+    width: 28px;
+    height: 28px;
+    border-radius: 999px;
+    border: 1px solid rgba(0,0,0,.20);
+    background: rgba(255,255,255,.55);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    font-size: 12px;
+    color: rgba(0,0,0,.60);
+  }
+
+  /* Big sign headline */
+  .hp-headline{
+    margin: 0;
+    font-size: 26px;
+    line-height: 1.02;
+    letter-spacing: .01em;
+  }
+
+  /* Supporting copy */
+  .hp-body{
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.45;
+    color: rgba(0,0,0,.78);
+    max-width: 68ch;
+  }
+
+  /* Bottom rule + small line */
+  .hp-footer{
+    margin-top: 6px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(0,0,0,.12);
+    display:flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .hp-fine{
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    font-size: 11px;
+    letter-spacing: .06em;
+    color: rgba(0,0,0,.62);
+  }
+
+  .hp-chips{
+    display:flex;
+    gap:8px;
+    flex-wrap: wrap;
+  }
+  .hp-chip{
+    padding: 5px 9px;
+    border-radius: 999px;
+    border: 1px solid rgba(0,0,0,.16);
+    background: rgba(255,255,255,.55);
+    font-size: 12px;
+    color: rgba(0,0,0,.68);
+    white-space: nowrap;
+  }
+
+  /* Colorways — relabel by swapping class */
+  .hp-red{ background: color-mix(in srgb, var(--sign-red) 18%, var(--sign-cream)); }
+  .hp-blue{ background: color-mix(in srgb, var(--sign-blue) 18%, var(--sign-cream)); }
+  .hp-ochre{ background: color-mix(in srgb, var(--sign-ochre) 18%, var(--sign-cream)); }
+  .hp-green{ background: color-mix(in srgb, var(--sign-green) 18%, var(--sign-cream)); }
+
+  /* “Saiko calm” option: slightly lower saturation */
+  .hp-calm{ filter: saturate(.85); }
+
+  /* Responsive */
+  @media (max-width: 640px){
+    .hp-headline{ font-size: 22px; }
+    .hp-body{ font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+  <div class="page">
+    <div class="mock-header">
+      <h1 class="mock-title">Helper Panels — 3 Variants (Bottom of Merchant Page)</h1>
+      <p class="mock-sub">
+        These are “fun little ads” that behave like signage: big type, one idea, calm materials.
+        They’re pure HTML/CSS (no images needed), so they fit within typical Next.js/React limits:
+        swap class names + copy strings to relabel.
+      </p>
+    </div>
+
+    <!-- Context: pretend we’re at the bottom of the merchant page -->
+    <div class="also-on">
+      <div class="label">Also On</div>
+      <div class="pills">
+        <div class="pill">Bobby’s LA food world</div>
+        <div class="pill">Silver Lake Natural Wine</div>
+      </div>
+    </div>
+
+    <!-- Helper Panel Variant 1 -->
+    <section class="helper-panel hp-red hp-calm" data-variant="mission">
+      <div class="hp-inner">
+        <div class="hp-rail">
+          <div class="hp-kicker">Saiko Helper Panel</div>
+          <div class="hp-mark">S</div>
+        </div>
+
+        <h2 class="hp-headline">WE’RE ON THE SIDE OF SMALL BUSINESSES</h2>
+
+        <p class="hp-body">
+          Saiko doesn’t sell rankings or bidding.
+          We try to make good-looking pages that help independent places get found.
+        </p>
+
+        <div class="hp-footer">
+          <div class="hp-fine">A small experiment in non-extractive promotion</div>
+          <div class="hp-chips">
+            <div class="hp-chip">no ads</div>
+            <div class="hp-chip">no bidding</div>
+            <div class="hp-chip">just pages</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Helper Panel Variant 2 -->
+    <section class="helper-panel hp-blue hp-calm" data-variant="merchant-forward">
+      <div class="hp-inner">
+        <div class="hp-rail">
+          <div class="hp-kicker">Saiko Helper Panel</div>
+          <div class="hp-mark">S</div>
+        </div>
+
+        <h2 class="hp-headline">THIS PLACE IS INDEPENDENT</h2>
+
+        <p class="hp-body">
+          Pages like this are built to help small spots like Seco get a little more attention — without pay-to-play.
+        </p>
+
+        <div class="hp-footer">
+          <div class="hp-fine">If we promote anything, it’s places like this</div>
+          <div class="hp-chips">
+            <div class="hp-chip">local</div>
+            <div class="hp-chip">human-run</div>
+            <div class="hp-chip">worth keeping</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Helper Panel Variant 3 (more whimsical) -->
+    <section class="helper-panel hp-ochre hp-calm" data-variant="whimsical">
+      <div class="hp-inner">
+        <div class="hp-rail">
+          <div class="hp-kicker">Saiko Helper Panel</div>
+          <div class="hp-mark">S</div>
+        </div>
+
+        <h2 class="hp-headline">NO ADS HERE</h2>
+
+        <p class="hp-body">
+          Just maps, notes, and a lot of respect for the people who run this place.
+          If you see this panel, it means we’re trying something better.
+        </p>
+
+        <div class="hp-footer">
+          <div class="hp-fine">1970s tools, modern intent</div>
+          <div class="hp-chips">
+            <div class="hp-chip">calm</div>
+            <div class="hp-chip">useful</div>
+            <div class="hp-chip">not extractive</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div style="height:40px;"></div>
+    <div style="text-align:center; color: rgba(87,83,78,.55); font-size: 12px;">
+      (Footer placeholder)
+    </div>
+  </div>
+</body>
+</html>

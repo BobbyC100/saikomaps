@@ -1,0 +1,23 @@
+{
+  "place_slug": "hayato",
+  "sources": [
+    {
+      "source_id": "src_michelin_guide_2025",
+      "publication": "Michelin Guide",
+      "title": "Hayato – Los Angeles - a MICHELIN Guide Restaurant",
+      "url": "https://guide.michelin.com/us/en/california/us-los-angeles/restaurant/hayato",
+      "published_at": "2025-06-25",
+      "trust_level": "editorial",
+      "content": "Two Stars: Excellent cooking\n\nWith only one seating per night, this is the kind of destination where a handful of lucky diners are privy to an exemplary culinary spectacle. Many of the courses begin with ingredients that are attractively arranged, then finished before your eyes, and presented by Chef Brandon Hayato Go with detailed explanations. To kick off the kaiseki, the chef serves a small bite, or sakizuke, like chilled, charred eggplant with ginger and dashi. From there, it's a seasonal celebration artistically arranged on vintage Japanese pottery and porcelain collected by the chef. Local corn and sea scallops is transformed into kakiage; bonito is lightly smoked over rice bran straw; and miso-glazed black cod is folded into a luscious rice pot to conclude the meal."
+    },
+    {
+      "source_id": "src_the_infatuation_2024",
+      "publication": "The Infatuation",
+      "title": "Hayato - Review - Downtown LA - Los Angeles - The Infatuation",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/hayato",
+      "published_at": "2024-11-21",
+      "trust_level": "editorial",
+      "content": "Hayato is a tiny Japanese restaurant in Row DTLA that serves elaborate traditional kaiseki dinners a few nights a week. Due to its small size and cadre of well-heeled regulars, it's also one of the toughest reservations in the city (it's been five years since we've been able to book a seat, which is why we aren't including a rating). A meal here involves silently sitting at a bar with a few other people in hushed reverence as the chef prepares a dozen or so mostly seafood courses, like tempura sea eel or dashi-poached fish. The food is delicious and pristine, but given the $400 price—and sheer exclusivity of the place—we'd say Hayato is best suited for Japanese food die-hards only.\n\nReservations are released on the first of the month at 10am and vanish instantly (there are only 7 seats per night). Hayato tends to prioritize bookings for regulars, but if you're persistent in joining the waitlist, it'll eventually pay off."
+    }
+  ]
+}

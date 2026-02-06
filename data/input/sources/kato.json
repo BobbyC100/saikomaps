@@ -1,0 +1,50 @@
+{
+  "place_slug": "kato",
+  "sources": [
+    {
+      "source_id": "src_infatuation_2022",
+      "publication": "The Infatuation",
+      "title": "Kato — Los Angeles Review",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/kato",
+      "published_at": "2022-06-15",
+      "trust_level": "editorial",
+      "content": "Kato feels like a secret, even though it's been one of LA's most talked-about restaurants for years. The Arts District space is intimate and restrained — concrete, wood, low lighting. No white tablecloths, but the service is precise. The vibe is serious without being stiff. The food is contemporary Taiwanese through a California lens: delicate crudos, koji-aged proteins, vegetables treated with the same care as the protein. The tasting menu changes with the seasons. At the bar, you can order à la carte — a shorter, more casual experience. The bar menu includes smaller plates and a rotating selection of dishes. Wine list leans natural and minimal-intervention; the beverage director has built something thoughtful. Dress code: smart casual. Reservations are essential for the dining room; the bar occasionally has walk-in availability."
+    },
+    {
+      "source_id": "src_worlds50best_2024",
+      "publication": "World's 50 Best",
+      "title": "Kato — One to Watch 2024",
+      "url": "https://www.theworlds50best.com/discovery/establishments/us/kato-los-angeles.html",
+      "published_at": "2024-06-01",
+      "trust_level": "editorial",
+      "content": "Kato occupies a converted warehouse in the Arts District — high ceilings, exposed brick, art on the walls. The room has a relaxed energy. Music runs indie and R&B at low volume; it feels like a dinner party at a friend's loft, not a temple of fine dining. Chef Jon Yao's contemporary Taiwanese cuisine has earned a Michelin star and back-to-back #1 on the LA Times 101 Best list. The space itself has evolved: from a strip mall in West LA to this industrial-chic Arts District flagship. The atmosphere is calm, confident, unpretentious. Art pieces rotate; the aesthetic is spare and considered. The dining room seats roughly 30; the bar offers a different experience — more casual, walk-in when available."
+    },
+    {
+      "source_id": "src_timeout_2025",
+      "publication": "Time Out LA",
+      "title": "Kato Restaurant Review — Best Fine Dining in LA",
+      "url": "https://www.timeout.com/los-angeles/restaurants/kato",
+      "published_at": "2025-01-10",
+      "trust_level": "editorial",
+      "content": "Kato's tasting menu runs $325 per person; the bar menu offers a more affordable entry at $185 for a shorter experience. Wine pairings are available — the beverage program is a strength, with a focus on natural wines and a zero-proof pairing option for non-drinkers. Service is attentive without hovering. The tasting menu is seasonal and changes frequently; expect Taiwanese-inflected dishes that nod to Jon Yao's SGV roots and his time in fine dining kitchens. The bar is first-come for walk-ins when space allows; the dining room is reservation-only. Updated January 2025."
+    },
+    {
+      "source_id": "src_michelin_2019",
+      "publication": "Michelin Guide",
+      "title": "Kato — Michelin Star Restaurant",
+      "url": "https://guide.michelin.com/us/en/california/restaurant/kato",
+      "published_at": "2019-09-01",
+      "trust_level": "editorial",
+      "content": "Jon Yao is self-taught. The San Gabriel Valley native opened Kato in 2016 in a West LA strip mall — a tiny room that became one of the most exciting restaurants in the city. His approach: contemporary Taiwanese cuisine filtered through California produce and technique. No gimmicks, no fusion-for-fusion's-sake. He sources with intention and lets ingredients lead. The restaurant has since moved to the Arts District; the food has evolved but the philosophy remains. Yao's cooking is precise, subtle, and deeply personal. Michelin awarded Kato one star. The chef's story — strip mall to fine dining — is well-documented, but the food speaks for itself."
+    },
+    {
+      "source_id": "src_opentable_2026",
+      "publication": "OpenTable / Official",
+      "title": "Kato — Reservations",
+      "url": "https://www.opentable.com/kato-los-angeles",
+      "published_at": "2026-01-15",
+      "trust_level": "official",
+      "content": "Kato. 777 Alameda Street, Los Angeles, CA 90021. Tasting menu: $350 per person. Bar experience: $195 per person. Reservations required for the dining room. Bar: limited walk-in availability — call ahead. Hours: Wed–Sun, dinner only. 5:30 PM – 10:00 PM. Dress code: smart casual, no shorts or sandals. Wine pairings and zero-proof pairings available. Tasting menu is prix fixe; dietary restrictions accommodated with advance notice. Cancellation policy: 48 hours. Kato is a contemporary Taiwanese restaurant by chef Jon Yao. One Michelin star. #1 LA Times 101 Best Restaurants."
+    }
+  ]
+}

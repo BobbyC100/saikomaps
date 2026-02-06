@@ -1,0 +1,59 @@
+{
+  "place_slug": "el-prado",
+  "sources": [
+    {
+      "source_id": "src_theinfatuation_2022",
+      "publication": "The Infatuation",
+      "title": "El Prado - Review - Echo Park - Los Angeles",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/el-prado",
+      "published_at": "2022-08-22",
+      "trust_level": "editorial",
+      "content": "El Prado in Echo Park is the wine bar that you wouldn't know was a wine bar. Most people in El Prado don't even realize it's a wine bar. Essentially serving as the pre-game/post-game drinking hole for Echoplex concertgoers, El Prado can certainly get rowdy at times on the weekends, but ultimately serves as a cool, mellow spot to grab a quick drink during most of the week. They also have a decent beer list and bar snacks (read: hummus) for when you need some nutrients."
+    },
+    {
+      "source_id": "src_theinfatuation_2023",
+      "publication": "The Infatuation",
+      "title": "The 25 Best Bars On The Eastside - Los Angeles",
+      "url": "https://www.theinfatuation.com/los-angeles/guides/the-eastside-bar-guide",
+      "published_at": "2023-03-08",
+      "trust_level": "editorial",
+      "content": "If you're riding an emotional high after an Echoplex concert and need a place to keep the night going, the answer is El Prado. During the week, this dimly lit wine bar is a mellow place to split a bottle with friends, but everything changes once the weekend rolls around: you'll find a DJ spinning records and a crowd spilling out onto the sidewalk. If you see a hot dog rotisserie behind the bar, no, you're not hallucinating—you can order a $5 hot dog with your natural wine, a combo we'll never judge you for."
+    },
+    {
+      "source_id": "src_theinfatuation_2024",
+      "publication": "The Infatuation",
+      "title": "The Best Bars In Echo Park - Los Angeles",
+      "url": "https://www.theinfatuation.com/los-angeles/guides/the-best-bars-in-echo-park",
+      "published_at": "2024-10-16",
+      "trust_level": "editorial",
+      "content": "If you're riding an emotional high after an Echoplex concert and need a place to keep the night going, the answer is El Prado. During the week, this dimly lit wine bar is a mellow place to split a bottle with friends, but everything changes once the weekend rolls around: you'll find a DJ spinning records and a crowd spilling out onto the sidewalk. If you see a hot dog rotisserie behind the bar, no, you're not hallucinating—you can order a $5 hot dog with your natural wine, a combo we'll never judge you for."
+    },
+    {
+      "source_id": "src_timeout_la_2016",
+      "publication": "Time Out LA",
+      "title": "El Prado | Bars in Echo Park, Los Angeles",
+      "url": "https://www.timeout.com/los-angeles/bars/el-prado",
+      "published_at": "2016-08-01",
+      "trust_level": "editorial",
+      "content": "This cozy beer and wine bar in Echo Park offers a well-culled selection of (often local) beers, red, white and sparkling wine, as well as small bites—think olives, pita and hummus, etc. Exposed brick, a wood bar and tables and soft, yellow glass light fixtures give this place a comfortable feel without sacrificing style. The music here comes from an old-school record player and an ever-changing vinyl collection, which adds to that warm, homey feeling. For smokers, there's a small wood patio out back. Weekends can get crowded, but weekdays are usually pretty mellow—except for Tuesdays, when Origami Vinyl hosts its Record Club at around 9."
+    },
+    {
+      "source_id": "src_timeout_la_2024",
+      "publication": "Time Out LA",
+      "title": "22 Best Wine Bars in Los Angeles for Top-Notch Pours and Pet-Nat",
+      "url": "https://www.timeout.com/los-angeles/bars/wine-bars-in-la-where-to-sniff-swirl-and-sip",
+      "published_at": "2024-02-20",
+      "trust_level": "editorial",
+      "content": "In our eyes, a truly great L.A. wine bar has to have three out of four of these things: A thoughtfully curated bottle list, delicious food to go along with it and a stylishly low-key ambience that pointedly doesn't turn into an absolute madhouse on the weekends. (We're looking at you, Voodoo Vin and El Prado.)"
+    },
+    {
+      "source_id": "src_foodgps_2024",
+      "publication": "Food GPS",
+      "title": "10 Great Craft Beer Places in Echo Park, Silver Lake + Los Feliz",
+      "url": "https://foodgps.com/10-great-places-drink-craft-beer-echo-park-silver-lake-los-feliz/",
+      "published_at": "2024-01-24",
+      "trust_level": "editorial",
+      "content": "To add a twist to this list of craft beer destinations in Echo Park, Silver Lake and Los Feliz, I purposefully left off two spots. Where do Los Angeles craft beer fans go when it comes to this section of the city? El Prado is featured among the top 10 great craft beer places in the neighborhood."
+    }
+  ]
+}

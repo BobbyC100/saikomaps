@@ -1,0 +1,41 @@
+{
+  "place_slug": "voodoo-vin",
+  "sources": [
+    {
+      "source_id": "src_theinfatuation_2024",
+      "publication": "The Infatuation",
+      "title": "Voodoo Vin - Review - Virgil Village - Los Angeles",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/voodoo-vin",
+      "published_at": "2024-03-25",
+      "trust_level": "editorial",
+      "content": "Voodoo Vin is a natural wine bar in Virgil Village with a collection of 400 bottles and a menu of simple small plates that slightly upstages the generous pours. The candlelit space feels like you're in a barebones café with only a couple of posters on the walls, two communal tables, and a few chairs scattered on the sidewalk. It's an intimate spot that doesn't take reservations, so your best bet is to take a few friends who know what \"full-bodied\" means and snack on a few of the Persian-leaning dishes, like shallot yogurt dip with sagnak and lamb-stuffed peppers.\n\nVoodoo Vin doesn't take reservations, but finding a seat isn't usually an issue. Consider it a reliable spot when you can't be bothered to make a dinner reservation or go to the same Happy Hour the third week in a row."
+    },
+    {
+      "source_id": "src_theinfatuation_2025",
+      "publication": "The Infatuation",
+      "title": "11 Great Wine Bar Restaurants In LA",
+      "url": "https://www.theinfatuation.com/los-angeles/guides/great-wine-bar-restaurants",
+      "published_at": "2025-07-16",
+      "trust_level": "editorial",
+      "content": "Voodoo Vin's candlelit space in Virgil Village feels like you're in a barebones café with only a couple of posters on the walls, two communal tables, and a few chairs scattered on the sidewalk. It's an intimate spot that doesn't take reservations, so your best bet is to take a few friends who know what \"full-bodied\" means and go to town on the simple, but delicious Persian-leaning menu. Dishes change frequently, but expect traditional dishes like ghormeh sabzi, saffron rice pudding, and zereshk polo bah morgh, a comforting bowl of saffron roasted chicken with rice and sweetened barberries."
+    },
+    {
+      "source_id": "src_theinfatuation_2025_winebars",
+      "publication": "The Infatuation",
+      "title": "The 15 Best Wine Bars In Los Angeles",
+      "url": "https://www.theinfatuation.com/los-angeles/guides/best-wine-bars-la",
+      "published_at": "2025-07-16",
+      "trust_level": "editorial",
+      "content": "Voodoo Vin is a natural wine bar in Virgil Village with a collection of 400 bottles and a menu of simple small plates. The candlelit space feels like you're in a barebones café with only a couple of posters on the walls, two communal tables, and a few chairs scattered on the sidewalk. It's an intimate spot that doesn't take reservations, so your best bet is to take a few friends who know what \"full-bodied\" means and snack on a few of the Persian-leaning dishes, like shallot yogurt dip with sagnak and lamb-stuffed pepper."
+    },
+    {
+      "source_id": "src_timeout_la_2024",
+      "publication": "Time Out LA",
+      "title": "22 Best Wine Bars in Los Angeles for Top-Notch Pours and Pet-Nat",
+      "url": "https://www.timeout.com/los-angeles/bars/wine-bars-in-la-where-to-sniff-swirl-and-sip",
+      "published_at": "2024-02-20",
+      "trust_level": "editorial",
+      "content": "Voodoo Vin is mentioned in Time Out LA's roundup of best wine bars, identified as one of the wine bars that doesn't strike the ideal balance of having a thoughtfully curated bottle list, delicious food, and stylishly low-key ambience that doesn't turn into a madhouse on weekends."
+    }
+  ]
+}

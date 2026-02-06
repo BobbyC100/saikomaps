@@ -1,0 +1,32 @@
+{
+  "place_slug": "gra",
+  "sources": [
+    {
+      "source_id": "src_michelin_2025",
+      "publication": "Michelin Guide",
+      "title": "Grá – Los Angeles - a MICHELIN Guide Restaurant",
+      "url": "https://guide.michelin.com/us/en/california/us-los-angeles/restaurant/gra",
+      "published_at": "2025-06-25",
+      "trust_level": "editorial",
+      "content": "Grá – a Bib Gourmand: good quality, good value cooking restaurant in the 2025 MICHELIN Guide USA.\n\nThere's a welcoming vibe at this hip spot where the focus is on natural fermentation with sourdough pizza, seasonal pickled vegetables, and fermented drinks such as tepache. Grá has indoor and covered patio seating, but all eyes will be on the cooks preparing pizzas in their wood-fired oven. It's all about the thin and crispy sourdough crust with high quality toppings. Classics like pepperoni will always rule, but hard hitters like stracciatella and prosciutto with basil and a drizzle of coffee-infused honey are worth noting. While pizza is certainly the scene stealer, don't ignore their salads or appetizers, including grilled maitake with pickled green peppercorn and agretti in a flavor-packed broth. For dessert, go for the soy-sauce caramel sundae or chocolate tart."
+    },
+    {
+      "source_id": "src_resy_2025",
+      "publication": "Resy",
+      "title": "How Grá Grew into One of L.A.'s Best Pizzerias, One Sourdough Pie at a Time",
+      "url": "https://blog.resy.com/2025/02/gra-los-angeles/",
+      "published_at": "2025-02-12",
+      "trust_level": "editorial",
+      "content": "Grá tends to fly a bit under the radar, but it is quietly creating some of the best pizza in the city (just check out its recently bestowed Michelin Bib Gourmand for proof). Owner Michael McSharry is equally passionate about music, food, and interior design.\n\nHere's one for you: an Irish advertising executive with no restaurant experience comes to Los Angeles and says, 'I'm going to open an all-fermented pizza restaurant right before a global pandemic, in a part of town no one knows exists — and it's going to be very successful.' Well, the joke is on everyone else. Not only did Grá (\"love\" in Irish) recently celebrate its fifth anniversary, it has survived every obstacle L.A. has thrown its way, and today is thriving in its odd little pocket of Echo Park-meets-Westlake.\n\nWhen McSharry was looking for a restaurant space, he was up against a ticking clock. As an Irish citizen, he could only come to L.A. for three-month stints, then return to England or Ireland for three months, until coming back to do it all over again. \"It was not an easy task, but I was really committed to it, because I felt a calling to open this restaurant. I was coming over and back, and I was getting knocked back by a lot of landlords in L.A. because they were like, 'sorry, who are you?' The last time I came into the airport, they were like, this is the last time you're coming over here without a visa,\" McSharry laughs.\n\nMcSharry's goal of 'lived in' very much comes to fruition here, with a shabby open kitchen where wood-fired pizzas crack and pop against the backdrop of his latest playlist.\n\nThe most original pie is the Kimchi, with daikon kimchi, mozzarella, scallions, cilantro, and sesame seeds – it's a pizza that truly embodies Grá's ethos. But other pizzas range from a basic (yet spectacular) margherita, a white pie with pistachio pesto, ricotta, and lemon, or \"The Banger,\" a tomato-based pizza with mozzarella, salami, 'nduja, fermented mustard seeds, honey, and basil.\n\nThe fermentation doesn't end with the food: the natural wine list travels the world, with standouts like the 2019 Savadonnay Croix & Courbet, a buttery chardonnay, or the 2022 Rosso Isi Alessandro Viola, a nero d'avolo-based red from Sicily. Orange wines, rosés, and sparkling varietals are also well-represented, along with ciders, piquettes, beers, and aperitifs.\n\nMcSharry's other passion is music. On Fridays and Saturdays, the restaurant brings in DJs who only spin vinyl on the restaurant's HiFi system, which imbues the room with a full, pure sound."
+    },
+    {
+      "source_id": "src_infatuation_2022",
+      "publication": "The Infatuation",
+      "title": "Gra - Review - Historic Filipinotown - Los Angeles",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/gra",
+      "published_at": "2022-08-22",
+      "trust_level": "editorial",
+      "content": "When new sourdough pizza spot Grá opened in Historic Filipinotown, we thought we could finally alert the masses that we had found our New Neighborhood Staple (affectionately and legally known as an N.N.S.). After all, with their fermentation-forward menu and hygge atmosphere, this place has huge N.N.S. energy. Their wine list is filled with great skin contacts, their White Pizza - topped with pistachio pesto, mozzarella, ricotta, and honey - is a sweet and salty home run, and the interior feels like you're at a dinner party in a friend's studio space.\n\nBut despite all that, a lot of the menu - from the kimchi pizza to the cured ham plate - is rather unremarkable, and doesn't justify the high price point of a meal here (with drinks, you could easily spend around $100 for two people), so we're holding off on sending that N.N.S. S.O.S. text for the time being."
+    }
+  ]
+}

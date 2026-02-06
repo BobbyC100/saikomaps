@@ -1,0 +1,1604 @@
+[
+  {
+    "slug": "mala-class",
+    "name": "mala class",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "vintage-junktion",
+    "name": "Vintage Junktion",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "loqui",
+    "name": "LOQUI",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "ferrazzanis-pasta-market",
+    "name": "Ferrazzani's Pasta & Market",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "fatto-a-mano-the-pasta-shop",
+    "name": "Fatto a Mano, The Pasta Shop",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "louders",
+    "name": "Louders",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "mae-malai-thai-house-of-noodles",
+    "name": "Mae Malai Thai House of Noodles",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "quat-la",
+    "name": "Quat LA",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "jame-enoteca",
+    "name": "Jame Enoteca",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "jaime-taqueria-breakfast-burritos",
+    "name": "¡Jaime! Taqueria & Breakfast Burritos",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "little-doms",
+    "name": "Little Dom's",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "the-high-low",
+    "name": "The High Low",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "hermons",
+    "name": "Hermon's",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "dunsmoor",
+    "name": "Dunsmoor",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "garcons-de-cafe",
+    "name": "Garçons de Café",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "sams-place",
+    "name": "Sam’s Place",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "secret-pizza",
+    "name": "Secret Pizza",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "chainsaw-cafe",
+    "name": "Chainsaw Café",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "lanza-brothers-market",
+    "name": "Lanza Brothers Market",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "beethoven-market",
+    "name": "Beethoven Market",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "seline",
+    "name": "SELINE",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "the-tower-bar",
+    "name": "The Tower Bar",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "betsy",
+    "name": "Betsy",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "seco",
+    "name": "Seco",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "ohana-superette",
+    "name": "Ohana Superette",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "the-airliner",
+    "name": "The Airliner",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "coucou",
+    "name": "Coucou",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "le-comptoir",
+    "name": "Le Comptoir",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "kissaten-corazon",
+    "name": "Kissaten Corazon",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "paul-barfood",
+    "name": "Paul Bar/Food",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "wine-stop-ecpk",
+    "name": "Wine Stop ECPK",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "del-re-wine-bar",
+    "name": "Del Re Wine Bar",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "clark-street-echo-park",
+    "name": "Clark Street Echo Park",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "nicks-cafe",
+    "name": "Nick's Cafe",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "gra",
+    "name": "Grá",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "the-semi-tropic",
+    "name": "The Semi-Tropic",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "bar-chelou",
+    "name": "Bar Chelou",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "bodega-los-alamos",
+    "name": "Bodega Los Alamos",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "bar-etoile",
+    "name": "Bar Etoile",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "beer-garden",
+    "name": "Beer Garden",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "churros-don-abel",
+    "name": "Churros Don Abel",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "el-ruso-1",
+    "name": "El Ruso #1",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "mini-kabob",
+    "name": "Mini Kabob",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "taste-of-tehran-restaurant",
+    "name": "Taste of Tehran Restaurant",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "arts-bakery-cafe",
+    "name": "Art's Bakery & Cafe",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "sushi-kisen",
+    "name": "江戸前鮨 㐂扇 Sushi Kisen",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "hows-it-going-to-end",
+    "name": "How's It Going To End?",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "holy-basil-market",
+    "name": "Holy Basil Market",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "bunkado",
+    "name": "Bunkado",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "picaresca-barra-de-cafe",
+    "name": "Picaresca Barra de Cafe",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "azay",
+    "name": "Azay",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "amour-weho",
+    "name": "Amour Weho",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "marouch-restaurant",
+    "name": "Marouch Restaurant",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "walts-bar",
+    "name": "Walt’s Bar",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "cardinale-du-vin",
+    "name": "Cardinale du Vin",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "melanie-wine-bar",
+    "name": "Melanie Wine Bar",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "adams-wine-shop",
+    "name": "Adams Wine Shop",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "baby-battista",
+    "name": "baby battista",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "kippered",
+    "name": "Kippered",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "justines-wine-bar",
+    "name": "Justine's Wine Bar",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "holcomb",
+    "name": "Holcomb",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "mamie-italian-kitchen",
+    "name": "Mamie Italian Kitchen",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "the-copper-room",
+    "name": "The Copper Room",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "lupes-burritos",
+    "name": "Lupe's Burritos",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "elf-cafe",
+    "name": "Elf Cafe",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "bar-sinizki",
+    "name": "Bar Sinizki",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "gwen",
+    "name": "Gwen",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "providence",
+    "name": "Providence",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "etra",
+    "name": "Ètra",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "okayama-kobo-bakery-cafe-dtla",
+    "name": "Okayama Kobo Bakery & Cafe DTLA",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "ernest-coffee",
+    "name": "Ernest Coffee",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "lowboy",
+    "name": "Lowboy",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "homage-brewing",
+    "name": "Homage Brewing",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "la-pharmacie-du-vin",
+    "name": "La Pharmacie du Vin",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "manuela",
+    "name": "Manuela",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "spina",
+    "name": "Spina",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "lou-wine-shop",
+    "name": "Lou Wine Shop",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "silverlake-wine",
+    "name": "Silverlake Wine",
+    "city": "Los Angeles",
+    "category": "wine bar"
+  },
+  {
+    "slug": "ggiata-delicatessen",
+    "name": "Ggiata Delicatessen",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "saffys",
+    "name": "Saffy's",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "shins-pizza",
+    "name": "Shins Pizza",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "oriel-chinatown",
+    "name": "Oriel Chinatown",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "camelia",
+    "name": "Camelia",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "the-serving-spoon",
+    "name": "The Serving Spoon",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "propaganda-wine-bar",
+    "name": "Propaganda Wine Bar",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "el-tepeyac-cafe",
+    "name": "El Tepeyac Cafe",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "poquito-mas",
+    "name": "Poquito Más",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "la-azteca-tortilleria",
+    "name": "La Azteca Tortilleria",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "du-vin-wine-spirits",
+    "name": "Du Vin Wine & Spirits",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "al-beas-mexican-food",
+    "name": "Al & Bea's Mexican Food",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "little-ripper-la",
+    "name": "Little Ripper LA",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "le-champ",
+    "name": "Le Champ",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "offhand-wine-bar",
+    "name": "Offhand Wine Bar",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "super-rad-sub-shop",
+    "name": "Super Rad Sub Shop",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "say-cheese",
+    "name": "Say Cheese",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "the-dutchess",
+    "name": "The Dutchess",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "rorys-place",
+    "name": "Rory's Place",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "chuys-tacos-dorados",
+    "name": "Chuy's Tacos Dorados",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "olivia-restaurant",
+    "name": "Olivia Restaurant",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "the-original-rinaldis-deli-cafe",
+    "name": "The Original Rinaldi's Deli & Cafe",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "jade-wok",
+    "name": "Jade Wok",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "yang-chow-restaurant",
+    "name": "Yang Chow Restaurant",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "sushi-takeda",
+    "name": "Sushi Takeda",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "buvette",
+    "name": "Buvette",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "the-seafood-shop-gourmet-charcuterie",
+    "name": "The Seafood Shop Gourmet & Charcuterie",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "manzke",
+    "name": "Manzke",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "budonoki",
+    "name": "Budonoki",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "pearl-river-deli",
+    "name": "Pearl River Deli",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "ritas-deluxe",
+    "name": "Rita’s Deluxe",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "oybar",
+    "name": "OyBar",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "stir-crazy",
+    "name": "Stir Crazy",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "royal-lobster-la",
+    "name": "Royal Lobster LA",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "el-chucho",
+    "name": "El Chucho",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "evil-twin-la",
+    "name": "Evil Twin LA",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "buvons-natural-wine-bar-shop",
+    "name": "Buvons Natural Wine Bar + Shop",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "highly-likely-highland-park",
+    "name": "Highly Likely Highland Park",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "meteora",
+    "name": "Meteora",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "maurys",
+    "name": "Maury's",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "dumpling-house",
+    "name": "Dumpling House",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "highly-likely",
+    "name": "Highly Likely",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "la-fe",
+    "name": "La Fe",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "helens-wines-fairfax",
+    "name": "Helen's Wines Fairfax",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "unfined-wines-la",
+    "name": "Unfined Wines LA",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "friends-family",
+    "name": "Friends & Family",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "perilla-la",
+    "name": "Perilla LA",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "nitethyme-wine-bar",
+    "name": "NiteThyme Wine Bar",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "yess-restaurant",
+    "name": "YESS Restaurant",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "baroo",
+    "name": "Baroo",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "otomisan-restaurant",
+    "name": "Otomisan Restaurant",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "mazal",
+    "name": "Mazal",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "the-cheese-store-of-beverly-hills",
+    "name": "The Cheese Store of Beverly Hills",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "maison-kitsune-los-angeles",
+    "name": "Maison Kitsuné Los Angeles",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "yangs-kitchen",
+    "name": "Yang's Kitchen",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "larchmont-village-wine-spirits-cheese",
+    "name": "Larchmont Village Wine, Spirits & Cheese",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "destroyer",
+    "name": "Destroyer",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "lolo-wine-bar-restaurant",
+    "name": "lolo wine bar & restaurant",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "melody",
+    "name": "Melody",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "voodoo-vin",
+    "name": "Voodoo Vin",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "vinovore",
+    "name": "Vinovore",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "psychic-wines",
+    "name": "Psychic Wines",
+    "city": "Los Angeles",
+    "category": "wine bar"
+  },
+  {
+    "slug": "ditroit-taqueria",
+    "name": "Ditroit Taqueria",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "surfas-culinary-district",
+    "name": "Surfas Culinary District",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "bar-monette",
+    "name": "Bar Monette",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "petit-trois",
+    "name": "Petit Trois",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "kimthai-garden",
+    "name": "KimThai Garden",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "leos-tacos-truck",
+    "name": "Leo's Tacos Truck",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "oh-la-la-cafe-bakery-kitchen",
+    "name": "Oh La La — Cafe, Bakery, Kitchen",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "barra-santos",
+    "name": "Barra Santos",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "zinque-dtla",
+    "name": "Zinqué - DTLA",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "pine-and-crane-dtla",
+    "name": "Pine and Crane DTLA",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "tsubaki",
+    "name": "Tsubaki",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "yamashiro-gardens",
+    "name": "Yamashiro Gardens",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "bar-bandini",
+    "name": "Bar Bandini",
+    "city": "Los Angeles",
+    "category": "wine bar"
+  },
+  {
+    "slug": "angry-egret-dinette",
+    "name": "Angry Egret Dinette",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "cafe-triste",
+    "name": "CAFÉ TRISTE",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "honey-hi",
+    "name": "Honey Hi",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "quarter-sheets-pizza",
+    "name": "Quarter Sheets Pizza",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "the-lonely-oyster",
+    "name": "The Lonely Oyster",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "el-prado",
+    "name": "El Prado",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "lasita-rotisserie-natural-wine",
+    "name": "Lasita Rotisserie & Natural Wine",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "botanica-restaurant-and-market",
+    "name": "Botanica Restaurant and Market",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "combo-a",
+    "name": "Combo A",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "la-pergoletta-on-sunset",
+    "name": "La Pergoletta on Sunset",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "sushi-tama",
+    "name": "Sushi Tama",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "maru-coffee",
+    "name": "Maru Coffee",
+    "city": "Los Angeles",
+    "category": "coffee"
+  },
+  {
+    "slug": "damian",
+    "name": "Damian",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "animal-restaurant",
+    "name": "Animal Restaurant",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "the-baked-potato",
+    "name": "The Baked Potato",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "eta",
+    "name": "ETA",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "the-belasco",
+    "name": "The Belasco",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "found-oyster",
+    "name": "Found Oyster",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "gold-diggers-bar",
+    "name": "Gold Diggers Bar",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "blossom-market-hall",
+    "name": "Blossom Market Hall",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "sonido-del-valle",
+    "name": "Sonido Del Valle",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "the-chori-man",
+    "name": "The Chori-Man",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "stanleys-wet-goods",
+    "name": "Stanley's Wet Goods",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "domaine-la",
+    "name": "Domaine LA",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "good-clean-fun",
+    "name": "Good Clean Fun",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "mignon",
+    "name": "Mignon",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "petite-peso",
+    "name": "Petite Peso",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "rhythm-room-la",
+    "name": "Rhythm Room L.A.",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "twelves",
+    "name": "Twelves",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "kashiwa-japanese-cuisine",
+    "name": "Kashiwa Japanese Cuisine",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "delilah",
+    "name": "Delilah",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "bar-lis",
+    "name": "Bar Lis",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "the-living-room",
+    "name": "The Living Room",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "sushi-ike",
+    "name": "Sushi Ike",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "asanebo",
+    "name": "Asanebo",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "steelcraft-long-beach",
+    "name": "SteelCraft Long Beach",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "sushi-inaba-manhattan-beach",
+    "name": "Sushi Inaba Manhattan Beach",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "mikaza-nikkei-sushi",
+    "name": "Mikaza Nikkei Sushi",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "everson-royce-bar",
+    "name": "Everson Royce Bar",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "all-day-baby",
+    "name": "All Day Baby",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "john-ogroats",
+    "name": "John O'Groats",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "proof-bakery",
+    "name": "Proof Bakery",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "bianca",
+    "name": "Bianca",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "la-chouquette",
+    "name": "LA Chouquette",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "chaumont-bakery-cafe",
+    "name": "Chaumont Bakery & Café",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "broad-street-oyster-company",
+    "name": "Broad Street Oyster Company",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "the-red-lion-tavern",
+    "name": "The Red Lion Tavern",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "myungin-dumplings",
+    "name": "Myungin Dumplings (명인만두)",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "lo-fi-wines",
+    "name": "Lo-Fi Wines",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "the-wine-house",
+    "name": "The Wine House",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "colori-kitchen",
+    "name": "Colori Kitchen",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "marios-italian-deli-market",
+    "name": "Mario's Italian Deli & Market",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "coras-coffee-shoppe",
+    "name": "Cora's Coffee Shoppe",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "fishing-with-dynamite",
+    "name": "Fishing With Dynamite",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "mori-sushi",
+    "name": "Mori Sushi",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "the-apple-pan",
+    "name": "The Apple Pan",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "burgers-never-say-die",
+    "name": "Burgers Never Say Die",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "aburiya-raku",
+    "name": "Aburiya Raku",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "spartina",
+    "name": "Spartina",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "pasta-sisters",
+    "name": "Pasta Sisters",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "ghost-pizza-kitchen",
+    "name": "Ghost Pizza Kitchen",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "gracies-pizza",
+    "name": "Gracie's Pizza",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "lamonicas-ny-pizza",
+    "name": "Lamonica's NY Pizza",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "palmeri-ristorante",
+    "name": "Palmeri Ristorante",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "la-pergoletta-restaurant-and-deli",
+    "name": "La Pergoletta restaurant and deli",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "il-sogno-deli",
+    "name": "Il Sogno Deli",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "xiang-la-hui",
+    "name": "香辣汇Xiang La Hui",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "bon-temps",
+    "name": "Bon Temps",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "pinkys-los-feliz",
+    "name": "Pinky's Los Feliz",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "golden-burger",
+    "name": "Golden Burger",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "gran-blanco",
+    "name": "Gran Blanco",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "fishermans-outlet",
+    "name": "Fisherman's Outlet",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "peking-tavern",
+    "name": "Peking Tavern",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "tacos-1986",
+    "name": "Tacos 1986",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "saritas-pupuseria",
+    "name": "Sarita's Pupuseria",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "kombu-sushi",
+    "name": "Kombu Sushi",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "sichuan-impression",
+    "name": "Sichuan Impression",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "birdie-gs",
+    "name": "Birdie G's",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "the-rooster",
+    "name": "The Rooster",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "tripp-burgers",
+    "name": "Tripp Burgers",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "cassells-hamburgers-k-town",
+    "name": "Cassell's Hamburgers K-town",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "hawkins-house-of-burgers",
+    "name": "Hawkins House of Burgers",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "tams-burger",
+    "name": "Tams Burger",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "fathers-office",
+    "name": "Father's Office",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "ronnies-diner",
+    "name": "Ronnie's Diner",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "the-bazaar-by-jose-andres",
+    "name": "The Bazaar by José Andrés",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "madeo-restaurant",
+    "name": "Madeo Restaurant",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "mariscos-y-sushi-los-tomateros",
+    "name": "Mariscos y Sushi Los Tomateros",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "master-burger",
+    "name": "Master Burger",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "earles",
+    "name": "Earle's",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "cjs-cafe",
+    "name": "CJ's Cafe",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "belizean-fish-market",
+    "name": "Belizean Fish Market",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "jasons-tacos",
+    "name": "Jason's Tacos",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "bomb-azz-tacos",
+    "name": "Bomb Azz Tacos",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "tacos-don-goyo",
+    "name": "Tacos Don Goyo",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "tacos-estilo-df",
+    "name": "Tacos Estilo DF",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "tacos-estilo-tijuana",
+    "name": "Tacos Estilo Tijuana",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "tacos-tamix-truck-3",
+    "name": "Tacos Tamix Truck #3",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "tacos-tamix-truck-1",
+    "name": "Tacos Tamix Truck #1",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "guerrilla-tacos",
+    "name": "Guerrilla Tacos",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "taqueria-vista-hermosa",
+    "name": "Taqueria Vista Hermosa",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "tacos-los-guichos",
+    "name": "Tacos Los Guichos",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "the-pier-house",
+    "name": "The Pier House",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "baja-cantina",
+    "name": "Baja Cantina",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "hinano-cafe",
+    "name": "Hinano Cafe",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "now-serving",
+    "name": "Now Serving",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "meals-by-genet",
+    "name": "Meals By Genet",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "badmaash",
+    "name": "Badmaash",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "michaels",
+    "name": "Michael's",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "uncle-bills-pancake-house",
+    "name": "Uncle Bill's Pancake House",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "good-stuff-restaurant",
+    "name": "Good Stuff Restaurant",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "kato",
+    "name": "Kato",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  {
+    "slug": "silver-lake-wine",
+    "name": "Silver Lake Wine",
+    "city": "Los Angeles",
+    "category": "wine bar"
+  },
+  {
+    "slug": "the-douglas",
+    "name": "The Douglas",
+    "city": "Los Angeles",
+    "category": "bar"
+  }
+]

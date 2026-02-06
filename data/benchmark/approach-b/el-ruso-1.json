@@ -1,0 +1,41 @@
+{
+  "place_slug": "el-ruso-1",
+  "sources": [
+    {
+      "source_id": "src_theinfatuation_2025",
+      "publication": "The Infatuation",
+      "title": "El Ruso - Review - Echo Park - Los Angeles",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/el-ruso-silver-lake",
+      "published_at": "2025-11-18",
+      "trust_level": "editorial",
+      "content": "At El Ruso, a Sonoran-style taco truck that parks in Echo Park, everything boils down to the tortilla. Made with flour that the truck's owner sources from his hometown of Tijuana, these are the kind of chewy, translucent tortillas that make each bite a euphoric experience. As far as El Ruso's excellent mesquite-grilled meats go, the muñeco combo is definitely our top choice. Smoky chopped carne asada and spicy chicharron en salsa roja are piled into one of those golden tortillas, plus you have the option of going all out by adding stewed pintos, cabbage, and diced onion to create a hearty beast of a taco. And if they happen to have them on the menu that day, don't leave without a burrito wrapped in one of their sobaqueras, a giant, stretchy hubcap-sized Sonoran flour tortilla."
+    },
+    {
+      "source_id": "src_theinfatuation_2022",
+      "publication": "The Infatuation",
+      "title": "El Ruso #2 - Review - Boyle Heights",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/el-ruso-2",
+      "published_at": "2022-09-29",
+      "trust_level": "editorial",
+      "content": "In 2019, El Ruso became one of most popular taco trucks in LA, with people driving from all over the city for a taste of their homemade flour tortillas and Sonoran-style tacos. Both those things certainly still exist, but now, just on the weekends. During the week (Monday-Thursday), the menu has shifted to highlight owner Walter Soto's Sinaloan roots, meaning corn tortillas, sweet and smokey abodaba, and chorreadas (flat, crispy tacos coated with a layer of chicharron paste). Our recommendation is to come as hungry as possible, because you're going to want everything you see—including their two inch-thick, Sinaloa-style vampiro that we've yet to take down in one sitting."
+    },
+    {
+      "source_id": "src_theinfatuation_2021",
+      "publication": "The Infatuation",
+      "title": "9 LA Chefs & Restaurateurs Pick Their Favorite Tacos",
+      "url": "https://www.theinfatuation.com/los-angeles/features/9-la-chefs-restaurateurs-pick-their-favorite-tacos",
+      "published_at": "2021-09-15",
+      "trust_level": "editorial",
+      "content": "My go-to taco at El Ruso is the taco con carne en chile Colorado, which is made with dreamy handmade flour tortillas, layers of medium spiced sauce, tender chunks of meat, and creaminess of the beans. I promise you will be hooked for life after the first bite. An ice-cold beer enjoyed with your fellow hardworking colleagues at El Ruso is the perfect way to end your day."
+    },
+    {
+      "source_id": "src_timeout_2025",
+      "publication": "Time Out LA",
+      "title": "El Ruso | Restaurants in Echo Park, Los Angeles",
+      "url": "https://www.timeout.com/los-angeles/restaurants/el-ruso",
+      "published_at": "2025-06-25",
+      "trust_level": "editorial",
+      "content": "If you're looking for pura calidad, you're in the right place. In fact, El Ruso operates under that slogan—and man, does it deliver, with some of the heftiest, most flavorful Sonora-style tacos in L.A. Founded in 2016 by Tijuana native Walter Soto and business partner Julia Silva, who named the business after Soto's childhood nickname, El Ruso is one of Central L.A.'s most popular taco joints thanks to the duo's perfectly tender mesquite-grilled meats and just-bubbled flour tortillas. Now, you can find Sonora-style meats on handmade flour tortillas every day of the week, plus a rotating weekend menu that might include birria, fish tacos or aguja (bone-in short rib). Just note the tacos are on the more expensive side ($5.25 each), though they're much larger than the average street taco and I think the quality is commensurate with the price."
+    }
+  ]
+}

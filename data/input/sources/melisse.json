@@ -1,0 +1,32 @@
+{
+  "place_slug": "melisse",
+  "sources": [
+    {
+      "source_id": "src_michelin_2025",
+      "publication": "Michelin Guide",
+      "title": "Mélisse – Santa Monica - a MICHELIN Guide Restaurant",
+      "url": "https://guide.michelin.com/us/en/california/santa-monica/restaurant/melisse",
+      "published_at": "2025-06-25",
+      "trust_level": "editorial",
+      "content": "Since opening in 1999, Chef Josiah Citrin's flagship has been a Santa Monica mainstay. Through its many evolutions, the restaurant has sought to offer a certain kind of fine dining experience that will never go out of style. Slip in through a discreet side entrance to enter the enclosed space that combines a vibe-y underground feel with classic luxury. One can expect the finest cutlery and plates, gorgeous presentations, plenty of tableside saucing, and a level of French decadence that borders on gratuitous. The results are indulgent. Truffles, wagyu, uni, and crab weave their way across intricate canapés and courses, ending with a signature finale of dry-aged duck \"Rouennaise\" that features a rich sauce made with the help of an antique silver press. Mélisse – a Two Stars: Excellent cooking restaurant in the 2025 MICHELIN Guide USA."
+    },
+    {
+      "source_id": "src_infatuation_2025",
+      "publication": "The Infatuation",
+      "title": "Melisse - Review - Santa Monica - Los Angeles - The Infatuation",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/melisse",
+      "published_at": "2025-07-03",
+      "trust_level": "editorial",
+      "content": "Melisse in Santa Monica subscribes to a lot of \"fancy restaurant\" cliches, but it's not a place you should be scared of. That is, if you have $800 to spend on dinner for two. To get that part out of the way: yes, eating at Melisse is very, very expensive. For $400 per person, you will get you a 10-course, multi-hour dinner including tax and tip, and nothing to drink except (very regularly refilled) water. But if you're going to spend that kind of money on a meal, Melisse is a damn great place to do it. Despite all those formalities, Melisse doesn't feel stiff. There are only five tables in the restaurant, but no one will scowl when you talk above a whisper. The soundtrack runs from David Bowie to Frank Sinatra to Fleetwood Mac to Abba. And there will be no judgment if you mention you'd like to spend under $100 on a bottle of wine. The staff will make thoughtful suggestions and treat you like you're ordering one of the four-figure options. Then, of course, there's the food, which also feels distinctly \"fine-dining yet approachable.\" There are 10 or so courses, but many of those are actually a couple of different plates. On a recent visit, a scallop carpaccio came with another plate involving a chicharrón and truffle gribiche chip and dip situation, and dessert was made up of six dishes that appeared at once. There's nothing challenging or particularly unusual about the food at Melisse—it's just that everything you put in your mouth is essentially perfect."
+    },
+    {
+      "source_id": "src_timeout_la_2025",
+      "publication": "Time Out LA",
+      "title": "Mélisse | Restaurants in Santa Monica, Los Angeles",
+      "url": "https://www.timeout.com/los-angeles/restaurants/melisse",
+      "published_at": "2025-02-20",
+      "trust_level": "editorial",
+      "content": "Josiah Citrin's two Michelin-starred Santa Monica stalwart—a long-time high watermark among L.A. tasting menus—underwent a rebrand, and gone is the more formal atmosphere. Instead, you'll find a more private, modern fine dining experience within a smaller room cordoned off from the chef's slightly more casual restaurant, Citrin, which also boasts a Michelin star. These days, head chef Ken Takayama delivers exquisite, detail-oriented dishes that rotate with the seasons for the eye-wateringly cost of $399 per person. The stellar bottle list will delight anyone well-versed in wines, and the kitchen also prepares an impressive non-alcoholic pairing that finishes with a delightful Irish coffee. While dishes vary with the season, expect lots of truffles, caviar and Wagyu beef—in other words, the kind of luxury ingredients such a high price commands."
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "place_slug": "camphor",
+  "sources": [
+    {
+      "source_id": "src_michelin_2025",
+      "publication": "Michelin Guide",
+      "title": "Camphor – Los Angeles - a MICHELIN Guide Restaurant",
+      "url": "https://guide.michelin.com/us/en/california/us-los-angeles/restaurant/camphor",
+      "published_at": "2025-06-25",
+      "trust_level": "editorial",
+      "content": "Headed by the talented Chef Max Boonthanakit and team, Camphor plates seriously good French fare with a sprinkle of spicing from Southeast Asia. Creative cocktails, including the refreshing Saint-Germain, complete the experience. This popular spot hums with activity from eager diners and a bustling open kitchen. Bubbling hot rigatoni stuffed with artichokes, Swiss chard and Comte delivers one satisfying bite after the next, and steak au poivre arrives resting in a pool of perfect sauce. Expertly seared with a caramelized exterior, it is buttery and tender, but it is the Cognac cream infused with peppercorn that will have you sopping up every last bit. The seasonal fruit tart, whimsically deconstructed, is a stunner."
+    },
+    {
+      "source_id": "src_timeout_la_2025",
+      "publication": "Time Out LA",
+      "title": "Camphor | Restaurants in Downtown Arts District, Los Angeles",
+      "url": "https://www.timeout.com/los-angeles/restaurants/camphor",
+      "published_at": "2025-05-08",
+      "trust_level": "editorial",
+      "content": "At Camphor, light-as-a-cloud French cuisine feels more than apt within the restaurant's airy white and blue dining room, where old-school touches and a featherweight culinary approach combine in a stunning blend of elegant, yet nontraditional, fine dining. Inside the former Nightshade space, Alain Ducasse veterans Max Boonthanakit and Lijo George offer what looks like the usual French bill of fare, with one major twist: far, far less butter and oil. Combined with a few South Asian-inspired dishes—the must-order gunpowder anchovies among them—Camphor's refined, slightly tweaked menu of classics puts the Arts District bistro in a class of its own. This extends to dessert, where a phenomenal bread pudding with vanilla ice cream and kiwi glacée hold their own next to citrus milk—a creamy vanilla mousse topped with refreshing seasonal fruit and wildflower honey."
+    },
+    {
+      "source_id": "src_theinfatuation_2025",
+      "publication": "The Infatuation",
+      "title": "Camphor gives the fancy French dinner a fresh makeover - Review - Los Angeles",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/camphor",
+      "published_at": "2025-09-02",
+      "trust_level": "editorial",
+      "content": "Camphor is a fancy French bistro with a laid-back personality. On arrival, you'll be handed warm towels as your butt sinks into a velvet booth, and before long, the olive oil-washed martinis you ordered arrive on silver platters. For every sports jacket and slip dress combo dressed up for the fanciest meal of the year, you'll find a denim-clad solo diner housing one of the city's best burgers or a bundle of friends gathering for the restaurant's weekly $65 steak frites party. And however casual or splashy your night's plans are, Camphor makes the occasion feel special with sharp service and a fresh perspective on high-end French dining. The balancing act is reflected in the menu, where straight-up classics like sole à la grenobloise and steak au poivre share space with French-coded dishes that have the occasional, subtle twist. French onion soup is reimagined into a gooey, cheese-capped tartine drowned tableside in stock, and a delicate, torpedo-shaped chicken ballotine is filled with masala-seasoned thigh meat. Whether you stick to the textbook stuff or Camphor's creative riffs, every dish is a delicious use of butter."
+    },
+    {
+      "source_id": "src_michelin_2022",
+      "publication": "Michelin Guide",
+      "title": "How Two Alain Ducasse-trained Chefs are Making Their Mark in LA",
+      "url": "https://guide.michelin.com/us/en/article/michelin-guide-ceremony/2022-michelin-guide-california-alain-ducasse-camphor-los-angeles",
+      "published_at": "2022-12-06",
+      "trust_level": "editorial",
+      "content": "One MICHELIN Star Camphor might be one of Los Angeles's most in-demand restaurants, but its start wasn't always a sure thing. After Chefs Max Boonthanakit and Lijo George experienced two lockdowns (and reopenings) of the One Star restaurant Blue by Alain Ducasse in Bangkok, they decided it was time to pick up and move. We just needed to keep cooking, says Chef Max Boonthanakit, an Atlanta native whose parents are Thai and Chinese, adding, and Lijo wanted to move away from Thailand. He said either Los Angeles or Australia. Enter Camphor's previous owners who offered the space to the duo—Boonthanakit initially said no—but was persuaded. I never visited the States before, says Chef Lijo George, a Kerala, South India native, I just focused on my work [but] I saw California as very open-minded and very welcoming. It's the culture of California. It's that ethos of acceptance and diversity, coupled with flavor and a touch of the weird, that's led to the pairs' success since opening. From Bangkok to Los Angeles, this dynamic duo of dining is bringing flavor back. Leading the new guard is paramount to the chefs, who believe that, having great younger blood in the kitchen and on the team makes a huge difference, says George. As for what's next for Camphor, the chefs plan to do more collaborations—they just released the Mise en Place varsity jacket with Los Angeles-based streetwear brand Menu, introducing takeout, and they are hoping to bring some of their Bangkok-based chefs over for a few guest appearances. We'd love to cook again with Wilfrid [Hocquet] of Blue, says Boonthanakit, adding, everyone is welcome to Camphor."
+    }
+  ]
+}

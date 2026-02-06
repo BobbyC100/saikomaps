@@ -1,0 +1,50 @@
+{
+  "place_slug": "silver-lake-pool-inn",
+  "sources": [
+    {
+      "source_id": "src_michelin_guide_2024",
+      "publication": "Michelin Guide",
+      "title": "Silver Lake Pool & Inn - Los Angeles Area",
+      "url": "https://guide.michelin.com/us/en/hotels-stays/los-angeles-area/silver-lake-pool-inn-9086",
+      "published_at": "",
+      "trust_level": "editorial",
+      "content": "From the beginning we've been impressed by the Palisociety hotels, and the seeming effortlessness with which they conjure a relaxed cool from the unlikeliest materials. With the Silver Lake Pool & Inn, though, they've reached new heights, transforming a truly undistinguished 1980s motel into a chic little design oasis right in the heart of one of the most desirable neighborhoods in Los Angeles. They had help from some talented designers — Cayley Lambur and Lucia Bartholomew from the Venice Beach-based Electric Bowery served as architects on the building's extensive renovation and as its interior designers as well. The result is light, bright, and welcoming, a modern-classic L.A. residential look with influences from Palm Springs and Mexico City, supplied with boutique-hotel necessities like walk-in rain showers, Nespresso machines, and locally sourced snacks in the mini bars. It's a perfect encapsulation of what makes Silver Lake special, from its creative energy to its unhurried pace of life — the latter perhaps best embodied by the elevated pool deck, a rare but welcome luxury in this part of town. And while the hotel's restaurant, Marco Polo, takes its inspiration from coastal Italian cuisine, a perfect match for the Silver Lake Pool & Inn's dolce vita vibe."
+    },
+    {
+      "source_id": "src_infatuation_2024",
+      "publication": "The Infatuation",
+      "title": "Marco Polo - Review",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/marco-polo",
+      "published_at": "2024-08-27",
+      "trust_level": "editorial",
+      "content": "Marco Polo is a sunny restaurant at the Silver Lake Pool & Inn that specializes in seafood-y Italian. This breezy all-day spot serves coastal Italian dishes on an umbrella-lined terrace at the Silver Lake Pool & Inn. You can drop by as early as 9am for a plate of french toast and a turmeric latte, but the best time to eat here is lunch. There's always a couple of people enjoying an afternoon spritz with their dog, and other vaguely employed hotel guests leisurely consuming seafood pasta at 3pm. We usually order the giant platter of Calabrian baked clams and the olive-filled chicken crostone—it's served on crispy bread flavored with chicken drippings."
+    },
+    {
+      "source_id": "src_infatuation_brunch_2021",
+      "publication": "The Infatuation",
+      "title": "The Best Brunch Places In Silver Lake",
+      "url": "https://www.theinfatuation.com/los-angeles/guides/best-brunch-silver-lake",
+      "published_at": "2021-09-30",
+      "trust_level": "editorial",
+      "content": "If your preferred vision of brunch includes sunbathing by the pool, perhaps it's time to book a reservation at Marco Polo. The sunny Mediterranean/seafood/Italian-ish (there's a lot going on here) restaurant is attached to the Silver Lake Pool & Inn and is a great place to spend a Saturday afternoon while pretending you're in Naples and chugging Aperol spritzes. Their brunch menu is short and sweet, packed with caprese bruschetta, Italian sausage paired with hash browns, and oysters served on the half shell."
+    },
+    {
+      "source_id": "src_timeout_la_2020",
+      "publication": "Time Out LA",
+      "title": "Marco Polo",
+      "url": "https://www.timeout.com/los-angeles/restaurants/marco-polo",
+      "published_at": "2020-01-03",
+      "trust_level": "editorial",
+      "content": "Find this breezy California-Italian restaurant tucked into the Silver Lake Pool & Inn, a darling boutique hotel that's small in size but big in style. Want to make your pastas, baked clams and cocktails even more luxe? Ask to dine poolside."
+    },
+    {
+      "source_id": "src_ahotellife_2021",
+      "publication": "A Hotel Life",
+      "title": "Silver Lake Pool & Inn Review",
+      "url": "https://www.ahotellife.com/hotels/silver-lake-pool-inn/",
+      "published_at": "2021-08-16",
+      "trust_level": "editorial",
+      "content": "The rooftop pool deck is where it's at. If you happen to forget your sunnies, you can grab new ones at Italian eyewear RETROSUPERFUTURE on Sunset Blvd. The Black Cat was the site of early demonstrations against police brutality towards the LGBTQIA+ community, well before the NYC Stonewall riots. The bar has expanded to the parking lot with loads of outdoor picnic table seating, decent bar food, great cocktails and good wines. Here you'll find some of the best people watching Silver Lake has to offer. A high-end boutique retail store featuring fashion, home and beauty brands such as Acne, Aesop and the well-loved local — Flamingo Estate. A lovely shop to treat yourself or someone else. When the hotel stops offering food and drink after hours, it's a nice opportunity to bring your own refreshments by popping over to the nearby Erewon Wine Shop."
+    }
+  ]
+}

@@ -1,0 +1,269 @@
+{
+  "place": {
+    "name": "Kato",
+    "city": "Los Angeles",
+    "category": "restaurant"
+  },
+  "claims": [
+    {
+      "field_key": "curator_note",
+      "proposed_value": "Intimate Arts District restaurant where chef Jon Yao serves contemporary Taiwanese cuisine through a California lens. The converted warehouse space feels like a dinner party at a friend's loft — concrete and wood, art on the walls, indie R&B at low volume. The tasting menu changes seasonally; the bar offers a shorter, more casual experience.",
+      "raw_value": null,
+      "confidence": "strong",
+      "confidence_reason": "confidence: strong",
+      "evidence": [
+        {
+          "source_id": "src_worlds50best_2024",
+          "quote": "it feels like a dinner party at a friend's loft, not a temple of fine dining"
+        },
+        {
+          "source_id": "src_infatuation_2022",
+          "quote": "contemporary Taiwanese through a California lens"
+        }
+      ],
+      "method": "search",
+      "notes_for_editor": null
+    },
+    {
+      "field_key": "vibe",
+      "proposed_value": "Intimate and unpretentious",
+      "raw_value": null,
+      "confidence": "strong",
+      "confidence_reason": "confidence: strong",
+      "evidence": [
+        {
+          "source_id": "src_infatuation_2022",
+          "quote": "serious without being stiff"
+        },
+        {
+          "source_id": "src_worlds50best_2024",
+          "quote": "calm, confident, unpretentious"
+        }
+      ],
+      "method": "search",
+      "notes_for_editor": null
+    },
+    {
+      "field_key": "seating",
+      "proposed_value": "Dining room seats roughly 30, plus bar seating for more casual experience",
+      "raw_value": null,
+      "confidence": "medium",
+      "confidence_reason": "confidence: medium",
+      "evidence": [
+        {
+          "source_id": "src_worlds50best_2024",
+          "quote": "dining room seats roughly 30; the bar offers a different experience"
+        }
+      ],
+      "method": "search",
+      "notes_for_editor": null
+    },
+    {
+      "field_key": "music",
+      "proposed_value": "Indie and R&B at low volume",
+      "raw_value": null,
+      "confidence": "medium",
+      "confidence_reason": "confidence: medium",
+      "evidence": [
+        {
+          "source_id": "src_worlds50best_2024",
+          "quote": "Music runs indie and R&B at low volume"
+        }
+      ],
+      "method": "search",
+      "notes_for_editor": null
+    },
+    {
+      "field_key": "decor",
+      "proposed_value": "Converted warehouse with high ceilings, exposed brick, concrete and wood, rotating art pieces, spare and considered aesthetic",
+      "raw_value": null,
+      "confidence": "strong",
+      "confidence_reason": "confidence: strong",
+      "evidence": [
+        {
+          "source_id": "src_worlds50best_2024",
+          "quote": "converted warehouse — high ceilings, exposed brick, art on the walls"
+        },
+        {
+          "source_id": "src_infatuation_2022",
+          "quote": "concrete, wood, low lighting"
+        }
+      ],
+      "method": "search",
+      "notes_for_editor": null
+    },
+    {
+      "field_key": "food",
+      "proposed_value": "Contemporary Taiwanese tasting menu featuring delicate crudos, koji-aged proteins, vegetables treated with same care as protein. Seasonal menu changes frequently. Bar offers shorter à la carte experience.",
+      "raw_value": null,
+      "confidence": "strong",
+      "confidence_reason": "confidence: strong",
+      "evidence": [
+        {
+          "source_id": "src_infatuation_2022",
+          "quote": "contemporary Taiwanese through a California lens: delicate crudos, koji-aged proteins, vegetables"
+        },
+        {
+          "source_id": "src_timeout_2025",
+          "quote": "tasting menu is seasonal and changes frequently"
+        }
+      ],
+      "method": "search",
+      "notes_for_editor": null
+    },
+    {
+      "field_key": "drinks",
+      "proposed_value": "Wine list leans natural and minimal-intervention. Wine pairings and zero-proof pairings available.",
+      "raw_value": null,
+      "confidence": "strong",
+      "confidence_reason": "confidence: strong",
+      "evidence": [
+        {
+          "source_id": "src_infatuation_2022",
+          "quote": "Wine list leans natural and minimal-intervention"
+        },
+        {
+          "source_id": "src_timeout_2025",
+          "quote": "zero-proof pairing option for non-drinkers"
+        }
+      ],
+      "method": "search",
+      "notes_for_editor": null
+    },
+    {
+      "field_key": "wifi",
+      "proposed_value": null,
+      "raw_value": null,
+      "confidence": "empty",
+      "confidence_reason": "confidence: empty",
+      "evidence": [],
+      "method": "search",
+      "notes_for_editor": "Not mentioned in reviews — field visit required for confirmation"
+    },
+    {
+      "field_key": "cups",
+      "proposed_value": null,
+      "raw_value": null,
+      "confidence": "empty",
+      "confidence_reason": "confidence: empty",
+      "evidence": [],
+      "method": "search",
+      "notes_for_editor": "Fine dining restaurant — tableware details not captured in reviews, field visit required"
+    },
+    {
+      "field_key": "staff_energy",
+      "proposed_value": "Precise and attentive without hovering",
+      "raw_value": null,
+      "confidence": "medium",
+      "confidence_reason": "confidence: medium",
+      "evidence": [
+        {
+          "source_id": "src_infatuation_2022",
+          "quote": "service is precise"
+        },
+        {
+          "source_id": "src_timeout_2025",
+          "quote": "Service is attentive without hovering"
+        }
+      ],
+      "method": "search",
+      "notes_for_editor": null
+    },
+    {
+      "field_key": "best_time",
+      "proposed_value": null,
+      "raw_value": null,
+      "confidence": "empty",
+      "confidence_reason": "confidence: empty",
+      "evidence": [],
+      "method": "search",
+      "notes_for_editor": "Check OpenTable or Google Maps popular times for dining patterns"
+    },
+    {
+      "field_key": "price_signal",
+      "proposed_value": "$$$$",
+      "raw_value": null,
+      "confidence": "strong",
+      "confidence_reason": "confidence: strong",
+      "evidence": [
+        {
+          "source_id": "src_opentable_2026",
+          "quote": "Tasting menu: $350 per person"
+        },
+        {
+          "source_id": "src_timeout_2025",
+          "quote": "tasting menu runs $325 per person"
+        }
+      ],
+      "method": "search",
+      "notes_for_editor": "Note price increase from $325 to $350 between 2025-2026 sources"
+    },
+    {
+      "field_key": "reservation_mode",
+      "proposed_value": "Reservations required for dining room, limited walk-in availability at bar",
+      "raw_value": null,
+      "confidence": "strong",
+      "confidence_reason": "confidence: strong",
+      "evidence": [
+        {
+          "source_id": "src_opentable_2026",
+          "quote": "Reservations required for the dining room. Bar: limited walk-in availability"
+        },
+        {
+          "source_id": "src_infatuation_2022",
+          "quote": "Reservations are essential for the dining room; the bar occasionally has walk-in"
+        }
+      ],
+      "method": "search",
+      "notes_for_editor": null
+    },
+    {
+      "field_key": "signature_dish",
+      "proposed_value": null,
+      "raw_value": null,
+      "confidence": "empty",
+      "confidence_reason": "confidence: empty",
+      "evidence": [],
+      "method": "search",
+      "notes_for_editor": "Seasonal tasting menu format — specific dishes not detailed in sources, check recent reviews or social media"
+    },
+    {
+      "field_key": "neighborhood_context",
+      "proposed_value": "Located in the Arts District on Alameda Street in a converted warehouse space.",
+      "raw_value": null,
+      "confidence": "strong",
+      "confidence_reason": "confidence: strong",
+      "evidence": [
+        {
+          "source_id": "src_opentable_2026",
+          "quote": "777 Alameda Street, Los Angeles, CA 90021"
+        },
+        {
+          "source_id": "src_worlds50best_2024",
+          "quote": "converted warehouse in the Arts District"
+        }
+      ],
+      "method": "search",
+      "notes_for_editor": null
+    },
+    {
+      "field_key": "similar_energy",
+      "proposed_value": null,
+      "raw_value": null,
+      "confidence": "empty",
+      "confidence_reason": "confidence: empty",
+      "evidence": [],
+      "method": "search",
+      "notes_for_editor": "No explicit comparisons in sources — editor judgment required after visiting similar LA fine dining"
+    }
+  ],
+  "_meta": {
+    "extracted_at": "2026-02-04T03:05:13.567Z",
+    "model": "claude-sonnet-4-20250514",
+    "prompt_version": "v2.2",
+    "source_count": 5,
+    "field_count": 16,
+    "null_count": 5,
+    "duration_ms": 24143
+  }
+}

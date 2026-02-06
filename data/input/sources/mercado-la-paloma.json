@@ -1,0 +1,50 @@
+{
+  "place_slug": "mercado-la-paloma",
+  "sources": [
+    {
+      "source_id": "src_timeout_2025",
+      "publication": "Time Out LA",
+      "title": "Mercado La Paloma | Restaurants in South LA, Los Angeles",
+      "url": "https://www.timeout.com/los-angeles/restaurants/mercado-la-paloma",
+      "published_at": "2025-07-29",
+      "trust_level": "editorial",
+      "content": "Founded by local nonprofit Esperanza Community Housing, Mercado La Paloma puts the neighborhood and first-time business owners first—and the eight unique eateries inside reflect this guiding mission. Housed in a former garment factory, this South L.A. mainstay isn't the typical sleekly designed food hall touting Instagrammable dishes or a million different p[...]"
+    },
+    {
+      "source_id": "src_timeout_best_restaurants_2025",
+      "publication": "Time Out LA",
+      "title": "The 40 best restaurants in Los Angeles you need to try in 2025",
+      "url": "https://www.timeout.com/los-angeles/restaurants/best-restaurants-in-los-angeles",
+      "published_at": "2025-12-01",
+      "trust_level": "editorial",
+      "content": "Why we love it: Housed inside food hall Mercado La Paloma, Gilberto Cetina Jr.'s Yucatecan-style mariscos counter is a profound revelation for those who enjoy spice, citrus and smoke. Time Out tip: If you're deterred by the heavy weekend lines, it's worth diverting to Komal, a newer stall in Mercado La Paloma launched by two former Holbox employees. The casual, recently Michelin-recognized eatery focuses on heirloom masa and offers affordable, tasty corn-based dishes like tamales and quesadillas."
+    },
+    {
+      "source_id": "src_michelin_2025",
+      "publication": "Michelin Guide",
+      "title": "Holbox – Los Angeles - a MICHELIN Guide Restaurant",
+      "url": "https://guide.michelin.com/us/en/california/us-los-angeles/restaurant/holbox",
+      "published_at": "2025-06-25",
+      "trust_level": "editorial",
+      "content": "Its namesake is a Caribbean island just off the coast of the Yucatán Peninsula, but this beloved counter, located inside the Mercado La Paloma, is a distinctively Angelino phenomenon. Chef Gilbert Cetina, who previously cooked with his father at neighboring stall Chichen Itza, draws from Mexican coastal cuisines in dishes whose simplicity belies remarkable flavor. Spectacular quality seafood of unassailable freshness leaves an impression, whether in electrifyingly vibrant aguachiles and ceviches, excellent tacos served on house-made heirloom corn tortillas, or skillfully grilled lobster—a panoply of exceptional house salsas gilds the lily. The frequently changing menu offers no shortage of delights, and a tasting menu, offered by reservation only on Thursdays and Fridays, is hotly sought-after."
+    },
+    {
+      "source_id": "src_theinfatuation_2022",
+      "publication": "The Infatuation",
+      "title": "Holbox's vibrant mariscos remind us why eating in LA is magical - Review",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/holbox",
+      "published_at": "2022-01-21",
+      "trust_level": "editorial",
+      "content": "Holbox, a Mexican seafood counter inside the Mercado La Paloma in South Central, is eating in LA at its best. Holbox doesn't need a PR team, viral TikToks or, frankly, this restaurant review to stay relevant. It's got uni-topped tostadas and plush scallop ceviches to do that. For years, this mariscos stall in Mercado La Paloma has been preparing coastal Mexican dishes with razor-sharp precision, relying on chiles, citrus, and ocean brine to transform pristine local seafood into tiny miracles cradled in tortillas or scooped up with chips. And for years, we've sprinted back to Holbox like kids chasing an ice cream truck, ready to hurl our money in exchange for whatever daily catch is on ice behind the counter. Even today, when hour-long lines spill into the parking lot on weekends, every casually refined meal here is a reminder of what makes eating in LA feel so special."
+    },
+    {
+      "source_id": "src_timeout_michelin_2024",
+      "publication": "Time Out LA",
+      "title": "Michelin awards stars to three all-new L.A. restaurants for 2024",
+      "url": "https://www.timeout.com/los-angeles/news/michelin-awards-stars-to-three-all-new-l-a-restaurants-for-2024-080624",
+      "published_at": "2024-08-06",
+      "trust_level": "editorial",
+      "content": "Tonight, Michelin announced its list of starred California restaurants for 2024 at an awards ceremony in the Bay Area, and the results for Los Angeles are in: three all-new one-star additions, including Gilberto Cetina Jr.'s scrappy Yucatecan seafood spot Holbox inside South L.A.'s Mercado La Paloma, plus seven new Bib Gourmands in L.A. County. Holbox's star designation represents a slight deviation for Michelin—the guide has previously never awarded recognition to longtime key players in L.A.'s formidable Mexican dining scene."
+    }
+  ]
+}

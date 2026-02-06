@@ -1,0 +1,41 @@
+{
+  "place_slug": "amour-weho",
+  "sources": [
+    {
+      "source_id": "src_michelin_2025",
+      "publication": "Michelin Guide",
+      "title": "The MICHELIN Guide to California",
+      "url": "https://guide.michelin.com/us/en/article/travel/visit-california-sacramento-los-angeles-san-diego-map-michelin-guide-restaurants-hotels",
+      "published_at": "2025-06-24",
+      "trust_level": "editorial",
+      "content": "At Amour, before you even see the menu the main question is indoors our out. Banquettes and booths beckon on the patio, while the dining room, accessed through a library stacked with vintage books, is loaded with charm down to the very last candlestick. Multicourse tasting menus are on offer or order à la carte from a menu that blends French and Asian influences, as in chawanmushi with Perigord truffles and trout roe. New Caledonia blue prawn carpaccio and a French-style omelet with a quenelle of caviar and Comté foam are just two of the well-executed dishes."
+    },
+    {
+      "source_id": "src_the_infatuation_2025",
+      "publication": "The Infatuation",
+      "title": "Amour - Review - West Hollywood - Los Angeles",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/amour",
+      "published_at": "2025-05-13",
+      "trust_level": "editorial",
+      "content": "If \"absurdly romantic restaurant\" appeared in the dictionary, it would be next to a picture of Amour. This fancy French restaurant in West Hollywood took over the old Dominick's space (home to one of the best patios in the city) and turned it into a paradis Français. There's a large back courtyard with ivy-covered walls, a dark dining room with tasseled lampshades, and a semi-private lounge with a roaring fireplace. The maître d' will greet you with a sultry, \"Bonsoir, mon ami.\" The whole thing's a bit ridiculous, but they get away with it because the food is solid (albeit pricey). Get the pumpkin soup, steak tartare, and lobster tagliatelle."
+    },
+    {
+      "source_id": "src_timeout_2025",
+      "publication": "Time Out LA",
+      "title": "Amour | Restaurants in Beverly, Los Angeles",
+      "url": "https://www.timeout.com/los-angeles/restaurants/amour",
+      "published_at": "2025-08-30",
+      "trust_level": "editorial",
+      "content": "True to its name, Amour conjures visions of romance with a candle-lit dining room, cozy lounge seating by the fireplace and a brick-lined, checker floored courtyard. During daylight hours, the sunshine makes the immaculately decorated patio feel straight out of a storybook. Step into the little library on your way back from the restroom and leave your loved one a message in a book—it's not only allowed, it's encouraged. The traditional French bistro fare runs on the pricier side, but the dreamy setting, first-rate service and excellent cooking make Amour an ultra-dreamy dining destination fit for date nights, anniversaries, birthdays and of course, Valentine's Day. The kitchen's precise saucework translates into straightforward, well-executed entrées, a standout steak tartare and French classics like onion soup, escargot and frog legs."
+    },
+    {
+      "source_id": "src_lamag_2025",
+      "publication": "LAMag",
+      "title": "Back for Amour: Chef Dani Chavez-Bello Has 'Iconic' Plans for West Hollywood French Brasserie",
+      "url": "https://lamag.com/dining/amour-chef-dani-chavez-bello-west-hollywood-french-brasserie-michelin-guide/",
+      "published_at": "2025-08-21",
+      "trust_level": "editorial",
+      "content": "Amour isn't just re-creating the Dominick's vibe: The restaurant has the air of a French brasserie with a highly romantic low-lit interior and a moody library at the entrance, as well as the iconic brick-laden patio in the back. The menu reflects Chavez-Bello's Michelin pedigree, with a la carte offerings that feature lobster tagliatelle and Colorado lamb saddle with spinach served in Le Patio or Le Jardin — as well as gorgeous prix fixe options available inside that include not only French-leaning favorites like a lavender duck breast with carrot puree but also Asian-inspired chawanmushi with uni and trout roe. Of course, the menu will change with the seasons, and there's playfulness in that, too: Plans include launching a burger available only through a sort of scavenger hunt in the library room."
+    }
+  ]
+}

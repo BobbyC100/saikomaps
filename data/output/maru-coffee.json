@@ -1,0 +1,260 @@
+{
+  "place": {
+    "name": "Maru Coffee",
+    "city": "Los Angeles",
+    "category": "coffee"
+  },
+  "claims": [
+    {
+      "field_key": "curator_note",
+      "proposed_value": "Tiny standing-room coffee bar on Hillhurst where the pour-overs are dead serious and the room is all beige wood and natural light. Korean-American owned, they roast their own beans and serve everything in handmade ceramic cups. The kind of place where ceramic studio assistants quietly debate Ethiopian versus Honduran while you wait.",
+      "raw_value": null,
+      "confidence": "strong",
+      "confidence_reason": "confidence: strong",
+      "evidence": [
+        {
+          "source_id": "src_infatuation_losfeliz",
+          "quote": "beige-toned temple of discerning taste and aesthetics"
+        },
+        {
+          "source_id": "src_infatuation_losfeliz",
+          "quote": "pretty much standing room only"
+        },
+        {
+          "source_id": "src_sprudge_2022",
+          "quote": "roast their own coffee"
+        }
+      ],
+      "method": "search",
+      "notes_for_editor": null
+    },
+    {
+      "field_key": "vibe",
+      "proposed_value": "Minimalist and tranquil",
+      "raw_value": null,
+      "confidence": "strong",
+      "confidence_reason": "confidence: strong",
+      "evidence": [
+        {
+          "source_id": "src_sprudge_2017",
+          "quote": "minimalist and tranquil spot"
+        },
+        {
+          "source_id": "src_infatuation_losfeliz",
+          "quote": "quiet-but-never-slow coffee shop"
+        }
+      ],
+      "method": "search",
+      "notes_for_editor": null
+    },
+    {
+      "field_key": "seating",
+      "proposed_value": "Standing room only",
+      "raw_value": null,
+      "confidence": "medium",
+      "confidence_reason": "confidence: medium",
+      "evidence": [
+        {
+          "source_id": "src_infatuation_losfeliz",
+          "quote": "pretty much standing room only"
+        }
+      ],
+      "method": "search",
+      "notes_for_editor": null
+    },
+    {
+      "field_key": "music",
+      "proposed_value": null,
+      "raw_value": null,
+      "confidence": "empty",
+      "confidence_reason": "confidence: empty",
+      "evidence": [],
+      "method": "search",
+      "notes_for_editor": "Check Instagram stories/reels for ambient audio"
+    },
+    {
+      "field_key": "decor",
+      "proposed_value": "Beige tones with gorgeous wooden shelving at the bar",
+      "raw_value": null,
+      "confidence": "medium",
+      "confidence_reason": "confidence: medium",
+      "evidence": [
+        {
+          "source_id": "src_infatuation_losfeliz",
+          "quote": "beige-toned temple"
+        },
+        {
+          "source_id": "src_infatuation_losfeliz",
+          "quote": "gorgeous wooden shelving at the bar"
+        }
+      ],
+      "method": "search",
+      "notes_for_editor": null
+    },
+    {
+      "field_key": "food",
+      "proposed_value": "Pastries from Cake Monkey including babka slices, doughnuts, and bacon jam twists",
+      "raw_value": null,
+      "confidence": "medium",
+      "confidence_reason": "confidence: medium",
+      "evidence": [
+        {
+          "source_id": "src_sprudge_2017",
+          "quote": "pastries come from LA's Cake Monkey — babka, doughnuts, bacon jam twists"
+        }
+      ],
+      "method": "search",
+      "notes_for_editor": "Primary source from 2017 — verify current pastry supplier"
+    },
+    {
+      "field_key": "drinks",
+      "proposed_value": "House-roasted single-origin espresso and pour-overs, plus herbal, green, and black teas. Known for drip coffee, pour-overs, and slow-drip cold brew.",
+      "raw_value": null,
+      "confidence": "strong",
+      "confidence_reason": "confidence: strong",
+      "evidence": [
+        {
+          "source_id": "src_sprudge_2022",
+          "quote": "single origin, even our espresso offerings"
+        },
+        {
+          "source_id": "src_sprudge_2017",
+          "quote": "herbal, green, and black teas"
+        },
+        {
+          "source_id": "src_infatuation_losfeliz",
+          "quote": "incredible coffee, particularly drip coffee, pour-overs, and slow-drip cold brew"
+        }
+      ],
+      "method": "search",
+      "notes_for_editor": null
+    },
+    {
+      "field_key": "wifi",
+      "proposed_value": null,
+      "raw_value": null,
+      "confidence": "empty",
+      "confidence_reason": "confidence: empty",
+      "evidence": [],
+      "method": "search",
+      "notes_for_editor": "Check Google Maps listing or ask staff directly"
+    },
+    {
+      "field_key": "cups",
+      "proposed_value": "Stylish ceramic cups",
+      "raw_value": null,
+      "confidence": "medium",
+      "confidence_reason": "confidence: medium",
+      "evidence": [
+        {
+          "source_id": "src_sprudge_2017",
+          "quote": "served in a stylish ceramic cup"
+        }
+      ],
+      "method": "search",
+      "notes_for_editor": null
+    },
+    {
+      "field_key": "staff_energy",
+      "proposed_value": null,
+      "raw_value": null,
+      "confidence": "empty",
+      "confidence_reason": "confidence: empty",
+      "evidence": [],
+      "method": "search",
+      "notes_for_editor": "Field visit required — not captured in reviews"
+    },
+    {
+      "field_key": "best_time",
+      "proposed_value": null,
+      "raw_value": null,
+      "confidence": "empty",
+      "confidence_reason": "confidence: empty",
+      "evidence": [],
+      "method": "search",
+      "notes_for_editor": "Check Google Maps popular times graph"
+    },
+    {
+      "field_key": "price_signal",
+      "proposed_value": null,
+      "raw_value": null,
+      "confidence": "empty",
+      "confidence_reason": "confidence: empty",
+      "evidence": [],
+      "method": "search",
+      "notes_for_editor": "Check Google Maps price level or recent menu photos"
+    },
+    {
+      "field_key": "reservation_mode",
+      "proposed_value": "walk-in",
+      "raw_value": null,
+      "confidence": "medium",
+      "confidence_reason": "confidence: medium",
+      "evidence": [
+        {
+          "source_id": "src_infatuation_losfeliz",
+          "quote": "standing room only"
+        }
+      ],
+      "method": "search",
+      "notes_for_editor": null
+    },
+    {
+      "field_key": "roasts_own",
+      "proposed_value": "Yes, roasts in-house on site",
+      "raw_value": null,
+      "confidence": "strong",
+      "confidence_reason": "confidence: strong",
+      "evidence": [
+        {
+          "source_id": "src_sprudge_2022",
+          "quote": "roasting our own coffee for about three years now"
+        },
+        {
+          "source_id": "src_sprudge_2022",
+          "quote": "roastery in Los Angeles"
+        }
+      ],
+      "method": "search",
+      "notes_for_editor": null
+    },
+    {
+      "field_key": "neighborhood_context",
+      "proposed_value": "Located on Hillhurst Avenue in Los Feliz, a small neighborhood between Silver Lake and Hollywood lined with independent businesses.",
+      "raw_value": null,
+      "confidence": "strong",
+      "confidence_reason": "confidence: strong",
+      "evidence": [
+        {
+          "source_id": "src_sprudge_2017",
+          "quote": "small neighborhood in Los Angeles that borders Silver Lake and Hollywood"
+        },
+        {
+          "source_id": "src_official_site",
+          "quote": "1936 Hillhurst Ave., Los Angeles, CA 90027"
+        }
+      ],
+      "method": "search",
+      "notes_for_editor": null
+    },
+    {
+      "field_key": "similar_energy",
+      "proposed_value": null,
+      "raw_value": null,
+      "confidence": "empty",
+      "confidence_reason": "confidence: empty",
+      "evidence": [],
+      "method": "search",
+      "notes_for_editor": "Editor judgment — suggest after visiting similar minimalist coffee bars"
+    }
+  ],
+  "_meta": {
+    "extracted_at": "2026-02-04T02:59:28.276Z",
+    "model": "claude-sonnet-4-20250514",
+    "prompt_version": "v2.2",
+    "source_count": 5,
+    "field_count": 16,
+    "null_count": 6,
+    "duration_ms": 28947
+  }
+}

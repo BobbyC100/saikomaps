@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Saiko Maps — Headers & Footers (Approved)</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #F5F5F5;
+      padding: 40px;
+      min-height: 100vh;
+    }
+
+    /* ========================================
+       DESIGN TOKENS
+       ======================================== */
+    :root {
+      --color-background: #FFFFFF;
+      --color-background-alt: #FAFAF9;
+      --color-text-primary: #1A1A1A;
+      --color-text-secondary: #6B6B6B;
+      --color-text-tertiary: #9A9A9A;
+      --color-accent: #E07A5F;
+      --color-border: #E5E5E5;
+      --color-border-subtle: #F0F0F0;
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #9A9A9A;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .section {
+      margin-bottom: 40px;
+    }
+
+    .mockup-container {
+      border: 1px solid var(--color-border);
+      border-radius: 2px;
+      overflow: hidden;
+      background: white;
+    }
+
+    /* ========================================
+       HEADER — LOGGED IN
+       ======================================== */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 24px;
+      background-color: var(--color-background);
+      border-bottom: 1px solid var(--color-border-subtle);
+    }
+
+    .header__logo {
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      color: var(--color-text-primary);
+      text-decoration: none;
+    }
+
+    .header__nav {
+      display: flex;
+      gap: 24px;
+      font-size: 14px;
+    }
+
+    .header__nav a {
+      color: var(--color-text-secondary);
+      text-decoration: none;
+    }
+
+    .header__nav a:hover {
+      color: var(--color-text-primary);
+    }
+
+    .header__nav a.accent {
+      color: var(--color-accent);
+      font-weight: 500;
+    }
+
+    /* ========================================
+       FOOTER — STANDARD
+       ======================================== */
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 24px;
+      background-color: var(--color-background);
+      border-top: 1px solid var(--color-border-subtle);
+    }
+
+    .footer__wordmark {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--color-text-secondary);
+    }
+
+    .footer__link {
+      font-size: 13px;
+      color: var(--color-text-tertiary);
+      text-decoration: none;
+    }
+
+    .footer__link:hover {
+      color: var(--color-text-secondary);
+    }
+
+    /* Footer Minimal */
+    .footer--minimal {
+      justify-content: center;
+      padding: 12px 24px;
+    }
+
+    .footer--minimal .footer__wordmark {
+      font-size: 12px;
+      color: var(--color-text-tertiary);
+    }
+
+    /* Page title */
+    h1 {
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin-bottom: 32px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Headers &amp; Footers — Approved</h1>
+
+  <!-- Header: Logged In -->
+  <div class="section">
+    <div class="section-label">Header — Logged In</div>
+    <div class="mockup-container">
+      <header class="header">
+        <a href="#" class="header__logo">SAIKO MAPS</a>
+        <nav class="header__nav">
+          <a href="#">Create New</a>
+          <a href="#">Dashboard</a>
+          <a href="#">Account</a>
+          <a href="#">Sign Out</a>
+        </nav>
+      </header>
+    </div>
+  </div>
+
+  <!-- Header: Logged Out -->
+  <div class="section">
+    <div class="section-label">Header — Logged Out</div>
+    <div class="mockup-container">
+      <header class="header">
+        <a href="#" class="header__logo">SAIKO MAPS</a>
+        <nav class="header__nav">
+          <a href="#">Sign In</a>
+          <a href="#" class="accent">Create Your Own</a>
+        </nav>
+      </header>
+    </div>
+  </div>
+
+  <!-- Header: Immersive (Map/Merchant View) -->
+  <div class="section">
+    <div class="section-label">Header — Immersive (Map/Merchant View)</div>
+    <div class="mockup-container">
+      <header class="header" style="justify-content: flex-start;">
+        <a href="#" class="header__logo">SAIKO MAPS</a>
+      </header>
+    </div>
+  </div>
+
+  <!-- Footer: Standard -->
+  <div class="section">
+    <div class="section-label">Footer — Standard</div>
+    <div class="mockup-container">
+      <footer class="footer">
+        <span class="footer__wordmark">Saiko Maps</span>
+        <a href="#" class="footer__link">About</a>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Footer: Minimal -->
+  <div class="section">
+    <div class="section-label">Footer — Minimal (Map/Merchant View)</div>
+    <div class="mockup-container">
+      <footer class="footer footer--minimal">
+        <span class="footer__wordmark">Saiko Maps</span>
+      </footer>
+    </div>
+  </div>
+
+</body>
+</html>

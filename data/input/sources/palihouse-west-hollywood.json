@@ -1,0 +1,32 @@
+{
+  "place_slug": "palihouse-west-hollywood",
+  "sources": [
+    {
+      "source_id": "src_michelin_guide_2024",
+      "publication": "Michelin Guide",
+      "title": "Palihouse West Hollywood - Los Angeles Area",
+      "url": "https://guide.michelin.com/us/en/hotels-stays/los-angeles-area/palihouse-west-hollywood-391",
+      "published_at": "",
+      "trust_level": "editorial",
+      "content": "As you'd expect based on the Palisociety brand's previous form, the Palihouse West Hollywood is a vintage-inspired stunner — its design incorporates L.A.'s plentiful European influences and encompasses a multitude of eras on the way to delivering a blend that ultimately feels fresh and fully realized. In its comforts it's in the happy middle between boutique minimalism and hyper-luxe ostentatiousness; custom-made furniture, Diptyque bath products, and well-stocked SMEG mini-fridges set the tone. And the social life, as is customary in a hotel like this, is just as important as the accommodations. The hotel's Lobby Lounge Café & Bar is just what it sounds like: a versatile space suited for everything from solo work to late-night revelry; meanwhile the Pool Lounge is an indoor-outdoor space for hotel guests only. How to get there: Palihouse West Hollywood is a 30-minute drive from Los Angeles International Airport, but the trip can take up to an hour in traffic."
+    },
+    {
+      "source_id": "src_the_infatuation_2025",
+      "publication": "The Infatuation",
+      "title": "Palihouse West Hollywood - Review",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/palihouse-west-hollywood",
+      "published_at": "2025-11-12",
+      "trust_level": "editorial",
+      "content": "Palihouse West Hollywood is located at 8384 W 3rd St, Los Angeles, CA 90048, West Hollywood, CA 90069. Ladyhawk is a modern Lebanese restaurant in West Hollywood that's an improvement over your average hotel restaurant. Get the mezze platter."
+    },
+    {
+      "source_id": "src_time_out_la_2021",
+      "publication": "Time Out LA",
+      "title": "Palihouse",
+      "url": "https://www.timeout.com/los-angeles/hotels/palihouse",
+      "published_at": "2021-06-09",
+      "trust_level": "editorial",
+      "content": "Designed like an artist's studio with shelves of old books, exposed brick walls and custom-designed leather furniture, every suite at Palihouse comes equipped with a microwave, two-top burner and dishware—making the hotel perfect for anyone who plans to make LA their home for a few weeks or even a few months. With fun hangout spaces like the casual courtyard restaurant Mardi and the vintage-inspired lobby lounge, you may never want to leave."
+    }
+  ]
+}

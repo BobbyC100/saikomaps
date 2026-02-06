@@ -1,0 +1,32 @@
+{
+  "place_slug": "tabula-rasa",
+  "sources": [
+    {
+      "source_id": "src_punch_2017",
+      "publication": "Punch",
+      "title": "America's New Vinyl Bars",
+      "url": "https://punchdrink.com/articles/america-new-best-record-bars-vinyl-nyc-la/",
+      "published_at": "2017-11-28",
+      "trust_level": "editorial",
+      "content": "Like many of Tokyo's vinyl havens, Tabula Rasa Bar in Los Angeles seems less concerned with what you see on the outside of the bar than what you experience upon entering. Co-owner Daniel Flores first used his personal collection, accrued over 20 years since first pilfering from his grandparents' basement in junior high, to stock the records that line the back bar. Flores, who came up in hospitality managing such forward-thinking restaurants as Bäco Mercat and Bestia, wanted to get back to his roots as a musician and DJ when he and his partner Zach Negin opened Tabula Rasa in 2016. The process of selecting and playing record is a \"tactile experience,\" he says, \"something that we've lost as a culture.\" The result was a low-key space with a menu of natural wines, a much-beloved panini-grilled burger and, of course, vinyl. \"Wine is the same way—wine comes from a specific place,\" Flores says, referring to records as having a tangible provenance."
+    },
+    {
+      "source_id": "src_theinfatuation_2023",
+      "publication": "The Infatuation",
+      "title": "Tabula Rasa - Review",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/tabula-rasa",
+      "published_at": "2023-11-23",
+      "trust_level": "editorial",
+      "content": "Located on Hollywood Blvd. in Thai Town, the small spot has a stripped-down, almost industrial feel to it, with a laid-back crowd to match. The wine list is short but solid, and they have great beer as well. A wine bar that doesn't suck? Tabula Rasa is your answer."
+    },
+    {
+      "source_id": "src_timeout_la_2023",
+      "publication": "Time Out LA",
+      "title": "Tabula Rasa Bar",
+      "url": "https://www.timeout.com/los-angeles/bars/tabula-rasa-bar",
+      "published_at": "2023-08-12",
+      "trust_level": "editorial",
+      "content": "Nestled on the far edge of Thai Town, this neighborhood wine bar offers ample space and plenty of booths for large groups. The wine list is funky and there's a decent snack selection, but what sets Tabula Rasa apart is the fact it's open until 2am on Fridays and Saturdays—a rarity among wine bars. A daily happy hour from 4 to 6pm nets you $7 glasses of house wine and $2 off all other varieties, making this place a boon for anyone looking for a discounted drinking experience near East Hollywood."
+    }
+  ]
+}

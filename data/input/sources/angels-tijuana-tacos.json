@@ -1,0 +1,41 @@
+{
+  "place_slug": "angels-tijuana-tacos",
+  "sources": [
+    {
+      "source_id": "src_theinfatuation_2024",
+      "publication": "The Infatuation",
+      "title": "Angel's Tijuana Tacos - Review - North Hollywood - Los Angeles",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/angels-tijuana-tacos",
+      "published_at": "2024-08-27",
+      "trust_level": "editorial",
+      "content": "If taco stands were judged the same way as baseball prospects, Angel's Tijuana Tacos would be what coaches call a five-tool player. Not only does this taco stand with locations all over LA County excel at juicy al pastor with a flick of pineapple, they also serve smoky grilled asada and flavorful braised meats like cabeza, too. In fact, from the bright salsas to the pressed-to-order tortillas, we've yet to encounter anything Angel's doesn't do well (dry cleaning? tax services?). Even if you insist you've had better this or that at other taco spots, rarely can you find all of it in one place, never mind an operation that has 12 locations stretching from North Hollywood to Long Beach. We're not Angels fans but we're Angel's fans, dig?"
+    },
+    {
+      "source_id": "src_theinfatuation_2023",
+      "publication": "The Infatuation",
+      "title": "Angel's Tijuana Tacos Echo Park - Review - Echo Park",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/angels-tijuana-tacos-echo-park",
+      "published_at": "2023-11-23",
+      "trust_level": "editorial",
+      "content": "Drive down Sunset in Echo Park on any given night, and you'll see a long line forming at this casual taco stand. It's a serious sidewalk operation complete with al pastor on a spit and a respectable salsa bar. We're huge fans of both the smoky grilled asada and the juicy al pastor with a flick of pineapple, and no matter what you order, you can easily spend less than $10 on dinner here. Take your tacos just up the hill to Everett Park and eat on the grass with great views of the DTLA skyline."
+    },
+    {
+      "source_id": "src_theinfatuation_2023",
+      "publication": "The Infatuation",
+      "title": "Angel's Tijuana Tacos - Review - Eagle Rock",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/angels-tijuana-tacos-eagle-rock-la",
+      "published_at": "2023-10-11",
+      "trust_level": "editorial",
+      "content": "If you're even slightly in the mood for tacos in Eagle Rock, all roads lead to Angel's. This sidewalk operation has multiple tents with people chopping juicy al pastor off a Titanic-sized trompo and plopping piles of the smoky meat into handmade tortillas. There's no seating whatsoever, so most people park in the nearby Target lot and eat their Tijuana-style tacos under the street lights. Whatever you decide, don't come here in a rush. Wait times can be over thirty minutes during peak dinner hours."
+    },
+    {
+      "source_id": "src_timeout_2020",
+      "publication": "Time Out LA",
+      "title": "Angel's Tijuana Tacos",
+      "url": "https://www.timeout.com/los-angeles/restaurants/angels-tijuana-tacos",
+      "published_at": "2020-08-06",
+      "trust_level": "editorial",
+      "content": "No matter where you go, you'll find tacos packed with flavor and your choice of grilled meat and then, as to be expected from the style, a sprinkling of cilantro and onions along with a hearty dollop of avocado salsa."
+    }
+  ]
+}

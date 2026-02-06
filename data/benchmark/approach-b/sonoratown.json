@@ -1,0 +1,41 @@
+{
+  "place_slug": "sonoratown",
+  "sources": [
+    {
+      "source_id": "src_infatuation_2021",
+      "publication": "The Infatuation",
+      "title": "Sonoratown - Review - Downtown LA",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/sonoratown",
+      "published_at": "2021-09-01",
+      "trust_level": "editorial",
+      "content": "When it comes to choosing which tacos to eat downtown, the decision can be difficult. We'll make it easy for you—go to Sonoratown. This tiny, order-at-the-counter taco spot is a bit removed from the main downtown hustle, but it's worth the extra few blocks walk. All the tortillas are made in-house and the carne asada is phenomenal. If you're in the mood for something more substantial, go for a carne asada burrito. Well, technically you'll have to order the \"Burrito 2.0,\" which is full of chunky guacamole, spicy salsa chiltepin, and plump pinto beans. Paired with their juicy steak and flaky flour tortilla, this loaded burrito is good enough to make you want to come back on a weekly basis."
+    },
+    {
+      "source_id": "src_infatuation_2022",
+      "publication": "The Infatuation",
+      "title": "The 25 Best Tacos In Los Angeles, Ranked",
+      "url": "https://www.theinfatuation.com/los-angeles/guides/the-best-tacos-in-los-angeles",
+      "published_at": "2022-01-21",
+      "trust_level": "editorial",
+      "content": "Carne asada competition is tough in LA, but Sonoratown has managed to take a tiny taqueria space in Downtown and build it into a full-on institution for Sonoran-style tacos. The legendary housemade flour tortillas here melt in your mouth, and the charred steak that gets tucked inside has the exact right degree of saltiness. You can certainly opt for Sonoratown's regular tacos, but our move is the caramelo, which measures roughly double the size and comes topped with pinto beans, jack cheese, salsa roja, avocado, and diced cabbage. There's a second location in Mid-City as well, with much easier parking."
+    },
+    {
+      "source_id": "src_infatuation_2025",
+      "publication": "The Infatuation",
+      "title": "The 17 Best Restaurants In Downtown Los Angeles",
+      "url": "https://www.theinfatuation.com/los-angeles/guides/the-best-restaurants-in-downtown-la",
+      "published_at": "2025-07-10",
+      "trust_level": "editorial",
+      "content": "But Sonoratown has managed to take a tiny space on Los Angeles St. and turn it into an institution. Their house-made flour tortillas melt in your mouth, and their charred grilled steak is smoky, sweet, and the exact right level of salty."
+    },
+    {
+      "source_id": "src_timeout_la_2021",
+      "publication": "Time Out LA",
+      "title": "Sonoratown | Restaurants in Downtown Fashion District, Los Angeles",
+      "url": "https://www.timeout.com/los-angeles/restaurants/sonoratown",
+      "published_at": "2021-04-02",
+      "trust_level": "editorial",
+      "content": "Sonoratown specializes in—you guessed it—Sonoran-style fare, which means tacos, quesadillas and chivis (think: soft chimichangas oozing cheese) all packed with fresh and straightforward ingredients that will have you planning a Northern Mexico vacation with every bite. It feels like home the second you walk through the door. Well, that, or a party. The staff are lively, open and fun-loving, and their mood is infectious. Patrons from all walks smile, laugh and even dance, all to the scent of chargrilled meats that get slid into handmade award-winning flour tortillas. Dishes get brightened by cabbage and a rainbow of house salsas, and topped by entire strands of grilled green onions."
+    }
+  ]
+}

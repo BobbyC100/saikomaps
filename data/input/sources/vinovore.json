@@ -1,0 +1,23 @@
+{
+  "place_slug": "vinovore",
+  "sources": [
+    {
+      "source_id": "src_theinfatuation_2021",
+      "publication": "The Infatuation",
+      "title": "Our Favorite LA Wine Shops",
+      "url": "https://www.theinfatuation.com/los-angeles/guides/the-best-wine-shops-in-la",
+      "published_at": "2021-01-13",
+      "trust_level": "editorial",
+      "content": "Vinovore is a Virgil Village wine shop that exclusively features bottles from women winemakers. There are varietals from across the world, and every bottle comes with a card that'll tell you about the wine you're drinking - whether it's a note about Chenoa Ashton-Lewis' Ashanta Wines, or a chillable red wine that's \"showy and explosive, like your crazy BF from college.\" Most bottles are under $75. Order online for curbside pick-up, local delivery, or FedEx shipping, or stop by their pick-up window."
+    },
+    {
+      "source_id": "src_timeout_2021",
+      "publication": "Time Out LA",
+      "title": "Vinovore",
+      "url": "https://www.timeout.com/los-angeles/shopping/vinovore",
+      "published_at": "2021-03-02",
+      "trust_level": "editorial",
+      "content": "One of Silver Lake's best wine shops, Vinovore not only offers a wide array of wines at a price points—it's also one of the only wine shops in the country to focus on wine made by women. Stop by for regular tasting events, peruse the wines (again, made entirely by women) or pick up one of the shop's signature \"Beast Boxes,\" which are meant to drive an entire evening or outing: they may contain a bottle of wine, a wine key, cups, chocolate or other useful items for a night in."
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "place_slug": "rustic-canyon",
+  "sources": [
+    {
+      "source_id": "src_michelin_2025",
+      "publication": "Michelin Guide",
+      "title": "Rustic Canyon – Santa Monica - a MICHELIN Guide Restaurant",
+      "url": "https://guide.michelin.com/us/en/california/santa-monica/restaurant/rustic-canyon",
+      "published_at": "2025-06-25",
+      "trust_level": "editorial",
+      "content": "A sense of community and warm hospitality pervades this beloved Santa Monica institution where the lighting is just right and where the bar and booths exude intimacy. Open since 2006, the restaurant has gone through many chapters and evolutions, but one guiding, foundational principle is a commitment to market-driven cooking. The menu today proudly acknowledges the farmers and producers behind every asparagus, chicory, persimmon and fish. The cooking is far from fussy. Think hearty pork terrines with pickled cauliflower, poached trout with sauerkraut, bay scallops with tomatoes and saffron, and roast chicken with walnut mole. Cocktails also follow the seasons and should be explored with no hesitation."
+    },
+    {
+      "source_id": "src_theinfatuation_2024",
+      "publication": "The Infatuation",
+      "title": "Rustic Canyon - Review - Santa Monica - Los Angeles - The Infatuation",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/rustic-canyon",
+      "published_at": "2024-08-03",
+      "trust_level": "editorial",
+      "content": "As quintessentially Santa Monica as Bernedoodles or brisk walks down Montana Avenue, Rustic Canyon is a cozy Westside restaurant best known for its close relationship with the Santa Monica Farmer's Market. For the past two decades, this upscale spot has been turning produce from local farms into gorgeous, snacky dishes that belong in a California tourism brochure. Recently Rustic Canyon's longtime chef-partner Jeremy Fox took over the kitchen once again and it appears as though he's there to stay. We've been pretty impressed with recent meals we've had, so check back soon for an updated review and rating."
+    },
+    {
+      "source_id": "src_timeout_2025",
+      "publication": "Time Out LA",
+      "title": "Rustic Canyon | Restaurants in Santa Monica, Los Angeles",
+      "url": "https://www.timeout.com/los-angeles/restaurants/rustic-canyon",
+      "published_at": "2025-02-07",
+      "trust_level": "editorial",
+      "content": "Since 2006—long before farm-to-table menus became fine dining de rigueur in L.A.—Rustic Canyon has been serving the best locally sourced meat and produce to tourists and neighborhood regulars alike. The menu changes on a seasonal basis, though you'll always find the wonderfully snacky lavender almonds alongsides locally sourced seafood and sustainably farmed pork and beef offset by the season's finest produce. No matter what you order, Rustic Canyon's dishes are fresh, comforting and comfortable—there's not a lot of pomp and circumstance in these plates, though the flavor's always there (vegetable or no). On Tuesday evenings, look to the $75 set menu for a more affordable way to experience Rustic Canyon."
+    },
+    {
+      "source_id": "src_lamag_2025",
+      "publication": "LA Magazine",
+      "title": "Rustic Canyon Celebrates A Unique Intersection of New Orleans and Los Angeles",
+      "url": "https://lamag.com/food/rustic-canyon-celebrates-a-unique-intersection-of-new-orleans-and-los-angeles/",
+      "published_at": "2025-08-21",
+      "trust_level": "editorial",
+      "content": "This summer, Rustic Canyon is launching Louisiana x Los Angeles (LaxLA), a bold new dinner series celebrating the intersection of two of America's most inventive culinary cities. Beginning Thursday, July 17, and running through September 4, this weekly Thursday-night series will spotlight a rotating roster of celebrated chefs from New Orleans and L.A., offering an ever-evolving menu that explores the tradition and innovation found within both regions. Rustic Canyon, a staple of Santa Monica's dining culture, is bringing these two cities together in a series that honors both Louisiana's Southern soulful Cajun-Creole roots and California's fresh, ingredient-forward ethos."
+    }
+  ]
+}

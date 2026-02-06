@@ -1,0 +1,59 @@
+{
+  "place_slug": "leos-tacos-truck",
+  "sources": [
+    {
+      "source_id": "src_theinfatuation_2024_sunset",
+      "publication": "The Infatuation",
+      "title": "Leo's Tacos Truck - Review - East Hollywood - Los Angeles",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/leos-tacos-truck-sunset",
+      "published_at": "2024-08-27",
+      "trust_level": "editorial",
+      "content": "You're not officially an Angeleno until you've stumbled out of a bar and kept right on stumbling to one of Leo's Tacos trucks. Their largest operation is at the WSS at Western and Sunset, where they have a full two-truck set-up and more picnic tables than most actual restaurants. They're here from 10am-2am during the week (3am on weekends) so pretty much any time you want some spit-roasted al pastor, you've got access to it. And that's what most people here are eating: Crispy, sweet al pastor on a corn tortilla, topped with pineapple and whatever you choose from a huge selection of salsas. The mulitas are also great, and if we really want to make sure we're hangover-free tomorrow, we get a carne asada burrito, loaded with rice, beans, cheese, and meat. Make sure you bring cash, otherwise, you'll end up having to Venmo the stranger who lent you $10 last night."
+    },
+    {
+      "source_id": "src_theinfatuation_2024_labrea",
+      "publication": "The Infatuation",
+      "title": "Leo's Tacos Truck - Review - Mid-Wilshire - Los Angeles",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/tacos-leo",
+      "published_at": "2024-11-23",
+      "trust_level": "editorial",
+      "content": "The black and orange taco truck in the parking lot of a 76 gas station on the corner of La Brea and Venice established itself as a member of LA's taco elite for serving fantastic al pastor shaved from the spit every night of the week. The meat itself is fantastic, but the secret is those chunks of pineapple. Refilling your gas tank in Mid-City was not supposed to taste this good. Truly Excellent: An 8 should be on your must-try list, because 8s are great. These spots are worth making an effort or crossing town for."
+    },
+    {
+      "source_id": "src_theinfatuation_2024_foodtrucks",
+      "publication": "The Infatuation",
+      "title": "The 11 Best Food Trucks in Los Angeles",
+      "url": "https://www.theinfatuation.com/los-angeles/guides/best-food-trucks-los-angeles",
+      "published_at": "2024-11-22",
+      "trust_level": "editorial",
+      "content": "Leo's doesn't skimp on toppings, and you can help yourself to a plentiful salsa bar at many of its trucks. There are rites of passage that make up the Los Angeles experience, like going to a Dodgers game, anxiously merging across five lanes on the 110, and our personal favorite, ordering one of the best meals of your life from a food truck. The greatest late nights are spent alongside a bunch of strangers waiting for tacos from one of L.A.'s many excellent loncheras. Since the food truck boom of the early 2000s, there are some newcomers on the scene and old-school spots still going strong about 20 years in. We searched all over town for the best food on wheels, from stuffed smashburgers to katsu curry sandwiches and lobster rolls dripping with truffle oil."
+    },
+    {
+      "source_id": "src_theinfatuation_2024_latenight",
+      "publication": "The Infatuation",
+      "title": "The Best Late Night Restaurants In LA",
+      "url": "https://www.theinfatuation.com/los-angeles/guides/best-late-night-restaurants-los-angeles",
+      "published_at": "2024-06-21",
+      "trust_level": "editorial",
+      "content": "The line for Leo's tacos stretches across the parking lot for a reason. This gas station taco truck at the corner of La Brea and Venice makes one of the best al pastor tacos in town. And their carne asada tacos are tasty too. We wouldn't throw either out of bed. Open until 2am every night and 3:30am weekends."
+    },
+    {
+      "source_id": "src_timeout_2025",
+      "publication": "Time Out LA",
+      "title": "Leo's Taco Truck | Restaurants in Mid City, Los Angeles",
+      "url": "https://www.timeout.com/los-angeles/restaurants/leos-taco-truck",
+      "published_at": "2025-03-01",
+      "trust_level": "editorial",
+      "content": "Leo's now has a dozen locations, but it's the gas station truck at La Brea and Venice that offers the reliably consistent outdoor trompos manned by talented taqueros on weekends and after 5pm on weeknights."
+    },
+    {
+      "source_id": "src_timeout_2025_bestfoodtrucks",
+      "publication": "Time Out LA",
+      "title": "The best food trucks in Los Angeles",
+      "url": "https://www.timeout.com/los-angeles/restaurants/best-food-trucks-in-los-angeles",
+      "published_at": "2025-12-10",
+      "trust_level": "editorial",
+      "content": "Although Leo's draws its largest crowds on weekend nights from the going out set, this isn't just your average drunchie. Operating like a well-oiled machine, the staff at each Leo's location deftly serves each customer's tacos, calling out numbers in both Spanish and English. Upon receiving your order, you can ask them for pre-packaged little plastic baggies of onions, cilantro and salsa—a pandemic-era safety and hygiene upgrade. Whether eaten in open air or taken home, the thin slices of al pastor, topped with a bit of pineapple, are a beautiful sight to behold—and consume. Though it may be tempting to only order their tacos al pastor, Leo's is no slouch in the offal department either. To diversify your taco order, order their buche (pork), cabeza (beef) and tripas (beef)."
+    }
+  ]
+}

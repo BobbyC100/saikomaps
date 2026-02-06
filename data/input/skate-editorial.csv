@@ -1,0 +1,16 @@
+name,lat,lng,region,spotType,tags,surface,description
+Venice Pavilion,33.9855,-118.4722,venice-westside,plaza,"ledge;stairs;manual pad;banks",smooth,Historic Venice street spot. The Pavilion and surrounding area have been a skateboarding landmark since the 1970s.
+Santa Monica Courthouse,34.0195,-118.4912,venice-westside,plaza,"ledge;stairs;rail",smooth,Santa Monica Courthouse plaza. Classic SoCal spot with ledges and stairs.
+Windward Plaza,33.9858,-118.4730,venice-westside,plaza,"ledge;manual pad",smooth,Venice Beach plaza near the boardwalk. Popular with locals.
+Hollywood High,34.1016,-118.3222,hollywood,school,"stairs;ledge;rail",mixed,Hollywood High School. Iconic LA street spot, widely documented.
+Lockwood Elementary,34.0989,-118.3189,hollywood,school,"ledge;stairs",mixed,Lockwood Elementary in Hollywood. Classic schoolyard spot.
+Belmont High,34.0412,-118.2875,hollywood,school,"stairs;ledge;rail",mixed,Belmont High School. Well-known East LA street spot.
+LA Courthouse (Spring St),34.0522,-118.2437,downtown,plaza,"ledge;stairs;banks",smooth,Historic downtown courthouse. Multiple spots around the complex.
+City Hall Ledges,34.0537,-118.2428,downtown,plaza,"ledge;stairs",smooth,LA City Hall plaza. Ledges and stairs, iconic DTLA spot.
+DTLA Banks,34.0489,-118.2495,downtown,street,"banks;transition",smooth,DTLA bank spots. Various street transitions downtown.
+Torrance Park,33.8356,-118.3406,south-bay,park,"bowl;street;ledge",smooth,Torrance Skatepark. Mix of bowl and street elements.
+Hermosa Pier Area,33.8622,-118.3995,south-bay,street,"ledge;manual pad",mixed,Hermosa Beach pier area. Street spots near the sand.
+El Porto Walls,33.9033,-118.4192,south-bay,street,"wall;banks",rough,El Porto area. Wall rides and banks near the beach.
+Balboa Park,34.1975,-118.5342,san-fernando-valley,park,"bowl;street;ledge",smooth,Balboa Park skatepark. Valley staple with bowl and street.
+North Hollywood Skatepark,34.1867,-118.3811,san-fernando-valley,park,"bowl;street;quarter-pipe",smooth,NoHo skatepark. Popular valley park with good flow.
+Hollenbeck Park,34.0311,-118.2186,east-la,park,"bowl;street",mixed,Hollenbeck Park in Boyle Heights. East LA landmark.

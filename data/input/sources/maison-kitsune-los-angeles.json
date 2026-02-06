@@ -1,0 +1,32 @@
+{
+  "place_slug": "maison-kitsune-los-angeles",
+  "sources": [
+    {
+      "source_id": "src_timeout_la_2024",
+      "publication": "Time Out LA",
+      "title": "Café Kitsuné",
+      "url": "https://www.timeout.com/los-angeles/restaurants/cafe-kitsune",
+      "published_at": "2024-02-10",
+      "trust_level": "editorial",
+      "content": "This French-Japanese streetwear brand's eponymous cafe is one of the newer additions to Silver Lake's coffee shop scene—and what it lacks in square footage, it makes up for in style. No laptops or tablets are allowed, but patrons still fill the space at all hours for matcha lattes and coffee standards served in branded cups and glasses, plus the chance to snap a photo of the space or their drink. Avoid the namesake drink on the menu; it's an expensive, chalky-tasting mix of turmeric, ginger and orange juice that makes a mockery of Los Angeles tastebuds."
+    },
+    {
+      "source_id": "src_dezeen_2024",
+      "publication": "Dezeen",
+      "title": "Café Kitsuné Los Angeles features Parisian interiors with 'Japanese twist'",
+      "url": "https://www.dezeen.com/2024/01/27/cafe-kitsune-los-angeles/",
+      "published_at": "2024-01-30",
+      "trust_level": "editorial",
+      "content": "Paris-based lifestyle brand Kitsuné has opened a cafe next to its boutique in Silver Lake, Los Angeles, both with minimalist interiors featuring white oak and stainless steel. The interiors of the new Café Kitsuné and the renovated Maison Kitsuné store were designed by co-founder Masaya Kuroki to reflect the brand's French-Japanese culture as well as the West Coast setting. Facing Sunset Boulevard on the east side of the city, this is the brand's fourth cafe in North America – following locations in Manhattan, Brooklyn and Vancouver – and its first in LA. \"A sprawling city of diverse findings, from cutting-edge restaurants to pockets of art and architecture second to none, LA has lent design inspiration and a backdrop to several campaigns for the fashion house,\" said the Kitsuné team. Inside the 700-square-foot (65-square-metre) cafe, white oak tables and brushed stainless-steel counters feature alongside burnt orange dining chairs and upholstered benches. Another Sincich mural covers the full length of a wall, offering \"a whimsical take on Café Kitsuné's standard appearance\" and presenting the space as an \"old-school market\". A speaker system by Japanese audio company Rotel was installed in the cafe \"to provide a top-notch sound experience for customers\", according to Kitsuné. Kitsuné was founded by 2002 by Kuroki and Gildas Loaëc and encompasses the fashion brand, Maison Kitsuné; a music label, Kitsuné Musique; and its line of cafes, bars and restaurants. Back in 2017, French designer Mathieu Lehanneur designed the Kitsuné store interior in New York's Soho, adding snaking metal rails for displaying garments."
+    },
+    {
+      "source_id": "src_sprudge_n_a",
+      "publication": "Sprudge",
+      "title": "",
+      "url": "",
+      "published_at": "",
+      "trust_level": "editorial",
+      "content": "No Sprudge article found"
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "place_slug": "langers-delicatessen",
+  "sources": [
+    {
+      "source_id": "src_michelin_guide_2025",
+      "publication": "Michelin Guide",
+      "title": "Langer's – Los Angeles - a MICHELIN Guide Restaurant",
+      "url": "https://guide.michelin.com/us/en/california/us-los-angeles/restaurant/langer-s",
+      "published_at": "2025-06-25",
+      "trust_level": "editorial",
+      "content": "Pico Blvd. is lined with Jewish delis, but stray from the pack and head to MacArthur Park and Langer's, which has been ladling matzoh ball soup since 1947. And while it began life as a 12-seat counter, it has transformed to a massive space—decked out with booths and that classic counter. Equally ample is the menu, with all of the requisite standards, such as latkes, blintzes and chopped liver. Breakfast is served all day, but if you're here for the first time, opt for the hot pastrami (provided by RC Provisions in Burbank) sandwich. Sugar-cured, seasoned and smoked; then piled with cheese, sauerkraut and grilled between two slices of rye—it's the king of the castle. The only way to make this meal better is to end with a slice of sinfully rich cheesecake."
+    },
+    {
+      "source_id": "src_the_infatuation_2025",
+      "publication": "The Infatuation",
+      "title": "At Langer's, perfection starts at #19 - Review - Los Angeles - The Infatuation",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/langers",
+      "published_at": "2025-03-06",
+      "trust_level": "editorial",
+      "content": "Let's get one thing clear. Langer's does not need this review. You do. Many folks outside LA would be surprised to learn the number of great Jewish delis in this city. Sure, you can find a $25 celebrity-sponsored smoothie if you want to, but finding a fantastic pastrami sandwich is our thing, too. And at Langer's, you aren't just eating the best pastrami in LA, you're eating what might be the best pastrami in the world—an icon of hand-cut smoked meat that beats anything you'd find at Katz's or Zingerman's. What sets Langer's further apart from the pack though is what you'll find at 7th and Alvarado every day. No tourist melee or commercial shtick. Just a 1940s-era diner filled with regulars sipping coffee and reading newspapers. Show up alone and you'll probably be telling your life story to an employee within ten minutes. Langer's menu is filled with solid versions of classic delicatessen specialties, but the clear standout—and arguably the most famous sandwich in LA—is the #19: thick, salty slices of pastrami so tender they jiggle, crisp housemade coleslaw, a not-quite-melted slice of swiss, and a subtle spread of russian dressing on soft double-baked rye. We're certainly not the first to call this the best pastrami sandwich in the world and we certainly won't be the last, but in this case, the hyperbole fits. We've eaten this sandwich over a hundred times, and each time we bite into it, the same thought enters our head, \"Good god, they've done it again.\" This is the main reason Langer's is so highly regarded and why, if you're reading this outside of California, it's time to start looking at flights. Langer's latkes are delicious. They're moist, crispy, and a good quarter-inch thick. The blintzes, however, are another story. A dry, very bland story."
+    },
+    {
+      "source_id": "src_michelin_guide_2019",
+      "publication": "Michelin Guide",
+      "title": "Behind the Bib: Langer's Deli",
+      "url": "https://guide.michelin.com/us/en/article/dining-out/langers-deli-los-angeles-history",
+      "published_at": "2019-11-27",
+      "trust_level": "editorial",
+      "content": "Opened in 1947, this pastrami-laced haven is a Los Angeles icon. When Nora Ephron claims that your pastrami sandwich is the best in the world, you know you're doing something right. For Norm Langer, owner of Langer's in Los Angeles, he's fully aware that he delivers a good product. The main goal is to ensure it stays that way. \"I put out the same product I put out today that I put out 50 years ago,\" Langer says. \"It's the same quality, consistency and volume of product. That's how I was taught.\" In a time when fickle food trends are ever-present and restaurants are rising and falling as quickly as it takes to make a McDonald's burger, there is one place that is entirely consistent: Langer's Deli. First opened as a 12-seat restaurant in 1947 by Langer's father, Albert J. Langer, Langer's Deli has, during its lifetime, taken over two more buildings and grown to 135 seats. As neighborhoods in Los Angeles expand and trend, Langer's has also remained in its same location on South Alvarado Street in Westlake. The stout brick building, which has a thick green panel that runs above the roof that reads \"Langer's Restaurant Delicatessen,\" has become an icon in the City of Angels. Inside, the vinyl interior of unchanged brown booths and pillowy bar stools, reminiscent of those in an old American diner, thousands of pastrami lovers have shared meals. The deli is a beacon for a Los Angeles past; for a time when people ventured out to eat a good ol' sandwich rather than numerous small plates laden with exotic ingredients. And the number 19 hot pastrami sandwich is generally how people like to eat it. Hand-sliced pastrami, Swiss cheese and coleslaw with Russian-style dressing, wedged between two pieces of warm rye, it is positively one of the most famous sandwiches in the city. A sandwich that has satisfied discerning customers for well over 50 years. It's this tireless consistency that sets Langer's apart in an industry of constant change and uncertainty."
+    },
+    {
+      "source_id": "src_la_magazine_2020",
+      "publication": "LA Magazine",
+      "title": "Best Jewish Deli is Langer's",
+      "url": "https://www.langersdeli.com/2020/07/24/los-angeles-magazine-best-jewish-deli-is-langers/",
+      "published_at": "2020-07-24",
+      "trust_level": "editorial",
+      "content": "Let's face it: most delis have the exact same menu, but, since 1947, Langer's Delicatessen has distinguished itself with the best pastrami in town, along with a perfectly anachronistic ambience. Steamed to perfection and hand-sliced, the thick strips of peppery, smoky beef almost melt on the tongue. When they're enjoyed in the famous No. 19 sandwich with coleslaw, Swiss cheese, and Russian dressing, it's easy to understand why this is a deli worthy of two James Beard Awards."
+    }
+  ]
+}

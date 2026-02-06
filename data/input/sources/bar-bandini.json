@@ -1,0 +1,41 @@
+{
+  "place_slug": "bar-bandini",
+  "sources": [
+    {
+      "source_id": "src_timeout_la_2023",
+      "publication": "Time Out LA",
+      "title": "Bar Bandini | Bars in Echo Park, Los Angeles",
+      "url": "https://www.timeout.com/los-angeles/bars/bar-bandini",
+      "published_at": "2023-08-12",
+      "trust_level": "editorial",
+      "content": "Cozy up to a date or a friend while sipping on craft beer and curated wines at this sexy Echo Park bar. Echo Park has a surprisingly large number of natural wine bars for such a small neighborhood, but Bar Bandini remains our top pick for its dark, sexy and unpretentious ambience. A curated selection of natural and organic wines and beers is listed on black letter boards, both legible and imposing in scale. Dark painted walls, suede banquettes and black slate surfaces are balanced with rustic exposed wood, conducive to both date nights and catching up with friends. Bar Bandini's recently added selection of solid snacks makes it easy to spend a long night of drinking here—the bar's open until 2am."
+    },
+    {
+      "source_id": "src_infatuation_2024",
+      "publication": "The Infatuation",
+      "title": "Bar Bandini - Review - Echo Park - Los Angeles",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/bar-bandini",
+      "published_at": "2024-02-26",
+      "trust_level": "editorial",
+      "content": "When it comes to a night out on the Eastside, Bar Bandini is never the first place that comes to mind. But this Echo Park wine bar deserves to be in your rotation. Bandini is one of those places that always seems to get the mood right - weekdays involve regulars drinking wine from the tap, and eating a part-burrata, part-mozzarella cheese that will change you. Come weekends, things get livelier, but never to the point where you have to worry about getting a lemon drop thrown in your face. In fact, it's beer and wine only. But it's also very far from being boring."
+    },
+    {
+      "source_id": "src_infatuation_eastside_2023",
+      "publication": "The Infatuation",
+      "title": "The 25 Best Bars On The Eastside - Los Angeles",
+      "url": "https://www.theinfatuation.com/los-angeles/guides/the-eastside-bar-guide",
+      "published_at": "2023-03-08",
+      "trust_level": "editorial",
+      "content": "Under-the-radar wine spot Bar Bandini isn't the first option that comes to mind for a big night out in Echo Park, but that's the reason we love it. The dark, narrow space is so stripped-down it looks like it's under construction, yet somehow the mood is always right: weekdays involve chill regulars drinking natural wine and craft beers from the tap and eating simple, tasty bar snacks like olives and cheese. Come weekends, things get livelier, but never to the point where you have to worry about getting a lemon drop thrown in your face. Bandini might be mellow, but it's never boring."
+    },
+    {
+      "source_id": "src_timeout_wine_bars_2024",
+      "publication": "Time Out LA",
+      "title": "22 Best Wine Bars in Los Angeles for Top-Notch Pours and Pet-Nat",
+      "url": "https://www.timeout.com/los-angeles/bars/wine-bars-in-la-where-to-sniff-swirl-and-sip",
+      "published_at": "2024-02-20",
+      "trust_level": "editorial",
+      "content": "Echo Park has a surprisingly large number of natural wine bars for such a small neighborhood, but Bar Bandini remains our top pick for its dark, sexy and unpretentious ambience. A curated selection of natural and organic wines and beers is listed on black letter boards, both legible and imposing in scale. Dark painted walls, suede banquettes and black slate surfaces are balanced with rustic exposed wood, conducive to both date nights and catching up with friends. Bar Bandini's recently added selection of solid snacks makes it easy to spend a long night of drinking here—and the bar's even open until 2am."
+    }
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "place_slug": "manuela",
+  "sources": [
+    {
+      "source_id": "src_michelin_guide_2025",
+      "publication": "Michelin Guide",
+      "title": "Manuela – Los Angeles - a MICHELIN Guide Restaurant",
+      "url": "https://guide.michelin.com/us/en/california/us-los-angeles/restaurant/manuela",
+      "published_at": "2025-06-25",
+      "trust_level": "editorial",
+      "content": "Tucked inside the multi-use Hauser & Wirth Arts Complex with an open-plan kitchen and conceptual art, Manuela has a creative, contemporary look and feel. The cooking is strong, with a Southern leaning, and features a menu with a heavy leaning toward local ingredients (including from their own garden). Choose a cocktail from their classic list, all elevated with house-made bitters and tonics. Warm, flaky biscuits with aged country ham and whipped butter are a must before a main course like their roasted duck breast with nicely rendered, crispy skin served over a bed of smoked soubise and paired with sliced yellow peaches. End the meal with one of their desserts, like their take on s'mores or their Harry's Berries and genmaicha shortbread ice cream."
+    },
+    {
+      "source_id": "src_michelin_guide_2025_dine_la",
+      "publication": "Michelin Guide",
+      "title": "Dine LA Restaurant Week has 34 MICHELIN Restaurants Participating",
+      "url": "https://guide.michelin.com/us/en/article/dining-out/la-restaurant-week-dine-los-angeles-michelin-guide-restaurants-hotels",
+      "published_at": "2025-07-22",
+      "trust_level": "editorial",
+      "content": "Manuela, Neighborhood: Arts District Cuisine: American Price: $65+ dinner menu. Creativity is in the air in this restaurant. Conceptual art and an open-plan kitchen whet the appetite, while Southern leaning dishes serve as entrée. Inspector notes: \"Inspired by deer camps from the local farming community, the venison burger sandwiched between brioche with pickled green tomato and fried leeks is top of the charts. Sprinkled with benne seeds, Gulf shrimp aguachile with cucumber and avocado is enriched by a ginger-lime dressing. Excellent desserts await, but for a simple finale go for one of the house-made sorbets.\""
+    },
+    {
+      "source_id": "src_the_infatuation_2024",
+      "publication": "The Infatuation",
+      "title": "Manuela - Review - Arts District - Los Angeles - The Infatuation",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/manuela",
+      "published_at": "2022-01-01",
+      "trust_level": "editorial",
+      "content": "Manuela is a Southern-ish restaurant in a lovely courtyard at Hauser & Wirth in the Arts District. Despite being inside an art gallery, isn't intimidating or stuffy. It's just a cool place to hang out, whether or not art is part of your agenda. Located on 3rd Street a stone's throw away from the pricey candle shops and specialty cafes at the heart of the Arts District, Manuela is a charming escape. The part-indoor, part-outdoor restaurant faces an expansive courtyard that feels more like the quaint square of a little European town than a converted milling plant downtown. At Manuela, most of the dishes are Southern and involve lots of vegetables. From skillet cornbread to pork chops with charred broccoli di ciccio, the somewhat fancy menu has subtle nods to down home cooking that should mostly feel familiar. Watch and learn from the Arts District regulars sipping negronis and sharing smoked albacore dip at the bar — stick to the small plates. From sweet Kusshi oysters to trout tartare, Manuela has lots of great options to choose from. But their fluffy cream biscuits are a must-order."
+    },
+    {
+      "source_id": "src_the_infatuation_2025_brunch",
+      "publication": "The Infatuation",
+      "title": "The 28 Best Brunch Restaurants In Los Angeles - Los Angeles - The Infatuation",
+      "url": "https://www.theinfatuation.com/los-angeles/guides/best-brunch-la-greatest-hits-list",
+      "published_at": "2025-11-14",
+      "trust_level": "editorial",
+      "content": "Think of this upscale Southern restaurant as one big brunch party in the heart of the Arts District's candle shops and specialty cafes. Despite being located inside Hauser & Wirth, Manuela feels like a world unto itself: loud, unstuffy, and overflowing with locals in intricate tank tops sitting in the charming courtyard. As far as the food goes, order the shrimp and grits, a popover benedict, and as many beignets as you deem reasonable."
+    },
+    {
+      "source_id": "src_the_infatuation_2023_lunch",
+      "publication": "The Infatuation",
+      "title": "The 15 Great Restaurants For A Lunch Meeting In LA - Los Angeles - The Infatuation",
+      "url": "https://www.theinfatuation.com/los-angeles/guides/lunch-meeting-los-angeles",
+      "published_at": "2023-05-02",
+      "trust_level": "editorial",
+      "content": "The Arts District is firmly a dinner destination, but Manuela is a daytime option that's enjoyable enough to extend lunch an extra 30 minutes. This charming Southern restaurant sits inside Hauser & Wirth's lush courtyard, where you can stretch your legs, feel the breeze, and talk shop over oyster platters, smoky trout dip, and scrumptious cream biscuits with ribbons of country ham that are nothing short of a euphoric experience."
+    },
+    {
+      "source_id": "src_the_infatuation_2022_arts_district",
+      "publication": "The Infatuation",
+      "title": "The Best Restaurants & Bars In The Arts District - Los Angeles - The Infatuation",
+      "url": "https://www.theinfatuation.com/los-angeles/guides/where-to-eat-drink-in-the-arts-district",
+      "published_at": "2022-01-21",
+      "trust_level": "editorial",
+      "content": "Art galleries can be intimidating. The good news is, if you're at Hauser & Wirth, you're 100 feet away from Manuela—a restaurant that, despite being inside an art gallery, isn't stuffy. It's just a cool place to hang out, whether art is part of your agenda or not. Most dishes are Southern and involve lots of vegetables. We like to stick with small plates, like sweet Kusshi oysters, trout tartare, and fluffy cream biscuits served with a small mountain of aged country ham that'll make you consider selling your car to open a farm."
+    },
+    {
+      "source_id": "src_timeout_la_2025",
+      "publication": "Time Out LA",
+      "title": "20 Best Restaurants in the Arts District, Downtown Los Angeles",
+      "url": "https://www.timeout.com/los-angeles/restaurants/best-arts-district-los-angeles-restaurants",
+      "published_at": "2025-01-31",
+      "trust_level": "editorial",
+      "content": "Ambience is half the equation at Manuela, the Hauser & Wirth complex's on-site eatery with an excellent Southern-inspired brunch on weekends and an adjacent garden full of chickens. Perfect before or after a visit to the galleries, the seasonally driven menu fits the bill for a sun-lit, slightly spenny daytime meal, though the somewhat dim-lit space feels a bit dark for dinner hour."
+    },
+    {
+      "source_id": "src_timeout_la_2016",
+      "publication": "Time Out LA",
+      "title": "Manuela | Restaurants in Downtown Arts District, Los Angeles",
+      "url": "https://www.timeout.com/los-angeles/restaurants/manuela",
+      "published_at": "2016-11-01",
+      "trust_level": "editorial",
+      "content": "Museum restaurants can seem stuffy at times, but Manuela, a restaurant housed in the courtyard of the Hauser & Wirth museum, is light, airy and approachable. Open for dinner daily, lunch Tuesday to Friday and brunch on the weekends, Manuela's menu is rooted in chef Kris Tominaga's Californian roots. Diners can find dishes like diver scallops, shrimp aguachile and barbecued oysters, along with beer, wine, cocktails and homemade kombucha. Oh yes, and there is a garden with chickens."
+    }
+  ]
+}

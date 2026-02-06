@@ -1,0 +1,23 @@
+{
+  "place_slug": "le-champ",
+  "sources": [
+    {
+      "source_id": "src_theinfatuation_2024",
+      "publication": "The Infatuation",
+      "title": "Le Champ - Review - Arts District - Los Angeles",
+      "url": "https://www.theinfatuation.com/los-angeles/reviews/le-champ-dtla-arts-district",
+      "published_at": "2024-10-09",
+      "trust_level": "editorial",
+      "content": "Le Champ is a good pick for a first date in the Arts District if you want to seem like the sort of grown-up who reads books and has a retirement portfolio. Though mainly a wine bar, there's a massive back patio and lots of little tables under string lights where you can sip chardonnay and nibble on small French plates. Nothing you eat here will blow you away, but they do have some solid escargot and a juicy bistro burger with gruyere and caramelized onion—though you'll need to order at least four more things to make up a full meal. The entire wine list is French, and there are some relatively affordable options if you don't feel like splurging."
+    },
+    {
+      "source_id": "src_timeout_2023",
+      "publication": "Time Out LA",
+      "title": "Le Champ | Restaurants in Downtown Arts District, Los Angeles",
+      "url": "https://www.timeout.com/los-angeles/restaurants/le-champ",
+      "published_at": "2023-12-01",
+      "trust_level": "editorial",
+      "content": "This mostly-outdoor Arts District wine bar is bringing more accessibly priced, extremely tasty bistro fare to a part of town better known for tasting menus and other splurge-worthy eateries."
+    }
+  ]
+}
