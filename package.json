@@ -23,7 +23,13 @@
     "import:skate-editorial": "tsx scripts/import-skate-editorial.ts",
     "import:sources": "tsx scripts/import-sources.ts",
     "backfill:google": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/backfill-google-places.ts",
-    "test:voice-engine": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/test-voice-engine.ts"
+    "test:voice-engine": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/test-voice-engine.ts",
+    "analyze:enrichment": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/analyze-enrichment-status.ts",
+    "find:duplicates": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/find-duplicate-places.ts",
+    "find:potential-duplicates": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/find-potential-duplicates.ts",
+    "investigate:backfill-failures": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/investigate-backfill-failures.ts",
+    "merge:duplicates": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/merge-duplicate-places.ts",
+    "cleanup:duplicates": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/cleanup-duplicate-places.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.72.1",

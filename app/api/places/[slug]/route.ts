@@ -123,6 +123,8 @@ export async function GET(
           curatorNote,
           curatorCreatorName,
           sources: place.sources || [],
+          vibeTags: place.vibeTags || [],
+          tips: place.tips || [],
         },
         guide: appearsOn[0]
           ? {

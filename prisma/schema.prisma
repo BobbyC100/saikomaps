@@ -81,7 +81,7 @@ model List {
   publishedAt          DateTime? @map("published_at")
   
   // Template & Design
-  templateType    String   @default("city_guide") @map("template_type") // city_guide, travel_itinerary, minimalist
+  templateType    String   @default("field-notes") @map("template_type") // field-notes only
   coverImageUrl   String?  @map("cover_image_url")
   primaryColor    String   @default("#5BA7A7") @map("primary_color")
   secondaryColor  String   @default("#7FA5A5") @map("secondary_color")
@@ -207,6 +207,10 @@ model Place {
   pullQuoteAuthor    String?  @map("pull_quote_author")
   pullQuoteUrl       String?  @map("pull_quote_url") @db.Text
   pullQuoteType      String?  @map("pull_quote_type") // "editorial" | "owner" | "self"
+
+  // Bento Grid Enrichment
+  vibeTags           String[] @map("vibe_tags") @default([]) // Atmosphere descriptors: ["Low-key", "Surf crowd", "Standing room"]
+  tips               String[] @default([]) // Helpful visitor tips: ["Go early for a seat", "Cash only"]
 
   // Cache Management
   placesDataCachedAt DateTime? @map("places_data_cached_at")

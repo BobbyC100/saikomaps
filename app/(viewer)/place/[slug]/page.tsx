@@ -6,6 +6,9 @@ import Link from 'next/link';
 import { Instagram, MapPin, Globe, Phone } from 'lucide-react';
 import { GlobalHeader } from '@/components/layouts/GlobalHeader';
 import { GlobalFooter } from '@/components/layouts/GlobalFooter';
+import { QuietCard } from '@/app/components/merchant/QuietCard';
+import { SaikoStamp } from '@/app/components/SaikoStamp';
+import { BackToMapButton } from '@/components/BackToMapButton';
 import styles from './place.module.css';
 
 
@@ -41,6 +44,8 @@ interface LocationData {
   curatorNote?: string | null;
   curatorCreatorName?: string | null;
   sources?: EditorialSource[];
+  vibeTags?: string[] | null;
+  tips?: string[] | null;
 }
 
 interface AppearsOnItem {
@@ -240,8 +245,10 @@ export default function PlacePage() {
   const hasCuratorNote = !!location.curatorNote?.trim();
   const hasPhotos = (location.photoUrls?.length ?? 0) > 0;
   const hasSources = (location.sources?.length ?? 0) > 0;
+  const hasVibeTags = (location.vibeTags?.length ?? 0) > 0;
+  const hasTips = (location.tips?.length ?? 0) > 0;
   const excerpt = getExcerpt(location.sources);
-  const isSparse = !hasCuratorNote && !hasPhotos && !hasSources;
+  const isSparse = !hasCuratorNote && !hasPhotos && !hasSources && !hasVibeTags && !hasTips;
   const instagramHandle = normalizeInstagram(location.instagram);
   const curatorName = location.curatorCreatorName || data.guide?.creatorName || appearsOn[0]?.creatorName;
 
@@ -273,10 +280,18 @@ export default function PlacePage() {
   const is24Hours = fullWeek[todayIndex]?.hours?.toLowerCase().includes('24') ?? false;
   const primaryMapSlug = appearsOn[0]?.slug ?? null;
   const viewOnMapUrl = primaryMapSlug ? `/map/${primaryMapSlug}?place=${slug}` : null;
-  // Also On: dedupe by slug, max 3
-  const appearsOnDeduped = Array.from(
-    new Map(appearsOn.map((item) => [item.slug, item])).values()
-  ).slice(0, 3);
+  
+  // Also On: dedupe by slug (filter to unique slugs only), max 3
+  const seenSlugs = new Set<string>();
+  const appearsOnDeduped = appearsOn
+    .filter((item) => {
+      if (seenSlugs.has(item.slug)) {
+        return false; // Skip duplicates
+      }
+      seenSlugs.add(item.slug);
+      return true;
+    })
+    .slice(0, 3);
 
   // Gallery: exclude hero image, show only additional photos
   const heroPhotoUrl = location.photoUrls?.[0] ?? null;
@@ -347,6 +362,71 @@ export default function PlacePage() {
       detail: 'Search on Instagram',
     });
   }
+
+  // Calculate grid occupancy for Quiet Cards
+  // Count grid columns occupied by content (6-column grid)
+  let occupiedColumns = 0;
+  
+  // Action cards row: full width (6 columns)
+  if (actionCards.length > 0) occupiedColumns += 6;
+  
+  // Gallery: full width (6 columns)
+  if (hasGallery) occupiedColumns += 6;
+  
+  // Tier 2 row: Curator's Note + Excerpt/Vibe (side by side when both exist)
+  // Curator's Note: 3 columns when paired, 6 when alone
+  // Excerpt: 3 columns when paired with note, otherwise variable
+  // Vibe: 3 columns
+  if (hasCuratorNote && (excerpt || hasVibeTags)) {
+    occupiedColumns += 3; // Curator's note (left)
+    occupiedColumns += 3; // Excerpt or Vibe (right)
+  } else if (hasCuratorNote) {
+    occupiedColumns += 6; // Curator's note full width
+  } else if (excerpt && hasVibeTags) {
+    occupiedColumns += 3; // Excerpt (left)
+    occupiedColumns += 3; // Vibe (right)
+  } else if (excerpt) {
+    occupiedColumns += 3; // Excerpt alone
+  } else if (hasVibeTags) {
+    occupiedColumns += 3; // Vibe alone
+  }
+  
+  // Tier 3 row: Hours + Map + Call
+  // Calculate actual columns based on what's present
+  let tier3Columns = 0;
+  if (hasFullWeekHours || hasOnlyOpenNow) tier3Columns += 2;
+  if (addressShort) tier3Columns += 2;
+  if (location.phone) tier3Columns += 2;
+  occupiedColumns += tier3Columns;
+  
+  // Tips block: 2 columns
+  if (hasTips) occupiedColumns += 2;
+  
+  // Coverage Row: 3 columns Coverage + 3 columns (2 stacked Quiet Cards) = 6 total (complete row)
+  // This is a special nested row structure, so we count it as 6 columns (one complete row)
+  if (hasSources) occupiedColumns += 6;
+  
+  // Best For: 6 columns
+  if (location.description) occupiedColumns += 6;
+  
+  // Calculate Quiet Cards to fill ONLY partial rows BEFORE Also On
+  // Don't add unnecessary full rows - only fill gaps
+  const currentRowPosition = occupiedColumns % 6;
+  const emptyCellsInCurrentRow = currentRowPosition === 0 ? 0 : 6 - currentRowPosition;
+  
+  // Generate Quiet Cards - each spans full 6 columns
+  const quietCardCount = emptyCellsInCurrentRow > 0 ? 1 : 0;
+  
+  const quietCards = Array.from({ length: quietCardCount }, (_, i) => ({
+    key: `quiet-${i}`,
+    variant: ['topo', 'texture', 'minimal'][i % 3] as 'topo' | 'texture' | 'minimal',
+  }));
+  
+  // Add Quiet Cards to occupied columns (full row)
+  occupiedColumns += quietCardCount > 0 ? 6 : 0;
+  
+  // Also On: 6 columns - renders LAST, no cards after this
+  if (appearsOnDeduped.length > 0) occupiedColumns += 6;
 
   return (
     <div
@@ -541,28 +621,40 @@ export default function PlacePage() {
               </div>
             )}
 
-            {/* Tier 2 — Row 5: Curator's Note | Coverage Quote+Vibe (side by side) */}
-            {(hasCuratorNote || excerpt || vibeTag) && (
+            {/* Tier 2 — Row 5: Curator's Note | Excerpt | Vibe (flexible layout) */}
+            {(hasCuratorNote || excerpt || hasVibeTags) && (
               <>
+                {/* Curator's Note */}
                 {hasCuratorNote && (
                   <div
-                    className={`${styles.bentoBlock} ${styles.fieldNoteBlock} ${(excerpt || vibeTag) ? styles.span3 : styles.span6}`}
+                    className={`${styles.bentoBlock} ${styles.fieldNoteBlock} ${(excerpt || hasVibeTags) ? styles.span3 : styles.span6}`}
                   >
                     <div className={styles.blockLabel}>Curator&apos;s Note</div>
                     <p className={styles.fieldNoteText}>{location.curatorNote}</p>
                     {curatorName && <div className={styles.fieldNoteAttribution}>— {curatorName}</div>}
                   </div>
                 )}
-                {(excerpt || vibeTag) && (
+                
+                {/* Excerpt block (quote from editorial source) */}
+                {excerpt && (
                   <div
-                    className={`${styles.bentoBlock} ${styles.excerptBlock} ${hasCuratorNote ? styles.span3 : styles.span6}`}
+                    className={`${styles.bentoBlock} ${styles.excerptBlock} ${hasCuratorNote ? styles.span3 : (hasVibeTags ? styles.span3 : styles.span6)}`}
                   >
-                    {excerpt && <div>{excerpt}</div>}
-                    {vibeTag && (
-                      <div className={styles.excerptVibeTag}>
-                        VIBE · {vibeTag}
-                      </div>
-                    )}
+                    <div>{excerpt}</div>
+                  </div>
+                )}
+                
+                {/* Vibe block (tags with dot separators) */}
+                {hasVibeTags && !excerpt && (
+                  <div
+                    className={`${styles.bentoBlock} ${styles.vibeBlock} ${hasCuratorNote ? styles.span3 : styles.span6}`}
+                  >
+                    <div className={styles.blockLabel}>Vibe</div>
+                    <div className={styles.vibeTags}>
+                      {location.vibeTags!.map((tag, i) => (
+                        <span key={i}>{tag}</span>
+                      ))}
+                    </div>
                   </div>
                 )}
               </>
@@ -689,22 +781,38 @@ export default function PlacePage() {
               </div>
             )}
 
-            {/* Coverage */}
+            {/* Coverage row with nested quiet cards on right */}
             {hasSources && (
-              <div className={`${styles.bentoBlock} ${styles.coverageBlock}`}>
-                <div className={styles.blockLabel}>Coverage</div>
-                {location.sources!.map((src, i) => (
-                  <a
-                    key={src.source_id || i}
-                    href={src.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={styles.coverageLink}
-                  >
-                    <span className={styles.coverageSource}>{src.publication}</span>
-                    <span className={styles.coverageTitle}>{src.title}</span>
-                  </a>
-                ))}
+              <div className={`${styles.coverageRow}`}>
+                <div className={`${styles.bentoBlock} ${styles.coverageBlock}`}>
+                  <div className={styles.blockLabel}>Coverage</div>
+                  {location.sources!.map((src, i) => (
+                    <a
+                      key={src.source_id || i}
+                      href={src.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={styles.coverageLink}
+                    >
+                      <span className={styles.coverageSource}>{src.publication}</span>
+                      <span className={styles.coverageTitle}>{src.title}</span>
+                    </a>
+                  ))}
+                </div>
+                <div className={styles.coverageQuietStack}>
+                  <QuietCard 
+                    variant="texture" 
+                    span={3} 
+                    className={styles.coverageQuietCard}
+                    noMinHeight={true}
+                  />
+                  <QuietCard 
+                    variant="minimal" 
+                    span={3} 
+                    className={styles.coverageQuietCard}
+                    noMinHeight={true}
+                  />
+                </div>
               </div>
             )}
 
@@ -715,14 +823,24 @@ export default function PlacePage() {
               </div>
             )}
 
-            {/* Also On */}
+            {/* Quiet Cards — Fill any remaining space in current row BEFORE Also On */}
+            {quietCards.map((card) => (
+              <QuietCard 
+                key={card.key} 
+                variant={card.variant} 
+                span={6} 
+                className={`${styles.bentoBlock} ${styles.quietCard}`}
+              />
+            ))}
+
+            {/* Also On — LAST element in bento grid, nothing after this */}
             {appearsOnDeduped.length > 0 && (
               <div className={`${styles.bentoBlock} ${styles.span6}`}>
                 <div className={styles.blockLabel}>Also on</div>
                 <div className={styles.alsoOnLinks}>
                   {appearsOnDeduped.map((item) => (
                     <Link
-                      key={item.id}
+                      key={item.slug}
                       href={`/map/${item.slug}`}
                       className={styles.alsoOnLink}
                     >
@@ -733,9 +851,14 @@ export default function PlacePage() {
               </div>
             )}
           </div>
+
+          {/* Saiko Stamp — Brand footer below the grid */}
+          <SaikoStamp />
         </div>
       </main>
-      <GlobalFooter variant="minimal" />
+
+      {/* Floating Back to Map button — shows only if navigated from a map */}
+      <BackToMapButton />
     </div>
   );
 }

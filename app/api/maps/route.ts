@@ -12,7 +12,7 @@ import { z } from 'zod';
 
 const createMapSchema = z.object({
   title: z.string().optional().default(''),
-  template: z.string().optional().default('city_guide'),
+  template: z.string().optional().default('field-notes'),
 });
 
 function getUserId(session: { user?: { id?: string } } | null): string | null {
@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { title = '', template = 'city_guide' } = validation.data;
+    const { title = '', template = 'field-notes' } = validation.data;
 
     // Generate a unique slug (from title or draft prefix)
     const base = title.trim()

@@ -222,11 +222,6 @@ export default function PublicMapPage({ params }: { params: Promise<{ slug: stri
   });
   const hasValidLocations = locations.some((loc) => parseLatLng(loc.latitude, loc.longitude));
 
-  // Override black/yellow monocle template to use postcard colors instead
-  if (template.id === 'monocle') {
-    template = MAP_TEMPLATES.postcard;
-  }
-
   const scrollToCard = useCallback((index: number) => {
     setMobileView('list');
     setActiveCardIndex(index);
@@ -445,10 +440,18 @@ export default function PublicMapPage({ params }: { params: Promise<{ slug: stri
         map.setCenter(points[0]);
         map.setZoom(14);
       } else {
+        // Calculate centroid (average position of all places)
+        const centroid = {
+          lat: points.reduce((sum, p) => sum + p.lat, 0) / points.length,
+          lng: points.reduce((sum, p) => sum + p.lng, 0) / points.length,
+        };
+        
         map.fitBounds(bounds, { top: 80, bottom: 40, left: 0, right: 40 });
         const idleListener = map.addListener('idle', () => {
           const zoom = map.getZoom();
           if (zoom != null && zoom > 15) map.setZoom(15);
+          // Pan to centroid after bounds are set
+          map.panTo(centroid);
           g.maps.event.removeListener(idleListener);
         });
       }
@@ -744,6 +747,7 @@ export default function PublicMapPage({ params }: { params: Promise<{ slug: stri
     return (
       <FieldNotesMapView
         title={mapData.title}
+        slug={mapData.slug}
         description={mapData.description ?? mapData.subtitle}
         category={mapData.subtitle ?? 'Places'}
         vibe={mapData.introText ?? undefined}

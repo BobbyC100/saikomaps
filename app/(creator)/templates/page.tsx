@@ -26,15 +26,6 @@ export default function TemplatesPage() {
 
   const templates: Template[] = [
     {
-      id: 'postcard',
-      title: 'Postcard',
-      subtitle: 'Vintage Postcard Vibes',
-      description: 'Perfect for travel guides and nostalgic collections. Locations are presented with a vintage postcard aesthetic.',
-      example: '"Biarritz Beach Spots"',
-      organization: ['Classic postcard layout', 'Nostalgic design', 'Travel-focused'],
-      image: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&q=80',
-    },
-    {
       id: 'field-notes',
       title: 'Field Notes',
       subtitle: 'Clean Notebook Aesthetic',
@@ -42,24 +33,6 @@ export default function TemplatesPage() {
       example: '"Tokyo Coffee Shops"',
       organization: ['Clean layout', 'Notebook style', 'Content-focused'],
       image: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=800&q=80',
-    },
-    {
-      id: 'monocle',
-      title: 'Monocle',
-      subtitle: 'Sophisticated Editorial',
-      description: 'Premium magazine-style layout. Perfect for sophisticated guides and editorial content.',
-      example: '"Paris Restaurants"',
-      organization: ['Editorial design', 'Premium feel', 'Magazine style'],
-      image: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800&q=80',
-    },
-    {
-      id: 'street',
-      title: 'Street',
-      subtitle: 'Bold Urban Energy',
-      description: 'Dynamic, urban-inspired design. Great for city guides and vibrant location collections.',
-      example: '"NYC Street Art"',
-      organization: ['Bold design', 'Urban aesthetic', 'Dynamic layout'],
-      image: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800&q=80',
     },
   ];
 
@@ -153,9 +126,9 @@ export default function TemplatesPage() {
 
       {/* Hero Section */}
       <section className={styles.hero}>
-        <h1 className={styles.heroTitle}>Choose Your Template</h1>
+        <h1 className={styles.heroTitle}>Field Notes Template</h1>
         <p className={styles.heroSubtitle}>
-          Select how you'd like to present your guide. Each template offers a unique aesthetic for your locations.
+          All maps use the Field Notes template - a clean, notebook aesthetic perfect for curated collections.
         </p>
       </section>
 
@@ -216,10 +189,10 @@ export default function TemplatesPage() {
         {/* Bottom Note */}
         <div className={styles.bottomNote}>
           <p>
-            <strong>Don't worry!</strong> You can change the template later or customize how your guide is presented.
+            <strong>Field Notes template</strong> is designed for clean, organized collections.
           </p>
           <p className={styles.bottomNoteSubtitle}>
-            Templates help structure your locations, but you'll have full control over ordering and presentation.
+            You'll have full control over ordering, presentation, and customization of your guide.
           </p>
         </div>
       </div>

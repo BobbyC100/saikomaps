@@ -3,7 +3,6 @@
 import { useState, useMemo } from 'react';
 import {
   CoverBlock,
-  formatAreaVitals,
   SectionDivider,
   PlaceCard,
   FeaturedCard,
@@ -11,8 +10,8 @@ import {
   FieldNotesNavBar,
   PageFooter,
   ExpandedMapView,
+  QuietCardTopo,
 } from './index';
-import { buildCoverPins, type CoverPin } from '../../lib/field-notes-utils';
 import type { PlaceCardData } from './PlaceCard';
 import { getPhotoRefFromStored, getGooglePhotoUrl } from '@/lib/google-places';
 
@@ -88,6 +87,7 @@ const SPAN_PATTERNS: [number, number][] = [
 
 export interface FieldNotesMapViewProps {
   title: string;
+  slug: string;
   description?: string | null;
   category: string;
   vibe?: string | null;
@@ -114,6 +114,7 @@ export interface FieldNotesMapViewProps {
 
 export function FieldNotesMapView({
   title,
+  slug,
   description,
   category,
   vibe,
@@ -145,17 +146,15 @@ export function FieldNotesMapView({
     }));
   }, [locations]);
 
-  const coverPins: CoverPin[] = useMemo(
+  const coverPins = useMemo(
     () =>
-      buildCoverPins(
-        locations.map((l) => ({
-          id: l.id,
-          name: l.name,
-          latitude: l.latitude,
-          longitude: l.longitude,
-          orderIndex: l.orderIndex,
-        }))
-      ),
+      locations.map((l, i) => ({
+        id: l.id,
+        name: l.name,
+        latitude: l.latitude,
+        longitude: l.longitude,
+        isFeatured: i === 0 || i < 3, // First place + next 2 featured
+      })),
     [locations]
   );
 
@@ -170,7 +169,6 @@ export function FieldNotesMapView({
       .map(([name]) => name);
   }, [locations]);
 
-  const areaVitals = formatAreaVitals(neighborhoods);
   const topCategory = locations
     .map((l) => l.category)
     .filter(Boolean)
@@ -185,6 +183,7 @@ export function FieldNotesMapView({
     return (
       <ExpandedMapView
         title={title}
+        mapSlug={slug}
         places={places}
         theme={theme}
         onBack={() => setView('list')}
@@ -193,6 +192,13 @@ export function FieldNotesMapView({
   }
 
   const remainingPlaces = places.slice(1);
+
+  // Determine if page is sparse - show QuietCardTopo if ≤3 places (Tier 2+3 combined)
+  const isSparse = places.length <= 3;
+
+  // Get most common neighborhood and city for Topo label
+  const topNeighborhood = neighborhoods.length > 0 ? neighborhoods[0] : null;
+  const city = 'Los Angeles'; // Could be dynamic based on data
 
   return (
     <div
@@ -213,7 +219,7 @@ export function FieldNotesMapView({
           description={description}
           authorName={authorName}
           authorAvatar={authorAvatar}
-          areaVitals={areaVitals || undefined}
+          neighborhoods={neighborhoods}
           vibeVitals={vibe || undefined}
           coverPins={coverPins}
           onCoverMapClick={() => setView('map')}
@@ -244,6 +250,14 @@ export function FieldNotesMapView({
         })}
 
         <PageFooter />
+
+        {/* Quiet Cards — page-level atmosphere (below bento grid content) */}
+        {/* QuietCardTopo — conditional: only when page is sparse (≤3 places) */}
+        {isSparse && (
+          <div className="col-span-2 md:col-span-4 lg:col-span-6">
+            <QuietCardTopo neighborhood={topNeighborhood} city={city} theme={theme} />
+          </div>
+        )}
       </div>
 
       <MapToggle view="list" onClick={() => setView('map')} />

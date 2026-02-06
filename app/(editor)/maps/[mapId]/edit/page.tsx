@@ -43,10 +43,8 @@ const FIELD_TO_SECTION: Record<string, string> = {
 };
 
 const TEMPLATE_OPTIONS = [
-  { id: 'city_guide', name: 'City Guide' },
+  { id: 'field-notes', name: 'Field Notes' },
   { id: 'field_notes', name: 'Field Notes' },
-  { id: 'postcard', name: 'Postcard' },
-  { id: 'monocle', name: 'Monocle' },
 ] as const;
 
 function buildPatchPayload(data: Partial<MapFormData>, templateType?: string): Record<string, unknown> {
@@ -76,7 +74,7 @@ export default function MapEditPage({ params }: { params: Promise<{ mapId: strin
   const [isLoading, setIsLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
   const [isPublishing, setIsPublishing] = useState(false);
-  const [templateType, setTemplateType] = useState<string>('city_guide');
+  const [templateType, setTemplateType] = useState<string>('field-notes');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [publishErrors, setPublishErrors] = useState<Record<string, string>>({});
   const [isGeneratingDetails, setIsGeneratingDetails] = useState(false);

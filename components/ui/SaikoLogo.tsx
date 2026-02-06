@@ -31,8 +31,8 @@ export function SaikoLogo({ href = '/', className = '', variant = 'dark' }: Saik
         <circle cx="12" cy="24" r="0.9" fill={logoFill}/>
       </svg>
       
-      {/* Wordmark */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+      {/* Wordmark - HORIZONTAL LAYOUT */}
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
         <span
           style={{
             fontFamily: 'Instrument Serif, Georgia, serif',
@@ -43,13 +43,13 @@ export function SaikoLogo({ href = '/', className = '', variant = 'dark' }: Saik
             color: saikoColor,
           }}
         >
-          Saiko
+          SAIKO
         </span>
         <span
           style={{
             fontFamily: 'DM Sans, sans-serif',
             fontWeight: 500,
-            fontSize: '8px',
+            fontSize: '9px',
             letterSpacing: '0.25em',
             textTransform: 'uppercase',
             lineHeight: 1,

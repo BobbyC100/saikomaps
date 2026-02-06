@@ -134,7 +134,7 @@ export async function PATCH(
     }
     if (body.templateType !== undefined) {
       const t = String(body.templateType).trim();
-      updateData.templateType = t || 'city_guide';
+      updateData.templateType = t || 'field-notes';
     }
 
     const merged = { ...list, ...updateData };

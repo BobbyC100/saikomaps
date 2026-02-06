@@ -14,7 +14,7 @@ export interface List {
   isPublished: boolean;
   locationCount: number;
   viewCount: number;
-  template: 'MONOCLE' | 'KINFOLK';
+  template: 'field-notes' | 'field_notes';
   createdAt: Date;
   updatedAt: Date;
 }

@@ -2,55 +2,18 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { Loader } from '@googlemaps/js-api-loader';
+import { MarkerClusterer } from '@googlemaps/markerclusterer';
 import Link from 'next/link';
-import { FieldNotesMapPins } from './FieldNotesMapPins';
 import type { PlaceCardData } from './PlaceCard';
 import { CardMetaRow } from './PlaceCard';
+import { calculateSmartBounds } from '@/app/map/[slug]/lib/smart-bounds';
+import { fieldNotesMapStyle } from '../../lib/fieldNotesMapStyle';
 
 const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '';
 
-/** Field Notes light mode — warm parchment, ocean water, leather roads */
-const fieldNotesLightStyle: google.maps.MapTypeStyle[] = [
-  { elementType: 'geometry', stylers: [{ color: '#F0ECE2' }] },
-  { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#B8D4DE' }] },
-  { featureType: 'water', elementType: 'labels.text.fill', stylers: [{ color: '#89B4C4' }] },
-  { featureType: 'road.highway', elementType: 'geometry', stylers: [{ color: '#DDD5C4' }] },
-  { featureType: 'road.highway', elementType: 'geometry.stroke', stylers: [{ color: '#C3B091' }] },
-  { featureType: 'road.arterial', elementType: 'geometry', stylers: [{ color: '#E6DFD0' }] },
-  { featureType: 'road.local', elementType: 'geometry', stylers: [{ color: '#EDE8DA' }] },
-  { elementType: 'labels.text.fill', stylers: [{ color: '#5A6B78' }] },
-  { elementType: 'labels.text.stroke', stylers: [{ color: '#F5F0E1' }, { weight: 3 }] },
-  { featureType: 'poi.park', elementType: 'geometry', stylers: [{ color: '#D4DEC8' }] },
-  { featureType: 'poi.park', elementType: 'labels.text.fill', stylers: [{ color: '#7A9A6B' }] },
-  { featureType: 'poi', elementType: 'geometry', stylers: [{ color: '#E8E2D4' }] },
-  { featureType: 'poi.business', stylers: [{ visibility: 'off' }] },
-  { featureType: 'transit', stylers: [{ visibility: 'off' }] },
-  { featureType: 'administrative', elementType: 'geometry.stroke', stylers: [{ color: '#C3B091' }, { weight: 0.5 }] },
-  { featureType: 'administrative.neighborhood', elementType: 'labels.text.fill', stylers: [{ color: '#8B7355' }] },
-];
-
-/** Field Notes dark mode — navy, deep ocean, muted cream roads */
-const fieldNotesDarkStyle: google.maps.MapTypeStyle[] = [
-  { elementType: 'geometry', stylers: [{ color: '#1B2A3D' }] },
-  { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#142233' }] },
-  { featureType: 'water', elementType: 'labels.text.fill', stylers: [{ color: '#4A7D96' }] },
-  { featureType: 'road.highway', elementType: 'geometry', stylers: [{ color: '#243548' }] },
-  { featureType: 'road.highway', elementType: 'geometry.stroke', stylers: [{ color: '#2D4058' }] },
-  { featureType: 'road.arterial', elementType: 'geometry', stylers: [{ color: '#1F3349' }] },
-  { featureType: 'road.local', elementType: 'geometry', stylers: [{ color: '#1C2E42' }] },
-  { elementType: 'labels.text.fill', stylers: [{ color: '#89A0B0' }] },
-  { elementType: 'labels.text.stroke', stylers: [{ color: '#1B2A3D' }, { weight: 3 }] },
-  { featureType: 'poi.park', elementType: 'geometry', stylers: [{ color: '#1A2E28' }] },
-  { featureType: 'poi.park', elementType: 'labels.text.fill', stylers: [{ color: '#4A7C59' }] },
-  { featureType: 'poi.business', stylers: [{ visibility: 'off' }] },
-  { featureType: 'poi', elementType: 'geometry', stylers: [{ color: '#1E2F44' }] },
-  { featureType: 'transit', stylers: [{ visibility: 'off' }] },
-  { featureType: 'administrative', elementType: 'geometry.stroke', stylers: [{ color: '#2D4058' }, { weight: 0.5 }] },
-  { featureType: 'administrative.neighborhood', elementType: 'labels.text.fill', stylers: [{ color: '#5A7A8A' }] },
-];
-
 interface ExpandedMapViewProps {
   title: string;
+  mapSlug: string;
   places: PlaceCardData[];
   theme: 'light' | 'dark';
   onBack: () => void;
@@ -67,16 +30,21 @@ function parseLatLng(
   return { lat: la, lng: ln };
 }
 
-const CAROUSEL_HEIGHT = 140;
+const CAROUSEL_HEIGHT = 180;
 const TOP_BAR_HEIGHT = 56;
 
-export function ExpandedMapView({ title, places, theme, onBack }: ExpandedMapViewProps) {
+export function ExpandedMapView({ title, mapSlug, places, theme, onBack }: ExpandedMapViewProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<google.maps.Map | null>(null);
+  const clustererRef = useRef<MarkerClusterer | null>(null);
+  const markersRef = useRef<google.maps.Marker[]>([]);
   const carouselRef = useRef<HTMLDivElement>(null);
   const cardRefsRef = useRef<Map<string, HTMLAnchorElement>>(new Map());
   const [mapReady, setMapReady] = useState(false);
   const [activePlaceId, setActivePlaceId] = useState<string | null>(null);
+  const [highlightedPlaceId, setHighlightedPlaceId] = useState<string | null>(null);
+  const [outlierCount, setOutlierCount] = useState(0);
+  const [showingAllBounds, setShowingAllBounds] = useState(false);
 
   const points = places
     .map((p) => parseLatLng(p.latitude, p.longitude))
@@ -90,6 +58,14 @@ export function ExpandedMapView({ title, places, theme, onBack }: ExpandedMapVie
     loader.load().then((g) => {
       if (!mapRef.current) return;
 
+      // Clear existing clusterer and markers
+      if (clustererRef.current) {
+        clustererRef.current.clearMarkers();
+        clustererRef.current = null;
+      }
+      markersRef.current.forEach((m) => m.setMap(null));
+      markersRef.current = [];
+
       const map = new g.maps.Map(mapRef.current, {
         center: points[0],
         zoom: 13,
@@ -98,7 +74,7 @@ export function ExpandedMapView({ title, places, theme, onBack }: ExpandedMapVie
         mapTypeControl: false,
         streetViewControl: false,
         fullscreenControl: true,
-        styles: theme === 'dark' ? fieldNotesDarkStyle : fieldNotesLightStyle,
+        styles: fieldNotesMapStyle, // Use shared Field Notes style
       });
 
       const bounds = new g.maps.LatLngBounds();
@@ -107,31 +83,161 @@ export function ExpandedMapView({ title, places, theme, onBack }: ExpandedMapVie
       if (points.length === 1) {
         map.setCenter(points[0]);
         map.setZoom(14);
+        setOutlierCount(0);
       } else {
-        map.fitBounds(bounds, {
+        // Use smart bounds to exclude outliers
+        const { bounds: smartBounds, outliers, included } = calculateSmartBounds(points);
+        setOutlierCount(outliers.length);
+        
+        // Calculate centroid (average position of all included points)
+        const centroid = {
+          lat: included.reduce((sum, p) => sum + p.lat, 0) / included.length,
+          lng: included.reduce((sum, p) => sum + p.lng, 0) / included.length,
+        };
+        
+        map.fitBounds(smartBounds, {
           top: 80,
           bottom: CAROUSEL_HEIGHT + 40,
-          left: 40,
-          right: 40,
+          left: 20,    // Less padding on empty side
+          right: 100,  // More padding where pins cluster
         });
+        
         const listener = map.addListener('idle', () => {
           const zoom = map.getZoom();
           if (zoom != null && zoom > 15) {
             map.setZoom(15);
           }
+          // Pan to centroid to center all pins in the view
+          map.panTo(centroid);
           g.maps.event.removeListener(listener);
         });
       }
 
+      // Create markers for each place
+      const markers = points.map((point, i) => {
+        const place = places[i];
+        const marker = new g.maps.Marker({
+          position: point,
+          icon: {
+            path: g.maps.SymbolPath.CIRCLE,
+            fillColor: theme === 'dark' ? '#F5F0E1' : '#D64541',
+            fillOpacity: 1,
+            strokeColor: theme === 'dark' ? '#1B2A3D' : '#F5F0E1',
+            strokeWeight: 3,
+            scale: 7,
+            anchor: new g.maps.Point(0, 0),
+            labelOrigin: new g.maps.Point(0, 3), // Position label just below pin center
+          },
+          label: {
+            text: place.name,
+            color: theme === 'dark' ? '#F5F0E1' : '#36454F',
+            fontFamily: "'Libre Baskerville', Georgia, serif",
+            fontSize: '11px',
+            fontWeight: '500',
+          },
+          title: place.name,
+        });
+
+        marker.addListener('click', () => {
+          setActivePlaceId(place.id);
+          // Scroll carousel to card
+          const cardEl = cardRefsRef.current.get(place.id);
+          if (cardEl && carouselRef.current) {
+            cardEl.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+          }
+        });
+
+        return marker;
+      });
+
+      // Create clusterer with Field Notes styling
+      const clusterer = new MarkerClusterer({
+        map,
+        markers,
+        renderer: {
+          render: ({ count, position }) => {
+            return new g.maps.Marker({
+              position,
+              icon: {
+                path: g.maps.SymbolPath.CIRCLE,
+                fillColor: theme === 'dark' ? '#F5F0E1' : '#36454F',
+                fillOpacity: 1,
+                strokeColor: theme === 'dark' ? '#1B2A3D' : '#F5F0E1',
+                strokeWeight: 3,
+                scale: 18,
+              },
+              label: {
+                text: String(count),
+                color: theme === 'dark' ? '#1B2A3D' : '#F5F0E1',
+                fontFamily: "'Libre Baskerville', Georgia, serif",
+                fontWeight: '700',
+                fontSize: '14px',
+              },
+              zIndex: Number(g.maps.Marker.MAX_ZINDEX) + count,
+            });
+          },
+        },
+      });
+
+      // Add zoom in on cluster click
+      clusterer.addListener('click', (event: any) => {
+        const currentZoom = map.getZoom() || 10;
+        const targetZoom = Math.min(currentZoom + 2, 18);
+        map.setZoom(targetZoom);
+        map.panTo(event.position);
+      });
+
+      markersRef.current = markers;
+      clustererRef.current = clusterer;
       mapInstanceRef.current = map;
       setMapReady(true);
     });
 
     return () => {
+      if (clustererRef.current) {
+        clustererRef.current.clearMarkers();
+        clustererRef.current = null;
+      }
+      markersRef.current.forEach((m) => m.setMap(null));
+      markersRef.current = [];
       mapInstanceRef.current = null;
       setMapReady(false);
     };
   }, [theme, points.length, places]);
+
+  // Update marker styles when active place changes
+  useEffect(() => {
+    if (!mapReady || markersRef.current.length === 0) return;
+
+    markersRef.current.forEach((marker, index) => {
+      const place = places[index];
+      const isActive = place.id === activePlaceId;
+      
+      marker.setIcon({
+        path: google.maps.SymbolPath.CIRCLE,
+        fillColor: theme === 'dark' ? '#F5F0E1' : '#D64541',
+        fillOpacity: 1,
+        strokeColor: theme === 'dark' ? '#1B2A3D' : '#F5F0E1',
+        strokeWeight: isActive ? 4 : 3,
+        scale: isActive ? 10 : 7,
+        anchor: new google.maps.Point(0, 0),
+        labelOrigin: new google.maps.Point(0, 3), // Position label just below pin center
+      });
+
+      marker.setLabel({
+        text: place.name,
+        color: theme === 'dark' ? '#F5F0E1' : '#36454F',
+        fontFamily: "'Libre Baskerville', Georgia, serif",
+        fontSize: '11px',
+        fontWeight: isActive ? '600' : '500',
+      });
+    });
+
+    // Re-render clusters to update display
+    if (clustererRef.current) {
+      clustererRef.current.render();
+    }
+  }, [activePlaceId, mapReady, places, theme]);
 
   const dark = theme === 'dark';
 
@@ -161,23 +267,41 @@ export function ExpandedMapView({ title, places, theme, onBack }: ExpandedMapVie
     setActivePlaceId(null);
   }, []);
 
+  const handleShowAllLocations = useCallback(() => {
+    if (!mapInstanceRef.current || points.length === 0) return;
+    
+    // Calculate centroid of all points
+    const centroid = {
+      lat: points.reduce((sum, p) => sum + p.lat, 0) / points.length,
+      lng: points.reduce((sum, p) => sum + p.lng, 0) / points.length,
+    };
+    
+    const bounds = new google.maps.LatLngBounds();
+    points.forEach((p) => bounds.extend(p));
+    
+    mapInstanceRef.current.fitBounds(bounds, {
+      top: 80,
+      bottom: CAROUSEL_HEIGHT + 40,
+      left: 40,
+      right: 40,
+    });
+    
+    // Pan to centroid after bounds are set
+    google.maps.event.addListenerOnce(mapInstanceRef.current, 'idle', () => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.panTo(centroid);
+      }
+    });
+    
+    setShowingAllBounds(true);
+    setOutlierCount(0);
+  }, [points]);
+
   return (
     <div className="fixed inset-0 z-50 flex flex-col">
-      {/* Map canvas + pins overlay */}
+      {/* Map canvas with native markers and clustering */}
       <div className="relative flex-1 w-full min-h-0">
         <div ref={mapRef} className="absolute inset-0 w-full h-full" />
-        {mapReady && mapInstanceRef.current && (
-          <FieldNotesMapPins
-            map={mapInstanceRef.current}
-            mapDivRef={mapRef}
-            places={places}
-            theme={theme}
-            variant="expanded"
-            activePlaceId={activePlaceId}
-            onSelectPlace={handleSelectPlace}
-            onClearSelection={handleClearSelection}
-          />
-        )}
       </div>
 
       {/* Top bar */}
@@ -277,14 +401,14 @@ export function ExpandedMapView({ title, places, theme, onBack }: ExpandedMapVie
           {places.map((place) => {
             const photoUrl = place.photoUrl;
             const categoryLabel = place.category || 'Place';
-            const highlighted = place.id === activePlaceId;
+            const highlighted = place.id === activePlaceId || place.id === highlightedPlaceId;
             return (
               <Link
                 key={place.id}
                 ref={(el) => {
                   if (el) cardRefsRef.current.set(place.id, el);
                 }}
-                href={`/place/${place.placeSlug ?? place.id}`}
+                href={`/place/${place.placeSlug ?? place.id}?from=${mapSlug}`}
                 role="tab"
                 aria-label={`${place.name}, ${categoryLabel}`}
                 aria-selected={highlighted}
@@ -295,15 +419,18 @@ export function ExpandedMapView({ title, places, theme, onBack }: ExpandedMapVie
                   border: dark ? '1px solid rgba(137,180,196,0.15)' : 'none',
                   boxShadow: highlighted
                     ? dark
-                      ? '0 0 0 2px rgba(214,69,65,0.6), 0 2px 8px rgba(0,0,0,0.2)'
-                      : '0 0 0 2px #D64541, 0 2px 8px rgba(139,115,85,0.1)'
+                      ? '0 4px 12px rgba(195,176,145,0.25), 0 0 0 2px rgba(214,69,65,0.6)'
+                      : '0 4px 12px rgba(195,176,145,0.25), 0 0 0 2px rgba(214,69,65,0.3)'
                     : dark
                       ? '0 2px 8px rgba(0,0,0,0.2)'
                       : '0 2px 8px rgba(139,115,85,0.1)',
                   transform: highlighted ? 'translateY(-2px)' : 'none',
+                  height: 156, // 180px carousel - 24px padding
                 }}
+                onMouseEnter={() => setHighlightedPlaceId(place.id)}
+                onMouseLeave={() => setHighlightedPlaceId(null)}
               >
-                <div className="relative h-[75px] overflow-hidden">
+                <div className="relative h-[116px] overflow-hidden">
                   {photoUrl ? (
                     <div
                       className="w-full h-full"
@@ -353,8 +480,8 @@ export function ExpandedMapView({ title, places, theme, onBack }: ExpandedMapVie
                     </h4>
                   </div>
                 </div>
-                <div className="px-2 py-2">
-                  <CardMetaRow place={place} dark={dark} fontSize={9} />
+                <div className="px-2.5 py-2.5">
+                  <CardMetaRow place={place} dark={dark} fontSize={10} />
                 </div>
               </Link>
             );
@@ -395,6 +522,50 @@ export function ExpandedMapView({ title, places, theme, onBack }: ExpandedMapVie
           <polygon points="20,6 21.5,14 18.5,14" fill="currentColor" />
         </svg>
       </div>
+
+      {/* Outlier indicator */}
+      {outlierCount > 0 && !showingAllBounds && (
+        <div
+          className="absolute left-1/2 z-20 flex items-center gap-3"
+          style={{
+            bottom: CAROUSEL_HEIGHT + 20,
+            transform: 'translateX(-50%)',
+            background: dark ? 'rgba(30,47,68,0.95)' : 'rgba(255,253,247,0.95)',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+            padding: '8px 16px',
+            borderRadius: 20,
+            fontFamily: "'Libre Baskerville', Georgia, serif",
+            fontSize: 11,
+            fontStyle: 'italic',
+            color: dark ? 'rgba(137,180,196,0.8)' : '#8B7355',
+            boxShadow: dark
+              ? '0 2px 8px rgba(0,0,0,0.3)'
+              : '0 2px 8px rgba(139,115,85,0.15)',
+            border: dark ? '1px solid rgba(137,180,196,0.1)' : 'none',
+          }}
+        >
+          <span>
+            {outlierCount} more location{outlierCount > 1 ? 's' : ''} outside view
+          </span>
+          <button
+            type="button"
+            onClick={handleShowAllLocations}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: '#D64541',
+              fontSize: 11,
+              fontWeight: 600,
+              cursor: 'pointer',
+              textDecoration: 'underline',
+              padding: 0,
+            }}
+          >
+            Show all
+          </button>
+        </div>
+      )}
     </div>
   );
 }

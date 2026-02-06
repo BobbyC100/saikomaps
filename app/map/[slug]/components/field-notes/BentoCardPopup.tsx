@@ -2,11 +2,11 @@
 
 import Link from 'next/link';
 import type { PlaceCardData } from './PlaceCard';
-import { CardMetaRow } from './PlaceCard';
 
 const POPUP_WIDTH = 310;
-const PHOTO_HEIGHT = 140;
-const POPUP_HEIGHT_ESTIMATE = 280;
+const PHOTO_WIDTH = 115;
+const POPUP_MIN_HEIGHT = 130;
+const POPUP_HEIGHT_ESTIMATE = 195;
 const GAP_ABOVE_PIN = 14;
 
 interface BentoCardPopupProps {
@@ -15,6 +15,7 @@ interface BentoCardPopupProps {
   pinPixelX: number;
   pinPixelY: number;
   mapRect: { width: number; height: number };
+  mapSlug?: string;
 }
 
 function getDirectionsUrl(place: PlaceCardData): string {
@@ -30,7 +31,7 @@ function getDirectionsUrl(place: PlaceCardData): string {
   return '#';
 }
 
-export function BentoCardPopup({ place, theme, pinPixelX, pinPixelY, mapRect }: BentoCardPopupProps) {
+export function BentoCardPopup({ place, theme, pinPixelX, pinPixelY, mapRect, mapSlug }: BentoCardPopupProps) {
   const dark = theme === 'dark';
 
   const popupLeft = Math.max(12, Math.min(mapRect.width - POPUP_WIDTH - 12, pinPixelX - POPUP_WIDTH / 2));
@@ -50,6 +51,9 @@ export function BentoCardPopup({ place, theme, pinPixelX, pinPixelY, mapRect }: 
     }
   };
 
+  // Debug: Log photo URL
+  console.log('[BentoCardPopup]', place.name, 'photoUrl:', place.photoUrl);
+
   return (
     <div
       role="dialog"
@@ -65,31 +69,42 @@ export function BentoCardPopup({ place, theme, pinPixelX, pinPixelY, mapRect }: 
         pointerEvents: 'auto',
         backgroundColor: dark ? 'rgba(30, 47, 68, 0.96)' : '#FFFDF7',
         backdropFilter: dark ? 'blur(16px)' : undefined,
+        WebkitBackdropFilter: dark ? 'blur(16px)' : undefined,
         border: dark ? '1px solid rgba(137,180,196,0.1)' : 'none',
         boxShadow: dark
           ? '0 4px 16px rgba(0,0,0,0.3), 0 0 0 1px rgba(137,180,196,0.05)'
           : '0 2px 8px rgba(139,115,85,0.08), 0 16px 48px rgba(139,115,85,0.14)',
         animation: 'fn-popupEnter 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) both',
+        display: 'grid',
+        gridTemplateColumns: `${PHOTO_WIDTH}px 1fr`,
+        gridTemplateRows: '1fr auto',
       }}
       onClick={(e) => e.stopPropagation()}
     >
-      {/* Photo with name overlay */}
-      <div className="relative w-full overflow-hidden" style={{ height: PHOTO_HEIGHT }}>
-        {place.photoUrl ? (
-          <div
-            className="w-full h-full"
+      {/* Photo — left column, spans both rows */}
+      <div
+        style={{
+          gridRow: '1 / 3',
+          minHeight: POPUP_MIN_HEIGHT,
+          backgroundImage: place.photoUrl ? `url(${place.photoUrl})` : undefined,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          filter: dark
+            ? 'saturate(0.8) contrast(1.08) brightness(0.9)'
+            : 'saturate(0.88) contrast(1.05)',
+          display: place.photoUrl ? undefined : 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: !place.photoUrl
+            ? dark
+              ? '#1E2F44'
+              : '#EDE8D8'
+            : undefined,
+        }}
+      >
+        {!place.photoUrl && (
+          <span
             style={{
-              backgroundImage: `url(${place.photoUrl})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              filter: dark ? 'saturate(0.8) contrast(1.08) brightness(0.9)' : 'saturate(0.88) contrast(1.05)',
-            }}
-          />
-        ) : (
-          <div
-            className="w-full h-full flex items-center justify-center"
-            style={{
-              background: dark ? '#1E2F44' : '#EDE8D8',
               fontFamily: "'Libre Baskerville', Georgia, serif",
               fontSize: 28,
               fontStyle: 'italic',
@@ -97,41 +112,96 @@ export function BentoCardPopup({ place, theme, pinPixelX, pinPixelY, mapRect }: 
             }}
           >
             {place.name.charAt(0).toUpperCase()}
-          </div>
+          </span>
         )}
-        <div
-          className="absolute bottom-0 left-0 right-0"
+      </div>
+
+      {/* Info section — right column, top row */}
+      <div style={{ padding: '14px 16px 6px', display: 'flex', flexDirection: 'column', gap: 2 }}>
+        {/* Place name */}
+        <h4
           style={{
-            padding: '24px 14px 10px',
-            background: 'linear-gradient(transparent, rgba(0, 0, 0, 0.55))',
+            fontFamily: "'Libre Baskerville', Georgia, serif",
+            fontSize: 16,
+            fontStyle: 'italic',
+            color: dark ? '#F5F0E1' : '#36454F',
+            lineHeight: 1.25,
+            margin: 0,
           }}
         >
-          <h4
+          {place.name}
+        </h4>
+
+        {/* Meta — category · neighborhood */}
+        <div
+          style={{
+            fontSize: 9,
+            textTransform: 'uppercase',
+            letterSpacing: '1.5px',
+            color: dark ? 'rgba(137,180,196,0.5)' : '#C3B091',
+            marginTop: 2,
+          }}
+        >
+          {place.category}
+          {place.neighborhood && ` · ${place.neighborhood}`}
+        </div>
+
+        {/* Status indicator */}
+        {place.status && (
+          <div
             style={{
-              fontFamily: "'Libre Baskerville', Georgia, serif",
-              fontSize: 16,
-              fontStyle: 'italic',
-              color: '#FFFDF7',
-              lineHeight: 1.2,
-              textShadow: '0 1px 4px rgba(0, 0, 0, 0.3)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4,
+              marginTop: 4,
             }}
           >
-            {place.name}
-          </h4>
-        </div>
+            <div
+              style={{
+                width: 6,
+                height: 6,
+                borderRadius: '50%',
+                backgroundColor:
+                  place.status === 'open'
+                    ? dark
+                      ? '#6BBF8A'
+                      : '#4A7C59'
+                    : dark
+                      ? 'rgba(137,180,196,0.3)'
+                      : '#36454F',
+                opacity: place.status === 'closed' ? 0.4 : 1,
+              }}
+            />
+            <span
+              style={{
+                fontSize: 9,
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px',
+                fontWeight: 600,
+                color:
+                  place.status === 'open'
+                    ? dark
+                      ? '#6BBF8A'
+                      : '#4A7C59'
+                    : dark
+                      ? 'rgba(137,180,196,0.3)'
+                      : '#36454F',
+                opacity: place.status === 'closed' ? 0.4 : 1,
+              }}
+            >
+              {place.status === 'open' ? 'Open' : 'Closed'}
+            </span>
+          </div>
+        )}
       </div>
 
-      {/* Info section — meta row only (creator note saved for profile page) */}
-      <div style={{ padding: '10px 14px 8px' }}>
-        <CardMetaRow place={place} dark={dark} fontSize={9} />
-      </div>
-
-      {/* Action buttons */}
+      {/* Action buttons — right column, below info */}
       <div
         style={{
-          padding: '0 14px 10px',
+          padding: '0 16px 10px',
           display: 'flex',
           gap: 8,
+          alignItems: 'center',
         }}
       >
         <a
@@ -186,10 +256,11 @@ export function BentoCardPopup({ place, theme, pinPixelX, pinPixelY, mapRect }: 
         </button>
       </div>
 
-      {/* Merchant link footer */}
+      {/* Merchant link footer — spans both columns */}
       <Link
-        href={`/place/${place.placeSlug ?? place.id}`}
+        href={`/place/${place.placeSlug ?? place.id}${mapSlug ? `?from=${mapSlug}` : ''}`}
         style={{
+          gridColumn: '1 / -1',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -205,7 +276,7 @@ export function BentoCardPopup({ place, theme, pinPixelX, pinPixelY, mapRect }: 
           transition: 'background-color 0.2s ease, color 0.2s ease',
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = dark ? 'rgba(137,180,196,0.08)' : 'rgba(195,176,145,0.12)';
+          e.currentTarget.style.backgroundColor = dark ? 'rgba(137,180,196,0.12)' : 'rgba(195,176,145,0.18)';
           e.currentTarget.style.color = dark ? '#89B4C4' : '#8B7355';
         }}
         onMouseLeave={(e) => {
@@ -213,9 +284,11 @@ export function BentoCardPopup({ place, theme, pinPixelX, pinPixelY, mapRect }: 
           e.currentTarget.style.color = dark ? 'rgba(137,180,196,0.5)' : '#8B7355';
         }}
       >
-        View place
+        View full profile
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" />
+          <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" />
+          <polyline points="15 3 21 3 21 9" />
+          <line x1="10" y1="14" x2="21" y2="3" />
         </svg>
       </Link>
 

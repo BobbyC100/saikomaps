@@ -28,8 +28,21 @@
   align-self: start;
 }
 
+/* Quiet Cards should stretch to match row height */
+.quietCard {
+  align-self: stretch !important;
+}
+
+.span2 {
+  grid-column: span 2;
+}
+
 .span3 {
   grid-column: span 3;
+}
+
+.span4 {
+  grid-column: span 4;
 }
 
 .span6 {
@@ -195,7 +208,7 @@
 }
 
 /* ================================================================
-   COVERAGE QUOTE + VIBE
+   COVERAGE QUOTE (EXCERPT)
    ================================================================ */
 .excerptBlock {
   border-left: 3px solid rgba(195, 176, 145, 0.3);
@@ -207,7 +220,6 @@
   line-height: 1.6;
   color: var(--fn-charcoal);
   opacity: 0.7;
-  margin-bottom: 12px;
 }
 
 .excerptVibeTag {
@@ -215,6 +227,29 @@
   text-transform: uppercase;
   letter-spacing: 1.5px;
   color: var(--fn-khaki);
+}
+
+/* ================================================================
+   VIBE BLOCK — Tags with dot separators
+   ================================================================ */
+.vibeBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.vibeTags {
+  font-family: 'Libre Baskerville', Georgia, serif;
+  font-size: 15px;
+  font-style: italic;
+  color: var(--fn-charcoal);
+  opacity: 0.7;
+  line-height: 1.55;
+}
+
+.vibeTags span:not(:last-child)::after {
+  content: ' · ';
+  opacity: 0.8;
 }
 
 /* ================================================================
@@ -592,11 +627,75 @@
 }
 
 /* ================================================================
-   COVERAGE LINKS
+   TIPS BLOCK
    ================================================================ */
+.tipsBlock {
+  padding: 16px 20px;
+}
+
+.tipsList {
+  list-style: none;
+  font-size: 12px;
+  color: var(--fn-charcoal);
+  line-height: 1.6;
+  margin: 0;
+  padding: 0;
+}
+
+.tipsList li {
+  position: relative;
+  padding-left: 12px;
+  margin-bottom: 6px;
+}
+
+.tipsList li:last-child {
+  margin-bottom: 0;
+}
+
+.tipsList li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: var(--fn-khaki);
+  font-weight: bold;
+}
+
+/* ================================================================
+   COVERAGE ROW — Coverage (3) + Two Quiet Cards stacked (3)
+   ================================================================ */
+.coverageRow {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  align-items: stretch;
+  max-width: 100%;
+}
+
 .coverageBlock {
   padding: 16px;
-  grid-column: span 3;
+  background: var(--fn-white);
+  border-radius: 12px;
+  min-height: 0;
+}
+
+.coverageQuietStack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  min-height: 0;
+}
+
+/* Special class for quiet cards in coverage row */
+.coverageQuietCard {
+  flex: 1 !important;
+  min-height: 0 !important;
+  height: auto !important;
+  width: 100% !important;
+  background: var(--fn-white);
+  border-radius: 12px;
+  overflow: hidden;
 }
 
 .coverageLink {
@@ -691,7 +790,9 @@
     grid-template-columns: 1fr 1fr 1fr;
   }
 
+  .span2,
   .span3,
+  .span4,
   .span6 {
     grid-column: 1 / -1;
   }
@@ -746,6 +847,14 @@
   .mapTile,
   .callBlock {
     grid-column: 1 / -1;
+  }
+  
+  .coverageRow {
+    display: block;
+  }
+  
+  .coverageQuietStack {
+    display: block;
   }
   
   .coverageBlock {

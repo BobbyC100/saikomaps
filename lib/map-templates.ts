@@ -17,16 +17,6 @@ export interface MapTemplate {
 }
 
 export const MAP_TEMPLATES: Record<string, MapTemplate> = {
-  postcard: {
-    id: 'postcard',
-    bg: '#FDF6E3',
-    text: '#5D4E37',
-    textMuted: '#7D6E57',
-    accent: '#E8998D',
-    fontClass: 'font-template-postcard',
-    cardClass: 'rounded-2xl shadow-md',
-    headerClass: 'rounded-2xl',
-  },
   'field-notes': {
     id: 'field-notes',
     bg: '#F5F0E1',
@@ -47,19 +37,9 @@ export const MAP_TEMPLATES: Record<string, MapTemplate> = {
     cardClass: 'rounded border border-current/10',
     headerClass: 'rounded border-b border-current/10',
   },
-  monocle: {
-    id: 'monocle',
-    bg: '#1A1A1A',
-    text: '#F5F5F0',
-    textMuted: '#A0A0A0',
-    accent: '#FFD500',
-    fontClass: 'font-template-monocle',
-    cardClass: 'rounded-none border border-white/10',
-    headerClass: 'rounded-none border-b border-white/10',
-  },
 };
 
 export function getMapTemplate(templateType: string | null | undefined): MapTemplate {
-  const key = (templateType || 'postcard').toLowerCase().replace(/\s+/g, '-');
-  return MAP_TEMPLATES[key] ?? MAP_TEMPLATES.postcard;
+  const key = (templateType || 'field-notes').toLowerCase().replace(/\s+/g, '-');
+  return MAP_TEMPLATES[key] ?? MAP_TEMPLATES['field-notes'];
 }

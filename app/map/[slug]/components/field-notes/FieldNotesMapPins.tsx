@@ -21,6 +21,8 @@ interface FieldNotesMapPinsProps {
   /** 'split' = Bento popup on pin tap. 'expanded' = carousel sync, no popup */
   variant?: FieldNotesMapPinsVariant;
   activePlaceId?: string | null;
+  highlightedPlaceId?: string | null;
+  mapSlug?: string;
   onSelectPlace?: (id: string) => void;
   onClearSelection?: () => void;
 }
@@ -30,8 +32,11 @@ function isFeatured(place: PlaceCardData, index: number): boolean {
   return index === 0 || !!(place.editorial?.quote_text || place.editorial?.tags?.length);
 }
 
-/** Determine if a pin is ghost (unlabeled, low opacity) — non-featured places */
-function isGhost(place: PlaceCardData, index: number): boolean {
+/** Determine if a pin is ghost (unlabeled, low opacity) — only in split view for background density */
+function isGhost(place: PlaceCardData, index: number, variant: FieldNotesMapPinsVariant): boolean {
+  // In expanded view, never show ghost pins (all places are visible)
+  if (variant === 'expanded') return false;
+  // In split view, non-featured places can be ghost pins
   return !isFeatured(place, index);
 }
 
@@ -42,38 +47,103 @@ export function FieldNotesMapPins({
   theme,
   variant = 'split',
   activePlaceId: controlledActivePlaceId,
+  highlightedPlaceId,
+  mapSlug,
   onSelectPlace,
   onClearSelection,
 }: FieldNotesMapPinsProps) {
   const [pinPositions, setPinPositions] = useState<PinPosition[]>([]);
   const [internalActivePlaceId, setInternalActivePlaceId] = useState<string | null>(null);
+  const [hoveredPlaceId, setHoveredPlaceId] = useState<string | null>(null);
   const [mapRect, setMapRect] = useState({ width: 0, height: 0 });
+  const overlayRef = useRef<google.maps.OverlayView | null>(null);
+  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const isExpanded = variant === 'expanded';
-  const activePlaceId = isExpanded ? controlledActivePlaceId ?? null : internalActivePlaceId;
+  // In expanded view, use controlled active ID for carousel sync, but also maintain internal state for popup
+  const activePlaceId = isExpanded ? (controlledActivePlaceId ?? internalActivePlaceId) : internalActivePlaceId;
+  
   const handleSetActive = (id: string | null) => {
+    // Clear any pending hover timeout
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+      hoverTimeoutRef.current = null;
+    }
+    
+    // Always set internal state for popup
+    setInternalActivePlaceId(id);
+    setHoveredPlaceId(null); // Clear hover when clicking
+    
+    // In expanded view, also notify parent for carousel sync
     if (isExpanded) {
       if (id) onSelectPlace?.(id);
       else onClearSelection?.();
-    } else {
-      setInternalActivePlaceId(id);
     }
+  };
+
+  const handlePinMouseEnter = (placeId: string) => {
+    // Clear any pending timeout
+    if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+    
+    // Delay before showing popup (prevents flicker on fast mouse movement)
+    hoverTimeoutRef.current = setTimeout(() => {
+      setHoveredPlaceId(placeId);
+    }, 200);
+  };
+
+  const handlePinMouseLeave = () => {
+    if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+    
+    // Delay before hiding (allows moving mouse to popup)
+    hoverTimeoutRef.current = setTimeout(() => {
+      if (!internalActivePlaceId) {
+        setHoveredPlaceId(null);
+      }
+    }, 150);
+  };
+
+  const handlePopupMouseEnter = () => {
+    // Keep popup open when hovering it
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+      hoverTimeoutRef.current = null;
+    }
+  };
+
+  const handlePopupMouseLeave = () => {
+    handlePinMouseLeave();
   };
 
   const updatePositions = useCallback(() => {
     if (!map || !mapDivRef.current) return;
-    const projection = map.getProjection();
-    if (!projection) return;
 
     const rect = mapDivRef.current.getBoundingClientRect();
     setMapRect({ width: rect.width, height: rect.height });
+
+    // Create overlay once and reuse
+    if (!overlayRef.current) {
+      const overlay = new google.maps.OverlayView();
+      overlay.onAdd = function() {};
+      overlay.draw = function() {};
+      overlay.onRemove = function() {};
+      overlay.setMap(map);
+      overlayRef.current = overlay;
+    }
+
+    // Get projection and calculate positions
+    const projection = overlayRef.current.getProjection();
+    if (!projection) {
+      // Projection not ready yet, try again on next frame
+      requestAnimationFrame(updatePositions);
+      return;
+    }
 
     const positions: PinPosition[] = [];
     places.forEach((place, index) => {
       const pt = parseLatLng(place.latitude, place.longitude);
       if (!pt) return;
       const latLng = new google.maps.LatLng(pt.lat, pt.lng);
-      const point = projection.fromLatLngToDivPixel(latLng);
+      const point = projection.fromLatLngToContainerPixel(latLng);
       if (point) {
         positions.push({ x: point.x, y: point.y, place, index });
       }
@@ -90,13 +160,22 @@ export function FieldNotesMapPins({
       map.addListener('center_changed', updatePositions),
       map.addListener('click', () => handleSetActive(null)),
     ];
-    return () => listeners.forEach((l) => google.maps.event.removeListener(l));
+    return () => {
+      listeners.forEach((l) => google.maps.event.removeListener(l));
+      // Clean up overlay on unmount
+      if (overlayRef.current) {
+        overlayRef.current.setMap(null);
+        overlayRef.current = null;
+      }
+    };
   }, [map, updatePositions]);
 
   const dark = theme === 'light' ? false : true;
-  const activePlace = activePlaceId ? places.find((p) => p.id === activePlaceId) : null;
-  const activePosition = activePlaceId
-    ? pinPositions.find((p) => p.place.id === activePlaceId)
+  // Show popup for either active (clicked) or hovered place
+  const popupPlaceId = activePlaceId || hoveredPlaceId;
+  const activePlace = popupPlaceId ? places.find((p) => p.id === popupPlaceId) : null;
+  const activePosition = popupPlaceId
+    ? pinPositions.find((p) => p.place.id === popupPlaceId)
     : null;
 
   return (
@@ -106,9 +185,11 @@ export function FieldNotesMapPins({
     >
       {/* Pins — pointer-events-auto so they're clickable */}
       {pinPositions.map(({ x, y, place, index }) => {
-        const ghost = isGhost(place, index);
+        const ghost = isGhost(place, index, variant);
         const featured = isFeatured(place, index);
         const active = place.id === activePlaceId;
+        const highlighted = place.id === highlightedPlaceId;
+        const hovered = place.id === hoveredPlaceId;
 
         return (
           <div
@@ -127,62 +208,35 @@ export function FieldNotesMapPins({
             }}
             onClick={(e) => {
               e.stopPropagation();
-              if (isExpanded) {
-                if (active) onClearSelection?.();
-                else onSelectPlace?.(place.id);
-              } else {
-                handleSetActive(active ? null : place.id);
-              }
+              handleSetActive(active ? null : place.id);
             }}
-            onMouseEnter={(e) => {
-              const el = e.currentTarget;
-              const dot = el.querySelector('[data-pin-dot]');
-              const label = el.querySelector('[data-pin-label]');
-              if (dot) {
-                (dot as HTMLElement).style.transform = 'scale(1.15)';
-                (dot as HTMLElement).style.boxShadow = '0 3px 12px rgba(214,69,65,0.45)';
-              }
-              if (label && !ghost) {
-                (label as HTMLElement).style.opacity = featured ? '0.9' : '0.75';
-              }
+            onMouseEnter={() => {
+              handlePinMouseEnter(place.id);
             }}
-            onMouseLeave={(e) => {
-              const el = e.currentTarget;
-              const dot = el.querySelector('[data-pin-dot]');
-              const label = el.querySelector('[data-pin-label]');
-              if (dot && !active) {
-                (dot as HTMLElement).style.transform = 'scale(1)';
-                (dot as HTMLElement).style.boxShadow = ghost
-                  ? '0 1px 4px rgba(214,69,65,0.2)'
-                  : featured
-                    ? '0 2px 10px rgba(214,69,65,0.4)'
-                    : '0 2px 8px rgba(214,69,65,0.35)';
-              }
-              if (label && !ghost) {
-                (label as HTMLElement).style.opacity = featured ? '0.7' : '0.5';
-              }
-            }}
+            onMouseLeave={handlePinMouseLeave}
           >
             {/* Pin dot */}
             <div
               data-pin-dot
               style={{
-                width: ghost ? 10 : featured ? 18 : 14,
-                height: ghost ? 10 : featured ? 18 : 14,
+                // Expanded view: 20px default, 26px featured
+                // Split view: smaller sizes for ghost pins
+                width: ghost ? 10 : (isExpanded ? (featured ? 26 : 20) : (featured ? 18 : 14)),
+                height: ghost ? 10 : (isExpanded ? (featured ? 26 : 20) : (featured ? 18 : 14)),
                 borderRadius: '50%',
                 backgroundColor: '#D64541',
-                border: `${ghost ? 2 : 2.5}px solid ${dark ? '#1B2A3D' : '#F5F0E1'}`,
+                border: `${ghost ? 2 : 3}px solid ${dark ? '#1B2A3D' : '#F5F0E1'}`,
                 boxShadow: active
                   ? dark
-                    ? '0 0 0 4px rgba(214,69,65,0.2), 0 3px 12px rgba(214,69,65,0.5)'
-                    : '0 0 0 4px rgba(214,69,65,0.15), 0 3px 12px rgba(214,69,65,0.45)'
+                    ? '0 0 0 5px rgba(214,69,65,0.2), 0 4px 16px rgba(214,69,65,0.5)'
+                    : '0 0 0 5px rgba(214,69,65,0.15), 0 4px 16px rgba(214,69,65,0.5)'
                   : ghost
                     ? '0 1px 4px rgba(214,69,65,0.2)'
                     : featured
-                      ? '0 2px 10px rgba(214,69,65,0.4)'
-                      : '0 2px 8px rgba(214,69,65,0.35)',
+                      ? '0 3px 14px rgba(214,69,65,0.45)'
+                      : '0 2px 10px rgba(214,69,65,0.4)',
                 opacity: ghost ? 0.35 : 1,
-                transform: active ? 'scale(1.2)' : 'scale(1)',
+                transform: active ? 'scale(1.2)' : (highlighted || hovered) ? 'scale(1.15)' : 'scale(1)',
                 transition: 'transform 0.2s ease, box-shadow 0.2s ease',
               }}
             />
@@ -192,20 +246,23 @@ export function FieldNotesMapPins({
                 data-pin-label
                 style={{
                   fontFamily: "'Libre Baskerville', Georgia, serif",
-                  fontSize: featured ? 10 : 8,
+                  fontSize: featured ? 24 : 20,
                   fontStyle: 'italic',
-                  fontWeight: featured ? 700 : 400,
-                  color: dark ? (featured ? 'rgba(245,240,225,0.6)' : 'rgba(245,240,225,0.45)') : (featured ? 'rgba(54,69,79,0.7)' : 'rgba(54,69,79,0.5)'),
-                  maxWidth: featured ? 100 : 80,
+                  fontWeight: featured ? 700 : 500,
+                  color: dark 
+                    ? '#F5F0E1'
+                    : '#36454F',
+                  maxWidth: featured ? 140 : 120,
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
                   textAlign: 'center',
                   textShadow: dark
-                    ? '0 0 6px rgba(27,42,61,0.95), 0 0 12px rgba(27,42,61,0.6)'
-                    : '0 0 6px rgba(245,240,225,0.95), 0 0 12px rgba(245,240,225,0.6)',
-                  opacity: active ? 0.9 : (featured ? 0.7 : 0.5),
-                  transition: 'opacity 0.2s ease',
+                    ? '-1px -1px 0 rgba(27,42,61,0.95), 1px -1px 0 rgba(27,42,61,0.95), -1px 1px 0 rgba(27,42,61,0.95), 1px 1px 0 rgba(27,42,61,0.95), 0 0 8px rgba(27,42,61,1), 0 0 16px rgba(27,42,61,0.9)'
+                    : '-1px -1px 0 rgba(255,253,247,0.9), 1px -1px 0 rgba(255,253,247,0.9), -1px 1px 0 rgba(255,253,247,0.9), 1px 1px 0 rgba(255,253,247,0.9), 0 0 8px rgba(255,253,247,1), 0 0 16px rgba(255,253,247,0.8)',
+                  opacity: active ? 0.95 : (highlighted || hovered) ? 0.9 : (featured ? 1 : 0.85),
+                  transform: (active || highlighted || hovered) ? 'scale(1.02)' : 'scale(1)',
+                  transition: 'opacity 0.2s ease, transform 0.2s ease',
                 }}
               >
                 {place.name}
@@ -215,15 +272,21 @@ export function FieldNotesMapPins({
         );
       })}
 
-      {/* Popup — only in split-view */}
-      {!isExpanded && activePlace && activePosition && mapRect.width > 0 && (
-        <BentoCardPopup
-          place={activePlace}
-          theme={theme}
-          pinPixelX={activePosition.x}
-          pinPixelY={activePosition.y}
-          mapRect={mapRect}
-        />
+      {/* Popup — shows in both split and expanded views */}
+      {activePlace && activePosition && mapRect.width > 0 && (
+        <div
+          onMouseEnter={handlePopupMouseEnter}
+          onMouseLeave={handlePopupMouseLeave}
+        >
+          <BentoCardPopup
+            place={activePlace}
+            theme={theme}
+            pinPixelX={activePosition.x}
+            pinPixelY={activePosition.y}
+            mapRect={mapRect}
+            mapSlug={mapSlug}
+          />
+        </div>
       )}
     </div>
   );

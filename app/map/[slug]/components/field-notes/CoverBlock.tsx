@@ -1,6 +1,6 @@
 'use client';
 
-import { CoverMap, type PlacePoint } from './CoverMap';
+import { CoverMapGoogle, type PlacePoint } from './CoverMapGoogle';
 
 export interface CoverBlockProps {
   theme: 'light' | 'dark';
@@ -9,7 +9,7 @@ export interface CoverBlockProps {
   description?: string | null;
   authorName: string;
   authorAvatar?: string | null;
-  areaVitals?: string; // e.g. "Silver Lake · Echo Park"
+  neighborhoods?: string[]; // Array of neighborhoods to display stacked
   vibeVitals?: string; // e.g. "Low-key, wine-forward"
   coverPins: PlacePoint[];
   onCoverMapClick?: () => void;
@@ -31,12 +31,13 @@ export function CoverBlock({
   description,
   authorName,
   authorAvatar,
-  areaVitals,
+  neighborhoods = [],
   vibeVitals,
   coverPins,
   onCoverMapClick,
 }: CoverBlockProps) {
   const dark = theme === 'dark';
+  const neighborhoodLabel = neighborhoods.length > 1 ? 'Neighborhoods' : 'Neighborhood';
 
   return (
     <div
@@ -46,7 +47,7 @@ export function CoverBlock({
         border: dark ? '1px solid rgba(137,180,196,0.1)' : '1px solid rgba(195,176,145,0.25)',
       }}
     >
-      <CoverMap places={coverPins} theme={theme} onClick={onCoverMapClick} />
+      <CoverMapGoogle places={coverPins} theme={theme} onClick={onCoverMapClick} />
 
       <div className="px-8 py-7">
         <div
@@ -108,23 +109,37 @@ export function CoverBlock({
             </span>
           </div>
           <div className="flex gap-5">
-            {areaVitals && (
-              <div className="text-right">
+            {neighborhoods.length > 0 && (
+              <div className="text-right max-w-[400px]">
                 <div
-                  className="text-[8px] uppercase tracking-[0.15em] mb-0.5"
+                  className="text-[8px] uppercase tracking-[0.15em] mb-1"
                   style={{ color: dark ? 'rgba(137,180,196,0.5)' : 'var(--fn-khaki)' }}
                 >
-                  Area
+                  {neighborhoodLabel}
                 </div>
-                <span
-                  className="text-xs"
+                <div
+                  className="flex flex-wrap gap-0 justify-end"
                   style={{
                     fontFamily: "'Libre Baskerville', Georgia, serif",
+                    fontSize: '12px',
+                    lineHeight: '1.4',
                     color: dark ? 'var(--fn-parchment)' : 'var(--fn-charcoal)',
                   }}
                 >
-                  {areaVitals}
-                </span>
+                  {neighborhoods.map((neighborhood, index) => (
+                    <span key={index} style={{ whiteSpace: 'nowrap' }}>
+                      {neighborhood}
+                      {index < neighborhoods.length - 1 && (
+                        <span style={{ 
+                          color: dark ? 'rgba(137,180,196,0.3)' : '#C3B091',
+                          margin: '0 4px'
+                        }}>
+                          ·
+                        </span>
+                      )}
+                    </span>
+                  ))}
+                </div>
               </div>
             )}
             {vibeVitals && (

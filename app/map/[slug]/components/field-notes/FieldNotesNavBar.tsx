@@ -36,12 +36,33 @@ export function FieldNotesNavBar({ theme }: FieldNotesNavBarProps) {
           <circle cx="12" cy="24" r="2.2" fill={dark ? 'var(--fn-ocean)' : '#E07A5F'}/>
           <circle cx="12" cy="24" r="0.9" fill={dark ? 'rgba(237, 232, 216, 0.95)' : '#FFFFFF'}/>
         </svg>
-        <span
-          className="text-[13px] font-bold uppercase tracking-[0.2em]"
-          style={{ color: dark ? 'var(--fn-parchment)' : 'var(--fn-charcoal)' }}
-        >
-          Saiko Maps
-        </span>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+          <span
+            style={{
+              fontFamily: 'Instrument Serif, Georgia, serif',
+              fontStyle: 'italic',
+              fontWeight: 400,
+              fontSize: '16px',
+              lineHeight: 1,
+              color: dark ? 'var(--fn-parchment)' : 'var(--fn-charcoal)',
+            }}
+          >
+            SAIKO
+          </span>
+          <span
+            style={{
+              fontFamily: 'DM Sans, sans-serif',
+              fontWeight: 500,
+              fontSize: '8px',
+              letterSpacing: '0.25em',
+              textTransform: 'uppercase',
+              lineHeight: 1,
+              color: dark ? 'rgba(137,180,196,0.6)' : 'var(--fn-khaki)',
+            }}
+          >
+            MAPS
+          </span>
+        </div>
       </Link>
       <div className="flex items-center gap-3">
         <button

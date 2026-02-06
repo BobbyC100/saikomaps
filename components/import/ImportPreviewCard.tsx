@@ -18,14 +18,13 @@ interface ImportPreviewCardProps {
 
 export function ImportPreviewCard({ preview, onConfirm, isProcessing }: ImportPreviewCardProps) {
   const [listTitle, setListTitle] = useState('')
-  const [templateType, setTemplateType] = useState<'city_guide' | 'travel_itinerary' | 'minimalist'>('city_guide')
 
   const handleConfirm = () => {
     if (!listTitle.trim()) {
       alert('Please enter a title for your guide')
       return
     }
-    onConfirm({ listTitle, templateType })
+    onConfirm({ listTitle, templateType: 'field-notes' })
   }
 
   return (
@@ -138,40 +137,9 @@ export function ImportPreviewCard({ preview, onConfirm, isProcessing }: ImportPr
               />
             </div>
 
-            {/* Template Selection */}
-            <div>
-              <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">
-                Template Style
-              </label>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                {[
-                  { value: 'city_guide', label: 'City Guide', icon: '🏙️', desc: 'Organized by category' },
-                  { value: 'travel_itinerary', label: 'Travel Itinerary', icon: '✈️', desc: 'Day-by-day timeline' },
-                  { value: 'minimalist', label: 'Minimalist', icon: '✨', desc: 'Simple list' },
-                ].map((template) => (
-                  <button
-                    key={template.value}
-                    type="button"
-                    onClick={() => setTemplateType(template.value as any)}
-                    disabled={isProcessing}
-                    className={`
-                      p-4 rounded-lg border-2 text-left transition-all
-                      ${templateType === template.value
-                        ? 'border-[var(--accent-primary)] bg-[var(--accent-primary)]/5'
-                        : 'border-[var(--border-color)] hover:border-[var(--accent-primary)]'
-                      }
-                    `}
-                  >
-                    <div className="text-2xl mb-2">{template.icon}</div>
-                    <div className="font-medium text-[var(--text-primary)]">
-                      {template.label}
-                    </div>
-                    <div className="text-xs text-[var(--text-secondary)] mt-1">
-                      {template.desc}
-                    </div>
-                  </button>
-                ))}
-              </div>
+            {/* Template Info */}
+            <div className="text-sm text-[var(--text-secondary)]">
+              Using <span className="font-medium text-[var(--text-primary)]">Field Notes</span> template
             </div>
 
             {/* Action Buttons */}

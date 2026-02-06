@@ -19,7 +19,7 @@ export interface UserProfile extends User {
 // LIST TYPES
 // ============================================
 
-export type TemplateType = 'city_guide' | 'travel_itinerary' | 'minimalist'
+export type TemplateType = 'field-notes' | 'field_notes'
 export type AccessLevel = 'public' | 'password' | 'private'
 
 export interface ListWithLocations extends List {

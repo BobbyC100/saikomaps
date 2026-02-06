@@ -6,42 +6,10 @@ import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import styles from './setup.module.css';
 
-const TEMPLATES = [
-  {
-    id: 'postcard',
-    name: 'Postcard',
-    subtitle: 'Vintage Postcard Vibes',
-    description: 'Perfect for travel guides and nostalgic collections',
-    image: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&q=80',
-  },
-  {
-    id: 'field-notes',
-    name: 'Field Notes',
-    subtitle: 'Clean Notebook Aesthetic',
-    description: 'Ideal for curated lists and personal collections',
-    image: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=800&q=80',
-  },
-  {
-    id: 'monocle',
-    name: 'Monocle',
-    subtitle: 'Sophisticated Editorial',
-    description: 'Premium magazine-style layout for sophisticated guides',
-    image: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800&q=80',
-  },
-  {
-    id: 'street',
-    name: 'Street',
-    subtitle: 'Bold Urban Energy',
-    description: 'Dynamic, urban-inspired design for city guides',
-    image: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800&q=80',
-  },
-];
-
 export default function SetupPage() {
   const router = useRouter();
   const [mapTitle, setMapTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [selectedTemplate, setSelectedTemplate] = useState('postcard');
   const [isCreating, setIsCreating] = useState(false);
   const [locationCount, setLocationCount] = useState(0);
 
@@ -101,7 +69,7 @@ export default function SetupPage() {
       // Call API to create map (auto-published)
       const requestBody = {
         listTitle: mapTitle.trim(),
-        templateType: selectedTemplate,
+        templateType: 'field-notes',
         locations: apiLocations,
       };
       
@@ -183,37 +151,9 @@ export default function SetupPage() {
               autoFocus
               disabled={isCreating}
             />
-          </div>
-
-          {/* Template Selection */}
-          <div className={styles.section}>
-            <label className={styles.label}>Template</label>
-            <div className={styles.templateGrid}>
-              {TEMPLATES.map((template) => (
-                <button
-                  key={template.id}
-                  type="button"
-                  onClick={() => setSelectedTemplate(template.id)}
-                  disabled={isCreating}
-                  className={`${styles.templateCard} ${
-                    selectedTemplate === template.id ? styles.selected : ''
-                  }`}
-                >
-                  <div
-                    className={styles.templateImage}
-                    style={{ backgroundImage: `url(${template.image})` }}
-                  >
-                    <div className={styles.templateOverlay}>
-                      <div className={styles.templateName}>{template.name}</div>
-                      <div className={styles.templateSubtitle}>{template.subtitle}</div>
-                    </div>
-                  </div>
-                  <div className={styles.templateInfo}>
-                    <p className={styles.templateDescription}>{template.description}</p>
-                  </div>
-                </button>
-              ))}
-            </div>
+            <p style={{ marginTop: '0.75rem', fontSize: '0.875rem', color: 'rgba(255, 255, 255, 0.5)' }}>
+              Using Field Notes template
+            </p>
           </div>
 
           {/* Description (Optional) */}

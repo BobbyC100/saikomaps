@@ -35,7 +35,7 @@ async function main() {
       subtitle: 'A test guide for development',
       slug: 'test-guide',
       introText: 'This is a test guide for development purposes.',
-      templateType: 'city_guide',
+      templateType: 'field-notes',
       published: true,
     },
   });
