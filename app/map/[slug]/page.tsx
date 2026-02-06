@@ -5,7 +5,6 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Loader } from '@googlemaps/js-api-loader';
 import { MarkerClusterer } from '@googlemaps/markerclusterer';
-import { Pencil, X, MapPin, Phone, Globe, Instagram, ExternalLink, Clock } from 'lucide-react';
 import { getMapTemplate, MAP_TEMPLATES, type MapTemplate } from '@/lib/map-templates';
 import { DEV_SHOW_ALL_UI } from '@/lib/config';
 import { saikoMapStyle } from '@/lib/mapStyle';
@@ -14,6 +13,9 @@ import { getMarkerIcon } from '@/lib/categoryMapping';
 import { EditLocationModal } from './components/EditLocationModal';
 import { MapHeader } from './components/MapHeader';
 import { TitleCard } from './components/TitleCard';
+import { FieldNotesMapView } from './components/field-notes/FieldNotesMapView';
+import { SkateLayerToggle } from './components/SkateLayerToggle';
+import { SkateSpotDetailPanel, type SkateSpot } from './components/SkateSpotDetailPanel';
 import { GlobalFooter } from '@/components/layouts/GlobalFooter';
 import { LocationCard } from '@/components/LocationCard';
 
@@ -23,6 +25,7 @@ interface Location {
   name: string;
   address: string | null;
   category: string | null;
+  neighborhood?: string | null;
   phone: string | null;
   website: string | null;
   instagram: string | null;
@@ -35,6 +38,8 @@ interface Location {
   userPhotos: string[];
   googlePhotos: unknown;
   orderIndex: number;
+  priceLevel?: number | null;
+  cuisineType?: string | null;
 }
 
 interface MapPlaceWithPlace {
@@ -49,6 +54,7 @@ interface MapPlaceWithPlace {
     name: string;
     address: string | null;
     category: string | null;
+    neighborhood?: string | null;
     phone: string | null;
     website: string | null;
     instagram: string | null;
@@ -57,6 +63,8 @@ interface MapPlaceWithPlace {
     latitude: unknown;
     longitude: unknown;
     googlePhotos: unknown;
+    priceLevel?: number | null;
+    cuisineType?: string | null;
   };
 }
 
@@ -71,6 +79,7 @@ interface MapData {
   userId: string;
   creatorName?: string;
   coverImageUrl?: string | null;
+  introText?: string | null;
   createdAt: string | Date;
   updatedAt: string | Date;
   isOwner?: boolean;
@@ -95,7 +104,23 @@ function getLocationPhotoUrl(loc: Location, maxWidth: number = 400): string | nu
   return null;
 }
 
-/** Get up to 3 photo URLs for gallery: main (400px) + 2 thumbs (200px). */
+/** Exclude Street View / photosphere photos (attribution is just "Google"). */
+function filterStreetViewPhotos(
+  photos: Array<{ html_attributions?: string[]; photo_reference?: string; photoReference?: string; name?: string }>
+): typeof photos {
+  return photos.filter((p) => {
+    const attrs = p.html_attributions;
+    if (!attrs || attrs.length === 0) return true;
+    if (attrs.length > 1) return true; // Multiple attributions = likely user photos
+    const text = (attrs[0] || '').replace(/<[^>]+>/g, '').trim();
+    if (!text) return true;
+    // Exclude if sole attribution is "Google" (Street View)
+    if (/^Google$/i.test(text)) return false;
+    return true;
+  });
+}
+
+/** Get up to 3 photo URLs for gallery: main (400px) + 2 thumbs (200px). Excludes Street View photos. */
 function getLocationPhotoGallery(loc: Location): {
   mainUrl: string | null;
   thumbUrls: string[];
@@ -108,7 +133,9 @@ function getLocationPhotoGallery(loc: Location): {
       totalCount: loc.userPhotos.length,
     };
   }
-  const arr = loc.googlePhotos && Array.isArray(loc.googlePhotos) ? loc.googlePhotos : [];
+  const raw = loc.googlePhotos && Array.isArray(loc.googlePhotos) ? loc.googlePhotos : [];
+  const filtered = filterStreetViewPhotos(raw as Array<{ html_attributions?: string[]; photo_reference?: string; photoReference?: string; name?: string }>);
+  const arr = filtered.length > 0 ? filtered : raw;
   if (!arr.length || !GOOGLE_MAPS_API_KEY) {
     return { mainUrl: null, thumbUrls: [], totalCount: 0 };
   }
@@ -160,6 +187,8 @@ export default function PublicMapPage({ params }: { params: Promise<{ slug: stri
   const markersRef = useRef<google.maps.Marker[]>([]);
   const clustererRef = useRef<MarkerClusterer | null>(null);
   const googleMapsRef = useRef<typeof google | null>(null);
+  const skateMarkersRef = useRef<google.maps.Marker[]>([]);
+  const skateClustererRef = useRef<MarkerClusterer | null>(null);
 
   let template: MapTemplate = getMapTemplate(mapData?.templateType);
   // Flatten mapPlaces to locations (place + mapPlace curator data)
@@ -172,6 +201,7 @@ export default function PublicMapPage({ params }: { params: Promise<{ slug: stri
         name: p.name,
         address: p.address,
         category: p.category,
+        neighborhood: (p as { neighborhood?: string }).neighborhood ?? null,
         phone: p.phone,
         website: p.website,
         instagram: p.instagram,
@@ -184,12 +214,14 @@ export default function PublicMapPage({ params }: { params: Promise<{ slug: stri
         userPhotos: mp.userPhotos ?? [],
         googlePhotos: p.googlePhotos,
         orderIndex: mp.orderIndex,
+        priceLevel: p.priceLevel ?? null,
+        cuisineType: p.cuisineType ?? null,
       } as Location;
     }
     return mp as Location;
   });
   const hasValidLocations = locations.some((loc) => parseLatLng(loc.latitude, loc.longitude));
-  
+
   // Override black/yellow monocle template to use postcard colors instead
   if (template.id === 'monocle') {
     template = MAP_TEMPLATES.postcard;
@@ -206,6 +238,9 @@ export default function PublicMapPage({ params }: { params: Promise<{ slug: stri
   const [editingLocation, setEditingLocation] = useState<Location | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [deletingLocationId, setDeletingLocationId] = useState<string | null>(null);
+  const [skateLayerOn, setSkateLayerOn] = useState(true);
+  const [activeSkateSpot, setActiveSkateSpot] = useState<SkateSpot | null>(null);
+  const [mapReady, setMapReady] = useState(false);
   
   const handleSaveLocation = useCallback(async (updatedData: Partial<Location>) => {
     if (!editingLocation || !mapData) return;
@@ -215,7 +250,7 @@ export default function PublicMapPage({ params }: { params: Promise<{ slug: stri
     const locationId = editingLocation.id;
     
     try {
-      // Optimistic update (mapPlaces)
+      // Optimistic update (mapPlaces + nested place)
       setMapData((prev) => {
         if (!prev?.mapPlaces) return prev;
         return {
@@ -227,6 +262,15 @@ export default function PublicMapPage({ params }: { params: Promise<{ slug: stri
                   descriptor: updatedData.descriptor ?? mp.descriptor,
                   userNote: updatedData.userNote ?? mp.userNote,
                   userPhotos: updatedData.userPhotos ?? mp.userPhotos,
+                  place:
+                    updatedData.neighborhood !== undefined || updatedData.priceLevel !== undefined || updatedData.cuisineType !== undefined
+                      ? {
+                          ...mp.place,
+                          neighborhood: updatedData.neighborhood !== undefined ? updatedData.neighborhood : mp.place.neighborhood,
+                          priceLevel: updatedData.priceLevel !== undefined ? updatedData.priceLevel : mp.place.priceLevel,
+                          cuisineType: updatedData.cuisineType !== undefined ? updatedData.cuisineType : mp.place.cuisineType,
+                        }
+                      : mp.place,
                 }
               : mp
           ),
@@ -259,6 +303,12 @@ export default function PublicMapPage({ params }: { params: Promise<{ slug: stri
                   descriptor: originalLocation.descriptor ?? mp.descriptor,
                   userNote: originalLocation.userNote ?? mp.userNote,
                   userPhotos: originalLocation.userPhotos ?? mp.userPhotos,
+                  place: {
+                    ...mp.place,
+                    neighborhood: originalLocation.neighborhood ?? mp.place.neighborhood,
+                    priceLevel: originalLocation.priceLevel ?? mp.place.priceLevel,
+                    cuisineType: originalLocation.cuisineType ?? mp.place.cuisineType,
+                  },
                 }
               : mp
           ),
@@ -391,9 +441,19 @@ export default function PublicMapPage({ params }: { params: Promise<{ slug: stri
 
       const bounds = new g.maps.LatLngBounds();
       points.forEach((p) => bounds.extend(p));
-      if (points.length > 1) map.fitBounds(bounds, 48);
+      if (points.length === 1) {
+        map.setCenter(points[0]);
+        map.setZoom(14);
+      } else {
+        map.fitBounds(bounds, { top: 80, bottom: 40, left: 0, right: 40 });
+        const idleListener = map.addListener('idle', () => {
+          const zoom = map.getZoom();
+          if (zoom != null && zoom > 15) map.setZoom(15);
+          g.maps.event.removeListener(idleListener);
+        });
+      }
 
-      // Create markers with category SVG icons (no numbers)
+      // Create markers with category icons
       const markers = points.map((point, i) => {
         const loc = locations[i];
         const category = loc?.category || 'eat';
@@ -485,6 +545,7 @@ export default function PublicMapPage({ params }: { params: Promise<{ slug: stri
 
       markersRef.current = markers;
       clustererRef.current = clusterer;
+      setMapReady(true);
     }).catch((error) => {
       console.error('Error loading Google Maps:', error);
     });
@@ -497,8 +558,94 @@ export default function PublicMapPage({ params }: { params: Promise<{ slug: stri
       markersRef.current.forEach((m) => m.setMap(null));
       markersRef.current = [];
       mapInstanceRef.current = null;
+      setMapReady(false);
     };
-  }, [mapData?.id, hasValidLocations, template.accent, template.bg, scrollToCard]);
+  }, [mapData?.id, hasValidLocations, template.accent, template.bg, scrollToCard, locations]);
+
+  // Skate layer: fetch spots and add markers when layer is on
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    const g = googleMapsRef.current;
+    if (!map || !g || !skateLayerOn) {
+      if (skateClustererRef.current) {
+        skateClustererRef.current.clearMarkers();
+        skateClustererRef.current = null;
+      }
+      skateMarkersRef.current.forEach((m) => m.setMap(null));
+      skateMarkersRef.current = [];
+      return;
+    }
+
+    let cancelled = false;
+    fetch('/api/spots/geojson?layer=SKATE')
+      .then((res) => res.ok ? res.json() : null)
+      .then((fc: { features?: Array<{ geometry: { coordinates: [number, number] }; properties: Record<string, unknown> }> }) => {
+        if (cancelled || !fc?.features?.length) return;
+        const markers = fc.features.map((f) => {
+          const [lng, lat] = f.geometry.coordinates;
+          const props = f.properties || {};
+          const marker = new g.maps.Marker({
+            position: { lat, lng },
+            map,
+            icon: {
+              url: '/markers/skate.svg',
+              scaledSize: new g.maps.Size(32, 32),
+              anchor: new g.maps.Point(16, 16),
+            },
+            zIndex: 100,
+          });
+          marker.addListener('click', () => {
+            setActiveSkateSpot({
+              id: String(props.id),
+              name: String(props.name || ''),
+              slug: props.slug ? String(props.slug) : null,
+              spotType: props.spotType ? String(props.spotType) : null,
+              tags: Array.isArray(props.tags) ? props.tags.map(String) : [],
+              surface: props.surface ? String(props.surface) : null,
+              skillLevel: null,
+              description: props.description ? String(props.description) : null,
+              region: props.region ? String(props.region) : null,
+              source: String(props.source || 'OSM'),
+              sourceUrl: props.sourceUrl ? String(props.sourceUrl) : null,
+            });
+          });
+          return marker;
+        });
+        const clusterer = new MarkerClusterer({
+          map,
+          markers,
+          renderer: {
+            render: ({ count, position }) =>
+              new g.maps.Marker({
+                position,
+                icon: {
+                  path: g.maps.SymbolPath.CIRCLE,
+                  fillColor: '#3D5A80',
+                  fillOpacity: 1,
+                  strokeColor: '#FFFFFF',
+                  strokeWeight: 2,
+                  scale: 18,
+                },
+                label: { text: String(count), color: 'white', fontWeight: 'bold', fontSize: '11px' },
+                zIndex: 101,
+              }),
+          },
+        });
+        skateMarkersRef.current = markers;
+        skateClustererRef.current = clusterer;
+      })
+      .catch(() => {});
+
+    return () => {
+      cancelled = true;
+      if (skateClustererRef.current) {
+        skateClustererRef.current.clearMarkers();
+        skateClustererRef.current = null;
+      }
+      skateMarkersRef.current.forEach((m) => m.setMap(null));
+      skateMarkersRef.current = [];
+    };
+  }, [skateLayerOn, mapData?.id, hasValidLocations, mapReady]);
 
   // Highlight active marker when card is in viewport (scale up category icon)
   useEffect(() => {
@@ -573,6 +720,41 @@ export default function PublicMapPage({ params }: { params: Promise<{ slug: stri
     );
   }
 
+  // Field Notes template: list-first bento layout with expanded map toggle
+  const isFieldNotes =
+    mapData.templateType?.toLowerCase().replace(/\s+/g, '-') === 'field-notes' ||
+    mapData.templateType?.toLowerCase() === 'field_notes';
+  if (isFieldNotes && locations.length > 0) {
+    const fnLocations = locations.map((loc) => ({
+      id: loc.id,
+      placeSlug: loc.placeSlug,
+      name: loc.name,
+      category: loc.category,
+      neighborhood: loc.neighborhood ?? null,
+      latitude: loc.latitude,
+      longitude: loc.longitude,
+      userPhotos: loc.userPhotos ?? [],
+      googlePhotos: loc.googlePhotos,
+      hours: loc.hours,
+      orderIndex: loc.orderIndex,
+      descriptor: loc.descriptor,
+      priceLevel: loc.priceLevel ?? null,
+      cuisineType: loc.cuisineType ?? null,
+    }));
+    return (
+      <FieldNotesMapView
+        title={mapData.title}
+        description={mapData.description ?? mapData.subtitle}
+        category={mapData.subtitle ?? 'Places'}
+        vibe={mapData.introText ?? undefined}
+        theme="light"
+        authorName={mapData.creatorName ?? 'Unknown'}
+        authorAvatar={undefined}
+        locations={fnLocations}
+      />
+    );
+  }
+
   const isOwner = mapData?.isOwner ?? false;
   const showOwnerUI = DEV_SHOW_ALL_UI || isOwner;
   
@@ -594,7 +776,17 @@ export default function PublicMapPage({ params }: { params: Promise<{ slug: stri
           className={`flex-shrink-0 w-full md:flex-[0_0_42%] md:h-full md:min-h-[400px] md:sticky md:top-0 order-first md:order-last ${mobileView === 'map' ? 'h-[70vh]' : 'h-[300px]'} md:h-full`}
         >
           {GOOGLE_MAPS_API_KEY && hasValidLocations ? (
-            <div ref={mapContainerRef} className="w-full h-full min-h-[300px]" />
+            <div className="relative w-full h-full min-h-[300px]">
+              <div ref={mapContainerRef} className="absolute inset-0 w-full h-full" />
+              <div className="absolute top-3 right-3 z-10">
+                <SkateLayerToggle on={skateLayerOn} onChange={setSkateLayerOn} />
+              </div>
+              {activeSkateSpot && (
+                <div className="absolute bottom-3 left-3 right-3 z-10 max-w-sm">
+                  <SkateSpotDetailPanel spot={activeSkateSpot} onClose={() => setActiveSkateSpot(null)} />
+                </div>
+              )}
+            </div>
           ) : (
             <div
               className="w-full h-full flex items-center justify-center text-center p-8"
@@ -680,8 +872,7 @@ export default function PublicMapPage({ params }: { params: Promise<{ slug: stri
                       placeSlug: loc.placeSlug,
                       name: loc.name,
                       address: loc.address,
-                      phone: loc.phone,
-                      website: loc.website,
+                      category: loc.category,
                       instagram: loc.instagram,
                       hours: loc.hours,
                       imageUrl: gallery.mainUrl,
@@ -689,11 +880,10 @@ export default function PublicMapPage({ params }: { params: Promise<{ slug: stri
                       latitude: loc.latitude,
                       longitude: loc.longitude,
                     }}
-                    index={index}
                     isActive={activeCardIndex === index}
                     isOwner={showOwnerUI}
-                    onEdit={showOwnerUI ? ((loc) => {
-                      const fullLocation = locations.find(l => l.id === loc.id);
+                    onEdit={showOwnerUI ? ((clickedLoc) => {
+                      const fullLocation = locations.find(l => l.id === clickedLoc.id);
                       if (fullLocation) setEditingLocation(fullLocation);
                     }) : undefined}
                     onDelete={showOwnerUI ? handleDeleteLocation : undefined}

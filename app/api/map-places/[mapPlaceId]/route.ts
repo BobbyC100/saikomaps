@@ -51,7 +51,24 @@ export async function PATCH(
     }
 
     const body = await request.json();
-    const { descriptor, userNote, orderIndex } = body;
+    const { descriptor, userNote, orderIndex, neighborhood, priceLevel, cuisineType } = body;
+
+    if (neighborhood !== undefined || priceLevel !== undefined || cuisineType !== undefined) {
+      await db.place.update({
+        where: { id: mapPlace.placeId },
+        data: {
+          ...(neighborhood !== undefined && {
+            neighborhood: neighborhood?.trim() || null,
+          }),
+          ...(priceLevel !== undefined && {
+            priceLevel: priceLevel === null || priceLevel === '' ? null : Math.min(4, Math.max(0, Number(priceLevel))),
+          }),
+          ...(cuisineType !== undefined && {
+            cuisineType: cuisineType?.trim() || null,
+          }),
+        },
+      });
+    }
 
     const updated = await db.mapPlace.update({
       where: { id: mapPlaceId },

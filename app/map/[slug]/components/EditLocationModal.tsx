@@ -12,6 +12,10 @@ interface Location {
   website: string | null;
   description: string | null;
   userNote: string | null;
+  descriptor?: string | null;
+  neighborhood?: string | null;
+  priceLevel?: number | null;
+  cuisineType?: string | null;
 }
 
 interface EditLocationModalProps {
@@ -33,14 +37,20 @@ export function EditLocationModal({
   const [address, setAddress] = useState(location.address || '');
   const [phone, setPhone] = useState(location.phone || '');
   const [website, setWebsite] = useState(location.website || '');
-  const [description, setDescription] = useState(location.description || location.userNote || '');
+  const [neighborhood, setNeighborhood] = useState(location.neighborhood || '');
+  const [cuisineType, setCuisineType] = useState(location.cuisineType || '');
+  const [priceLevel, setPriceLevel] = useState<number | ''>(location.priceLevel ?? '');
+  const [creatorNote, setCreatorNote] = useState(location.descriptor || location.userNote || '');
 
   useEffect(() => {
     setName(location.name);
     setAddress(location.address || '');
     setPhone(location.phone || '');
     setWebsite(location.website || '');
-    setDescription(location.description || location.userNote || '');
+    setNeighborhood(location.neighborhood || '');
+    setCuisineType(location.cuisineType || '');
+    setPriceLevel(location.priceLevel ?? '');
+    setCreatorNote(location.descriptor || location.userNote || '');
   }, [location]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -50,8 +60,11 @@ export function EditLocationModal({
       address: address.trim() || null,
       phone: phone.trim() || null,
       website: website.trim() || null,
-      description: description.trim() || null,
-      userNote: description.trim() || null,
+      neighborhood: neighborhood.trim() || null,
+      cuisineType: cuisineType.trim() || null,
+      priceLevel: priceLevel === '' ? null : (typeof priceLevel === 'number' ? priceLevel : parseInt(String(priceLevel), 10)),
+      descriptor: creatorNote.trim() || null,
+      userNote: creatorNote.trim() || null,
     });
   };
 
@@ -124,6 +137,67 @@ export function EditLocationModal({
 
           <div>
             <label className="block text-sm font-medium mb-2" style={{ color: template.text }}>
+              Neighborhood
+            </label>
+            <input
+              type="text"
+              value={neighborhood}
+              onChange={(e) => setNeighborhood(e.target.value)}
+              placeholder="e.g. Kailua, North Shore"
+              className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2"
+              style={{
+                backgroundColor: template.bg === '#1A1A1A' ? '#1A1A1A' : '#F5F1EC',
+                borderColor: template.bg === '#1A1A1A' ? 'rgba(255,255,255,0.1)' : '#E8E3DC',
+                color: template.text,
+              }}
+              disabled={isSaving}
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-2" style={{ color: template.text }}>
+              Cuisine type
+            </label>
+            <input
+              type="text"
+              value={cuisineType}
+              onChange={(e) => setCuisineType(e.target.value)}
+              placeholder="e.g. Italian, Japanese, Seafood"
+              className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2"
+              style={{
+                backgroundColor: template.bg === '#1A1A1A' ? '#1A1A1A' : '#F5F1EC',
+                borderColor: template.bg === '#1A1A1A' ? 'rgba(255,255,255,0.1)' : '#E8E3DC',
+                color: template.text,
+              }}
+              disabled={isSaving}
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-2" style={{ color: template.text }}>
+              Price level
+            </label>
+            <select
+              value={priceLevel === '' ? 'none' : priceLevel}
+              onChange={(e) => setPriceLevel(e.target.value === 'none' ? '' : parseInt(e.target.value, 10))}
+              className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2"
+              style={{
+                backgroundColor: template.bg === '#1A1A1A' ? '#1A1A1A' : '#F5F1EC',
+                borderColor: template.bg === '#1A1A1A' ? 'rgba(255,255,255,0.1)' : '#E8E3DC',
+                color: template.text,
+              }}
+              disabled={isSaving}
+            >
+              <option value="none">None</option>
+              <option value={1}>$</option>
+              <option value={2}>$$</option>
+              <option value={3}>$$$</option>
+              <option value={4}>$$$$</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-2" style={{ color: template.text }}>
               Phone
             </label>
             <input
@@ -160,12 +234,14 @@ export function EditLocationModal({
 
           <div>
             <label className="block text-sm font-medium mb-2" style={{ color: template.text }}>
-              Description / Notes
+              Creator&apos;s note
             </label>
             <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={4}
+              value={creatorNote}
+              onChange={(e) => setCreatorNote(e.target.value.slice(0, 280))}
+              rows={3}
+              maxLength={280}
+              placeholder="Why this place matters to you..."
               className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 resize-none"
               style={{
                 backgroundColor: template.bg === '#1A1A1A' ? '#1A1A1A' : '#F5F1EC',
@@ -174,6 +250,9 @@ export function EditLocationModal({
               }}
               disabled={isSaving}
             />
+            <p className="text-xs mt-1" style={{ color: template.textMuted }}>
+              {creatorNote.length}/280 characters
+            </p>
           </div>
 
           {/* Actions */}

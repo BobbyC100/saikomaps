@@ -15,6 +15,7 @@ export async function GET(
   try {
     const { slug } = await params;
     const session = await getServerSession(authOptions);
+    const devOwner = process.env.NODE_ENV === 'development' && request.nextUrl.searchParams.get('devOwner') === '1';
 
     const list = await db.list.findFirst({
       where: {
@@ -29,8 +30,9 @@ export async function GET(
             email: true,
           },
         },
-        locations: {
+        mapPlaces: {
           orderBy: { orderIndex: 'asc' },
+          include: { place: true },
         },
       },
     });
@@ -42,8 +44,8 @@ export async function GET(
       );
     }
 
-    // Check if current user is the owner
-    const isOwner = session?.user?.id === list.userId;
+    // Check if current user is the owner (or dev override: ?devOwner=1 in development)
+    const isOwner = devOwner || session?.user?.id === list.userId;
 
     return NextResponse.json({
       success: true,

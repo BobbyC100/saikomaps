@@ -48,18 +48,21 @@ export async function PATCH(
     }
 
     const body = await request.json();
-    const { name, address, phone, website, description, userNote } = body;
+    const { name, address, phone, website, description, userNote, descriptor, orderIndex } = body;
 
-    // Update location
     const updated = await db.location.update({
       where: { id: locationId },
       data: {
-        name: name?.trim() || location.name,
-        address: address !== undefined ? (address?.trim() || null) : location.address,
-        phone: phone !== undefined ? (phone?.trim() || null) : location.phone,
-        website: website !== undefined ? (website?.trim() || null) : location.website,
-        description: description !== undefined ? (description?.trim() || null) : location.description,
-        userNote: userNote !== undefined ? (userNote?.trim() || null) : location.userNote,
+        ...(name !== undefined && { name: name?.trim() || location.name }),
+        ...(address !== undefined && { address: address?.trim() || null }),
+        ...(phone !== undefined && { phone: phone?.trim() || null }),
+        ...(website !== undefined && { website: website?.trim() || null }),
+        ...(description !== undefined && { description: description?.trim() || null }),
+        ...(userNote !== undefined && { userNote: userNote?.trim() || null }),
+        ...(descriptor !== undefined && {
+          descriptor: descriptor?.trim()?.slice(0, 120) || null,
+        }),
+        ...(typeof orderIndex === 'number' && { orderIndex }),
       },
     });
 
