@@ -62,9 +62,10 @@ function parseHours(hours: unknown): {
   today: string | null;
   isOpen: boolean | null;
   closesAt: string | null;
+  opensAt: string | null;
   fullWeek: Array<{ day: string; short: string; hours: string }>;
 } {
-  const empty = { today: null, isOpen: null, closesAt: null, fullWeek: [] };
+  const empty = { today: null, isOpen: null, closesAt: null, opensAt: null, fullWeek: [] };
   if (!hours || (typeof hours === 'object' && !Object.keys(hours as object).length))
     return empty;
 
@@ -80,96 +81,88 @@ function parseHours(hours: unknown): {
       : (hours as Record<string, unknown>);
   if (!obj) return empty;
 
-  // Prefer openNow when available (Google Places, timezone-aware)
-  if (typeof obj.openNow === 'boolean') {
-    const fullWeek: Array<{ day: string; short: string; hours: string }> = [];
-    const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-    const shortNames = ['M', 'T', 'W', 'Th', 'F', 'S', 'Su'];
-    const todayIndex = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
-    const weekdayText = (obj.weekday_text ?? obj.weekdayText) as string[] | undefined;
-    if (weekdayText?.length) {
-      for (let i = 0; i < weekdayText.length; i++) {
-        const line = weekdayText[i] ?? '';
-        const match = line.match(/:\s*(.+)$/);
-        fullWeek.push({
-          day: dayNames[i] ?? '',
-          short: shortNames[i] ?? '',
-          hours: match ? match[1].trim() : line,
-        });
-      }
-    }
-    const todayRow = fullWeek[todayIndex];
-    const todayHours = todayRow?.hours ?? null;
-    const closeMatch = todayHours?.match(/[–-]\s*(\d{1,2}:\d{2}\s*(?:AM|PM)|[\d:]+\s*(?:AM|PM))/i);
-    return {
-      today: todayHours,
-      isOpen: obj.openNow,
-      closesAt: closeMatch ? closeMatch[1] : null,
-      fullWeek,
-    };
-  }
-  if (typeof (obj as { open_now?: boolean }).open_now === 'boolean') {
-    const fullWeek: Array<{ day: string; short: string; hours: string }> = [];
-    const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-    const shortNames = ['M', 'T', 'W', 'Th', 'F', 'S', 'Su'];
-    const todayIndex = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
-    const weekdayText = (obj.weekday_text ?? obj.weekdayText) as string[] | undefined;
-    if (weekdayText?.length) {
-      for (let i = 0; i < weekdayText.length; i++) {
-        const line = weekdayText[i] ?? '';
-        const match = line.match(/:\s*(.+)$/);
-        fullWeek.push({
-          day: dayNames[i] ?? '',
-          short: shortNames[i] ?? '',
-          hours: match ? match[1].trim() : line,
-        });
-      }
-    }
-    const todayRow = fullWeek[todayIndex];
-    const todayHours = todayRow?.hours ?? null;
-    const closeMatch = todayHours?.match(/[–-]\s*(\d{1,2}:\d{2}\s*(?:AM|PM)|[\d:]+\s*(?:AM|PM))/i);
-    return {
-      today: todayHours,
-      isOpen: (obj as { open_now: boolean }).open_now,
-      closesAt: closeMatch ? closeMatch[1] : null,
-      fullWeek,
-    };
-  }
-
   const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
   const shortNames = ['M', 'T', 'W', 'Th', 'F', 'S', 'Su'];
   const todayIndex = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
 
-  let fullWeek: Array<{ day: string; short: string; hours: string }> = [];
-
-  const weekdayTextArr = (obj.weekday_text ?? obj.weekdayText) as string[] | undefined;
-  if (Array.isArray(weekdayTextArr) && weekdayTextArr.length) {
-    fullWeek = weekdayTextArr.map((line, idx) => {
+  // Parse full week
+  const fullWeek: Array<{ day: string; short: string; hours: string }> = [];
+  const weekdayText = (obj.weekday_text ?? obj.weekdayText) as string[] | undefined;
+  
+  if (weekdayText?.length) {
+    for (let i = 0; i < weekdayText.length; i++) {
+      const line = weekdayText[i] ?? '';
       const match = line.match(/:\s*(.+)$/);
-      return {
-        day: dayNames[idx] ?? '',
-        short: shortNames[idx] ?? '',
+      fullWeek.push({
+        day: dayNames[i] ?? '',
+        short: shortNames[i] ?? '',
         hours: match ? match[1].trim() : line,
-      };
-    });
+      });
+    }
   } else {
     const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
-    fullWeek = days.map((day, idx) => ({
-      day: dayNames[idx],
-      short: shortNames[idx],
+    fullWeek.push(...days.map((day, idx) => ({
+      day: dayNames[idx] ?? '',
+      short: shortNames[idx] ?? '',
       hours: (obj[day] as string) || 'Closed',
-    }));
+    })));
   }
 
+  // Determine if open
+  let isOpen: boolean | null = null;
+  if (typeof obj.openNow === 'boolean') {
+    isOpen = obj.openNow;
+  } else if (typeof (obj as { open_now?: boolean }).open_now === 'boolean') {
+    isOpen = (obj as { open_now: boolean }).open_now;
+  } else {
+    const todayRow = fullWeek[todayIndex];
+    const todayHours = todayRow?.hours ?? null;
+    isOpen = todayHours ? !todayHours.toLowerCase().includes('closed') : null;
+  }
+
+  // Extract close time from today's hours
   const todayRow = fullWeek[todayIndex];
   const todayHours = todayRow?.hours ?? null;
-  const isOpen = todayHours ? !todayHours.toLowerCase().includes('closed') : null;
-  const closeMatch = todayHours?.match(
-    /[–-]\s*(\d{1,2}:\d{2}\s*(?:AM|PM)|[\d:]+\s*(?:AM|PM))/i
-  );
-  const closesAt = closeMatch ? closeMatch[1] : null;
+  
+  // Check for 24-hour operation
+  const is24Hours = todayHours?.toLowerCase().includes('open 24 hours') || 
+                    todayHours?.toLowerCase().includes('24 hours') ||
+                    todayHours?.toLowerCase().includes('24/7');
+  
+  const closeMatch = !is24Hours ? todayHours?.match(/[–-]\s*(\d{1,2}:?\d{0,2}\s*(?:AM|PM))/i) : null;
+  let closesAt = closeMatch ? closeMatch[1].trim() : (is24Hours ? null : null);
+  
+  // Format close time to match "11 PM" style
+  if (closesAt) {
+    closesAt = closesAt.replace(/(\d+):00/, '$1').replace(/\s+/g, ' ');
+  }
 
-  return { today: todayHours, isOpen, closesAt, fullWeek };
+  // Extract open time (for when closed)
+  const openMatch = todayHours?.match(/(\d{1,2}:?\d{0,2}\s*(?:AM|PM))\s*[–-]/i);
+  let opensAt = openMatch ? openMatch[1].trim() : null;
+  
+  // If closed today, find next opening time
+  if (!isOpen && (!opensAt || todayHours?.toLowerCase().includes('closed'))) {
+    // Look for next day that's open
+    for (let i = 1; i <= 7; i++) {
+      const nextDayIndex = (todayIndex + i) % 7;
+      const nextDayHours = fullWeek[nextDayIndex]?.hours;
+      if (nextDayHours && !nextDayHours.toLowerCase().includes('closed')) {
+        const nextOpenMatch = nextDayHours.match(/(\d{1,2}:?\d{0,2}\s*(?:AM|PM))/i);
+        if (nextOpenMatch) {
+          opensAt = nextOpenMatch[1].trim();
+          break;
+        }
+      }
+    }
+  }
+  
+  // Format open time
+  if (opensAt) {
+    opensAt = opensAt.replace(/(\d+):00/, '$1').replace(/\s+/g, ' ');
+  }
+
+  return { today: todayHours, isOpen, closesAt, opensAt, fullWeek };
 }
 
 function normalizeInstagram(handle: string | null | undefined): string | null {
@@ -243,7 +236,7 @@ export default function PlacePage() {
   }
 
   const { location, appearsOn } = data;
-  const { today, isOpen, closesAt, fullWeek } = parseHours(location.hours);
+  const { today, isOpen, closesAt, opensAt, fullWeek } = parseHours(location.hours);
   const hasCuratorNote = !!location.curatorNote?.trim();
   const hasPhotos = (location.photoUrls?.length ?? 0) > 0;
   const hasSources = (location.sources?.length ?? 0) > 0;
@@ -277,6 +270,7 @@ export default function PlacePage() {
   const hasFullWeekHours = fullWeek.length > 0;
   const hasOnlyOpenNow = isOpen !== null && fullWeek.length === 0;
   const todayIndex = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
+  const is24Hours = fullWeek[todayIndex]?.hours?.toLowerCase().includes('24') ?? false;
   const primaryMapSlug = appearsOn[0]?.slug ?? null;
   const viewOnMapUrl = primaryMapSlug ? `/map/${primaryMapSlug}?place=${slug}` : null;
   // Also On: dedupe by slug, max 3
@@ -574,116 +568,125 @@ export default function PlacePage() {
               </>
             )}
 
-            {/* Tier 3: Hours | Map | Call | Coverage — 4 equal cells */}
-            {/* Hours */}
-            {(hasFullWeekHours || hasOnlyOpenNow) && (
-              <div className={`${styles.bentoBlock} ${styles.hoursBlock}`}>
-                <div className={styles.blockLabel}>Hours</div>
-                {hasFullWeekHours ? (
-                  <div className={styles.hoursGrid}>
-                    {fullWeek.map((row, idx) => {
-                      const isToday = idx === todayIndex;
-                      const statusInline = isToday && isOpen !== null;
-                      return (
-                        <div
-                          key={row.day}
-                          className={`${styles.hoursRow} ${isToday ? styles.hoursRowToday : ''}`}
-                        >
-                          <span className={styles.hoursRowDay}>{row.short}</span>
-                          <span className={styles.hoursRowHours}>
-                            {row.hours}
-                            {statusInline && (
-                              <>
-                                {' '}
-                                <span
-                                  style={{
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    gap: 3,
-                                    fontSize: 9,
-                                    color: isOpen ? '#4A7C59' : 'rgba(54,69,79,0.6)',
-                                  }}
+            {/* Tier 3 Row: Hours | Map | Call */}
+            {((hasFullWeekHours || hasOnlyOpenNow) || addressShort || location.phone) && (
+              <div className={`${styles.tier3Row} ${
+                !(hasFullWeekHours || hasOnlyOpenNow) ? styles.noHours : 
+                !location.phone ? styles.noPhone : 
+                !(hasFullWeekHours || hasOnlyOpenNow) && !location.phone ? styles.onlyMap : ''
+              }`}>
+                {/* Hours Card */}
+                {(hasFullWeekHours || hasOnlyOpenNow) && (
+                  <div className={`${styles.bentoBlock} ${styles.hoursBlock}`}>
+                    <div className={styles.blockLabel}>HOURS</div>
+                    {hasFullWeekHours ? (
+                      <>
+                        <div className={styles.hoursGrid}>
+                          {/* Left column: M, T, W, Th */}
+                          <div className={styles.hoursColumn}>
+                            {fullWeek.slice(0, 4).map((row, idx) => {
+                              const isToday = idx === todayIndex;
+                              return (
+                                <div
+                                  key={row.day}
+                                  className={`${styles.hoursRow} ${isToday ? styles.hoursRowToday : ''}`}
                                 >
-                                  <span
-                                    style={{
-                                      width: 5,
-                                      height: 5,
-                                      borderRadius: '50%',
-                                      background: isOpen ? '#4A7C59' : 'rgba(54,69,79,0.4)',
-                                      flexShrink: 0,
-                                    }}
-                                  />
-                                  {isOpen ? 'Open' : 'Closed'}
-                                </span>
-                              </>
-                            )}
+                                  <span className={styles.hoursRowDay}>{row.short}</span>
+                                  <span className={styles.hoursRowHours}>{row.hours}</span>
+                                </div>
+                              );
+                            })}
+                          </div>
+                          {/* Right column: F, S, Su */}
+                          <div className={styles.hoursColumn}>
+                            {fullWeek.slice(4, 7).map((row, idx) => {
+                              const actualIdx = idx + 4;
+                              const isToday = actualIdx === todayIndex;
+                              return (
+                                <div
+                                  key={row.day}
+                                  className={`${styles.hoursRow} ${isToday ? styles.hoursRowToday : ''}`}
+                                >
+                                  <span className={styles.hoursRowDay}>{row.short}</span>
+                                  <span className={styles.hoursRowHours}>{row.hours}</span>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                        {isOpen !== null && (
+                          <div className={styles.hoursStatusFooter}>
+                            <div className={`${styles.hoursStatusDot} ${!isOpen ? 'closed' : ''}`} />
+                            <div className={`${styles.hoursStatusText} ${!isOpen ? 'closed' : ''}`}>
+                              {isOpen 
+                                ? (is24Hours 
+                                   ? 'Open 24 Hours' 
+                                   : `Open${closesAt ? ` · Closes ${closesAt}` : ''}`)
+                                : `Closed${opensAt ? ` · Opens ${opensAt}` : ''}`
+                              }
+                            </div>
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      isOpen !== null && (
+                        <div className={styles.hoursStatusCompact}>
+                          <span
+                            style={{
+                              width: 6,
+                              height: 6,
+                              borderRadius: '50%',
+                              background: isOpen ? '#4A7C59' : '#36454F',
+                              flexShrink: 0,
+                            }}
+                          />
+                          <span style={{ fontWeight: 600 }}>
+                            {isOpen ? 'Open now' : 'Closed now'}
                           </span>
                         </div>
-                      );
-                    })}
+                      )
+                    )}
                   </div>
-                ) : (
-                  isOpen !== null && (
-                    <div className={styles.hoursStatusCompact}>
-                      <span
-                        style={{
-                          width: 6,
-                          height: 6,
-                          borderRadius: '50%',
-                          background: isOpen ? '#4A7C59' : '#36454F',
-                          flexShrink: 0,
-                        }}
-                      />
-                      <span style={{ fontWeight: 600 }}>
-                        {isOpen ? 'Open now' : 'Closed now'}
-                      </span>
+                )}
+
+                {/* Map Card */}
+                {addressShort && (
+                  <a
+                    href={directionsUrl || '#'}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`${styles.bentoBlock} ${styles.mapCard}`}
+                  >
+                    <div className={styles.mapCardLabel}>MAP</div>
+                    <div className={styles.mapTileStyled}>
+                      <div className={`${styles.mapRoad} ${styles.mapRoadHorizontal}`} style={{ top: '40%' }} />
+                      <div className={`${styles.mapRoad} ${styles.mapRoadHorizontal}`} style={{ top: '65%' }} />
+                      <div className={`${styles.mapRoad} ${styles.mapRoadVertical}`} style={{ left: '35%' }} />
+                      <div className={`${styles.mapRoad} ${styles.mapRoadVertical}`} style={{ left: '68%' }} />
+                      <div className={styles.mapPinDot} />
                     </div>
-                  )
+                    {addressLines && (
+                      <div className={styles.mapAddressBlock}>
+                        <div className={styles.mapAddressLine1}>{addressLines.line1}</div>
+                        {addressLines.line2 && <div className={styles.mapAddressLine2}>{addressLines.line2}</div>}
+                      </div>
+                    )}
+                  </a>
+                )}
+
+                {/* Call Card */}
+                {location.phone && (
+                  <a href={`tel:${location.phone}`} className={`${styles.bentoBlock} ${styles.callCard}`}>
+                    <div className={styles.callCardLabel}>CALL</div>
+                    <div className={styles.callCardContent}>
+                      <div className={styles.callCardIcon}>
+                        <Phone size={32} strokeWidth={1.5} />
+                      </div>
+                      <div className={styles.callCardNumber}>{location.phone}</div>
+                    </div>
+                  </a>
                 )}
               </div>
-            )}
-
-            {/* Map */}
-            {(addressShort || viewOnMapUrl) && (
-              <div className={`${styles.bentoBlock} ${styles.mapTile}`}>
-                <div className={styles.mapTileStyled}>
-                  <div className={styles.mapTileWaterWash} />
-                  <svg className={styles.mapTileTopo} viewBox="0 0 200 100" preserveAspectRatio="none" aria-hidden>
-                    <path d="M0,65 Q40,30 80,50 Q120,65 160,40 Q180,30 200,45" fill="none" stroke="rgba(137,180,196,0.18)" strokeWidth="1.5" />
-                    <path d="M0,80 Q50,45 100,60 Q140,75 200,55" fill="none" stroke="rgba(137,180,196,0.1)" strokeWidth="1" />
-                  </svg>
-                  <div className={`${styles.mapRoad} ${styles.mapRoadPrimary}`} style={{ top: '46%', left: 0, right: 0, height: '1px' }} />
-                  <div className={styles.mapRoad} style={{ top: 0, bottom: 0, left: '56%', width: '1px' }} />
-                  <div className={styles.mapRoadDiagonal} />
-                  <div className={styles.mapPinIcon}>
-                    <MapPin size={18} strokeWidth={1.5} style={{ color: '#D64541' }} />
-                  </div>
-                </div>
-                <div className={styles.mapTileContent}>
-                  {addressLines && (
-                    <div className={styles.mapAddressBlock}>
-                      <div className={styles.mapAddressLine1}>{addressLines.line1}</div>
-                      {addressLines.line2 && <div className={styles.mapAddressLine2}>{addressLines.line2}</div>}
-                    </div>
-                  )}
-                  {viewOnMapUrl && (
-                    <Link href={viewOnMapUrl} className={styles.mapLinkView}>
-                      View on map →
-                    </Link>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* Call */}
-            {location.phone && (
-              <a href={`tel:${location.phone}`} className={`${styles.bentoBlock} ${styles.callBlock}`}>
-                <span className={styles.actionIcon}>
-                  <Phone size={22} strokeWidth={1.5} />
-                </span>
-                <span className={styles.actionLabel}>Call</span>
-                <span className={styles.actionDetail}>{location.phone}</span>
-              </a>
             )}
 
             {/* Coverage */}

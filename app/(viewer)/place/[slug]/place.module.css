@@ -218,26 +218,67 @@
 }
 
 /* ================================================================
-   HOURS
+   TIER 3 ROW — Hours | Map | Call
+   ================================================================ */
+.tier3Row {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 0.8fr;
+  gap: 12px;
+  align-items: stretch;
+}
+
+/* Force all children in tier3Row to stretch to full height */
+.tier3Row > * {
+  align-self: stretch !important;
+  height: 100%;
+}
+
+/* Graceful degradation */
+.tier3Row.noHours {
+  grid-template-columns: 1fr 0.8fr; /* Map + Call only */
+}
+
+.tier3Row.noPhone {
+  grid-template-columns: 1.2fr 1fr; /* Hours + Map only */
+}
+
+.tier3Row.onlyMap {
+  grid-template-columns: 1fr; /* Map only */
+}
+
+/* ================================================================
+   HOURS CARD — Two-column layout
    ================================================================ */
 .hoursBlock {
-  padding: 16px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
 .hoursGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 16px;
+  flex: 1;
+}
+
+.hoursColumn {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
 }
 
 .hoursRow {
   display: flex;
-  justify-content: space-between;
   align-items: baseline;
-  font-size: 10px;
+  font-family: 'Libre Baskerville', Georgia, serif;
+  font-size: 11px;
   color: var(--fn-charcoal);
-  opacity: 0.65;
-  gap: 6px;
+  opacity: 0.6;
+  gap: 4px;
+  line-height: 1.4;
 }
 
 .hoursRow.hoursRowToday {
@@ -246,15 +287,49 @@
 }
 
 .hoursRowDay {
-  white-space: nowrap;
+  width: 22px;
+  flex-shrink: 0;
+  font-size: 10px;
 }
 
 .hoursRowHours {
-  text-align: right;
-  white-space: nowrap;
+  flex: 1;
+  font-size: 11px;
+}
+
+.hoursStatusFooter {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(195, 176, 145, 0.2);
   display: flex;
   align-items: center;
   gap: 6px;
+}
+
+.hoursStatusDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--fn-sage);
+  flex-shrink: 0;
+}
+
+.hoursStatusDot.closed {
+  background: var(--fn-charcoal);
+  opacity: 0.4;
+}
+
+.hoursStatusText {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--fn-sage);
+  font-weight: 700;
+}
+
+.hoursStatusText.closed {
+  color: var(--fn-charcoal);
+  opacity: 0.4;
 }
 
 .hoursStatusCompact {
@@ -265,22 +340,45 @@
 }
 
 /* ================================================================
-   MAP TILE — Field Notes aesthetic
+   MAP CARD — Field Notes aesthetic
    ================================================================ */
-.mapTile {
+.mapCard {
   padding: 0;
   overflow: hidden;
   border-radius: 12px;
-  align-self: start;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  text-decoration: none;
+  color: inherit;
+  min-height: 0;
+}
+
+.mapCard:hover .mapTileStyled {
+  opacity: 0.95;
+}
+
+.mapCardLabel {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 2.5px;
+  color: var(--fn-khaki);
+  font-weight: 600;
+  align-self: flex-start;
+  padding: 20px 20px 12px;
 }
 
 .mapTileStyled {
+  flex: 1;
+  min-height: 70px;
+  border-radius: 8px;
+  background: linear-gradient(145deg, #EDE8D8, #F0ECE2);
   position: relative;
-  background: linear-gradient(145deg, #EDE8D8 0%, #F0ECE2 40%, #E8E2D4 100%);
-  border-radius: 12px 12px 0 0;
   overflow: hidden;
-  width: 100%;
-  height: 100px;
+  margin: 0 20px;
+  transition: opacity 0.15s ease;
 }
 
 .mapTileStyled::before {
@@ -288,9 +386,70 @@
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(90deg, rgba(195, 176, 145, 0.06) 1px, transparent 1px),
-    linear-gradient(rgba(195, 176, 145, 0.06) 1px, transparent 1px);
-  background-size: 18px 18px;
+    linear-gradient(90deg, rgba(195, 176, 145, 0.08) 1px, transparent 1px),
+    linear-gradient(rgba(195, 176, 145, 0.08) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.mapRoad {
+  position: absolute;
+  background: rgba(195, 176, 145, 0.2);
+  pointer-events: none;
+}
+
+.mapRoadHorizontal {
+  left: 0;
+  right: 0;
+  height: 1.5px;
+}
+
+.mapRoadVertical {
+  top: 0;
+  bottom: 0;
+  width: 1.5px;
+}
+
+.mapPinDot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--fn-coral);
+  border: 2.5px solid #FFFDF7;
+  box-shadow: 0 2px 4px rgba(214, 69, 65, 0.3);
+}
+
+.mapAddressBlock {
+  text-align: center;
+  padding: 10px 20px 20px;
+}
+
+.mapAddressLine1 {
+  font-family: 'Libre Baskerville', Georgia, serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--fn-charcoal);
+  line-height: 1.3;
+}
+
+.mapAddressLine2 {
+  font-family: 'Libre Baskerville', Georgia, serif;
+  font-size: 10px;
+  color: var(--fn-charcoal);
+  opacity: 0.6;
+  margin-top: 2px;
+  line-height: 1.3;
+}
+
+/* Legacy styles for backward compatibility */
+.mapTile {
+  padding: 0;
+  overflow: hidden;
+  border-radius: 12px;
+  align-self: start;
 }
 
 .mapTileWaterWash {
@@ -308,12 +467,6 @@
   inset: 0;
   width: 100%;
   height: 100%;
-}
-
-.mapRoad {
-  position: absolute;
-  background: rgba(195, 176, 145, 0.12);
-  pointer-events: none;
 }
 
 .mapRoadPrimary {
@@ -344,23 +497,6 @@
   padding: 10px 14px 12px;
 }
 
-.mapAddressBlock {
-  margin-bottom: 6px;
-}
-
-.mapAddressLine1 {
-  font-size: 11px;
-  color: var(--fn-charcoal);
-  font-weight: 600;
-  margin-bottom: 1px;
-}
-
-.mapAddressLine2 {
-  font-size: 10px;
-  color: var(--fn-charcoal);
-  opacity: 0.5;
-}
-
 .mapLinkView {
   font-family: 'Libre Baskerville', Georgia, serif;
   font-size: 10px;
@@ -374,8 +510,60 @@
 }
 
 /* ================================================================
-   CALL BLOCK
+   CALL CARD
    ================================================================ */
+.callCard {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  text-decoration: none;
+  color: inherit;
+  min-height: 0;
+}
+
+.callCard:hover {
+  background: rgba(255, 253, 247, 0.7);
+}
+
+.callCardLabel {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 2.5px;
+  color: var(--fn-khaki);
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.callCardContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  gap: 10px;
+}
+
+.callCardIcon {
+  width: 32px;
+  height: 32px;
+  color: var(--fn-khaki);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.callCardNumber {
+  font-family: 'Libre Baskerville', Georgia, serif;
+  font-size: 14px;
+  color: var(--fn-charcoal);
+  line-height: 1.3;
+}
+
+/* Legacy call block styles for backward compatibility */
 .callBlock {
   padding: 16px;
   display: flex;
@@ -494,7 +682,7 @@
 /* ================================================================
    RESPONSIVE — MOBILE
    ================================================================ */
-@media (max-width: 600px) {
+@media (max-width: 640px) {
   .bentoGrid {
     grid-template-columns: 1fr;
   }
@@ -508,6 +696,52 @@
     grid-column: 1 / -1;
   }
 
+  /* Tier 3 row stacks vertically on mobile */
+  .tier3Row {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  /* Hours card keeps two-column layout internally */
+  .hoursGrid {
+    grid-template-columns: 1fr 1fr;
+    gap: 0 12px;
+  }
+  
+  .hoursColumn {
+    gap: 3px;
+  }
+
+  /* Map tile gets taller on mobile */
+  .mapTileStyled {
+    min-height: 120px;
+  }
+
+  /* Call card becomes horizontal on mobile */
+  .callCard {
+    padding: 18px 20px;
+  }
+
+  .callCardLabel {
+    margin-bottom: 8px;
+  }
+
+  .callCardContent {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 12px;
+  }
+
+  .callCardIcon {
+    width: 28px;
+    height: 28px;
+  }
+
+  .callCardNumber {
+    font-size: 14px;
+  }
+
+  /* Legacy blocks */
   .hoursBlock,
   .mapTile,
   .callBlock {
