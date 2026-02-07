@@ -212,6 +212,11 @@ model Place {
   vibeTags           String[] @map("vibe_tags") @default([]) // Atmosphere descriptors: ["Low-key", "Surf crowd", "Standing room"]
   tips               String[] @default([]) // Helpful visitor tips: ["Go early for a seat", "Cash only"]
 
+  // Chef Recs — Internal signal (non-public by default)
+  // Reference-backed associations with chefs/owners as subject-matter experts
+  // Created during editorial mining/coverage scans
+  chefRecs           Json?    @map("chef_recs") // Array of ChefRec objects
+
   // Cache Management
   placesDataCachedAt DateTime? @map("places_data_cached_at")
 
