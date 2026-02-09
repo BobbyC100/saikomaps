@@ -12,8 +12,6 @@ import { HoursCard } from '@/components/merchant/HoursCard';
 import { CoverageCard } from '@/components/merchant/CoverageCard';
 import { GalleryCard } from '@/components/merchant/GalleryCard';
 import { CuratorCard } from '@/components/merchant/CuratorCard';
-import { MapCard } from '@/components/merchant/MapCard';
-import { DetailsCard } from '@/components/merchant/DetailsCard';
 import { VibeCard } from '@/components/merchant/VibeCard';
 import { AlsoOnCard } from '@/components/merchant/AlsoOnCard';
 
@@ -330,14 +328,33 @@ export default function PlacePage() {
     : `Closed${opensAt ? ` · Opens ${opensAt}` : ''}`;
 
   // Graceful degradation checks
-  const hasCoverage = !!(
-    location.pullQuote?.trim() ||
-    (location.sources?.length && location.sources.some(s => 
-      (s.publication && s.title) || (s.name && s.excerpt)
-    ))
-  );
+  const hasCoverage = (() => {
+    // Has pull quote?
+    if (location.pullQuote?.trim()) return true;
+    
+    // Has source with actual content (full article)?
+    const firstSource = location.sources?.[0];
+    if (firstSource?.content && firstSource.content.length >= 100) {
+      return true; // CoverageCard will extract quote from content
+    }
+    
+    // Has valid excerpt? (not just metadata)
+    if (firstSource?.excerpt) {
+      const excerpt = firstSource.excerpt || '';
+      const sourceName = firstSource.publication || firstSource.name || '';
+      
+      // Valid excerpt must be at least 50 chars and not just source name
+      const isValidExcerpt = excerpt.length >= 50 && 
+        !(sourceName && excerpt.toLowerCase().includes(sourceName.toLowerCase()));
+      
+      if (isValidExcerpt) return true;
+    }
+    
+    return false;
+  })();
   const hasCurator = !!location.curatorNote?.trim();
   const hasGallery = (location.photoUrls?.length ?? 0) > 1; // More than just hero
+  
 
   // Service options (placeholder - add when Google fields available)
   const serviceOptions: string[] = [];
@@ -383,6 +400,7 @@ export default function PlacePage() {
           photoCount={location.photoUrls?.length || 0}
           onHeroClick={() => openGallery(0)}
           onShareClick={handleShare}
+          hours={location.hours}
         />
 
         {/* Action Strip */}
@@ -402,13 +420,14 @@ export default function PlacePage() {
             gap: 12,
           }}
         >
-          {/* Row 1: Hours (2) + Coverage (4) */}
+          {/* Row 1: Hours (2 or 6) + Coverage (3-5) */}
           <HoursCard
             todayHours={today}
             isOpen={isOpen}
             statusText={statusText}
             fullWeek={fullWeek}
             isIrregular={isIrregular}
+            span={hasCoverage ? 2 : 6}
           />
 
           {hasCoverage && (
@@ -416,67 +435,34 @@ export default function PlacePage() {
               pullQuote={location.pullQuote}
               pullQuoteSource={location.pullQuoteSource}
               pullQuoteAuthor={location.pullQuoteAuthor}
+              pullQuoteUrl={location.pullQuoteUrl}
               sources={location.sources}
               vibeTag={location.vibeTags?.[0] || null}
             />
           )}
 
-          {/* Row 2: Gallery (3) + Curator (3) */}
-          {/* Apply graceful degradation */}
+          {/* Row 2: Gallery (3 or 6) + Curator (3) */}
           {hasGallery && (
-            <div
-              style={{
-                gridColumn: hasCurator ? 'span 3' : 'span 6',
-              }}
-            >
-              <GalleryCard
-                photos={location.photoUrls!.slice(1)} // Exclude hero
-                onThumbnailClick={(idx) => openGallery(idx + 1)}
-              />
-            </div>
-          )}
-
-          {hasCurator && (
-            <div
-              style={{
-                gridColumn: hasCoverage ? 'span 3' : 'span 4',
-              }}
-            >
-              <CuratorCard note={location.curatorNote!} />
-            </div>
-          )}
-
-          {/* Row 3: Map (6) */}
-          {location.address && (
-            <MapCard
-              address={location.address}
-              neighborhood={location.neighborhood}
-              latitude={location.latitude ? Number(location.latitude) : null}
-              longitude={location.longitude ? Number(location.longitude) : null}
-              onMapClick={() => {
-                // TODO: Open Expanded Map View
-                console.log('Open Expanded Map View');
-              }}
+            <GalleryCard
+              photos={location.photoUrls!.slice(1)} // Exclude hero
+              onThumbnailClick={(idx) => openGallery(idx + 1)}
+              span={hasCurator ? 3 : 6}
             />
           )}
 
-          {/* Row 4: Details (6) */}
-          <DetailsCard
-            website={location.website}
-            restaurantGroupName={location.restaurantGroup?.name || null}
-            restaurantGroupSlug={location.restaurantGroup?.slug || null}
-            serviceOptions={serviceOptions.length > 0 ? serviceOptions : null}
-            reservationsNote={reservationsNote}
-            parkingNote={null}
-            isAccessible={null}
-          />
+          {hasCurator && (
+            <CuratorCard 
+              note={location.curatorNote!} 
+              span={3}
+            />
+          )}
 
-          {/* Row 5: Vibe (6) */}
+          {/* Row 3: Vibe (6) */}
           {location.vibeTags && location.vibeTags.length > 0 && (
             <VibeCard vibeTags={location.vibeTags} />
           )}
 
-          {/* Row 6: Also On (6) */}
+          {/* Row 4: Also On (6) */}
           {appearsOnDeduped.length > 0 && (
             <AlsoOnCard maps={appearsOnDeduped} />
           )}

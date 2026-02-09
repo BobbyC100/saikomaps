@@ -38,14 +38,37 @@ export function AlsoOnCard({ maps }: AlsoOnCardProps) {
             className={styles.listItem}
           >
             {/* Thumbnail */}
-            <div
-              className={styles.thumbnail}
-              style={{
-                backgroundImage: map.coverImageUrl
-                  ? `url(${map.coverImageUrl})`
-                  : 'linear-gradient(145deg, #E8E2D4, #D4CFC0)',
-              }}
-            />
+            <div className={styles.thumbnail}>
+              {map.coverImageUrl ? (
+                <div
+                  className={styles.thumbnailImage}
+                  style={{ backgroundImage: `url(${map.coverImageUrl})` }}
+                />
+              ) : (
+                <div className={styles.thumbnailPlaceholder}>
+                  <svg className={styles.gridPattern} viewBox="0 0 48 48">
+                    <defs>
+                      <pattern
+                        id={`grid-${map.id}`}
+                        x="0"
+                        y="0"
+                        width="8"
+                        height="8"
+                        patternUnits="userSpaceOnUse"
+                      >
+                        <path
+                          d="M 8 0 L 0 0 0 8"
+                          fill="none"
+                          stroke="rgba(195, 176, 145, 0.2)"
+                          strokeWidth="0.5"
+                        />
+                      </pattern>
+                    </defs>
+                    <rect width="48" height="48" fill="url(#grid-${map.id})" />
+                  </svg>
+                </div>
+              )}
+            </div>
 
             {/* Info */}
             <div className={styles.info}>

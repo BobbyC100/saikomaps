@@ -9,6 +9,7 @@ interface HoursCardProps {
   statusText: string | null; // "Open · Closes 12 AM"
   fullWeek: Array<{ day: string; short: string; hours: string }>;
   isIrregular: boolean;
+  span?: number; // Grid column span (2 or 6)
 }
 
 export function HoursCard({
@@ -17,13 +18,17 @@ export function HoursCard({
   statusText,
   fullWeek,
   isIrregular,
+  span = 2,
 }: HoursCardProps) {
   const [expanded, setExpanded] = useState(false);
 
   // If irregular hours, show fallback
   if (isIrregular) {
     return (
-      <div className={`${styles.hoursCard} ${styles.col2}`}>
+      <div 
+        className={styles.hoursCard}
+        style={{ gridColumn: `span ${span}` }}
+      >
         <div className={styles.label}>HOURS</div>
         <div className={styles.todayHours}>Hours vary</div>
       </div>
@@ -31,25 +36,16 @@ export function HoursCard({
   }
 
   return (
-    <div className={`${styles.hoursCard} ${styles.col2}`}>
+    <div 
+      className={styles.hoursCard}
+      style={{ gridColumn: `span ${span}` }}
+    >
       {!expanded ? (
         <>
           <div className={styles.label}>HOURS</div>
           <div className={styles.todayHours}>
             {todayHours || 'Closed'}
           </div>
-
-          {statusText && (
-            <div className={styles.statusRow}>
-              <span
-                className={styles.statusDot}
-                style={{
-                  background: isOpen ? '#4A7C59' : '#36454F',
-                }}
-              />
-              <span className={styles.statusText}>{statusText}</span>
-            </div>
-          )}
 
           {fullWeek.length > 0 && (
             <button

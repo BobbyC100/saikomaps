@@ -50,7 +50,7 @@ export default function SearchPage() {
 
     async function fetchResults() {
       try {
-        const params = new URLSearchParams({ q: query });
+        const params = new URLSearchParams(query ? { q: query } : {});
         if (userLat && userLng) {
           params.append('lat', userLat.toString());
           params.append('lng', userLng.toString());

@@ -28,7 +28,7 @@ export function ActionStrip({ latitude, longitude, phone, instagram }: ActionStr
 
   return (
     <div className={styles.actionStrip}>
-      {/* Directions (Primary) */}
+      {/* Directions */}
       {directionsUrl && (
         <a
           href={directionsUrl}
@@ -37,7 +37,7 @@ export function ActionStrip({ latitude, longitude, phone, instagram }: ActionStr
           className={`${styles.action} ${styles.primary}`}
         >
           <Navigation className={styles.icon} size={16} />
-          <span className={styles.label}>Directions</span>
+          <span className={styles.label}>Nav</span>
         </a>
       )}
 
@@ -58,7 +58,7 @@ export function ActionStrip({ latitude, longitude, phone, instagram }: ActionStr
           className={styles.action}
         >
           <Instagram className={styles.icon} size={16} />
-          <span className={styles.label}>Instagram</span>
+          <span className={styles.label}>Insta</span>
         </a>
       )}
     </div>

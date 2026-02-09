@@ -3,14 +3,14 @@
  * 
  * Shows editorial coverage with internal priority:
  * 1. Pull Quote (best case)
- * 2. Excerpt from first source (fallback)
- * 3. Source list only (minimal case)
+ * 2. Extract from sources array (runtime extraction)
  * 
- * Merchant Page v2: 4-col card with vibe tag
+ * Merchant Page v2: Dynamic sizing (3-5 columns based on quote length)
  */
 
 'use client';
 
+import { extractQuoteFromSources } from '@/lib/extractQuote';
 import styles from './CoverageCard.module.css';
 
 interface EditorialSource {
@@ -30,77 +30,77 @@ interface CoverageCardProps {
   pullQuote?: string | null;
   pullQuoteSource?: string | null;
   pullQuoteAuthor?: string | null;
+  pullQuoteUrl?: string | null;
   sources?: EditorialSource[];
-  vibeTag?: string | null; // Optional first vibe tag to display
+  vibeTag?: string | null;
 }
 
 export function CoverageCard({
   pullQuote,
   pullQuoteSource,
   pullQuoteAuthor,
+  pullQuoteUrl,
   sources = [],
   vibeTag,
 }: CoverageCardProps) {
-  const hasPullQuote = !!pullQuote?.trim();
-  const firstSource = sources[0];
-  const hasExcerpt = !!(firstSource?.content || firstSource?.excerpt);
-  const hasSources = sources.length > 0;
-
-  // Don't render if no content at all
-  if (!hasPullQuote && !hasExcerpt && !hasSources) {
+  // Priority 1: Use explicit pullQuote if available
+  let displayQuote = pullQuote?.trim() || null;
+  let displaySource = pullQuoteSource || null;
+  let displayUrl = pullQuoteUrl || null;
+  
+  // Priority 2: Extract from sources array
+  if (!displayQuote && sources.length > 0) {
+    const extracted = extractQuoteFromSources(sources);
+    if (extracted) {
+      displayQuote = extracted.quote;
+      displaySource = extracted.source;
+      displayUrl = extracted.url;
+    }
+  }
+  
+  // If still no quote, don't render the card
+  if (!displayQuote) {
     return null;
   }
-
-  // Determine source label (uppercase publication name)
-  let sourceLabel = '';
-  if (hasPullQuote && pullQuoteSource) {
-    sourceLabel = pullQuoteSource.toUpperCase();
-  } else if (hasExcerpt || hasSources) {
-    sourceLabel = (firstSource?.publication || firstSource?.name || 'COVERAGE').toUpperCase();
-  }
+  
+  // Dynamic sizing based on quote length
+  const isShortQuote = displayQuote.length < 120;
+  const isMediumQuote = displayQuote.length < 180;
+  const columnSpan = isShortQuote ? 3 : isMediumQuote ? 4 : 5;
 
   return (
-    <div className={`${styles.coverageCard} ${styles.col4}`}>
-      {/* Source label */}
-      {sourceLabel && <div className={styles.label}>{sourceLabel}</div>}
-
-      {/* Priority 1: Pull Quote (best case) */}
-      {hasPullQuote && (
-        <div className={styles.quote}>
-          &ldquo;{pullQuote}&rdquo;
-        </div>
+    <div 
+      className={styles.coverageCard}
+      style={{ gridColumn: `span ${columnSpan}` }}
+    >
+      {/* Source Label */}
+      <div className={styles.label}>
+        {displaySource?.toUpperCase() || 'EDITORIAL'}
+      </div>
+      
+      {/* Quote */}
+      <blockquote 
+        className={styles.quote}
+        style={{ fontSize: isShortQuote ? '13px' : '12px' }}
+      >
+        &ldquo;{displayQuote}&rdquo;
+      </blockquote>
+      
+      {/* Optional: Link to full article */}
+      {displayUrl && (
+        <a 
+          href={displayUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={styles.readMore}
+        >
+          Read more
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M7 17L17 7M7 7h10v10" />
+          </svg>
+        </a>
       )}
-
-      {/* Priority 2: Excerpt from first source (fallback) */}
-      {!hasPullQuote && hasExcerpt && (
-        <div className={styles.quote}>
-          &ldquo;{(() => {
-            const content = firstSource.content || firstSource.excerpt || '';
-            if (content.length <= 150) return content;
-            // Truncate to ~150 chars at sentence or word boundary
-            const truncated = content.slice(0, 150);
-            const lastSentence = truncated.lastIndexOf('. ');
-            const lastSpace = truncated.lastIndexOf(' ');
-            const cutPoint = lastSentence > 100 ? lastSentence + 1 : lastSpace;
-            return truncated.slice(0, cutPoint) + '…';
-          })()}&rdquo;
-        </div>
-      )}
-
-      {/* Priority 3: Source list only (minimal case) */}
-      {!hasPullQuote && !hasExcerpt && hasSources && (
-        <div className={styles.sourceList}>
-          {sources
-            .filter((src) => (src.publication && src.title) || (src.name && src.excerpt))
-            .slice(0, 3)
-            .map((src, i) => (
-              <div key={src.source_id || i} className={styles.sourceItem}>
-                {src.title || src.excerpt}
-              </div>
-            ))}
-        </div>
-      )}
-
+      
       {/* Optional vibe tag */}
       {vibeTag && <div className={styles.vibeTag}>{vibeTag}</div>}
     </div>

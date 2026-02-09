@@ -1,6 +1,6 @@
 'use client';
 
-import { Share2, Camera } from 'lucide-react';
+import { Camera, ArrowUpRight } from 'lucide-react';
 import styles from './HeroSection.module.css';
 
 interface HeroSectionProps {
@@ -14,6 +14,7 @@ interface HeroSectionProps {
   photoCount: number;
   onHeroClick: () => void;
   onShareClick: () => void;
+  hours?: unknown; // Raw hours data for meal context calculation
 }
 
 export function HeroSection({
@@ -27,9 +28,60 @@ export function HeroSection({
   photoCount,
   onHeroClick,
   onShareClick,
+  hours,
 }: HeroSectionProps) {
-  // Build meta row
-  const metaParts = [category, neighborhood, price].filter(Boolean);
+  // Calculate meal context from hours
+  const getMealContext = (): string | null => {
+    if (!hours) return null;
+    
+    // Parse hours to get opening time
+    const hoursObj = typeof hours === 'string' 
+      ? (() => { try { return JSON.parse(hours); } catch { return null; } })()
+      : hours as Record<string, unknown>;
+    
+    if (!hoursObj) return null;
+    
+    // Get today's hours
+    const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+    const todayIndex = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
+    const todayKey = days[todayIndex];
+    
+    // Try weekday_text first (Google format)
+    const weekdayText = (hoursObj.weekday_text ?? hoursObj.weekdayText) as string[] | undefined;
+    let todayHours: string | null = null;
+    
+    if (weekdayText && weekdayText[todayIndex]) {
+      todayHours = weekdayText[todayIndex] || null;
+    } else if (todayKey && hoursObj[todayKey]) {
+      todayHours = hoursObj[todayKey] as string;
+    }
+    
+    if (!todayHours || todayHours.toLowerCase().includes('closed')) return null;
+    
+    // Extract opening time
+    const timeMatch = todayHours.match(/(\d{1,2}):?(\d{2})?\s*(AM|PM)/i);
+    if (!timeMatch) return null;
+    
+    const hour = parseInt(timeMatch[1] || '0');
+    const period = (timeMatch[3] || '').toUpperCase();
+    
+    // Convert to 24-hour format
+    let hour24 = hour;
+    if (period === 'PM' && hour !== 12) hour24 = hour + 12;
+    if (period === 'AM' && hour === 12) hour24 = 0;
+    
+    // Determine meal context
+    if (hour24 >= 21) return 'Late Night'; // 9 PM or later
+    if (hour24 >= 17) return 'Dinner'; // 5 PM or later
+    if (hour24 < 12) return 'Lunch'; // Before noon
+    
+    return null; // Midday, no strong signal
+  };
+  
+  const mealContext = getMealContext();
+  
+  // Build meta row with meal context instead of category
+  const metaParts = [mealContext, neighborhood, price].filter(Boolean);
   const metaText = metaParts.join(' · ');
 
   return (
@@ -65,8 +117,9 @@ export function HeroSection({
             e.stopPropagation();
             onShareClick();
           }}
+          aria-label="Share"
         >
-          <Share2 className={styles.shareIcon} size={14} />
+          <ArrowUpRight className={styles.shareIcon} size={16} strokeWidth={1.5} />
         </button>
       </div>
 

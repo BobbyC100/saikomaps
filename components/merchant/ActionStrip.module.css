@@ -1,7 +1,7 @@
 .actionStrip {
   display: flex;
   justify-content: center;
-  gap: 4px;
+  gap: 16px;
   padding: 10px 20px;
   border-top: 1px solid rgba(195, 176, 145, 0.15);
   border-bottom: 1px solid rgba(195, 176, 145, 0.15);
@@ -12,7 +12,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 14px;
+  padding: 10px 18px;
   border-radius: 8px;
   background: transparent;
   text-decoration: none;

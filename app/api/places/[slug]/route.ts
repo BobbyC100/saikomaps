@@ -61,10 +61,10 @@ export async function GET(
       );
     }
 
-    // Get photo URLs (up to 4 for merchant page gallery)
+    // Get photo URLs (up to 10 for merchant page: 1 hero + up to 9 gallery)
     const photoUrls: string[] = [];
     if (place.googlePhotos && Array.isArray(place.googlePhotos)) {
-      for (let i = 0; i < Math.min(4, place.googlePhotos.length); i++) {
+      for (let i = 0; i < Math.min(10, place.googlePhotos.length); i++) {
         const ref = getPhotoRefFromStored(place.googlePhotos[i] as { photo_reference?: string; photoReference?: string; name?: string });
         if (ref) {
           try {

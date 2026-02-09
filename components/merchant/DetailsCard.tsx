@@ -9,6 +9,8 @@ interface DetailRow {
 }
 
 interface DetailsCardProps {
+  address?: string | null;
+  neighborhood?: string | null;
   website?: string | null;
   restaurantGroupName?: string | null;
   restaurantGroupSlug?: string | null;
@@ -16,9 +18,12 @@ interface DetailsCardProps {
   reservationsNote?: string | null; // 'Not accepted', 'Recommended', 'Required'
   parkingNote?: string | null;
   isAccessible?: boolean | null;
+  span?: number; // Grid column span (4 or 5)
 }
 
 export function DetailsCard({
+  address,
+  neighborhood,
   website,
   restaurantGroupName,
   restaurantGroupSlug,
@@ -26,15 +31,33 @@ export function DetailsCard({
   reservationsNote,
   parkingNote,
   isAccessible,
+  span = 6,
 }: DetailsCardProps) {
   const [expanded, setExpanded] = useState(false);
+
+  // Helper: Format website domain for display
+  const formatWebsiteDomain = (url: string): string => {
+    let formatted = url.replace(/^https?:\/\//, ''); // Remove protocol
+    formatted = formatted.replace(/^www\./, ''); // Remove www
+    
+    // Special case: Keep path for link aggregators (linktree, beacons, etc)
+    if (formatted.includes('linktr.ee/') || formatted.includes('beacons.ai/') || formatted.includes('link.bio/')) {
+      return formatted.replace(/\/$/, ''); // Keep path, just remove trailing slash
+    }
+    
+    // For normal domains, remove path and keep just domain (with meaningful subdomain if exists)
+    formatted = formatted.split('/')[0] || formatted;
+    formatted = formatted.replace(/\/$/, ''); // Remove trailing slash
+    
+    return formatted;
+  };
 
   // Build rows
   const rows: DetailRow[] = [];
 
-  // 1. Website
-  if (website) {
-    const domain = website.replace(/^https?:\/\//, '').replace(/\/$/, '');
+  // 1. Website (skip Instagram URLs entirely - Instagram belongs in Action Strip, not Details)
+  if (website && !website.includes('instagram.com')) {
+    const displayDomain = formatWebsiteDomain(website);
     rows.push({
       label: 'Website',
       value: (
@@ -44,7 +67,7 @@ export function DetailsCard({
           rel="noopener noreferrer"
           className={styles.link}
         >
-          {domain}
+          {displayDomain}
         </a>
       ),
     });
@@ -104,7 +127,10 @@ export function DetailsCard({
   const hasMore = rows.length > 4;
 
   return (
-    <div className={`${styles.detailsCard} ${styles.col6}`}>
+    <div 
+      className={styles.detailsCard}
+      style={{ gridColumn: `span ${span}` }}
+    >
       {visibleRows.map((row, idx) => (
         <div key={idx} className={styles.detailRow}>
           <span className={styles.label}>{row.label}</span>
