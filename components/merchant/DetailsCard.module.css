@@ -1,0 +1,63 @@
+.detailsCard {
+  background: #FFFDF7;
+  border-radius: 12px;
+  padding: 0;
+  overflow: hidden;
+}
+
+.col6 {
+  grid-column: span 6;
+}
+
+.detailRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(195, 176, 145, 0.1);
+}
+
+.detailRow:last-child {
+  border-bottom: none;
+}
+
+.label {
+  font-size: 10px;
+  color: #C3B091;
+}
+
+.value {
+  font-size: 11px;
+  color: #36454F;
+  text-align: right;
+}
+
+.link {
+  font-family: 'Libre Baskerville', Georgia, serif;
+  font-style: italic;
+  color: #8B7355;
+  text-decoration: underline;
+  text-decoration-color: rgba(195, 176, 145, 0.4);
+  transition: color 0.2s ease;
+}
+
+.link:hover {
+  color: #36454F;
+}
+
+.expandButton {
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 10px;
+  color: #8B7355;
+  background: none;
+  border: none;
+  border-top: 1px solid rgba(195, 176, 145, 0.1);
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.expandButton:hover {
+  background: rgba(195, 176, 145, 0.05);
+}

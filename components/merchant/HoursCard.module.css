@@ -1,0 +1,95 @@
+.hoursCard {
+  background: #FFFDF7;
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.col2 {
+  grid-column: span 2;
+}
+
+.label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: #C3B091;
+}
+
+.todayHours {
+  font-family: 'Libre Baskerville', Georgia, serif;
+  font-size: 14px;
+  color: #36454F;
+}
+
+.statusRow {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.statusDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.statusText {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+  color: #4A7C59;
+}
+
+.expandLink {
+  font-size: 10px;
+  color: #8B7355;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  margin-top: auto;
+  text-align: left;
+  transition: color 0.2s ease;
+}
+
+.expandLink:hover {
+  color: #36454F;
+}
+
+/* Expanded week view */
+.weekGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.dayRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 8px;
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+.todayRow {
+  background: rgba(195, 176, 145, 0.18);
+}
+
+.dayName {
+  font-size: 10px;
+  font-weight: 600;
+  color: #36454F;
+}
+
+.dayHours {
+  font-size: 10px;
+  color: #8B7355;
+}

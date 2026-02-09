@@ -1,0 +1,74 @@
+.alsoOnCard {
+  background: #FFFDF7;
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.col6 {
+  grid-column: span 6;
+}
+
+.label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: #C3B091;
+}
+
+.listContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.listItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  padding: 4px;
+  border-radius: 6px;
+  transition: background 0.2s ease;
+}
+
+.listItem:hover {
+  background: rgba(195, 176, 145, 0.05);
+}
+
+.thumbnail {
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  background-size: cover;
+  background-position: center;
+  flex-shrink: 0;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.title {
+  font-family: 'Libre Baskerville', Georgia, serif;
+  font-size: 11px;
+  font-style: italic;
+  color: #36454F;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.author {
+  font-size: 9px;
+  color: #C3B091;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

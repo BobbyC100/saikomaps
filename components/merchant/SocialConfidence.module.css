@@ -1,0 +1,142 @@
+/* Social Confidence Section Styles
+ * Groups Curator's Note, Pull Quote, and Instagram
+ */
+
+.socialConfidenceSection {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+/* Curator's Note Card */
+.curatorNoteCard {
+  background: #FFFDF7;
+  border: 1px solid rgba(195, 176, 145, 0.2);
+  border-radius: 12px;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.curatorNoteText {
+  font-size: 14px;
+  line-height: 1.65;
+  color: #36454F;
+  margin: 0;
+}
+
+.curatorNoteAttribution {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: rgba(54, 69, 79, 0.5);
+  font-weight: 600;
+}
+
+/* Pull Quote Card */
+.pullQuoteCard {
+  background: #FFFDF7;
+  border: 1px solid rgba(195, 176, 145, 0.2);
+  border-radius: 12px;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  justify-content: center;
+}
+
+.pullQuoteText {
+  font-family: 'Libre Baskerville', Georgia, serif;
+  font-size: 15px;
+  font-style: italic;
+  color: #36454F;
+  line-height: 1.6;
+  opacity: 0.85;
+}
+
+.pullQuoteAttribution {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: rgba(54, 69, 79, 0.5);
+  font-weight: 600;
+}
+
+/* Instagram Card */
+.instagramCard {
+  background: #FFFDF7;
+  border: 1px solid rgba(195, 176, 145, 0.2);
+  border-radius: 12px;
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.instagramCard:hover {
+  background: #FFF;
+  border-color: rgba(195, 176, 145, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(195, 176, 145, 0.15);
+}
+
+.instagramIconWrapper {
+  color: #C3B091;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.instagramHandle {
+  font-size: 14px;
+  color: #36454F;
+  font-weight: 500;
+}
+
+/* Block Label (shared) */
+.blockLabel {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: rgba(54, 69, 79, 0.4);
+  font-weight: 600;
+}
+
+/* Mobile responsive */
+@media (max-width: 640px) {
+  .socialConfidenceSection {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* When only 2 items, make them side by side on desktop */
+.socialConfidenceSection:has(.curatorNoteCard:nth-child(2):last-child),
+.socialConfidenceSection:has(.pullQuoteCard:nth-child(2):last-child),
+.socialConfidenceSection:has(.instagramCard:nth-child(2):last-child) {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+/* When only 3 items, make them side by side on desktop */
+.socialConfidenceSection:has(.curatorNoteCard:nth-child(3):last-child),
+.socialConfidenceSection:has(.pullQuoteCard:nth-child(3):last-child),
+.socialConfidenceSection:has(.instagramCard:nth-child(3):last-child) {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+/* Mobile: always stack */
+@media (max-width: 640px) {
+  .socialConfidenceSection:has(.curatorNoteCard:nth-child(2):last-child),
+  .socialConfidenceSection:has(.pullQuoteCard:nth-child(2):last-child),
+  .socialConfidenceSection:has(.instagramCard:nth-child(2):last-child),
+  .socialConfidenceSection:has(.curatorNoteCard:nth-child(3):last-child),
+  .socialConfidenceSection:has(.pullQuoteCard:nth-child(3):last-child),
+  .socialConfidenceSection:has(.instagramCard:nth-child(3):last-child) {
+    grid-template-columns: 1fr;
+  }
+}

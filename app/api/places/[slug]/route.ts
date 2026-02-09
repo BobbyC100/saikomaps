@@ -45,6 +45,12 @@ export async function GET(
             },
           },
         },
+        restaurantGroup: {
+          select: {
+            name: true,
+            slug: true,
+          },
+        },
       },
     });
 
@@ -104,6 +110,7 @@ export async function GET(
       data: {
         location: {
           id: place.id,
+          slug: place.slug,
           name: place.name,
           address: place.address,
           latitude: place.latitude ? Number(place.latitude) : null,
@@ -125,6 +132,18 @@ export async function GET(
           sources: place.sources || [],
           vibeTags: place.vibeTags || [],
           tips: place.tips || [],
+          tagline: place.tagline,
+          pullQuote: place.pullQuote,
+          pullQuoteSource: place.pullQuoteSource,
+          pullQuoteAuthor: place.pullQuoteAuthor,
+          pullQuoteUrl: place.pullQuoteUrl,
+          pullQuoteType: place.pullQuoteType,
+          // Decision Onset fields
+          intentProfile: place.intentProfile,
+          intentProfileOverride: place.intentProfileOverride,
+          reservationUrl: place.reservationUrl,
+          // Restaurant Group
+          restaurantGroup: place.restaurantGroup || null,
         },
         guide: appearsOn[0]
           ? {

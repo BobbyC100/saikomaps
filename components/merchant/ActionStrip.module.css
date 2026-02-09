@@ -1,0 +1,46 @@
+.actionStrip {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  padding: 10px 20px;
+  border-top: 1px solid rgba(195, 176, 145, 0.15);
+  border-bottom: 1px solid rgba(195, 176, 145, 0.15);
+  background: transparent;
+}
+
+.action {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: transparent;
+  text-decoration: none;
+  color: #8B7355; /* leather */
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.action:hover {
+  background: rgba(195, 176, 145, 0.12);
+}
+
+/* Primary action (Directions) uses charcoal instead of leather */
+.action.primary {
+  color: #36454F;
+}
+
+.action.primary .icon {
+  color: #36454F;
+}
+
+.icon {
+  color: #8B7355;
+  flex-shrink: 0;
+}
+
+.label {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+}

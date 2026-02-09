@@ -1,0 +1,52 @@
+.coverageCard {
+  background: #FFFDF7;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.col4 {
+  grid-column: span 4;
+}
+
+.label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: #C3B091;
+}
+
+.quote {
+  font-family: 'Libre Baskerville', Georgia, serif;
+  font-size: 13px;
+  font-style: italic;
+  color: #36454F;
+  line-height: 1.5;
+  border-left: 2px solid #C3B091;
+  padding-left: 12px;
+}
+
+.sourceList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sourceItem {
+  font-size: 11px;
+  color: #36454F;
+  line-height: 1.4;
+}
+
+.vibeTag {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #8B7355;
+  background: rgba(195, 176, 145, 0.15);
+  padding: 4px 8px;
+  border-radius: 4px;
+  align-self: flex-start;
+}

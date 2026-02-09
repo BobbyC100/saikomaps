@@ -1,0 +1,75 @@
+.mapCard {
+  background: #FFFDF7;
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  max-height: 96px;
+  transition: box-shadow 0.2s ease;
+}
+
+.mapCard:hover {
+  box-shadow: 0 2px 12px rgba(139, 115, 85, 0.1);
+}
+
+.col6 {
+  grid-column: span 6;
+}
+
+/* Map Preview */
+.mapPreview {
+  width: 60px;
+  height: 60px;
+  flex-shrink: 0;
+  background: linear-gradient(145deg, #EDE8D8, #E6E0D4);
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.gridOverlay {
+  width: 100%;
+  height: 100%;
+}
+
+/* Pin */
+.pin {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 10px;
+  height: 10px;
+  background: #D64541;
+  border: 2px solid #F5F0E1;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Address Info */
+.addressInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.street {
+  font-family: 'Libre Baskerville', Georgia, serif;
+  font-size: 11px;
+  color: #36454F;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cityState {
+  font-size: 9px;
+  color: #C3B091;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

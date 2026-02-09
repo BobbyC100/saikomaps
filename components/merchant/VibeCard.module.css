@@ -1,0 +1,38 @@
+.vibeCard {
+  background: #FFFDF7;
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.col6 {
+  grid-column: span 6;
+}
+
+.label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: #C3B091;
+}
+
+.tagsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tag {
+  font-size: 10px;
+  color: #8B7355;
+  background: rgba(195, 176, 145, 0.12);
+  padding: 5px 10px;
+  border-radius: 6px;
+  transition: background 0.2s ease;
+}
+
+.tag:hover {
+  background: rgba(195, 176, 145, 0.18);
+}
