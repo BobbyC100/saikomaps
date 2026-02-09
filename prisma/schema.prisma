@@ -165,6 +165,12 @@ model Location {
 // PLACES (canonical entity)
 // ============================================
 
+enum PlaceStatus {
+  OPEN
+  CLOSED
+  PERMANENTLY_CLOSED
+}
+
 model Place {
   id                 String   @id @default(uuid())
   slug               String   @unique
@@ -217,6 +223,15 @@ model Place {
   // Created during editorial mining/coverage scans
   chefRecs           Json?    @map("chef_recs") // Array of ChefRec objects
 
+  // Decision Onset System — Intent Profiles
+  intentProfile      String?  @map("intent_profile") // "transactional" | "visit-now" | "go-there"
+  intentProfileOverride Boolean @default(false) @map("intent_profile_override")
+  reservationUrl     String?  @map("reservation_url") @db.Text
+
+  // People & Groups Infrastructure
+  restaurantGroupId  String?  @map("restaurant_group_id")
+  status             PlaceStatus @default(OPEN)
+
   // Cache Management
   placesDataCachedAt DateTime? @map("places_data_cached_at")
 
@@ -226,10 +241,14 @@ model Place {
   // Relations
   mapPlaces          MapPlace[]
   viewerBookmarks    ViewerBookmark[]
+  restaurantGroup    RestaurantGroup? @relation(fields: [restaurantGroupId], references: [id])
+  personPlaces       PersonPlace[]
 
   @@index([googlePlaceId])
   @@index([category])
   @@index([neighborhood])
+  @@index([restaurantGroupId])
+  @@index([status])
   @@map("places")
 }
 
@@ -368,4 +387,110 @@ model ImportJob {
   @@index([userId])
   @@index([status])
   @@map("import_jobs")
+}
+
+// ============================================
+// PEOPLE & RESTAURANT GROUPS
+// Infrastructure for chef/owner lineage
+// ============================================
+
+enum PersonRole {
+  CHEF
+  OWNER
+  OPERATOR
+  FOUNDER
+  PARTNER
+}
+
+enum PersonPlaceRole {
+  EXECUTIVE_CHEF
+  OWNER
+  FOUNDER
+  FORMER_CHEF
+  PARTNER
+  OPERATOR
+}
+
+enum Visibility {
+  INTERNAL  // signal only, never displayed in UI
+  VERIFIED  // can display in Tier 3 bento, requires high confidence
+}
+
+// Person Model
+// Represents chefs, owners, operators
+// Doctrine: We model people, but we do not promote them
+model Person {
+  id                  String    @id @default(cuid())
+  name                String
+  slug                String    @unique
+  role                PersonRole
+  visibility          Visibility
+  bio                 String?   @db.Text
+  imageUrl            String?   @map("image_url") @db.Text
+  sources             Json      // Array of source objects with attribution
+  restaurantGroupId   String?   @map("restaurant_group_id")
+  
+  createdAt           DateTime  @default(now()) @map("created_at")
+  updatedAt           DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  restaurantGroup     RestaurantGroup? @relation(fields: [restaurantGroupId], references: [id])
+  personPlaces        PersonPlace[]
+
+  @@index([slug])
+  @@index([visibility])
+  @@index([restaurantGroupId])
+  @@map("people")
+}
+
+// PersonPlace Join Table
+// Links people to places with role context
+model PersonPlace {
+  id          String          @id @default(cuid())
+  personId    String          @map("person_id")
+  placeId     String          @map("place_id")
+  role        PersonPlaceRole
+  current     Boolean         @default(true)
+  startYear   Int?            @map("start_year")
+  endYear     Int?            @map("end_year")
+  source      String          @db.Text
+  
+  createdAt   DateTime        @default(now()) @map("created_at")
+  updatedAt   DateTime        @updatedAt @map("updated_at")
+
+  // Relations
+  person      Person          @relation(fields: [personId], references: [id], onDelete: Cascade)
+  place       Place           @relation(fields: [placeId], references: [id], onDelete: Cascade)
+
+  @@unique([personId, placeId, role])
+  @@index([personId])
+  @@index([placeId])
+  @@index([current])
+  @@map("person_places")
+}
+
+// RestaurantGroup Model
+// Represents multi-unit hospitality groups
+// Doctrine: Groups exist to explain and validate places — never to replace them
+model RestaurantGroup {
+  id                    String      @id @default(cuid())
+  name                  String
+  slug                  String      @unique
+  visibility            Visibility
+  description           String?     @db.Text
+  anchorCity            String?     @map("anchor_city")
+  website               String?     @db.Text
+  locationCountEstimate Int?        @map("location_count_estimate") // Bootstrap field before all places linked
+  sources               Json        // Array of source objects with attribution
+  
+  createdAt             DateTime    @default(now()) @map("created_at")
+  updatedAt             DateTime    @updatedAt @map("updated_at")
+
+  // Relations
+  places                Place[]
+  people                Person[]
+
+  @@index([slug])
+  @@index([visibility])
+  @@map("restaurant_groups")
 }
