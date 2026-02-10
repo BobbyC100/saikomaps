@@ -2,6 +2,7 @@
 
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { GlobalHeader } from '@/components/layouts/GlobalHeader';
 import {
   BentoGrid,
   PlaceCard1x1,
@@ -77,6 +78,8 @@ export default function SearchPage() {
         href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap"
         rel="stylesheet"
       />
+
+      <GlobalHeader variant="default" />
 
       <div
         style={{

@@ -243,6 +243,41 @@ export default function PlacePage() {
       .finally(() => setLoading(false));
   }, [slug]);
 
+  // Share functionality
+  const handleShare = () => {
+    const url = window.location.href;
+    const title = data?.location?.name || 'Check out this place';
+    
+    // Try native Web Share API first (mobile)
+    if (navigator.share) {
+      navigator.share({ title, url }).catch(() => {
+        // User cancelled or error - fallback to clipboard
+        copyToClipboard(url);
+      });
+    } else {
+      // Desktop fallback: copy to clipboard
+      copyToClipboard(url);
+    }
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text).then(
+      () => {
+        // Could show a toast notification here
+        console.log('Link copied to clipboard');
+      },
+      () => {
+        // Fallback for older browsers
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+      }
+    );
+  };
+
   // Gallery handlers
   const openGallery = (index: number = 0) => {
     setLightboxIndex(index);
@@ -273,7 +308,7 @@ export default function PlacePage() {
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#F5F0E1' }}>
-        <GlobalHeader variant="immersive" />
+        <GlobalHeader variant="immersive" onShare={handleShare} />
         <main className="flex-1 flex items-center justify-center">
           <div className="text-center">
             <div
@@ -290,7 +325,7 @@ export default function PlacePage() {
   if (!data) {
     return (
       <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#F5F0E1' }}>
-        <GlobalHeader variant="immersive" />
+        <GlobalHeader variant="immersive" onShare={handleShare} />
         <main className="flex-1 flex items-center justify-center">
           <div className="text-center">
             <p className="text-[#36454F] text-lg mb-2">Place not found</p>
@@ -385,7 +420,7 @@ export default function PlacePage() {
         rel="stylesheet"
       />
 
-      <GlobalHeader variant="immersive" />
+      <GlobalHeader variant="immersive" onShare={handleShare} />
 
       <main style={{ maxWidth: 720, margin: '0 auto' }}>
         {/* Hero Section */}

@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Saiko Maps — Map Card System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    :root {
+      --parchment: #F5F0E1;
+      --warm-white: #FFFDF7;
+      --khaki: #C3B091;
+      --khaki-dark: #8B7355;
+      --charcoal: #36454F;
+      --border-light: rgba(195, 176, 145, 0.2);
+    }
+    
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #1a1a1a;
+      padding: 40px;
+      color: #ccc;
+    }
+    
+    .page-title {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #666;
+      margin-bottom: 8px;
+    }
+    
+    .page-subtitle {
+      font-size: 20px;
+      color: #ccc;
+      margin-bottom: 40px;
+    }
+    
+    .section {
+      margin-bottom: 60px;
+    }
+    
+    .section-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #666;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #333;
+    }
+    
+    .demo-container {
+      background: var(--parchment);
+      padding: 24px;
+      border-radius: 12px;
+    }
+    
+    .note {
+      font-size: 12px;
+      color: #888;
+      margin-top: 16px;
+      line-height: 1.6;
+    }
+    
+    .note code {
+      background: #333;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 11px;
+      color: #C3B091;
+    }
+    
+    .tag {
+      display: inline-block;
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 4px 8px;
+      border-radius: 3px;
+      margin-left: 8px;
+      background: #2d4a3e;
+      color: #8bc49e;
+    }
+    
+    .variants-row {
+      display: flex;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+    
+    .variant {
+      flex: 1;
+      min-width: 280px;
+    }
+    
+    .variant-label {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #888;
+      margin-bottom: 12px;
+    }
+    
+    /* ==========================================
+       SEARCH GRID CONTEXT
+       ========================================== */
+    
+    .search-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+    
+    /* ==========================================
+       PLACE CARD (for context)
+       ========================================== */
+    
+    .place-card {
+      background: var(--warm-white);
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid var(--border-light);
+    }
+    
+    .place-card.v-1x2 {
+      grid-row: span 2;
+    }
+    
+    .place-card .photo {
+      height: 100px;
+      background: linear-gradient(135deg, #d4c5b5 0%, #c8b9a8 100%);
+      filter: saturate(0.88) contrast(1.05);
+    }
+    
+    .place-card.v-1x2 .photo {
+      height: 140px;
+    }
+    
+    .place-card .info {
+      padding: 12px;
+    }
+    
+    .place-card .name {
+      font-family: 'Libre Baskerville', Georgia, serif;
+      font-style: italic;
+      font-size: 13px;
+      color: var(--charcoal);
+      margin-bottom: 4px;
+    }
+    
+    .place-card .meta {
+      font-size: 8px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--khaki);
+    }
+    
+    /* ==========================================
+       MAP CARD — 2x1 WIDE (Search Results)
+       ========================================== */
+    
+    .map-card-2x1 {
+      grid-column: span 2;
+      display: flex;
+      background: var(--warm-white);
+      border-radius: 6px;
+      overflow: hidden;
+      border: 2px solid var(--khaki);
+      text-decoration: none;
+      color: inherit;
+      transition: all 0.2s ease;
+    }
+    
+    .map-card-2x1:hover {
+      box-shadow: 0 4px 20px rgba(139, 115, 85, 0.15);
+      transform: translateY(-2px);
+    }
+    
+    .map-card-2x1 .photo {
+      width: 35%;
+      min-height: 140px;
+      background: url('https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&h=300&fit=crop') center/cover;
+      filter: saturate(0.88) contrast(1.05);
+      flex-shrink: 0;
+    }
+    
+    .map-card-2x1 .info {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      flex: 1;
+      gap: 6px;
+    }
+    
+    .map-card-2x1 .type-label {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--khaki-dark);
+      font-weight: 600;
+    }
+    
+    .map-card-2x1 .title {
+      font-family: 'Libre Baskerville', Georgia, serif;
+      font-style: italic;
+      font-size: 17px;
+      color: var(--charcoal);
+      line-height: 1.3;
+    }
+    
+    .map-card-2x1 .description {
+      font-size: 12px;
+      color: var(--khaki-dark);
+      line-height: 1.5;
+    }
+    
+    .map-card-2x1 .meta-row {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--khaki);
+      display: flex;
+      gap: 8px;
+      margin-top: 4px;
+    }
+    
+    .map-card-2x1 .meta-row .separator {
+      opacity: 0.5;
+    }
+    
+    /* ==========================================
+       MAP CARD — 2x2 FEATURED (Homepage/Editorial)
+       ========================================== */
+    
+    .map-card-2x2 {
+      grid-column: span 2;
+      grid-row: span 2;
+      display: flex;
+      flex-direction: column;
+      background: var(--warm-white);
+      border-radius: 8px;
+      overflow: hidden;
+      border: 2px solid var(--khaki);
+      text-decoration: none;
+      color: inherit;
+      transition: all 0.2s ease;
+    }
+    
+    .map-card-2x2:hover {
+      box-shadow: 0 6px 28px rgba(139, 115, 85, 0.18);
+      transform: translateY(-3px);
+    }
+    
+    .map-card-2x2 .photo {
+      height: 180px;
+      background: url('https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600&h=400&fit=crop') center/cover;
+      filter: saturate(0.88) contrast(1.05);
+      position: relative;
+    }
+    
+    .map-card-2x2 .photo .badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      font-size: 8px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 5px 10px;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      color: #fff;
+      border-radius: 3px;
+      font-weight: 600;
+    }
+    
+    .map-card-2x2 .info {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      gap: 8px;
+    }
+    
+    .map-card-2x2 .type-label {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--khaki-dark);
+      font-weight: 600;
+    }
+    
+    .map-card-2x2 .title {
+      font-family: 'Libre Baskerville', Georgia, serif;
+      font-style: italic;
+      font-size: 22px;
+      color: var(--charcoal);
+      line-height: 1.25;
+    }
+    
+    .map-card-2x2 .description {
+      font-size: 13px;
+      color: var(--khaki-dark);
+      line-height: 1.6;
+      flex: 1;
+    }
+    
+    .map-card-2x2 .meta-row {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--khaki);
+      display: flex;
+      gap: 8px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border-light);
+    }
+    
+    .map-card-2x2 .meta-row .separator {
+      opacity: 0.5;
+    }
+    
+    /* ==========================================
+       MAP TITLE BLOCK — Standalone (No Image)
+       ========================================== */
+    
+    .map-title-block {
+      background: var(--warm-white);
+      border-radius: 6px;
+      padding: 20px;
+      border: 2px solid var(--khaki);
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+    
+    .map-title-block:hover {
+      box-shadow: 0 4px 16px rgba(139, 115, 85, 0.12);
+      transform: translateY(-2px);
+    }
+    
+    .map-title-block .type-label {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--khaki-dark);
+      font-weight: 600;
+    }
+    
+    .map-title-block .title {
+      font-family: 'Libre Baskerville', Georgia, serif;
+      font-style: italic;
+      font-size: 18px;
+      color: var(--charcoal);
+      line-height: 1.3;
+    }
+    
+    .map-title-block .description {
+      font-size: 12px;
+      color: var(--khaki-dark);
+      line-height: 1.5;
+    }
+    
+    .map-title-block .meta-row {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--khaki);
+      display: flex;
+      gap: 8px;
+      margin-top: 4px;
+    }
+    
+    .map-title-block .meta-row .separator {
+      opacity: 0.5;
+    }
+    
+    /* Compact variant */
+    .map-title-block.compact {
+      padding: 14px 16px;
+      gap: 4px;
+    }
+    
+    .map-title-block.compact .title {
+      font-size: 15px;
+    }
+    
+    .map-title-block.compact .description {
+      font-size: 11px;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    
+    /* ==========================================
+       AUTHOR VARIANTS
+       ========================================== */
+    
+    .curator-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 8px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 3px 8px;
+      background: rgba(195, 176, 145, 0.2);
+      border-radius: 3px;
+      color: var(--khaki-dark);
+      font-weight: 600;
+    }
+    
+    .curator-badge::before {
+      content: '★';
+      font-size: 7px;
+    }
+    
+    /* ==========================================
+       LAYOUT HELPERS
+       ========================================== */
+    
+    .standalone-demos {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    
+    .standalone-demo {
+      flex: 1;
+      min-width: 260px;
+      max-width: 340px;
+    }
+    
+    .standalone-demo-label {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #666;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="page-title">Saiko Maps — Map Card System</div>
+  <h1 class="page-subtitle">Three variants for different contexts</h1>
+
+  <!-- ============================================
+       VARIANT 1: 2x1 WIDE — SEARCH RESULTS
+       ============================================ -->
+  <div class="section">
+    <div class="section-label">1. Map Card 2×1 — Search Results <span class="tag">Primary</span></div>
+    <div class="demo-container">
+      <div class="search-grid">
+        <!-- Map card -->
+        <a href="#" class="map-card-2x1">
+          <div class="photo"></div>
+          <div class="info">
+            <div class="type-label">Map · 8 places</div>
+            <div class="title">Silver Lake Coffee Crawl</div>
+            <div class="description">The essential stops for a caffeine-fueled afternoon in the neighborhood.</div>
+            <div class="meta-row">
+              <span>By @bobby</span>
+              <span class="separator">·</span>
+              <span>Silver Lake</span>
+            </div>
+          </div>
+        </a>
+        
+        <!-- Place cards for context -->
+        <div class="place-card v-1x2">
+          <div class="photo"></div>
+          <div class="info">
+            <div class="name">Maru Coffee</div>
+            <div class="meta">Coffee · Silver Lake</div>
+          </div>
+        </div>
+        <div class="place-card v-1x2">
+          <div class="photo"></div>
+          <div class="info">
+            <div class="name">Dinosaur Coffee</div>
+            <div class="meta">Coffee · Silver Lake</div>
+          </div>
+        </div>
+        
+        <!-- More place cards -->
+        <div class="place-card">
+          <div class="photo"></div>
+          <div class="info">
+            <div class="name">Intelligentsia</div>
+            <div class="meta">Coffee · $$$</div>
+          </div>
+        </div>
+        <div class="place-card">
+          <div class="photo"></div>
+          <div class="info">
+            <div class="name">Kumquat</div>
+            <div class="meta">Coffee · $$</div>
+          </div>
+        </div>
+        <div class="place-card">
+          <div class="photo"></div>
+          <div class="info">
+            <div class="name">Dayglow</div>
+            <div class="meta">Coffee · $$</div>
+          </div>
+        </div>
+        <div class="place-card">
+          <div class="photo"></div>
+          <div class="info">
+            <div class="name">Stories Books</div>
+            <div class="meta">Cafe · Echo Park</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="note">
+      <strong>Use for:</strong> Search results, neighborhood pages, any mixed grid.<br>
+      <strong>Differentiation:</strong> 2px khaki border + horizontal layout + <code>MAP · X PLACES</code> label.<br>
+      <strong>Author:</strong> Username for all maps. No "Saiko Maps" attribution.
+    </p>
+  </div>
+
+  <!-- ============================================
+       VARIANT 1b: CURATOR PICK EXAMPLE
+       ============================================ -->
+  <div class="section">
+    <div class="section-label">1b. Map Card 2×1 — Curator Pick Variant</div>
+    <div class="demo-container">
+      <div class="search-grid">
+        <a href="#" class="map-card-2x1">
+          <div class="photo"></div>
+          <div class="info">
+            <div class="type-label">Map · 12 places</div>
+            <div class="title">Essential Echo Park</div>
+            <div class="description">From tacos to natural wine — the neighborhood's non-negotiables.</div>
+            <div class="meta-row">
+              <span class="curator-badge">Curator Pick</span>
+              <span class="separator">·</span>
+              <span>Echo Park</span>
+            </div>
+          </div>
+        </a>
+        <div class="place-card v-1x2">
+          <div class="photo"></div>
+          <div class="info">
+            <div class="name">Cookbook</div>
+            <div class="meta">Restaurant · Echo Park</div>
+          </div>
+        </div>
+        <div class="place-card v-1x2">
+          <div class="photo"></div>
+          <div class="info">
+            <div class="name">Taco Zone</div>
+            <div class="meta">Tacos · $</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="note">
+      <strong>"Curator Pick" badge:</strong> Replaces username for Saiko-curated maps. Subtle editorial signal without saying "Saiko Maps."
+    </p>
+  </div>
+
+  <!-- ============================================
+       VARIANT 2: 2x2 FEATURED — HOMEPAGE/EDITORIAL
+       ============================================ -->
+  <div class="section">
+    <div class="section-label">2. Map Card 2×2 — Featured / Homepage</div>
+    <div class="demo-container">
+      <div class="search-grid">
+        <!-- Featured map card -->
+        <a href="#" class="map-card-2x2">
+          <div class="photo">
+            <span class="badge">Curator Pick</span>
+          </div>
+          <div class="info">
+            <div class="type-label">Map · 15 places</div>
+            <div class="title">The LA Natural Wine Trail</div>
+            <div class="description">From Silver Lake to Venice — every bottle shop, bar, and restaurant pouring the good stuff. Start your weekend here.</div>
+            <div class="meta-row">
+              <span>Wine</span>
+              <span class="separator">·</span>
+              <span>Los Angeles</span>
+            </div>
+          </div>
+        </a>
+        
+        <!-- Place cards for context -->
+        <div class="place-card v-1x2">
+          <div class="photo"></div>
+          <div class="info">
+            <div class="name">Psychic Wines</div>
+            <div class="meta">Wine Bar · Silver Lake</div>
+          </div>
+        </div>
+        <div class="place-card v-1x2">
+          <div class="photo"></div>
+          <div class="info">
+            <div class="name">Helen's Wines</div>
+            <div class="meta">Wine Shop · Mar Vista</div>
+          </div>
+        </div>
+        
+        <div class="place-card">
+          <div class="photo"></div>
+          <div class="info">
+            <div class="name">Esters</div>
+            <div class="meta">Wine Bar · $$</div>
+          </div>
+        </div>
+        <div class="place-card">
+          <div class="photo"></div>
+          <div class="info">
+            <div class="name">Bar Bandini</div>
+            <div class="meta">Wine Bar · Echo Park</div>
+          </div>
+        </div>
+        <div class="place-card">
+          <div class="photo"></div>
+          <div class="info">
+            <div class="name">Lou Wine Shop</div>
+            <div class="meta">Wine Shop · $$</div>
+          </div>
+        </div>
+        <div class="place-card">
+          <div class="photo"></div>
+          <div class="info">
+            <div class="name">Vinovore</div>
+            <div class="meta">Wine Shop · Silver Lake</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="note">
+      <strong>Use for:</strong> Homepage features, editorial surfaces, "Map of the week."<br>
+      <strong>When:</strong> When you want a map to feel like a destination, not just a result.<br>
+      <strong>Avoid:</strong> Don't use in search results — too heavy.
+    </p>
+  </div>
+
+  <!-- ============================================
+       VARIANT 3: TITLE BLOCK — STANDALONE
+       ============================================ -->
+  <div class="section">
+    <div class="section-label">3. Map Title Block — Standalone (No Image)</div>
+    <div class="demo-container">
+      <div class="standalone-demos">
+        
+        <div class="standalone-demo">
+          <div class="standalone-demo-label">Full</div>
+          <a href="#" class="map-title-block">
+            <div class="type-label">Map · 8 places</div>
+            <div class="title">Silver Lake Coffee Crawl</div>
+            <div class="description">The essential stops for a caffeine-fueled afternoon in the neighborhood.</div>
+            <div class="meta-row">
+              <span>By @bobby</span>
+              <span class="separator">·</span>
+              <span>Silver Lake</span>
+            </div>
+          </a>
+        </div>
+        
+        <div class="standalone-demo">
+          <div class="standalone-demo-label">Compact</div>
+          <a href="#" class="map-title-block compact">
+            <div class="type-label">Map · 8 places</div>
+            <div class="title">Silver Lake Coffee Crawl</div>
+            <div class="description">The essential stops for a caffeine-fueled afternoon.</div>
+            <div class="meta-row">
+              <span>By @bobby</span>
+            </div>
+          </a>
+        </div>
+        
+        <div class="standalone-demo">
+          <div class="standalone-demo-label">Curator Pick</div>
+          <a href="#" class="map-title-block">
+            <div class="type-label">Map · 12 places</div>
+            <div class="title">Essential Echo Park</div>
+            <div class="description">From tacos to natural wine — the neighborhood's non-negotiables.</div>
+            <div class="meta-row">
+              <span class="curator-badge">Curator Pick</span>
+              <span class="separator">·</span>
+              <span>Echo Park</span>
+            </div>
+          </a>
+        </div>
+        
+      </div>
+    </div>
+    <p class="note">
+      <strong>Use for:</strong> Sidebar lists, "Featured on X maps" links, text-heavy layouts, mobile contexts where images are too heavy.<br>
+      <strong>When image isn't available:</strong> Falls back gracefully.<br>
+      <strong>Compact variant:</strong> For tighter spaces — description truncates to 1 line.
+    </p>
+  </div>
+
+  <!-- ============================================
+       SPEC SUMMARY
+       ============================================ -->
+  <div class="section">
+    <div class="section-label">Map Card System — Spec Summary</div>
+    <div style="background: #2a2a2a; border-radius: 8px; padding: 24px; color: #ccc; font-size: 13px; line-height: 1.8;">
+      
+      <p><strong style="color: #C3B091;">Three Variants</strong></p>
+      <table style="width: 100%; border-collapse: collapse; margin: 12px 0 20px; font-size: 12px;">
+        <tr style="border-bottom: 1px solid #444;">
+          <td style="padding: 8px 0; color: #888;">Variant</td>
+          <td style="padding: 8px 0; color: #888;">Size</td>
+          <td style="padding: 8px 0; color: #888;">Image</td>
+          <td style="padding: 8px 0; color: #888;">Use Case</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #333;">
+          <td style="padding: 8px 0;">2×1 Wide</td>
+          <td style="padding: 8px 0;">2 cols × 1 row</td>
+          <td style="padding: 8px 0;">Hero (35% width)</td>
+          <td style="padding: 8px 0;">Search results, mixed grids</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #333;">
+          <td style="padding: 8px 0;">2×2 Featured</td>
+          <td style="padding: 8px 0;">2 cols × 2 rows</td>
+          <td style="padding: 8px 0;">Hero (full width top)</td>
+          <td style="padding: 8px 0;">Homepage, editorial features</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px 0;">Title Block</td>
+          <td style="padding: 8px 0;">Flexible</td>
+          <td style="padding: 8px 0;">None</td>
+          <td style="padding: 8px 0;">Sidebars, lists, fallback</td>
+        </tr>
+      </table>
+      
+      <p><strong style="color: #C3B091;">Content Hierarchy (All Variants)</strong></p>
+      <ol style="margin: 8px 0 20px 20px; color: #aaa;">
+        <li><code style="background: #333; padding: 2px 6px; border-radius: 3px;">MAP · X PLACES</code> — always first, always visible</li>
+        <li>Title — Libre Baskerville italic</li>
+        <li>Description — 1-2 lines</li>
+        <li>Meta: Author + Area</li>
+      </ol>
+      
+      <p><strong style="color: #C3B091;">Author Attribution</strong></p>
+      <ul style="margin: 8px 0 20px 20px; color: #aaa;">
+        <li>User maps: <code style="background: #333; padding: 2px 6px; border-radius: 3px;">By @username</code></li>
+        <li>Saiko-curated: <code style="background: #333; padding: 2px 6px; border-radius: 3px;">Curator Pick</code> badge</li>
+        <li>Never show "Saiko Maps" or "Staff Pick"</li>
+      </ul>
+      
+      <p><strong style="color: #C3B091;">Visual Differentiation</strong></p>
+      <ul style="margin: 8px 0 0 20px; color: #aaa;">
+        <li>2px khaki border (Place cards use 1px subtle)</li>
+        <li><code style="background: #333; padding: 2px 6px; border-radius: 3px;">MAP · X PLACES</code> label is primary signal</li>
+        <li>Horizontal layout (2×1) vs vertical (most Place cards)</li>
+      </ul>
+      
+    </div>
+  </div>
+
+</body>
+</html>

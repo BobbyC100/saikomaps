@@ -40,6 +40,8 @@ interface Location {
   orderIndex: number;
   priceLevel?: number | null;
   cuisineType?: string | null;
+  placePersonality?: string | null;
+  priceTier?: string | null;
 }
 
 interface MapPlaceWithPlace {
@@ -65,6 +67,8 @@ interface MapPlaceWithPlace {
     googlePhotos: unknown;
     priceLevel?: number | null;
     cuisineType?: string | null;
+    placePersonality?: string | null;
+    priceTier?: string | null;
   };
 }
 
@@ -190,6 +194,41 @@ export default function PublicMapPage({ params }: { params: Promise<{ slug: stri
   const skateMarkersRef = useRef<google.maps.Marker[]>([]);
   const skateClustererRef = useRef<MarkerClusterer | null>(null);
 
+  // Share functionality
+  const handleShare = useCallback(() => {
+    const url = window.location.href;
+    const title = mapData?.title || 'Check out this map';
+    
+    // Try native Web Share API first (mobile)
+    if (navigator.share) {
+      navigator.share({ title, url }).catch(() => {
+        // User cancelled or error - fallback to clipboard
+        copyToClipboard(url);
+      });
+    } else {
+      // Desktop fallback: copy to clipboard
+      copyToClipboard(url);
+    }
+  }, [mapData?.title]);
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text).then(
+      () => {
+        // Could show a toast notification here
+        console.log('Link copied to clipboard');
+      },
+      () => {
+        // Fallback for older browsers
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+      }
+    );
+  };
+
   let template: MapTemplate = getMapTemplate(mapData?.templateType);
   // Flatten mapPlaces to locations (place + mapPlace curator data)
   const locations: Location[] = (mapData?.mapPlaces ?? mapData?.locations ?? []).map((mp: MapPlaceWithPlace | Location) => {
@@ -216,6 +255,8 @@ export default function PublicMapPage({ params }: { params: Promise<{ slug: stri
         orderIndex: mp.orderIndex,
         priceLevel: p.priceLevel ?? null,
         cuisineType: p.cuisineType ?? null,
+        placePersonality: p.placePersonality ?? null,
+        priceTier: p.priceTier ?? null,
       } as Location;
     }
     return mp as Location;
@@ -771,7 +812,7 @@ export default function PublicMapPage({ params }: { params: Promise<{ slug: stri
       style={{ backgroundColor: pageBg, color: template.text }}
     >
       {/* Minimal Header - Logo only */}
-      <MapHeader template={template} />
+      <MapHeader template={template} onShare={handleShare} />
 
       {/* Split layout: below 768px stack (map top 300px, cards below); above 768px ~55% cards / 45% map */}
       <div className="flex flex-col md:flex-row md:h-[calc(100vh-8rem)]">
