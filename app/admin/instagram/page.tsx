@@ -133,6 +133,46 @@ export default function InstagramAdminPage() {
     setSaving(null);
   }
 
+  async function markAsNoInstagram(canonicalId: string, placeName: string) {
+    setSaving(canonicalId);
+    try {
+      const res = await fetch('/api/admin/instagram', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ canonical_id: canonicalId, no_instagram: true }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        console.log('✅ Marked as no Instagram:', data);
+        
+        // Remove from list
+        setPlaces(places.filter(p => p.canonical_id !== canonicalId));
+        setTotal(total - 1);
+        
+        // Show success toast
+        setToast({
+          message: `✅ "${placeName}" marked as no Instagram`,
+          type: 'success',
+        });
+      } else {
+        console.error('❌ Failed to mark as no Instagram:', data);
+        setToast({
+          message: `❌ ${data.error || 'Failed to mark as no Instagram'}`,
+          type: 'error',
+        });
+      }
+    } catch (error) {
+      console.error('❌ Network error:', error);
+      setToast({
+        message: '❌ Network error - check console',
+        type: 'error',
+      });
+    }
+    setSaving(null);
+  }
+
   const totalPages = Math.ceil(total / pageSize);
 
   return (
@@ -213,6 +253,7 @@ export default function InstagramAdminPage() {
                   place={place}
                   onSave={updateInstagram}
                   onClose={markAsClosed}
+                  onNoInstagram={markAsNoInstagram}
                   saving={saving === place.canonical_id}
                 />
               ))}
@@ -251,11 +292,13 @@ function PlaceCard({
   place,
   onSave,
   onClose,
+  onNoInstagram,
   saving,
 }: {
   place: Place;
   onSave: (id: string, handle: string, placeName: string) => void;
   onClose: (id: string, placeName: string) => void;
+  onNoInstagram: (id: string, placeName: string) => void;
   saving: boolean;
 }) {
   const [handle, setHandle] = useState('');
@@ -347,13 +390,22 @@ function PlaceCard({
             </button>
           </form>
           
-          <button
-            onClick={() => onClose(place.canonical_id, place.name)}
-            disabled={saving}
-            className="px-4 py-2 bg-red-600 text-white text-sm rounded-md hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            Mark as Closed
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={() => onNoInstagram(place.canonical_id, place.name)}
+              disabled={saving}
+              className="flex-1 px-4 py-2 bg-gray-500 text-white text-sm rounded-md hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              No Instagram
+            </button>
+            <button
+              onClick={() => onClose(place.canonical_id, place.name)}
+              disabled={saving}
+              className="flex-1 px-4 py-2 bg-red-600 text-white text-sm rounded-md hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              Mark as Closed
+            </button>
+          </div>
         </div>
       </div>
     </div>

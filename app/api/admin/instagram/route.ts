@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     // Build where clause
     const where: any = {
       county: 'Los Angeles',
-      instagram_handle: null,
+      instagram_handle: null, // Only null (not marked as NONE)
       google_place_id: { not: null },
       lifecycle_status: 'ACTIVE', // Only show active places
     };
@@ -93,21 +93,42 @@ export async function GET(request: NextRequest) {
 
 /**
  * POST /api/admin/instagram
- * Update Instagram handle for a place
+ * Update Instagram handle for a place or mark as "no Instagram"
  */
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { canonical_id, instagram_handle } = body;
+    const { canonical_id, instagram_handle, no_instagram } = body;
 
-    console.log('[Instagram API] Received request:', { canonical_id, instagram_handle });
+    console.log('[Instagram API] Received request:', { canonical_id, instagram_handle, no_instagram });
 
-    if (!canonical_id || instagram_handle === undefined) {
+    if (!canonical_id || (instagram_handle === undefined && !no_instagram)) {
       console.error('[Instagram API] Missing parameters');
       return NextResponse.json(
         { error: 'Missing canonical_id or instagram_handle' },
         { status: 400 }
       );
+    }
+
+    // Handle "no Instagram" marking
+    if (no_instagram) {
+      const updated = await prisma.golden_records.update({
+        where: { canonical_id },
+        data: {
+          instagram_handle: 'NONE', // Special marker
+          updated_at: new Date(),
+        },
+      });
+
+      console.log('[Instagram API] Marked as no Instagram:', {
+        name: updated.name,
+      });
+
+      return NextResponse.json({
+        success: true,
+        no_instagram: true,
+        canonical_id,
+      });
     }
 
     // Extract handle from URL or @ prefix

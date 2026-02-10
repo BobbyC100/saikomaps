@@ -21,7 +21,7 @@ async function exportTier12Instagram() {
   const places = await prisma.golden_records.findMany({
     where: {
       county: 'Los Angeles',
-      instagram_handle: null,
+      instagram_handle: null, // Only truly missing (not marked as NONE)
       google_place_id: { not: null }, // Need for auto-linking
       lifecycle_status: 'ACTIVE', // Only active places
       provenance: {

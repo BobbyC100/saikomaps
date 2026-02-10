@@ -37,11 +37,22 @@ http://localhost:3000/admin/instagram
 
 ### 4. For Each Place
 
+**If place HAS Instagram:**
 1. **Click website link** → Look for Instagram in footer/social links
 2. **Click Google Maps** → Check business profile for Instagram
-3. **Type Instagram handle** (@ is optional)
+3. **Type Instagram handle** (@ optional, or paste full URL)
 4. **Hit Save**
 5. **Place auto-removes** from list ✅
+
+**If place DOES NOT have Instagram:**
+1. **Verify** they really don't have one (check Google Maps, website)
+2. **Click "No Instagram" button**
+3. **Place auto-removes** and won't show up again ✅
+
+**If place is CLOSED:**
+1. **Click "Mark as Closed" button**
+2. **Confirm** the prompt
+3. **Place archives** and won't show on site ✅
 
 ## Debugging
 

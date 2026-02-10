@@ -8,11 +8,17 @@
  * - Photos
  * - Categories
  * - Address details
+ * - Coordinates (lat/lng)
  * 
  * Usage: npm run enrich:google [--dry-run] [--limit=100]
  * 
- * Requires: GOOGLE_MAPS_API_KEY in .env
+ * Requires: GOOGLE_MAPS_API_KEY in .env or .env.local
  */
+
+// Load environment variables from .env and .env.local
+import { config } from 'dotenv';
+config({ path: '.env' });
+config({ path: '.env.local', override: true });
 
 import { PrismaClient } from '@prisma/client';
 
@@ -87,27 +93,13 @@ async function enrichPlaces() {
   const placesToEnrich = await prisma.golden_records.findMany({
     where: {
       google_place_id: { not: null },
-      enriched_at: null, // Only process places not yet attempted
-      phone: null, // Missing data
-      
-      // LA County filter - use county tag OR exclude known non-LA areas
+      county: 'Los Angeles', // Focus on LA County only
       OR: [
-        { county: 'Los Angeles' }, // Prefer county tag if set
-        {
-          AND: [
-            { county: null }, // If county not set, use exclusion list
-            {
-              NOT: [
-                { neighborhood: { in: ['McCully - Moiliili', 'Downtown Core'] } },
-                { name: { contains: 'Honolulu', mode: 'insensitive' } },
-                { name: { contains: 'Palm Beach', mode: 'insensitive' } },
-                { name: { contains: 'Olomana', mode: 'insensitive' } },
-                { name: { contains: 'Waikiki', mode: 'insensitive' } },
-              ]
-            }
-          ]
-        }
-      ]
+        { enriched_at: null }, // Not yet enriched
+        { lat: 0 }, // Has 0,0 coords (needs re-enrichment)
+        { lng: 0 },
+        { phone: null }, // Missing data
+      ],
     },
     take: limit,
     select: {
@@ -117,6 +109,8 @@ async function enrichPlaces() {
       phone: true,
       neighborhood: true,
       county: true,
+      lat: true,
+      lng: true,
     }
   });
   
@@ -150,6 +144,17 @@ async function enrichPlaces() {
         }
         failed++;
         continue;
+      }
+      
+      // Coordinates - FIX for 0,0 bug
+      if (details.geometry?.location) {
+        const currentLat = Number(place.lat);
+        const currentLng = Number(place.lng);
+        if (currentLat === 0 || currentLng === 0 || !place.lat || !place.lng) {
+          updates.lat = details.geometry.location.lat;
+          updates.lng = details.geometry.location.lng;
+          console.log(`  ✓ Coords: ${details.geometry.location.lat}, ${details.geometry.location.lng}`);
+        }
       }
       
       // Phone
