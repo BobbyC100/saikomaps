@@ -1,0 +1,1502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Saiko Resolver — Admin</title>
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --sand-50: #FDFCF9;
+      --sand-100: #F5F0E1;
+      --sand-200: #E8E2D4;
+      --sand-300: #D4CFC0;
+      --sand-400: #C3B091;
+      --sand-500: #8B7355;
+      --sand-700: #5C4D3C;
+      --sand-900: #36454F;
+      --forest-50: #F0F5F1;
+      --forest-100: #D9E8DC;
+      --forest-500: #4A7C59;
+      --forest-600: #3D6649;
+      --forest-700: #2F503A;
+      --red-50: #FEF2F2;
+      --red-100: #FEE2E2;
+      --red-500: #D64541;
+      --red-600: #B91C1C;
+      --amber-50: #FFFBEB;
+      --amber-500: #F59E0B;
+      --amber-600: #D97706;
+      --warm-white: #FFFDF7;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: var(--sand-100);
+      color: var(--sand-900);
+      min-height: 100vh;
+    }
+
+    .serif {
+      font-family: 'Libre Baskerville', Georgia, serif;
+    }
+
+    .mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Layout */
+    .app-container {
+      display: flex;
+      height: 100vh;
+    }
+
+    .sidebar {
+      width: 220px;
+      background: var(--sand-900);
+      color: var(--sand-100);
+      padding: 24px 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar-logo {
+      padding: 0 24px 24px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      margin-bottom: 16px;
+    }
+
+    .sidebar-logo h1 {
+      font-family: 'Libre Baskerville', serif;
+      font-size: 18px;
+      font-style: italic;
+      font-weight: 400;
+      color: var(--sand-100);
+    }
+
+    .sidebar-logo span {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--sand-400);
+      display: block;
+      margin-top: 4px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 24px;
+      color: var(--sand-400);
+      text-decoration: none;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+    }
+
+    .nav-item:hover {
+      background: rgba(255,255,255,0.05);
+      color: var(--sand-100);
+    }
+
+    .nav-item.active {
+      background: rgba(255,255,255,0.1);
+      color: var(--sand-100);
+      border-left: 2px solid var(--forest-500);
+    }
+
+    .nav-item svg {
+      width: 18px;
+      height: 18px;
+      opacity: 0.7;
+    }
+
+    .nav-badge {
+      margin-left: auto;
+      background: var(--red-500);
+      color: white;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 10px;
+    }
+
+    .main-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 32px 40px;
+    }
+
+    /* Page Header */
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 32px;
+    }
+
+    .page-title {
+      font-family: 'Libre Baskerville', serif;
+      font-size: 28px;
+      font-style: italic;
+      font-weight: 400;
+    }
+
+    .page-subtitle {
+      font-size: 13px;
+      color: var(--sand-500);
+      margin-top: 4px;
+    }
+
+    /* Stats Row */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .stat-card {
+      background: var(--warm-white);
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 1px 3px rgba(139,115,85,0.08);
+    }
+
+    .stat-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--sand-400);
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 32px;
+      font-weight: 500;
+      color: var(--sand-900);
+    }
+
+    .stat-value.green { color: var(--forest-500); }
+    .stat-value.red { color: var(--red-500); }
+    .stat-value.amber { color: var(--amber-600); }
+
+    .stat-change {
+      font-size: 11px;
+      color: var(--sand-500);
+      margin-top: 4px;
+    }
+
+    /* Review Card */
+    .review-container {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 24px;
+    }
+
+    .review-card {
+      background: var(--warm-white);
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(139,115,85,0.08), 0 8px 24px rgba(139,115,85,0.06);
+      overflow: hidden;
+    }
+
+    .review-header {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-bottom: 1px solid var(--sand-200);
+    }
+
+    .review-source {
+      padding: 16px 20px;
+      background: var(--sand-50);
+    }
+
+    .review-source:last-child {
+      border-left: 1px solid var(--sand-200);
+    }
+
+    .source-label {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--sand-400);
+    }
+
+    .source-name {
+      font-size: 12px;
+      color: var(--sand-700);
+      margin-top: 4px;
+    }
+
+    /* Field Rows */
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-bottom: 1px solid var(--sand-100);
+    }
+
+    .field-row:last-child {
+      border-bottom: none;
+    }
+
+    .field-row.conflict {
+      background: var(--red-50);
+    }
+
+    .field-row.similar {
+      background: var(--amber-50);
+    }
+
+    .field-cell {
+      padding: 16px 20px;
+      position: relative;
+    }
+
+    .field-cell:last-child {
+      border-left: 1px solid var(--sand-200);
+    }
+
+    .field-row.conflict .field-cell:last-child {
+      border-left-color: rgba(214,69,65,0.2);
+    }
+
+    .field-label {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--sand-400);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .field-label .winner {
+      color: var(--forest-500);
+    }
+
+    .field-value {
+      font-size: 14px;
+      color: var(--sand-900);
+    }
+
+    .field-value.name {
+      font-family: 'Libre Baskerville', serif;
+      font-size: 18px;
+      font-style: italic;
+    }
+
+    .field-value.conflict {
+      color: var(--red-600);
+      font-weight: 600;
+    }
+
+    .field-value.empty {
+      color: var(--sand-300);
+      font-style: italic;
+    }
+
+    .diff-highlight {
+      background: rgba(214,69,65,0.2);
+      color: var(--red-600);
+      font-weight: 600;
+      padding: 0 2px;
+      border-radius: 2px;
+    }
+
+    /* Proximity Badge */
+    .proximity-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      background: var(--sand-50);
+      border-top: 1px solid var(--sand-200);
+    }
+
+    .proximity-badge {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+
+    .proximity-badge.close {
+      background: var(--forest-100);
+      color: var(--forest-700);
+    }
+
+    .proximity-badge.medium {
+      background: var(--amber-50);
+      color: var(--amber-600);
+    }
+
+    .proximity-badge.far {
+      background: var(--red-100);
+      color: var(--red-600);
+    }
+
+    .confidence-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--sand-400);
+    }
+
+    .confidence-label span {
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--sand-700);
+    }
+
+    /* Golden Preview */
+    .golden-preview {
+      padding: 16px 20px;
+      background: var(--forest-50);
+      border-top: 1px solid var(--forest-100);
+    }
+
+    .golden-preview-label {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--forest-500);
+      margin-bottom: 8px;
+    }
+
+    .golden-preview-name {
+      font-family: 'Libre Baskerville', serif;
+      font-size: 16px;
+      font-style: italic;
+      color: var(--forest-700);
+    }
+
+    .golden-preview-meta {
+      font-size: 11px;
+      color: var(--forest-600);
+      margin-top: 2px;
+    }
+
+    /* Action Bar */
+    .action-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 24px;
+      background: var(--warm-white);
+      border-radius: 12px;
+      margin-top: 24px;
+      box-shadow: 0 1px 3px rgba(139,115,85,0.08);
+    }
+
+    .action-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      transition: all 0.15s ease;
+    }
+
+    .action-btn.primary {
+      background: var(--forest-500);
+      color: white;
+    }
+
+    .action-btn.primary:hover {
+      background: var(--forest-600);
+    }
+
+    .action-btn.secondary {
+      background: var(--sand-200);
+      color: var(--sand-700);
+    }
+
+    .action-btn.secondary:hover {
+      background: var(--sand-300);
+    }
+
+    .action-btn.ghost {
+      background: transparent;
+      color: var(--sand-500);
+    }
+
+    .action-btn.ghost:hover {
+      background: var(--sand-100);
+      color: var(--sand-700);
+    }
+
+    .action-btn.danger {
+      background: transparent;
+      color: var(--amber-600);
+    }
+
+    .action-btn.danger:hover {
+      background: var(--amber-50);
+    }
+
+    .kbd {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      background: rgba(0,0,0,0.1);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .action-btn.primary .kbd {
+      background: rgba(255,255,255,0.2);
+    }
+
+    .action-divider {
+      width: 1px;
+      height: 32px;
+      background: var(--sand-200);
+      margin: 0 8px;
+    }
+
+    .keyboard-hint {
+      text-align: center;
+      font-size: 11px;
+      color: var(--sand-400);
+      margin-top: 12px;
+    }
+
+    .keyboard-hint kbd {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      background: var(--sand-200);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    /* Evidence Panel */
+    .evidence-panel {
+      background: var(--warm-white);
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(139,115,85,0.08);
+      overflow: hidden;
+    }
+
+    .evidence-header {
+      padding: 16px 20px;
+      background: var(--sand-50);
+      border-bottom: 1px solid var(--sand-200);
+    }
+
+    .evidence-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--sand-500);
+    }
+
+    .evidence-section {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--sand-100);
+    }
+
+    .evidence-section:last-child {
+      border-bottom: none;
+    }
+
+    .evidence-label {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--sand-400);
+      margin-bottom: 8px;
+    }
+
+    .evidence-link {
+      font-size: 12px;
+      color: var(--forest-500);
+      text-decoration: none;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .evidence-link:hover {
+      text-decoration: underline;
+    }
+
+    .mini-map {
+      width: 100%;
+      height: 160px;
+      background: var(--sand-100);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--sand-400);
+      font-size: 12px;
+    }
+
+    .json-preview {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      background: var(--sand-900);
+      color: var(--sand-300);
+      padding: 12px;
+      border-radius: 8px;
+      max-height: 200px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    /* Empty State */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 80px 40px;
+      text-align: center;
+    }
+
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+
+    .empty-state-title {
+      font-family: 'Libre Baskerville', serif;
+      font-size: 24px;
+      font-style: italic;
+      color: var(--sand-700);
+      margin-bottom: 8px;
+    }
+
+    .empty-state-text {
+      font-size: 14px;
+      color: var(--sand-500);
+    }
+
+    /* Streak Toast */
+    .streak-toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--forest-500);
+      color: white;
+      padding: 16px 24px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(74,124,89,0.3);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      animation: slideUp 0.3s ease;
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(20px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .streak-toast-icon {
+      font-size: 24px;
+    }
+
+    .streak-toast-text {
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .streak-toast-count {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    /* Demo Mode Banner */
+    .demo-banner {
+      background: var(--amber-50);
+      border-bottom: 1px solid var(--amber-500);
+      padding: 8px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--amber-600);
+    }
+
+    .demo-banner.connected {
+      background: var(--forest-50);
+      border-bottom-color: var(--forest-500);
+      color: var(--forest-600);
+    }
+
+    .demo-banner a {
+      color: inherit;
+      font-weight: 600;
+    }
+
+    .demo-banner code {
+      background: rgba(0,0,0,0.1);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useCallback } = React;
+
+    // ============================================================
+    // API CONFIGURATION
+    // ============================================================
+    
+    const API_CONFIG = {
+      // Change this to your Saiko API base URL
+      baseUrl: 'http://localhost:3000',
+      
+      // Set to false to use real API instead of mock data
+      useMockData: true,
+      
+      endpoints: {
+        queue: '/api/admin/review-queue',
+        resolve: '/api/admin/review-queue/{id}/resolve',
+        skip: '/api/admin/review-queue/{id}/skip',
+        stats: '/api/admin/stats',
+      }
+    };
+
+    // ============================================================
+    // API FUNCTIONS
+    // ============================================================
+
+    async function fetchQueue() {
+      if (API_CONFIG.useMockData) {
+        return { items: MOCK_QUEUE, stats: MOCK_STATS };
+      }
+      
+      const res = await fetch(`${API_CONFIG.baseUrl}${API_CONFIG.endpoints.queue}?status=pending&limit=20`);
+      if (!res.ok) throw new Error('Failed to fetch queue');
+      return res.json();
+    }
+
+    async function resolveItem(queueId, resolution) {
+      if (API_CONFIG.useMockData) {
+        console.log(`[Mock] Resolving ${queueId} as ${resolution}`);
+        return { success: true };
+      }
+      
+      const url = `${API_CONFIG.baseUrl}${API_CONFIG.endpoints.resolve.replace('{id}', queueId)}`;
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ resolution })
+      });
+      if (!res.ok) throw new Error('Failed to resolve item');
+      return res.json();
+    }
+
+    async function skipItem(queueId) {
+      if (API_CONFIG.useMockData) {
+        console.log(`[Mock] Skipping ${queueId}`);
+        return { success: true };
+      }
+      
+      const url = `${API_CONFIG.baseUrl}${API_CONFIG.endpoints.skip.replace('{id}', queueId)}`;
+      const res = await fetch(url, { method: 'POST' });
+      if (!res.ok) throw new Error('Failed to skip item');
+      return res.json();
+    }
+
+    // ============================================================
+    // MOCK DATA - Used when API_CONFIG.useMockData = true
+    // ============================================================
+    
+    const MOCK_QUEUE = [
+      {
+        queue_id: '1',
+        match_confidence: 0.78,
+        conflict_type: 'low_confidence_match',
+        recordA: {
+          source_name: 'editorial_eater',
+          source_url: 'https://eater.com/...',
+          name: 'The Bird',
+          address: '1355 Sunset Blvd',
+          neighborhood: 'Echo Park',
+          category: 'Wine Bar',
+          phone: null,
+        },
+        recordB: {
+          source_name: 'google_places',
+          source_url: null,
+          name: "Birdie's",
+          address: '1355 W Sunset Boulevard',
+          neighborhood: 'Echo Park',
+          category: 'Bar',
+          phone: '(323) 555-0123',
+        },
+        distanceMeters: 12,
+      },
+      {
+        queue_id: '2',
+        match_confidence: 0.85,
+        conflict_type: 'low_confidence_match',
+        recordA: {
+          source_name: 'editorial_infatuation',
+          source_url: 'https://infatuation.com/...',
+          name: 'Guisados',
+          address: '2100 E Cesar Chavez Ave',
+          neighborhood: 'Boyle Heights',
+          category: 'Tacos',
+          phone: '(323) 264-7201',
+        },
+        recordB: {
+          source_name: 'google_places',
+          source_url: null,
+          name: 'Guisados - Boyle Heights',
+          address: '2100 E César E Chávez Ave',
+          neighborhood: 'Boyle Heights',
+          category: 'Mexican Restaurant',
+          phone: '(323) 264-7201',
+        },
+        distanceMeters: 3,
+      },
+      {
+        queue_id: '3',
+        match_confidence: 0.72,
+        conflict_type: 'low_confidence_match',
+        recordA: {
+          source_name: 'editorial_latimes',
+          source_url: 'https://latimes.com/...',
+          name: 'Burritos La Palma',
+          address: '5120 Peck Rd',
+          neighborhood: 'El Monte',
+          category: 'Tacos',
+          phone: null,
+        },
+        recordB: {
+          source_name: 'google_places',
+          source_url: null,
+          name: 'La Palma Taqueria',
+          address: '5120 Peck Road',
+          neighborhood: 'El Monte',
+          category: 'Mexican',
+          phone: '(626) 350-8226',
+        },
+        distanceMeters: 45,
+      },
+    ];
+
+    const MOCK_STATS = {
+      pending: 47,
+      resolvedToday: 23,
+      autoLinked: 156,
+      totalGolden: 234,
+    };
+
+    // ============================================================
+    // COMPONENTS
+    // ============================================================
+
+    function Sidebar({ activeTab, setActiveTab, pendingCount }) {
+      return (
+        <div className="sidebar">
+          <div className="sidebar-logo">
+            <h1>Saiko</h1>
+            <span>Resolver Admin</span>
+          </div>
+          
+          <button 
+            className={`nav-item ${activeTab === 'review' ? 'active' : ''}`}
+            onClick={() => setActiveTab('review')}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+            </svg>
+            Review Queue
+            {pendingCount > 0 && <span className="nav-badge">{pendingCount}</span>}
+          </button>
+          
+          <button 
+            className={`nav-item ${activeTab === 'dashboard' ? 'active' : ''}`}
+            onClick={() => setActiveTab('dashboard')}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <rect x="3" y="3" width="7" height="7"/>
+              <rect x="14" y="3" width="7" height="7"/>
+              <rect x="14" y="14" width="7" height="7"/>
+              <rect x="3" y="14" width="7" height="7"/>
+            </svg>
+            Dashboard
+          </button>
+          
+          <button 
+            className={`nav-item ${activeTab === 'import' ? 'active' : ''}`}
+            onClick={() => setActiveTab('import')}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+              <polyline points="17 8 12 3 7 8"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+            Import CSV
+          </button>
+          
+          <button 
+            className={`nav-item ${activeTab === 'browse' ? 'active' : ''}`}
+            onClick={() => setActiveTab('browse')}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="11" cy="11" r="8"/>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            Browse Data
+          </button>
+        </div>
+      );
+    }
+
+    function StatsRow({ stats }) {
+      return (
+        <div className="stats-row">
+          <div className="stat-card">
+            <div className="stat-label">Pending Review</div>
+            <div className={`stat-value ${stats.pending > 20 ? 'amber' : ''}`}>
+              {stats.pending}
+            </div>
+            <div className="stat-change">items in queue</div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-label">Resolved Today</div>
+            <div className="stat-value green">{stats.resolvedToday}</div>
+            <div className="stat-change">manual decisions</div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-label">Auto-Linked</div>
+            <div className="stat-value">{stats.autoLinked}</div>
+            <div className="stat-change">via Placekey</div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-label">Golden Records</div>
+            <div className="stat-value">{stats.totalGolden}</div>
+            <div className="stat-change">total entities</div>
+          </div>
+        </div>
+      );
+    }
+
+    function FieldRow({ label, valA, valB, isName, winnerA }) {
+      const similarity = jaroWinkler(valA || '', valB || '');
+      const isMatch = similarity > 0.95;
+      const isConflict = similarity < 0.80 && valA && valB;
+      const isSimilar = !isMatch && !isConflict && valA && valB;
+
+      let rowClass = 'field-row';
+      if (isConflict) rowClass += ' conflict';
+      else if (isSimilar) rowClass += ' similar';
+
+      return (
+        <div className={rowClass}>
+          <div className="field-cell">
+            <div className="field-label">
+              {label}
+              {winnerA && <span className="winner">★</span>}
+            </div>
+            <div className={`field-value ${isName ? 'name' : ''} ${isConflict ? 'conflict' : ''} ${!valA ? 'empty' : ''}`}>
+              {valA || '—'}
+            </div>
+          </div>
+          <div className="field-cell">
+            <div className="field-label">
+              {!winnerA && valB && <span className="winner">★</span>}
+            </div>
+            <div className={`field-value ${isName ? 'name' : ''} ${isConflict ? 'conflict' : ''} ${!valB ? 'empty' : ''}`}>
+              {valB || '—'}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function ProximityBadge({ distanceMeters }) {
+      let label, className;
+      
+      if (distanceMeters < 20) {
+        label = `${distanceMeters}m — Likely same storefront`;
+        className = 'proximity-badge close';
+      } else if (distanceMeters < 50) {
+        label = `${distanceMeters}m — Same block`;
+        className = 'proximity-badge close';
+      } else if (distanceMeters < 100) {
+        label = `${distanceMeters}m — Nearby`;
+        className = 'proximity-badge medium';
+      } else {
+        label = `${distanceMeters}m — ⚠ Different blocks`;
+        className = 'proximity-badge far';
+      }
+
+      return <span className={className}>{label}</span>;
+    }
+
+    function GoldenPreview({ recordA, recordB }) {
+      // Apply survivorship rules for preview
+      const name = recordA.source_name.includes('editorial') ? recordA.name : recordB.name;
+      const address = recordB.source_name === 'google_places' ? recordB.address : recordA.address;
+      const neighborhood = recordA.neighborhood || recordB.neighborhood;
+
+      return (
+        <div className="golden-preview">
+          <div className="golden-preview-label">Result if merged</div>
+          <div className="golden-preview-name">{name}</div>
+          <div className="golden-preview-meta">{address} · {neighborhood}</div>
+        </div>
+      );
+    }
+
+    function EvidencePanel({ recordA, recordB }) {
+      return (
+        <div className="evidence-panel">
+          <div className="evidence-header">
+            <div className="evidence-title">Evidence</div>
+          </div>
+          
+          <div className="evidence-section">
+            <div className="evidence-label">Source Links</div>
+            {recordA.source_url && (
+              <a href={recordA.source_url} target="_blank" rel="noopener" className="evidence-link">
+                📄 {recordA.source_name.replace('editorial_', '').replace('_', ' ')}
+              </a>
+            )}
+            {recordB.source_url && (
+              <a href={recordB.source_url} target="_blank" rel="noopener" className="evidence-link">
+                📄 {recordB.source_name.replace('editorial_', '').replace('_', ' ')}
+              </a>
+            )}
+            {!recordA.source_url && !recordB.source_url && (
+              <span style={{ fontSize: '12px', color: 'var(--sand-400)' }}>No source links available</span>
+            )}
+          </div>
+          
+          <div className="evidence-section">
+            <div className="evidence-label">Map Preview</div>
+            <div className="mini-map">
+              🗺️ Map integration coming soon
+            </div>
+          </div>
+          
+          <div className="evidence-section">
+            <div className="evidence-label">Raw Data (Record A)</div>
+            <div className="json-preview">
+              {JSON.stringify(recordA, null, 2)}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function ReviewQueue({ queue, currentIndex, setCurrentIndex, onMerge, onDifferent, onSkip, onFlag, streak }) {
+      const currentItem = queue[currentIndex];
+
+      if (!currentItem) {
+        return (
+          <div className="review-card">
+            <div className="empty-state">
+              <div className="empty-state-icon">🎉</div>
+              <div className="empty-state-title">Queue empty!</div>
+              <div className="empty-state-text">All items have been reviewed. Great work!</div>
+            </div>
+          </div>
+        );
+      }
+
+      const { recordA, recordB, match_confidence, distanceMeters } = currentItem;
+
+      return (
+        <>
+          <div className="review-container">
+            <div>
+              <div className="review-card">
+                <div className="review-header">
+                  <div className="review-source">
+                    <div className="source-label">Record A</div>
+                    <div className="source-name">{formatSourceName(recordA.source_name)}</div>
+                  </div>
+                  <div className="review-source">
+                    <div className="source-label">Record B</div>
+                    <div className="source-name">{formatSourceName(recordB.source_name)}</div>
+                  </div>
+                </div>
+
+                <FieldRow 
+                  label="Name" 
+                  valA={recordA.name} 
+                  valB={recordB.name} 
+                  isName={true}
+                  winnerA={recordA.source_name.includes('editorial')}
+                />
+                <FieldRow 
+                  label="Address" 
+                  valA={recordA.address} 
+                  valB={recordB.address}
+                  winnerA={recordB.source_name !== 'google_places'}
+                />
+                <FieldRow 
+                  label="Neighborhood" 
+                  valA={recordA.neighborhood} 
+                  valB={recordB.neighborhood}
+                  winnerA={true}
+                />
+                <FieldRow 
+                  label="Category" 
+                  valA={recordA.category} 
+                  valB={recordB.category}
+                  winnerA={recordA.source_name.includes('editorial')}
+                />
+                <FieldRow 
+                  label="Phone" 
+                  valA={recordA.phone} 
+                  valB={recordB.phone}
+                  winnerA={recordB.source_name !== 'google_places'}
+                />
+
+                <div className="proximity-row">
+                  <ProximityBadge distanceMeters={distanceMeters} />
+                  <span className="confidence-label">
+                    Confidence: <span>{Math.round(match_confidence * 100)}%</span>
+                  </span>
+                </div>
+
+                <GoldenPreview recordA={recordA} recordB={recordB} />
+              </div>
+
+              <div className="action-bar">
+                <button className="action-btn primary" onClick={onMerge}>
+                  Same Place
+                  <span className="kbd">M</span>
+                </button>
+                <button className="action-btn secondary" onClick={onDifferent}>
+                  Different
+                  <span className="kbd">D</span>
+                </button>
+                
+                <div className="action-divider" />
+                
+                <button className="action-btn ghost" onClick={onSkip}>
+                  Skip
+                  <span className="kbd">S</span>
+                </button>
+                <button className="action-btn danger" onClick={onFlag}>
+                  Flag
+                  <span className="kbd">F</span>
+                </button>
+              </div>
+              
+              <div className="keyboard-hint">
+                Press <kbd>?</kbd> for all shortcuts · Item {currentIndex + 1} of {queue.length}
+                {streak > 0 && <span> · 🔥 {streak} streak</span>}
+              </div>
+            </div>
+
+            <EvidencePanel recordA={recordA} recordB={recordB} />
+          </div>
+        </>
+      );
+    }
+
+    function Dashboard({ stats }) {
+      return (
+        <div>
+          <div className="page-header">
+            <div>
+              <h1 className="page-title">Dashboard</h1>
+              <p className="page-subtitle">System health and activity overview</p>
+            </div>
+          </div>
+          
+          <StatsRow stats={stats} />
+          
+          <div className="review-card" style={{ padding: '40px', textAlign: 'center' }}>
+            <p style={{ color: 'var(--sand-500)' }}>
+              More dashboard widgets coming soon — backfill progress, data quality scores, recent activity.
+            </p>
+          </div>
+        </div>
+      );
+    }
+
+    function ImportTool() {
+      return (
+        <div>
+          <div className="page-header">
+            <div>
+              <h1 className="page-title">Import CSV</h1>
+              <p className="page-subtitle">Add new editorial sources to the resolver</p>
+            </div>
+          </div>
+          
+          <div className="review-card" style={{ padding: '60px', textAlign: 'center' }}>
+            <div style={{ fontSize: '48px', marginBottom: '16px' }}>📁</div>
+            <p style={{ fontSize: '16px', color: 'var(--sand-700)', marginBottom: '8px' }}>
+              Drag & drop a CSV file here
+            </p>
+            <p style={{ fontSize: '13px', color: 'var(--sand-500)' }}>
+              Expected columns: Name, Neighborhood, Category, Source, SourceURL
+            </p>
+          </div>
+        </div>
+      );
+    }
+
+    function DataBrowser() {
+      return (
+        <div>
+          <div className="page-header">
+            <div>
+              <h1 className="page-title">Browse Data</h1>
+              <p className="page-subtitle">Search and edit golden records</p>
+            </div>
+          </div>
+          
+          <div className="review-card" style={{ padding: '40px', textAlign: 'center' }}>
+            <p style={{ color: 'var(--sand-500)' }}>
+              Data browser coming soon — search merchants, view source attribution, edit fields.
+            </p>
+          </div>
+        </div>
+      );
+    }
+
+    function StreakToast({ count, onClose }) {
+      useEffect(() => {
+        const timer = setTimeout(onClose, 3000);
+        return () => clearTimeout(timer);
+      }, [onClose]);
+
+      return (
+        <div className="streak-toast">
+          <span className="streak-toast-icon">🔥</span>
+          <span className="streak-toast-text">Streak!</span>
+          <span className="streak-toast-count">{count}</span>
+        </div>
+      );
+    }
+
+    // ============================================================
+    // UTILITIES
+    // ============================================================
+
+    function jaroWinkler(s1, s2) {
+      // Simplified Jaro-Winkler - replace with proper library in production
+      if (s1 === s2) return 1;
+      if (!s1 || !s2) return 0;
+      
+      s1 = s1.toLowerCase();
+      s2 = s2.toLowerCase();
+      
+      if (s1 === s2) return 1;
+      
+      const len1 = s1.length;
+      const len2 = s2.length;
+      const matchWindow = Math.floor(Math.max(len1, len2) / 2) - 1;
+      
+      let matches = 0;
+      const s1Matches = new Array(len1).fill(false);
+      const s2Matches = new Array(len2).fill(false);
+      
+      for (let i = 0; i < len1; i++) {
+        const start = Math.max(0, i - matchWindow);
+        const end = Math.min(i + matchWindow + 1, len2);
+        
+        for (let j = start; j < end; j++) {
+          if (s2Matches[j] || s1[i] !== s2[j]) continue;
+          s1Matches[i] = true;
+          s2Matches[j] = true;
+          matches++;
+          break;
+        }
+      }
+      
+      if (matches === 0) return 0;
+      
+      let transpositions = 0;
+      let k = 0;
+      for (let i = 0; i < len1; i++) {
+        if (!s1Matches[i]) continue;
+        while (!s2Matches[k]) k++;
+        if (s1[i] !== s2[k]) transpositions++;
+        k++;
+      }
+      
+      const jaro = (matches / len1 + matches / len2 + (matches - transpositions / 2) / matches) / 3;
+      
+      // Winkler modification
+      let prefix = 0;
+      for (let i = 0; i < Math.min(4, Math.min(len1, len2)); i++) {
+        if (s1[i] === s2[i]) prefix++;
+        else break;
+      }
+      
+      return jaro + prefix * 0.1 * (1 - jaro);
+    }
+
+    function formatSourceName(name) {
+      return name
+        .replace('editorial_', '')
+        .replace('google_places', 'Google Places')
+        .replace('_', ' ')
+        .split(' ')
+        .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(' ');
+    }
+
+    // ============================================================
+    // MAIN APP
+    // ============================================================
+
+    function App() {
+      const [activeTab, setActiveTab] = useState('review');
+      const [queue, setQueue] = useState([]);
+      const [currentIndex, setCurrentIndex] = useState(0);
+      const [stats, setStats] = useState({ pending: 0, resolvedToday: 0, autoLinked: 0, totalGolden: 0 });
+      const [streak, setStreak] = useState(0);
+      const [showStreakToast, setShowStreakToast] = useState(false);
+      const [isLoading, setIsLoading] = useState(true);
+      const [error, setError] = useState(null);
+
+      // Load initial data
+      useEffect(() => {
+        loadQueue();
+      }, []);
+
+      const loadQueue = async () => {
+        setIsLoading(true);
+        setError(null);
+        try {
+          const data = await fetchQueue();
+          setQueue(data.items || MOCK_QUEUE);
+          if (data.stats) {
+            setStats(data.stats);
+          } else {
+            setStats(MOCK_STATS);
+          }
+        } catch (err) {
+          console.error('Failed to load queue:', err);
+          setError(err.message);
+          // Fall back to mock data
+          setQueue(MOCK_QUEUE);
+          setStats(MOCK_STATS);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
+      // Keyboard shortcuts
+      useEffect(() => {
+        const handleKeyDown = (e) => {
+          if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+          
+          switch (e.key.toLowerCase()) {
+            case 'm':
+              handleMerge();
+              break;
+            case 'd':
+              handleDifferent();
+              break;
+            case 's':
+              handleSkip();
+              break;
+            case 'f':
+              handleFlag();
+              break;
+            case 'n':
+            case 'arrowright':
+              goNext();
+              break;
+            case 'p':
+            case 'arrowleft':
+              goPrevious();
+              break;
+            case 'r':
+              loadQueue(); // Refresh
+              break;
+          }
+        };
+        
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+      }, [currentIndex, queue, streak]);
+
+      const goNext = () => {
+        if (currentIndex < queue.length - 1) {
+          setCurrentIndex(prev => prev + 1);
+        }
+      };
+
+      const goPrevious = () => {
+        if (currentIndex > 0) {
+          setCurrentIndex(prev => prev - 1);
+        }
+      };
+
+      const incrementStreak = () => {
+        const newStreak = streak + 1;
+        setStreak(newStreak);
+        
+        if (newStreak % 10 === 0) {
+          setShowStreakToast(true);
+        }
+      };
+
+      const handleMerge = useCallback(async () => {
+        const item = queue[currentIndex];
+        if (!item) return;
+        
+        // Optimistic update
+        incrementStreak();
+        setStats(prev => ({ ...prev, pending: prev.pending - 1, resolvedToday: prev.resolvedToday + 1 }));
+        goNext();
+        
+        // API call in background
+        try {
+          await resolveItem(item.queue_id, 'merged');
+        } catch (err) {
+          console.error('Failed to merge:', err);
+          // Could add a toast/retry here
+        }
+      }, [currentIndex, queue, streak]);
+
+      const handleDifferent = useCallback(async () => {
+        const item = queue[currentIndex];
+        if (!item) return;
+        
+        incrementStreak();
+        setStats(prev => ({ ...prev, pending: prev.pending - 1, resolvedToday: prev.resolvedToday + 1 }));
+        goNext();
+        
+        try {
+          await resolveItem(item.queue_id, 'kept_separate');
+        } catch (err) {
+          console.error('Failed to mark different:', err);
+        }
+      }, [currentIndex, queue, streak]);
+
+      const handleSkip = useCallback(async () => {
+        const item = queue[currentIndex];
+        if (!item) return;
+        
+        goNext();
+        
+        try {
+          await skipItem(item.queue_id);
+        } catch (err) {
+          console.error('Failed to skip:', err);
+        }
+      }, [currentIndex, queue]);
+
+      const handleFlag = useCallback(async () => {
+        const item = queue[currentIndex];
+        if (!item) return;
+        
+        goNext();
+        
+        try {
+          await resolveItem(item.queue_id, 'flagged');
+        } catch (err) {
+          console.error('Failed to flag:', err);
+        }
+      }, [currentIndex, queue]);
+
+      const bannerClass = API_CONFIG.useMockData ? 'demo-banner' : 'demo-banner connected';
+      const bannerText = API_CONFIG.useMockData 
+        ? <>⚠️ Demo Mode — Edit <code>API_CONFIG.useMockData = false</code> and set your API URL to connect</>
+        : <>✓ Connected to <code>{API_CONFIG.baseUrl}</code></>;
+
+      return (
+        <>
+          <div className={bannerClass}>
+            {bannerText}
+          </div>
+          
+          <div className="app-container">
+            <Sidebar 
+              activeTab={activeTab} 
+              setActiveTab={setActiveTab}
+              pendingCount={stats.pending}
+            />
+            
+            <div className="main-content">
+              {activeTab === 'review' && (
+                <>
+                  <div className="page-header">
+                    <div>
+                      <h1 className="page-title">Review Queue</h1>
+                      <p className="page-subtitle">Resolve ambiguous entity matches · Press <kbd style={{background:'var(--sand-200)',padding:'2px 6px',borderRadius:'4px',fontFamily:'JetBrains Mono',fontSize:'11px'}}>R</kbd> to refresh</p>
+                    </div>
+                  </div>
+                  <StatsRow stats={stats} />
+                  {isLoading ? (
+                    <div className="review-card" style={{ padding: '60px', textAlign: 'center' }}>
+                      <p style={{ color: 'var(--sand-500)' }}>Loading queue...</p>
+                    </div>
+                  ) : (
+                    <ReviewQueue 
+                      queue={queue}
+                      currentIndex={currentIndex}
+                      setCurrentIndex={setCurrentIndex}
+                      onMerge={handleMerge}
+                      onDifferent={handleDifferent}
+                      onSkip={handleSkip}
+                      onFlag={handleFlag}
+                      streak={streak}
+                    />
+                  )}
+                </>
+              )}
+              
+              {activeTab === 'dashboard' && <Dashboard stats={stats} />}
+              {activeTab === 'import' && <ImportTool />}
+              {activeTab === 'browse' && <DataBrowser />}
+            </div>
+          </div>
+          
+          {showStreakToast && (
+            <StreakToast 
+              count={streak} 
+              onClose={() => setShowStreakToast(false)} 
+            />
+          )}
+        </>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
