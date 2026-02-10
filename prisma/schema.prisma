@@ -489,6 +489,39 @@ model golden_records {
   data_completeness Decimal? @db.Decimal(3, 2) // 0.00 to 1.00
   source_count    Int      @default(1)
   
+  // Menu & Wine List Scraper Fields
+  menu_url           String?    // Discovered menu page URL
+  menu_source_url    String?    // Page where menu link was found
+  menu_raw_text      String?    // Extracted menu content for AI processing
+  winelist_url       String?    // Discovered wine list URL
+  winelist_source_url String?   // Page where wine list link was found
+  winelist_raw_text  String?    // Extracted wine list content
+  about_copy         String?    // "Our Story" / "About Us" content
+  about_source_url   String?    // URL of about page
+  scraped_at         DateTime?  // Last successful scrape timestamp
+  scrape_status      String?    // 'success' | 'partial' | 'blocked' | 'timeout' | 'failed'
+  
+  // Identity Signal Fields (AI-extracted from scraped content)
+  cuisine_posture      String?   // produce-driven | protein-centric | carb-forward | seafood-focused | balanced
+  service_model        String?   // tasting-menu | a-la-carte | small-plates | family-style | counter
+  price_tier           String?   // $ | $$ | $$$ | $$$$
+  wine_program_intent  String?   // natural | classic | eclectic | minimal | none
+  place_personality    String?   // neighborhood-joint | destination | chef-driven | scene | hidden-gem | institution
+  identity_signals     Json?     // Extended signals: signature_dishes, key_producers, vibe_words, etc.
+  signals_generated_at DateTime? // When signals were extracted
+  signals_version      Int?      // Increment when extraction prompt changes
+  signals_reviewed     Boolean   @default(false)
+  signals_reviewed_by  String?
+  signals_reviewed_at  DateTime?
+  
+  // Voice Engine v2.0 — Tagline Fields
+  tagline              String?
+  tagline_candidates   String[]  @default([])
+  tagline_pattern      String?   // 'food' | 'neighborhood' | 'vibe' | 'authority'
+  tagline_generated_at DateTime?
+  tagline_signals      Json?     // Snapshot of identity signals used for generation
+  tagline_version      Int?      // Voice engine version (2)
+  
   // Relations
   entity_links    entity_links[]
   review_queue    review_queue[]

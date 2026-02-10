@@ -44,6 +44,46 @@ export async function GET(
       );
     }
 
+    // Fetch identity signals for places
+    const googlePlaceIds = list.mapPlaces
+      .map(mp => mp.place.googlePlaceId)
+      .filter((id): id is string => id !== null);
+    
+    const identitySignals = await db.goldenRecord.findMany({
+      where: {
+        googlePlaceId: { in: googlePlaceIds },
+      },
+      select: {
+        googlePlaceId: true,
+        placePersonality: true,
+        priceTier: true,
+      },
+    });
+    
+    // Build map of google_place_id -> identity signals
+    const signalsMap = new Map<string, { placePersonality: string | null; priceTier: string | null }>();
+    identitySignals.forEach(record => {
+      if (record.googlePlaceId) {
+        signalsMap.set(record.googlePlaceId, {
+          placePersonality: record.placePersonality,
+          priceTier: record.priceTier,
+        });
+      }
+    });
+    
+    // Enrich mapPlaces with identity signals
+    const enrichedMapPlaces = list.mapPlaces.map(mp => {
+      const signals = mp.place.googlePlaceId ? signalsMap.get(mp.place.googlePlaceId) : null;
+      return {
+        ...mp,
+        place: {
+          ...mp.place,
+          placePersonality: signals?.placePersonality || null,
+          priceTier: signals?.priceTier || null,
+        },
+      };
+    });
+
     // Check if current user is the owner (or dev override: ?devOwner=1 in development)
     const isOwner = devOwner || session?.user?.id === list.userId;
 
@@ -51,6 +91,7 @@ export async function GET(
       success: true,
       data: {
         ...list,
+        mapPlaces: enrichedMapPlaces,
         creatorName: list.user.name || list.user.email.split('@')[0], // Use name or email prefix
         isOwner, // Include ownership flag
       },

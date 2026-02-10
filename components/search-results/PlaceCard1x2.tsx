@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { PlaceCardData } from './types';
+import { PlaceCardData, getPersonalityLabel } from './types';
 
 interface PlaceCard1x2Props {
   place: PlaceCardData;
@@ -22,7 +22,10 @@ export function PlaceCard1x2({ place }: PlaceCard1x2Props) {
     signals = [],
     coverageQuote,
     distanceMiles,
+    placePersonality,
   } = place;
+  
+  const personalityLabel = getPersonalityLabel(placePersonality);
 
   const placeholderGradient = 'linear-gradient(135deg, #E8E2D4, #D4CFC0)';
 
@@ -126,6 +129,7 @@ export function PlaceCard1x2({ place }: PlaceCard1x2Props) {
           {neighborhood && ` · ${neighborhood}`}
           {cuisine && ` · ${cuisine}`}
           {price && ` · ${price}`}
+          {personalityLabel && ` · ${personalityLabel}`}
         </div>
 
         {/* Coverage quote */}

@@ -1,0 +1,215 @@
+{
+  "exported_at": "2026-02-10T18:11:37.136Z",
+  "count": 19,
+  "records": [
+    {
+      "canonical_id": "242ad0cc-fa97-483e-b011-2717d5708245",
+      "name": "85°C Bakery Cafe - Alhambra",
+      "slug": "85c-bakery-cafe-alhambra-alhambra",
+      "website": "http://www.85cbakerycafe.com/",
+      "category": "coffee",
+      "neighborhood": "Alhambra",
+      "instagram_handle": "85cbakerycafe",
+      "vibe_tags": [],
+      "data_completeness": "0.71"
+    },
+    {
+      "canonical_id": "51d116e5-e624-4b31-ace0-a73276ba08ea",
+      "name": "A&J seafood shack",
+      "slug": "aandj-seafood-shack-eastside",
+      "website": "http://ajseafoodshack.com/",
+      "category": "eat",
+      "neighborhood": "Eastside",
+      "instagram_handle": "ajseafoodshack",
+      "vibe_tags": [],
+      "data_completeness": "0.71"
+    },
+    {
+      "canonical_id": "b692b580-2f4f-44aa-8a5f-2c25fc597dfd",
+      "name": "Abbot's Pizza Company",
+      "slug": "abbots-pizza-company-venice",
+      "website": "http://www.abbotspizzaco.com/",
+      "category": "eat",
+      "neighborhood": "Venice",
+      "instagram_handle": "abbotspizzaco95",
+      "vibe_tags": [],
+      "data_completeness": "0.71"
+    },
+    {
+      "canonical_id": "a72f33c9-e4a1-4726-9c5c-3bc807c93394",
+      "name": "Aburiya Raku",
+      "slug": "aburiya-raku-central-la",
+      "website": "http://aburiyarakula.wixsite.com/weho",
+      "category": "eat",
+      "neighborhood": "Central LA",
+      "instagram_handle": "aburiyaraku",
+      "vibe_tags": [],
+      "data_completeness": "0.71"
+    },
+    {
+      "canonical_id": "142bf2a8-584b-44a1-81da-f1a5164cb515",
+      "name": "Ackee Bamboo Jamaican Cuisine",
+      "slug": "ackee-bamboo-jamaican-cuisine-beverlywood-2",
+      "website": "http://www.ackeebamboo.com/",
+      "category": "eat",
+      "neighborhood": "Beverlywood",
+      "instagram_handle": "ckeebamboo",
+      "vibe_tags": [],
+      "data_completeness": "0.71"
+    },
+    {
+      "canonical_id": "846afeb1-1075-4ce0-a0f9-dcbca82ee32f",
+      "name": "Adams Wine Shop",
+      "slug": "adams-wine-shop-los-angeles",
+      "website": "https://adamswineshop.com/",
+      "category": "wine",
+      "neighborhood": "Los Angeles",
+      "instagram_handle": "adamswineshop",
+      "vibe_tags": [],
+      "data_completeness": "0.71"
+    },
+    {
+      "canonical_id": "4580428b-1d0a-42a3-bb43-e5617a07ff2b",
+      "name": "Agnes Restaurant & Cheesery",
+      "slug": "agnes-restaurant-and-cheesery-south-arroyo",
+      "website": "https://www.agnesla.com/",
+      "category": "eat",
+      "neighborhood": "South Arroyo",
+      "instagram_handle": "alandbeas",
+      "vibe_tags": [],
+      "data_completeness": "0.71"
+    },
+    {
+      "canonical_id": "5716df92-8068-4451-accf-b477e4c2bc88",
+      "name": "Al & Bea's Mexican Food",
+      "slug": "al-and-beas-mexican-food-central-la",
+      "website": "http://www.alandbeas.com/",
+      "category": "eat",
+      "neighborhood": "Central LA",
+      "instagram_handle": "alandbeas",
+      "vibe_tags": [],
+      "data_completeness": "0.71"
+    },
+    {
+      "canonical_id": "b5e9e2a7-0637-4307-aa9f-ca41d5cb64fe",
+      "name": "Al-Noor Indian Pakistani Halal",
+      "slug": "al-noor-indian-pakistani-halal-lawndale-2",
+      "website": "http://www.alnoor-restaurant.net/",
+      "category": "eat",
+      "neighborhood": "Lawndale",
+      "instagram_handle": "alnoor.restaurant",
+      "vibe_tags": [],
+      "data_completeness": "0.71"
+    },
+    {
+      "canonical_id": "e7f0c2db-fe00-45b6-a125-7db1d0bcb64c",
+      "name": "Alta Adams",
+      "slug": "alta-adams-los-angeles-2",
+      "website": "http://altaadams.com/",
+      "category": "eat",
+      "neighborhood": "Los Angeles",
+      "instagram_handle": "altaadams",
+      "vibe_tags": [],
+      "data_completeness": "0.71"
+    },
+    {
+      "canonical_id": "d780267c-1a3f-4ed6-937e-76705c6339a4",
+      "name": "American Deli",
+      "slug": "american-deli-inglewood-2",
+      "website": "https://americandeli.com/",
+      "category": "eat",
+      "neighborhood": "Inglewood",
+      "instagram_handle": "americandeli",
+      "vibe_tags": [],
+      "data_completeness": "0.71"
+    },
+    {
+      "canonical_id": "cc131b56-b3ea-471a-9029-38379bd26a70",
+      "name": "Anajak Thai Cuisine",
+      "slug": "anajak-thai-cuisine-sherman-oaks-2",
+      "website": "http://www.anajakthai.com/",
+      "category": "drinks",
+      "neighborhood": "Sherman Oaks",
+      "instagram_handle": "anajak_thai",
+      "vibe_tags": [],
+      "data_completeness": "0.71"
+    },
+    {
+      "canonical_id": "30d47f1c-0bac-4722-8ee6-f102ad029014",
+      "name": "Angelini Osteria",
+      "slug": "angelini-osteria-fairfax-2",
+      "website": "http://www.angelinibeverly.com/",
+      "category": "eat",
+      "neighborhood": "Fairfax",
+      "instagram_handle": "angeliniosteria",
+      "vibe_tags": [],
+      "data_completeness": "0.71"
+    },
+    {
+      "canonical_id": "108365ca-5fca-4a18-bd21-7b4d16cf8bc0",
+      "name": "Antico Nuovo",
+      "slug": "antico-nuovo-larchmont-2",
+      "website": "https://www.anticonuovo-la.com/",
+      "category": "eat",
+      "neighborhood": "Larchmont",
+      "instagram_handle": "anticonuovo",
+      "vibe_tags": [],
+      "data_completeness": "0.71"
+    },
+    {
+      "canonical_id": "ee3bba3b-96ea-4b5e-9ce8-39af6d7c3419",
+      "name": "Apollonia's Pizzeria",
+      "slug": "apollonias-pizzeria-central-la",
+      "website": "http://www.apolloniaspizzeria.com/",
+      "category": "eat",
+      "neighborhood": "Central LA",
+      "instagram_handle": "apolloniaspizzeria",
+      "vibe_tags": [],
+      "data_completeness": "0.71"
+    },
+    {
+      "canonical_id": "efc58c1c-2804-46f1-947c-9f554e1d7d99",
+      "name": "Arnold's Beach Bar",
+      "slug": "arnolds-beach-bar-waikiki",
+      "website": "https://m.facebook.com/Arnoldswaikiki/",
+      "category": "drinks",
+      "neighborhood": "Waikiki",
+      "instagram_handle": "arnoldsbeachbar",
+      "vibe_tags": [],
+      "data_completeness": "0.71"
+    },
+    {
+      "canonical_id": "b18cf046-5ec2-4e92-89d5-b22eccca0aef",
+      "name": "Art's Bakery & Cafe",
+      "slug": "arts-bakery-and-cafe-adams-hill",
+      "website": "http://artsbakeryglendale.com/",
+      "category": "coffee",
+      "neighborhood": "Adams Hill",
+      "instagram_handle": "artsbakerycafe",
+      "vibe_tags": [],
+      "data_completeness": "0.71"
+    },
+    {
+      "canonical_id": "12adf2c8-2ffe-4e00-844f-a6429bcb1e0d",
+      "name": "Atlantic Seafood and Dim Sum",
+      "slug": "atlantic-seafood-and-dim-sum-monterey-park-2",
+      "website": "https://atlanticseafooddimsum.shop/",
+      "category": "eat",
+      "neighborhood": "Monterey Park",
+      "instagram_handle": "NONE",
+      "vibe_tags": [],
+      "data_completeness": "0.71"
+    },
+    {
+      "canonical_id": "b9582255-1d34-4f05-9043-c42fa2ec4115",
+      "name": "Augustine Wine Bar",
+      "slug": "augustine-wine-bar-sherman-oaks",
+      "website": "http://www.augustinewinebar.com/",
+      "category": "Wine Bar",
+      "neighborhood": "Sherman Oaks",
+      "instagram_handle": "augustinewinebar",
+      "vibe_tags": [],
+      "data_completeness": "0.71"
+    }
+  ]
+}

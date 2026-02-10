@@ -133,6 +133,7 @@ export async function GET(request: NextRequest) {
         vibeTags: true,
         latitude: true,
         longitude: true,
+        googlePlaceId: true, // Need this to join with golden_records
         
         // Photos
         googlePhotos: true,
@@ -154,6 +155,29 @@ export async function GET(request: NextRequest) {
       },
       take: 50, // Get more for ranking
     })
+    
+    // Fetch identity signals for places that have google_place_id
+    const googlePlaceIds = places
+      .map(p => p.googlePlaceId)
+      .filter((id): id is string => id !== null);
+    
+    const identitySignals = await prisma.golden_records.findMany({
+      where: {
+        google_place_id: { in: googlePlaceIds },
+      },
+      select: {
+        google_place_id: true,
+        place_personality: true,
+      },
+    });
+    
+    // Build map of google_place_id -> place_personality
+    const personalityMap = new Map<string, string | null>();
+    identitySignals.forEach(record => {
+      if (record.google_place_id) {
+        personalityMap.set(record.google_place_id, record.place_personality);
+      }
+    });
 
     // Helper: Calculate distance in miles
     const calculateDistance = (lat1: number | null, lng1: number | null, lat2: any, lng2: any): number | undefined => {
@@ -206,13 +230,16 @@ export async function GET(request: NextRequest) {
       })
       .sort((a, b) => b.score - a.score)
       .slice(0, 12) // Get top 12 for bento grid
-      .map(({ score, id, ...place }) => {
+      .map(({ score, id, googlePlaceId, ...place }) => {
         // Transform to PlaceCardData format
         const photoUrl = getFirstPhotoUrl(place.googlePhotos);
         const status = getOpenStatus(place.hours);
         const signals = extractSignals(place);
         const price = mapPriceLevel(place.priceLevel);
         const distanceMiles = calculateDistance(userLat, userLng, place.latitude, place.longitude);
+        
+        // Get place_personality from map
+        const placePersonality = googlePlaceId ? personalityMap.get(googlePlaceId) : null;
         
         return {
           slug: place.slug,
@@ -228,6 +255,7 @@ export async function GET(request: NextRequest) {
           coverageSource: place.pullQuoteSource,
           vibeTags: place.vibeTags?.slice(0, 3), // Max 3 tags
           distanceMiles: distanceMiles !== undefined ? parseFloat(distanceMiles.toFixed(1)) : undefined,
+          placePersonality: placePersonality as any, // Add personality
         };
       })
 

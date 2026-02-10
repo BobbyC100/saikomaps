@@ -3,6 +3,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { Instagram, Link2, Pencil, RefreshCw } from 'lucide-react';
 import { type MapTemplate } from '@/lib/map-templates';
+import { generateMapSummary } from '@/lib/map-identity-summary';
 
 interface TitleCardProps {
   mapData: {
@@ -17,7 +18,11 @@ interface TitleCardProps {
     creatorName: string;
     createdAt: string | Date;
     updatedAt: string | Date;
-    locations: Array<{ category?: string | null }>;
+    locations: Array<{ 
+      category?: string | null;
+      placePersonality?: string | null;
+      priceTier?: string | null;
+    }>;
     slug: string;
   };
   isOwner: boolean;
@@ -274,6 +279,32 @@ export function TitleCard({ mapData, isOwner, template, onEdit, onDescriptionUpd
       >
         {mapData.title}
       </h1>
+
+      {/* Map Identity Summary (auto-generated) */}
+      {(() => {
+        const places = mapData.locations.map(loc => ({
+          place_personality: loc.placePersonality || null,
+          price_tier: loc.priceTier || null,
+        }));
+        const summary = generateMapSummary(places);
+        
+        if (summary) {
+          return (
+            <p
+              style={{
+                fontSize: '13px',
+                fontFamily: '"DM Sans", sans-serif',
+                color: '#888',
+                lineHeight: 1.5,
+                margin: '0 0 14px 0',
+              }}
+            >
+              {summary}
+            </p>
+          );
+        }
+        return null;
+      })()}
 
       {/* Map description (AI-generated or edited) */}
       {(mapData.description || isEditingDescription || (isOwner && !mapData.description)) && (
