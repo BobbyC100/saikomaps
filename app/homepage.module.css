@@ -1,0 +1,47 @@
+.page {
+  background: var(--parchment);
+  color: var(--charcoal);
+}
+
+.section {
+  padding: 56px 32px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.neighborhoodGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.categorySection {
+  background: var(--warm-white);
+  padding: 56px 0;
+}
+
+.categoryGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+@media (max-width: 1000px) {
+  .neighborhoodGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .categoryGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .neighborhoodGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .categoryGrid {
+    grid-template-columns: 1fr;
+  }
+}

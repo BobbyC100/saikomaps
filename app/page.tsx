@@ -1,51 +1,172 @@
-'use client'
-
-import Link from 'next/link'
-import { GlobalHeader } from '@/components/layouts/GlobalHeader'
-import { GlobalFooter } from '@/components/layouts/GlobalFooter'
+import { Hero } from '@/components/homepage/Hero'
+import { SearchBar } from '@/components/homepage/SearchBar'
+import { BrowseSection } from '@/components/homepage/BrowseSection'
+import { SectionHeader } from '@/components/homepage/SectionHeader'
+import { NeighborhoodCard } from '@/components/homepage/NeighborhoodCard'
+import { CategoryCard } from '@/components/homepage/CategoryCard'
+import { HomepageFooter } from '@/components/homepage/HomepageFooter'
+import styles from './homepage.module.css'
 
 export default function Home() {
+  const browseColumns = [
+    {
+      label: 'Neighborhood',
+      href: '/explore?view=neighborhoods',
+      card: {
+        name: 'Echo Park',
+        count: 31,
+        imageUrl: 'https://images.unsplash.com/photo-1559329007-40df8a9345d8?w=600&h=450&fit=crop',
+        href: '/explore?neighborhood=echo-park'
+      }
+    },
+    {
+      label: 'Cuisine',
+      href: '/explore?view=cuisine',
+      card: {
+        name: 'Korean',
+        count: 24,
+        imageUrl: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&h=450&fit=crop',
+        href: '/explore?cuisine=korean'
+      }
+    },
+    {
+      label: 'Collection',
+      href: '/explore?view=collections',
+      card: {
+        name: 'Date Night',
+        count: 24,
+        imageUrl: 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=600&h=450&fit=crop',
+        href: '/explore?experience=date-night'
+      }
+    },
+    {
+      label: 'Experience',
+      href: '/explore?view=experience',
+      card: {
+        name: 'Late Night',
+        count: 22,
+        imageUrl: 'https://images.unsplash.com/photo-1504718855392-c0f33b372e72?w=600&h=450&fit=crop',
+        href: '/explore?experience=late-night'
+      }
+    }
+  ]
+
+  const neighborhoods = [
+    {
+      name: 'Echo Park',
+      count: 31,
+      imageUrl: 'https://images.unsplash.com/photo-1559329007-40df8a9345d8?w=600&h=450&fit=crop',
+      href: '/explore?neighborhood=echo-park'
+    },
+    {
+      name: 'Highland Park',
+      count: 28,
+      imageUrl: 'https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=600&h=450&fit=crop',
+      href: '/explore?neighborhood=highland-park'
+    },
+    {
+      name: 'Koreatown',
+      count: 67,
+      imageUrl: 'https://images.unsplash.com/photo-1498654896293-37aacf113fd9?w=600&h=450&fit=crop',
+      href: '/explore?neighborhood=koreatown'
+    },
+    {
+      name: 'San Gabriel Valley',
+      count: 53,
+      imageUrl: 'https://images.unsplash.com/photo-1552566626-52f8b828add9?w=600&h=450&fit=crop',
+      href: '/explore?neighborhood=san-gabriel-valley'
+    }
+  ]
+
+  const categories = [
+    {
+      title: 'Wine',
+      description: 'Natural pours and neighborhood gems',
+      count: 19,
+      imageUrl: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=600&h=375&fit=crop',
+      href: '/explore?category=wine'
+    },
+    {
+      title: 'Coffee',
+      description: 'Third wave pours and quiet corners',
+      count: 38,
+      imageUrl: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600&h=375&fit=crop',
+      href: '/explore?category=coffee'
+    },
+    {
+      title: 'Cheese Shops',
+      description: 'Curated selections and expert picks',
+      count: 8,
+      imageUrl: 'https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?w=600&h=375&fit=crop',
+      href: '/explore?category=cheese-shops'
+    },
+    {
+      title: 'Late Night',
+      description: 'Open past midnight when you need it',
+      count: 24,
+      imageUrl: 'https://images.unsplash.com/photo-1504718855392-c0f33b372e72?w=600&h=375&fit=crop',
+      href: '/explore?category=late-night'
+    }
+  ]
+
+  const experiences = [
+    { name: 'Date Night', count: 24, imageUrl: 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=600&h=450&fit=crop', href: '/explore?experience=date-night' },
+    { name: 'Solo Dinner', count: 18, imageUrl: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&h=450&fit=crop', href: '/explore?experience=solo-dinner' },
+    { name: 'Group Night', count: 31, imageUrl: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=600&h=450&fit=crop', href: '/explore?experience=group-night' },
+    { name: 'Late Night', count: 22, imageUrl: 'https://images.unsplash.com/photo-1504718855392-c0f33b372e72?w=600&h=450&fit=crop', href: '/explore?experience=late-night' },
+    { name: 'Patio', count: 28, imageUrl: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600&h=450&fit=crop', href: '/explore?experience=patio' },
+    { name: 'Celebration', count: 19, imageUrl: 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=600&h=450&fit=crop', href: '/explore?experience=celebration' }
+  ]
+
   return (
-    <div className="min-h-screen bg-white flex flex-col">
-      <GlobalHeader variant="default" />
-      <main className="flex-1 max-w-6xl mx-auto px-8 pt-16 pb-24">
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
-          <div>
-            <h1 className="text-5xl lg:text-6xl font-bold text-[#1A1A1A] leading-tight mb-6">
-              Share places<br />
-              <span style={{ color: '#E07A5F' }}>worth finding.</span>
-            </h1>
-            <p className="text-xl text-[#6B6B6B] mb-10 max-w-md">
-              Create cool, personal maps in minutes. Pick a vibe, drop your spots, share the link.
-            </p>
-            <Link 
-              href="/maps/new" 
-              className="inline-block px-8 py-4 bg-[#E07A5F] text-white font-bold text-lg hover:bg-[#D06A4F] transition-colors"
-              style={{ borderRadius: '2px' }}
-            >
-              Start a Map
-            </Link>
-          </div>
-          <div className="relative hidden lg:block">
-            <div className="relative w-full aspect-square flex items-center justify-center">
-              {/* The Fold Logo - Large Version */}
-              <svg width="240" height="200" viewBox="0 0 38 32" fill="none">
-                <path d="M2 4 L13 2 L25 4 L36 2 L36 28 L25 30 L13 28 L2 30 Z" fill="#FFFFFF" stroke="#1A1A1A" strokeWidth="1.2"/>
-                <line x1="13" y1="2" x2="13" y2="28" stroke="#E5E5E5" strokeWidth="0.8" strokeDasharray="2 2"/>
-                <line x1="25" y1="4" x2="25" y2="30" stroke="#E5E5E5" strokeWidth="0.8" strokeDasharray="2 2"/>
-                <path d="M25 8.5 C24 7.5 21 6 18 6.5 C14.5 7 13 9 13 11 C13 13.5 15.5 14.5 19 15.5 C22.5 16.5 25 17.5 25 20.5 C25 23 23 25.5 19 26 C15.5 26.5 13 25 12 24" stroke="#E07A5F" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
-                <circle cx="25" cy="8.5" r="2.2" fill="#E07A5F"/>
-                <circle cx="25" cy="8.5" r="0.9" fill="#FFFFFF"/>
-                <circle cx="19" cy="16" r="1.6" fill="#E07A5F"/>
-                <circle cx="19" cy="16" r="0.6" fill="#FFFFFF"/>
-                <circle cx="12" cy="24" r="2.2" fill="#E07A5F"/>
-                <circle cx="12" cy="24" r="0.9" fill="#FFFFFF"/>
-              </svg>
-            </div>
+    <div className={styles.page}>
+      <Hero />
+      <SearchBar />
+      
+      <BrowseSection columns={browseColumns} seeAllHref="/explore" />
+
+      <section className={styles.section}>
+        <SectionHeader 
+          title="BY NEIGHBORHOOD" 
+          linkText="See all" 
+          linkHref="/explore?view=neighborhoods" 
+        />
+        <div className={styles.neighborhoodGrid}>
+          {neighborhoods.map((neighborhood) => (
+            <NeighborhoodCard key={neighborhood.name} {...neighborhood} />
+          ))}
+        </div>
+      </section>
+
+      <section className={styles.categorySection}>
+        <div className={styles.section}>
+          <SectionHeader 
+            title="BY CATEGORY" 
+            linkText="See all" 
+            linkHref="/explore?filter=categories" 
+          />
+          <div className={styles.categoryGrid}>
+            {categories.map((category) => (
+              <CategoryCard key={category.title} {...category} />
+            ))}
           </div>
         </div>
-      </main>
-      <GlobalFooter variant="standard" />
+      </section>
+
+      <section className={styles.section}>
+        <SectionHeader 
+          title="BY EXPERIENCE" 
+          linkText="See all" 
+          linkHref="/explore?view=experience" 
+        />
+        <div className={styles.neighborhoodGrid}>
+          {experiences.map((experience) => (
+            <NeighborhoodCard key={experience.name} {...experience} />
+          ))}
+        </div>
+      </section>
+
+      <HomepageFooter />
     </div>
   )
 }
