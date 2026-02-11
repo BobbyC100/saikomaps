@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Saiko Maps — Explore Wireframe v1</title>
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --parchment: #F5F0E1;
+      --warm-white: #FFFDF7;
+      --charcoal: #36454F;
+      --khaki: #C3B091;
+      --leather: #8B7355;
+      --brand-red: #D64541;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--parchment);
+      color: var(--charcoal);
+      min-height: 100vh;
+    }
+
+    /* ============================================
+       WIREFRAME STYLING — intentionally sparse
+       Gray boxes with labels, no polish
+       ============================================ */
+    
+    .wire-box {
+      background: rgba(54, 69, 79, 0.08);
+      border: 1px dashed rgba(54, 69, 79, 0.25);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--leather);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .wire-text {
+      background: rgba(54, 69, 79, 0.15);
+      height: 8px;
+      border-radius: 2px;
+    }
+
+    .wire-text.short { width: 60px; }
+    .wire-text.medium { width: 120px; }
+    .wire-text.long { width: 200px; }
+
+    /* ============================================
+       HEADER — minimal
+       ============================================ */
+    
+    .header {
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(195, 176, 145, 0.2);
+    }
+
+    .logo {
+      font-family: 'Libre Baskerville', serif;
+      font-size: 18px;
+      font-style: italic;
+      color: var(--charcoal);
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .header-actions .wire-box {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+    }
+
+    /* ============================================
+       SEARCH BAR — prominent
+       ============================================ */
+    
+    .search-section {
+      padding: 32px 24px 24px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .search-bar {
+      background: var(--warm-white);
+      border: 1px solid rgba(195, 176, 145, 0.3);
+      border-radius: 12px;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 2px 8px rgba(139, 115, 85, 0.06);
+    }
+
+    .search-icon {
+      width: 20px;
+      height: 20px;
+      opacity: 0.4;
+    }
+
+    .search-input {
+      flex: 1;
+      font-family: 'Libre Baskerville', serif;
+      font-size: 15px;
+      font-style: italic;
+      color: var(--charcoal);
+      border: none;
+      background: transparent;
+      outline: none;
+    }
+
+    .search-input::placeholder {
+      color: var(--khaki);
+    }
+
+    /* ============================================
+       FILTER TABS
+       ============================================ */
+    
+    .filter-row {
+      display: flex;
+      gap: 8px;
+      padding: 0 24px 24px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .filter-tab {
+      padding: 8px 16px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-radius: 20px;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .filter-tab.active {
+      background: var(--charcoal);
+      color: var(--parchment);
+    }
+
+    .filter-tab:not(.active) {
+      background: rgba(195, 176, 145, 0.15);
+      color: var(--leather);
+    }
+
+    /* ============================================
+       MAIN CONTENT AREA
+       ============================================ */
+    
+    .main {
+      padding: 0 24px 48px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* ============================================
+       SECTION HEADERS
+       ============================================ */
+    
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      padding-top: 8px;
+    }
+
+    .section-title {
+      font-family: 'Libre Baskerville', serif;
+      font-size: 14px;
+      font-style: italic;
+      color: var(--charcoal);
+    }
+
+    .section-link {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--khaki);
+    }
+
+    /* ============================================
+       MAP CARDS GRID — 4 col desktop
+       ============================================ */
+    
+    .map-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+
+    @media (max-width: 900px) {
+      .map-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 500px) {
+      .map-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ============================================
+       MAP CARD — 2×1 (standard grid card)
+       ============================================ */
+    
+    .map-card {
+      background: var(--warm-white);
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid rgba(195, 176, 145, 0.15);
+      transition: box-shadow 0.2s ease, transform 0.2s ease;
+      cursor: pointer;
+    }
+
+    .map-card:hover {
+      box-shadow: 0 4px 20px rgba(139, 115, 85, 0.12);
+      transform: translateY(-2px);
+    }
+
+    .map-card-image {
+      aspect-ratio: 16 / 10;
+      background: rgba(54, 69, 79, 0.08);
+      position: relative;
+    }
+
+    .map-card-badge {
+      display: inline-block;
+      font-size: 8px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      background: rgba(195, 176, 145, 0.2);
+      color: var(--leather);
+      margin-bottom: 8px;
+    }
+
+    .map-card-badge.curator {
+      background: var(--charcoal);
+      color: var(--parchment);
+    }
+
+    .map-card-body {
+      padding: 14px 16px;
+    }
+
+    .map-card-title {
+      font-family: 'Libre Baskerville', serif;
+      font-size: 14px;
+      font-style: italic;
+      color: var(--charcoal);
+      margin-bottom: 4px;
+      line-height: 1.3;
+    }
+
+    .map-card-tagline {
+      font-size: 12px;
+      color: var(--leather);
+      margin-bottom: 6px;
+      line-height: 1.4;
+    }
+
+    .map-card-meta {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--khaki);
+    }
+
+    /* ============================================
+       MAP CARD — 2×2 (featured, spans 2 cols)
+       ============================================ */
+    
+    .map-card.featured {
+      grid-column: span 2;
+    }
+
+    .map-card.featured .map-card-image {
+      aspect-ratio: 16 / 9;
+    }
+
+    .map-card.featured .map-card-title {
+      font-size: 18px;
+    }
+
+    @media (max-width: 500px) {
+      .map-card.featured {
+        grid-column: span 1;
+      }
+    }
+
+    /* ============================================
+       SEARCH RESULTS STATE
+       ============================================ */
+    
+    .search-results-header {
+      padding: 16px 0;
+      border-bottom: 1px solid rgba(195, 176, 145, 0.2);
+      margin-bottom: 24px;
+    }
+
+    .search-query {
+      font-family: 'Libre Baskerville', serif;
+      font-size: 20px;
+      font-style: italic;
+      color: var(--charcoal);
+      margin-bottom: 4px;
+    }
+
+    .search-count {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--khaki);
+    }
+
+    /* ============================================
+       LIST VIEW (title blocks)
+       ============================================ */
+    
+    .map-list {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1px;
+      background: rgba(195, 176, 145, 0.15);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 40px;
+    }
+
+    @media (max-width: 700px) {
+      .map-list { grid-template-columns: 1fr; }
+    }
+
+    .map-list-item {
+      background: var(--warm-white);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+
+    .map-list-item:hover {
+      background: rgba(255, 253, 247, 0.8);
+    }
+
+    .map-list-thumb {
+      width: 44px;
+      height: 44px;
+      border-radius: 6px;
+      background: rgba(54, 69, 79, 0.08);
+      flex-shrink: 0;
+    }
+
+    .map-list-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .map-list-title {
+      font-family: 'Libre Baskerville', serif;
+      font-size: 13px;
+      font-style: italic;
+      color: var(--charcoal);
+      margin-bottom: 2px;
+    }
+
+    .map-list-tagline {
+      font-size: 11px;
+      color: var(--leather);
+      margin-bottom: 3px;
+      line-height: 1.3;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .map-list-meta {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--khaki);
+    }
+
+    .map-list-badge {
+      font-size: 8px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: rgba(195, 176, 145, 0.15);
+      color: var(--leather);
+      flex-shrink: 0;
+    }
+
+    .map-list-badge.curator {
+      background: var(--charcoal);
+      color: var(--parchment);
+    }
+
+    /* ============================================
+       EMPTY STATE
+       ============================================ */
+    
+    .empty-state {
+      text-align: center;
+      padding: 64px 24px;
+    }
+
+    .empty-state-icon {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 16px;
+      opacity: 0.3;
+    }
+
+    .empty-state-title {
+      font-family: 'Libre Baskerville', serif;
+      font-size: 16px;
+      font-style: italic;
+      color: var(--charcoal);
+      margin-bottom: 8px;
+    }
+
+    .empty-state-text {
+      font-size: 12px;
+      color: var(--khaki);
+    }
+
+    /* ============================================
+       VIEW TOGGLE
+       ============================================ */
+    
+    .view-toggle {
+      display: flex;
+      gap: 4px;
+      background: rgba(195, 176, 145, 0.15);
+      padding: 4px;
+      border-radius: 8px;
+    }
+
+    .view-toggle button {
+      padding: 6px 12px;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border: none;
+      background: transparent;
+      color: var(--leather);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .view-toggle button.active {
+      background: var(--warm-white);
+      color: var(--charcoal);
+    }
+
+    /* ============================================
+       ANNOTATIONS (wireframe labels)
+       ============================================ */
+    
+    .annotation {
+      position: absolute;
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--brand-red);
+      background: rgba(214, 69, 65, 0.1);
+      padding: 2px 6px;
+      border-radius: 3px;
+      pointer-events: none;
+    }
+
+    .page-section {
+      position: relative;
+      padding-top: 32px;
+    }
+
+    .page-section::before {
+      content: attr(data-label);
+      position: absolute;
+      top: 0;
+      left: 0;
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--brand-red);
+      opacity: 0.7;
+    }
+
+    hr.wire {
+      border: none;
+      border-top: 1px dashed rgba(214, 69, 65, 0.3);
+      margin: 40px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================
+       EXPLORE PAGE — DEFAULT STATE (no search)
+       ============================================ -->
+
+  <header class="header">
+    <div class="logo">Saiko</div>
+    <div class="header-actions">
+      <div class="wire-box" title="Search"></div>
+      <div class="wire-box" title="Profile"></div>
+    </div>
+  </header>
+
+  <section class="search-section">
+    <div class="search-bar">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+      </svg>
+      <input type="text" class="search-input" placeholder="Search maps, places, or neighborhoods...">
+    </div>
+  </section>
+
+  <div class="filter-row">
+    <span class="filter-tab active">All</span>
+    <span class="filter-tab">Restaurants</span>
+    <span class="filter-tab">Coffee</span>
+    <span class="filter-tab">Bars</span>
+    <span class="filter-tab">Neighborhoods</span>
+    <span class="filter-tab">Near Me</span>
+  </div>
+
+  <main class="main">
+
+    <!-- GLOBAL VIEW TOGGLE -->
+    <div class="page-section" data-label="Global View Toggle (one control for page)">
+      <div class="section-header">
+        <span class="section-title">Browse Maps</span>
+        <div class="view-toggle">
+          <button class="active">Grid</button>
+          <button>List</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- POPULAR FIRST (discovery feel, not magazine) -->
+    <div class="page-section" data-label="Popular First (peer cards, discovery feel)">
+      <div class="section-header">
+        <span class="section-title">Popular This Week</span>
+        <span class="section-link">See all →</span>
+      </div>
+
+      <div class="map-grid">
+        <div class="map-card">
+          <div class="map-card-image"></div>
+          <div class="map-card-body">
+            <div class="map-card-title">Westside Date Spots</div>
+            <div class="map-card-tagline">Candlelit rooms and ocean views</div>
+            <div class="map-card-meta">18 places · Maria Chen</div>
+          </div>
+        </div>
+
+        <div class="map-card">
+          <div class="map-card-image"></div>
+          <div class="map-card-body">
+            <div class="map-card-title">Taco Trail: East LA</div>
+            <div class="map-card-tagline">Street vendors to sit-down classics</div>
+            <div class="map-card-meta">42 places · Alex Ramirez</div>
+          </div>
+        </div>
+
+        <div class="map-card">
+          <div class="map-card-image"></div>
+          <div class="map-card-body">
+            <div class="map-card-title">Bakeries Worth the Drive</div>
+            <div class="map-card-tagline">Croissants, sourdough, and pastry perfection</div>
+            <div class="map-card-meta">15 places · Jenny Park</div>
+          </div>
+        </div>
+
+        <div class="map-card">
+          <div class="map-card-image"></div>
+          <div class="map-card-body">
+            <div class="map-card-title">South LA Soul Food</div>
+            <div class="map-card-tagline">Comfort food with deep roots</div>
+            <div class="map-card-meta">31 places · Saiko</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="wire">
+
+    <!-- CURATOR PICKS (editorial, after discovery) -->
+    <div class="page-section" data-label="Curator Picks (editorial, featured allowed here)">
+      <div class="section-header">
+        <span class="section-title">Curator Picks</span>
+        <span class="section-link">See all →</span>
+      </div>
+
+      <div class="map-grid">
+        <!-- Featured 2×2 allowed after Priority Zone -->
+        <div class="map-card featured">
+          <div class="map-card-image"></div>
+          <div class="map-card-body">
+            <span class="map-card-badge curator">Curator Pick</span>
+            <div class="map-card-title">The Essential SGV — 53 places that define the San Gabriel Valley</div>
+            <div class="map-card-tagline">Dim sum, dumplings, and regional Chinese across the 626</div>
+            <div class="map-card-meta">53 places · Saiko</div>
+          </div>
+        </div>
+
+        <div class="map-card">
+          <div class="map-card-image"></div>
+          <div class="map-card-body">
+            <span class="map-card-badge curator">Curator Pick</span>
+            <div class="map-card-title">Late Night Eats</div>
+            <div class="map-card-tagline">Open past midnight when you need it most</div>
+            <div class="map-card-meta">24 places · Saiko</div>
+          </div>
+        </div>
+
+        <div class="map-card">
+          <div class="map-card-image"></div>
+          <div class="map-card-body">
+            <span class="map-card-badge curator">Curator Pick</span>
+            <div class="map-card-title">Best Coffee in Silver Lake</div>
+            <div class="map-card-tagline">Third wave pours and quiet corners</div>
+            <div class="map-card-meta">12 places · Saiko</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="wire">
+
+    <!-- LIST VIEW EXAMPLE -->
+    <div class="page-section" data-label="List View (with taglines for density)">
+      <div class="section-header">
+        <span class="section-title">By Neighborhood</span>
+      </div>
+
+      <div class="map-list">
+        <div class="map-list-item">
+          <div class="map-list-thumb"></div>
+          <div class="map-list-info">
+            <div class="map-list-title">Silver Lake Essentials</div>
+            <div class="map-list-tagline">Coffee, wine bars, and the best breakfast tacos</div>
+            <div class="map-list-meta">28 places · Saiko</div>
+          </div>
+          <span class="map-list-badge curator">Curator Pick</span>
+        </div>
+
+        <div class="map-list-item">
+          <div class="map-list-thumb"></div>
+          <div class="map-list-info">
+            <div class="map-list-title">Echo Park Hangs</div>
+            <div class="map-list-tagline">Lake views, late nights, and locals-only spots</div>
+            <div class="map-list-meta">19 places · Saiko</div>
+          </div>
+          <span class="map-list-badge curator">Curator Pick</span>
+        </div>
+
+        <div class="map-list-item">
+          <div class="map-list-thumb"></div>
+          <div class="map-list-info">
+            <div class="map-list-title">Highland Park Crawl</div>
+            <div class="map-list-tagline">York Blvd classics and Figueroa gems</div>
+            <div class="map-list-meta">33 places · Dan Torres</div>
+          </div>
+        </div>
+
+        <div class="map-list-item">
+          <div class="map-list-thumb"></div>
+          <div class="map-list-info">
+            <div class="map-list-title">DTLA After Dark</div>
+            <div class="map-list-tagline">Rooftop bars, speakeasies, and 2am noodles</div>
+            <div class="map-list-meta">41 places · Lisa Wong</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <hr class="wire">
+
+  <!-- ============================================
+       SEARCH RESULTS STATE
+       ============================================ -->
+
+  <main class="main">
+    <div class="page-section" data-label="Search Results — 4 peers first (Priority Zone rule)">
+      
+      <div class="search-results-header">
+        <div class="search-query">"korean bbq"</div>
+        <div class="search-count">12 maps · 47 places</div>
+      </div>
+
+      <div class="section-header">
+        <span class="section-title">Maps</span>
+      </div>
+
+      <!-- PRIORITY ZONE: 4 peer cards, equal weight, no featured -->
+      <div class="map-grid">
+        <div class="map-card">
+          <div class="map-card-image"></div>
+          <div class="map-card-body">
+            <span class="map-card-badge curator">Curator Pick</span>
+            <div class="map-card-title">K-Town KBBQ Guide</div>
+            <div class="map-card-tagline">Every spot worth your time in Koreatown</div>
+            <div class="map-card-meta">28 places · Saiko</div>
+          </div>
+        </div>
+
+        <div class="map-card">
+          <div class="map-card-image"></div>
+          <div class="map-card-body">
+            <div class="map-card-title">All-You-Can-Eat KBBQ</div>
+            <div class="map-card-tagline">Unlimited meat, ranked by value</div>
+            <div class="map-card-meta">15 places · Mike Lee</div>
+          </div>
+        </div>
+
+        <div class="map-card">
+          <div class="map-card-image"></div>
+          <div class="map-card-body">
+            <div class="map-card-title">Late Night Korean</div>
+            <div class="map-card-tagline">Open past 2am for post-drink cravings</div>
+            <div class="map-card-meta">22 places · Sarah Kim</div>
+          </div>
+        </div>
+
+        <div class="map-card">
+          <div class="map-card-image"></div>
+          <div class="map-card-body">
+            <div class="map-card-title">SGV Korean Gems</div>
+            <div class="map-card-tagline">Beyond K-Town: suburban strip mall finds</div>
+            <div class="map-card-meta">19 places · David Park</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Places results hint -->
+      <div class="section-header" style="margin-top: 32px;">
+        <span class="section-title">Places matching "korean bbq"</span>
+        <span class="section-link">View all 47 →</span>
+      </div>
+
+      <div class="map-list">
+        <div class="map-list-item">
+          <div class="map-list-thumb"></div>
+          <div class="map-list-info">
+            <div class="map-list-title">Kang Ho-dong Baekjeong</div>
+            <div class="map-list-tagline">Tableside grilling, celebrity-backed</div>
+            <div class="map-list-meta">Koreatown · On 4 maps</div>
+          </div>
+        </div>
+        <div class="map-list-item">
+          <div class="map-list-thumb"></div>
+          <div class="map-list-info">
+            <div class="map-list-title">Park's BBQ</div>
+            <div class="map-list-tagline">Prime cuts, old-school service</div>
+            <div class="map-list-meta">Koreatown · On 6 maps</div>
+          </div>
+        </div>
+        <div class="map-list-item">
+          <div class="map-list-thumb"></div>
+          <div class="map-list-info">
+            <div class="map-list-title">Quarters Korean BBQ</div>
+            <div class="map-list-tagline">All-you-can-eat with quality meat</div>
+            <div class="map-list-meta">Koreatown · On 3 maps</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <hr class="wire">
+
+  <!-- ============================================
+       EMPTY STATE
+       ============================================ -->
+
+  <main class="main">
+    <div class="page-section" data-label="Empty State (no results)">
+      
+      <div class="search-results-header">
+        <div class="search-query">"underwater restaurants"</div>
+        <div class="search-count">0 results</div>
+      </div>
+
+      <div class="empty-state">
+        <svg class="empty-state-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          <path d="M8 11h6"/>
+        </svg>
+        <div class="empty-state-title">No maps or places found</div>
+        <div class="empty-state-text">Try a different search term or browse our curator picks</div>
+      </div>
+
+    </div>
+  </main>
+
+</body>
+</html>
