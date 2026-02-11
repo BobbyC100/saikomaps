@@ -194,11 +194,12 @@ export function placeCategoryToScopeType(category: string | null | undefined): S
 
 /** Auto-generate title placeholder from places. Same category+neighborhood → "[Category] in [Neighborhood]", etc. */
 export function generateTitleFromPlaces(
-  places: Array<{ place?: { category?: string | null; neighborhood?: string | null } } | { places?: { category?: string | null; neighborhood?: string | null } }>
+  places: Array<{ place?: { category?: string | null; neighborhood?: string | null }; places?: { category?: string | null; neighborhood?: string | null } }>
 ): string {
   if (places.length < 2) return '';
-  const categories = [...new Set(places.map((p) => ('place' in p ? p.place?.category : p.places?.category)).filter(Boolean))] as string[];
-  const neighborhoods = [...new Set(places.map((p) => ('place' in p ? p.place?.neighborhood : p.places?.neighborhood)).filter(Boolean))] as string[];
+  const pl = (p: (typeof places)[0]) => p.place ?? p.places;
+  const categories = [...new Set(places.map((p) => pl(p)?.category).filter(Boolean))] as string[];
+  const neighborhoods = [...new Set(places.map((p) => pl(p)?.neighborhood).filter(Boolean))] as string[];
   const sameCategory = categories.length === 1 && categories[0];
   const sameNeighborhood = neighborhoods.length === 1 && neighborhoods[0];
   const primaryCategory = sameCategory ? (CATEGORY_TO_SCOPE[sameCategory] ?? sameCategory) : null;
@@ -220,11 +221,11 @@ export function generateTitleFromPlaces(
 
 /** Auto-select scope place types from place categories. */
 export function getAutoPlaceTypes(
-  places: Array<{ place?: { category?: string | null } }>
+  places: Array<{ place?: { category?: string | null }; places?: { category?: string | null } }>
 ): ScopePlaceType[] {
   const types = new Set<ScopePlaceType>();
   for (const p of places) {
-    const t = placeCategoryToScopeType(p.place?.category);
+    const t = placeCategoryToScopeType((p.place ?? p.places)?.category);
     if (t) types.add(t);
   }
   return [...types];
@@ -232,9 +233,10 @@ export function getAutoPlaceTypes(
 
 /** Auto-fill "Where" from unique neighborhoods. */
 export function getAutoGeography(
-  places: Array<{ place?: { neighborhood?: string | null } }>
+  places: Array<{ place?: { neighborhood?: string | null }; places?: { neighborhood?: string | null } }>
 ): string {
-  const neighborhoods = [...new Set(places.map((p) => p.place?.neighborhood).filter(Boolean))] as string[];
+  const pl = (p: typeof places[0]) => p.place ?? p.places;
+  const neighborhoods = [...new Set(places.map((p) => pl(p)?.neighborhood).filter(Boolean))] as string[];
   return neighborhoods.join(', ');
 }
 

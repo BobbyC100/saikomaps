@@ -250,7 +250,6 @@ export default function PlacePage() {
     setLightboxOpen(true);
   };
 
-  // Share handler
   const handleShare = async () => {
     if (navigator.share) {
       try {

@@ -5,6 +5,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { randomUUID } from 'crypto';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { db } from '@/lib/db';
@@ -160,7 +161,7 @@ export async function POST(request: NextRequest) {
           return !!exists;
         });
 
-        place = await db.places.create({
+
           data: {
             id: randomUUID(),
             slug,
@@ -178,8 +179,7 @@ export async function POST(request: NextRequest) {
             category: getSaikoCategory(finalName, placeDetails?.types ?? []),
             googlePhotos: placeDetails?.photos ? JSON.parse(JSON.stringify(placeDetails.photos)) : undefined,
             hours: placeDetails?.openingHours ? JSON.parse(JSON.stringify(placeDetails.openingHours)) : null,
-            placesDataCachedAt: placeDetails ? new Date() : null,
-            updatedAt: new Date(),
+
           },
         });
         if (placeDetails) enriched++;

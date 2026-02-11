@@ -5,6 +5,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { randomUUID } from 'crypto';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { db } from '@/lib/db';
@@ -34,7 +35,7 @@ export async function GET(request: NextRequest) {
     const lists = await db.lists.findMany({
       where: { userId },
       include: {
-        _count: { select: { mapPlaces: true } },
+        _count: { select: { map_places: true } },
       },
       orderBy: { updatedAt: 'desc' },
     });
@@ -85,6 +86,7 @@ export async function POST(request: NextRequest) {
           email: 'demo@saikomaps.com',
           name: 'Demo User',
           passwordHash: 'demo-hash-not-for-production',
+          updatedAt: new Date(),
         },
       });
     }
@@ -108,6 +110,7 @@ export async function POST(request: NextRequest) {
       : 'draft';
     const slug = (base ? base + '-' : '') + Math.random().toString(36).substring(2, 10);
 
+    const now = new Date();
     const createData = {
       id: randomUUID(),
       userId,
@@ -115,7 +118,7 @@ export async function POST(request: NextRequest) {
       slug,
       templateType: template,
       published: false,
-      updatedAt: new Date(),
+
     };
     console.log('[API MAPS POST] Prisma create data:', createData);
 

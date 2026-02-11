@@ -37,9 +37,12 @@ export function ImportProgress({ jobId, onComplete }: ImportProgressProps) {
         // If completed, stop polling and trigger callback
         if (jobData.status === 'completed') {
           clearInterval(interval)
-          setTimeout(() => {
-            onComplete(jobData.list.id, jobData.list.slug)
-          }, 1000)
+          const listData = jobData.lists ?? jobData.list
+          if (listData) {
+            setTimeout(() => {
+              onComplete(listData.id, listData.slug)
+            }, 1000)
+          }
         }
 
         // If failed, stop polling and show error

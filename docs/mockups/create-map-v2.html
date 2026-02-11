@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Saiko Maps — Create Map</title>
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --fn-parchment: #F5F0E1;
+      --fn-warm-white: #FFFDF7;
+      --fn-charcoal: #36454F;
+      --fn-khaki: #C3B091;
+      --fn-leather: #8B7355;
+      --fn-olive: #6B7F59;
+      --fn-ocean: #89B4C4;
+      --fn-red: #D64541;
+      --fn-green: #4A7C59;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter Tight', system-ui, -apple-system, sans-serif;
+      background: var(--fn-parchment);
+      color: var(--fn-charcoal);
+      min-height: 100vh;
+    }
+
+    /* ================================================================
+       PAGE HEADER
+       ================================================================ */
+    .page-header {
+      padding: 20px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(195, 176, 145, 0.2);
+      background: var(--fn-parchment);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .back-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--fn-leather);
+      transition: all 0.15s ease;
+    }
+
+    .back-btn:hover {
+      background: rgba(195, 176, 145, 0.15);
+    }
+
+    .back-btn svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .page-title {
+      font-family: 'Libre Baskerville', Georgia, serif;
+      font-size: 18px;
+      font-style: italic;
+      color: var(--fn-charcoal);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-secondary {
+      padding: 10px 18px;
+      background: transparent;
+      border: 1px solid rgba(195, 176, 145, 0.4);
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--fn-leather);
+      transition: all 0.15s ease;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(195, 176, 145, 0.1);
+      border-color: rgba(195, 176, 145, 0.6);
+    }
+
+    .btn-primary {
+      padding: 10px 20px;
+      background: var(--fn-charcoal);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--fn-parchment);
+      transition: all 0.15s ease;
+    }
+
+    .btn-primary:hover {
+      background: var(--fn-leather);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* ================================================================
+       MAIN LAYOUT
+       ================================================================ */
+    .main-content {
+      display: grid;
+      grid-template-columns: 1fr 400px;
+      min-height: calc(100vh - 77px);
+    }
+
+    @media (max-width: 900px) {
+      .main-content {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ================================================================
+       LEFT PANEL: MAP DETAILS
+       ================================================================ */
+    .panel-left {
+      padding: 32px 40px;
+      border-right: 1px solid rgba(195, 176, 145, 0.2);
+    }
+
+    @media (max-width: 900px) {
+      .panel-left {
+        border-right: none;
+        border-bottom: 1px solid rgba(195, 176, 145, 0.2);
+      }
+    }
+
+    .form-section {
+      margin-bottom: 32px;
+    }
+
+    .form-label-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .form-label-row .form-label {
+      margin-bottom: 0;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--fn-khaki);
+      margin-bottom: 10px;
+      font-weight: 500;
+    }
+
+    /* SaikoAI Assist Button */
+    .ai-assist-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      background: transparent;
+      border: 1px solid rgba(195, 176, 145, 0.3);
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 10px;
+      color: var(--fn-leather);
+      transition: all 0.15s ease;
+    }
+
+    .ai-assist-btn:hover:not(:disabled) {
+      background: linear-gradient(135deg, rgba(195, 176, 145, 0.15) 0%, rgba(137, 180, 196, 0.1) 100%);
+      border-color: var(--fn-khaki);
+    }
+
+    .ai-assist-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .ai-assist-btn svg {
+      width: 14px;
+      height: 14px;
+      color: var(--fn-khaki);
+    }
+
+    .ai-assist-btn:hover:not(:disabled) svg {
+      color: var(--fn-ocean);
+    }
+
+    .ai-hint {
+      font-size: 11px;
+      color: var(--fn-khaki);
+      margin-top: 8px;
+      font-style: italic;
+    }
+
+    .ai-hint.hidden {
+      display: none;
+    }
+
+    /* AI Loading State */
+    .ai-assist-btn.loading {
+      pointer-events: none;
+    }
+
+    .ai-assist-btn.loading svg {
+      animation: pulse 1s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 1; }
+    }
+
+    /* AI Suggestion Appear */
+    .ai-suggestion {
+      background: linear-gradient(135deg, rgba(195, 176, 145, 0.08) 0%, rgba(137, 180, 196, 0.05) 100%);
+      border: 1px solid rgba(195, 176, 145, 0.2);
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin-top: 10px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .ai-suggestion-icon {
+      width: 16px;
+      height: 16px;
+      color: var(--fn-ocean);
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .ai-suggestion-content {
+      flex: 1;
+    }
+
+    .ai-suggestion-text {
+      font-size: 14px;
+      color: var(--fn-charcoal);
+      line-height: 1.5;
+      margin-bottom: 8px;
+    }
+
+    .ai-suggestion-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .ai-suggestion-btn {
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .ai-suggestion-btn.accept {
+      background: var(--fn-charcoal);
+      border: none;
+      color: var(--fn-parchment);
+    }
+
+    .ai-suggestion-btn.accept:hover {
+      background: var(--fn-leather);
+    }
+
+    .ai-suggestion-btn.regenerate {
+      background: transparent;
+      border: 1px solid rgba(195, 176, 145, 0.3);
+      color: var(--fn-leather);
+    }
+
+    .ai-suggestion-btn.regenerate:hover {
+      background: rgba(195, 176, 145, 0.1);
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 14px 16px;
+      background: var(--fn-warm-white);
+      border: 1px solid rgba(195, 176, 145, 0.25);
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 15px;
+      color: var(--fn-charcoal);
+      transition: all 0.15s ease;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--fn-khaki);
+      box-shadow: 0 0 0 3px rgba(195, 176, 145, 0.15);
+    }
+
+    .form-input::placeholder {
+      color: var(--fn-khaki);
+    }
+
+    .form-input.title-input {
+      font-family: 'Libre Baskerville', Georgia, serif;
+      font-size: 20px;
+      font-style: italic;
+      padding: 16px 18px;
+    }
+
+    .form-textarea {
+      width: 100%;
+      padding: 14px 16px;
+      background: var(--fn-warm-white);
+      border: 1px solid rgba(195, 176, 145, 0.25);
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 14px;
+      color: var(--fn-charcoal);
+      resize: vertical;
+      min-height: 88px;
+      line-height: 1.5;
+      transition: all 0.15s ease;
+    }
+
+    .form-textarea:focus {
+      outline: none;
+      border-color: var(--fn-khaki);
+      box-shadow: 0 0 0 3px rgba(195, 176, 145, 0.15);
+    }
+
+    .form-textarea::placeholder {
+      color: var(--fn-khaki);
+    }
+
+    .char-count {
+      font-size: 11px;
+      color: var(--fn-khaki);
+      text-align: right;
+      margin-top: 6px;
+    }
+
+    /* Cover Upload */
+    .cover-upload {
+      width: 100%;
+      height: 160px;
+      background: var(--fn-warm-white);
+      border: 2px dashed rgba(195, 176, 145, 0.35);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .cover-upload:hover {
+      border-color: var(--fn-khaki);
+      background: rgba(255, 253, 247, 0.8);
+    }
+
+    .cover-upload svg {
+      width: 32px;
+      height: 32px;
+      color: var(--fn-khaki);
+    }
+
+    .cover-upload span {
+      font-size: 13px;
+      color: var(--fn-leather);
+    }
+
+    .cover-upload .hint {
+      font-size: 11px;
+      color: var(--fn-khaki);
+    }
+
+    /* ================================================================
+       RIGHT PANEL: PLACES
+       ================================================================ */
+    .panel-right {
+      padding: 32px;
+      background: var(--fn-warm-white);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .panel-right-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .panel-right-title {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--fn-khaki);
+      font-weight: 500;
+    }
+
+    .place-count {
+      font-size: 12px;
+      color: var(--fn-leather);
+    }
+
+    /* Smart Search */
+    .smart-search {
+      position: relative;
+      margin-bottom: 16px;
+    }
+
+    .smart-search-input {
+      width: 100%;
+      padding: 14px 16px 14px 44px;
+      background: var(--fn-parchment);
+      border: 1px solid rgba(195, 176, 145, 0.25);
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 14px;
+      color: var(--fn-charcoal);
+      transition: all 0.15s ease;
+    }
+
+    .smart-search-input:focus {
+      outline: none;
+      border-color: var(--fn-khaki);
+      box-shadow: 0 0 0 3px rgba(195, 176, 145, 0.15);
+    }
+
+    .smart-search-input::placeholder {
+      color: var(--fn-khaki);
+    }
+
+    .smart-search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 18px;
+      height: 18px;
+      color: var(--fn-khaki);
+      pointer-events: none;
+    }
+
+    .search-hint {
+      font-size: 11px;
+      color: var(--fn-khaki);
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+
+    .search-hint strong {
+      color: var(--fn-leather);
+      font-weight: 500;
+    }
+
+    /* Search Results Dropdown */
+    .search-results {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      right: 0;
+      background: var(--fn-warm-white);
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(139, 115, 85, 0.15), 0 0 0 1px rgba(195, 176, 145, 0.1);
+      max-height: 300px;
+      overflow-y: auto;
+      z-index: 60;
+      display: none;
+    }
+
+    .search-results.open {
+      display: block;
+    }
+
+    .search-result-group {
+      padding: 8px;
+    }
+
+    .search-result-group + .search-result-group {
+      border-top: 1px solid rgba(195, 176, 145, 0.15);
+    }
+
+    .search-result-label {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--fn-khaki);
+      padding: 6px 8px;
+    }
+
+    .search-result-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.1s ease;
+    }
+
+    .search-result-item:hover {
+      background: rgba(195, 176, 145, 0.1);
+    }
+
+    .result-photo {
+      width: 40px;
+      height: 40px;
+      border-radius: 6px;
+      background-size: cover;
+      background-position: center;
+      background-color: var(--fn-parchment);
+      flex-shrink: 0;
+    }
+
+    .result-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .result-name {
+      font-family: 'Libre Baskerville', Georgia, serif;
+      font-size: 13px;
+      font-style: italic;
+      color: var(--fn-charcoal);
+      margin-bottom: 2px;
+    }
+
+    .result-meta {
+      font-size: 11px;
+      color: var(--fn-khaki);
+    }
+
+    .result-source {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 3px 6px;
+      background: rgba(195, 176, 145, 0.15);
+      border-radius: 4px;
+      color: var(--fn-leather);
+      flex-shrink: 0;
+    }
+
+    .result-source.unverified {
+      background: rgba(195, 176, 145, 0.08);
+      border: 1px solid rgba(195, 176, 145, 0.25);
+      color: var(--fn-khaki);
+    }
+
+    /* Add Actions */
+    .add-actions {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .add-action-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      background: transparent;
+      border: 1px solid rgba(195, 176, 145, 0.3);
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 11px;
+      color: var(--fn-leather);
+      transition: all 0.15s ease;
+    }
+
+    .add-action-btn:hover {
+      background: rgba(195, 176, 145, 0.1);
+      border-color: rgba(195, 176, 145, 0.5);
+    }
+
+    .add-action-btn svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    /* Places List */
+    .places-list {
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .place-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: var(--fn-parchment);
+      border-radius: 10px;
+      margin-bottom: 8px;
+      transition: all 0.15s ease;
+    }
+
+    .place-item:hover {
+      box-shadow: 0 2px 8px rgba(139, 115, 85, 0.1);
+    }
+
+    .place-drag-handle {
+      width: 20px;
+      height: 20px;
+      color: var(--fn-khaki);
+      cursor: grab;
+      flex-shrink: 0;
+    }
+
+    .place-photo {
+      width: 48px;
+      height: 48px;
+      border-radius: 8px;
+      background-size: cover;
+      background-position: center;
+      background-color: rgba(195, 176, 145, 0.2);
+      flex-shrink: 0;
+    }
+
+    .place-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .place-name {
+      font-family: 'Libre Baskerville', Georgia, serif;
+      font-size: 14px;
+      font-style: italic;
+      color: var(--fn-charcoal);
+      margin-bottom: 2px;
+    }
+
+    .place-meta {
+      font-size: 11px;
+      color: var(--fn-khaki);
+    }
+
+    .place-remove {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--fn-khaki);
+      transition: all 0.15s ease;
+      flex-shrink: 0;
+    }
+
+    .place-remove:hover {
+      background: rgba(214, 69, 65, 0.1);
+      color: var(--fn-red);
+    }
+
+    .place-remove svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* Empty State */
+    .places-empty {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .places-empty svg {
+      width: 48px;
+      height: 48px;
+      color: var(--fn-khaki);
+      opacity: 0.4;
+      margin-bottom: 16px;
+    }
+
+    .places-empty p {
+      font-size: 14px;
+      color: var(--fn-leather);
+      line-height: 1.5;
+      max-width: 240px;
+    }
+
+    /* Scope chips */
+    .scope-section.hidden {
+      display: none;
+    }
+    .scope-row { display: flex; flex-direction: column; gap: 14px; }
+    .scope-group { display: flex; flex-direction: column; gap: 8px; }
+    .scope-label { font-size: 11px; color: var(--fn-leather); }
+    .scope-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+
+    .chip {
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(195,176,145,0.28);
+      background: var(--fn-warm-white);
+      color: var(--fn-leather);
+      font-size: 11px;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .chip.add { background: transparent; }
+    .chip:hover { border-color: rgba(195,176,145,0.55); background: rgba(255,253,247,0.9); }
+
+    /* Coverage posture */
+    .coverage-row {
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(195,176,145,0.2);
+      background: rgba(245,240,225,0.6);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .coverage-toggle { display: flex; gap: 10px; align-items: center; font-size: 12px; color: var(--fn-leather); cursor: pointer; }
+    .coverage-toggle input { accent-color: var(--fn-khaki); }
+    .coverage-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+    .coverage-chip {
+      font-size: 10px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(195,176,145,0.18);
+      color: var(--fn-leather);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+    }
+
+    /* Customize accordion */
+    .customize {
+      border: 1px solid rgba(195,176,145,0.25);
+      border-radius: 12px;
+      background: rgba(255,253,247,0.65);
+      overflow: hidden;
+    }
+    .customize-summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .customize-summary::-webkit-details-marker { display: none; }
+    .customize-title { font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--fn-khaki); font-weight: 500; }
+    .customize-hint { font-size: 11px; color: var(--fn-leather); }
+    .customize-body { padding: 16px; border-top: 1px solid rgba(195,176,145,0.18); }
+    .subhint { font-size: 11px; color: var(--fn-khaki); margin: 6px 0 12px; font-style: italic; }
+
+    /* View toggle */
+    .view-toggle {
+      display: flex;
+      background: rgba(195, 176, 145, 0.15);
+      border-radius: 8px;
+      padding: 3px;
+      gap: 3px;
+    }
+    .toggle-btn {
+      padding: 6px 14px;
+      font-size: 11px;
+      font-family: inherit;
+      border: none;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--fn-leather);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .toggle-btn.active {
+      background: var(--fn-warm-white);
+      color: var(--fn-charcoal);
+      box-shadow: 0 1px 2px rgba(139,115,85,0.1);
+    }
+
+    /* Map preview */
+    .map-preview { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+    .map-canvas {
+      flex: 1;
+      background: var(--fn-parchment);
+      border-radius: 12px;
+      border: 1px solid rgba(195,176,145,0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 300px;
+    }
+    .map-placeholder { text-align: center; color: var(--fn-khaki); }
+    .map-placeholder svg { width: 48px; height: 48px; margin-bottom: 12px; opacity: 0.6; }
+    .map-placeholder p { font-size: 14px; color: var(--fn-leather); margin-bottom: 4px; }
+    .map-placeholder span { font-size: 11px; }
+
+    /* Flex fixes for panel overflow */
+    .panel-right { min-height: 0; }
+    .places-list { min-height: 0; }
+
+    /* ================================================================
+       DEMO LABEL
+       ================================================================ */
+    .demo-label {
+      position: fixed;
+      bottom: 16px;
+      right: 16px;
+      padding: 8px 12px;
+      background: rgba(54, 69, 79, 0.9);
+      color: var(--fn-parchment);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-radius: 6px;
+      z-index: 100;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Page Header -->
+  <header class="page-header">
+    <div class="header-left">
+      <button class="back-btn" aria-label="Back to My Maps">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M19 12H5"/>
+          <polyline points="12 19 5 12 12 5"/>
+        </svg>
+      </button>
+      <h1 class="page-title">New Map</h1>
+    </div>
+    <div class="header-actions">
+      <button class="btn-secondary">Save Draft</button>
+      <button class="btn-primary">Save Map</button>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+
+    <!-- Left Panel: Map Details -->
+    <section class="panel-left">
+      <div class="form-section">
+        <div class="form-label-row">
+          <label class="form-label" for="map-title">Title</label>
+          <button class="ai-assist-btn" id="ai-title-btn" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+              <path d="M2 17l10 5 10-5"/>
+              <path d="M2 12l10 5 10-5"/>
+            </svg>
+            Suggest title
+          </button>
+        </div>
+        <input 
+          type="text" 
+          id="map-title" 
+          class="form-input title-input" 
+          placeholder="Echo Park Date Nights"
+        >
+        <p class="ai-hint" id="ai-title-hint">Add 3+ places to unlock AI suggestions</p>
+      </div>
+
+      <div class="form-section scope-section" id="scope-section">
+        <label class="form-label">Scope</label>
+        <div class="scope-row">
+          <div class="scope-group">
+            <span class="scope-label">Neighborhood</span>
+            <div class="scope-chips">
+              <button class="chip">Echo Park</button>
+              <button class="chip">Silver Lake</button>
+              <button class="chip add">+ Add</button>
+            </div>
+          </div>
+
+          <div class="scope-group">
+            <span class="scope-label">Cuisine / Category</span>
+            <div class="scope-chips">
+              <button class="chip">Wine bars</button>
+              <button class="chip add">+ Add</button>
+            </div>
+          </div>
+
+          <div class="scope-group">
+            <span class="scope-label">Experience</span>
+            <div class="scope-chips">
+              <button class="chip">Date night</button>
+              <button class="chip add">+ Add</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-label-row">
+          <label class="form-label" for="map-description">Curator note</label>
+          <button class="ai-assist-btn" id="ai-desc-btn" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+              <path d="M2 17l10 5 10-5"/>
+              <path d="M2 12l10 5 10-5"/>
+            </svg>
+            Draft note
+          </button>
+        </div>
+        <textarea 
+          id="map-description" 
+          class="form-textarea" 
+          placeholder="A short note about what this map is about..."
+          maxlength="280"
+        ></textarea>
+        <div class="char-count"><span id="desc-count">0</span> / 280</div>
+        
+        <!-- Example AI Suggestion (shown after clicking "Draft note") -->
+        <div class="ai-suggestion" id="ai-suggestion-demo" style="display: none;">
+          <svg class="ai-suggestion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+            <path d="M2 17l10 5 10-5"/>
+            <path d="M2 12l10 5 10-5"/>
+          </svg>
+          <div class="ai-suggestion-content">
+            <p class="ai-suggestion-text">Wine bars and neighborhood gems across Silver Lake and Los Feliz. Perfect for a low-key evening out.</p>
+            <div class="ai-suggestion-actions">
+              <button class="ai-suggestion-btn accept">Use this</button>
+              <button class="ai-suggestion-btn regenerate">Try another</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="coverage-row">
+          <label class="coverage-toggle">
+            <input type="checkbox" checked />
+            <span>Show coverage sources on map page</span>
+          </label>
+
+          <div class="coverage-chips" aria-label="Coverage preview">
+            <span class="coverage-chip">Eater</span>
+            <span class="coverage-chip">Infatuation</span>
+            <span class="coverage-chip">Resy</span>
+          </div>
+        </div>
+      </div>
+
+      <details class="customize">
+        <summary class="customize-summary">
+          <span class="customize-title">Customize</span>
+          <span class="customize-hint">Optional</span>
+        </summary>
+
+        <div class="customize-body">
+          <div class="form-section" style="margin-bottom:0;">
+            <label class="form-label">Cover</label>
+            <p class="subhint">Default cover is generated automatically from your first places.</p>
+
+            <div class="cover-upload">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                <circle cx="8.5" cy="8.5" r="1.5"/>
+                <polyline points="21 15 16 10 5 21"/>
+              </svg>
+              <span>Upload a cover image</span>
+              <span class="hint">or drag and drop</span>
+            </div>
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <!-- Right Panel: Places -->
+    <section class="panel-right">
+      <div class="panel-right-header">
+        <span class="panel-right-title">On this map</span>
+
+        <div class="view-toggle" role="tablist">
+          <button class="toggle-btn active" data-view="list">List</button>
+          <button class="toggle-btn" data-view="map">Map</button>
+        </div>
+
+        <span class="place-count">3 added</span>
+      </div>
+
+      <!-- Builder Tools (hidden in Map view) -->
+      <div class="places-tools" id="places-tools">
+        <!-- Smart Search -->
+        <div class="smart-search">
+        <svg class="smart-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input 
+          type="text" 
+          class="smart-search-input" 
+          placeholder="Search places, paste a URL, or drop a CSV..."
+          id="place-search"
+        >
+        
+        <!-- Search Results (shown when typing) -->
+        <div class="search-results" id="search-results">
+          <div class="search-result-group">
+            <div class="search-result-label">In Saiko</div>
+            <div class="search-result-item">
+              <div class="result-photo" style="background-image: url('https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=100&h=100&fit=crop');"></div>
+              <div class="result-info">
+                <div class="result-name">Bar Covell</div>
+                <div class="result-meta">Wine Bar · Los Feliz</div>
+              </div>
+              <span class="result-source">Eater</span>
+            </div>
+            <div class="search-result-item">
+              <div class="result-photo" style="background-image: url('https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=100&h=100&fit=crop');"></div>
+              <div class="result-info">
+                <div class="result-name">Vinovore</div>
+                <div class="result-meta">Wine Shop · Silver Lake</div>
+              </div>
+              <span class="result-source">Infatuation</span>
+            </div>
+          </div>
+          <div class="search-result-group">
+            <div class="search-result-label">New place</div>
+            <div class="search-result-item">
+              <div class="result-photo"></div>
+              <div class="result-info">
+                <div class="result-name">The Wellesbourne</div>
+                <div class="result-meta">Bar · West Hollywood</div>
+              </div>
+              <span class="result-source unverified">Unverified</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p class="search-hint">
+        <strong>Tip:</strong> Paste a place link to add it quickly (Google Maps works best).
+      </p>
+
+      <!-- Secondary Add Actions -->
+      <div class="add-actions">
+        <button class="add-action-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+          Import CSV
+        </button>
+        <button class="add-action-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          Add a place
+        </button>
+      </div>
+      </div>
+
+      <!-- Places List -->
+      <div class="places-list">
+        <div class="place-item">
+          <svg class="place-drag-handle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="8" y1="6" x2="8" y2="6"/>
+            <line x1="16" y1="6" x2="16" y2="6"/>
+            <line x1="8" y1="12" x2="8" y2="12"/>
+            <line x1="16" y1="12" x2="16" y2="12"/>
+            <line x1="8" y1="18" x2="8" y2="18"/>
+            <line x1="16" y1="18" x2="16" y2="18"/>
+          </svg>
+          <div class="place-photo" style="background-image: url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=100&h=100&fit=crop');"></div>
+          <div class="place-info">
+            <div class="place-name">Seco</div>
+            <div class="place-meta">Wine Bar · Silver Lake</div>
+          </div>
+          <button class="place-remove" aria-label="Remove place">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="place-item">
+          <svg class="place-drag-handle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="8" y1="6" x2="8" y2="6"/>
+            <line x1="16" y1="6" x2="16" y2="6"/>
+            <line x1="8" y1="12" x2="8" y2="12"/>
+            <line x1="16" y1="12" x2="16" y2="12"/>
+            <line x1="8" y1="18" x2="8" y2="18"/>
+            <line x1="16" y1="18" x2="16" y2="18"/>
+          </svg>
+          <div class="place-photo" style="background-image: url('https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=100&h=100&fit=crop');"></div>
+          <div class="place-info">
+            <div class="place-name">Bar Covell</div>
+            <div class="place-meta">Wine Bar · Los Feliz</div>
+          </div>
+          <button class="place-remove" aria-label="Remove place">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="place-item">
+          <svg class="place-drag-handle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="8" y1="6" x2="8" y2="6"/>
+            <line x1="16" y1="6" x2="16" y2="6"/>
+            <line x1="8" y1="12" x2="8" y2="12"/>
+            <line x1="16" y1="12" x2="16" y2="12"/>
+            <line x1="8" y1="18" x2="8" y2="18"/>
+            <line x1="16" y1="18" x2="16" y2="18"/>
+          </svg>
+          <div class="place-photo" style="background-image: url('https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=100&h=100&fit=crop');"></div>
+          <div class="place-info">
+            <div class="place-name">Vinovore</div>
+            <div class="place-meta">Wine Shop · Silver Lake</div>
+          </div>
+          <button class="place-remove" aria-label="Remove place">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Map Preview (shown when Map toggle is active) -->
+      <div class="map-preview" id="map-preview" style="display:none;">
+        <div class="map-canvas">
+          <div class="map-placeholder">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M3 6l7-3 7 3 4-2v14l-4 2-7-3-7 3z"/>
+              <line x1="10" y1="3" x2="10" y2="21"/>
+              <line x1="17" y1="6" x2="17" y2="20"/>
+            </svg>
+            <p>Map preview</p>
+            <span>3 places plotted</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <div class="demo-label">Create Map · v2.1</div>
+
+  <script>
+    // Character count for description
+    const textarea = document.getElementById('map-description');
+    const countDisplay = document.getElementById('desc-count');
+    
+    textarea.addEventListener('input', () => {
+      countDisplay.textContent = textarea.value.length;
+    });
+
+    // Toggle search results on input focus (demo only)
+    const searchInput = document.getElementById('place-search');
+    const searchResults = document.getElementById('search-results');
+
+    searchInput.addEventListener('focus', () => {
+      if (searchInput.value.length > 0) {
+        searchResults.classList.add('open');
+      }
+    });
+
+    searchInput.addEventListener('input', () => {
+      if (searchInput.value.length > 0) {
+        searchResults.classList.add('open');
+      } else {
+        searchResults.classList.remove('open');
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.smart-search')) {
+        searchResults.classList.remove('open');
+      }
+    });
+
+    // SaikoAI Demo
+    const aiTitleBtn = document.getElementById('ai-title-btn');
+    const aiDescBtn = document.getElementById('ai-desc-btn');
+    const aiTitleHint = document.getElementById('ai-title-hint');
+    const aiSuggestionDemo = document.getElementById('ai-suggestion-demo');
+    const mapTitleInput = document.getElementById('map-title');
+
+    // AI Title suggestion demo
+    aiTitleBtn.addEventListener('click', () => {
+      if (aiTitleBtn.disabled) return;
+      aiTitleBtn.classList.add('loading');
+      setTimeout(() => {
+        aiTitleBtn.classList.remove('loading');
+        mapTitleInput.value = 'Silver Lake Wine Trail';
+        mapTitleInput.focus();
+      }, 800);
+    });
+
+    // AI Description suggestion demo
+    aiDescBtn.addEventListener('click', () => {
+      if (aiDescBtn.disabled) return;
+      aiDescBtn.classList.add('loading');
+      setTimeout(() => {
+        aiDescBtn.classList.remove('loading');
+        aiSuggestionDemo.style.display = 'flex';
+      }, 800);
+    });
+
+    // Accept suggestion
+    document.querySelector('.ai-suggestion-btn.accept')?.addEventListener('click', () => {
+      const suggestionText = document.querySelector('.ai-suggestion-text').textContent;
+      textarea.value = suggestionText;
+      countDisplay.textContent = suggestionText.length;
+      aiSuggestionDemo.style.display = 'none';
+    });
+
+    // Regenerate (demo just hides and shows again)
+    document.querySelector('.ai-suggestion-btn.regenerate')?.addEventListener('click', () => {
+      aiSuggestionDemo.style.display = 'none';
+      aiDescBtn.classList.add('loading');
+      setTimeout(() => {
+        aiDescBtn.classList.remove('loading');
+        document.querySelector('.ai-suggestion-text').textContent = 
+          'Three of my favorite spots for natural wine and good vibes on the Eastside.';
+        aiSuggestionDemo.style.display = 'flex';
+      }, 800);
+    });
+
+    // View Toggle Logic (List / Map)
+    const toggleButtons = document.querySelectorAll('.toggle-btn');
+    const placesList = document.querySelector('.places-list');
+    const mapPreview = document.getElementById('map-preview');
+    const placesTools = document.getElementById('places-tools');
+
+    toggleButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        toggleButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const view = btn.dataset.view;
+
+        if (view === 'map') {
+          placesTools.style.display = 'none';
+          placesList.style.display = 'none';
+          mapPreview.style.display = 'flex';
+        } else {
+          placesTools.style.display = 'block';
+          mapPreview.style.display = 'none';
+          placesList.style.display = 'block';
+        }
+      });
+    });
+
+    // Scope section visibility (show when 3+ places)
+    const scopeSection = document.getElementById('scope-section');
+    const placeCountEl = document.querySelector('.place-count');
+    
+    function updateScopeVisibility() {
+      const placeItems = document.querySelectorAll('.place-item');
+      const count = placeItems.length;
+      
+      // Update count display
+      placeCountEl.textContent = count + ' added';
+      
+      // Show/hide scope
+      if (count >= 3) {
+        scopeSection.classList.remove('hidden');
+        // Enable AI buttons
+        aiTitleBtn.disabled = false;
+        aiDescBtn.disabled = false;
+        aiTitleHint.classList.add('hidden');
+      } else {
+        scopeSection.classList.add('hidden');
+        // Disable AI buttons
+        aiTitleBtn.disabled = true;
+        aiDescBtn.disabled = true;
+        aiTitleHint.classList.remove('hidden');
+      }
+    }
+
+    // Remove place handler
+    document.querySelectorAll('.place-remove').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.target.closest('.place-item').remove();
+        updateScopeVisibility();
+      });
+    });
+
+    // Initial check (demo has 3 places, so scope shows)
+    updateScopeVisibility();
+  </script>
+
+</body>
+</html>

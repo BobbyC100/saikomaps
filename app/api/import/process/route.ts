@@ -5,6 +5,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { randomUUID } from 'crypto'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { db } from '@/lib/db'
@@ -62,7 +63,8 @@ export async function POST(request: NextRequest) {
 
     // Create the list (auto-published)
     const slug = generateSlug(listTitle)
-    const list = await db.lists.create({
+
+
       data: {
         id: randomUUID(),
         userId,
@@ -71,7 +73,7 @@ export async function POST(request: NextRequest) {
         templateType,
         accessLevel: 'public', // Public by default
         published: true, // Auto-publish
-        updatedAt: new Date(),
+
       },
     })
     
@@ -296,6 +298,7 @@ async function enrichLocationsSync(
             hours: placeDetails.openingHours ? JSON.parse(JSON.stringify(placeDetails.openingHours)) : null,
             googlePhotos: placeDetails.photos ? JSON.parse(JSON.stringify(placeDetails.photos)) : null,
             placesDataCachedAt: new Date(),
+            updatedAt: new Date(),
           },
         })
         
@@ -480,6 +483,7 @@ async function processLocationsAsync(
             description: null, // PlaceDetails doesn't have description field
             googlePhotos: placeDetails.photos ? JSON.parse(JSON.stringify(placeDetails.photos)) : null,
             placesDataCachedAt: new Date(),
+            updatedAt: new Date(),
           },
         })
         

@@ -13,7 +13,7 @@ export async function GET(
   try {
     const { id } = await params;
 
-    const spot = await db.activitySpot.findFirst({
+    const spot = await db.activity_spots.findFirst({
       where: {
         id,
         enabled: true,

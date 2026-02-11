@@ -5,6 +5,8 @@
 
 import type { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
+import GoogleProvider from 'next-auth/providers/google'
+import { randomUUID } from 'crypto'
 import { compare } from 'bcryptjs'
 import { db } from '@/lib/db'
 
@@ -31,17 +33,50 @@ export const authOptions: NextAuthOptions = {
         }
       },
     }),
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID ?? '',
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? '',
+      authorization: {
+        params: {
+          prompt: 'consent',
+          access_type: 'offline',
+          response_type: 'code',
+        },
+      },
+    }),
   ],
   session: {
     strategy: 'jwt',
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async signIn({ user, account }) {
+      if (account?.provider === 'google' && user.email) {
+        const existing = await db.users.findUnique({ where: { email: user.email } })
+        if (!existing) {
+          const now = new Date()
+          await db.users.create({
+            data: {
+              id: randomUUID(),
+              email: user.email,
+              name: user.name ?? user.email.split('@')[0],
+              updatedAt: now,
+            },
+          })
+        }
+      }
+      return true
+    },
+    async jwt({ token, user, account }) {
       if (user) {
-        token.id = user.id
         token.email = user.email
         token.name = user.name
+        if (account?.provider === 'credentials') {
+          token.id = user.id
+        } else if (account?.provider === 'google' && user.email) {
+          const ourUser = await db.users.findUnique({ where: { email: user.email } })
+          if (ourUser) token.id = ourUser.id
+        }
       }
       return token
     },

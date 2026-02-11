@@ -5,6 +5,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { randomUUID } from 'crypto';
 import { db } from '@/lib/db';
 import { getPlaceDetails, getNeighborhoodFromPlaceDetails, getNeighborhoodFromCoords } from '@/lib/google-places';
 import { addLocationSchema } from '@/lib/validations';
@@ -76,7 +77,7 @@ export async function POST(
         return !!exists;
       });
 
-      place = await db.places.create({
+
         data: {
           id: randomUUID(),
           slug: slugValue,
@@ -99,8 +100,7 @@ export async function POST(
           hours: placeDetails.openingHours
             ? JSON.parse(JSON.stringify(placeDetails.openingHours))
             : null,
-          updatedAt: new Date(),
-          placesDataCachedAt: new Date(),
+
         },
       });
     } else {

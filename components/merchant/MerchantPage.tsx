@@ -80,9 +80,9 @@ export function MerchantPage({ merchant }: MerchantPageProps) {
 
       {/* Tier 3: Facts - HOURS ALWAYS RENDERS */}
       <HoursCard
-        hours={merchant.hours}
-        openStatus={merchant.openStatus}
-      />
+  hours={merchant.hours ?? null}
+  openStatus={merchant.openStatus ?? null}
+/>
 
       {merchant.address && (
         <AddressCard address={merchant.address} />

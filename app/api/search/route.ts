@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
+import { db } from '@/lib/db'
 import { getGooglePhotoUrl } from '@/lib/google-places'
-
-const prisma = new PrismaClient()
 
 // Helper: Extract first photo URL
 function getFirstPhotoUrl(googlePhotos: any): string | undefined {
@@ -62,10 +60,7 @@ function extractSignals(place: any): Array<{ type: string; label: string }> {
   const signals: Array<{ type: string; label: string }> = [];
   
   // Check sources for publication names
-  if (places.sources && Array.isArray(places.sources)) {
-    const seenTypes = new Set<string>();
-    
-    for (const source of places.sources) {
+
       if (signals.length >= 2) break; // Max 2 signals
       
       const pub = source.publication?.toLowerCase() || '';
@@ -111,7 +106,7 @@ export async function GET(request: NextRequest) {
 
   try {
     // Search places with enriched data for bento grid
-    const places = await prisma.places.findMany({
+
       where: {
         OR: [
           { name: { contains: queryLower, mode: 'insensitive' } },
@@ -145,12 +140,7 @@ export async function GET(request: NextRequest) {
         pullQuote: true,
         pullQuoteSource: true,
         pullQuoteAuthor: true,
-        sources: {
-          select: {
-            publication: true,
-            title: true,
-          },
-        },
+        editorialSources: true,
         chefRecs: true,
       },
       take: 50, // Get more for ranking
@@ -161,7 +151,7 @@ export async function GET(request: NextRequest) {
       .map(p => p.googlePlaceId)
       .filter((id): id is string => id !== null);
     
-    const identitySignals = await prisma.golden_records.findMany({
+    const identitySignals = await db.golden_records.findMany({
       where: {
         google_place_id: { in: googlePlaceIds },
       },
@@ -300,6 +290,6 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     )
   } finally {
-    await prisma.$disconnect()
+    await db.$disconnect()
   }
 }

@@ -214,7 +214,7 @@ export function ProfilePageClient({
                       key={opt}
                       type="button"
                       onClick={() => setSortBy(opt)}
-                      className={`px-3 py-2 rounded-full text-[10px] transition-colors min-h-[44px] ${
+                      className={`px-2.5 py-1 rounded-full text-[10px] transition-colors ${
                         sortBy === opt
                           ? 'bg-[#FFFDF7] text-[#8B7355] font-medium'
                           : 'text-[#C3B091] hover:text-[#8B7355]'

@@ -488,11 +488,12 @@ export default function PublicMapPage({ params }: { params: Promise<{ slug: stri
         };
         
         map.fitBounds(bounds, { top: 80, bottom: 40, left: 0, right: 40 });
-        const idleListener = map.addListener('idle', () => {
-          const zoom = map.getZoom();
-          if (zoom != null && zoom > 15) map.setZoom(15);
+        const mapInstance = map;
+        const idleListener = mapInstance.addListener('idle', () => {
+          const zoom = mapInstance.getZoom();
+          if (zoom != null && zoom > 15) mapInstance.setZoom(15);
           // Pan to centroid after bounds are set
-          map.panTo(centroid);
+          mapInstance.panTo(centroid);
           g.maps.event.removeListener(idleListener);
         });
       }

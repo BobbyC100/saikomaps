@@ -35,14 +35,12 @@ export function ComparisonCard({
     valA: string | null | undefined;
     valB: string | null | undefined;
     prioritySource: 'editorial' | 'google' | 'foursquare';
-    showDiff?: boolean;
   }> = [
     { 
       label: 'Name', 
       valA: recordA.name, 
       valB: recordB.name,
       prioritySource: 'editorial',
-      showDiff: true
     },
     { 
       label: 'Address', 

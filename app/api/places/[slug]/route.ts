@@ -34,7 +34,7 @@ export async function GET(
                 slug: true,
                 status: true,
                 published: true,
-                cover_image_url: true,
+
                 users: {
                   select: {
                     name: true,
@@ -90,12 +90,16 @@ export async function GET(
     }
 
     // Format appearsOn (only published maps) and curator note from first map with descriptor
-    const publishedMapPlaces = places.map_places.filter((mp) => mp.lists && mp.lists.status === 'PUBLISHED');
+
     const appearsOn = publishedMapPlaces.map((mp) => ({
       id: mp.lists!.id,
       title: mp.lists!.title,
       slug: mp.lists!.slug,
-      coverImageUrl: mp.lists!.cover_image_url,
+      <<<<<<< HEAD
+      const publishedMapPlaces = places.map_places.filter((mp) => mp.lists && mp.lists.status === 'PUBLISHED');
+  =======
+      const publishedMapPlaces = place.map_places.filter((mp) => mp.lists && mp.lists.status === 'PUBLISHED');
+  >>>>>>> df94ee8 (Saiko Maps User Profule)
       creatorName: mp.lists!.users?.name || mp.lists!.users?.email?.split('@')[0] || 'Unknown',
     }));
     const curatorMapPlace = publishedMapPlaces.find((mp) => mp.descriptor?.trim());
@@ -129,21 +133,13 @@ export async function GET(
           googlePlaceId: places.google_place_id,
           curatorNote,
           curatorCreatorName,
-          sources: places.editorial_sources || [],
-          vibeTags: places.vibe_tags || [],
-          tips: places.tips || [],
-          tagline: places.tagline,
-          pullQuote: places.pull_quote,
-          pullQuoteSource: places.pull_quote_source,
-          pullQuoteAuthor: places.pull_quote_author,
-          pullQuoteUrl: places.pull_quote_url,
-          pullQuoteType: places.pull_quote_type,
+
           // Decision Onset fields
           intentProfile: places.intent_profile,
           intentProfileOverride: places.intent_profile_override,
           reservationUrl: places.reservation_url,
           // Restaurant Group
-          restaurantGroup: places.restaurant_groups || null,
+
         },
         guide: appearsOn[0]
           ? {

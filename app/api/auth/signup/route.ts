@@ -6,9 +6,9 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { hash } from 'bcryptjs'
+import { randomUUID } from 'crypto'
 import { db } from '@/lib/db'
 import { signupSchema } from '@/lib/validations'
-import { randomUUID } from 'crypto'
 
 export async function POST(request: NextRequest) {
   try {
@@ -41,13 +41,15 @@ export async function POST(request: NextRequest) {
     const passwordHash = await hash(password, 12)
 
     // Create user
-    const user = await db.users.create({
+    const user = await const now = new Date() db.users.create({
       data: {
         id: randomUUID(),
         email,
         name,
         passwordHash,
-        updatedAt: new Date(),
+
+        updatedAt: now,
+
       },
       select: {
         id: true,

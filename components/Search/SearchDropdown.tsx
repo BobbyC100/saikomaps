@@ -14,7 +14,7 @@ interface SearchDropdownProps {
   onSelectRecent: (query: string) => void
   onRemoveRecent: (query: string) => void
   onNavigate: (url: string) => void
-  dropdownRef: React.RefObject<HTMLDivElement>
+  dropdownRef: React.RefObject<HTMLDivElement | null>
 }
 
 export function SearchDropdown({

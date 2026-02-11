@@ -30,56 +30,47 @@ export default async function ProfilePage() {
     redirect('/login');
   }
 
-  let userMaps: Awaited<ReturnType<typeof db.lists.findMany>> = [];
-  let savedMapsRows: Awaited<ReturnType<typeof db.savedMap.findMany>> = [];
-  let user: { name: string | null; curatorNote: string | null; scopePills: string[]; coverageSources: string[]; avatarUrl: string | null } | null = null;
-
-  try {
-    [userMaps, savedMapsRows, user] = await Promise.all([
-      db.lists.findMany({
-        where: { userId },
-        include: {
-          map_places: {
-            take: 4,
-            orderBy: { orderIndex: 'asc' },
-            include: { places: { select: { googlePhotos: true } } },
-          },
-          _count: { select: { map_places: true } },
+  const [userMaps, savedMapsRows, user] = await Promise.all([
+    db.lists.findMany({
+      where: { userId },
+      include: {
+        map_places: {
+          take: 4,
+          orderBy: { orderIndex: 'asc' },
+          include: { places: { select: { googlePhotos: true } } },
         },
-        orderBy: { updatedAt: 'desc' },
-      }),
-      db.savedMap.findMany({
-        where: { userId },
-        include: {
-          lists: {
-            include: {
-              users: { select: { name: true } },
-              map_places: {
-                take: 4,
-                orderBy: { orderIndex: 'asc' },
-                include: { places: { select: { googlePhotos: true } } },
-              },
-              _count: { select: { map_places: true } },
+        _count: { select: { map_places: true } },
+      },
+      orderBy: { updatedAt: 'desc' },
+    }),
+    db.saved_maps.findMany({
+      where: { userId },
+      include: {
+        lists: {
+          include: {
+            users: { select: { name: true } },
+            map_places: {
+              take: 4,
+              orderBy: { orderIndex: 'asc' },
+              include: { places: { select: { googlePhotos: true } } },
             },
+            _count: { select: { map_places: true } },
           },
         },
-        orderBy: { savedAt: 'desc' },
-      }),
-      db.users.findUnique({
-        where: { id: userId },
-        select: {
-          name: true,
-          curatorNote: true,
-          scopePills: true,
-          coverageSources: true,
-          avatarUrl: true,
-        },
-      }),
-    ]);
-  } catch (error) {
-    console.error('[Profile] Failed to load profile data:', error);
-    // Continue with empty data — page will show empty states
-  }
+      },
+      orderBy: { savedAt: 'desc' },
+    }),
+    db.users.findUnique({
+      where: { id: userId },
+      select: {
+        name: true,
+        curatorNote: true,
+        scopePills: true,
+        coverageSources: true,
+        avatarUrl: true,
+      },
+    }),
+  ]);
 
   const stats = {
     mapCount: userMaps.length,

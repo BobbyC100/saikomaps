@@ -233,7 +233,10 @@ model places {
   intentProfile           String?            @map("intent_profile")
   intentProfileOverride   Boolean            @default(false) @map("intent_profile_override")
   reservationUrl          String?            @map("reservation_url")
+<<<<<<< HEAD
   googlePlacesAttributes  Json?              @map("google_places_attributes")
+=======
+>>>>>>> df94ee8 (Saiko Maps User Profule)
   map_places              map_places[]
   person_places           person_places[]
   restaurant_groups       restaurant_groups? @relation(fields: [restaurantGroupId], references: [id])

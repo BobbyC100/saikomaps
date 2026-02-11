@@ -4,6 +4,7 @@
  * Creates a new person (chef, owner, operator) with attribution
  */
 
+import { randomUUID } from 'crypto'
 import { db } from '@/lib/db'
 import { 
   createSource, 
@@ -161,14 +162,16 @@ async function main() {
 
   // Build person object
   const person = {
+    id: randomUUID(),
     name: args.name,
     slug,
     role: args.role!.toUpperCase() as any,
     visibility: args.visibility!.toUpperCase() as any,
     bio: args.bio,
-    imageUrl: args.imageUrl,
+    image_url: args.imageUrl,
     sources: [source],
-    restaurantGroupId,
+    updated_at: new Date(),
+    ...(restaurantGroupId != null && { restaurant_group_id: restaurantGroupId }),
   }
 
   // Validate
@@ -182,7 +185,7 @@ async function main() {
 
   // Create person
   const created = await db.person.create({
-    data: person
+    data: person as any
   })
 
   console.log('\n✅ Person created successfully!')
