@@ -5,6 +5,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { randomUUID } from 'crypto';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { db } from '@/lib/db';
@@ -159,8 +160,10 @@ export async function POST(request: NextRequest) {
           return !!exists;
         });
 
+        const now = new Date();
         place = await db.place.create({
           data: {
+            id: randomUUID(),
             slug,
             googlePlaceId: googlePlaceId ?? undefined,
             name: finalName,
@@ -176,7 +179,8 @@ export async function POST(request: NextRequest) {
             category: getSaikoCategory(finalName, placeDetails?.types ?? []),
             googlePhotos: placeDetails?.photos ? JSON.parse(JSON.stringify(placeDetails.photos)) : undefined,
             hours: placeDetails?.openingHours ? JSON.parse(JSON.stringify(placeDetails.openingHours)) : null,
-            placesDataCachedAt: placeDetails ? new Date() : null,
+            placesDataCachedAt: placeDetails ? now : null,
+            updatedAt: now,
           },
         });
         if (placeDetails) enriched++;
@@ -190,10 +194,12 @@ export async function POST(request: NextRequest) {
 
       await db.mapPlace.create({
         data: {
+          id: randomUUID(),
           mapId: list.id,
           placeId: place.id,
           userNote: input.comment?.trim() || null,
           orderIndex: nextOrderIndex++,
+          updatedAt: new Date(),
         },
       });
 

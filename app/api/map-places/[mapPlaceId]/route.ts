@@ -33,7 +33,7 @@ export async function PATCH(
 
     const mapPlace = await db.mapPlace.findUnique({
       where: { id: mapPlaceId },
-      include: { map: true },
+      include: { lists: true },
     });
 
     if (!mapPlace) {
@@ -43,7 +43,7 @@ export async function PATCH(
       );
     }
 
-    if (mapPlace.map.userId !== userId) {
+    if (mapPlace.lists.userId !== userId) {
       return NextResponse.json(
         { error: 'You do not have permission to edit this place' },
         { status: 403 }
@@ -79,7 +79,7 @@ export async function PATCH(
         ...(userNote !== undefined && { userNote: userNote?.trim() || null }),
         ...(typeof orderIndex === 'number' && { orderIndex }),
       },
-      include: { place: true },
+      include: { places: true },
     });
 
     return NextResponse.json({
@@ -116,7 +116,7 @@ export async function DELETE(
 
     const mapPlace = await db.mapPlace.findUnique({
       where: { id: mapPlaceId },
-      include: { map: true },
+      include: { lists: true },
     });
 
     if (!mapPlace) {
@@ -126,7 +126,7 @@ export async function DELETE(
       );
     }
 
-    if (mapPlace.map.userId !== userId) {
+    if (mapPlace.lists.userId !== userId) {
       return NextResponse.json(
         { error: 'You do not have permission to delete this place' },
         { status: 403 }

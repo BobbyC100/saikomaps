@@ -5,7 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient, Prisma } from '@prisma/client';
-import { normalizeName } from '@/lib/similarity';
+import { normalizeName } from '@/lib/normalize';
 import slugify from 'slugify';
 
 const prisma = new PrismaClient();
@@ -96,13 +96,13 @@ export async function POST(request: NextRequest) {
             raw_json: {
               name: row.Name,
               neighborhood: row.Neighborhood,
-              category: row.Category || null,
-              source_publication: row.Source || null,
-              source_url: row.SourceURL || null,
-              address: row.Address || null,
-              phone: row.Phone || null,
-              instagram_handle: row.Instagram || null,
-            } as Prisma.JsonValue,
+              category: row.Category ?? undefined,
+              source_publication: row.Source ?? undefined,
+              source_url: row.SourceURL ?? undefined,
+              address: row.Address ?? undefined,
+              phone: row.Phone ?? undefined,
+              instagram_handle: row.Instagram ?? undefined,
+            } as Prisma.InputJsonValue,
             is_processed: false,
           }
         });

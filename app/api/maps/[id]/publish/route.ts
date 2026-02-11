@@ -37,9 +37,9 @@ export async function POST(
     const existing = await db.list.findUnique({
       where: { id },
       include: {
-        mapPlaces: {
+        map_places: {
           orderBy: { orderIndex: 'asc' },
-          include: { place: true },
+          include: { places: true },
         },
       },
     });
@@ -58,8 +58,8 @@ export async function POST(
     const formData = mapToFormData(existing);
     const { canPublish, errors } = validateForPublish(
       formData,
-      existing.mapPlaces.length,
-      existing.mapPlaces
+      existing.map_places.length,
+      existing.map_places
     );
 
     if (!canPublish) {
@@ -101,8 +101,8 @@ export async function POST(
       } catch {
         // ignore
       }
-      if (!titleToSet && existing.mapPlaces.length >= 2) {
-        titleToSet = generateTitleFromPlaces(existing.mapPlaces) || 'Untitled Map';
+      if (!titleToSet && existing.map_places.length >= 2) {
+        titleToSet = generateTitleFromPlaces(existing.map_places) || 'Untitled Map';
       }
       if (!titleToSet) {
         titleToSet = 'Untitled Map';
@@ -118,12 +118,12 @@ export async function POST(
     };
 
     // Generate AI description if none exists and map has 2+ places
-    if (existing.description == null && existing.mapPlaces.length >= 2) {
+    if (existing.description == null && existing.map_places.length >= 2) {
       try {
-        const places = existing.mapPlaces.map((mp) => ({
-          name: mp.place.name,
-          category: mp.place.category || 'eat',
-          neighborhood: mp.place.neighborhood ?? undefined,
+        const places = existing.map_places.map((mp) => ({
+          name: mp.places.name,
+          category: mp.places.category || 'eat',
+          neighborhood: mp.places.neighborhood ?? undefined,
         }));
         const description = await generateMapDescription({
           title: titleToSet,

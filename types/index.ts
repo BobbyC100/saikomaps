@@ -86,10 +86,17 @@ export interface ImportPreview {
   costEstimate?: { totalCost?: number }
 }
 
-export interface ImportProgress extends ImportJob {
+export interface ImportProgress {
+  id: string
+  status: string
+  totalLocations?: number | null
+  processedLocations: number
+  failedLocations: number
+  errorLog?: Array<{ location?: string; error?: string }> | null
   percentage: number
   currentLocation?: string
   list?: { id: string; slug: string }
+  lists?: { id: string; slug: string } | null
 }
 
 // ============================================

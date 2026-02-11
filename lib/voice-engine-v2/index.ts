@@ -47,7 +47,7 @@ export {
 } from './orchestrator';
 
 // Re-export vocabulary and validation from v1.1 (unchanged)
-export { VOCABULARY, BANNED_WORDS } from '../voice-engine/vocabulary';
+export { VOCABULARY } from '../voice-engine/vocabulary';
 export {
   validateTagline,
   validateTaglineCandidates,

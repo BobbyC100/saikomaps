@@ -5,6 +5,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { randomUUID } from 'crypto';
 import { db } from '@/lib/db';
 import { getPlaceDetails, getNeighborhoodFromPlaceDetails, getNeighborhoodFromCoords } from '@/lib/google-places';
 import { addLocationSchema } from '@/lib/validations';
@@ -75,8 +76,10 @@ export async function POST(
         return !!exists;
       });
 
+      const now = new Date();
       place = await db.place.create({
         data: {
+          id: randomUUID(),
           slug: slugValue,
           googlePlaceId,
           name: placeDetails.name,
@@ -97,7 +100,8 @@ export async function POST(
           hours: placeDetails.openingHours
             ? JSON.parse(JSON.stringify(placeDetails.openingHours))
             : null,
-          placesDataCachedAt: new Date(),
+          placesDataCachedAt: now,
+          updatedAt: now,
         },
       });
     } else {
@@ -138,14 +142,16 @@ export async function POST(
     // 5. Create MapPlace
     const mapPlace = await db.mapPlace.create({
       data: {
+        id: randomUUID(),
         mapId: list.id,
         placeId: place.id,
         descriptor: descriptor?.trim() || null,
         userNote: userNote || null,
         userPhotos: [],
         orderIndex: nextOrderIndex,
+        updatedAt: new Date(),
       },
-      include: { place: true },
+      include: { places: true },
     });
 
     return NextResponse.json({

@@ -5,6 +5,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { randomUUID } from 'crypto'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { db } from '@/lib/db'
@@ -61,14 +62,17 @@ export async function POST(request: NextRequest) {
 
     // Create the list (auto-published)
     const slug = generateSlug(listTitle)
+    const now = new Date()
     const list = await db.list.create({
       data: {
+        id: randomUUID(),
         userId,
         title: listTitle,
         slug: `${slug}-${Date.now()}`, // Add timestamp to ensure uniqueness
         templateType,
         accessLevel: 'public', // Public by default
         published: true, // Auto-publish
+        updatedAt: now,
       },
     })
     
@@ -81,6 +85,7 @@ export async function POST(request: NextRequest) {
     // Create import job
     const importJob = await db.importJob.create({
       data: {
+        id: randomUUID(),
         userId,
         listId: list.id,
         status: 'processing',
@@ -125,11 +130,13 @@ export async function POST(request: NextRequest) {
       try {
         const created = await db.location.create({
           data: {
+            id: randomUUID(),
             listId: list.id,
             name: cleanName,
             address: cleanAddress,
             userNote: location.comment?.trim() || null,
             orderIndex: i,
+            updatedAt: new Date(),
           },
         })
         createdLocations.push(created)
@@ -290,6 +297,7 @@ async function enrichLocationsSync(
             hours: placeDetails.openingHours ? JSON.parse(JSON.stringify(placeDetails.openingHours)) : null,
             googlePhotos: placeDetails.photos ? JSON.parse(JSON.stringify(placeDetails.photos)) : null,
             placesDataCachedAt: new Date(),
+            updatedAt: new Date(),
           },
         })
         
@@ -474,6 +482,7 @@ async function processLocationsAsync(
             description: null, // PlaceDetails doesn't have description field
             googlePhotos: placeDetails.photos ? JSON.parse(JSON.stringify(placeDetails.photos)) : null,
             placesDataCachedAt: new Date(),
+            updatedAt: new Date(),
           },
         })
         

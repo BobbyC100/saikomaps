@@ -40,67 +40,68 @@ model activity_spots {
 
 model import_jobs {
   id                  String    @id
-  user_id             String
-  list_id             String?
+  userId              String    @map("user_id")
+  listId              String?   @map("list_id")
   status              String    @default("processing")
-  total_locations     Int?
-  processed_locations Int       @default(0)
-  failed_locations    Int       @default(0)
-  error_log           Json?
-  created_at          DateTime  @default(now())
-  completed_at        DateTime?
-  lists               lists?    @relation(fields: [list_id], references: [id])
-  users               users     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  totalLocations      Int?      @map("total_locations")
+  processedLocations  Int       @default(0) @map("processed_locations")
+  failedLocations     Int       @default(0) @map("failed_locations")
+  errorLog            Json?     @map("error_log")
+  createdAt           DateTime  @default(now()) @map("created_at")
+  completedAt         DateTime? @map("completed_at")
+  lists               lists?    @relation(fields: [listId], references: [id])
+  users               users     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([status])
-  @@index([user_id])
+  @@index([userId])
 }
 
 model lists {
   id                    String           @id
-  user_id               String
+  userId                String           @map("user_id")
   title                 String
   subtitle              String?
   description           String?
-  description_source    String?
+  descriptionSource    String?           @map("description_source")
   slug                  String           @unique
-  intro_text            String?
-  function_type         String?
-  function_context      String?
-  scope_geography       String?
-  scope_place_types     String[]
-  scope_exclusions      String[]
-  organizing_logic      OrganizingLogic?
-  organizing_logic_note String?
+  introText             String?          @map("intro_text")
+  functionType          String?          @map("function_type")
+  functionContext       String?          @map("function_context")
+  scopeGeography        String?          @map("scope_geography")
+  scopePlaceTypes       String[]         @map("scope_place_types")
+  scopeExclusions       String[]         @map("scope_exclusions")
+  organizingLogic       OrganizingLogic?  @map("organizing_logic")
+  organizingLogicNote   String?          @map("organizing_logic_note")
   notes                 String?
   status                MapStatus        @default(DRAFT)
-  published_at          DateTime?
-  template_type         String           @default("field-notes")
-  cover_image_url       String?
-  primary_color         String           @default("#5BA7A7")
-  secondary_color       String           @default("#7FA5A5")
-  access_level          String           @default("public")
-  password_hash         String?
-  allowed_emails        String[]
+  publishedAt           DateTime?        @map("published_at")
+  templateType          String           @default("field-notes") @map("template_type")
+  coverImageUrl         String?          @map("cover_image_url")
+  primaryColor          String           @default("#5BA7A7") @map("primary_color")
+  secondaryColor        String           @default("#7FA5A5") @map("secondary_color")
+  accessLevel           String           @default("public") @map("access_level")
+  passwordHash          String?          @map("password_hash")
+  allowedEmails         String[]         @map("allowed_emails")
   published             Boolean          @default(false)
-  view_count            Int              @default(0)
-  created_at            DateTime         @default(now())
-  updated_at            DateTime
+  viewCount             Int              @default(0) @map("view_count")
+  createdAt             DateTime         @default(now()) @map("created_at")
+  updatedAt             DateTime         @map("updated_at")
   import_jobs           import_jobs[]
-  users                 users            @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  users                 users            @relation(fields: [userId], references: [id], onDelete: Cascade)
   locations             locations[]
   map_places            map_places[]
+  saved_maps            saved_maps[]
 
   @@index([published])
   @@index([slug])
   @@index([status])
-  @@index([user_id])
+  @@index([userId])
 }
 
 model locations {
   id                    String    @id
-  list_id               String
-  google_place_id       String?
+  listId                String    @map("list_id")
+  googlePlaceId         String?   @map("google_place_id")
   name                  String
   address               String?
   latitude              Decimal?  @db.Decimal(10, 8)
@@ -110,43 +111,43 @@ model locations {
   instagram             String?
   hours                 Json?
   description           String?
-  google_types          String[]  @default([])
-  price_level           Int?
+  googleTypes           String[]  @default([]) @map("google_types")
+  priceLevel            Int?      @map("price_level")
   neighborhood          String?
-  google_photos         Json?
-  user_photos           String[]
-  user_note             String?
+  googlePhotos          Json?     @map("google_photos")
+  userPhotos            String[]  @map("user_photos")
+  userNote              String?   @map("user_note")
   category              String?
   descriptor            String?
-  order_index           Int       @default(0)
-  places_data_cached_at DateTime?
-  created_at            DateTime  @default(now())
-  updated_at            DateTime
-  lists                 lists     @relation(fields: [list_id], references: [id], onDelete: Cascade)
+  orderIndex            Int       @default(0) @map("order_index")
+  placesDataCachedAt    DateTime? @map("places_data_cached_at")
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @map("updated_at")
+  lists                 lists     @relation(fields: [listId], references: [id], onDelete: Cascade)
 
-  @@index([google_place_id])
-  @@index([list_id, category])
-  @@index([list_id])
-  @@index([list_id, order_index])
+  @@index([googlePlaceId])
+  @@index([listId, category])
+  @@index([listId])
+  @@index([listId, orderIndex])
 }
 
 model map_places {
   id          String   @id
-  map_id      String
-  place_id    String
+  mapId       String   @map("map_id")
+  placeId     String   @map("place_id")
   descriptor  String?  @db.VarChar(120)
-  user_note   String?
-  user_photos String[]
-  order_index Int      @default(0)
-  created_at  DateTime @default(now())
-  updated_at  DateTime
-  lists       lists    @relation(fields: [map_id], references: [id], onDelete: Cascade)
-  places      places   @relation(fields: [place_id], references: [id])
+  userNote    String?  @map("user_note")
+  userPhotos  String[] @map("user_photos")
+  orderIndex  Int      @default(0) @map("order_index")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @map("updated_at")
+  lists       lists    @relation(fields: [mapId], references: [id], onDelete: Cascade)
+  places      places   @relation(fields: [placeId], references: [id])
 
-  @@unique([map_id, place_id])
-  @@index([map_id])
-  @@index([map_id, order_index])
-  @@index([place_id])
+  @@unique([mapId, placeId])
+  @@index([mapId])
+  @@index([mapId, orderIndex])
+  @@index([placeId])
 }
 
 model people {
@@ -192,7 +193,7 @@ model person_places {
 model places {
   id                      String             @id
   slug                    String             @unique
-  google_place_id         String?            @unique
+  googlePlaceId           String?            @unique @map("google_place_id")
   name                    String
   address                 String?
   latitude                Decimal?           @db.Decimal(10, 8)
@@ -202,45 +203,45 @@ model places {
   instagram               String?
   hours                   Json?
   description             String?
-  google_photos           Json?
-  google_types            String[]           @default([])
-  price_level             Int?
+  googlePhotos            Json?              @map("google_photos")
+  googleTypes             String[]           @default([]) @map("google_types")
+  priceLevel              Int?               @map("price_level")
   neighborhood            String?
   category                String?
-  places_data_cached_at   DateTime?
-  created_at              DateTime           @default(now())
-  updated_at              DateTime
-  editorial_sources       Json?
-  cuisine_type            String?
-  ad_unit_override        Boolean            @default(false)
-  ad_unit_type            String?
-  pull_quote              String?
-  pull_quote_author       String?
-  pull_quote_source       String?
-  pull_quote_type         String?
-  pull_quote_url          String?
+  placesDataCachedAt      DateTime?          @map("places_data_cached_at")
+  createdAt               DateTime           @default(now()) @map("created_at")
+  updatedAt               DateTime           @map("updated_at")
+  editorialSources        Json?              @map("editorial_sources")
+  cuisineType             String?            @map("cuisine_type")
+  adUnitOverride          Boolean            @default(false) @map("ad_unit_override")
+  adUnitType              String?            @map("ad_unit_type")
+  pullQuote               String?            @map("pull_quote")
+  pullQuoteAuthor         String?            @map("pull_quote_author")
+  pullQuoteSource         String?            @map("pull_quote_source")
+  pullQuoteType           String?            @map("pull_quote_type")
+  pullQuoteUrl            String?            @map("pull_quote_url")
   tagline                 String?
-  tagline_candidates      String[]           @default([])
-  tagline_generated       DateTime?
-  tagline_pattern         String?
-  tagline_signals         Json?
+  taglineCandidates       String[]           @default([]) @map("tagline_candidates")
+  taglineGenerated        DateTime?          @map("tagline_generated")
+  taglinePattern          String?            @map("tagline_pattern")
+  taglineSignals          Json?              @map("tagline_signals")
   tips                    String[]           @default([])
-  vibe_tags               String[]           @default([])
-  chef_recs               Json?
-  restaurant_group_id     String?
+  vibeTags                String[]           @default([]) @map("vibe_tags")
+  chefRecs                Json?              @map("chef_recs")
+  restaurantGroupId       String?            @map("restaurant_group_id")
   status                  PlaceStatus        @default(OPEN)
-  intent_profile          String?
-  intent_profile_override Boolean            @default(false)
-  reservation_url         String?
+  intentProfile           String?            @map("intent_profile")
+  intentProfileOverride   Boolean            @default(false) @map("intent_profile_override")
+  reservationUrl          String?            @map("reservation_url")
   map_places              map_places[]
   person_places           person_places[]
-  restaurant_groups       restaurant_groups? @relation(fields: [restaurant_group_id], references: [id])
+  restaurant_groups       restaurant_groups? @relation(fields: [restaurantGroupId], references: [id])
   viewer_bookmarks        viewer_bookmarks[]
 
   @@index([category])
-  @@index([google_place_id])
+  @@index([googlePlaceId])
   @@index([neighborhood])
-  @@index([restaurant_group_id])
+  @@index([restaurantGroupId])
   @@index([status])
 }
 
@@ -264,35 +265,52 @@ model restaurant_groups {
 }
 
 model users {
-  id                String             @id
-  email             String             @unique
-  name              String?
-  password_hash     String?
-  avatar_url        String?
-  subscription_tier String             @default("free")
-  created_at        DateTime           @default(now())
-  updated_at        DateTime
-  import_jobs       import_jobs[]
-  lists             lists[]
-  viewer_bookmarks  viewer_bookmarks[]
+  id                 String             @id
+  email              String             @unique
+  name               String?
+  passwordHash       String?            @map("password_hash")
+  avatarUrl          String?            @map("avatar_url")
+  subscriptionTier   String             @default("free") @map("subscription_tier")
+  curatorNote        String?            @db.VarChar(140) @map("curator_note")
+  scopePills         String[]           @default([]) @map("scope_pills")
+  coverageSources    String[]           @default([]) @map("coverage_sources")
+  createdAt          DateTime           @default(now()) @map("created_at")
+  updatedAt          DateTime           @map("updated_at")
+  import_jobs        import_jobs[]
+  lists              lists[]
+  viewer_bookmarks   viewer_bookmarks[]
+  saved_maps         saved_maps[]
 
   @@index([email])
 }
 
+model saved_maps {
+  id         String   @id @default(cuid())
+  userId     String   @map("user_id")
+  listId     String   @map("list_id")
+  savedAt    DateTime @default(now()) @map("saved_at")
+  users      users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lists      lists    @relation(fields: [listId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, listId])
+  @@index([userId])
+  @@index([listId])
+}
+
 model viewer_bookmarks {
   id             String   @id
-  viewer_user_id String?
-  place_id       String
+  viewerUserId   String?  @map("viewer_user_id")
+  placeId        String   @map("place_id")
   visited        Boolean  @default(false)
-  personal_note  String?
-  created_at     DateTime @default(now())
-  updated_at     DateTime
-  places         places   @relation(fields: [place_id], references: [id], onDelete: Cascade)
-  users          users?   @relation(fields: [viewer_user_id], references: [id], onDelete: Cascade)
+  personalNote   String?  @map("personal_note")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @map("updated_at")
+  places         places   @relation(fields: [placeId], references: [id], onDelete: Cascade)
+  users          users?   @relation(fields: [viewerUserId], references: [id], onDelete: Cascade)
 
-  @@unique([viewer_user_id, place_id])
-  @@index([place_id])
-  @@index([viewer_user_id])
+  @@unique([viewerUserId, placeId])
+  @@index([placeId])
+  @@index([viewerUserId])
 }
 
 enum LayerType {

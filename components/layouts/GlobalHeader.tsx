@@ -57,7 +57,7 @@ export function GlobalHeader({ variant = 'default', onShare }: GlobalHeaderProps
           height: '56px',
         }}
       >
-        <SaikoLogo href={showLoggedInNav ? '/dashboard' : '/'} />
+        <SaikoLogo href={showLoggedInNav ? '/profile' : '/'} />
         
         <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
           <button
@@ -201,7 +201,7 @@ export function GlobalHeader({ variant = 'default', onShare }: GlobalHeaderProps
               Create
             </Link>
             <Link
-              href="/dashboard"
+              href="/profile"
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -216,7 +216,7 @@ export function GlobalHeader({ variant = 'default', onShare }: GlobalHeaderProps
                 e.currentTarget.style.color = '#6B6B6B'
               }}
               className="nav-link"
-              title="Dashboard"
+              title="My Maps"
             >
               <User size={18} />
             </Link>

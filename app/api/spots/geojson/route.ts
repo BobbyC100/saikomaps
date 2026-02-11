@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    const spots = await db.activitySpot.findMany({
+    const spots = await db.activity_spots.findMany({
       where,
       select: {
         id: true,
@@ -61,13 +61,13 @@ export async function GET(request: NextRequest) {
         slug: true,
         latitude: true,
         longitude: true,
-        layerType: true,
-        spotType: true,
+        layer_type: true,
+        spot_type: true,
         tags: true,
         region: true,
         city: true,
         source: true,
-        sourceUrl: true,
+        source_url: true,
         surface: true,
         description: true,
       },
@@ -83,13 +83,13 @@ export async function GET(request: NextRequest) {
         id: s.id,
         name: s.name,
         slug: s.slug,
-        layerType: s.layerType,
-        spotType: s.spotType,
+        layerType: s.layer_type,
+        spotType: s.spot_type,
         tags: s.tags,
         region: s.region,
         city: s.city,
         source: s.source,
-        sourceUrl: s.sourceUrl,
+        sourceUrl: s.source_url,
         surface: s.surface,
         description: s.description,
       },

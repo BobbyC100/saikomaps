@@ -162,7 +162,7 @@ async function main() {
 
   // Create group
   const created = await db.restaurantGroup.create({
-    data: group
+    data: { ...group, id: require('crypto').randomUUID(), updated_at: new Date() } as any
   })
 
   console.log('\n✅ Restaurant group created successfully!')

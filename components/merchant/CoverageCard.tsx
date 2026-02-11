@@ -54,7 +54,7 @@ export function CoverageCard({
     if (extracted) {
       displayQuote = extracted.quote;
       displaySource = extracted.source;
-      displayUrl = extracted.url;
+      displayUrl = extracted.url ?? null;
     }
   }
   

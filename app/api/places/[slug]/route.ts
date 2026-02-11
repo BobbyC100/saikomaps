@@ -25,9 +25,9 @@ export async function GET(
     const place = await db.place.findUnique({
       where: { slug },
       include: {
-        mapPlaces: {
+        map_places: {
           include: {
-            map: {
+            lists: {
               select: {
                 id: true,
                 title: true,
@@ -35,7 +35,7 @@ export async function GET(
                 status: true,
                 published: true,
                 coverImageUrl: true,
-                user: {
+                users: {
                   select: {
                     name: true,
                     email: true,
@@ -45,7 +45,7 @@ export async function GET(
             },
           },
         },
-        restaurantGroup: {
+        restaurant_groups: {
           select: {
             name: true,
             slug: true,
@@ -90,19 +90,19 @@ export async function GET(
     }
 
     // Format appearsOn (only published maps) and curator note from first map with descriptor
-    const publishedMapPlaces = place.mapPlaces.filter((mp) => mp.map && mp.map.status === 'PUBLISHED');
+    const publishedMapPlaces = place.map_places.filter((mp) => mp.lists && mp.lists.status === 'PUBLISHED');
     const appearsOn = publishedMapPlaces.map((mp) => ({
-      id: mp.map!.id,
-      title: mp.map!.title,
-      slug: mp.map!.slug,
-      coverImageUrl: mp.map!.coverImageUrl,
-      creatorName: mp.map!.user?.name || mp.map!.user?.email?.split('@')[0] || 'Unknown',
+      id: mp.lists!.id,
+      title: mp.lists!.title,
+      slug: mp.lists!.slug,
+      coverImageUrl: mp.lists!.coverImageUrl,
+      creatorName: mp.lists!.users?.name || mp.lists!.users?.email?.split('@')[0] || 'Unknown',
     }));
     const curatorMapPlace = publishedMapPlaces.find((mp) => mp.descriptor?.trim());
     const curatorNote = curatorMapPlace?.descriptor?.trim() ?? null;
     const curatorCreatorName =
-      curatorMapPlace?.map?.user?.name ||
-      curatorMapPlace?.map?.user?.email?.split('@')[0] ||
+      curatorMapPlace?.lists?.users?.name ||
+      curatorMapPlace?.lists?.users?.email?.split('@')[0] ||
       null;
 
     return NextResponse.json({
@@ -129,7 +129,7 @@ export async function GET(
           googlePlaceId: place.googlePlaceId,
           curatorNote,
           curatorCreatorName,
-          sources: place.sources || [],
+          sources: (place.editorialSources as unknown[]) || [],
           vibeTags: place.vibeTags || [],
           tips: place.tips || [],
           tagline: place.tagline,
@@ -143,7 +143,7 @@ export async function GET(
           intentProfileOverride: place.intentProfileOverride,
           reservationUrl: place.reservationUrl,
           // Restaurant Group
-          restaurantGroup: place.restaurantGroup || null,
+          restaurantGroup: place.restaurant_groups || null,
         },
         guide: appearsOn[0]
           ? {

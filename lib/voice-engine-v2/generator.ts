@@ -72,7 +72,7 @@ export async function generateTaglineCandidatesV2(
     
     return {
       candidates,
-      validationResults,
+      validationResults: validationResults as [ValidationResult, ValidationResult, ValidationResult, ValidationResult],
       allValid,
     };
   } catch (error) {

@@ -151,8 +151,8 @@ export function FieldNotesMapView({
       locations.map((l, i) => ({
         id: l.id,
         name: l.name,
-        latitude: l.latitude,
-        longitude: l.longitude,
+        latitude: l.latitude ?? null,
+        longitude: l.longitude ?? null,
         isFeatured: i === 0 || i < 3, // First place + next 2 featured
       })),
     [locations]

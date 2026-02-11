@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Saiko Maps — Share Cards & Link Previews</title>
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --fn-parchment: #F5F0E1;
+      --fn-warm-white: #FFFDF7;
+      --fn-charcoal: #36454F;
+      --fn-khaki: #C3B091;
+      --fn-leather: #8B7355;
+      --fn-olive: #6B7F59;
+      --fn-ocean: #89B4C4;
+      --fn-red: #D64541;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter Tight', system-ui, -apple-system, sans-serif;
+      background: #2a2a2a;
+      color: var(--fn-charcoal);
+      min-height: 100vh;
+      padding: 40px;
+    }
+
+    .page-title {
+      font-family: 'Libre Baskerville', Georgia, serif;
+      font-size: 24px;
+      font-style: italic;
+      color: var(--fn-parchment);
+      margin-bottom: 8px;
+    }
+
+    .page-subtitle {
+      font-size: 13px;
+      color: var(--fn-khaki);
+      margin-bottom: 40px;
+    }
+
+    .section {
+      margin-bottom: 60px;
+    }
+
+    .section-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--fn-khaki);
+      margin-bottom: 20px;
+    }
+
+    .cards-row {
+      display: flex;
+      gap: 40px;
+      flex-wrap: wrap;
+      align-items: flex-start;
+    }
+
+    .card-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .card-label {
+      font-size: 11px;
+      color: rgba(255,255,255,0.5);
+    }
+
+    .card-dimensions {
+      font-size: 10px;
+      color: rgba(255,255,255,0.3);
+    }
+
+    /* ================================================================
+       INSTAGRAM STORY (9:16) — 1080×1920 scaled to 270×480
+       ================================================================ */
+    .story-card {
+      width: 270px;
+      height: 480px;
+      background: var(--fn-parchment);
+      border-radius: 16px;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .story-photo-grid {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 3px;
+      padding: 3px;
+      background: var(--fn-parchment);
+    }
+
+    .story-photo {
+      background-size: cover;
+      background-position: center;
+      filter: saturate(0.88) contrast(1.05);
+    }
+
+    .story-photo:first-child {
+      border-radius: 12px 0 0 0;
+    }
+
+    .story-photo:nth-child(2) {
+      border-radius: 0 12px 0 0;
+    }
+
+    .story-content {
+      padding: 20px;
+      padding-bottom: 18px;
+      background: var(--fn-parchment);
+    }
+
+    .story-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 8px;
+      background: rgba(195, 176, 145, 0.2);
+      border-radius: 4px;
+      font-size: 8px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--fn-leather);
+      margin-bottom: 12px;
+    }
+
+    .story-badge svg {
+      width: 10px;
+      height: 10px;
+    }
+
+    .story-title {
+      font-family: 'Libre Baskerville', Georgia, serif;
+      font-size: 20px;
+      font-style: italic;
+      color: var(--fn-charcoal);
+      line-height: 1.25;
+      margin-bottom: 8px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .story-meta {
+      font-size: 11px;
+      color: var(--fn-leather);
+      margin-bottom: 16px;
+    }
+
+    .story-curator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .story-avatar {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--fn-khaki);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--fn-warm-white);
+      font-size: 10px;
+      font-weight: 500;
+    }
+
+    .story-curator-name {
+      font-size: 11px;
+      color: var(--fn-leather);
+    }
+
+    .story-link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 10px 16px;
+      background: var(--fn-charcoal);
+      border-radius: 8px;
+      color: var(--fn-parchment);
+      font-size: 11px;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .story-link svg {
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
+    }
+
+    /* Photo fallback for missing images */
+    .photo-fallback {
+      background: linear-gradient(135deg, rgba(195,176,145,0.22), rgba(137,180,196,0.10)) !important;
+    }
+
+    .story-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      background: rgba(195, 176, 145, 0.1);
+    }
+
+    .story-logo {
+      font-family: 'Libre Baskerville', Georgia, serif;
+      font-size: 14px;
+      font-style: italic;
+      color: var(--fn-charcoal);
+    }
+
+    .story-cta {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--fn-leather);
+    }
+
+    /* ================================================================
+       OG IMAGE — SINGLE MAP (1200×630 scaled to 400×210)
+       ================================================================ */
+    .og-card {
+      width: 400px;
+      height: 210px;
+      background: var(--fn-parchment);
+      border-radius: 8px;
+      overflow: hidden;
+      display: flex;
+    }
+
+    .og-photo {
+      width: 210px;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      filter: saturate(0.88) contrast(1.05);
+      flex-shrink: 0;
+    }
+
+    .og-content {
+      flex: 1;
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .og-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      padding: 3px 6px;
+      background: rgba(195, 176, 145, 0.2);
+      border-radius: 3px;
+      font-size: 7px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--fn-leather);
+      margin-bottom: 10px;
+      align-self: flex-start;
+    }
+
+    .og-badge svg {
+      width: 8px;
+      height: 8px;
+    }
+
+    .og-title {
+      font-family: 'Libre Baskerville', Georgia, serif;
+      font-size: 16px;
+      font-style: italic;
+      color: var(--fn-charcoal);
+      line-height: 1.3;
+      margin-bottom: 6px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .og-meta {
+      font-size: 10px;
+      color: var(--fn-leather);
+      margin-bottom: auto;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .og-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 10px;
+      border-top: 1px solid rgba(195, 176, 145, 0.2);
+    }
+
+    .og-curator {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .og-avatar {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--fn-khaki);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--fn-warm-white);
+      font-size: 8px;
+      font-weight: 500;
+    }
+
+    .og-curator-name {
+      font-size: 9px;
+      color: var(--fn-leather);
+    }
+
+    .og-logo {
+      font-family: 'Libre Baskerville', Georgia, serif;
+      font-size: 11px;
+      font-style: italic;
+      color: var(--fn-charcoal);
+    }
+
+    /* ================================================================
+       OG IMAGE — GUIDE / COLLECTION (1200×630 scaled to 400×210)
+       ================================================================ */
+    .og-guide {
+      width: 400px;
+      height: 210px;
+      background: var(--fn-parchment);
+      border-radius: 8px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .og-guide-photos {
+      height: 120px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2px;
+    }
+
+    .og-guide-photo {
+      background-size: cover;
+      background-position: center;
+      filter: saturate(0.88) contrast(1.05);
+    }
+
+    .og-guide-content {
+      flex: 1;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .og-guide-info {
+      flex: 1;
+    }
+
+    .og-guide-label {
+      font-size: 8px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--fn-khaki);
+      margin-bottom: 4px;
+    }
+
+    .og-guide-title {
+      font-family: 'Libre Baskerville', Georgia, serif;
+      font-size: 15px;
+      font-style: italic;
+      color: var(--fn-charcoal);
+      margin-bottom: 4px;
+    }
+
+    .og-guide-meta {
+      font-size: 10px;
+      color: var(--fn-leather);
+    }
+
+    .og-guide-logo {
+      font-family: 'Libre Baskerville', Georgia, serif;
+      font-size: 12px;
+      font-style: italic;
+      color: var(--fn-charcoal);
+    }
+
+    /* ================================================================
+       VARIANT: STORY WITH SINGLE HERO
+       ================================================================ */
+    .story-card.hero-variant .story-hero {
+      flex: 1;
+      background-size: cover;
+      background-position: center;
+      filter: saturate(0.88) contrast(1.05);
+      position: relative;
+    }
+
+    /* ================================================================
+       INSTAGRAM FEED (4:5) — 1080×1350 scaled to 270×337.5
+       ================================================================ */
+    .feed-card {
+      width: 270px;
+      height: 338px;
+      background: var(--fn-parchment);
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .feed-photo-grid {
+      height: 180px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 2px;
+    }
+
+    .feed-photo {
+      background-size: cover;
+      background-position: center;
+      filter: saturate(0.88) contrast(1.05);
+    }
+
+    .feed-content {
+      flex: 1;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .feed-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 8px;
+      background: rgba(195, 176, 145, 0.2);
+      border-radius: 4px;
+      font-size: 8px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--fn-leather);
+      margin-bottom: 10px;
+      align-self: flex-start;
+    }
+
+    .feed-badge svg {
+      width: 10px;
+      height: 10px;
+    }
+
+    .feed-title {
+      font-family: 'Libre Baskerville', Georgia, serif;
+      font-size: 18px;
+      font-style: italic;
+      color: var(--fn-charcoal);
+      line-height: 1.25;
+      margin-bottom: 6px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .feed-curator {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: auto;
+    }
+
+    .feed-avatar {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--fn-khaki);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--fn-warm-white);
+      font-size: 9px;
+      font-weight: 500;
+    }
+
+    .feed-curator-name {
+      font-size: 11px;
+      color: var(--fn-leather);
+    }
+
+    .feed-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 12px;
+      border-top: 1px solid rgba(195, 176, 145, 0.15);
+    }
+
+    .feed-link {
+      font-size: 10px;
+      color: var(--fn-leather);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .feed-logo {
+      font-family: 'Libre Baskerville', Georgia, serif;
+      font-size: 12px;
+      font-style: italic;
+      color: var(--fn-charcoal);
+    }
+
+    /* ================================================================
+       DEMO LABEL
+       ================================================================ */
+    .demo-label {
+      position: fixed;
+      bottom: 16px;
+      right: 16px;
+      padding: 8px 12px;
+      background: rgba(54, 69, 79, 0.9);
+      color: var(--fn-parchment);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-radius: 6px;
+      z-index: 100;
+    }
+  </style>
+</head>
+<body>
+
+  <h1 class="page-title">Share Cards & Link Previews</h1>
+  <p class="page-subtitle">Visual assets for sharing Saiko Maps content externally</p>
+
+  <!-- INSTAGRAM STORY -->
+  <section class="section">
+    <div class="section-label">Share Card — Instagram Story</div>
+    <div class="cards-row">
+      
+      <!-- Variant A: 4-up photo grid -->
+      <div class="card-wrapper">
+        <div class="card-label">4-up grid</div>
+        <div class="story-card">
+          <div class="story-photo-grid">
+            <div class="story-photo" style="background-image: url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=400&fit=crop');"></div>
+            <div class="story-photo" style="background-image: url('https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=400&h=400&fit=crop');"></div>
+            <div class="story-photo" style="background-image: url('https://images.unsplash.com/photo-1552566626-52f8b828add9?w=400&h=400&fit=crop');"></div>
+            <div class="story-photo" style="background-image: url('https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=400&fit=crop');"></div>
+          </div>
+          <div class="story-content">
+            <div class="story-badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+              12 places
+            </div>
+            <h2 class="story-title">Echo Park Date Nights</h2>
+            <div class="story-curator">
+              <div class="story-avatar">B</div>
+              <span class="story-curator-name">by Bobby</span>
+            </div>
+            <div class="story-link">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/>
+                <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/>
+              </svg>
+              saiko.la/m/echo-park
+            </div>
+          </div>
+          <div class="story-footer">
+            <span class="story-logo">Saiko</span>
+            <span class="story-cta">Swipe up to explore</span>
+          </div>
+        </div>
+        <div class="card-dimensions">1080 × 1920</div>
+      </div>
+
+      <!-- Variant B: Single hero -->
+      <div class="card-wrapper">
+        <div class="card-label">Hero photo</div>
+        <div class="story-card hero-variant">
+          <div class="story-hero" style="background-image: url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=600&h=800&fit=crop');"></div>
+          <div class="story-content">
+            <div class="story-badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+              12 places
+            </div>
+            <h2 class="story-title">Echo Park Date Nights</h2>
+            <div class="story-curator">
+              <div class="story-avatar">B</div>
+              <span class="story-curator-name">by Bobby</span>
+            </div>
+            <div class="story-link">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/>
+                <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/>
+              </svg>
+              saiko.la/m/echo-park
+            </div>
+          </div>
+          <div class="story-footer">
+            <span class="story-logo">Saiko</span>
+            <span class="story-cta">Swipe up to explore</span>
+          </div>
+        </div>
+        <div class="card-dimensions">1080 × 1920</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- INSTAGRAM FEED -->
+  <section class="section">
+    <div class="section-label">Share Card — Instagram Feed (4:5)</div>
+    <div class="cards-row">
+      
+      <!-- Feed Card -->
+      <div class="card-wrapper">
+        <div class="card-label">4-up grid</div>
+        <div class="feed-card">
+          <div class="feed-photo-grid">
+            <div class="feed-photo" style="background-image: url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=300&h=300&fit=crop');"></div>
+            <div class="feed-photo" style="background-image: url('https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=300&h=300&fit=crop');"></div>
+            <div class="feed-photo" style="background-image: url('https://images.unsplash.com/photo-1552566626-52f8b828add9?w=300&h=300&fit=crop');"></div>
+            <div class="feed-photo" style="background-image: url('https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=300&h=300&fit=crop');"></div>
+          </div>
+          <div class="feed-content">
+            <div class="feed-badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+              12 places
+            </div>
+            <h2 class="feed-title">Echo Park Date Nights</h2>
+            <div class="feed-curator">
+              <div class="feed-avatar">B</div>
+              <span class="feed-curator-name">by Bobby</span>
+            </div>
+            <div class="feed-footer">
+              <span class="feed-link">saiko.la/m/echo-park</span>
+              <span class="feed-logo">Saiko</span>
+            </div>
+          </div>
+        </div>
+        <div class="card-dimensions">1080 × 1350</div>
+      </div>
+
+      <!-- Feed Card with fallback photo -->
+      <div class="card-wrapper">
+        <div class="card-label">With missing photo</div>
+        <div class="feed-card">
+          <div class="feed-photo-grid">
+            <div class="feed-photo" style="background-image: url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=300&h=300&fit=crop');"></div>
+            <div class="feed-photo" style="background-image: url('https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=300&h=300&fit=crop');"></div>
+            <div class="feed-photo" style="background-image: url('https://images.unsplash.com/photo-1552566626-52f8b828add9?w=300&h=300&fit=crop');"></div>
+            <div class="feed-photo photo-fallback"></div>
+          </div>
+          <div class="feed-content">
+            <div class="feed-badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+              8 places
+            </div>
+            <h2 class="feed-title">SGV Dim Sum Run</h2>
+            <div class="feed-curator">
+              <div class="feed-avatar">B</div>
+              <span class="feed-curator-name">by Bobby</span>
+            </div>
+            <div class="feed-footer">
+              <span class="feed-link">saiko.la/m/sgv-dim-sum</span>
+              <span class="feed-logo">Saiko</span>
+            </div>
+          </div>
+        </div>
+        <div class="card-dimensions">1080 × 1350</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- OG IMAGES — LINK PREVIEWS -->
+  <section class="section">
+    <div class="section-label">Link Previews — OG Images</div>
+    <div class="cards-row">
+
+      <!-- Single Map -->
+      <div class="card-wrapper">
+        <div class="card-label">Single Map</div>
+        <div class="og-card">
+          <div class="og-photo" style="background-image: url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=400&fit=crop');"></div>
+          <div class="og-content">
+            <div class="og-badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+              12 places
+            </div>
+            <h2 class="og-title">Echo Park Date Nights</h2>
+            <p class="og-meta">Wine bars and neighborhood gems across Silver Lake and Los Feliz.</p>
+            <div class="og-footer">
+              <div class="og-curator">
+                <div class="og-avatar">B</div>
+                <span class="og-curator-name">by Bobby</span>
+              </div>
+              <span class="og-logo">Saiko</span>
+            </div>
+          </div>
+        </div>
+        <div class="card-dimensions">1200 × 630</div>
+      </div>
+
+      <!-- Guide / Collection -->
+      <div class="card-wrapper">
+        <div class="card-label">Guide / Collection</div>
+        <div class="og-guide">
+          <div class="og-guide-photos">
+            <div class="og-guide-photo" style="background-image: url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=300&h=200&fit=crop');"></div>
+            <div class="og-guide-photo" style="background-image: url('https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=300&h=200&fit=crop');"></div>
+            <div class="og-guide-photo" style="background-image: url('https://images.unsplash.com/photo-1552566626-52f8b828add9?w=300&h=200&fit=crop');"></div>
+            <div class="og-guide-photo" style="background-image: url('https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=300&h=200&fit=crop');"></div>
+          </div>
+          <div class="og-guide-content">
+            <div class="og-guide-info">
+              <div class="og-guide-label">Guide</div>
+              <h2 class="og-guide-title">Best of Silver Lake</h2>
+              <p class="og-guide-meta">4 maps · 47 places</p>
+            </div>
+            <span class="og-guide-logo">Saiko</span>
+          </div>
+        </div>
+        <div class="card-dimensions">1200 × 630</div>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="demo-label">Share Assets · v2</div>
+
+</body>
+</html>

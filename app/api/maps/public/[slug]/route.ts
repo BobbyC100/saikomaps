@@ -23,16 +23,16 @@ export async function GET(
         published: true, // Only show published maps
       },
       include: {
-        user: {
+        users: {
           select: {
             id: true,
             name: true,
             email: true,
           },
         },
-        mapPlaces: {
+        map_places: {
           orderBy: { orderIndex: 'asc' },
-          include: { place: true },
+          include: { places: true },
         },
       },
     });
@@ -45,39 +45,39 @@ export async function GET(
     }
 
     // Fetch identity signals for places
-    const googlePlaceIds = list.mapPlaces
-      .map(mp => mp.place.googlePlaceId)
-      .filter((id): id is string => id !== null);
+    const googlePlaceIds = list.map_places
+      .map(mp => mp.places?.googlePlaceId)
+      .filter((id): id is string => id != null && id !== '');
     
-    const identitySignals = await db.goldenRecord.findMany({
+    const identitySignals = await db.golden_records.findMany({
       where: {
-        googlePlaceId: { in: googlePlaceIds },
+        google_place_id: { in: googlePlaceIds },
       },
       select: {
-        googlePlaceId: true,
-        placePersonality: true,
-        priceTier: true,
+        google_place_id: true,
+        place_personality: true,
+        price_tier: true,
       },
     });
     
     // Build map of google_place_id -> identity signals
     const signalsMap = new Map<string, { placePersonality: string | null; priceTier: string | null }>();
     identitySignals.forEach(record => {
-      if (record.googlePlaceId) {
-        signalsMap.set(record.googlePlaceId, {
-          placePersonality: record.placePersonality,
-          priceTier: record.priceTier,
+      if (record.google_place_id) {
+        signalsMap.set(record.google_place_id, {
+          placePersonality: record.place_personality || null,
+          priceTier: record.price_tier || null,
         });
       }
     });
     
     // Enrich mapPlaces with identity signals
-    const enrichedMapPlaces = list.mapPlaces.map(mp => {
-      const signals = mp.place.googlePlaceId ? signalsMap.get(mp.place.googlePlaceId) : null;
+    const enrichedMapPlaces = list.map_places.map(mp => {
+      const signals = mp.places?.googlePlaceId ? signalsMap.get(mp.places.googlePlaceId) : null;
       return {
         ...mp,
         place: {
-          ...mp.place,
+          ...mp.places,
           placePersonality: signals?.placePersonality || null,
           priceTier: signals?.priceTier || null,
         },
@@ -92,7 +92,7 @@ export async function GET(
       data: {
         ...list,
         mapPlaces: enrichedMapPlaces,
-        creatorName: list.user.name || list.user.email.split('@')[0], // Use name or email prefix
+        creatorName: list.users?.name || list.users?.email?.split('@')[0], // Use name or email prefix
         isOwner, // Include ownership flag
       },
     });

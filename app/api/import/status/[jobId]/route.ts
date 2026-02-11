@@ -17,7 +17,7 @@ export async function GET(
     const importJob = await db.importJob.findUnique({
       where: { id: jobId },
       include: {
-        list: {
+        lists: {
           select: {
             id: true,
             title: true,
