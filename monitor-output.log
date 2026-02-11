@@ -725,3 +725,425 @@ API error: RateLimitError: 429 {"type":"error","error":{"type":"rate_limit_error
 [119/333] Gwen
 [120/333] Hakata Izakaya HERO
 [121/333] Haleiwa Joe's Haiku Gardens
+API error: RateLimitError: 429 {"type":"error","error":{"type":"rate_limit_error","message":"This request would exceed your organization's rate limit of 450,000 input tokens per minute (org: cf981f65-f092-44b3-881d-f16a1fb203ac, model: claude-sonnet-4-20250514). For details, refer to: https://docs.claude.com/en/api/rate-limits. You can see the response headers for current usage. Please reduce the prompt length or the maximum tokens requested, or try again later. You may also contact sales at https://www.anthropic.com/contact-sales to discuss your options for a rate limit increase."},"request_id":"req_011CY1CMNL4fHVG9SWgBQYRz"}
+    at Function.generate (/Users/bobbyciccaglione/saiko-maps/node_modules/@anthropic-ai/sdk/src/core/error.ts:87:14)
+    at Anthropic.makeStatusError (/Users/bobbyciccaglione/saiko-maps/node_modules/@anthropic-ai/sdk/src/client.ts:445:28)
+    at Anthropic.makeRequest (/Users/bobbyciccaglione/saiko-maps/node_modules/@anthropic-ai/sdk/src/client.ts:680:24)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async extractSignals (/Users/bobbyciccaglione/saiko-maps/scripts/extract-identity-signals.ts:324:22)
+    at async main (/Users/bobbyciccaglione/saiko-maps/scripts/extract-identity-signals.ts:477:38) {
+  status: 429,
+  headers: Headers {
+    date: 'Tue, 10 Feb 2026 22:43:03 GMT',
+    'content-type': 'application/json',
+    'content-length': '603',
+    connection: 'keep-alive',
+    'x-should-retry': 'true',
+    'anthropic-ratelimit-input-tokens-limit': '450000',
+    'anthropic-ratelimit-input-tokens-remaining': '450000',
+    'anthropic-ratelimit-input-tokens-reset': '1970-01-01T00:00:00Z',
+    'anthropic-ratelimit-output-tokens-limit': '90000',
+    'anthropic-ratelimit-output-tokens-remaining': '90000',
+    'anthropic-ratelimit-output-tokens-reset': '1970-01-01T00:00:00Z',
+    'anthropic-ratelimit-requests-limit': '1000',
+    'anthropic-ratelimit-requests-remaining': '1000',
+    'anthropic-ratelimit-requests-reset': '2026-02-10T22:43:03Z',
+    'retry-after': '57',
+    'anthropic-ratelimit-tokens-limit': '540000',
+    'anthropic-ratelimit-tokens-remaining': '540000',
+    'anthropic-ratelimit-tokens-reset': '1970-01-01T00:00:00Z',
+    'request-id': 'req_011CY1CMNL4fHVG9SWgBQYRz',
+    'strict-transport-security': 'max-age=31536000; includeSubDomains; preload',
+    'anthropic-organization-id': 'cf981f65-f092-44b3-881d-f16a1fb203ac',
+    server: 'cloudflare',
+    'x-envoy-upstream-service-time': '232',
+    'cf-cache-status': 'DYNAMIC',
+    'x-robots-tag': 'none',
+    'content-security-policy': "default-src 'none'; frame-ancestors 'none'",
+    'cf-ray': '9cbf1f85baf40d12-LAX'
+  },
+  requestID: 'req_011CY1CMNL4fHVG9SWgBQYRz',
+  error: {
+    type: 'error',
+    error: {
+      type: 'rate_limit_error',
+      message: "This request would exceed your organization's rate limit of 450,000 input tokens per minute (org: cf981f65-f092-44b3-881d-f16a1fb203ac, model: claude-sonnet-4-20250514). For details, refer to: https://docs.claude.com/en/api/rate-limits. You can see the response headers for current usage. Please reduce the prompt length or the maximum tokens requested, or try again later. You may also contact sales at https://www.anthropic.com/contact-sales to discuss your options for a rate limit increase."
+    },
+    request_id: 'req_011CY1CMNL4fHVG9SWgBQYRz'
+  }
+}
+[122/333] HAPPA Japanese Izakaya & Bar
+[123/333] Happy Harbor Seafood Restaurant 凱悅大酒樓
+[124/333] Happy Together 喜薈
+[125/333] Harold & Belle's
+[126/333] Hasu Japanese Izakaya & Grill
+[127/333] Hatchet Hall
+[128/333] Hawkins House of Burgers
+[129/333] Heavy Handed
+[130/333] Helen's Wines Fairfax
+[131/333] Heritage
+[132/333] Hey Kiddo
+API error: BadRequestError: 400 {"type":"error","error":{"type":"invalid_request_error","message":"prompt is too long: 239812 tokens > 200000 maximum"},"request_id":"req_011CY1CQ81gYB3wDD2GfKh81"}
+    at Function.generate (/Users/bobbyciccaglione/saiko-maps/node_modules/@anthropic-ai/sdk/src/core/error.ts:63:14)
+    at Anthropic.makeStatusError (/Users/bobbyciccaglione/saiko-maps/node_modules/@anthropic-ai/sdk/src/client.ts:445:28)
+    at Anthropic.makeRequest (/Users/bobbyciccaglione/saiko-maps/node_modules/@anthropic-ai/sdk/src/client.ts:680:24)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async extractSignals (/Users/bobbyciccaglione/saiko-maps/scripts/extract-identity-signals.ts:324:22)
+    at async main (/Users/bobbyciccaglione/saiko-maps/scripts/extract-identity-signals.ts:477:38) {
+  status: 400,
+  headers: Headers {
+    date: 'Tue, 10 Feb 2026 22:43:40 GMT',
+    'content-type': 'application/json',
+    'content-length': '164',
+    connection: 'keep-alive',
+    'x-should-retry': 'false',
+    'request-id': 'req_011CY1CQ81gYB3wDD2GfKh81',
+    'strict-transport-security': 'max-age=31536000; includeSubDomains; preload',
+    'anthropic-organization-id': 'cf981f65-f092-44b3-881d-f16a1fb203ac',
+    server: 'cloudflare',
+    'x-envoy-upstream-service-time': '183',
+    'cf-cache-status': 'DYNAMIC',
+    'x-robots-tag': 'none',
+    'content-security-policy': "default-src 'none'; frame-ancestors 'none'",
+    'cf-ray': '9cbf20710de60d12-LAX'
+  },
+  requestID: 'req_011CY1CQ81gYB3wDD2GfKh81',
+  error: {
+    type: 'error',
+    error: {
+      type: 'invalid_request_error',
+      message: 'prompt is too long: 239812 tokens > 200000 maximum'
+    },
+    request_id: 'req_011CY1CQ81gYB3wDD2GfKh81'
+  }
+}
+[133/333] Hilltop Coffee + Kitchen
+[134/333] Hinano Cafe
+[135/333] Hippo
+[136/333] Holbox
+[137/333] Honey Hi
+[138/333] Hong Kong Dim Sum House
+[139/333] Hop Alley
+[140/333] IMA
+[141/333] Inaba Japanese Restaurant
+[142/333] Izakaya Akatsuki
+[143/333] Jade Wok
+[144/333] Jar
+[145/333] Javan Restaurant
+[146/333] Jeannot's Patisserie & Bistro
+[147/333] Jidaiya Ramen Dining
+[148/333] Jitlada Restaurant
+[149/333] Jones
+[150/333] Josui Ramen
+[151/333] Kagura Torrance
+[152/333] Kato Restaurant
+[153/333] Killer Noodle Tsujita
+[154/333] Kippered
+[155/333] Kismet
+[156/333] Kismet Rotisserie
+[157/333] kodo
+[158/333] KTEAM BBQ
+[159/333] KUKU Cafe
+[160/333] La Bête Noire
+[161/333] La Fe
+[162/333] LA FLAMA Culver City
+[163/333] La Fonda Of Inglewood Restaurant & Cafe
+[164/333] La Pergoletta
+[165/333] La Pergoletta on Sunset
+[166/333] La Pharmacie du Vin
+[167/333] LA PUREPECHA COCINA MEXICANA
+[168/333] Lamonica's NY Pizza
+[169/333] Langer's Delicatessen-Restaurant
+[170/333] Lasita Rotisserie & Natural Wine
+[171/333] Laurel Grill
+API error: BadRequestError: 400 {"type":"error","error":{"type":"invalid_request_error","message":"prompt is too long: 239480 tokens > 200000 maximum"},"request_id":"req_011CY1CaXX5KahXTrx82xqn9"}
+    at Function.generate (/Users/bobbyciccaglione/saiko-maps/node_modules/@anthropic-ai/sdk/src/core/error.ts:63:14)
+    at Anthropic.makeStatusError (/Users/bobbyciccaglione/saiko-maps/node_modules/@anthropic-ai/sdk/src/client.ts:445:28)
+    at Anthropic.makeRequest (/Users/bobbyciccaglione/saiko-maps/node_modules/@anthropic-ai/sdk/src/client.ts:680:24)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async extractSignals (/Users/bobbyciccaglione/saiko-maps/scripts/extract-identity-signals.ts:324:22)
+    at async main (/Users/bobbyciccaglione/saiko-maps/scripts/extract-identity-signals.ts:477:38) {
+  status: 400,
+  headers: Headers {
+    date: 'Tue, 10 Feb 2026 22:46:02 GMT',
+    'content-type': 'application/json',
+    'content-length': '164',
+    connection: 'keep-alive',
+    'x-should-retry': 'false',
+    'request-id': 'req_011CY1CaXX5KahXTrx82xqn9',
+    'strict-transport-security': 'max-age=31536000; includeSubDomains; preload',
+    'anthropic-organization-id': 'cf981f65-f092-44b3-881d-f16a1fb203ac',
+    server: 'cloudflare',
+    'x-envoy-upstream-service-time': '205',
+    'cf-cache-status': 'DYNAMIC',
+    'x-robots-tag': 'none',
+    'content-security-policy': "default-src 'none'; frame-ancestors 'none'",
+    'cf-ray': '9cbf23e3dd6e0d12-LAX'
+  },
+  requestID: 'req_011CY1CaXX5KahXTrx82xqn9',
+  error: {
+    type: 'error',
+    error: {
+      type: 'invalid_request_error',
+      message: 'prompt is too long: 239480 tokens > 200000 maximum'
+    },
+    request_id: 'req_011CY1CaXX5KahXTrx82xqn9'
+  }
+}
+[172/333] Le Comptoir
+[173/333] Leo's Tacos Truck
+[174/333] Little Belize Restaurant
+[175/333] Little Fatty
+[176/333] Little Ripper LA
+API error: BadRequestError: 400 {"type":"error","error":{"type":"invalid_request_error","message":"prompt is too long: 208939 tokens > 200000 maximum"},"request_id":"req_011CY1CbZdrPpL87wdVZzQbE"}
+    at Function.generate (/Users/bobbyciccaglione/saiko-maps/node_modules/@anthropic-ai/sdk/src/core/error.ts:63:14)
+    at Anthropic.makeStatusError (/Users/bobbyciccaglione/saiko-maps/node_modules/@anthropic-ai/sdk/src/client.ts:445:28)
+    at Anthropic.makeRequest (/Users/bobbyciccaglione/saiko-maps/node_modules/@anthropic-ai/sdk/src/client.ts:680:24)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async extractSignals (/Users/bobbyciccaglione/saiko-maps/scripts/extract-identity-signals.ts:324:22)
+    at async main (/Users/bobbyciccaglione/saiko-maps/scripts/extract-identity-signals.ts:477:38) {
+  status: 400,
+  headers: Headers {
+    date: 'Tue, 10 Feb 2026 22:46:16 GMT',
+    'content-type': 'application/json',
+    'content-length': '164',
+    connection: 'keep-alive',
+    'x-should-retry': 'false',
+    'request-id': 'req_011CY1CbZdrPpL87wdVZzQbE',
+    'strict-transport-security': 'max-age=31536000; includeSubDomains; preload',
+    'anthropic-organization-id': 'cf981f65-f092-44b3-881d-f16a1fb203ac',
+    server: 'cloudflare',
+    'x-envoy-upstream-service-time': '131',
+    'cf-cache-status': 'DYNAMIC',
+    'x-robots-tag': 'none',
+    'content-security-policy': "default-src 'none'; frame-ancestors 'none'",
+    'cf-ray': '9cbf243bbb430d12-LAX'
+  },
+  requestID: 'req_011CY1CbZdrPpL87wdVZzQbE',
+  error: {
+    type: 'error',
+    error: {
+      type: 'invalid_request_error',
+      message: 'prompt is too long: 208939 tokens > 200000 maximum'
+    },
+    request_id: 'req_011CY1CbZdrPpL87wdVZzQbE'
+  }
+}
+[177/333] Liu's Cafe
+[178/333] Lo-Fi Wines
+[179/333] Longo Seafood Restaurant
+[180/333] Lonzo's Restaurant
+[181/333] Loreto
+[182/333] Loreto's Fried Turkey
+[183/333] Los Cheros Pupuseria
+[184/333] Lou Wine Shop
+[185/333] Love & Salt
+[186/333] Lowboy
+[187/333] Lucky Plaza
+[188/333] LULU Restaurant LA
+[189/333] Lumière
+[190/333] Lunasia Dim Sum House (Torrance)
+[191/333] Lunasia Dim Sum House Pasadena
+[192/333] Madeo Restaurant
+[193/333] Maison Kitsuné Los Angeles
+[194/333] Majordomo
+[195/333] Mamie
+[196/333] Manuela
+[197/333] Maple Block Meat Co.
+[198/333] Margot
+[199/333] Marina Del Rey Hotel
+[200/333] Mario's Italian Deli & Market
+[201/333] Marouch Restaurant
+[202/333] Maru Coffee
+[203/333] Master Burger
+[204/333] Maury's
+[205/333] Mazal
+[206/333] Meals By Genet
+[207/333] Melanie Restaurant
+[208/333] Mélisse Restaurant
+[209/333] Melody
+[210/333] Mi Corazon Mexican Cuisine
+[211/333] MIAN West Adams
+[212/333] Michaels
+[213/333] Milo & Olive
+[214/333] Mitch's Fish Market & Sushi Bar
+[215/333] Moo's Craft Barbecue
+[216/333] Morihiro
+[217/333] Mr. B's Wine & Spirits Downtown Denver
+[218/333] Mt. Olomana Trail (Three Peaks)
+[219/333] Nalu Vida Venice Beach
+[220/333] Nick's Cafe
+[221/333] Night + Market Weho
+[222/333] Object
+[223/333] Ocean Bo Dim Sum Cafe
+[224/333] OH LA LA
+[225/333] Olivia Restaurant
+[226/333] Open Sesame Grill - Long Beach
+[227/333] Orleans & York Inglewood
+[228/333] Ospi Venice
+[229/333] Osteria Mozza
+[230/333] OTOTO
+[231/333] Palmeri Ristorante
+[232/333] Pann's Restaurant
+[233/333] Park's BBQ
+[234/333] Parkers' Lighthouse
+[235/333] pasjoli
+[236/333] Paul Bar/Food
+[237/333] Petit Trois
+[238/333] Phorage Vietnamese Overland
+[239/333] Pijja Palace
+[240/333] Pizzana
+[241/333] Pizzeria Bianco
+[242/333] Pizzeria Mozza
+[243/333] Porta Via Italian Foods
+[244/333] Post & Beam
+[245/333] Proof Bakery
+[246/333] Propaganda Wine Bar
+[247/333] Providence
+[248/333] Q
+[249/333] Quarter Sheets
+[250/333] R/10 Social House
+[251/333] Rainforest Flora, Inc.
+[252/333] Ramona Room
+[253/333] Randy's Donuts
+[254/333] Rasarumah
+[255/333] Rasselbock Kitchen & Beer Garden
+[256/333] Redbird
+[257/333] Revival Denver Public House
+[258/333] Rhythm Room L.A.
+[259/333] Riot Games Inc.
+[260/333] Roasted Duck by Pa Ord
+[261/333] Ronan
+[262/333] Rustic Canyon
+[263/333] Saffy’s
+[264/333] San Laurel
+[265/333] Savta
+[266/333] Say Cheese
+[267/333] Senia
+[268/333] Shin-Sen-Gumi Chanko - Gardena
+[269/333] Shins Pizza
+[270/333] Shirubē
+[271/333] Si! Mon
+[272/333] Sichuan Street Food (当代川菜)
+API error: BadRequestError: 400 {"type":"error","error":{"type":"invalid_request_error","message":"prompt is too long: 240647 tokens > 200000 maximum"},"request_id":"req_011CY1D4V61W1Y7PSaQUVFEu"}
+    at Function.generate (/Users/bobbyciccaglione/saiko-maps/node_modules/@anthropic-ai/sdk/src/core/error.ts:63:14)
+    at Anthropic.makeStatusError (/Users/bobbyciccaglione/saiko-maps/node_modules/@anthropic-ai/sdk/src/client.ts:445:28)
+    at Anthropic.makeRequest (/Users/bobbyciccaglione/saiko-maps/node_modules/@anthropic-ai/sdk/src/client.ts:680:24)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async extractSignals (/Users/bobbyciccaglione/saiko-maps/scripts/extract-identity-signals.ts:324:22)
+    at async main (/Users/bobbyciccaglione/saiko-maps/scripts/extract-identity-signals.ts:477:38) {
+  status: 400,
+  headers: Headers {
+    date: 'Tue, 10 Feb 2026 22:52:21 GMT',
+    'content-type': 'application/json',
+    'content-length': '164',
+    connection: 'keep-alive',
+    'x-should-retry': 'false',
+    'request-id': 'req_011CY1D4V61W1Y7PSaQUVFEu',
+    'strict-transport-security': 'max-age=31536000; includeSubDomains; preload',
+    'anthropic-organization-id': 'cf981f65-f092-44b3-881d-f16a1fb203ac',
+    server: 'cloudflare',
+    'x-envoy-upstream-service-time': '177',
+    'cf-cache-status': 'DYNAMIC',
+    'x-robots-tag': 'none',
+    'content-security-policy': "default-src 'none'; frame-ancestors 'none'",
+    'cf-ray': '9cbf2d25fc5d0d12-LAX'
+  },
+  requestID: 'req_011CY1D4V61W1Y7PSaQUVFEu',
+  error: {
+    type: 'error',
+    error: {
+      type: 'invalid_request_error',
+      message: 'prompt is too long: 240647 tokens > 200000 maximum'
+    },
+    request_id: 'req_011CY1D4V61W1Y7PSaQUVFEu'
+  }
+}
+[273/333] Side Street Inn On Da Strip
+[274/333] Solidarity
+[275/333] Somerville
+[276/333] Spina
+[277/333] Stanley's Wet Goods
+[278/333] SteelCraft Long Beach
+[279/333] Sunnin Lebanese Cafe
+[280/333] Surfas Culinary District
+[281/333] Sushi Ginza Onodera
+[282/333] Sushi Tama
+[283/333] Tabula Rasa Bar
+[284/333] Tacos 1986
+[285/333] Taormina Sicilian Cuisine
+[286/333] TAVERNA at The Mar Vista
+[287/333] The Airliner
+[288/333] The Apple Pan
+[289/333] The Arthur J
+[290/333] The Baked Potato
+[291/333] The Belasco
+[292/333] The Breakers Palm Beach
+[293/333] The Brixton
+[294/333] The Brothers Sushi Culver City
+[295/333] The Copper Room
+[296/333] The Crawford Hotel
+[297/333] The Factory Kitchen
+[298/333] The Italian Deli Co.
+[299/333] The MEETING SPOT
+[300/333] The Mulberry LA
+[301/333] The Original Rinaldi's Deli and Cafe
+[302/333] The Palms
+[303/333] The Paramour Estate
+[304/333] The Pig and The Lady
+[305/333] The Rose Venice
+[306/333] The Semi-Tropic
+[307/333] The Serving Spoon
+[308/333] The Wilkes Brentwood
+[309/333] Toranj Restaurant
+[310/333] Tortuga Bay
+[311/333] Trinistyle Cuisine
+[312/333] Tripp Burgers
+[313/333] Two Hommés
+[314/333] UCLA Mathias Botanical Garden
+[315/333] Union Restaurant
+[316/333] UOVO | Pasadena
+[317/333] US Thai Cafe
+[318/333] Vendome Wines & Spirits
+[319/333] Veronica's Kitchen - The Fufuland
+[320/333] Villa's Tacos Los Angeles
+[321/333] Vin Folk
+[322/333] Whole Foods Market
+[323/333] Woodcat Coffee
+[324/333] Xiang La Hui
+[325/333] XUNTOS
+[326/333] Yamashiro Gardens
+[327/333] Yang Chow Restaurant
+[328/333] Yang's Kitchen
+[329/333] YESS
+[330/333] Yongsusan Restaurant
+[331/333] Yunomi Handroll
+[332/333] Zinqué - DTLA
+[333/333] 江戸前鮨 㐂扇 Sushi Kisen
+
+==========================================
+📊 EXTRACTION SUMMARY
+==========================================
+Total processed:  333
+Extracted:        325
+Skipped (no data): 0
+Failed:           8
+
+By Confidence Tier:
+  Publish (≥0.7):  238
+  Review (0.4-0.7): 15
+  Hold (<0.4):     72
+
+By Input Quality:
+  Good (2+ sources): 155
+  Partial (1 source): 175
+  Minimal:          3
+  None:             0
+==========================================
+
+✅ Database updated
+
+════════════════════════════════════════════════════════════
+✅ Phase 2 Complete!
+════════════════════════════════════════════════════════════
+

@@ -28,6 +28,12 @@ const isDryRun = process.argv.includes('--dry-run');
 const limitArg = process.argv.find(arg => arg.startsWith('--limit='));
 const limit = limitArg ? parseInt(limitArg.split('=')[1]) : 100;
 
+interface AddressComponent {
+  long_name: string;
+  short_name: string;
+  types: string[];
+}
+
 interface GooglePlaceDetails {
   name?: string;
   formatted_address?: string;
@@ -43,6 +49,8 @@ interface GooglePlaceDetails {
     height: number;
   }>;
   types?: string[];
+  address_components?: AddressComponent[];
+  price_level?: number;
   geometry?: {
     location: {
       lat: number;
@@ -58,7 +66,7 @@ async function fetchPlaceDetails(placeId: string): Promise<GooglePlaceDetails | 
     throw new Error('GOOGLE_MAPS_API_KEY not found in environment');
   }
   
-  const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=name,formatted_address,formatted_phone_number,website,opening_hours,photos,types,geometry&key=${apiKey}`;
+  const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=name,formatted_address,formatted_phone_number,website,opening_hours,photos,types,geometry,address_components,price_level&key=${apiKey}`;
   
   try {
     const response = await fetch(url);
@@ -74,6 +82,49 @@ async function fetchPlaceDetails(placeId: string): Promise<GooglePlaceDetails | 
     console.error(`Failed to fetch place ${placeId}:`, error);
     return null;
   }
+}
+
+/**
+ * Extract a component value from Google Places address_components
+ */
+function extractFromAddressComponents(
+  components: AddressComponent[] | undefined,
+  type: string
+): string | null {
+  if (!components) return null;
+  const component = components.find(c => c.types.includes(type));
+  return component?.long_name || null;
+}
+
+/**
+ * Map Google Places types to our category taxonomy
+ */
+function mapPrimaryType(types: string[] | undefined): string | null {
+  if (!types || types.length === 0) return null;
+  
+  const categoryMap: Record<string, string> = {
+    'restaurant': 'Restaurant',
+    'cafe': 'Cafe',
+    'bar': 'Bar',
+    'night_club': 'Bar',
+    'bakery': 'Bakery',
+    'meal_takeaway': 'Restaurant',
+    'meal_delivery': 'Restaurant',
+    'food': 'Restaurant',
+    'store': 'Market',
+    'grocery_or_supermarket': 'Market',
+    'liquor_store': 'Wine Shop',
+  };
+  
+  // Try to find a match in our taxonomy
+  for (const type of types) {
+    if (categoryMap[type]) {
+      return categoryMap[type];
+    }
+  }
+  
+  // If no match, return the first type capitalized
+  return types[0].split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 }
 
 async function enrichPlaces() {
@@ -98,7 +149,10 @@ async function enrichPlaces() {
         { enriched_at: null }, // Not yet enriched
         { lat: 0 }, // Has 0,0 coords (needs re-enrichment)
         { lng: 0 },
-        { phone: null }, // Missing data
+        { phone: null }, // Missing phone
+        { address_street: null }, // Missing address (NEW)
+        { neighborhood: null }, // Missing neighborhood (NEW)
+        { category: null }, // Missing category (NEW)
       ],
     },
     take: limit,
@@ -111,6 +165,8 @@ async function enrichPlaces() {
       county: true,
       lat: true,
       lng: true,
+      address_street: true,
+      category: true,
     }
   });
   
@@ -167,6 +223,52 @@ async function enrichPlaces() {
       if (details.opening_hours) {
         updates.hours_json = details.opening_hours;
         console.log(`  ✓ Hours: ${details.opening_hours.weekday_text?.length || 0} periods`);
+      }
+      
+      // Address - from formatted_address
+      if (details.formatted_address) {
+        updates.address_street = details.formatted_address;
+        console.log(`  ✓ Address: ${details.formatted_address}`);
+      }
+      
+      // Address components - extract city, state, zip, neighborhood
+      if (details.address_components) {
+        const city = extractFromAddressComponents(details.address_components, 'locality');
+        const state = extractFromAddressComponents(details.address_components, 'administrative_area_level_1');
+        const zip = extractFromAddressComponents(details.address_components, 'postal_code');
+        const neighborhood = extractFromAddressComponents(details.address_components, 'sublocality') 
+          || extractFromAddressComponents(details.address_components, 'sublocality_level_1')
+          || extractFromAddressComponents(details.address_components, 'neighborhood');
+        
+        if (city) {
+          updates.address_city = city;
+          console.log(`  ✓ City: ${city}`);
+        }
+        if (state) {
+          updates.address_state = state;
+        }
+        if (zip) {
+          updates.address_zip = zip;
+        }
+        if (neighborhood && !place.neighborhood) {
+          updates.neighborhood = neighborhood;
+          console.log(`  ✓ Neighborhood: ${neighborhood}`);
+        }
+      }
+      
+      // Category - from types
+      if (details.types) {
+        const category = mapPrimaryType(details.types);
+        if (category) {
+          updates.category = category;
+          console.log(`  ✓ Category: ${category}`);
+        }
+      }
+      
+      // Price tier - from price_level (0-4)
+      if (details.price_level !== undefined && details.price_level > 0) {
+        updates.price_tier = '$'.repeat(details.price_level);
+        console.log(`  ✓ Price: ${updates.price_tier}`);
       }
       
       // Update with enriched data

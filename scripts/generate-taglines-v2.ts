@@ -208,11 +208,20 @@ async function main() {
         
         // Write to database
         if (!args.dryRun) {
-          // Note: golden_records doesn't have tagline fields yet
-          // This would need to be added to the schema or stored in places table
-          // For now, just log that we would write
+          await prisma.golden_records.update({
+            where: { canonical_id: record.canonical_id },
+            data: {
+              tagline: result.tagline,
+              tagline_candidates: result.taglineCandidates,
+              tagline_pattern: result.taglinePattern,
+              tagline_generated_at: new Date(),
+              tagline_signals: result.signalsSnapshot as any,
+              tagline_version: 2,
+            },
+          });
+          
           if (args.verbose) {
-            console.log(`  💾 Would write to database (schema update needed)`);
+            console.log(`  💾 Saved to database`);
           }
         }
         
@@ -258,16 +267,8 @@ async function main() {
 
   if (args.dryRun) {
     console.log('🔸 DRY RUN — no changes written to database');
-    console.log('⚠️  NOTE: golden_records schema needs tagline fields to persist results');
-  } else {
-    console.log('⚠️  NOTE: golden_records schema needs tagline fields to persist results');
-    console.log('Add these fields to store taglines:');
-    console.log('  - tagline: String?');
-    console.log('  - tagline_candidates: String[]');
-    console.log('  - tagline_pattern: String?');
-    console.log('  - tagline_generated_at: DateTime?');
-    console.log('  - tagline_signals: Json?');
-    console.log('  - tagline_version: Int?');
+  } else if (stats.generated > 0) {
+    console.log(`\n✅ Successfully saved ${stats.generated} taglines to database`);
   }
 }
 

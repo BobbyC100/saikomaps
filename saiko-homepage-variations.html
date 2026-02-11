@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Saiko Maps — Homepage Variations</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --parchment: #F5F0E1;
+      --warm-white: #FFFDF7;
+      --charcoal: #36454F;
+      --khaki: #C3B091;
+      --leather: #8B7355;
+      --brand-red: #D64541;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #111;
+      color: var(--charcoal);
+    }
+
+    /* ================= VARIATION WRAPPER ================= */
+
+    .variation {
+      max-width: 1400px;
+      margin: 60px auto;
+      background: var(--parchment);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+
+    .variation-label {
+      background: var(--charcoal);
+      color: var(--parchment);
+      padding: 16px 24px;
+      font-family: "Inter Tight", sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .variation-label span {
+      font-weight: 500;
+      opacity: 0.6;
+      margin-left: 12px;
+      letter-spacing: 0;
+      text-transform: none;
+    }
+
+    /* ================= HEADER ================= */
+
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      height: 64px;
+      padding: 0 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255,253,247,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(195,176,145,0.15);
+    }
+
+    .logo {
+      font-family: "Inter Tight", system-ui, sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: var(--charcoal);
+    }
+
+    .header-icons {
+      display: flex;
+      gap: 16px;
+    }
+
+    .header-icon {
+      width: 20px;
+      height: 20px;
+      color: var(--leather);
+    }
+
+    /* ================= HERO ================= */
+
+    .hero {
+      position: relative;
+      height: 56vh;
+      min-height: 400px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .map-plate {
+      position: absolute;
+      inset: 24px;
+      border-radius: 16px;
+      background: linear-gradient(145deg,#EDE8D8,#F0ECE2,#E6E0D4);
+      transform: rotate(-1deg) scale(1.04);
+      opacity: 0.9;
+    }
+
+    .map-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(90deg, rgba(195,176,145,.07) 1px, transparent 1px),
+        linear-gradient(rgba(195,176,145,.07) 1px, transparent 1px);
+      background-size: 48px 48px;
+    }
+
+    .road {
+      position: absolute;
+      background: rgba(195,176,145,.25);
+    }
+
+    .road.h { left: 0; right: 0; height: 2px; }
+    .road.v { top: 0; bottom: 0; width: 2px; }
+    .road.h.one { top: 38%; }
+    .road.h.two { top: 58%; }
+    .road.v.one { left: 32%; }
+    .road.v.two { left: 62%; }
+
+    .pin {
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--brand-red);
+      border: 2px solid var(--parchment);
+      box-shadow: 0 2px 8px rgba(214,69,65,.4);
+    }
+
+    .pin.big { width: 18px; height: 18px; }
+
+    .hero-content {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+    }
+
+    .brand {
+      font-family: "Inter Tight", system-ui, sans-serif;
+      font-size: 64px;
+      font-weight: 700;
+      letter-spacing: 8px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .location {
+      font-family: "Inter Tight", system-ui, sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--khaki);
+      margin-bottom: 32px;
+    }
+
+    .cta {
+      display: inline-block;
+      padding: 16px 42px;
+      background: var(--charcoal);
+      color: var(--parchment);
+      border-radius: 6px;
+      font-family: "Inter Tight", system-ui, sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 1.6px;
+      text-transform: uppercase;
+      text-decoration: none;
+      box-shadow: 0 6px 20px rgba(54,69,79,.2);
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+    .cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 28px rgba(54,69,79,.28);
+    }
+
+    /* ================= SECTIONS ================= */
+
+    .section {
+      padding: 56px 32px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(195, 176, 145, 0.25);
+    }
+
+    .section-title {
+      font-family: "Inter Tight", system-ui, sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 2.4px;
+      text-transform: uppercase;
+      color: var(--leather);
+    }
+
+    .section-link {
+      font-family: "Inter Tight", system-ui, sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--khaki);
+      text-decoration: none;
+    }
+
+    /* ================= NEIGHBORHOOD GRID ================= */
+
+    .neighborhood-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+
+    .neighborhood-card {
+      position: relative;
+      aspect-ratio: 4 / 3;
+      border-radius: 12px;
+      overflow: hidden;
+      text-decoration: none;
+    }
+
+    .neighborhood-card-image {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      transition: transform 0.4s ease;
+      filter: saturate(0.9) contrast(1.05);
+    }
+
+    .neighborhood-card:hover .neighborhood-card-image {
+      transform: scale(1.05);
+    }
+
+    .neighborhood-card-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(54,69,79,0.85) 0%, rgba(54,69,79,0.4) 40%, rgba(54,69,79,0.1) 100%);
+    }
+
+    .neighborhood-card-content {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 20px;
+    }
+
+    .neighborhood-card-name {
+      font-family: 'Libre Baskerville', serif;
+      font-size: 18px;
+      font-style: italic;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+
+    .neighborhood-card-count {
+      font-family: "Inter Tight", sans-serif;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.7);
+    }
+
+    /* ================= CATEGORY SECTION ================= */
+
+    .category-section {
+      background: var(--warm-white);
+      padding: 56px 0;
+    }
+
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+
+    .category-card {
+      background: var(--warm-white);
+      border: 1px solid rgba(195,176,145,0.2);
+      border-radius: 12px;
+      overflow: hidden;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .category-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(139,115,85,0.12);
+    }
+
+    .category-card-image {
+      aspect-ratio: 16 / 10;
+      background-size: cover;
+      background-position: center;
+      filter: saturate(0.9) contrast(1.05);
+    }
+
+    .category-card-body {
+      padding: 18px;
+    }
+
+    .category-card-title {
+      font-family: 'Libre Baskerville', serif;
+      font-size: 17px;
+      font-style: italic;
+      color: var(--charcoal);
+      margin-bottom: 4px;
+    }
+
+    .category-card-desc {
+      font-size: 13px;
+      color: var(--leather);
+      line-height: 1.5;
+      margin-bottom: 10px;
+    }
+
+    .category-card-meta {
+      font-family: "Inter Tight", sans-serif;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--khaki);
+    }
+
+    /* ================= EXPLORE GRID (Option B) ================= */
+
+    .explore-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .explore-card {
+      background: var(--warm-white);
+      border-radius: 12px;
+      overflow: hidden;
+      text-decoration: none;
+      border: 1px solid rgba(195,176,145,0.15);
+      transition: all 0.2s ease;
+    }
+
+    .explore-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(139,115,85,0.1);
+    }
+
+    .explore-card-image {
+      aspect-ratio: 1 / 1;
+      background-size: cover;
+      background-position: center;
+      filter: saturate(0.9) contrast(1.05);
+    }
+
+    .explore-card-body {
+      padding: 16px;
+    }
+
+    .explore-card-type {
+      font-family: "Inter Tight", sans-serif;
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--khaki);
+      margin-bottom: 6px;
+    }
+
+    .explore-card-title {
+      font-family: 'Libre Baskerville', serif;
+      font-size: 15px;
+      font-style: italic;
+      color: var(--charcoal);
+      margin-bottom: 4px;
+      line-height: 1.3;
+    }
+
+    .explore-card-meta {
+      font-family: "Inter Tight", sans-serif;
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--leather);
+    }
+
+    /* ================= FOOTER ================= */
+
+    .footer {
+      padding: 48px 32px;
+      background: var(--charcoal);
+      color: var(--parchment);
+    }
+
+    .footer-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .footer-logo {
+      font-family: "Inter Tight", sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+
+    .footer-tagline {
+      font-family: 'Libre Baskerville', serif;
+      font-size: 13px;
+      font-style: italic;
+      color: rgba(245,240,225,0.5);
+      margin-top: 8px;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 40px;
+    }
+
+    .footer-link-group h4 {
+      font-family: "Inter Tight", sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(245,240,225,0.4);
+      margin-bottom: 12px;
+    }
+
+    .footer-link-group a {
+      display: block;
+      font-size: 13px;
+      color: rgba(245,240,225,0.7);
+      text-decoration: none;
+      margin-bottom: 8px;
+    }
+
+    .footer-bottom {
+      max-width: 1200px;
+      margin: 32px auto 0;
+      padding-top: 20px;
+      border-top: 1px solid rgba(245,240,225,0.1);
+      font-size: 11px;
+      color: rgba(245,240,225,0.3);
+    }
+
+    /* ================= RESPONSIVE ================= */
+
+    @media (max-width: 1000px) {
+      .neighborhood-grid, .category-grid, .explore-grid { grid-template-columns: repeat(2, 1fr); }
+      .brand { font-size: 48px; letter-spacing: 6px; }
+    }
+
+    @media (max-width: 600px) {
+      .neighborhood-grid, .category-grid, .explore-grid { grid-template-columns: 1fr; }
+      .brand { font-size: 36px; letter-spacing: 4px; }
+      .footer-inner { flex-direction: column; gap: 32px; }
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- =====================================================
+     VARIATION A: Neighborhoods + Categories
+     ===================================================== -->
+
+<div class="variation">
+  <div class="variation-label">Option A <span>Neighborhoods + Categories (your previous version)</span></div>
+
+  <header class="header">
+    <a class="logo" href="#">Saiko</a>
+    <div class="header-icons">
+      <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+      </svg>
+      <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/>
+      </svg>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="map-plate">
+      <div class="map-grid"></div>
+      <div class="road h one"></div>
+      <div class="road h two"></div>
+      <div class="road v one"></div>
+      <div class="road v two"></div>
+      <div class="pin big" style="top:40%;left:48%"></div>
+      <div class="pin" style="top:55%;left:62%"></div>
+      <div class="pin" style="top:32%;left:34%"></div>
+      <div class="pin" style="top:48%;left:28%"></div>
+      <div class="pin" style="top:65%;left:45%"></div>
+      <div class="pin" style="top:28%;left:58%"></div>
+    </div>
+    <div class="hero-content">
+      <div class="brand">Saiko</div>
+      <div class="location">Los Angeles</div>
+      <a class="cta" href="#">Explore Maps</a>
+    </div>
+  </section>
+
+  <div class="section">
+    <div class="section-header">
+      <h2 class="section-title">By Neighborhood</h2>
+      <a href="#" class="section-link">See all →</a>
+    </div>
+    <div class="neighborhood-grid">
+      <a href="#" class="neighborhood-card">
+        <div class="neighborhood-card-image" style="background-image: url('https://images.unsplash.com/photo-1559329007-40df8a9345d8?w=600&h=450&fit=crop');"></div>
+        <div class="neighborhood-card-overlay"></div>
+        <div class="neighborhood-card-content">
+          <h3 class="neighborhood-card-name">Echo Park</h3>
+          <span class="neighborhood-card-count">31 places</span>
+        </div>
+      </a>
+      <a href="#" class="neighborhood-card">
+        <div class="neighborhood-card-image" style="background-image: url('https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=600&h=450&fit=crop');"></div>
+        <div class="neighborhood-card-overlay"></div>
+        <div class="neighborhood-card-content">
+          <h3 class="neighborhood-card-name">Highland Park</h3>
+          <span class="neighborhood-card-count">28 places</span>
+        </div>
+      </a>
+      <a href="#" class="neighborhood-card">
+        <div class="neighborhood-card-image" style="background-image: url('https://images.unsplash.com/photo-1498654896293-37aacf113fd9?w=600&h=450&fit=crop');"></div>
+        <div class="neighborhood-card-overlay"></div>
+        <div class="neighborhood-card-content">
+          <h3 class="neighborhood-card-name">Koreatown</h3>
+          <span class="neighborhood-card-count">67 places</span>
+        </div>
+      </a>
+      <a href="#" class="neighborhood-card">
+        <div class="neighborhood-card-image" style="background-image: url('https://images.unsplash.com/photo-1552566626-52f8b828add9?w=600&h=450&fit=crop');"></div>
+        <div class="neighborhood-card-overlay"></div>
+        <div class="neighborhood-card-content">
+          <h3 class="neighborhood-card-name">San Gabriel Valley</h3>
+          <span class="neighborhood-card-count">53 places</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="category-section">
+    <div class="section" style="padding-top: 0; padding-bottom: 0;">
+      <div class="section-header">
+        <h2 class="section-title">By Category</h2>
+        <a href="#" class="section-link">See all →</a>
+      </div>
+      <div class="category-grid">
+        <a href="#" class="category-card">
+          <div class="category-card-image" style="background-image: url('https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=600&h=375&fit=crop');"></div>
+          <div class="category-card-body">
+            <h3 class="category-card-title">Wine</h3>
+            <p class="category-card-desc">Natural pours and neighborhood gems</p>
+            <span class="category-card-meta">19 places</span>
+          </div>
+        </a>
+        <a href="#" class="category-card">
+          <div class="category-card-image" style="background-image: url('https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600&h=375&fit=crop');"></div>
+          <div class="category-card-body">
+            <h3 class="category-card-title">Coffee</h3>
+            <p class="category-card-desc">Third wave pours and quiet corners</p>
+            <span class="category-card-meta">38 places</span>
+          </div>
+        </a>
+        <a href="#" class="category-card">
+          <div class="category-card-image" style="background-image: url('https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?w=600&h=375&fit=crop');"></div>
+          <div class="category-card-body">
+            <h3 class="category-card-title">Cheese Shops</h3>
+            <p class="category-card-desc">Curated selections and expert picks</p>
+            <span class="category-card-meta">8 places</span>
+          </div>
+        </a>
+        <a href="#" class="category-card">
+          <div class="category-card-image" style="background-image: url('https://images.unsplash.com/photo-1504718855392-c0f33b372e72?w=600&h=375&fit=crop');"></div>
+          <div class="category-card-body">
+            <h3 class="category-card-title">Late Night</h3>
+            <p class="category-card-desc">Open past midnight when you need it</p>
+            <span class="category-card-meta">24 places</span>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div>
+        <div class="footer-logo">Saiko</div>
+        <p class="footer-tagline">Curated maps from people who know.</p>
+      </div>
+      <div class="footer-links">
+        <div class="footer-link-group">
+          <h4>Explore</h4>
+          <a href="#">All Maps</a>
+          <a href="#">Neighborhoods</a>
+          <a href="#">Categories</a>
+        </div>
+        <div class="footer-link-group">
+          <h4>Saiko</h4>
+          <a href="#">About</a>
+          <a href="#">Contact</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">© 2026 Saiko Maps</div>
+  </footer>
+</div>
+
+<!-- =====================================================
+     VARIATION B: Explore Page Grid (Mixed)
+     ===================================================== -->
+
+<div class="variation">
+  <div class="variation-label">Option B <span>Explore page style — mixed grid of neighborhoods + categories</span></div>
+
+  <header class="header">
+    <a class="logo" href="#">Saiko</a>
+    <div class="header-icons">
+      <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+      </svg>
+      <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/>
+      </svg>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="map-plate">
+      <div class="map-grid"></div>
+      <div class="road h one"></div>
+      <div class="road h two"></div>
+      <div class="road v one"></div>
+      <div class="road v two"></div>
+      <div class="pin big" style="top:40%;left:48%"></div>
+      <div class="pin" style="top:55%;left:62%"></div>
+      <div class="pin" style="top:32%;left:34%"></div>
+      <div class="pin" style="top:48%;left:28%"></div>
+      <div class="pin" style="top:65%;left:45%"></div>
+      <div class="pin" style="top:28%;left:58%"></div>
+    </div>
+    <div class="hero-content">
+      <div class="brand">Saiko</div>
+      <div class="location">Los Angeles</div>
+      <a class="cta" href="#">Explore Maps</a>
+    </div>
+  </section>
+
+  <div class="section">
+    <div class="section-header">
+      <h2 class="section-title">Browse</h2>
+      <a href="#" class="section-link">See all →</a>
+    </div>
+    <div class="explore-grid">
+      <a href="#" class="explore-card">
+        <div class="explore-card-image" style="background-image: url('https://images.unsplash.com/photo-1559329007-40df8a9345d8?w=400&h=400&fit=crop');"></div>
+        <div class="explore-card-body">
+          <div class="explore-card-type">Neighborhood</div>
+          <h3 class="explore-card-title">Echo Park</h3>
+          <span class="explore-card-meta">31 places</span>
+        </div>
+      </a>
+      <a href="#" class="explore-card">
+        <div class="explore-card-image" style="background-image: url('https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=400&fit=crop');"></div>
+        <div class="explore-card-body">
+          <div class="explore-card-type">Category</div>
+          <h3 class="explore-card-title">Wine</h3>
+          <span class="explore-card-meta">19 places</span>
+        </div>
+      </a>
+      <a href="#" class="explore-card">
+        <div class="explore-card-image" style="background-image: url('https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=400&h=400&fit=crop');"></div>
+        <div class="explore-card-body">
+          <div class="explore-card-type">Neighborhood</div>
+          <h3 class="explore-card-title">Highland Park</h3>
+          <span class="explore-card-meta">28 places</span>
+        </div>
+      </a>
+      <a href="#" class="explore-card">
+        <div class="explore-card-image" style="background-image: url('https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?w=400&h=400&fit=crop');"></div>
+        <div class="explore-card-body">
+          <div class="explore-card-type">Category</div>
+          <h3 class="explore-card-title">Cheese Shops</h3>
+          <span class="explore-card-meta">8 places</span>
+        </div>
+      </a>
+      <a href="#" class="explore-card">
+        <div class="explore-card-image" style="background-image: url('https://images.unsplash.com/photo-1498654896293-37aacf113fd9?w=400&h=400&fit=crop');"></div>
+        <div class="explore-card-body">
+          <div class="explore-card-type">Neighborhood</div>
+          <h3 class="explore-card-title">Koreatown</h3>
+          <span class="explore-card-meta">67 places</span>
+        </div>
+      </a>
+      <a href="#" class="explore-card">
+        <div class="explore-card-image" style="background-image: url('https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&h=400&fit=crop');"></div>
+        <div class="explore-card-body">
+          <div class="explore-card-type">Category</div>
+          <h3 class="explore-card-title">Coffee</h3>
+          <span class="explore-card-meta">38 places</span>
+        </div>
+      </a>
+      <a href="#" class="explore-card">
+        <div class="explore-card-image" style="background-image: url('https://images.unsplash.com/photo-1552566626-52f8b828add9?w=400&h=400&fit=crop');"></div>
+        <div class="explore-card-body">
+          <div class="explore-card-type">Neighborhood</div>
+          <h3 class="explore-card-title">San Gabriel Valley</h3>
+          <span class="explore-card-meta">53 places</span>
+        </div>
+      </a>
+      <a href="#" class="explore-card">
+        <div class="explore-card-image" style="background-image: url('https://images.unsplash.com/photo-1504718855392-c0f33b372e72?w=400&h=400&fit=crop');"></div>
+        <div class="explore-card-body">
+          <div class="explore-card-type">Category</div>
+          <h3 class="explore-card-title">Late Night</h3>
+          <span class="explore-card-meta">24 places</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div>
+        <div class="footer-logo">Saiko</div>
+        <p class="footer-tagline">Curated maps from people who know.</p>
+      </div>
+      <div class="footer-links">
+        <div class="footer-link-group">
+          <h4>Explore</h4>
+          <a href="#">All Maps</a>
+          <a href="#">Neighborhoods</a>
+          <a href="#">Categories</a>
+        </div>
+        <div class="footer-link-group">
+          <h4>Saiko</h4>
+          <a href="#">About</a>
+          <a href="#">Contact</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">© 2026 Saiko Maps</div>
+  </footer>
+</div>
+
+</body>
+</html>
