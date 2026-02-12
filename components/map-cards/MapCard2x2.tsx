@@ -56,6 +56,9 @@ export function MapCard2x2({ map }: MapCard2x2Props) {
           <img
             src={map.coverImageUrl}
             alt={`Cover image for ${map.title} map`}
+            aria-hidden="true"
+            loading="lazy"
+            decoding="async"
             style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0,0,0,0)', whiteSpace: 'nowrap' }}
           />
           {map.authorType === 'saiko' && (
