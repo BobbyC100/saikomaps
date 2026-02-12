@@ -16,8 +16,6 @@ export async function POST(
     const body = await request.json();
     const { status = 'PERMANENTLY_CLOSED', reason } = body;
 
-    console.log('[Close Place API] Marking place as closed:', { id, status, reason });
-
     // Update golden_record
     const updated = await prisma.golden_records.update({
       where: { canonical_id: id },
@@ -33,11 +31,6 @@ export async function POST(
         name: true,
         lifecycle_status: true,
       },
-    });
-
-    console.log('[Close Place API] Successfully closed:', {
-      name: updated.name,
-      status: updated.lifecycle_status,
     });
 
     return NextResponse.json({

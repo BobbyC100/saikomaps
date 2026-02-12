@@ -73,8 +73,17 @@ export function MapCard({
               backgroundSize: 'cover',
               backgroundPosition: 'center',
               filter: 'saturate(0.88) contrast(1.05)',
+              position: 'relative',
+              overflow: 'hidden',
             }}
-          />
+          >
+            {/* Hidden img for SEO crawlers */}
+            <img
+              src={url}
+              alt={i === 0 ? `${title} map cover` : `${title} photo ${i + 1}`}
+              style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0,0,0,0)', whiteSpace: 'nowrap' }}
+            />
+          </div>
         ))}
       </div>
       <div style={{ padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 6 }}>

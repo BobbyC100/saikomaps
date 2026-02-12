@@ -1,131 +1,172 @@
-/**
- * Homepage — Field Notes redesign
- * Route: /
- */
+import { Hero } from '@/components/homepage/Hero'
+import { SearchBar } from '@/components/homepage/SearchBar'
+import { BrowseSection } from '@/components/homepage/BrowseSection'
+import { SectionHeader } from '@/components/homepage/SectionHeader'
+import { NeighborhoodCard } from '@/components/homepage/NeighborhoodCard'
+import { CategoryCard } from '@/components/homepage/CategoryCard'
+import { HomepageFooter } from '@/components/homepage/HomepageFooter'
+import styles from './homepage.module.css'
 
-import Link from 'next/link';
-import { GlobalHeader } from '@/components/layouts/GlobalHeader';
-import { GlobalFooter } from '@/components/layouts/GlobalFooter';
-import { MapCard } from '@/components/ui/MapCard';
-import { db } from '@/lib/db';
-import styles from './homepage.module.css';
-
-const PLACEHOLDER_PHOTOS = [
-  'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=250&fit=crop',
-  'https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=400&h=250&fit=crop',
-  'https://images.unsplash.com/photo-1552566626-52f8b828add9?w=400&h=250&fit=crop',
-  'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=250&fit=crop',
-];
-
-function getCoverPhotos(mapPlaces: Array<{ places: { googlePhotos: unknown } }>): string[] {
-  const urls: string[] = [];
-  for (const mp of mapPlaces) {
-    const gp = mp.places?.googlePhotos;
-    if (gp && Array.isArray(gp) && gp.length > 0) {
-      const first = gp[0] as { url?: string };
-      if (first.url) urls.push(first.url);
-    }
-  }
-  while (urls.length < 4) {
-    urls.push(PLACEHOLDER_PHOTOS[urls.length % PLACEHOLDER_PHOTOS.length]);
-  }
-  return urls.slice(0, 4);
-}
-
-export default async function Home() {
-  const featuredMaps = await db.lists.findMany({
-    where: { published: true },
-    include: {
-      users: { select: { name: true } },
-      map_places: {
-        take: 4,
-        orderBy: { orderIndex: 'asc' },
-        include: { places: { select: { googlePhotos: true } } },
-      },
-      _count: { select: { map_places: true } },
+export default function Home() {
+  const browseColumns = [
+    {
+      label: 'Neighborhood',
+      href: '/explore?view=neighborhoods',
+      card: {
+        name: 'Echo Park',
+        count: 31,
+        imageUrl: 'https://images.unsplash.com/photo-1559329007-40df8a9345d8?w=600&h=450&fit=crop',
+        href: '/explore?neighborhood=echo-park'
+      }
     },
-    orderBy: { publishedAt: 'desc' },
-    take: 8,
-  });
+    {
+      label: 'Cuisine',
+      href: '/explore?view=cuisine',
+      card: {
+        name: 'Korean',
+        count: 24,
+        imageUrl: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&h=450&fit=crop',
+        href: '/explore?cuisine=korean'
+      }
+    },
+    {
+      label: 'Collection',
+      href: '/explore?view=collections',
+      card: {
+        name: 'Date Night',
+        count: 24,
+        imageUrl: 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=600&h=450&fit=crop',
+        href: '/explore?experience=date-night'
+      }
+    },
+    {
+      label: 'Experience',
+      href: '/explore?view=experience',
+      card: {
+        name: 'Late Night',
+        count: 22,
+        imageUrl: 'https://images.unsplash.com/photo-1504718855392-c0f33b372e72?w=600&h=450&fit=crop',
+        href: '/explore?experience=late-night'
+      }
+    }
+  ]
+
+  const neighborhoods = [
+    {
+      name: 'Echo Park',
+      count: 31,
+      imageUrl: 'https://images.unsplash.com/photo-1559329007-40df8a9345d8?w=600&h=450&fit=crop',
+      href: '/explore?neighborhood=echo-park'
+    },
+    {
+      name: 'Highland Park',
+      count: 28,
+      imageUrl: 'https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=600&h=450&fit=crop',
+      href: '/explore?neighborhood=highland-park'
+    },
+    {
+      name: 'Koreatown',
+      count: 67,
+      imageUrl: 'https://images.unsplash.com/photo-1498654896293-37aacf113fd9?w=600&h=450&fit=crop',
+      href: '/explore?neighborhood=koreatown'
+    },
+    {
+      name: 'San Gabriel Valley',
+      count: 53,
+      imageUrl: 'https://images.unsplash.com/photo-1552566626-52f8b828add9?w=600&h=450&fit=crop',
+      href: '/explore?neighborhood=san-gabriel-valley'
+    }
+  ]
+
+  const categories = [
+    {
+      title: 'Wine',
+      description: 'Natural pours and neighborhood gems',
+      count: 19,
+      imageUrl: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=600&h=375&fit=crop',
+      href: '/explore?category=wine'
+    },
+    {
+      title: 'Coffee',
+      description: 'Third wave pours and quiet corners',
+      count: 38,
+      imageUrl: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600&h=375&fit=crop',
+      href: '/explore?category=coffee'
+    },
+    {
+      title: 'Cheese Shops',
+      description: 'Curated selections and expert picks',
+      count: 8,
+      imageUrl: 'https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?w=600&h=375&fit=crop',
+      href: '/explore?category=cheese-shops'
+    },
+    {
+      title: 'Late Night',
+      description: 'Open past midnight when you need it',
+      count: 24,
+      imageUrl: 'https://images.unsplash.com/photo-1504718855392-c0f33b372e72?w=600&h=375&fit=crop',
+      href: '/explore?category=late-night'
+    }
+  ]
+
+  const experiences = [
+    { name: 'Date Night', count: 24, imageUrl: 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=600&h=450&fit=crop', href: '/explore?experience=date-night' },
+    { name: 'Solo Dinner', count: 18, imageUrl: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&h=450&fit=crop', href: '/explore?experience=solo-dinner' },
+    { name: 'Group Night', count: 31, imageUrl: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=600&h=450&fit=crop', href: '/explore?experience=group-night' },
+    { name: 'Late Night', count: 22, imageUrl: 'https://images.unsplash.com/photo-1504718855392-c0f33b372e72?w=600&h=450&fit=crop', href: '/explore?experience=late-night' },
+    { name: 'Patio', count: 28, imageUrl: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600&h=450&fit=crop', href: '/explore?experience=patio' },
+    { name: 'Celebration', count: 19, imageUrl: 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=600&h=450&fit=crop', href: '/explore?experience=celebration' }
+  ]
 
   return (
     <div className={styles.page}>
-      <GlobalHeader variant="default" />
+      <Hero />
+      <SearchBar />
 
-      {/* Hero Section */}
-      <section className={styles.hero}>
-        <h1 className={styles.heroHeadline}>
-          Curated maps for people who care where they go.
-        </h1>
-        <p className={styles.heroSubhead}>
-          Discover restaurants, bars, and neighborhood gems — or create your own map to share.
-        </p>
-        <div className={styles.heroActions}>
-          <Link href="/explore" className={styles.btnPrimary}>
-            Explore Maps
-          </Link>
-          <Link href="/maps/new" className={styles.btnSecondary}>
-            Create a Map
-          </Link>
+      <BrowseSection columns={browseColumns} seeAllHref="/explore" />
+
+      <section className={styles.section}>
+        <SectionHeader
+          title="BY NEIGHBORHOOD"
+          linkText="See all"
+          linkHref="/explore?view=neighborhoods"
+        />
+        <div className={styles.neighborhoodGrid}>
+          {neighborhoods.map((neighborhood) => (
+            <NeighborhoodCard key={neighborhood.name} {...neighborhood} />
+          ))}
         </div>
       </section>
 
-      {/* Featured Maps Section */}
-      <section className={styles.featuredSection}>
-        <span className={styles.sectionLabel}>Featured Maps</span>
-        <div className={styles.mapGrid}>
-          {featuredMaps.length > 0 ? (
-            featuredMaps.map((map) => (
-              <MapCard
-                key={map.id}
-                id={map.id}
-                title={map.title}
-                slug={map.slug}
-                placeCount={map._count?.map_places ?? 0}
-                coverPhotos={getCoverPhotos(map.map_places)}
-                curatorName={map.users?.name ?? 'Saiko'}
-              />
-            ))
-          ) : (
-            <>
-              <MapCard
-                id="1"
-                title="Echo Park Date Nights"
-                slug="echo-park-date-nights"
-                placeCount={12}
-                coverPhotos={PLACEHOLDER_PHOTOS}
-                curatorName="Bobby"
-              />
-              <MapCard
-                id="2"
-                title="SGV Dim Sum Run"
-                slug="sgv-dim-sum"
-                placeCount={8}
-                coverPhotos={PLACEHOLDER_PHOTOS}
-                curatorName="Bobby"
-              />
-              <MapCard
-                id="3"
-                title="Silver Lake Essentials"
-                slug="silver-lake-essentials"
-                placeCount={15}
-                coverPhotos={PLACEHOLDER_PHOTOS}
-                curatorName="Saiko"
-              />
-              <MapCard
-                id="4"
-                title="Late Night Eats"
-                slug="late-night-eats"
-                placeCount={24}
-                coverPhotos={PLACEHOLDER_PHOTOS}
-                curatorName="Saiko"
-              />
-            </>
-          )}
+      <section className={styles.categorySection}>
+        <div className={styles.section}>
+          <SectionHeader
+            title="BY CATEGORY"
+            linkText="See all"
+            linkHref="/explore?filter=categories"
+          />
+          <div className={styles.categoryGrid}>
+            {categories.map((category) => (
+              <CategoryCard key={category.title} {...category} />
+            ))}
+          </div>
         </div>
       </section>
 
-      <GlobalFooter variant="standard" />
+      <section className={styles.section}>
+        <SectionHeader
+          title="BY EXPERIENCE"
+          linkText="See all"
+          linkHref="/explore?view=experience"
+        />
+        <div className={styles.neighborhoodGrid}>
+          {experiences.map((experience) => (
+            <NeighborhoodCard key={experience.name} {...experience} />
+          ))}
+        </div>
+      </section>
+
+      <HomepageFooter />
     </div>
-  );
+  )
 }

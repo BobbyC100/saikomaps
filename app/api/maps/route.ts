@@ -92,7 +92,6 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    console.log('[API MAPS POST] req.body:', body);
     const validation = createMapSchema.safeParse(body);
 
     if (!validation.success) {
@@ -120,14 +119,12 @@ export async function POST(request: NextRequest) {
       published: false,
 
     };
-    console.log('[API MAPS POST] Prisma create data:', createData);
 
     // Create the map/list
     const list = await db.lists.create({
       data: createData,
     });
 
-    console.log('[API MAPS POST] Created record:', { id: list.id, title: list.title });
 
     return NextResponse.json({
       success: true,

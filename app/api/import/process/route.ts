@@ -35,12 +35,6 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json()
     
-    console.log('[IMPORT] Received request:', {
-      listTitle: body.listTitle,
-      templateType: body.templateType,
-      locationCount: body.locations?.length || 0,
-      firstLocation: body.locations?.[0],
-    })
     
     // Validate input
     const validation = processImportSchema.safeParse(body)
@@ -54,12 +48,6 @@ export async function POST(request: NextRequest) {
 
     const { listTitle, templateType, locations } = validation.data
     
-    console.log('[IMPORT] Validated data:', {
-      listTitle,
-      templateType,
-      locationCount: locations.length,
-      sampleLocation: locations[0],
-    })
 
     // Create the list (auto-published)
     const slug = generateSlug(listTitle)
@@ -77,11 +65,6 @@ export async function POST(request: NextRequest) {
       },
     })
     
-    console.log('[IMPORT] Created list:', {
-      listId: list.id,
-      slug: list.slug,
-      title: list.title,
-    })
 
     // Create import job
     const importJob = await db.import_jobs.create({
@@ -96,14 +79,8 @@ export async function POST(request: NextRequest) {
       },
     })
     
-    console.log('[IMPORT] Created import job:', {
-      importJobId: importJob.id,
-      listId: list.id,
-      totalLocations: locations.length,
-    })
 
     // Create basic locations synchronously FIRST (so they're available immediately)
-    console.log('[IMPORT] Creating basic locations synchronously...')
     const createdLocations = []
     
     for (let i = 0; i < locations.length; i++) {
@@ -141,22 +118,17 @@ export async function POST(request: NextRequest) {
           },
         })
         createdLocations.push(created)
-        console.log(`[IMPORT] Created basic location ${i + 1}/${locations.length}:`, created.id, cleanName)
       } catch (error) {
         console.error(`[IMPORT] Failed to create location ${i + 1}:`, error)
       }
     }
     
-    console.log('[IMPORT] Created', createdLocations.length, 'basic locations')
 
     // Enrich locations synchronously (for MVP - ensures coordinates are available)
-    console.log('[IMPORT] Starting synchronous enrichment...')
     const enrichmentResult = await enrichLocationsSync(list.id, locations, importJob.id)
-    console.log('[IMPORT] Enrichment complete:', enrichmentResult)
     
     // Continue enrichment in background for any remaining locations
     if (enrichmentResult.remaining > 0) {
-      console.log('[IMPORT] Starting background enrichment for', enrichmentResult.remaining, 'remaining locations...')
       const remainingLocations = locations.slice(enrichmentResult.enriched)
       processLocationsAsync(importJob.id, list.id, remainingLocations, enrichmentResult.enriched).catch((error) => {
         console.error('[IMPORT] Background enrichment failed:', error)
@@ -192,7 +164,6 @@ async function enrichLocationsSync(
   locations: Array<{ name: string; address?: string; comment?: string; url?: string }>,
   importJobId: string
 ): Promise<{ enriched: number; remaining: number }> {
-  console.log('[ENRICH SYNC] Starting sync enrichment for', locations.length, 'locations')
   
   // Check if Google Places API key is available
   if (!process.env.GOOGLE_PLACES_API_KEY) {
@@ -214,7 +185,6 @@ async function enrichLocationsSync(
   let enriched = 0
   const maxSyncEnrichment = Math.min(30, locations.length) // Enrich first 30 synchronously
   
-  console.log(`[ENRICH SYNC] Will enrich ${maxSyncEnrichment} locations synchronously`)
   
   for (let i = 0; i < maxSyncEnrichment; i++) {
     const location = locations[i]
@@ -234,7 +204,6 @@ async function enrichLocationsSync(
           try {
             placeDetails = await getPlaceDetails(placeId)
           } catch (e) {
-            console.log(`[ENRICH SYNC] Failed to get details for place_id ${placeId}, trying search...`)
           }
         }
       }
@@ -257,7 +226,6 @@ async function enrichLocationsSync(
             placeDetails = await getPlaceDetails(placeId)
           }
         } catch (e) {
-          console.log(`[ENRICH SYNC] Search failed for ${cleanName}:`, e)
         }
       }
       
@@ -303,7 +271,6 @@ async function enrichLocationsSync(
         })
         
         enriched++
-        console.log(`[ENRICH SYNC] Enriched ${i + 1}/${maxSyncEnrichment}:`, existingLocation.name)
       }
       
       // Update progress every 5 locations
@@ -323,7 +290,6 @@ async function enrichLocationsSync(
     }
   }
   
-  console.log(`[ENRICH SYNC] Enriched ${enriched}/${maxSyncEnrichment} locations synchronously`)
   return { enriched: maxSyncEnrichment, remaining: locations.length - maxSyncEnrichment }
 }
 
@@ -337,12 +303,6 @@ async function processLocationsAsync(
   locations: Array<{ name: string; address?: string; comment?: string; url?: string }>,
   startIndex: number = 0
 ) {
-  console.log('[IMPORT ASYNC] Starting enrichment:', {
-    importJobId,
-    listId,
-    locationCount: locations.length,
-    startIndex,
-  })
   
   // Check if Google Places API key is available
   if (!process.env.GOOGLE_PLACES_API_KEY) {
@@ -356,7 +316,6 @@ async function processLocationsAsync(
     orderBy: { orderIndex: 'asc' },
   })
   
-  console.log('[IMPORT ASYNC] Found', existingLocations.length, 'existing locations to enrich')
   
   const errorLog: any[] = []
   let processed = 0
@@ -374,12 +333,6 @@ async function processLocationsAsync(
       continue
     }
     
-    console.log(`[IMPORT ASYNC] Enriching location ${i + 1}/${locations.length} (index ${locationIndex}):`, {
-      locationId: existingLocation.id,
-      name: location.name,
-      hasAddress: !!location.address,
-      hasUrl: !!location.url,
-    })
     try {
       // Clean the name - ensure it's not empty or a URL
       let cleanName = location.name?.trim() || ''
@@ -418,7 +371,6 @@ async function processLocationsAsync(
           try {
             placeDetails = await getPlaceDetails(placeId)
           } catch (e) {
-            console.log(`Failed to get details for place_id ${placeId}, trying search...`)
           }
         }
       }
@@ -442,7 +394,6 @@ async function processLocationsAsync(
             placeDetails = await getPlaceDetails(placeId)
           }
         } catch (e) {
-          console.log(`Search failed for ${cleanName}:`, e)
         }
       }
 
@@ -487,18 +438,8 @@ async function processLocationsAsync(
           },
         })
         
-        console.log(`[IMPORT ASYNC] Enriched location:`, {
-          locationId: enrichedLocation.id,
-          name: enrichedLocation.name,
-          listId: enrichedLocation.listId,
-          hasCoordinates: !!(enrichedLocation.latitude && enrichedLocation.longitude),
-        })
       } else {
         // No place found - location already exists from sync creation, just log
-        console.log(`[IMPORT ASYNC] No enrichment found for location:`, {
-          locationId: existingLocation.id,
-          name: existingLocation.name,
-        })
         
         errorLog.push({
           location: existingLocation.name,
@@ -554,14 +495,6 @@ async function processLocationsAsync(
     select: { id: true, name: true },
   })
   
-  console.log('[IMPORT ASYNC] Processing complete:', {
-    importJobId,
-    listId,
-    processed,
-    failed,
-    totalCreated: createdLocations.length,
-    createdLocationNames: createdLocations.map(l => l.name).slice(0, 5),
-  })
   
   if (createdLocations.length === 0) {
     console.error('[IMPORT ASYNC] WARNING: No locations were created!', {

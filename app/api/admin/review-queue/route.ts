@@ -6,10 +6,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getReviewQueueItems } from '@/lib/review-queue';
 import { PrismaClient } from '@prisma/client';
+import { requireAdmin } from '@/lib/admin-auth';
 
 const prisma = new PrismaClient();
 
 export async function GET(request: NextRequest) {
+  const admin = await requireAdmin();
+  if (admin.error) return admin.error;
+
   try {
     const { searchParams } = new URL(request.url);
     
@@ -25,7 +29,6 @@ export async function GET(request: NextRequest) {
       offset,
     });
     
-    console.log(`[Review Queue API] Fetched ${result.items.length} items (${result.stats.pending} pending)`);
     
     return NextResponse.json(result);
   } catch (error: any) {

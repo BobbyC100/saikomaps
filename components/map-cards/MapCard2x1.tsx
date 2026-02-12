@@ -48,8 +48,17 @@ export function MapCard2x1({ map }: MapCard2x1Props) {
             backgroundPosition: 'center',
             filter: 'saturate(0.88) contrast(1.05)',
             flexShrink: 0,
+            position: 'relative',
+            overflow: 'hidden',
           }}
-        />
+        >
+          {/* Hidden img for SEO crawlers */}
+          <img
+            src={map.coverImageUrl}
+            alt={`Cover image for ${map.title} map`}
+            style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0,0,0,0)', whiteSpace: 'nowrap' }}
+          />
+        </div>
       )}
       <div
         style={{

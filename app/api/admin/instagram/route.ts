@@ -100,8 +100,6 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { canonical_id, instagram_handle, no_instagram } = body;
 
-    console.log('[Instagram API] Received request:', { canonical_id, instagram_handle, no_instagram });
-
     if (!canonical_id || (instagram_handle === undefined && !no_instagram)) {
       console.error('[Instagram API] Missing parameters');
       return NextResponse.json(
@@ -118,10 +116,6 @@ export async function POST(request: NextRequest) {
           instagram_handle: 'NONE', // Special marker
           updated_at: new Date(),
         },
-      });
-
-      console.log('[Instagram API] Marked as no Instagram:', {
-        name: updated.name,
       });
 
       return NextResponse.json({
@@ -163,11 +157,6 @@ export async function POST(request: NextRequest) {
         instagram_handle: cleanHandle,
         updated_at: new Date(),
       },
-    });
-
-    console.log('[Instagram API] Successfully updated:', {
-      name: updated.name,
-      instagram_handle: cleanHandle,
     });
 
     return NextResponse.json({

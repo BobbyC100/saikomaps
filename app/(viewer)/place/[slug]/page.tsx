@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { GlobalHeader } from '@/components/layouts/GlobalHeader';
@@ -230,19 +230,32 @@ export default function PlacePage() {
   const slug = params?.slug as string;
   const [data, setData] = useState<PlacePageData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
 
-  useEffect(() => {
+  const loadPlace = useCallback(() => {
     if (!slug) return;
+    setLoading(true);
+    setFetchError(null);
     fetch(`/api/places/${slug}`)
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error(res.status === 404 ? 'not_found' : 'server_error');
+        return res.json();
+      })
       .then((json) => {
         if (json.success && json.data) setData(json.data);
       })
-      .catch((err) => console.error('Failed to load place:', err))
+      .catch((err) => {
+        console.error('Failed to load place:', err);
+        setFetchError(err.message === 'not_found' ? 'not_found' : 'server_error');
+      })
       .finally(() => setLoading(false));
   }, [slug]);
+
+  useEffect(() => {
+    loadPlace();
+  }, [loadPlace]);
 
   // Gallery handlers
   const openGallery = (index: number = 0) => {
@@ -287,16 +300,94 @@ export default function PlacePage() {
     );
   }
 
+  if (fetchError === 'server_error') {
+    return (
+      <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#F5F0E1' }}>
+        <GlobalHeader variant="immersive" onShare={handleShare} />
+        <main className="flex-1 flex items-center justify-center">
+          <div style={{ textAlign: 'center', padding: '24px' }}>
+            <div style={{ fontSize: '20px', fontWeight: 600, color: '#36454F', marginBottom: '8px' }}>
+              Something went wrong
+            </div>
+            <p style={{ fontSize: '14px', color: '#8B7355', marginBottom: '24px', maxWidth: '320px' }}>
+              We couldn't load this place. Please try again.
+            </p>
+            <button
+              onClick={loadPlace}
+              style={{
+                padding: '10px 24px',
+                fontSize: '13px',
+                fontWeight: 600,
+                color: '#F5F0E1',
+                background: '#36454F',
+                border: 'none',
+                borderRadius: '6px',
+                cursor: 'pointer',
+              }}
+            >
+              Try Again
+            </button>
+          </div>
+        </main>
+        <GlobalFooter variant="minimal" />
+      </div>
+    );
+  }
+
   if (!data) {
     return (
       <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#F5F0E1' }}>
         <GlobalHeader variant="immersive" onShare={handleShare} />
         <main className="flex-1 flex items-center justify-center">
-          <div className="text-center">
-            <p className="text-[#36454F] text-lg mb-2">Place not found</p>
-            <Link href="/" className="text-[#C3B091] hover:underline">
-              Return to homepage
-            </Link>
+          <div style={{ textAlign: 'center', padding: '24px' }}>
+            <div
+              style={{
+                fontSize: '48px',
+                fontFamily: 'var(--font-libre), Georgia, serif',
+                fontStyle: 'italic',
+                color: '#C3B091',
+                marginBottom: '8px',
+              }}
+            >
+              404
+            </div>
+            <div style={{ fontSize: '20px', fontWeight: 600, color: '#36454F', marginBottom: '8px' }}>
+              Place not found
+            </div>
+            <p style={{ fontSize: '14px', color: '#8B7355', marginBottom: '24px', maxWidth: '320px' }}>
+              This place may have been removed or doesn't exist.
+            </p>
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+              <Link
+                href="/"
+                style={{
+                  padding: '10px 24px',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  color: '#F5F0E1',
+                  background: '#36454F',
+                  borderRadius: '6px',
+                  textDecoration: 'none',
+                }}
+              >
+                Go Home
+              </Link>
+              <Link
+                href="/explore"
+                style={{
+                  padding: '10px 24px',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  color: '#36454F',
+                  background: 'transparent',
+                  border: '1px solid #C3B091',
+                  borderRadius: '6px',
+                  textDecoration: 'none',
+                }}
+              >
+                Explore Maps
+              </Link>
+            </div>
           </div>
         </main>
         <GlobalFooter variant="minimal" />
@@ -356,12 +447,8 @@ export default function PlacePage() {
   const hasGallery = (location.photoUrls?.length ?? 0) > 1; // More than just hero
   
 
-  // Service options (placeholder - add when Google fields available)
+  // Service options — awaiting Google Places fields (delivery, takeout, dineIn)
   const serviceOptions: string[] = [];
-  // TODO: When delivery/takeout/dineIn available from Google:
-  // if (location.delivery) serviceOptions.push('Delivery');
-  // if (location.takeout) serviceOptions.push('Takeout');
-  // if (location.dineIn) serviceOptions.push('Dine-in');
 
   // Reservations note
   const reservationsNote = location.reservationUrl
@@ -457,6 +544,7 @@ export default function PlacePage() {
           {hasGallery && (
             <GalleryCard
               photos={location.photoUrls!.slice(1)} // Exclude hero
+              placeName={location.name}
               onThumbnailClick={(idx) => openGallery(idx + 1)}
               span={hasCurator ? 3 : 6}
             />

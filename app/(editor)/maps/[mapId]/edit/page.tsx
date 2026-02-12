@@ -367,8 +367,6 @@ export default function MapEditPage({ params }: { params: Promise<{ mapId: strin
 
       const d = json.data;
       if (process.env.NODE_ENV === 'development') {
-        console.log('[AI] API response:', JSON.stringify(d, null, 2));
-        console.log('[AI] Will set title:', !!d?.title, 'desc/subtitle:', !!d?.description || !!d?.subtitle, 'scope.geography:', !!d?.scope?.geography, 'scope.placeTypes:', d?.scope?.placeTypes);
       }
 
       const suggested: Record<string, boolean> = {};

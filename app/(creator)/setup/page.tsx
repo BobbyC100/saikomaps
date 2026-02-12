@@ -48,10 +48,6 @@ export default function SetupPage() {
     try {
       const locations = JSON.parse(storedLocations);
       
-      console.log('[SETUP] Parsed locations from localStorage:', {
-        count: locations.length,
-        firstLocation: locations[0],
-      });
       
       // Transform locations to API format
       const apiLocations = locations.map((loc: any) => ({
@@ -61,10 +57,6 @@ export default function SetupPage() {
         comment: loc.Comment || loc.Note || loc.comment,
       })).filter((loc: any) => loc.name && loc.name.trim() !== '');
       
-      console.log('[SETUP] Transformed locations for API:', {
-        count: apiLocations.length,
-        firstLocation: apiLocations[0],
-      });
 
       // Call API to create map (auto-published)
       const requestBody = {
@@ -73,11 +65,6 @@ export default function SetupPage() {
         locations: apiLocations,
       };
       
-      console.log('[SETUP] Calling API with:', {
-        listTitle: requestBody.listTitle,
-        templateType: requestBody.templateType,
-        locationCount: requestBody.locations.length,
-      });
       
       // Show processing state
       setIsCreating(true);
@@ -90,10 +77,6 @@ export default function SetupPage() {
 
       const result = await response.json();
       
-      console.log('[SETUP] API response:', {
-        ok: response.ok,
-        result,
-      });
 
       if (!response.ok) {
         throw new Error(result.error || 'Failed to create map');

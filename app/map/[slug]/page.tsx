@@ -182,6 +182,7 @@ export default function PublicMapPage({ params }: { params: Promise<{ slug: stri
   const devOwner = searchParams.get('devOwner') === '1';
   const [mapData, setMapData] = useState<MapData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [mobileView, setMobileView] = useState<'list' | 'map'>('list');
   const [activeCardIndex, setActiveCardIndex] = useState<number>(0);
   const cardRefs = useRef<(HTMLAnchorElement | null)[]>([]);
@@ -215,7 +216,6 @@ export default function PublicMapPage({ params }: { params: Promise<{ slug: stri
     navigator.clipboard.writeText(text).then(
       () => {
         // Could show a toast notification here
-        console.log('Link copied to clipboard');
       },
       () => {
         // Fallback for older browsers
@@ -413,19 +413,21 @@ export default function PublicMapPage({ params }: { params: Promise<{ slug: stri
     let cancelled = false;
     params.then((p) => {
       fetch(`/api/maps/public/${p.slug}${devOwner ? '?devOwner=1' : ''}`)
-        .then((res) => (res.ok ? res.json() : null))
+        .then((res) => {
+          if (!res.ok) throw new Error(res.status === 404 ? 'not_found' : 'server_error');
+          return res.json();
+        })
         .then((json) => {
           if (!cancelled && json?.data) {
-            console.log('[MAP] Loaded map data:', {
-              title: json.data.title,
-              isOwner: json.data.isOwner,
-              userId: json.data.userId,
-            });
             setMapData(json.data);
             cardRefs.current = [];
           }
         })
-        .catch(() => {})
+        .catch((err) => {
+          if (!cancelled) {
+            setFetchError(err.message === 'not_found' ? 'not_found' : 'server_error');
+          }
+        })
         .finally(() => {
           if (!cancelled) setIsLoading(false);
         });
@@ -735,21 +737,54 @@ export default function PublicMapPage({ params }: { params: Promise<{ slug: stri
     };
   }, [mapData?.id, locations.length]);
 
-  // Debug log for ownership (must be before early returns)
-  useEffect(() => {
-    if (mapData) {
-      console.log('[MAP] Owner check:', {
-        mapDataIsOwner: mapData.isOwner,
-        mapUserId: mapData.userId,
-        willShowButtons: mapData.isOwner === true,
-      });
-    }
-  }, [mapData]);
-
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#FFFFFF' }}>
-        <div className="text-lg" style={{ color: '#1A1A1A' }}>Loading...</div>
+        <div style={{ textAlign: 'center' }}>
+          <div
+            style={{
+              width: '36px',
+              height: '36px',
+              border: '3px solid rgba(0,0,0,0.08)',
+              borderTopColor: '#C3B091',
+              borderRadius: '50%',
+              animation: 'spin 1s linear infinite',
+              margin: '0 auto 12px',
+            }}
+          />
+          <div style={{ fontSize: '14px', color: '#8B7355' }}>Loading map...</div>
+          <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+        </div>
+      </div>
+    );
+  }
+
+  if (fetchError === 'server_error') {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#FFFFFF' }}>
+        <div style={{ textAlign: 'center', padding: '24px' }}>
+          <div style={{ fontSize: '20px', fontWeight: 600, color: '#36454F', marginBottom: '8px' }}>
+            Something went wrong
+          </div>
+          <p style={{ fontSize: '14px', color: '#8B7355', marginBottom: '24px', maxWidth: '320px' }}>
+            We couldn&apos;t load this map. Please try again.
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            style={{
+              padding: '10px 24px',
+              fontSize: '13px',
+              fontWeight: 600,
+              color: '#F5F0E1',
+              background: '#36454F',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer',
+            }}
+          >
+            Try Again
+          </button>
+        </div>
       </div>
     );
   }
@@ -757,9 +792,55 @@ export default function PublicMapPage({ params }: { params: Promise<{ slug: stri
   if (!mapData) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#FFFFFF' }}>
-        <div className="text-center">
-          <div className="text-[#1A1A1A] text-2xl mb-4">Map not found</div>
-          <Link href="/" className="text-[#E07A5F] hover:underline">Go home</Link>
+        <div style={{ textAlign: 'center', padding: '24px' }}>
+          <div
+            style={{
+              fontSize: '48px',
+              fontFamily: 'var(--font-libre), Georgia, serif',
+              fontStyle: 'italic',
+              color: '#C3B091',
+              marginBottom: '8px',
+            }}
+          >
+            404
+          </div>
+          <div style={{ fontSize: '20px', fontWeight: 600, color: '#36454F', marginBottom: '8px' }}>
+            Map not found
+          </div>
+          <p style={{ fontSize: '14px', color: '#8B7355', marginBottom: '24px', maxWidth: '320px' }}>
+            This map may have been removed or isn&apos;t published yet.
+          </p>
+          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+            <Link
+              href="/"
+              style={{
+                padding: '10px 24px',
+                fontSize: '13px',
+                fontWeight: 600,
+                color: '#F5F0E1',
+                background: '#36454F',
+                borderRadius: '6px',
+                textDecoration: 'none',
+              }}
+            >
+              Go Home
+            </Link>
+            <Link
+              href="/explore"
+              style={{
+                padding: '10px 24px',
+                fontSize: '13px',
+                fontWeight: 600,
+                color: '#36454F',
+                background: 'transparent',
+                border: '1px solid #C3B091',
+                borderRadius: '6px',
+                textDecoration: 'none',
+              }}
+            >
+              Explore Maps
+            </Link>
+          </div>
         </div>
       </div>
     );
