@@ -48,6 +48,9 @@ export function AlsoOnCard({ maps }: AlsoOnCardProps) {
                   <img
                     src={map.coverImageUrl}
                     alt={`${map.title} map thumbnail`}
+                    aria-hidden="true"
+                    loading="lazy"
+                    decoding="async"
                     style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0,0,0,0)', whiteSpace: 'nowrap' }}
                   />
                 </div>

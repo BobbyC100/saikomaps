@@ -81,6 +81,9 @@ export function MapCard({
             <img
               src={url}
               alt={i === 0 ? `${title} map cover` : `${title} photo ${i + 1}`}
+              aria-hidden="true"
+              loading="lazy"
+              decoding="async"
               style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0,0,0,0)', whiteSpace: 'nowrap' }}
             />
           </div>

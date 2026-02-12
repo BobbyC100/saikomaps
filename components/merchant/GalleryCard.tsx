@@ -40,6 +40,9 @@ export function GalleryCard({ photos, placeName, onThumbnailClick, span = 3 }: G
               <img
                 src={photo}
                 alt={placeName ? `${placeName} photo ${idx + 1}` : `Photo ${idx + 1}`}
+                aria-hidden="true"
+                loading="lazy"
+                decoding="async"
                 style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0,0,0,0)', whiteSpace: 'nowrap' }}
               />
               {isLast && (
