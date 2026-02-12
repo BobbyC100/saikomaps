@@ -96,6 +96,14 @@ export function HeroSection({
         }}
         onClick={onHeroClick}
       >
+        {/* Hidden img for SEO crawlers — background-image is not indexable */}
+        {photoUrl && (
+          <img
+            src={photoUrl}
+            alt={`Photo of ${name}${neighborhood ? ` in ${neighborhood}` : ''}${category ? ` — ${category}` : ''}`}
+            style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0,0,0,0)', whiteSpace: 'nowrap' }}
+          />
+        )}
         {/* Photo Count Badge (bottom-left) */}
         {photoCount > 0 && (
           <button

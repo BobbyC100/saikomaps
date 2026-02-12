@@ -22,6 +22,9 @@ interface ProfileData {
   email: string;
   name: string | null;
   avatarUrl: string | null;
+  curatorNote: string | null;
+  scopePills: string[];
+  coverageSources: string[];
   createdAt: string;
   stats: {
     mapsCount: number;
@@ -122,16 +125,20 @@ export default function DashboardPage() {
               <h1 className="font-[var(--font-libre),Georgia,serif] text-[28px] italic text-[#36454F] mb-1.5">
                 {displayName}&apos;s Maps
               </h1>
-              <p className="text-sm text-[#8B7355] leading-relaxed max-w-[440px] mb-3.5 line-clamp-2">
-                Tight lists for LA nights out. Mostly wine bars and small plates. If it&apos;s not somewhere I&apos;d take a friend, it&apos;s not on the list.
-              </p>
-              <div className="flex gap-1.5 flex-wrap items-center">
-                <span className="px-3 py-1.5 bg-[#FFFDF7] rounded-full text-[11px] text-[#8B7355] font-medium">Echo Park</span>
-                <span className="px-3 py-1.5 bg-[#FFFDF7] rounded-full text-[11px] text-[#8B7355] font-medium">Silver Lake</span>
-                <span className="px-3 py-1.5 bg-[#FFFDF7] rounded-full text-[11px] text-[#8B7355] font-medium">Wine bars</span>
-                <span className="px-3 py-1.5 bg-[#FFFDF7] rounded-full text-[11px] text-[#8B7355] font-medium">Late night</span>
-                <span className="px-3 py-1.5 bg-[#FFFDF7] rounded-full text-[11px] text-[#8B7355] font-medium">SGV</span>
-              </div>
+              {profile?.curatorNote && (
+                <p className="text-sm text-[#8B7355] leading-relaxed max-w-[440px] mb-3.5 line-clamp-2">
+                  {profile.curatorNote}
+                </p>
+              )}
+              {profile?.scopePills && profile.scopePills.length > 0 && (
+                <div className="flex gap-1.5 flex-wrap items-center">
+                  {profile.scopePills.map((pill) => (
+                    <span key={pill} className="px-3 py-1.5 bg-[#FFFDF7] rounded-full text-[11px] text-[#8B7355] font-medium">
+                      {pill}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
             <div className="relative shrink-0" ref={settingsRef}>
               <button
@@ -204,9 +211,11 @@ export default function DashboardPage() {
               <span className="mx-2 opacity-40">·</span>
               <strong className="font-semibold text-[#36454F]">{profile?.stats.savedCount ?? 0}</strong> saved
             </span>
-            <div className="flex items-center gap-2 text-[11px] text-[#8B7355]">
-              Eater · Infatuation · Resy · Michelin
-            </div>
+            {profile?.coverageSources && profile.coverageSources.length > 0 && (
+              <div className="flex items-center gap-2 text-[11px] text-[#8B7355]">
+                {profile.coverageSources.join(' · ')}
+              </div>
+            )}
           </div>
         </header>
 
@@ -223,7 +232,7 @@ export default function DashboardPage() {
                         key={opt}
                         type="button"
                         onClick={() => setSortBy(opt)}
-                        className={`px-2.5 py-1 rounded-full text-[10px] transition-colors ${
+                        className={`px-3 py-2 rounded-full text-[10px] transition-colors min-h-[44px] ${
                           sortBy === opt
                             ? 'bg-[#FFFDF7] text-[#8B7355] font-medium'
                             : 'text-[#C3B091] hover:text-[#8B7355]'

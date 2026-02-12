@@ -63,7 +63,6 @@ export async function POST(
     );
 
     if (!canPublish) {
-      console.log('[PUBLISH] Validation failed:', JSON.stringify(errors, null, 2));
       return NextResponse.json(
         { error: 'Validation failed', errors },
         { status: 422 }

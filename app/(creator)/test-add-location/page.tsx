@@ -6,6 +6,12 @@ import AddLocationModal from '@/components/AddLocationModal';
 export default function TestAddLocationPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  // Only accessible in development
+  if (typeof window !== 'undefined' && process.env.NODE_ENV === 'production') {
+    window.location.href = '/';
+    return null;
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
       <div className="max-w-2xl w-full bg-white rounded-xl shadow-lg p-8">
@@ -59,7 +65,6 @@ export default function TestAddLocationPage() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSuccess={() => {
-          console.log('Location added successfully!');
           alert('✅ Demo successful! In production, this would save to the database.\n\nLocation: ' + (document.querySelector('[data-place-name]')?.textContent || 'Selected place'));
         }}
       />

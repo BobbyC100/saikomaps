@@ -42,8 +42,15 @@ export function AlsoOnCard({ maps }: AlsoOnCardProps) {
               {map.coverImageUrl ? (
                 <div
                   className={styles.thumbnailImage}
-                  style={{ backgroundImage: `url(${map.coverImageUrl})` }}
-                />
+                  style={{ backgroundImage: `url(${map.coverImageUrl})`, position: 'relative' }}
+                >
+                  {/* Hidden img for SEO crawlers */}
+                  <img
+                    src={map.coverImageUrl}
+                    alt={`${map.title} map thumbnail`}
+                    style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0,0,0,0)', whiteSpace: 'nowrap' }}
+                  />
+                </div>
               ) : (
                 <div className={styles.thumbnailPlaceholder}>
                   <svg className={styles.gridPattern} viewBox="0 0 48 48">

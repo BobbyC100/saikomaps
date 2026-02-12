@@ -15,7 +15,6 @@ export default function ImportPage() {
   const [isProcessing, setIsProcessing] = useState(false);
 
   const handleUploadComplete = async (result: UploadCSVResponse) => {
-    console.log('Upload complete:', result);
     setFileId(result.fileId);
     setIsProcessing(true);
 

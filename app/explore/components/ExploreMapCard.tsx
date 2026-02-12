@@ -49,8 +49,15 @@ export function ExploreMapCard({ map, featured = false }: ExploreMapCardProps) {
             backgroundPosition: 'center',
             filter: 'saturate(0.88) contrast(1.05)',
             position: 'relative',
+            overflow: 'hidden',
           }}
         >
+          {/* Hidden img for SEO crawlers */}
+          <img
+            src={map.coverImageUrl}
+            alt={`Cover image for ${map.title} map`}
+            style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0,0,0,0)', whiteSpace: 'nowrap' }}
+          />
           {/* Badge overlay for featured curator picks */}
           {featured && map.isCuratorPick && (
             <span

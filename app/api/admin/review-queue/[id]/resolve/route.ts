@@ -20,7 +20,6 @@ export async function POST(
     const body = await request.json();
     const { resolution, resolution_notes, canonical_id } = body;
     
-    console.log('[Review Queue API] Resolving item:', { id, resolution });
     
     // TODO: Get user from auth session
     const resolvedBy = 'admin';
@@ -44,12 +43,6 @@ export async function POST(
       },
     });
     
-    console.log('[Review Queue API] Successfully resolved:', {
-      queueId: id,
-      resolution,
-      entityLinksCreated: result.entityLinksCreated,
-      nextQueueId: result.nextQueueId,
-    });
     
     return NextResponse.json(result);
   } catch (error: any) {

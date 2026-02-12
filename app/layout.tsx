@@ -41,9 +41,34 @@ const instrumentSerif = Instrument_Serif({
   variable: "--font-instrument-serif",
 });
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://saikomaps.com';
+
 export const metadata: Metadata = {
-  title: "Saiko Maps",
-  description: "Create cool, personal maps — fast",
+  title: {
+    default: 'Saiko Maps — Curated Maps for People Who Care Where They Go',
+    template: '%s | Saiko Maps',
+  },
+  description:
+    'Discover curated restaurant guides, wine bars, and neighborhood gems in Los Angeles — or create your own map to share.',
+  metadataBase: new URL(siteUrl),
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    siteName: 'Saiko Maps',
+    title: 'Saiko Maps — Curated Maps for People Who Care Where They Go',
+    description:
+      'Discover curated restaurant guides, wine bars, and neighborhood gems in Los Angeles — or create your own map to share.',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Saiko Maps',
+    description:
+      'Discover curated restaurant guides, wine bars, and neighborhood gems — or create your own map to share.',
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({

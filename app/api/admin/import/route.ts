@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient, Prisma } from '@prisma/client';
 import { normalizeName } from '@/lib/normalize';
 import slugify from 'slugify';
+import { requireAdmin } from '@/lib/admin-auth';
 
 const prisma = new PrismaClient();
 
@@ -22,6 +23,9 @@ interface CSVRow {
 }
 
 export async function POST(request: NextRequest) {
+  const admin = await requireAdmin();
+  if (admin.error) return admin.error;
+
   try {
     const formData = await request.formData();
     const file = formData.get('file') as File;

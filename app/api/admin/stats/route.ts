@@ -5,10 +5,14 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import { requireAdmin } from '@/lib/admin-auth';
 
 const prisma = new PrismaClient();
 
 export async function GET(request: NextRequest) {
+  const admin = await requireAdmin();
+  if (admin.error) return admin.error;
+
   try {
     const today = new Date();
     today.setHours(0, 0, 0, 0);

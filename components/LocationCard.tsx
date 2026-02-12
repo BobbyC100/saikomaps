@@ -197,7 +197,7 @@ export function LocationCard({ location, isOwner, onEdit, onDelete, cardRef }: L
                 e.preventDefault();
                 onEdit(location);
               }}
-              className="p-1.5 rounded hover:opacity-80 transition-opacity"
+              className="p-2.5 rounded hover:opacity-80 transition-opacity min-w-[44px] min-h-[44px] flex items-center justify-center"
               style={{ color: '#B0A99F', backgroundColor: 'transparent' }}
               title="Edit location"
               aria-label="Edit location"
@@ -215,7 +215,7 @@ export function LocationCard({ location, isOwner, onEdit, onDelete, cardRef }: L
                   onDelete(location.id);
                 }
               }}
-              className="p-1.5 rounded hover:opacity-80 transition-opacity"
+              className="p-2.5 rounded hover:opacity-80 transition-opacity min-w-[44px] min-h-[44px] flex items-center justify-center"
               style={{ color: '#B0A99F', backgroundColor: 'transparent' }}
               title="Delete location"
               aria-label="Delete location"

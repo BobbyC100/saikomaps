@@ -63,7 +63,6 @@ export default function InstagramAdminPage() {
       const data = await res.json();
 
       if (res.ok) {
-        console.log('✅ Saved successfully:', data);
         
         // Remove from list (it now has Instagram)
         setPlaces(places.filter(p => p.canonical_id !== canonicalId));
@@ -105,7 +104,6 @@ export default function InstagramAdminPage() {
       const data = await res.json();
 
       if (res.ok) {
-        console.log('✅ Marked as closed:', data);
         
         // Remove from list
         setPlaces(places.filter(p => p.canonical_id !== canonicalId));
@@ -145,7 +143,6 @@ export default function InstagramAdminPage() {
       const data = await res.json();
 
       if (res.ok) {
-        console.log('✅ Marked as no Instagram:', data);
         
         // Remove from list
         setPlaces(places.filter(p => p.canonical_id !== canonicalId));

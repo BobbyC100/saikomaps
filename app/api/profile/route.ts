@@ -30,6 +30,9 @@ export async function GET() {
         email: true,
         name: true,
         avatarUrl: true,
+        curatorNote: true,
+        scopePills: true,
+        coverageSources: true,
         createdAt: true,
       },
     });
@@ -56,6 +59,9 @@ export async function GET() {
         email: user.email,
         name: user.name,
         avatarUrl: user.avatarUrl,
+        curatorNote: user.curatorNote,
+        scopePills: user.scopePills,
+        coverageSources: user.coverageSources,
         createdAt: user.createdAt,
         stats: {
           mapsCount,

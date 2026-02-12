@@ -131,8 +131,7 @@ export function TitleCard({ mapData, isOwner, template, onEdit, onDescriptionUpd
   };
 
   const handleInstagramShare = () => {
-    // TODO: Implement Instagram story image generation
-    console.log('Share to Instagram');
+    // Future: Instagram story image generation
   };
 
   // Always use coral color for title card, regardless of template

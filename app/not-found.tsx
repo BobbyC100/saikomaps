@@ -1,19 +1,10 @@
-'use client';
+/**
+ * Global 404 — Not Found page
+ */
 
-import { useEffect } from 'react';
 import Link from 'next/link';
 
-export default function Error({
-  error,
-  reset,
-}: {
-  error: Error & { digest?: string };
-  reset: () => void;
-}) {
-  useEffect(() => {
-    console.error(error);
-  }, [error]);
-
+export default function NotFound() {
   return (
     <div
       style={{
@@ -30,58 +21,57 @@ export default function Error({
     >
       <div
         style={{
-          fontSize: '48px',
+          fontSize: '72px',
           fontFamily: 'var(--font-libre), Georgia, serif',
           fontStyle: 'italic',
           color: '#C3B091',
           lineHeight: 1,
-          marginBottom: '12px',
+          marginBottom: '16px',
         }}
       >
-        Oops
+        404
       </div>
-      <h2
+      <h1
         style={{
           fontFamily: 'var(--font-libre), Georgia, serif',
           fontStyle: 'italic',
-          fontSize: '22px',
+          fontSize: '24px',
           fontWeight: 400,
-          margin: '0 0 8px',
+          margin: '0 0 12px',
           color: '#36454F',
         }}
       >
-        Something went wrong
-      </h2>
+        Page not found
+      </h1>
       <p
         style={{
           fontSize: '14px',
           color: '#8B7355',
           maxWidth: '360px',
           lineHeight: 1.5,
-          margin: '0 0 28px',
+          margin: '0 0 32px',
         }}
       >
-        An unexpected error occurred. Please try again.
+        The page you're looking for doesn't exist or may have been moved.
       </p>
       <div style={{ display: 'flex', gap: '12px' }}>
-        <button
-          onClick={() => reset()}
+        <Link
+          href="/"
           style={{
             padding: '10px 24px',
             fontSize: '13px',
             fontWeight: 600,
             color: '#F5F0E1',
             background: '#36454F',
-            border: 'none',
             borderRadius: '6px',
-            cursor: 'pointer',
+            textDecoration: 'none',
             letterSpacing: '0.5px',
           }}
         >
-          Try Again
-        </button>
+          Go Home
+        </Link>
         <Link
-          href="/"
+          href="/explore"
           style={{
             padding: '10px 24px',
             fontSize: '13px',
@@ -94,7 +84,7 @@ export default function Error({
             letterSpacing: '0.5px',
           }}
         >
-          Go Home
+          Explore Maps
         </Link>
       </div>
     </div>

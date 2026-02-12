@@ -52,7 +52,6 @@ export function BentoCardPopup({ place, theme, pinPixelX, pinPixelY, mapRect, ma
   };
 
   // Debug: Log photo URL
-  console.log('[BentoCardPopup]', place.name, 'photoUrl:', place.photoUrl);
 
   return (
     <div

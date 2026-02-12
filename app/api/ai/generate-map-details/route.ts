@@ -139,15 +139,12 @@ export async function POST(request: NextRequest) {
 
     const result = await generateMapDetails(placeInputs);
     if (process.env.NODE_ENV === 'development') {
-      console.log('[AI generate-map-details] Raw AI result:', JSON.stringify(result, null, 2));
-      console.log('[AI generate-map-details] Raw placeTypes from AI:', result.scope.placeTypes);
     }
 
     incrementRateLimit(rateKey);
 
     const scopePlaceTypes = mapPlaceTypesToScope(result.scope.placeTypes);
     if (process.env.NODE_ENV === 'development') {
-      console.log('[AI generate-map-details] Mapped placeTypes:', scopePlaceTypes);
     }
 
     const responseData = {
@@ -160,7 +157,6 @@ export async function POST(request: NextRequest) {
       },
     };
     if (process.env.NODE_ENV === 'development') {
-      console.log('[AI generate-map-details] Response data:', JSON.stringify(responseData, null, 2));
     }
 
     return NextResponse.json({

@@ -165,6 +165,12 @@ const quietStat: QuietCardData = {
 };
 
 export default function BentoGridDemoPage() {
+  // Redirect in production (runtime check for client component)
+  if (typeof window !== 'undefined' && process.env.NODE_ENV === 'production') {
+    window.location.href = '/';
+    return null;
+  }
+
   return (
     <>
       <link
@@ -213,8 +219,8 @@ export default function BentoGridDemoPage() {
               margin: '0 auto',
             }}
           >
-            Four equal-weight 1×2 Place cards in the priority zone (first 2 rows). 
-            Distributed visual weight signals "multiple strong matches" — not editorial curation.
+            Four equal-weight 1×2 Place cards in the priority zone (first 2 rows).
+            Distributed visual weight signals &quot;multiple strong matches&quot; — not editorial curation.
           </p>
         </div>
 
@@ -244,97 +250,6 @@ export default function BentoGridDemoPage() {
           <PlaceCard2x1 place={samplePlaces[4]} />
           <QuietCard2x1 quiet={quietStat} />
         </BentoGrid>
-
-        {/* Info callout */}
-        <div
-          style={{
-            maxWidth: 900,
-            margin: '40px auto 0',
-            padding: 20,
-            background: 'rgba(74, 124, 89, 0.08)',
-            borderRadius: 8,
-            borderLeft: '3px solid #4A7C59',
-          }}
-        >
-          <h3
-            style={{
-              fontSize: 11,
-              textTransform: 'uppercase',
-              letterSpacing: '2px',
-              color: '#4A7C59',
-              marginBottom: 12,
-            }}
-          >
-            Priority Zone Definition
-          </h3>
-          <p
-            style={{
-              fontFamily: '"Libre Baskerville", Georgia, serif',
-              fontStyle: 'italic',
-              fontSize: 14,
-              color: '#36454F',
-              lineHeight: 1.6,
-              marginBottom: 12,
-            }}
-          >
-            "The Priority Zone is the trust calibration zone — the first screen where users decide 
-            whether they're looking at results or an editorial layout."
-          </p>
-          <p
-            style={{
-              fontSize: 12,
-              color: '#6B7F59',
-              lineHeight: 1.7,
-            }}
-          >
-            Visual weight must be distributed across multiple Place cards in this zone. No single tile 
-            should carry most of the semantic load. The user's subconscious question — "Is this results 
-            or curation?" — must resolve to "results" within ~500ms.
-          </p>
-        </div>
-
-        {/* Responsive info */}
-        <div
-          style={{
-            maxWidth: 900,
-            margin: '20px auto 0',
-            padding: 16,
-            background: '#2a2a2a',
-            borderRadius: 8,
-            border: '1px solid #333',
-          }}
-        >
-          <h4
-            style={{
-              fontSize: 11,
-              textTransform: 'uppercase',
-              letterSpacing: '2px',
-              color: '#89B4C4',
-              marginBottom: 12,
-            }}
-          >
-            Responsive Breakpoints
-          </h4>
-          <ul
-            style={{
-              listStyle: 'none',
-              fontSize: 12,
-              color: '#888',
-              lineHeight: 1.8,
-              paddingLeft: 0,
-            }}
-          >
-            <li style={{ marginBottom: 4 }}>
-              <strong style={{ color: '#aaa' }}>Desktop (&gt;900px):</strong> 4 columns
-            </li>
-            <li style={{ marginBottom: 4 }}>
-              <strong style={{ color: '#aaa' }}>Tablet (641-900px):</strong> 2 columns
-            </li>
-            <li>
-              <strong style={{ color: '#aaa' }}>Mobile (≤640px):</strong> 1 column (2×1 cards flip to vertical)
-            </li>
-          </ul>
-        </div>
       </div>
     </>
   );

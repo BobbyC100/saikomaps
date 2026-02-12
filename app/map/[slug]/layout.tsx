@@ -1,23 +1,39 @@
 /**
- * Layout for public map view: provides Share Card metadata (OG + Twitter)
- * so when the map URL is shared, link unfurls show title, description, and image.
+ * Layout for public map view: provides Share Card metadata (OG + Twitter),
+ * canonical URL, and ItemList JSON-LD structured data.
  */
 
 import type { Metadata } from 'next';
 import { db } from '@/lib/db';
 
-function getBaseUrl(): string {
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
-  if (process.env.NEXTAUTH_URL) {
-    try {
-      return new URL(process.env.NEXTAUTH_URL).origin;
-    } catch {
-      return 'http://localhost:3000';
-    }
-  }
-  return 'http://localhost:3000';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://saikomaps.com';
+
+async function getMapData(slug: string) {
+  return db.lists.findFirst({
+    where: { slug, published: true },
+    select: {
+      title: true,
+      subtitle: true,
+      description: true,
+      slug: true,
+      coverImageUrl: true,
+      users: { select: { name: true } },
+      map_places: {
+        orderBy: { orderIndex: 'asc' },
+        select: {
+          places: {
+            select: {
+              name: true,
+              neighborhood: true,
+              slug: true,
+            },
+          },
+        },
+      },
+      _count: { select: { map_places: true } },
+    },
+  });
 }
-const BASE_URL = getBaseUrl();
 
 export async function generateMetadata({
   params,
@@ -26,40 +42,48 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
 
-  const list = await db.list.findFirst({
-    where: { slug, published: true },
-    include: { _count: { select: { locations: true } } },
-  });
+  const map = await getMapData(slug);
 
-  if (!list) {
-    return {
-      title: 'Map not found | Saiko Maps',
-    };
+  if (!map) {
+    return { title: 'Map Not Found' };
   }
 
-  const title = list.title;
-  const description =
-    list.subtitle ||
-    `${list._count.locations} locations · A map made with Saiko Maps`;
-  const url = `${BASE_URL}/map/${slug}`;
-  const imageUrl = list.coverImageUrl
-    ? (list.coverImageUrl.startsWith('http') ? list.coverImageUrl : `${BASE_URL}${list.coverImageUrl}`)
-    : `${BASE_URL}/saiko-logo.png`;
+  const creatorName = map.users?.name || 'Saiko Maps';
+  const placeCount = map._count?.map_places || 0;
+
+  const neighborhoods = [
+    ...new Set(
+      map.map_places
+        .map((mp) => mp.places?.neighborhood)
+        .filter(Boolean)
+    ),
+  ].slice(0, 3);
+
+  const description = (
+    map.description ||
+    map.subtitle ||
+    `${placeCount} curated places${neighborhoods.length > 0 ? ` in ${neighborhoods.join(', ')}` : ''} by ${creatorName}`
+  ).slice(0, 160);
+
+  const url = `${siteUrl}/map/${slug}`;
+  const imageUrl = map.coverImageUrl
+    ? (map.coverImageUrl.startsWith('http') ? map.coverImageUrl : `${siteUrl}${map.coverImageUrl}`)
+    : `${siteUrl}/saiko-logo.png`;
 
   return {
-    title: `${title} | Saiko Maps`,
+    title: `${map.title} by ${creatorName}`,
     description,
     openGraph: {
-      title,
+      title: map.title,
       description,
       url,
       siteName: 'Saiko Maps',
-      images: [{ url: imageUrl, width: 1200, height: 630, alt: title }],
+      images: [{ url: imageUrl, width: 1200, height: 630, alt: map.title }],
       type: 'website',
     },
     twitter: {
       card: 'summary_large_image',
-      title,
+      title: map.title,
       description,
       images: [imageUrl],
     },
@@ -67,10 +91,43 @@ export async function generateMetadata({
   };
 }
 
-export default function MapSlugLayout({
+export default async function MapSlugLayout({
+  params,
   children,
 }: {
+  params: Promise<{ slug: string }>;
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  const { slug } = await params;
+  const map = await getMapData(slug);
+
+  if (!map) return <>{children}</>;
+
+  // Build ItemList JSON-LD
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: map.title,
+    description: map.description || map.subtitle || undefined,
+    numberOfItems: map._count?.map_places || 0,
+    itemListElement: map.map_places.map((mp, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      item: {
+        '@type': 'Restaurant',
+        name: mp.places?.name || 'Unknown',
+        url: mp.places?.slug ? `${siteUrl}/place/${mp.places.slug}` : undefined,
+      },
+    })),
+  };
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      {children}
+    </>
+  );
 }
