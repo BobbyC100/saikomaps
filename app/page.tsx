@@ -7,17 +7,7 @@ import { CategoryCard } from '@/components/homepage/CategoryCard'
 import { HomepageFooter } from '@/components/homepage/HomepageFooter'
 import styles from './homepage.module.css'
 
-export default function Home() {
-  const browseColumns = [
-    {
-      label: 'Neighborhood',
-      href: '/explore?view=neighborhoods',
-      card: {
-        name: 'Echo Park',
-        count: 31,
-        imageUrl: 'https://images.unsplash.com/photo-1559329007-40df8a9345d8?w=600&h=450&fit=crop',
-        href: '/explore?neighborhood=echo-park'
-      }
+
     },
     {
       label: 'Cuisine',
@@ -123,20 +113,7 @@ export default function Home() {
       <Hero />
       <SearchBar />
 
-      <BrowseSection columns={browseColumns} seeAllHref="/explore" />
 
-      <section className={styles.section}>
-        <SectionHeader
-          title="BY NEIGHBORHOOD"
-          linkText="See all"
-          linkHref="/explore?view=neighborhoods"
-        />
-        <div className={styles.neighborhoodGrid}>
-          {neighborhoods.map((neighborhood) => (
-            <NeighborhoodCard key={neighborhood.name} {...neighborhood} />
-          ))}
-        </div>
-      </section>
 
       <section className={styles.categorySection}>
         <div className={styles.section}>

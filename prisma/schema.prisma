@@ -216,6 +216,7 @@ model places {
   intentProfileOverride   Boolean            @default(false) @map("intent_profile_override")
   reservationUrl          String?            @map("reservation_url")
 
+
   map_places              map_places[]
   person_places           person_places[]
   restaurant_groups       restaurant_groups? @relation(fields: [restaurantGroupId], references: [id])
@@ -549,6 +550,7 @@ enum Visibility {
   VERIFIED
 }
 
+<eat: Merchant page 4-bucket architecture + homepage hero restore)
 
 // ============================================================================
 // ENUMS FOR LIFECYCLE AND VERIFICATION

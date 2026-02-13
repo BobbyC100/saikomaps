@@ -1,0 +1,30 @@
+.quietCard {
+  background: #FFFDF7;
+  border: 1px solid rgba(195, 176, 145, 0.28);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 20px 16px;
+  gap: 8px;
+}
+
+.text {
+  font-family: 'Libre Baskerville', Georgia, serif;
+  font-size: 11px;
+  font-style: italic;
+  color: #36454F;
+  opacity: 0.6;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #C3B091;
+  opacity: 0.85;
+}

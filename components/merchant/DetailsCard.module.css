@@ -13,7 +13,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 14px;
+  padding: 8px 12px;
   border-bottom: 1px solid rgba(195, 176, 145, 0.1);
 }
 
@@ -47,7 +47,7 @@
 
 .expandButton {
   width: 100%;
-  padding: 10px 14px;
+  padding: 8px 12px;
   font-size: 10px;
   color: #8B7355;
   background: none;
