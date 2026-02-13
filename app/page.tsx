@@ -3,9 +3,9 @@
  * Route: /
  */
 
-import Link from 'next/link';
 import { GlobalHeader } from '@/components/layouts/GlobalHeader';
 import { GlobalFooter } from '@/components/layouts/GlobalFooter';
+import { Hero } from '@/components/homepage/Hero';
 import { MapCard } from '@/components/ui/MapCard';
 import { db } from '@/lib/db';
 import styles from './homepage.module.css';
@@ -52,23 +52,8 @@ export default async function Home() {
     <div className={styles.page}>
       <GlobalHeader variant="default" />
 
-      {/* Hero Section */}
-      <section className={styles.hero}>
-        <h1 className={styles.heroHeadline}>
-          Curated maps for people who care where they go.
-        </h1>
-        <p className={styles.heroSubhead}>
-          Discover restaurants, bars, and neighborhood gems — or create your own map to share.
-        </p>
-        <div className={styles.heroActions}>
-          <Link href="/explore" className={styles.btnPrimary}>
-            Explore Maps
-          </Link>
-          <Link href="/maps/new" className={styles.btnSecondary}>
-            Create a Map
-          </Link>
-        </div>
-      </section>
+      {/* Hero Section — watercolor map */}
+      <Hero />
 
       {/* Featured Maps Section */}
       <section className={styles.featuredSection}>

@@ -14,26 +14,16 @@ interface GlobalFooterProps {
 }
 
 export function GlobalFooter({ variant = 'standard' }: GlobalFooterProps) {
-  // Minimal variant (map/merchant view) - wordmark only
+  // Minimal variant (map/merchant view) - clean bottom edge only
   if (variant === 'minimal') {
     return (
       <footer
         style={{
-          padding: '12px 24px',
+          padding: '8px 24px',
           backgroundColor: '#FFFFFF',
           borderTop: '1px solid #F0F0F0',
-          textAlign: 'center',
         }}
-      >
-        <span
-          style={{
-            fontSize: '12px',
-            color: '#9A9A9A',
-          }}
-        >
-          Saiko Maps
-        </span>
-      </footer>
+      />
     )
   }
 

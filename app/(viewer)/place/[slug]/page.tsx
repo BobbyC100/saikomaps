@@ -13,7 +13,10 @@ import { CoverageCard } from '@/components/merchant/CoverageCard';
 import { GalleryCard } from '@/components/merchant/GalleryCard';
 import { CuratorCard } from '@/components/merchant/CuratorCard';
 import { VibeCard } from '@/components/merchant/VibeCard';
-import { AlsoOnCard } from '@/components/merchant/AlsoOnCard';
+import { DetailsCard } from '@/components/merchant/DetailsCard';
+import { MapTitleBlock } from '@/components/map-cards/MapTitleBlock';
+import { QuietCard } from '@/components/merchant/QuietCard';
+import { SourcesCard } from '@/components/merchant/SourcesCard';
 
 interface EditorialSource {
   source_id?: string;
@@ -67,6 +70,22 @@ interface LocationData {
     name: string;
     slug: string;
   } | null;
+  googlePlacesAttributes?: {
+    accessibility?: string[];
+    service_options?: string[];
+    highlights?: string[];
+    popular_for?: string[];
+    offerings?: string[];
+    dining_options?: string[];
+    amenities?: string[];
+    atmosphere?: string[];
+    crowd?: string[];
+    planning?: string[];
+    payments?: string[];
+    children?: string[];
+    parking?: string[];
+    pets?: string[];
+  } | null;
 }
 
 interface AppearsOnItem {
@@ -75,6 +94,7 @@ interface AppearsOnItem {
   slug: string;
   coverImageUrl: string | null;
   creatorName: string;
+  placeCount: number;
 }
 
 interface PlacePageData {
@@ -159,55 +179,102 @@ function parseHours(hours: unknown): {
     isIrregular = true;
   }
 
-  // Determine if open
-  let isOpen: boolean | null = null;
-  if (typeof obj.openNow === 'boolean') {
-    isOpen = obj.openNow;
-  } else if (typeof (obj as { open_now?: boolean }).open_now === 'boolean') {
-    isOpen = (obj as { open_now: boolean }).open_now;
-  } else {
-    const todayRow = fullWeek[todayIndex];
-    const todayHours = todayRow?.hours ?? null;
-    isOpen = todayHours ? !todayHours.toLowerCase().includes('closed') : null;
-  }
+  // Helper: parse a time string like "5:00 PM" or "11:00\u202fPM" into minutes since midnight
+  const parseTimeToMinutes = (timeStr: string): number | null => {
+    const match = timeStr.match(/(\d{1,2}):?(\d{2})?\s*[\u2009\u202f ]*(AM|PM)/i);
+    if (!match) return null;
+    let hours = parseInt(match[1], 10);
+    const minutes = match[2] ? parseInt(match[2], 10) : 0;
+    const period = match[3].toUpperCase();
+    if (period === 'PM' && hours !== 12) hours += 12;
+    if (period === 'AM' && hours === 12) hours = 0;
+    return hours * 60 + minutes;
+  };
 
-  // Extract close time from today's hours
+  // Helper: extract open and close times from a range string like "5:00 – 11:00 PM"
+  const extractTimeRange = (hoursStr: string | null | undefined): { openTime: string | null; closeTime: string | null } => {
+    if (!hoursStr || hoursStr.toLowerCase().includes('closed')) return { openTime: null, closeTime: null };
+
+    // Match range: "5:00 – 11:00 PM" or "5:00 AM – 11:00 PM"
+    const rangeMatch = hoursStr.match(/(\d{1,2}:?\d{0,2})\s*(?:AM|PM)?\s*[\u2009\u202f ]*[–\-]\s*[\u2009\u202f ]*(\d{1,2}:?\d{0,2})\s*[\u2009\u202f ]*(AM|PM)/i);
+    if (!rangeMatch) return { openTime: null, closeTime: null };
+
+    const openRaw = rangeMatch[1];
+    const closeRaw = rangeMatch[2];
+    const closePeriod = rangeMatch[3];
+
+    // Check if the opening time has its own AM/PM
+    const withPeriod = hoursStr.match(/(\d{1,2}:?\d{0,2})\s*[\u2009\u202f ]*(AM|PM)\s*[\u2009\u202f ]*[–\-]/i);
+    const openTime = withPeriod
+      ? `${withPeriod[1]} ${withPeriod[2]}`
+      : `${openRaw} ${closePeriod}`;
+    const closeTime = `${closeRaw} ${closePeriod}`;
+
+    return { openTime, closeTime };
+  };
+
   const todayRow = fullWeek[todayIndex];
   const todayHours = todayRow?.hours ?? null;
-  
+
   // Check for 24-hour operation
-  const is24Hours = todayHours?.toLowerCase().includes('open 24 hours') || 
+  const is24Hours = todayHours?.toLowerCase().includes('open 24 hours') ||
                     todayHours?.toLowerCase().includes('24 hours') ||
                     todayHours?.toLowerCase().includes('24/7');
-  
-  const closeMatch = !is24Hours ? todayHours?.match(/[–-]\s*(\d{1,2}:?\d{0,2}\s*(?:AM|PM))/i) : null;
-  let closesAt = closeMatch ? closeMatch[1].trim() : (is24Hours ? null : null);
-  
-  // Format close time to match "11 PM" style
+
+  // Compute open/closed from current time vs today's hours range
+  const { openTime: todayOpenTime, closeTime: todayCloseTime } = extractTimeRange(todayHours);
+
+  let isOpen: boolean | null = null;
+  if (is24Hours) {
+    isOpen = true;
+  } else if (todayHours?.toLowerCase().includes('closed')) {
+    isOpen = false;
+  } else if (todayOpenTime && todayCloseTime) {
+    const now = new Date();
+    const nowMinutes = now.getHours() * 60 + now.getMinutes();
+    const openMin = parseTimeToMinutes(todayOpenTime);
+    const closeMin = parseTimeToMinutes(todayCloseTime);
+    if (openMin !== null && closeMin !== null) {
+      if (closeMin > openMin) {
+        // Normal range: e.g. 5 PM – 11 PM
+        isOpen = nowMinutes >= openMin && nowMinutes < closeMin;
+      } else {
+        // Overnight range: e.g. 10 PM – 2 AM
+        isOpen = nowMinutes >= openMin || nowMinutes < closeMin;
+      }
+    }
+  }
+  // Fallback to stale openNow if we couldn't compute
+  if (isOpen === null) {
+    if (typeof obj.openNow === 'boolean') {
+      isOpen = obj.openNow;
+    } else if (typeof (obj as { open_now?: boolean }).open_now === 'boolean') {
+      isOpen = (obj as { open_now: boolean }).open_now;
+    }
+  }
+
+  // Format close time
+  let closesAt = todayCloseTime;
   if (closesAt) {
     closesAt = closesAt.replace(/(\d+):00/, '$1').replace(/\s+/g, ' ');
   }
 
-  // Extract open time (for when closed)
-  const openMatch = todayHours?.match(/(\d{1,2}:?\d{0,2}\s*(?:AM|PM))\s*[–-]/i);
-  let opensAt = openMatch ? openMatch[1].trim() : null;
-  
+  // Determine opens at time
+  let opensAt = todayOpenTime;
+
   // If closed today, find next opening time
   if (!isOpen && (!opensAt || todayHours?.toLowerCase().includes('closed'))) {
-    // Look for next day that's open
     for (let i = 1; i <= 7; i++) {
       const nextDayIndex = (todayIndex + i) % 7;
       const nextDayHours = fullWeek[nextDayIndex]?.hours;
-      if (nextDayHours && !nextDayHours.toLowerCase().includes('closed')) {
-        const nextOpenMatch = nextDayHours.match(/(\d{1,2}:?\d{0,2}\s*(?:AM|PM))/i);
-        if (nextOpenMatch) {
-          opensAt = nextOpenMatch[1].trim();
-          break;
-        }
+      const { openTime: nextOpen } = extractTimeRange(nextDayHours);
+      if (nextOpen) {
+        opensAt = nextOpen;
+        break;
       }
     }
   }
-  
+
   // Format open time
   if (opensAt) {
     opensAt = opensAt.replace(/(\d+):00/, '$1').replace(/\s+/g, ' ');
@@ -355,17 +422,35 @@ export default function PlacePage() {
   const hasGallery = (location.photoUrls?.length ?? 0) > 1; // More than just hero
   
 
-  // Service options (placeholder - add when Google fields available)
-  const serviceOptions: string[] = [];
-  // TODO: When delivery/takeout/dineIn available from Google:
-  // if (location.delivery) serviceOptions.push('Delivery');
-  // if (location.takeout) serviceOptions.push('Takeout');
-  // if (location.dineIn) serviceOptions.push('Dine-in');
+  // --- Facts bucket (from Google Places attributes) ---
+  const gpa = location.googlePlacesAttributes;
+  const serviceOptions = gpa?.service_options ?? [];
+  const parkingItems = gpa?.parking ?? [];
+  const parkingNote = parkingItems.length > 0 ? parkingItems.join(', ') : null;
+  const isAccessible = (gpa?.accessibility?.length ?? 0) > 0;
 
   // Reservations note
   const reservationsNote = location.reservationUrl
     ? 'Recommended'
-    : null;
+    : gpa?.planning?.some(p => p.toLowerCase().includes('reservation'))
+      ? 'Accepted'
+      : null;
+
+  // --- Vibes bucket (merge vibeTags + atmosphere + highlights + crowd) ---
+  const vibeBucket = [
+    ...(location.vibeTags ?? []),
+    ...(gpa?.atmosphere ?? []),
+    ...(gpa?.highlights ?? []),
+    ...(gpa?.crowd ?? []),
+  ];
+  // Deduplicate (case-insensitive)
+  const vibeTagsSeen = new Set<string>();
+  const mergedVibeTags = vibeBucket.filter(tag => {
+    const key = tag.toLowerCase();
+    if (vibeTagsSeen.has(key)) return false;
+    vibeTagsSeen.add(key);
+    return true;
+  });
 
   // Deduplicate appearsOn by slug, max 3
   const seenSlugs = new Set<string>();
@@ -417,18 +502,35 @@ export default function PlacePage() {
             display: 'grid',
             gridTemplateColumns: 'repeat(6, 1fr)',
             gap: 12,
+            alignItems: 'start',
           }}
         >
-          {/* Row 1: Hours (2 or 6) + Coverage (3-5) */}
+          {/* Row 1: Hours + Details (Facts) */}
           <HoursCard
             todayHours={today}
             isOpen={isOpen}
             statusText={statusText}
             fullWeek={fullWeek}
             isIrregular={isIrregular}
-            span={hasCoverage ? 2 : 6}
+            span={2}
           />
 
+          {/* Facts card — highest hierarchy after hours */}
+          <DetailsCard
+            website={location.website}
+            restaurantGroupName={location.restaurantGroup?.name}
+            restaurantGroupSlug={location.restaurantGroup?.slug}
+            serviceOptions={serviceOptions}
+            reservationsNote={reservationsNote}
+            parkingNote={parkingNote}
+            isAccessible={isAccessible}
+            offerings={gpa?.offerings ?? null}
+            diningOptions={gpa?.dining_options ?? null}
+            petsNote={gpa?.pets?.length ? gpa.pets.join(', ') : null}
+            span={4}
+          />
+
+          {/* Row 2: Coverage + Sources */}
           {hasCoverage && (
             <CoverageCard
               pullQuote={location.pullQuote}
@@ -437,10 +539,15 @@ export default function PlacePage() {
               pullQuoteUrl={location.pullQuoteUrl}
               sources={location.sources}
               vibeTag={location.vibeTags?.[0] || null}
+              span={(location.sources?.length ?? 0) >= 2 ? 4 : 6}
             />
           )}
 
-          {/* Row 2: Gallery (3 or 6) + Curator (3) */}
+          {(location.sources?.length ?? 0) >= 2 && (
+            <SourcesCard sources={location.sources!} span={hasCoverage ? 2 : 6} />
+          )}
+
+          {/* Row 3: Gallery + Curator + quiet fill */}
           {hasGallery && (
             <GalleryCard
               photos={location.photoUrls!.slice(1)} // Exclude hero
@@ -450,21 +557,55 @@ export default function PlacePage() {
           )}
 
           {hasCurator && (
-            <CuratorCard 
-              note={location.curatorNote!} 
-              span={3}
+            <CuratorCard
+              note={location.curatorNote!}
+              span={hasGallery ? 3 : 6}
             />
           )}
 
-          {/* Row 3: Vibe (6) */}
-          {location.vibeTags && location.vibeTags.length > 0 && (
-            <VibeCard vibeTags={location.vibeTags} />
+          {/* Quiet fill after gallery/curator row */}
+          {!hasGallery && !hasCurator && (
+            <QuietCard
+              neighborhood={location.neighborhood}
+              category={location.category}
+              span={6}
+            />
           )}
 
-          {/* Row 4: Also On (6) */}
-          {appearsOnDeduped.length > 0 && (
-            <AlsoOnCard maps={appearsOnDeduped} />
+          {/* Vibes (merged: vibeTags + atmosphere + highlights + crowd) */}
+          {mergedVibeTags.length > 0 && (
+            <VibeCard vibeTags={mergedVibeTags} />
           )}
+
+          {/* Also On — compact map cards */}
+          {appearsOnDeduped.length > 0 && (
+            <>
+              <div style={{ gridColumn: 'span 6', fontSize: 9, textTransform: 'uppercase', letterSpacing: '1.5px', color: '#C3B091', marginTop: 4 }}>
+                ALSO ON
+              </div>
+              {appearsOnDeduped.map((item) => (
+                <div key={item.id} style={{ gridColumn: `span ${appearsOnDeduped.length === 1 ? 6 : appearsOnDeduped.length === 2 ? 3 : 2}` }}>
+                  <MapTitleBlock
+                    compact
+                    map={{
+                      slug: item.slug,
+                      title: item.title,
+                      placeCount: item.placeCount || 0,
+                      coverImageUrl: item.coverImageUrl ?? undefined,
+                      authorType: 'user',
+                      authorUsername: item.creatorName,
+                    }}
+                  />
+                </div>
+              ))}
+            </>
+          )}
+
+          {/* Quiet card — fills bottom of grid */}
+          <QuietCard
+            neighborhood={location.neighborhood}
+            category={location.category}
+          />
         </div>
       </main>
 

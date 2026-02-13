@@ -41,6 +41,9 @@ export async function GET(
                     email: true,
                   },
                 },
+                _count: {
+                  select: { map_places: true },
+                },
               },
             },
           },
@@ -59,6 +62,18 @@ export async function GET(
         { error: 'Place not found' },
         { status: 404 }
       );
+    }
+
+    // Cross-reference golden_records for enrichment data (Google Places attributes)
+    let googlePlacesAttributes = place.googlePlacesAttributes ?? null;
+    if (!googlePlacesAttributes && place.googlePlaceId) {
+      const goldenRecord = await db.golden_records.findFirst({
+        where: { google_place_id: place.googlePlaceId },
+        select: { google_places_attributes: true },
+      });
+      if (goldenRecord?.google_places_attributes) {
+        googlePlacesAttributes = goldenRecord.google_places_attributes;
+      }
     }
 
     // Get photo URLs (up to 10 for merchant page: 1 hero + up to 9 gallery)
@@ -97,6 +112,7 @@ export async function GET(
       slug: mp.lists!.slug,
       coverImageUrl: mp.lists!.coverImageUrl,
       creatorName: mp.lists!.users?.name || mp.lists!.users?.email?.split('@')[0] || 'Unknown',
+      placeCount: (mp.lists as any)._count?.map_places ?? 0,
     }));
     const curatorMapPlace = publishedMapPlaces.find((mp) => mp.descriptor?.trim());
     const curatorNote = curatorMapPlace?.descriptor?.trim() ?? null;
@@ -144,6 +160,8 @@ export async function GET(
           reservationUrl: place.reservationUrl,
           // Restaurant Group
           restaurantGroup: place.restaurant_groups || null,
+          // Google Places structured attributes (from places table or golden_records fallback)
+          googlePlacesAttributes: googlePlacesAttributes || null,
         },
         guide: appearsOn[0]
           ? {

@@ -233,6 +233,7 @@ model places {
   intentProfile           String?            @map("intent_profile")
   intentProfileOverride   Boolean            @default(false) @map("intent_profile_override")
   reservationUrl          String?            @map("reservation_url")
+  googlePlacesAttributes  Json?              @map("google_places_attributes")
   map_places              map_places[]
   person_places           person_places[]
   restaurant_groups       restaurant_groups? @relation(fields: [restaurantGroupId], references: [id])
@@ -539,7 +540,11 @@ model golden_records {
   tagline_generated_at DateTime?
   tagline_signals      Json?     // Snapshot of identity signals used for generation
   tagline_version      Int?      // Voice engine version (2)
-  
+
+  // Google Places "About" attributes (structured JSONB)
+  google_places_attributes             Json?
+  google_places_attributes_fetched_at  DateTime?
+
   // Relations
   entity_links    entity_links[]
   review_queue    review_queue[]
