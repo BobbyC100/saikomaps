@@ -51,6 +51,12 @@ export interface PlaceDetails {
   businessStatus?: string;
   addressComponents?: AddressComponent[];
   vicinity?: string;
+  // Structured location data
+  zip?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  county?: string;
 }
 
 /**
@@ -65,6 +71,51 @@ export function parseNeighborhood(addressComponents: AddressComponent[] | null |
     if (component?.long_name) return component.long_name;
   }
   return null;
+}
+
+/**
+ * Extract ZIP code from address_components
+ */
+export function extractZip(addressComponents: AddressComponent[] | null | undefined): string | null {
+  if (!addressComponents?.length) return null;
+  const zipComponent = addressComponents.find((c) => c.types.includes('postal_code'));
+  return zipComponent?.short_name || null;
+}
+
+/**
+ * Extract city from address_components
+ */
+export function extractCity(addressComponents: AddressComponent[] | null | undefined): string | null {
+  if (!addressComponents?.length) return null;
+  const cityComponent = addressComponents.find((c) => c.types.includes('locality'));
+  return cityComponent?.short_name || null;
+}
+
+/**
+ * Extract state from address_components
+ */
+export function extractState(addressComponents: AddressComponent[] | null | undefined): string | null {
+  if (!addressComponents?.length) return null;
+  const stateComponent = addressComponents.find((c) => c.types.includes('administrative_area_level_1'));
+  return stateComponent?.short_name || null;
+}
+
+/**
+ * Extract country from address_components
+ */
+export function extractCountry(addressComponents: AddressComponent[] | null | undefined): string | null {
+  if (!addressComponents?.length) return null;
+  const countryComponent = addressComponents.find((c) => c.types.includes('country'));
+  return countryComponent?.short_name || null;
+}
+
+/**
+ * Extract county from address_components
+ */
+export function extractCounty(addressComponents: AddressComponent[] | null | undefined): string | null {
+  if (!addressComponents?.length) return null;
+  const countyComponent = addressComponents.find((c) => c.types.includes('administrative_area_level_2'));
+  return countyComponent?.long_name || null;
 }
 
 /**
@@ -204,6 +255,13 @@ export async function getPlaceDetails(
     types: c.types || [],
   }));
 
+  // Extract structured location data
+  const zip = extractZip(addressComponents);
+  const city = extractCity(addressComponents);
+  const state = extractState(addressComponents);
+  const country = extractCountry(addressComponents);
+  const county = extractCounty(addressComponents);
+
   return {
     placeId: place.place_id,
     name: place.name,
@@ -232,6 +290,11 @@ export async function getPlaceDetails(
     businessStatus: place.business_status,
     addressComponents: addressComponents || undefined,
     vicinity: place.vicinity || undefined,
+    zip,
+    city,
+    state,
+    country,
+    county,
   };
 }
 

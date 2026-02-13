@@ -2,13 +2,20 @@
  * Backfill Google Places data for Place records missing photos, hours, contact info,
  * neighborhood, and cuisine_type.
  *
+ * Default: processes active LA County places (scope: active, region: la_county)
+ * Failed lookups are marked with placesDataCachedAt so we don't retry forever.
+ *
  * Usage:
- *   npm run backfill:google                    # places never cached (placesDataCachedAt null)
- *   npm run backfill:google -- --missing-meta  # places with null neighborhood or cuisineType
- *   npm run backfill:google -- --limit 20      # first 20 only
- *   npm run backfill:google -- --slug seco     # single place by slug
- *   npm run backfill:google -- --dry-run       # preview without updating
- *   npm run backfill:google -- --force         # re-enrich all places
+ *   npm run backfill:google                           # places never cached (placesDataCachedAt null)
+ *   npm run backfill:google -- --la-county            # DEPRECATED: use --region la_county
+ *   npm run backfill:google -- --scope active         # filter by scope
+ *   npm run backfill:google -- --region la_county     # filter by region
+ *   npm run backfill:google -- --curated              # filter by provenance (old method)
+ *   npm run backfill:google -- --missing-meta         # places with null neighborhood or cuisineType
+ *   npm run backfill:google -- --limit 20             # first 20 only
+ *   npm run backfill:google -- --slug seco            # single place by slug
+ *   npm run backfill:google -- --dry-run              # preview without updating
+ *   npm run backfill:google -- --force                # re-enrich all places
  *
  * Requires: GOOGLE_PLACES_API_KEY, DATABASE_URL
  */
@@ -24,10 +31,51 @@ import {
 import { getSaikoCategory, parseCuisineType } from "@/lib/categoryMapping";
 
 const prisma = new PrismaClient();
+
+const CURATED_ONLY = process.argv.includes('--curated');
+const SCOPE = process.argv.includes('--scope')
+  ? process.argv[process.argv.indexOf('--scope') + 1]
+  : 'active'; // Default to active
+const REGION = process.argv.includes('--region')
+  ? process.argv[process.argv.indexOf('--region') + 1]
+  : 'la_county'; // Default to LA County
 const RATE_LIMIT_MS = 150;
 
 // LA center for location bias when searching by name only
 const LA_CENTER = { latitude: 34.0522, longitude: -118.2437 };
+
+// LA County neighborhoods/cities — curated places in these areas only (from tag-la-county, la-county-coverage)
+const LA_COUNTY_AREAS = [
+  "Central LA", "Downtown", "DTLA", "Arts District", "Little Tokyo", "Chinatown",
+  "Historic Core", "Financial District",
+  "Santa Monica", "Venice", "Marina del Rey", "Culver City", "Westwood", "Brentwood",
+  "Pacific Palisades", "West LA", "Palms", "Mar Vista", "Playa Vista",
+  "Hollywood", "West Hollywood", "Los Feliz", "Silver Lake", "Echo Park",
+  "Highland Park", "Eagle Rock", "Atwater Village",
+  "Manhattan Beach", "Hermosa Beach", "Redondo Beach", "El Segundo", "Hawthorne",
+  "Torrance", "Gardena", "Inglewood", "Lawndale",
+  "South LA", "Watts", "Compton", "Lynwood", "South Gate", "Huntington Park",
+  "Boyle Heights", "East LA", "Lincoln Heights", "El Sereno", "Montebello",
+  "Monterey Park", "Alhambra", "San Gabriel", "Rosemead", "Temple City",
+  "Pasadena", "South Pasadena", "Arcadia", "Monrovia", "Sierra Madre",
+  "San Marino", "Glendale", "La Cañada Flintridge",
+  "Sherman Oaks", "Studio City", "North Hollywood", "Burbank", "Van Nuys",
+  "Encino", "Tarzana", "Reseda", "Northridge", "Granada Hills", "Porter Ranch",
+  "Woodland Hills", "Canoga Park", "Chatsworth", "Pacoima", "San Fernando",
+  "Toluca Lake", "Valley Village", "Panorama City", "Tujunga",
+  "San Pedro", "Wilmington", "Harbor City", "Long Beach",
+  "Downtown Los Angeles", "Westlake", "Koreatown", "East Hollywood", "Fairfax",
+  "Melrose", "Central", "Ocean Park", "Wilshire Montana", "Pico", "Sunset Park",
+  "Mid-City", "Sawtelle", "Westside Village", "West Los Angeles", "Northeast",
+  "Pico-Robertson", "South Los Angeles", "View Park", "Leimert Park", "West Adams",
+  "Baldwin Hills", "Jefferson Park", "South Park", "South Central", "Slauson Corridor",
+  "Slauson", "Westchester", "Northeast Torrance", "Five Points", "Clarkdale",
+  "Valley Village", "Universal City", "Winnetka", "Northeast Los Angeles",
+  "Mount Washington", "Glassell Park", "South Arroyo", "Hastings Ranch", "El Monte",
+  "Rowland Heights", "Garvey", "San Marino", "Altadena", "Palos Verdes",
+  "Pico Rivera", "Malibu", "Calabasas", "Agoura Hills", "Thousand Oaks", "Los Angeles",
+  "Beverly Hills",
+];
 
 function parseArgs() {
   const args = process.argv.slice(2);
@@ -36,6 +84,7 @@ function parseArgs() {
   let dryRun = false;
   let force = false;
   let missingMeta = false;
+  let laCounty = false;
 
   for (let i = 0; i < args.length; i++) {
     if (args[i] === "--limit") limit = parseInt(args[++i] || "0", 10) || Infinity;
@@ -43,9 +92,10 @@ function parseArgs() {
     else if (args[i] === "--dry-run") dryRun = true;
     else if (args[i] === "--force") force = true;
     else if (args[i] === "--missing-meta") missingMeta = true;
+    else if (args[i] === "--la-county") laCounty = true;
   }
 
-  return { limit, slug, dryRun, force, missingMeta };
+  return { limit, slug, dryRun, force, missingMeta, laCounty };
 }
 
 function sleep(ms: number) {
@@ -70,7 +120,7 @@ function formatHoursForStore(
 }
 
 async function main() {
-  const { limit, slug, dryRun, force, missingMeta } = parseArgs();
+  const { limit, slug, dryRun, force, missingMeta, laCounty } = parseArgs();
 
   if (!process.env.GOOGLE_PLACES_API_KEY) {
     console.error("❌ GOOGLE_PLACES_API_KEY is not set. Add it to .env or .env.local");
@@ -92,13 +142,46 @@ async function main() {
     where = { placesDataCachedAt: null };
   }
 
-  const places = await prisma.place.findMany({
+  // Add scope/region filters (default: active LA County)
+  if (!slug) {
+    if (SCOPE) where.scope = SCOPE as any;
+    if (REGION) where.region = REGION;
+  }
+
+  // Optional: restrict to curated places only (those with provenance)
+  if (CURATED_ONLY && !slug) {
+    const curatedIds = await prisma.provenance.findMany({ select: { place_id: true } }).then((r) => r.map((p) => p.place_id));
+    if (curatedIds.length > 0) {
+      where = { ...where, id: { in: curatedIds } };
+    }
+  }
+
+  // Restrict to curated places in LA County only (by neighborhood)
+  let skippedNotLACounty = 0;
+  if (laCounty && !slug) {
+    const totalNeedingBackfill = await prisma.places.count({
+      where: {
+        ...(force ? {} : missingMeta ? { googlePlaceId: { not: null }, OR: [{ neighborhood: null }, { cuisineType: null }] } : { placesDataCachedAt: null }),
+        id: { in: curatedIds },
+      },
+    });
+    where = {
+      ...where,
+      neighborhood: { in: LA_COUNTY_AREAS },
+    };
+    const laCountyCount = await prisma.places.count({ where });
+    skippedNotLACounty = totalNeedingBackfill - laCountyCount;
+  }
+
+  const places = await prisma.places.findMany({
     where,
     orderBy: { createdAt: "asc" },
     ...(Number.isFinite(limit) && limit > 0 && { take: limit }),
   });
 
   console.log(`\nBackfill Google Places — ${places.length} place(s) to process`);
+  if (!slug) console.log("(Curated places only)\n");
+  if (laCounty) console.log("(LA County only — filtered by neighborhood)\n");
   if (dryRun) console.log("(dry run — no updates)\n");
   else console.log("");
 
@@ -145,6 +228,13 @@ async function main() {
       if (!placeDetails) {
         failed++;
         console.log(`  ❌ ${label}: could not resolve via Google Places`);
+        // Mark as attempted so we don't retry forever (Google doesn't have this place)
+        if (!dryRun) {
+          await prisma.places.update({
+            where: { id: place.id },
+            data: { placesDataCachedAt: new Date() },
+          });
+        }
         await sleep(RATE_LIMIT_MS);
         continue;
       }
@@ -165,6 +255,29 @@ async function main() {
           : null);
 
       const cuisineType = parseCuisineType(placeDetails.types ?? []) ?? null;
+
+      // Check if google_place_id already exists (duplicate check)
+      if (googlePlaceId) {
+        const existingPlace = await prisma.places.findUnique({
+          where: { googlePlaceId: googlePlaceId },
+        });
+
+        if (existingPlace && existingPlace.id !== place.id) {
+          failed++;
+          console.log(
+            `  ⚠️  ${label}: Google Place ID already assigned to "${existingPlace.name}" (${existingPlace.slug}) - marking as attempted`
+          );
+          // Mark as attempted to prevent retry
+          if (!dryRun) {
+            await prisma.places.update({
+              where: { id: place.id },
+              data: { placesDataCachedAt: new Date() },
+            });
+          }
+          await sleep(RATE_LIMIT_MS);
+          continue;
+        }
+      }
 
       const updateData = {
         googlePlaceId: googlePlaceId ?? undefined,
@@ -194,7 +307,7 @@ async function main() {
       };
 
       if (!dryRun) {
-        await prisma.place.update({
+        await prisma.places.update({
           where: { id: place.id },
           data: updateData,
         });
@@ -218,6 +331,9 @@ async function main() {
   console.log("\n--- Backfill Complete ---");
   console.log(`Enriched: ${enriched}`);
   if (failed > 0) console.log(`Failed: ${failed}`);
+  if (skippedNotLACounty > 0) {
+    console.log(`Skipped (not LA County): ${skippedNotLACounty}`);
+  }
   if (dryRun) console.log("(No changes were made — run without --dry-run to apply)");
 }
 

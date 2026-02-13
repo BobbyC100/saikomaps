@@ -18,6 +18,9 @@ saiko-maps@0.1.0
 uploads/
 Takeout/
 
+# enrichment logs
+logs/
+
 # test files
 test-*.js
 test-*.csv
