@@ -39,58 +39,58 @@ model activity_spots {
 }
 
 model import_jobs {
-  id                  String    @id
-  userId              String    @map("user_id")
-  listId              String?   @map("list_id")
-  status              String    @default("processing")
-  totalLocations      Int?      @map("total_locations")
-  processedLocations  Int       @default(0) @map("processed_locations")
-  failedLocations     Int       @default(0) @map("failed_locations")
-  errorLog            Json?     @map("error_log")
-  createdAt           DateTime  @default(now()) @map("created_at")
-  completedAt         DateTime? @map("completed_at")
-  lists               lists?    @relation(fields: [listId], references: [id])
-  users               users     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                 String    @id
+  userId             String    @map("user_id")
+  listId             String?   @map("list_id")
+  status             String    @default("processing")
+  totalLocations     Int?      @map("total_locations")
+  processedLocations Int       @default(0) @map("processed_locations")
+  failedLocations    Int       @default(0) @map("failed_locations")
+  errorLog           Json?     @map("error_log")
+  createdAt          DateTime  @default(now()) @map("created_at")
+  completedAt        DateTime? @map("completed_at")
+  lists              lists?    @relation(fields: [listId], references: [id])
+  users              users     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([status])
   @@index([userId])
 }
 
 model lists {
-  id                    String           @id
-  userId                String           @map("user_id")
-  title                 String
-  subtitle              String?
-  description           String?
-  descriptionSource    String?           @map("description_source")
-  slug                  String           @unique
-  introText             String?          @map("intro_text")
-  functionType          String?          @map("function_type")
-  functionContext       String?          @map("function_context")
-  scopeGeography        String?          @map("scope_geography")
-  scopePlaceTypes       String[]         @map("scope_place_types")
-  scopeExclusions       String[]         @map("scope_exclusions")
-  organizingLogic       OrganizingLogic?  @map("organizing_logic")
-  organizingLogicNote   String?          @map("organizing_logic_note")
-  notes                 String?
-  status                MapStatus        @default(DRAFT)
-  publishedAt           DateTime?        @map("published_at")
-  templateType          String           @default("field-notes") @map("template_type")
-  coverImageUrl         String?          @map("cover_image_url")
-  primaryColor          String           @default("#5BA7A7") @map("primary_color")
-  secondaryColor        String           @default("#7FA5A5") @map("secondary_color")
-  accessLevel           String           @default("public") @map("access_level")
-  passwordHash          String?          @map("password_hash")
-  allowedEmails         String[]         @map("allowed_emails")
-  published             Boolean          @default(false)
-  viewCount             Int              @default(0) @map("view_count")
-  createdAt             DateTime         @default(now()) @map("created_at")
-  updatedAt             DateTime         @map("updated_at")
-  import_jobs           import_jobs[]
-  users                 users            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  locations             locations[]
-  map_places            map_places[]
-  saved_maps            saved_maps[]
+  id                  String           @id
+  userId              String           @map("user_id")
+  title               String
+  subtitle            String?
+  description         String?
+  descriptionSource   String?          @map("description_source")
+  slug                String           @unique
+  introText           String?          @map("intro_text")
+  functionType        String?          @map("function_type")
+  functionContext     String?          @map("function_context")
+  scopeGeography      String?          @map("scope_geography")
+  scopePlaceTypes     String[]         @map("scope_place_types")
+  scopeExclusions     String[]         @map("scope_exclusions")
+  organizingLogic     OrganizingLogic? @map("organizing_logic")
+  organizingLogicNote String?          @map("organizing_logic_note")
+  notes               String?
+  status              MapStatus        @default(DRAFT)
+  publishedAt         DateTime?        @map("published_at")
+  templateType        String           @default("field-notes") @map("template_type")
+  coverImageUrl       String?          @map("cover_image_url")
+  primaryColor        String           @default("#5BA7A7") @map("primary_color")
+  secondaryColor      String           @default("#7FA5A5") @map("secondary_color")
+  accessLevel         String           @default("public") @map("access_level")
+  passwordHash        String?          @map("password_hash")
+  allowedEmails       String[]         @map("allowed_emails")
+  published           Boolean          @default(false)
+  viewCount           Int              @default(0) @map("view_count")
+  createdAt           DateTime         @default(now()) @map("created_at")
+  updatedAt           DateTime         @map("updated_at")
+  import_jobs         import_jobs[]
+  users               users            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  locations           locations[]
+  map_places          map_places[]
+  saved_maps          saved_maps[]
 
   @@index([published])
   @@index([slug])
@@ -99,31 +99,31 @@ model lists {
 }
 
 model locations {
-  id                    String    @id
-  listId                String    @map("list_id")
-  googlePlaceId         String?   @map("google_place_id")
-  name                  String
-  address               String?
-  latitude              Decimal?  @db.Decimal(10, 8)
-  longitude             Decimal?  @db.Decimal(11, 8)
-  phone                 String?
-  website               String?
-  instagram             String?
-  hours                 Json?
-  description           String?
-  googleTypes           String[]  @default([]) @map("google_types")
-  priceLevel            Int?      @map("price_level")
-  neighborhood          String?
-  googlePhotos          Json?     @map("google_photos")
-  userPhotos            String[]  @map("user_photos")
-  userNote              String?   @map("user_note")
-  category              String?
-  descriptor            String?
-  orderIndex            Int       @default(0) @map("order_index")
-  placesDataCachedAt    DateTime? @map("places_data_cached_at")
-  createdAt             DateTime  @default(now()) @map("created_at")
-  updatedAt             DateTime  @map("updated_at")
-  lists                 lists     @relation(fields: [listId], references: [id], onDelete: Cascade)
+  id                 String    @id
+  listId             String    @map("list_id")
+  googlePlaceId      String?   @map("google_place_id")
+  name               String
+  address            String?
+  latitude           Decimal?  @db.Decimal(10, 8)
+  longitude          Decimal?  @db.Decimal(11, 8)
+  phone              String?
+  website            String?
+  instagram          String?
+  hours              Json?
+  description        String?
+  googleTypes        String[]  @default([]) @map("google_types")
+  priceLevel         Int?      @map("price_level")
+  neighborhood       String?
+  googlePhotos       Json?     @map("google_photos")
+  userPhotos         String[]  @map("user_photos")
+  userNote           String?   @map("user_note")
+  category           String?
+  descriptor         String?
+  orderIndex         Int       @default(0) @map("order_index")
+  placesDataCachedAt DateTime? @map("places_data_cached_at")
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @map("updated_at")
+  lists              lists     @relation(fields: [listId], references: [id], onDelete: Cascade)
 
   @@index([googlePlaceId])
   @@index([listId, category])
@@ -132,17 +132,17 @@ model locations {
 }
 
 model map_places {
-  id          String   @id
-  mapId       String   @map("map_id")
-  placeId     String   @map("place_id")
-  descriptor  String?  @db.VarChar(120)
-  userNote    String?  @map("user_note")
-  userPhotos  String[] @map("user_photos")
-  orderIndex  Int      @default(0) @map("order_index")
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @map("updated_at")
-  lists       lists    @relation(fields: [mapId], references: [id], onDelete: Cascade)
-  places      places   @relation(fields: [placeId], references: [id])
+  id         String   @id
+  mapId      String   @map("map_id")
+  placeId    String   @map("place_id")
+  descriptor String?  @db.VarChar(120)
+  userNote   String?  @map("user_note")
+  userPhotos String[] @map("user_photos")
+  orderIndex Int      @default(0) @map("order_index")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @map("updated_at")
+  lists      lists    @relation(fields: [mapId], references: [id], onDelete: Cascade)
+  places     places   @relation(fields: [placeId], references: [id])
 
   @@unique([mapId, placeId])
   @@index([mapId])
@@ -170,25 +170,7 @@ model people {
   @@index([visibility])
 }
 
-model person_places {
-  id         String          @id
-  person_id  String
-  place_id   String
-  role       PersonPlaceRole
-  current    Boolean         @default(true)
-  start_year Int?
-  end_year   Int?
-  source     String
-  created_at DateTime        @default(now())
-  updated_at DateTime
-  people     people          @relation(fields: [person_id], references: [id], onDelete: Cascade)
-  places     places          @relation(fields: [place_id], references: [id], onDelete: Cascade)
 
-  @@unique([person_id, place_id, role])
-  @@index([current])
-  @@index([person_id])
-  @@index([place_id])
-}
 
 model places {
   id                      String             @id
@@ -233,20 +215,23 @@ model places {
   intentProfile           String?            @map("intent_profile")
   intentProfileOverride   Boolean            @default(false) @map("intent_profile_override")
   reservationUrl          String?            @map("reservation_url")
-<<<<<<< HEAD
-  googlePlacesAttributes  Json?              @map("google_places_attributes")
-=======
->>>>>>> df94ee8 (Saiko Maps User Profule)
+
   map_places              map_places[]
   person_places           person_places[]
   restaurant_groups       restaurant_groups? @relation(fields: [restaurantGroupId], references: [id])
   viewer_bookmarks        viewer_bookmarks[]
 
   @@index([category])
+  @@index([city])
+  @@index([county])
   @@index([googlePlaceId])
   @@index([neighborhood])
+  @@index([region])
   @@index([restaurantGroupId])
+  @@index([scope])
   @@index([status])
+  @@index([zip])
+  @@index([scope, region])
 }
 
 model restaurant_groups {
@@ -269,32 +254,32 @@ model restaurant_groups {
 }
 
 model users {
-  id                 String             @id
-  email              String             @unique
-  name               String?
-  passwordHash       String?            @map("password_hash")
-  avatarUrl          String?            @map("avatar_url")
-  subscriptionTier   String             @default("free") @map("subscription_tier")
-  curatorNote        String?            @db.VarChar(140) @map("curator_note")
-  scopePills         String[]           @default([]) @map("scope_pills")
-  coverageSources    String[]           @default([]) @map("coverage_sources")
-  createdAt          DateTime           @default(now()) @map("created_at")
-  updatedAt          DateTime           @map("updated_at")
-  import_jobs        import_jobs[]
-  lists              lists[]
-  viewer_bookmarks   viewer_bookmarks[]
-  saved_maps         saved_maps[]
+  id               String             @id
+  email            String             @unique
+  name             String?
+  passwordHash     String?            @map("password_hash")
+  avatarUrl        String?            @map("avatar_url")
+  subscriptionTier String             @default("free") @map("subscription_tier")
+  createdAt        DateTime           @default(now()) @map("created_at")
+  updatedAt        DateTime           @map("updated_at")
+  coverageSources  String[]           @default([]) @map("coverage_sources")
+  curatorNote      String?            @map("curator_note") @db.VarChar(140)
+  scopePills       String[]           @default([]) @map("scope_pills")
+  import_jobs      import_jobs[]
+  lists            lists[]
+  saved_maps       saved_maps[]
+  viewer_bookmarks viewer_bookmarks[]
 
   @@index([email])
 }
 
 model saved_maps {
-  id         String   @id @default(cuid())
-  userId     String   @map("user_id")
-  listId     String   @map("list_id")
-  savedAt    DateTime @default(now()) @map("saved_at")
-  users      users    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  lists      lists    @relation(fields: [listId], references: [id], onDelete: Cascade)
+  id      String   @id @default(cuid())
+  userId  String   @map("user_id")
+  listId  String   @map("list_id")
+  savedAt DateTime @default(now()) @map("saved_at")
+  lists   lists    @relation(fields: [listId], references: [id], onDelete: Cascade)
+  users   users    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, listId])
   @@index([userId])
@@ -302,19 +287,211 @@ model saved_maps {
 }
 
 model viewer_bookmarks {
-  id             String   @id
-  viewerUserId   String?  @map("viewer_user_id")
-  placeId        String   @map("place_id")
-  visited        Boolean  @default(false)
-  personalNote   String?  @map("personal_note")
-  createdAt      DateTime @default(now()) @map("created_at")
-  updatedAt      DateTime @map("updated_at")
-  places         places   @relation(fields: [placeId], references: [id], onDelete: Cascade)
-  users          users?   @relation(fields: [viewerUserId], references: [id], onDelete: Cascade)
+  id           String   @id
+  viewerUserId String?  @map("viewer_user_id")
+  placeId      String   @map("place_id")
+  visited      Boolean  @default(false)
+  personalNote String?  @map("personal_note")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @map("updated_at")
+  places       places   @relation(fields: [placeId], references: [id], onDelete: Cascade)
+  users        users?   @relation(fields: [viewerUserId], references: [id], onDelete: Cascade)
 
   @@unique([viewerUserId, placeId])
   @@index([placeId])
   @@index([viewerUserId])
+}
+
+/// Raw records from all sources - never overwrite, always append
+model raw_records {
+  raw_id            String         @id @default(uuid())
+  source_name       String
+  external_id       String?
+  source_url        String?
+  placekey          String?
+  h3_index_r9       BigInt?
+  h3_neighbors_r9   BigInt[]
+  raw_json          Json
+  name_normalized   String?
+  lat               Decimal?       @db.Decimal(10, 7)
+  lng               Decimal?       @db.Decimal(11, 7)
+  observed_at       DateTime?
+  ingested_at       DateTime       @default(now())
+  is_processed      Boolean        @default(false)
+  entity_links_from entity_links[]
+  review_queue_a    review_queue[] @relation("ReviewQueueRecordA")
+  review_queue_b    review_queue[] @relation("ReviewQueueRecordB")
+
+  @@unique([source_name, external_id])
+  @@index([h3_index_r9])
+  @@index([placekey])
+  @@index([is_processed])
+  @@index([name_normalized])
+}
+
+/// Entity links - maps raw records to canonical entities
+model entity_links {
+  canonical_id     String
+  raw_id           String
+  match_confidence Decimal?       @db.Decimal(4, 3)
+  match_method     String
+  match_features   Json?
+  is_active        Boolean        @default(true)
+  linked_at        DateTime       @default(now())
+  linked_by        String?
+  golden_record    golden_records @relation(fields: [canonical_id], references: [canonical_id])
+  raw_record       raw_records    @relation(fields: [raw_id], references: [raw_id])
+
+  @@id([canonical_id, raw_id])
+  @@index([raw_id])
+  @@index([canonical_id])
+  @@index([match_method])
+}
+
+/// Golden records - the computed "truth" that the app queries
+model golden_records {
+  canonical_id         String          @id @default(uuid())
+  placekey             String?         @unique
+  google_place_id      String?
+  slug                 String          @unique
+  name                 String
+  name_display         String?
+  lat                  Decimal         @db.Decimal(10, 7)
+  lng                  Decimal         @db.Decimal(11, 7)
+  address_street       String?
+  address_city         String?
+  address_state        String?
+  address_zip          String?
+  neighborhood         String?
+  category             String?
+  cuisines             String[]
+  price_level          Int?
+  phone                String?
+  website              String?
+  instagram_handle     String?
+  hours_json           Json?
+  hours_irregular      Boolean         @default(false)
+  description          String?
+  vibe_tags            String[]
+  signature_dishes     String[]
+  pro_tips             String[]
+  pull_quote           String?
+  pull_quote_source    String?
+  pull_quote_url       String?
+  business_status      String          @default("operational")
+  source_attribution   Json
+  created_at           DateTime        @default(now())
+  updated_at           DateTime        @updatedAt
+  last_resolved_at     DateTime?
+  data_completeness    Decimal?        @db.Decimal(3, 2)
+  source_count         Int             @default(1)
+  archive_reason       ArchiveReason?  @map("archive_reason")
+  archived_at          DateTime?       @map("archived_at")
+  archived_by          String?         @map("archived_by")
+  lifecycle_status     LifecycleStatus @default(ACTIVE) @map("lifecycle_status")
+  enriched_at          DateTime?
+  county               String?
+  about_copy           String?
+  about_source_url     String?
+  menu_raw_text        String?
+  menu_source_url      String?
+  menu_url             String?
+  scrape_status        String?
+  scraped_at           DateTime?
+  winelist_raw_text    String?
+  winelist_source_url  String?
+  winelist_url         String?
+  cuisine_posture      String?
+  identity_signals     Json?
+  place_personality    String?
+  price_tier           String?
+  service_model        String?
+  signals_generated_at DateTime?
+  signals_reviewed     Boolean         @default(false)
+  signals_reviewed_at  DateTime?
+  signals_reviewed_by  String?
+  signals_version      Int?
+  wine_program_intent  String?
+  tagline              String?
+  tagline_candidates   String[]        @default([])
+  tagline_generated_at DateTime?
+  tagline_pattern      String?
+  tagline_signals      Json?
+  tagline_version      Int?
+  google_places_attributes             Json?
+  google_places_attributes_fetched_at  DateTime?
+  entity_links         entity_links[]
+  provenance           provenance[]
+  review_queue         review_queue[]
+
+  @@index([neighborhood])
+  @@index([category])
+  @@index([business_status])
+  @@index([slug])
+}
+
+/// Review queue - human-in-the-loop for ambiguous matches
+model review_queue {
+  queue_id           String             @id @default(uuid())
+  canonical_id       String?
+  raw_id_a           String
+  raw_id_b           String?
+  conflict_type      String
+  match_confidence   Decimal?           @db.Decimal(4, 3)
+  conflicting_fields Json?
+  priority           Int                @default(5)
+  status             String             @default("pending")
+  resolution         String?
+  resolution_notes   String?
+  created_at         DateTime           @default(now())
+  assigned_to        String?
+  resolved_by        String?
+  resolved_at        DateTime?
+  audit_logs         review_audit_log[]
+  golden_record      golden_records?    @relation(fields: [canonical_id], references: [canonical_id])
+  raw_record_a       raw_records        @relation("ReviewQueueRecordA", fields: [raw_id_a], references: [raw_id])
+  raw_record_b       raw_records?       @relation("ReviewQueueRecordB", fields: [raw_id_b], references: [raw_id])
+
+  @@index([status])
+  @@index([priority, status])
+  @@index([canonical_id])
+}
+
+/// Audit trail for review decisions
+model review_audit_log {
+  log_id           String       @id @default(uuid())
+  queue_id         String
+  resolved_by      String
+  resolution       String
+  decision_time_ms Int?
+  resolved_at      DateTime     @default(now())
+  review_queue     review_queue @relation(fields: [queue_id], references: [queue_id])
+
+  @@index([queue_id])
+  @@index([resolved_at])
+}
+
+/// Provenance - Chain of custody for places
+model provenance {
+  id                  String             @id @default(cuid())
+  place_id            String             @map("place_id")
+  added_by            String             @map("added_by")
+  source_type         String?            @map("source_type")
+  source_name         String?            @map("source_name")
+  source_url          String?            @map("source_url")
+  source_date         DateTime?          @map("source_date")
+  notes               String?
+  import_batch        String?            @map("import_batch")
+  created_at          DateTime           @default(now()) @map("created_at")
+  source_tier         Int?               @map("source_tier")
+  source_verified_at  DateTime?          @map("source_verified_at")
+  source_verified_by  String?            @map("source_verified_by")
+  verification_status VerificationStatus @default(UNVERIFIED) @map("verification_status")
+  golden_record       golden_records     @relation(fields: [place_id], references: [canonical_id], onDelete: Cascade)
+
+  @@index([place_id])
+  @@index([added_by])
+  @@index([import_batch])
 }
 
 enum LayerType {
@@ -372,291 +549,11 @@ enum Visibility {
   VERIFIED
 }
 
-// ============================================================================
-// ENTITY RESOLUTION SYSTEM
-// New MDM (Master Data Management) tables for multi-source data integration
-// ============================================================================
-
-/// Raw records from all sources - never overwrite, always append
-model raw_records {
-  raw_id          String   @id @default(uuid())
-  
-  // Source identification
-  source_name     String   // 'google_places', 'editorial_eater', 'editorial_infatuation', 'foursquare', 'saiko_ai', 'saiko_seed'
-  external_id     String?  // ID from the source (e.g., Google Place ID)
-  source_url      String?  // Original article/page URL for editorial
-  
-  // Standardized identifiers for blocking/matching
-  placekey        String?  // Placekey if available
-  h3_index_r9     BigInt?  // H3 hexagon at resolution 9 (~0.1 km²)
-  h3_neighbors_r9 BigInt[] // K-ring neighbors for edge cases
-  
-  // The raw data
-  raw_json        Json     // Full blob exactly as received
-  
-  // Extracted fields for indexing (denormalized for query performance)
-  name_normalized String?
-  lat             Decimal? @db.Decimal(10, 7)
-  lng             Decimal? @db.Decimal(11, 7)
-  
-  // Metadata
-  observed_at     DateTime?
-  ingested_at     DateTime  @default(now())
-  is_processed    Boolean   @default(false)
-  
-  // Relations
-  entity_links_from entity_links[]
-  review_queue_a    review_queue[]  @relation("ReviewQueueRecordA")
-  review_queue_b    review_queue[]  @relation("ReviewQueueRecordB")
-  
-  @@unique([source_name, external_id])
-  @@index([h3_index_r9])
-  @@index([placekey])
-  @@index([is_processed])
-  @@index([name_normalized])
-}
-
-/// Entity links - maps raw records to canonical entities
-model entity_links {
-  canonical_id     String
-  raw_id           String
-  
-  // Match metadata
-  match_confidence Decimal? @db.Decimal(4, 3) // 0.000 to 1.000
-  match_method     String   // 'placekey_exact', 'dedupe_ml', 'manual_review', 'seed_record'
-  match_features   Json?    // Feature scores that led to this match
-  
-  // Lifecycle
-  is_active        Boolean  @default(true)
-  linked_at        DateTime @default(now())
-  linked_by        String?  // 'system', 'manual:bobby', etc.
-  
-  // Relations
-  raw_record       raw_records   @relation(fields: [raw_id], references: [raw_id])
-  golden_record    golden_records @relation(fields: [canonical_id], references: [canonical_id])
-  
-  @@id([canonical_id, raw_id])
-  @@index([raw_id])
-  @@index([canonical_id])
-  @@index([match_method])
-}
-
-/// Golden records - the computed "truth" that the app queries
-model golden_records {
-  canonical_id    String   @id @default(uuid())
-  
-  // Identifiers
-  placekey        String?  @unique
-  google_place_id String?
-  slug            String   @unique
-  
-  // Core fields (computed from survivorship rules)
-  name            String
-  name_display    String?
-  
-  // Location
-  lat             Decimal  @db.Decimal(10, 7)
-  lng             Decimal  @db.Decimal(11, 7)
-  address_street  String?
-  address_city    String?
-  address_state   String?
-  address_zip     String?
-  neighborhood    String?
-  
-  // Classification
-  category        String?
-  cuisines        String[]
-  price_level     Int?
-  
-  // Contact
-  phone           String?
-  website         String?
-  instagram_handle String?
-  
-  // Hours
-  hours_json      Json?
-  hours_irregular Boolean  @default(false)
-  
-  // Editorial enrichment
-  description     String?
-  vibe_tags       String[]
-  signature_dishes String[]
-  pro_tips        String[]
-  pull_quote      String?
-  pull_quote_source String?
-  pull_quote_url  String?
-  
-  // Status
-  business_status String   @default("operational") // 'operational', 'closed_temporarily', 'closed_permanently'
-  
-  // Lifecycle Management
-  lifecycle_status LifecycleStatus @default(ACTIVE) @map("lifecycle_status")
-  archive_reason   ArchiveReason?  @map("archive_reason")
-  archived_at      DateTime?       @map("archived_at")
-  archived_by      String?         @map("archived_by")
-  
-  // Provenance (which source won each field)
-  source_attribution Json
-  
-  // Metadata
-  created_at      DateTime @default(now())
-  updated_at      DateTime @updatedAt
-  last_resolved_at DateTime?
-  enriched_at     DateTime? // Last attempted enrichment (success or failure)
-  
-  // Geographic scope (for selective enrichment)
-  county          String?   // 'Los Angeles', 'Orange', 'San Diego', etc.
-  
-  // Quality signals
-  data_completeness Decimal? @db.Decimal(3, 2) // 0.00 to 1.00
-  source_count    Int      @default(1)
-  
-  // Menu & Wine List Scraper Fields
-  menu_url           String?    // Discovered menu page URL
-  menu_source_url    String?    // Page where menu link was found
-  menu_raw_text      String?    // Extracted menu content for AI processing
-  winelist_url       String?    // Discovered wine list URL
-  winelist_source_url String?   // Page where wine list link was found
-  winelist_raw_text  String?    // Extracted wine list content
-  about_copy         String?    // "Our Story" / "About Us" content
-  about_source_url   String?    // URL of about page
-  scraped_at         DateTime?  // Last successful scrape timestamp
-  scrape_status      String?    // 'success' | 'partial' | 'blocked' | 'timeout' | 'failed'
-  
-  // Identity Signal Fields (AI-extracted from scraped content)
-  cuisine_posture      String?   // produce-driven | protein-centric | carb-forward | seafood-focused | balanced
-  service_model        String?   // tasting-menu | a-la-carte | small-plates | family-style | counter
-  price_tier           String?   // $ | $$ | $$$ | $$$$
-  wine_program_intent  String?   // natural | classic | eclectic | minimal | none
-  place_personality    String?   // neighborhood-joint | destination | chef-driven | scene | hidden-gem | institution
-  identity_signals     Json?     // Extended signals: signature_dishes, key_producers, vibe_words, etc.
-  signals_generated_at DateTime? // When signals were extracted
-  signals_version      Int?      // Increment when extraction prompt changes
-  signals_reviewed     Boolean   @default(false)
-  signals_reviewed_by  String?
-  signals_reviewed_at  DateTime?
-  
-  // Voice Engine v2.0 — Tagline Fields
-  tagline              String?
-  tagline_candidates   String[]  @default([])
-  tagline_pattern      String?   // 'food' | 'neighborhood' | 'vibe' | 'authority'
-  tagline_generated_at DateTime?
-  tagline_signals      Json?     // Snapshot of identity signals used for generation
-  tagline_version      Int?      // Voice engine version (2)
-
-  // Google Places "About" attributes (structured JSONB)
-  google_places_attributes             Json?
-  google_places_attributes_fetched_at  DateTime?
-
-  // Relations
-  entity_links    entity_links[]
-  review_queue    review_queue[]
-  provenance      provenance[]
-  
-  @@index([neighborhood])
-  @@index([category])
-  @@index([business_status])
-  @@index([slug])
-}
-
-/// Review queue - human-in-the-loop for ambiguous matches
-model review_queue {
-  queue_id         String   @id @default(uuid())
-  
-  // What's being reviewed
-  canonical_id     String?
-  raw_id_a         String
-  raw_id_b         String?
-  
-  // Conflict details
-  conflict_type    String   // 'low_confidence_match', 'attribute_mismatch', 'potential_duplicate', 'new_entity'
-  match_confidence Decimal? @db.Decimal(4, 3)
-  conflicting_fields Json?
-  
-  // Review workflow
-  priority         Int      @default(5) // 1 (urgent) to 10 (low)
-  status           String   @default("pending") // 'pending', 'in_progress', 'resolved', 'deferred', 'flagged'
-  resolution       String?  // 'merged', 'kept_separate', 'new_canonical', 'dismissed'
-  resolution_notes String?
-  
-  // Audit
-  created_at       DateTime @default(now())
-  assigned_to      String?
-  resolved_by      String?
-  resolved_at      DateTime?
-  
-  // Relations
-  golden_record    golden_records? @relation(fields: [canonical_id], references: [canonical_id])
-  raw_record_a     raw_records     @relation("ReviewQueueRecordA", fields: [raw_id_a], references: [raw_id])
-  raw_record_b     raw_records?    @relation("ReviewQueueRecordB", fields: [raw_id_b], references: [raw_id])
-  audit_logs       review_audit_log[]
-  
-  @@index([status])
-  @@index([priority, status])
-  @@index([canonical_id])
-}
-
-/// Audit trail for review decisions
-model review_audit_log {
-  log_id           String   @id @default(uuid())
-  queue_id         String
-  resolved_by      String
-  resolution       String
-  decision_time_ms Int?
-  resolved_at      DateTime @default(now())
-  
-  // Relations
-  review_queue     review_queue @relation(fields: [queue_id], references: [queue_id])
-  
-  @@index([queue_id])
-  @@index([resolved_at])
-}
-
-// ============================================================================
-// PROVENANCE SYSTEM
-// Chain of custody - proves Bobby added every place, not AI
-// ============================================================================
-
-/// Provenance - Chain of custody for places
-model provenance {
-  id            String    @id @default(cuid())
-  place_id      String    @map("place_id")
-  
-  // WHO - Chain of custody (NEVER 'claude', 'cursor', 'ai', 'auto', 'bot')
-  added_by      String    @map("added_by")        // 'bobby', 'bobby_bulk_import'
-  
-  // WHY - Source justification (flexible, not enforced)
-  source_type   String?   @map("source_type")     // 'editorial', 'google_saves', 'chef_rec', 'video', 'personal', 'map_feature'
-  source_name   String?   @map("source_name")     // 'Eater LA', 'Jonathan Gold', 'Bobby Google Saves', 'Chef David Chang'
-  source_url    String?   @map("source_url")      // article/video link if available
-  source_date   DateTime? @map("source_date")     // when the source was published (if known)
-  
-  // CONTEXT
-  notes         String?                           // freeform: "Mentioned in 'Best Tacos' video", "My go-to since 2019"
-  
-  // BATCH TRACKING
-  import_batch  String?   @map("import_batch")    // 'sgv_expansion', 'beach_cities', 'initial_google_saves', 'sfv_expansion'
-  
-  // SOURCE QUALITY & VERIFICATION
-  source_tier          Int?                @map("source_tier")  // 1, 2, 3, or 4
-  verification_status  VerificationStatus  @default(UNVERIFIED) @map("verification_status")
-  source_verified_at   DateTime?           @map("source_verified_at")
-  source_verified_by   String?             @map("source_verified_by")
-  
-  // TIMESTAMPS
-  created_at    DateTime  @default(now()) @map("created_at")
-  
-  // RELATIONS
-  golden_record golden_records @relation(fields: [place_id], references: [canonical_id], onDelete: Cascade)
-  
-  @@index([place_id])
-  @@index([added_by])
-  @@index([import_batch])
-}
 
 // ============================================================================
 // ENUMS FOR LIFECYCLE AND VERIFICATION
 // ============================================================================
+
 
 enum LifecycleStatus {
   ACTIVE
@@ -678,4 +575,10 @@ enum VerificationStatus {
   UNVERIFIED
   SOURCE_CONFIRMED
   FOUNDER_VERIFIED
+}
+
+enum PlaceScope {
+  active
+  future_region
+  archive
 }
