@@ -563,15 +563,6 @@ export default function PlacePage() {
             />
           )}
 
-          {/* Quiet fill after gallery/curator row */}
-          {!hasGallery && !hasCurator && (
-            <QuietCard
-              neighborhood={location.neighborhood}
-              category={location.category}
-              span={6}
-            />
-          )}
-
           {/* Vibes (merged: vibeTags + atmosphere + highlights + crowd) */}
           {mergedVibeTags.length > 0 && (
             <VibeCard vibeTags={mergedVibeTags} />
