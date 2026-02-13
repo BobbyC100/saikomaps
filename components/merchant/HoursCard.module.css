@@ -54,7 +54,7 @@
   border: none;
   padding: 0;
   cursor: pointer;
-  margin-top: auto;
+  margin-top: 4px;
   text-align: left;
   transition: color 0.2s ease;
 }

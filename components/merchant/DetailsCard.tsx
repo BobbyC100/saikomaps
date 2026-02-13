@@ -18,6 +18,9 @@ interface DetailsCardProps {
   reservationsNote?: string | null; // 'Not accepted', 'Recommended', 'Required'
   parkingNote?: string | null;
   isAccessible?: boolean | null;
+  offerings?: string[] | null; // ['Beer', 'Wine', 'Cocktails']
+  diningOptions?: string[] | null; // ['Breakfast', 'Lunch', 'Dinner']
+  petsNote?: string | null;
   span?: number; // Grid column span (4 or 5)
 }
 
@@ -31,6 +34,9 @@ export function DetailsCard({
   reservationsNote,
   parkingNote,
   isAccessible,
+  offerings,
+  diningOptions,
+  petsNote,
   span = 6,
 }: DetailsCardProps) {
   const [expanded, setExpanded] = useState(false);
@@ -112,7 +118,23 @@ export function DetailsCard({
     });
   }
 
-  // 6. Accessibility
+  // 6. Offerings
+  if (offerings && offerings.length > 0) {
+    rows.push({
+      label: 'Drinks',
+      value: offerings.join(' · '),
+    });
+  }
+
+  // 7. Dining Options
+  if (diningOptions && diningOptions.length > 0) {
+    rows.push({
+      label: 'Meals',
+      value: diningOptions.join(' · '),
+    });
+  }
+
+  // 8. Accessibility
   if (isAccessible) {
     rows.push({
       label: 'Accessibility',
@@ -120,11 +142,19 @@ export function DetailsCard({
     });
   }
 
+  // 9. Pets
+  if (petsNote) {
+    rows.push({
+      label: 'Pets',
+      value: petsNote,
+    });
+  }
+
   // Don't render if no rows
   if (rows.length === 0) return null;
 
-  const visibleRows = expanded ? rows : rows.slice(0, 4);
-  const hasMore = rows.length > 4;
+  const visibleRows = expanded ? rows : rows.slice(0, 5);
+  const hasMore = rows.length > 5;
 
   return (
     <div 

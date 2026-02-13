@@ -33,6 +33,7 @@ interface CoverageCardProps {
   pullQuoteUrl?: string | null;
   sources?: EditorialSource[];
   vibeTag?: string | null;
+  span?: number; // Grid column span (parent controls layout)
 }
 
 export function CoverageCard({
@@ -42,6 +43,7 @@ export function CoverageCard({
   pullQuoteUrl,
   sources = [],
   vibeTag,
+  span,
 }: CoverageCardProps) {
   // Priority 1: Use explicit pullQuote if available
   let displayQuote = pullQuote?.trim() || null;
@@ -63,13 +65,12 @@ export function CoverageCard({
     return null;
   }
   
-  // Dynamic sizing based on quote length
+  // Use parent-controlled span, or fallback to dynamic sizing
   const isShortQuote = displayQuote.length < 120;
-  const isMediumQuote = displayQuote.length < 180;
-  const columnSpan = isShortQuote ? 3 : isMediumQuote ? 4 : 5;
+  const columnSpan = span ?? (isShortQuote ? 3 : displayQuote.length < 180 ? 4 : 5);
 
   return (
-    <div 
+    <div
       className={styles.coverageCard}
       style={{ gridColumn: `span ${columnSpan}` }}
     >
@@ -77,18 +78,18 @@ export function CoverageCard({
       <div className={styles.label}>
         {displaySource?.toUpperCase() || 'EDITORIAL'}
       </div>
-      
+
       {/* Quote */}
-      <blockquote 
+      <blockquote
         className={styles.quote}
         style={{ fontSize: isShortQuote ? '13px' : '12px' }}
       >
         &ldquo;{displayQuote}&rdquo;
       </blockquote>
-      
-      {/* Optional: Link to full article */}
+
+      {/* Primary source link */}
       {displayUrl && (
-        <a 
+        <a
           href={displayUrl}
           target="_blank"
           rel="noopener noreferrer"
@@ -100,7 +101,7 @@ export function CoverageCard({
           </svg>
         </a>
       )}
-      
+
       {/* Optional vibe tag */}
       {vibeTag && <div className={styles.vibeTag}>{vibeTag}</div>}
     </div>

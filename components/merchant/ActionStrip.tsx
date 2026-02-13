@@ -34,7 +34,7 @@ export function ActionStrip({ latitude, longitude, phone, instagram }: ActionStr
           href={directionsUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className={`${styles.action} ${styles.primary}`}
+          className={styles.action}
         >
           <Navigation className={styles.icon} size={16} />
           <span className={styles.label}>Nav</span>
