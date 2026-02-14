@@ -1,0 +1,6 @@
+R2_ACCESS_KEY_ID=7fe92398b9da0a8f95b87640274924af
+
+R2_SECRET_ACCESS_KEY=39de0144e10d8482be77f8d73b76fa12a52317701e617d4cfe75843e4d3f6024
+
+R2_ENDPOINT=https://youraccountid.r2.cloudflarestorage.com
+R2_BUCKET_NAME=saiko-assets

@@ -1,0 +1,262 @@
+[
+  {
+    "id": "af6839d1-9170-4426-b404-dd6d428b692e",
+    "name": "12 East 12 Condominium",
+    "slug": "twelves-east-village"
+  },
+  {
+    "id": "4bfe7227-8269-41ca-936b-be92853c6a48",
+    "name": "Alan Wong's Honolulu",
+    "slug": "alan-wongs-honolulu-mccully-moiliili"
+  },
+  {
+    "id": "efc58c1c-2804-46f1-947c-9f554e1d7d99",
+    "name": "Arnold's Beach Bar",
+    "slug": "arnolds-beach-bar-waikiki"
+  },
+  {
+    "id": "aa2951f0-fcda-45e9-8c86-aa511060b31a",
+    "name": "Bar Leather Apron",
+    "slug": "bar-leather-apron-downtown"
+  },
+  {
+    "id": "48ab6d60-09cc-457a-bbbf-8f47a64db3ef",
+    "name": "Birrieria La Guadalajara",
+    "slug": "unknown-48ab6d60"
+  },
+  {
+    "id": "3fda14c5-9954-49fa-86c2-2e3e90a5272f",
+    "name": "Burnt Bean Company",
+    "slug": "unknown-3fda14c5"
+  },
+  {
+    "id": "41fd2e4c-f5e2-463e-bb3c-7dcd4c77acfb",
+    "name": "Café Haleiwa",
+    "slug": "cafe-haleiwa-north-shore"
+  },
+  {
+    "id": "b386a261-e268-4b36-94e8-a6fa3eaa4847",
+    "name": "Carnitas Don Jose",
+    "slug": "unknown-b386a261"
+  },
+  {
+    "id": "aee52cbe-35d2-411d-a001-9d429db45fec",
+    "name": "Chez Maggy",
+    "slug": "chez-maggy-central"
+  },
+  {
+    "id": "a7c25480-d922-49a6-b5d3-ebea9c1f3af0",
+    "name": "Cocina Doña Rosa",
+    "slug": "unknown-a7c25480"
+  },
+  {
+    "id": "6cbf3c30-7ef4-4411-8857-f52ac2c7eb02",
+    "name": "Denver Wine Merchant",
+    "slug": "denver-wine-merchant-globeville"
+  },
+  {
+    "id": "82217a31-0405-4e68-8cdf-d8cccbab9182",
+    "name": "Dio Mio",
+    "slug": "dio-mio-five-points"
+  },
+  {
+    "id": "0eccb2c7-605c-4924-86ed-99fd77411d69",
+    "name": "Ethel's Grill",
+    "slug": "ethels-grill-kalihi-palama"
+  },
+  {
+    "id": "c8e2e370-e891-44fa-822a-7f5ca465cb60",
+    "name": "Fish Tales Gourmet Seafood Market",
+    "slug": "unknown-c8e2e370"
+  },
+  {
+    "id": "edda6718-a549-4a6e-b4ed-486ae7bcbd17",
+    "name": "Frasca Food and Wine",
+    "slug": "frasca-food-and-wine-downtown"
+  },
+  {
+    "id": "8c73a1c6-19fb-44e7-83b1-0734f6d6fc4c",
+    "name": "Gravity Haus Denver Hotel",
+    "slug": "gravity-haus-denver-hotel-highland"
+  },
+  {
+    "id": "a5d43e43-62c1-43c9-966d-5fa32f9e7656",
+    "name": "Haleiwa Joe's Haiku Gardens",
+    "slug": "haleiwa-joes-haiku-gardens-kaneohe"
+  },
+  {
+    "id": "2dee7c04-e91f-47b0-9568-c0433dc488f8",
+    "name": "Harbor Lights",
+    "slug": "unknown-2dee7c04"
+  },
+  {
+    "id": "78d1a94c-55bd-4648-99c3-1d66987f3aed",
+    "name": "Harbor Street",
+    "slug": "unknown-78d1a94c"
+  },
+  {
+    "id": "4ad145ff-a22f-4b85-bd57-cefe733622b7",
+    "name": "Hey Kiddo",
+    "slug": "hey-kiddo-northwest"
+  },
+  {
+    "id": "f1c778ec-3e0c-4589-8096-ba5c6c815f89",
+    "name": "Hop Alley",
+    "slug": "hop-alley-five-points"
+  },
+  {
+    "id": "aded0d30-0730-470e-806b-341371f669f3",
+    "name": "Jeannot's Patisserie & Bistro",
+    "slug": "jeannots-patisserie-and-bistro-lafayette"
+  },
+  {
+    "id": "3c365b8a-0d5f-43d9-8534-abc9447f719c",
+    "name": "Kyung's Seafood",
+    "slug": "kyungs-seafood-ala-moana"
+  },
+  {
+    "id": "d24fcf37-84c5-43a2-8f9a-2e569662ec52",
+    "name": "La Mariana Sailing Club",
+    "slug": "la-mariana-sailing-club-kalihi-palama"
+  },
+  {
+    "id": "e943c386-57a7-4f5d-884f-2f2ccf1ce0e2",
+    "name": "Mitch's Fish Market & Sushi Bar",
+    "slug": "mitchs-fish-market-and-sushi-bar-honolulu"
+  },
+  {
+    "id": "d04ab646-5c03-4c5f-a405-79a46a529382",
+    "name": "Mr. B's Wine & Spirits Downtown Denver",
+    "slug": "mr-bs-wine-and-spirits-downtown-denver-five-points"
+  },
+  {
+    "id": "7c8590b0-ce93-4428-957f-bf898d0d999a",
+    "name": "Mt. Olomana Trail (Three Peaks)",
+    "slug": "mt-olomana-trail-three-peaks-kailua"
+  },
+  {
+    "id": "cff01f01-4c3b-4db5-ac99-1106cacff7b1",
+    "name": "Papadakis",
+    "slug": "unknown-cff01f01"
+  },
+  {
+    "id": "55458727-303c-4917-b5e6-b333782b7df3",
+    "name": "Peppino Ristorante",
+    "slug": "unknown-55458727"
+  },
+  {
+    "id": "32124c65-d238-4613-92e5-125956491017",
+    "name": "Potager",
+    "slug": "potager-central"
+  },
+  {
+    "id": "60db6b71-5324-45d2-b783-1616845857de",
+    "name": "Rangoon Burmese kitchen",
+    "slug": "rangoon-burmese-kitchen-arts-district"
+  },
+  {
+    "id": "482c2fc2-0ded-415a-ac0d-2580a3be613f",
+    "name": "Revival Denver Public House",
+    "slug": "revival-denver-public-house-north-capitol-hill"
+  },
+  {
+    "id": "3371cba4-0ce2-46c4-a1be-30de51e5cd97",
+    "name": "Samba Brazilian Steakhouse",
+    "slug": "unknown-3371cba4"
+  },
+  {
+    "id": "3f424346-8b98-4556-aac8-da7e1bbbb403",
+    "name": "Senia",
+    "slug": "senia-downtown"
+  },
+  {
+    "id": "6105f771-0edd-4e5a-a3b6-275e812cf760",
+    "name": "Side Street Inn On Da Strip",
+    "slug": "side-street-inn-on-da-strip-diamond-head-kapahulu-st-louis-heights"
+  },
+  {
+    "id": "0424f792-8a99-47f1-a7a3-a6daa50ac760",
+    "name": "Taormina Sicilian Cuisine",
+    "slug": "taormina-sicilian-cuisine-waikiki"
+  },
+  {
+    "id": "76cff715-fa84-4009-a249-fb686f0717fa",
+    "name": "The Beet Box Cafe",
+    "slug": "the-beet-box-cafe-kailua"
+  },
+  {
+    "id": "4182f06a-5abf-478f-8ce2-8fe7e9085d14",
+    "name": "The Crawford Hotel",
+    "slug": "the-crawford-hotel-union-station"
+  },
+  {
+    "id": "a1c612a2-5f28-4402-b2e1-a94352675d96",
+    "name": "The Pig and The Lady",
+    "slug": "the-pig-and-the-lady-kaimuki"
+  },
+  {
+    "id": "ef33336b-b230-408a-b176-faf8bf2062cb",
+    "name": "The Slate Hotel Denver Downtown, Tapestry by Hilton",
+    "slug": "the-slate-hotel-denver-downtown-tapestry-by-hilton-central-business-district"
+  },
+  {
+    "id": "187a2416-674c-4707-a1a2-f54081d254a5",
+    "name": "The Wolf's Tailor",
+    "slug": "the-wolfs-tailor-northwest"
+  },
+  {
+    "id": "4f51c53a-2d10-4910-acaa-64f1358b6d8f",
+    "name": "US Thai Cafe",
+    "slug": "us-thai-cafe-edgewater"
+  },
+  {
+    "id": "4916c456-e7d9-4929-a0ce-6d1adb0c6fe0",
+    "name": "Harborview Lounge & Cafe",
+    "slug": "unknown-4916c456"
+  },
+  {
+    "id": "7d53ac3c-6a3e-405a-9d9e-d2bead25d7a6",
+    "name": "K-Food Village",
+    "slug": "unknown-7d53ac3c"
+  },
+  {
+    "id": "752fa5f0-8bc3-4392-8123-7c3c2e83889f",
+    "name": "Las Flores Drive",
+    "slug": "unknown-752fa5f0"
+  },
+  {
+    "id": "19a764e6-f670-4952-b079-79274ea3e638",
+    "name": "Odyssey Drive",
+    "slug": "unknown-19a764e6"
+  },
+  {
+    "id": "ca3a2110-3144-4bdd-882a-89a37449b192",
+    "name": "Ports O' Call Village",
+    "slug": "unknown-ca3a2110"
+  },
+  {
+    "id": "37498133-f9e1-4b10-9aa7-f6e69ee6e074",
+    "name": "THE Blvd Restaurant and Lounge",
+    "slug": "unknown-37498133"
+  },
+  {
+    "id": "20e2d53e-e6a6-40db-82f5-49ee2cd78ff0",
+    "name": "The Portofino Hotel & Marina",
+    "slug": "unknown-20e2d53e"
+  },
+  {
+    "id": "8cd8dc87-3050-4366-bc85-cfa953becaa2",
+    "name": "Toberman Park",
+    "slug": "bruto-ballpark-district"
+  },
+  {
+    "id": "4f2242c2-b450-404e-8e92-99ac1b02ee94",
+    "name": "Waters Edge Way",
+    "slug": "unknown-4f2242c2"
+  },
+  {
+    "id": "b86f1de0-e37b-48ef-9944-c074c0c58e6f",
+    "name": "Portuguese Bend Reserve",
+    "slug": "unknown-b86f1de0"
+  }
+]
