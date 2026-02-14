@@ -1,28 +1,36 @@
-# dependencies
+# deps
 node_modules/
+
+# next build output
 .next/
+out/
 
-# env files
+# env files (never commit real env)
 .env
-.env.local
-.env.production
+.env.*
+!.env.example
 
-# OS files
-.DS_Store
-
-# zip archives & temp files
-*.zip
-saiko-maps@0.1.0
-
-# uploads & takeout
-uploads/
-Takeout/
-
-# enrichment logs
+# logs
+*.log
 logs/
 
-# test files
-test-*.js
-test-*.csv
-tsx
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+
+# TS build cache
+tsconfig.tsbuildinfo
+
+# local tooling
 .claude/
+.cursor/
+
+# zips / archives
+*.zip
+
+# local data exports (ignore by default)
+Takeout/
+uploads/
+files/
+data/
