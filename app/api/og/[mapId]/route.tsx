@@ -27,7 +27,7 @@ export async function GET(
     const format = (request.nextUrl.searchParams.get('format') || 'square') as Format;
     const isStory = format === 'story';
 
-    const list = await db.list.findUnique({
+    const list = await db.lists.findUnique({
       where: { id: mapId },
       include: { _count: { select: { locations: true } } },
     });

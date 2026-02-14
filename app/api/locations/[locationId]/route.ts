@@ -25,7 +25,7 @@ export async function PATCH(
     }
 
     // Get the location and its list to check ownership
-    const location = await db.location.findUnique({
+    const location = await db.locations.findUnique({
       where: { id: locationId },
       include: {
         list: true,
@@ -50,7 +50,7 @@ export async function PATCH(
     const body = await request.json();
     const { name, address, phone, website, description, userNote, descriptor, orderIndex } = body;
 
-    const updated = await db.location.update({
+    const updated = await db.locations.update({
       where: { id: locationId },
       data: {
         ...(name !== undefined && { name: name?.trim() || location.name }),
@@ -98,7 +98,7 @@ export async function DELETE(
     }
 
     // Get the location and its list to check ownership
-    const location = await db.location.findUnique({
+    const location = await db.locations.findUnique({
       where: { id: locationId },
       include: {
         list: true,
@@ -121,7 +121,7 @@ export async function DELETE(
     }
 
     // Delete the location
-    await db.location.delete({
+    await db.locations.delete({
       where: { id: locationId },
     });
 

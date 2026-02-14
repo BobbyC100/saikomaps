@@ -17,7 +17,7 @@ export async function GET(
     const session = await getServerSession(authOptions);
     const devOwner = process.env.NODE_ENV === 'development' && request.nextUrl.searchParams.get('devOwner') === '1';
 
-    const list = await db.list.findFirst({
+    const list = await db.lists.findFirst({
       where: {
         slug,
         published: true, // Only show published maps

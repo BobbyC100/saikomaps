@@ -30,13 +30,13 @@ export default async function ProfilePage() {
     redirect('/login');
   }
 
-  let userMaps: Awaited<ReturnType<typeof db.list.findMany>> = [];
+  let userMaps: Awaited<ReturnType<typeof db.lists.findMany>> = [];
   let savedMapsRows: Awaited<ReturnType<typeof db.savedMap.findMany>> = [];
   let user: { name: string | null; curatorNote: string | null; scopePills: string[]; coverageSources: string[]; avatarUrl: string | null } | null = null;
 
   try {
     [userMaps, savedMapsRows, user] = await Promise.all([
-      db.list.findMany({
+      db.lists.findMany({
         where: { userId },
         include: {
           map_places: {
@@ -65,7 +65,7 @@ export default async function ProfilePage() {
         },
         orderBy: { savedAt: 'desc' },
       }),
-      db.user.findUnique({
+      db.users.findUnique({
         where: { id: userId },
         select: {
           name: true,

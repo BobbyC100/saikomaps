@@ -9,6 +9,7 @@ import { HeroSection } from '@/components/merchant/HeroSection';
 import { ActionStrip } from '@/components/merchant/ActionStrip';
 import { GalleryLightbox } from '@/components/merchant/GalleryLightbox';
 import { HoursCard } from '@/components/merchant/HoursCard';
+import { DetailsCard } from '@/components/merchant/DetailsCard';
 import { CoverageCard } from '@/components/merchant/CoverageCard';
 import { GalleryCard } from '@/components/merchant/GalleryCard';
 import { CuratorCard } from '@/components/merchant/CuratorCard';

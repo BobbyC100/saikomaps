@@ -31,7 +31,7 @@ export async function PATCH(
       );
     }
 
-    const mapPlace = await db.mapPlace.findUnique({
+    const mapPlace = await db.map_places.findUnique({
       where: { id: mapPlaceId },
       include: { map: true },
     });
@@ -54,7 +54,7 @@ export async function PATCH(
     const { descriptor, userNote, orderIndex, neighborhood, priceLevel, cuisineType } = body;
 
     if (neighborhood !== undefined || priceLevel !== undefined || cuisineType !== undefined) {
-      await db.place.update({
+      await db.places.update({
         where: { id: mapPlace.placeId },
         data: {
           ...(neighborhood !== undefined && {
@@ -70,7 +70,7 @@ export async function PATCH(
       });
     }
 
-    const updated = await db.mapPlace.update({
+    const updated = await db.map_places.update({
       where: { id: mapPlaceId },
       data: {
         ...(descriptor !== undefined && {
@@ -114,7 +114,7 @@ export async function DELETE(
       );
     }
 
-    const mapPlace = await db.mapPlace.findUnique({
+    const mapPlace = await db.map_places.findUnique({
       where: { id: mapPlaceId },
       include: { map: true },
     });
@@ -133,7 +133,7 @@ export async function DELETE(
       );
     }
 
-    await db.mapPlace.delete({
+    await db.map_places.delete({
       where: { id: mapPlaceId },
     });
 

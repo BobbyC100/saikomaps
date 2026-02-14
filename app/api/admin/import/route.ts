@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
               address: row.Address || null,
               phone: row.Phone || null,
               instagram_handle: row.Instagram || null,
-            } as Prisma.JsonValue,
+            } as Prisma.InputJsonValue,
             is_processed: false,
           }
         });

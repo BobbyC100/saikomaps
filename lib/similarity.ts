@@ -4,7 +4,10 @@
  * Various string comparison algorithms for entity matching
  */
 
-import { jaroWinkler, levenshtein } from 'jellyfish';
+import { JaroWinklerDistance, LevenshteinDistance } from 'natural';
+
+const jaro = new JaroWinklerDistance();
+const lev = new LevenshteinDistance();
 
 /**
  * Jaro-Winkler similarity (0 to 1, higher = more similar)
@@ -12,7 +15,7 @@ import { jaroWinkler, levenshtein } from 'jellyfish';
  */
 export function jaroWinklerSimilarity(str1: string, str2: string): number {
   if (!str1 || !str2) return 0;
-  return jaroWinkler(str1, str2);
+  return jaro.distance(str1, str2);
 }
 
 /**
@@ -22,7 +25,7 @@ export function levenshteinSimilarity(str1: string, str2: string): number {
   if (!str1 || !str2) return 0;
   const maxLen = Math.max(str1.length, str2.length);
   if (maxLen === 0) return 1;
-  const distance = levenshtein(str1, str2);
+  const distance = lev.distance(str1, str2);
   return 1 - distance / maxLen;
 }
 

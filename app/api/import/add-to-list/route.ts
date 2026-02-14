@@ -13,6 +13,7 @@ import { extractPlaceId } from '@/lib/utils/googleMapsParser';
 import { generatePlaceSlug, ensureUniqueSlug } from '@/lib/place-slug';
 import { getSaikoCategory, parseCuisineType } from '@/lib/categoryMapping';
 import Papa from 'papaparse';
+import { randomUUID } from 'crypto';
 
 function getUserId(session: { user?: { id?: string } } | null): string | null {
   if (session?.user?.id) return session.user.id;
@@ -88,13 +89,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const list = await db.list.findFirst({
+    const list = await db.lists.findFirst({
       where: { OR: [{ id: listId }, { slug: listId }] },
     });
     if (!list) return NextResponse.json({ error: 'Map not found' }, { status: 404 });
     if (list.userId !== userId) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
-    const lastMapPlace = await db.mapPlace.findFirst({
+    const lastMapPlace = await db.map_places.findFirst({
       where: { mapId: list.id },
       orderBy: { orderIndex: 'desc' },
       select: { orderIndex: true },
@@ -141,7 +142,7 @@ export async function POST(request: NextRequest) {
         }
       }
 
-      let place = googlePlaceId ? await db.place.findUnique({ where: { googlePlaceId } }) : null;
+      let place = googlePlaceId ? await db.places.findUnique({ where: { googlePlaceId } }) : null;
 
       if (!place) {
         const neighborhood = placeDetails
@@ -155,12 +156,13 @@ export async function POST(request: NextRequest) {
           : cleanName;
         const baseSlug = generatePlaceSlug(finalName, neighborhood ?? undefined);
         const slug = await ensureUniqueSlug(baseSlug, async (s) => {
-          const exists = await db.place.findUnique({ where: { slug: s } });
+          const exists = await db.places.findUnique({ where: { slug: s } });
           return !!exists;
         });
 
-        place = await db.place.create({
+        place = await db.places.create({
           data: {
+            id: randomUUID(),
             slug,
             googlePlaceId: googlePlaceId ?? undefined,
             name: finalName,
@@ -177,23 +179,26 @@ export async function POST(request: NextRequest) {
             googlePhotos: placeDetails?.photos ? JSON.parse(JSON.stringify(placeDetails.photos)) : undefined,
             hours: placeDetails?.openingHours ? JSON.parse(JSON.stringify(placeDetails.openingHours)) : null,
             placesDataCachedAt: placeDetails ? new Date() : null,
+            updatedAt: new Date(),
           },
         });
         if (placeDetails) enriched++;
         else failed++;
       }
 
-      const existingMapPlace = await db.mapPlace.findUnique({
+      const existingMapPlace = await db.map_places.findUnique({
         where: { mapId_placeId: { mapId: list.id, placeId: place.id } },
       });
       if (existingMapPlace) continue;
 
-      await db.mapPlace.create({
+      await db.map_places.create({
         data: {
+          id: randomUUID(),
           mapId: list.id,
           placeId: place.id,
           userNote: input.comment?.trim() || null,
           orderIndex: nextOrderIndex++,
+          updatedAt: new Date(),
         },
       });
 

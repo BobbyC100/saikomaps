@@ -19,6 +19,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  serverExternalPackages: ['jellyfish', 'jsdom', 'zombie'],
 };
 
 export default nextConfig;

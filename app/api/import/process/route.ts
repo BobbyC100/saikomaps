@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
 
     // Create the list (auto-published)
     const slug = generateSlug(listTitle)
-    const list = await db.list.create({
+    const list = await db.lists.create({
       data: {
         userId,
         title: listTitle,
@@ -123,7 +123,7 @@ export async function POST(request: NextRequest) {
         : null
       
       try {
-        const created = await db.location.create({
+        const created = await db.locations.create({
           data: {
             listId: list.id,
             name: cleanName,
@@ -193,7 +193,7 @@ async function enrichLocationsSync(
   }
   
   // Get existing locations
-  const existingLocations = await db.location.findMany({
+  const existingLocations = await db.locations.findMany({
     where: { listId },
     orderBy: { orderIndex: 'asc' },
   })
@@ -274,7 +274,7 @@ async function enrichLocationsSync(
           getNeighborhoodFromPlaceDetails(placeDetails) ??
           (!Number.isNaN(lat) && !Number.isNaN(lng) ? await getNeighborhoodFromCoords(lat, lng) : null)
         
-        await db.location.update({
+        await db.locations.update({
           where: { id: existingLocation.id },
           data: {
             googlePlaceId: placeId,
@@ -342,7 +342,7 @@ async function processLocationsAsync(
   }
   
   // Get existing locations for this list (created synchronously)
-  const existingLocations = await db.location.findMany({
+  const existingLocations = await db.locations.findMany({
     where: { listId },
     orderBy: { orderIndex: 'asc' },
   })
@@ -457,7 +457,7 @@ async function processLocationsAsync(
           getNeighborhoodFromPlaceDetails(placeDetails) ??
           (!Number.isNaN(lat) && !Number.isNaN(lng) ? await getNeighborhoodFromCoords(lat, lng) : null)
 
-        const enrichedLocation = await db.location.update({
+        const enrichedLocation = await db.locations.update({
           where: { id: existingLocation.id },
           data: {
             googlePlaceId: placeId,
@@ -539,7 +539,7 @@ async function processLocationsAsync(
   })
   
   // Verify locations were created
-  const createdLocations = await db.location.findMany({
+  const createdLocations = await db.locations.findMany({
     where: { listId },
     select: { id: true, name: true },
   })

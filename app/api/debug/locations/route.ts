@@ -9,13 +9,13 @@ import { db } from '@/lib/db'
 
 export async function GET() {
   try {
-    const locations = await db.location.findMany({
+    const locations = await db.locations.findMany({
       take: 10,
       select: {
         id: true,
         name: true,
         address: true,
-        list: {
+        lists: {
           select: {
             title: true,
             slug: true,
@@ -33,8 +33,8 @@ export async function GET() {
         id: loc.id,
         name: loc.name,
         address: loc.address,
-        mapTitle: loc.list.title,
-        mapSlug: loc.list.slug,
+        mapTitle: loc.lists.title,
+        mapSlug: loc.lists.slug,
         url: `/place/${loc.id}`,
       })),
     })

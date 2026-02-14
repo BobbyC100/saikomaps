@@ -26,7 +26,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
 
-  const list = await db.list.findFirst({
+  const list = await db.lists.findFirst({
     where: { slug, published: true },
     include: { _count: { select: { locations: true } } },
   });

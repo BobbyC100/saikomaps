@@ -30,7 +30,13 @@ export function ComparisonCard({
   );
   
   // Define fields to compare
-  const fields = [
+  const fields: Array<{
+    label: string;
+    valA: string | null | undefined;
+    valB: string | null | undefined;
+    prioritySource: 'editorial' | 'google' | 'foursquare';
+    showDiff?: boolean;
+  }> = [
     { 
       label: 'Name', 
       valA: recordA.name, 

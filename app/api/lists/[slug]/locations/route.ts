@@ -17,7 +17,7 @@ export async function POST(
 ) {
   try {
     const { slug } = await params;
-    const list = await db.list.findFirst({
+    const list = await db.lists.findFirst({
       where: { OR: [{ slug }, { id: slug }] },
     });
 
@@ -37,11 +37,11 @@ export async function POST(
     const { placeId: googlePlaceId, category, userNote, descriptor } = validation.data;
 
     // 1. Check if MapPlace already exists (place already on this map)
-    const existingPlace = await db.place.findUnique({
+    const existingPlace = await db.places.findUnique({
       where: { googlePlaceId },
     });
     if (existingPlace) {
-      const existingMapPlace = await db.mapPlace.findUnique({
+      const existingMapPlace = await db.map_places.findUnique({
         where: {
           mapId_placeId: { mapId: list.id, placeId: existingPlace.id },
         },
@@ -71,11 +71,11 @@ export async function POST(
         ));
       const baseSlug = generatePlaceSlug(placeDetails.name, neighborhood ?? undefined);
       const slugValue = await ensureUniqueSlug(baseSlug, async (s) => {
-        const exists = await db.place.findUnique({ where: { slug: s } });
+        const exists = await db.places.findUnique({ where: { slug: s } });
         return !!exists;
       });
 
-      place = await db.place.create({
+      place = await db.places.create({
         data: {
           slug: slugValue,
           googlePlaceId,
@@ -116,7 +116,7 @@ export async function POST(
             : undefined;
         const cuisineType = needsCuisineType ? parseCuisineType(placeDetails.types || []) ?? null : undefined;
         const priceLevel = needsPriceLevel ? placeDetails.priceLevel ?? null : undefined;
-        place = await db.place.update({
+        place = await db.places.update({
           where: { id: place.id },
           data: {
             ...(neighborhood !== undefined && { neighborhood: neighborhood ?? null }),
@@ -128,7 +128,7 @@ export async function POST(
     }
 
     // 4. Get next orderIndex
-    const lastMapPlace = await db.mapPlace.findFirst({
+    const lastMapPlace = await db.map_places.findFirst({
       where: { mapId: list.id },
       orderBy: { orderIndex: 'desc' },
       select: { orderIndex: true },
@@ -136,7 +136,7 @@ export async function POST(
     const nextOrderIndex = (lastMapPlace?.orderIndex ?? -1) + 1;
 
     // 5. Create MapPlace
-    const mapPlace = await db.mapPlace.create({
+    const mapPlace = await db.map_places.create({
       data: {
         mapId: list.id,
         placeId: place.id,

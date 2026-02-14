@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const lists = await db.list.findMany({
+    const lists = await db.lists.findMany({
       where: { userId },
       include: {
         _count: { select: { mapPlaces: true } },
@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
 
     // In development, ensure demo user exists before creating list (foreign key)
     if (process.env.NODE_ENV === 'development' && userId === 'demo-user-id') {
-      await db.user.upsert({
+      await db.users.upsert({
         where: { id: 'demo-user-id' },
         update: {},
         create: {
@@ -117,7 +117,7 @@ export async function POST(request: NextRequest) {
     console.log('[API MAPS POST] Prisma create data:', createData);
 
     // Create the map/list
-    const list = await db.list.create({
+    const list = await db.lists.create({
       data: createData,
     });
 

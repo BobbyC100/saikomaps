@@ -8,6 +8,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { hash } from 'bcryptjs'
 import { db } from '@/lib/db'
 import { signupSchema } from '@/lib/validations'
+import { randomUUID } from 'crypto'
 
 export async function POST(request: NextRequest) {
   try {
@@ -25,7 +26,7 @@ export async function POST(request: NextRequest) {
     const { email, password, name } = validation.data
 
     // Check if user already exists
-    const existingUser = await db.user.findUnique({
+    const existingUser = await db.users.findUnique({
       where: { email },
     })
 
@@ -40,11 +41,13 @@ export async function POST(request: NextRequest) {
     const passwordHash = await hash(password, 12)
 
     // Create user
-    const user = await db.user.create({
+    const user = await db.users.create({
       data: {
+        id: randomUUID(),
         email,
         name,
         passwordHash,
+        updatedAt: new Date(),
       },
       select: {
         id: true,
