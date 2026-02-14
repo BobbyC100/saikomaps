@@ -14,7 +14,7 @@ interface GlobalFooterProps {
 }
 
 export function GlobalFooter({ variant = 'standard' }: GlobalFooterProps) {
-  // Minimal variant (map/merchant view) - clean bottom edge only
+
   if (variant === 'minimal') {
     return (
       <footer

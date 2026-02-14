@@ -3,14 +3,12 @@
  * GET /api/maps - List current user's maps
  * POST /api/maps - Create a new map
  */
-
 import { NextRequest, NextResponse } from 'next/server';
-import { randomUUID } from 'crypto';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { z } from 'zod';
-
+import { randomUUID } from 'crypto';
 const createMapSchema = z.object({
   title: z.string().optional().default(''),
   template: z.string().optional().default('field-notes'),
@@ -31,7 +29,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const lists = await db.list.findMany({
+    const lists = await db.lists.findMany({
       where: { userId },
       include: {
         _count: { select: { map_places: true } },
@@ -66,6 +64,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
+
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -77,7 +76,7 @@ export async function POST(request: NextRequest) {
 
     // In development, ensure demo user exists before creating list (foreign key)
     if (process.env.NODE_ENV === 'development' && userId === 'demo-user-id') {
-      await db.user.upsert({
+      await db.users.upsert({
         where: { id: 'demo-user-id' },
         update: {},
         create: {
@@ -116,11 +115,11 @@ export async function POST(request: NextRequest) {
       slug,
       templateType: template,
       published: false,
-      updatedAt: now,
+
     };
 
     // Create the map/list
-    const list = await db.list.create({
+    const list = await db.lists.create({
       data: createData,
     });
 

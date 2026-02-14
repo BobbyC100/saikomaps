@@ -32,7 +32,7 @@ export async function POST(
 
     const { id } = await params;
 
-    const list = await db.list.findUnique({
+    const list = await db.lists.findUnique({
       where: { id },
       include: {
         map_places: {
@@ -68,7 +68,7 @@ export async function POST(
       places,
     });
 
-    const updated = await db.list.update({
+    const updated = await db.lists.update({
       where: { id },
       data: {
         description: description || null,

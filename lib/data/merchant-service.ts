@@ -3,7 +3,7 @@
  * Queries only — no voice generation, no tier logic
  */
 
-import { db as prisma } from '@/lib/db';
+
 import { transformDatabaseToMerchant } from './transformers';
 import { MerchantData } from '@/lib/types/merchant';
 

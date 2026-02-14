@@ -1,10 +1,27 @@
 /**
  * Google Places API Integration
  * Handles search and place details fetching
+ * 
+ * ARCHITECTURE NOTE: This should ONLY be called from:
+ * - Import pipelines
+ * - Background jobs
+ * - Explicit admin actions
+ * 
+ * NEVER call from:
+ * - Page loads
+ * - User interactions
+ * - UI components
  */
 
 const GOOGLE_PLACES_API_KEY = process.env.GOOGLE_PLACES_API_KEY;
+const GOOGLE_PLACES_ENABLED = process.env.GOOGLE_PLACES_ENABLED === 'true';
 const PLACES_API_BASE = 'https://maps.googleapis.com/maps/api/place';
+
+function checkEnabled() {
+  if (!GOOGLE_PLACES_ENABLED) {
+    throw new Error('Google Places API is disabled. Enable via GOOGLE_PLACES_ENABLED=true');
+  }
+}
 
 export interface PlaceSearchResult {
   placeId: string;
@@ -147,6 +164,7 @@ export async function searchPlace(
   query: string,
   options: SearchOptions = {}
 ): Promise<PlaceSearchResult[]> {
+  checkEnabled();
   if (!GOOGLE_PLACES_API_KEY) {
     throw new Error('Google Places API key is not configured');
   }
@@ -203,6 +221,7 @@ export async function searchPlace(
 export async function getPlaceDetails(
   placeId: string
 ): Promise<PlaceDetails | null> {
+  checkEnabled();
   if (!GOOGLE_PLACES_API_KEY) {
     throw new Error('Google Places API key is not configured');
   }

@@ -14,7 +14,7 @@ export async function GET(
   try {
     const { jobId } = await params
 
-    const importJob = await db.importJob.findUnique({
+    const importJob = await db.import_jobs.findUnique({
       where: { id: jobId },
       include: {
         lists: {

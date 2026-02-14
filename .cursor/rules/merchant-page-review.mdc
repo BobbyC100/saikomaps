@@ -1,0 +1,167 @@
+---
+description: Merchant page implementation standards and PR review checklist
+globs: **/merchant/**/*.{tsx,ts}
+alwaysApply: false
+---
+
+# Merchant Page Implementation Standards
+
+This rule enforces the locked tier hierarchy and component behavior for the Saiko Merchant Page.
+
+## Tier Order (Non-Negotiable)
+
+Components must render in this exact order:
+
+1. `HeroHeader`
+2. `PrimaryActionSet`
+3. `InstagramConfidenceRow` (conditional)
+4. `PhotoCollage` (conditional)
+5. `VibeTagsRow` (conditional)
+6. `TrustBlock` (conditional)
+7. `HoursCard` (ALWAYS renders)
+8. `AddressCard` (conditional)
+9. `MapTile` (conditional)
+10. `AttributesCard` (conditional)
+11. `AlsoOnLists` (conditional)
+12. `HouseCard` (Tier 5, fixed)
+
+## Critical Component Rules
+
+### HoursCard (ALWAYS RENDERS)
+
+```tsx
+// ✅ CORRECT: Always renders, even with missing data
+{hours ? <HoursCard hours={hours} /> : <HoursCard empty />}
+
+// ❌ WRONG: Never conditionally hide
+{hours && <HoursCard hours={hours} />}
+```
+
+**Behavior:**
+- Default: compact (today only, no full week)
+- Missing data: shows "Hours unavailable" with neutral styling
+- Never collapses entirely
+
+### InstagramConfidenceRow (Slim Treatment)
+
+```tsx
+// ✅ CORRECT: Single-line, lightweight, clickable row
+<InstagramConfidenceRow 
+  handle={instagram}
+  className="text-sm hover:bg-gray-50 rounded-lg transition"
+/>
+
+// ❌ WRONG: Heavy button styling or card treatment
+<Button variant="filled">
+  <InstagramIcon /> Follow on Instagram
+</Button>
+```
+
+**Rules:**
+- Must be single-line and lighter than Tier 0 actions
+- Cannot use filled button styling
+- Should not visually compete with Call/Directions/Reserve
+
+### Conditional Rendering (No Empty Containers)
+
+```tsx
+// ✅ CORRECT: Hard guards prevent empty renders
+{collagePhotos.length >= 1 && <PhotoCollage photos={collagePhotos} />}
+{(curatorNote || coverageSources?.length > 0) && <TrustBlock {...} />}
+{attributes?.length >= 1 && <AttributesCard attributes={attributes} />}
+{address && <AddressCard address={address} />}
+{coordinates && <MapTile lat={coordinates.lat} lng={coordinates.lng} />}
+
+// ❌ WRONG: Empty containers with padding/borders
+<div className="card p-4">
+  {attributes?.map(...)}
+</div>
+```
+
+### Photo Collage Protection
+
+```tsx
+// ✅ CORRECT: Hero photo excluded from collage
+const collagePhotos = photos.filter(p => p.id !== heroPhoto.id);
+
+// ❌ WRONG: Hero included in collage
+const collagePhotos = photos;
+```
+
+**Rules:**
+- Hero photo must never appear in collage
+- Collage collapses silently if empty (no placeholder)
+- Must render above TrustBlock
+
+### AttributesCard (Chip Compression)
+
+```tsx
+// ✅ CORRECT: Compact chip display
+<AttributesCard>
+  {visibleAttributes.map(attr => (
+    <Chip key={attr.id}>{attr.name}</Chip>
+  ))}
+  {hasMore && <Chip onClick={expand}>+{remaining} more</Chip>}
+</AttributesCard>
+
+// ❌ WRONG: Large labeled rows (spec sheet style)
+<AttributesCard>
+  <div className="row">
+    <strong>Service Options:</strong> Delivery, Takeout
+  </div>
+  <div className="row">
+    <strong>Parking:</strong> Street, Garage
+  </div>
+</AttributesCard>
+```
+
+**Rules:**
+- Default: show max ~6 chips
+- Overflow: "+N more" chip to expand
+- Never render as labeled table/rows
+
+### MapTile (Reference Only)
+
+```tsx
+// ✅ CORRECT: Small, reference-only tile
+<MapTile 
+  lat={coordinates.lat} 
+  lng={coordinates.lng}
+  size="small"
+  interactive={false}
+/>
+
+// ❌ WRONG: Hero-sized map with CTA
+<MapTile size="large">
+  <Button>Get Directions</Button>
+</MapTile>
+```
+
+**Rules:**
+- Small/reference-only size
+- No "Get Directions" button (belongs in Tier 0)
+- Collapses if no coordinates
+
+## Editorial vs Promotional Check
+
+The page should feel like **a curated editorial guide**, not a polished Google profile.
+
+**Red flags (reject PR):**
+- Attributes dominate the page
+- Map is hero-sized
+- Instagram has primary button weight
+- Photos pushed below the fold
+
+## PR Approval Checklist
+
+Before approving, verify:
+
+- [ ] Tier order is exact (1-12)
+- [ ] HoursCard always renders (even when empty)
+- [ ] InstagramConfidenceRow is slim and single-line
+- [ ] No empty containers with visible padding/borders
+- [ ] Hero photo excluded from collage
+- [ ] Attributes render as chips (max ~6 visible)
+- [ ] Map is small and has no Directions CTA
+- [ ] Page feels editorial, not promotional
+- [ ] Mobile: Tier 0 wraps cleanly, no scroll fatigue

@@ -28,7 +28,7 @@ export async function POST(
     }
 
     const { id } = await params;
-    const list = await db.list.findUnique({ where: { id } });
+    const list = await db.lists.findUnique({ where: { id } });
 
     if (!list) {
       return NextResponse.json({ error: 'Map not found' }, { status: 404 });
@@ -38,7 +38,7 @@ export async function POST(
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    await db.list.update({
+    await db.lists.update({
       where: { id },
       data: { status: 'ARCHIVED' },
     });

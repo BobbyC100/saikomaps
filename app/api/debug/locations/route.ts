@@ -33,8 +33,7 @@ export async function GET() {
         id: loc.id,
         name: loc.name,
         address: loc.address,
-        mapTitle: loc.lists?.title,
-        mapSlug: loc.lists?.slug,
+
         url: `/place/${loc.id}`,
       })),
     })

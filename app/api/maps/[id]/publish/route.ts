@@ -34,7 +34,7 @@ export async function POST(
 
     const { id } = await params;
 
-    const existing = await db.list.findUnique({
+    const existing = await db.lists.findUnique({
       where: { id },
       include: {
         map_places: {
@@ -73,7 +73,7 @@ export async function POST(
     let slug: string | null = null;
     for (let attempt = 0; attempt < MAX_SLUG_ATTEMPTS; attempt++) {
       const candidate = generateShortSlug(8);
-      const taken = await db.list.findUnique({
+      const taken = await db.lists.findUnique({
         where: { slug: candidate },
       });
       if (!taken) {
@@ -137,7 +137,7 @@ export async function POST(
       }
     }
 
-    const list = await db.list.update({
+    const list = await db.lists.update({
       where: { id },
       data: updateData,
     });

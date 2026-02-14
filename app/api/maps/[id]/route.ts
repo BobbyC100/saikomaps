@@ -41,7 +41,7 @@ export async function GET(
   try {
     const { id } = await params;
 
-    const list = await db.list.findUnique({
+    const list = await db.lists.findUnique({
       where: { id },
       include: {
         map_places: {
@@ -93,7 +93,7 @@ export async function PATCH(
     }
 
     const { id } = await params;
-    const list = await db.list.findUnique({
+    const list = await db.lists.findUnique({
       where: { id },
       include: {
         map_places: {
@@ -145,7 +145,7 @@ export async function PATCH(
     );
     updateData.status = newStatus;
 
-    const updated = await db.list.update({
+    const updated = await db.lists.update({
       where: { id },
       data: updateData,
       include: {
