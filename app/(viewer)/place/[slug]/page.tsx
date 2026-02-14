@@ -243,41 +243,6 @@ export default function PlacePage() {
       .finally(() => setLoading(false));
   }, [slug]);
 
-  // Share functionality
-  const handleShare = () => {
-    const url = window.location.href;
-    const title = data?.location?.name || 'Check out this place';
-    
-    // Try native Web Share API first (mobile)
-    if (navigator.share) {
-      navigator.share({ title, url }).catch(() => {
-        // User cancelled or error - fallback to clipboard
-        copyToClipboard(url);
-      });
-    } else {
-      // Desktop fallback: copy to clipboard
-      copyToClipboard(url);
-    }
-  };
-
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text).then(
-      () => {
-        // Could show a toast notification here
-        console.log('Link copied to clipboard');
-      },
-      () => {
-        // Fallback for older browsers
-        const textarea = document.createElement('textarea');
-        textarea.value = text;
-        document.body.appendChild(textarea);
-        textarea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textarea);
-      }
-    );
-  };
-
   // Gallery handlers
   const openGallery = (index: number = 0) => {
     setLightboxIndex(index);
@@ -455,16 +420,28 @@ export default function PlacePage() {
             gap: 12,
           }}
         >
-          {/* Row 1: Hours (2 or 6) + Coverage (3-5) */}
+          {/* Row 1: Hours (2) + Details (4) OR Hours (6) */}
           <HoursCard
             todayHours={today}
             isOpen={isOpen}
             statusText={statusText}
             fullWeek={fullWeek}
             isIrregular={isIrregular}
-            span={hasCoverage ? 2 : 6}
+            span={2}
           />
 
+          <DetailsCard
+            address={location.address}
+            neighborhood={location.neighborhood}
+            website={location.website}
+            restaurantGroupName={location.restaurantGroup?.name}
+            restaurantGroupSlug={location.restaurantGroup?.slug}
+            serviceOptions={serviceOptions}
+            reservationsNote={reservationsNote}
+            span={4}
+          />
+
+          {/* Row 2: Coverage (3-5) */}
           {hasCoverage && (
             <CoverageCard
               pullQuote={location.pullQuote}
@@ -476,7 +453,7 @@ export default function PlacePage() {
             />
           )}
 
-          {/* Row 2: Gallery (3 or 6) + Curator (3) */}
+          {/* Row 3: Gallery (3 or 6) + Curator (3) */}
           {hasGallery && (
             <GalleryCard
               photos={location.photoUrls!.slice(1)} // Exclude hero
@@ -492,12 +469,12 @@ export default function PlacePage() {
             />
           )}
 
-          {/* Row 3: Vibe (6) */}
+          {/* Row 4: Vibe (6) */}
           {location.vibeTags && location.vibeTags.length > 0 && (
             <VibeCard vibeTags={location.vibeTags} />
           )}
 
-          {/* Row 4: Also On (6) */}
+          {/* Row 5: Also On (6) */}
           {appearsOnDeduped.length > 0 && (
             <AlsoOnCard maps={appearsOnDeduped} />
           )}
