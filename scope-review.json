@@ -1,0 +1,349 @@
+{
+  "timestamp": "2026-02-12T17:16:43.257Z",
+  "total": 919,
+  "unchanged": 877,
+  "toUpdate": 42,
+  "breakdown": {
+    "la_county": 0,
+    "travel": 42,
+    "archive": 0
+  },
+  "updates": [
+    {
+      "id": "d57b5049-b882-4081-9776-48b32eadbe0d",
+      "name": "As de Guia Gastrofonda",
+      "slug": "as-de-guia-gastrofonda",
+      "oldScope": "la_county",
+      "newScope": "travel",
+      "reason": "MX"
+    },
+    {
+      "id": "65feb542-d8f0-45c9-ae3b-a5a2ad1b2873",
+      "name": "Barra D` Café",
+      "slug": "barra-d-caf",
+      "oldScope": "la_county",
+      "newScope": "travel",
+      "reason": "MX"
+    },
+    {
+      "id": "abec6ac5-3ed5-41cc-8600-8b964e1a0460",
+      "name": "Bart's Books",
+      "slug": "barts-books-ojai",
+      "oldScope": "la_county",
+      "newScope": "travel",
+      "reason": "Address parsing (CA)"
+    },
+    {
+      "id": "29c23185-f87f-4663-8ae6-86587b1f7efa",
+      "name": "Bodega Los Alamos",
+      "slug": "bodega-los-alamos",
+      "oldScope": "la_county",
+      "newScope": "travel",
+      "reason": "Address parsing (CA)"
+    },
+    {
+      "id": "de09d40c-e068-414c-92be-26a0c7db1fba",
+      "name": "Broadway by Amar Santana",
+      "slug": "unknown-de09d40c",
+      "oldScope": "la_county",
+      "newScope": "travel",
+      "reason": "Address parsing (CA)"
+    },
+    {
+      "id": "39f5f8b7-f8ef-43f4-a745-9e2d6de13475",
+      "name": "Carnitas El Rey",
+      "slug": "unknown-39f5f8b7",
+      "oldScope": "la_county",
+      "newScope": "travel",
+      "reason": "Address parsing (CA)"
+    },
+    {
+      "id": "338cb9b3-bc00-493c-8032-4adc0ac98964",
+      "name": "Coastal Kitchen",
+      "slug": "unknown-338cb9b3",
+      "oldScope": "la_county",
+      "newScope": "travel",
+      "reason": "Address parsing (CA)"
+    },
+    {
+      "id": "90b7d2ef-0a71-4e8e-8d00-49724383610a",
+      "name": "Concha de Piedra Vinícola",
+      "slug": "concha-de-piedra-vin-cola",
+      "oldScope": "la_county",
+      "newScope": "travel",
+      "reason": "MX"
+    },
+    {
+      "id": "183c1644-2914-45ed-98d8-46691d143b6c",
+      "name": "Ernest Coffee",
+      "slug": "ernest-coffee",
+      "oldScope": "la_county",
+      "newScope": "travel",
+      "reason": "Address parsing (CA)"
+    },
+    {
+      "id": "1694a965-847c-4b45-bfe4-1e4137651319",
+      "name": "ETA",
+      "slug": "eta",
+      "oldScope": "la_county",
+      "newScope": "travel",
+      "reason": "No location data"
+    },
+    {
+      "id": "9ebffb85-aa93-4501-8ff8-f438831a5624",
+      "name": "Guisados",
+      "slug": "guisados-echo-park",
+      "oldScope": "la_county",
+      "newScope": "travel",
+      "reason": "Neighborhood: Echo Park"
+    },
+    {
+      "id": "764704f2-f60d-4bc7-b200-014c140117b9",
+      "name": "Gusto Bread",
+      "slug": "gusto-bread-4th-street-corridor",
+      "oldScope": "la_county",
+      "newScope": "travel",
+      "reason": "City: Long Beach"
+    },
+    {
+      "id": "c0695023-9103-4865-a7e9-695a72cb4cd8",
+      "name": "Hotel Las Rosas & Spa",
+      "slug": "hotel-las-rosas-spa",
+      "oldScope": "la_county",
+      "newScope": "travel",
+      "reason": "MX"
+    },
+    {
+      "id": "0a3cbd6d-73a7-4267-b89e-c0eb4a7953af",
+      "name": "J Zhou Oriental Cuisine",
+      "slug": "j-zhou-oriental-cuisine-tustin-legacy",
+      "oldScope": "la_county",
+      "newScope": "travel",
+      "reason": "Address parsing (CA)"
+    },
+    {
+      "id": "adec07d7-8596-42e5-bc0f-6871d854c231",
+      "name": "Joe's Crab Shack",
+      "slug": "unknown-adec07d7",
+      "oldScope": "la_county",
+      "newScope": "travel",
+      "reason": "Address parsing (CA)"
+    },
+    {
+      "id": "608f835b-db87-40bd-94ed-5642624d4071",
+      "name": "La Bête Noire",
+      "slug": "la-b-te-noire",
+      "oldScope": "la_county",
+      "newScope": "travel",
+      "reason": "FR"
+    },
+    {
+      "id": "bc68eb66-6b15-42b8-8576-bd2796e1b64d",
+      "name": "La Cocina de Doña Esthela",
+      "slug": "la-cocina-de-do-a-esthela",
+      "oldScope": "la_county",
+      "newScope": "travel",
+      "reason": "MX"
+    },
+    {
+      "id": "4cdb9672-66a6-4848-808e-7e07d70340b1",
+      "name": "La Noisette Sweets",
+      "slug": "la-noisette-sweets-west-berkeley",
+      "oldScope": "la_county",
+      "newScope": "travel",
+      "reason": "Address parsing (CA)"
+    },
+    {
+      "id": "bb2b27b7-fa8c-4e73-a402-03eb026b4cc8",
+      "name": "Lo-Fi Wines",
+      "slug": "lo-fi-wines",
+      "oldScope": "la_county",
+      "newScope": "travel",
+      "reason": "Address parsing (CA)"
+    },
+    {
+      "id": "f7fa3f30-3bee-4262-961d-3033f9c1d357",
+      "name": "Magokoro",
+      "slug": "magokoro",
+      "oldScope": "la_county",
+      "newScope": "travel",
+      "reason": "MX"
+    },
+    {
+      "id": "309efdb3-ff2c-4dcc-8255-7ec6fff0a4e4",
+      "name": "Mama's Comfort Food & Cocktails",
+      "slug": "unknown-309efdb3",
+      "oldScope": "la_county",
+      "newScope": "travel",
+      "reason": "Address parsing (CA)"
+    },
+    {
+      "id": "3da9c40d-f0aa-4896-8f88-513a6c0c905e",
+      "name": "Muelle 3",
+      "slug": "muelle-3",
+      "oldScope": "la_county",
+      "newScope": "travel",
+      "reason": "MX"
+    },
+    {
+      "id": "ec2c5010-e7d3-4446-bd5c-18923398c818",
+      "name": "Oc & Lau Restaurant",
+      "slug": "oc-lau-restaurant-garden-grove",
+      "oldScope": "la_county",
+      "newScope": "travel",
+      "reason": "Address parsing (CA)"
+    },
+    {
+      "id": "6ddfbb27-431b-4369-ba14-c88ab573275c",
+      "name": "Paul Bar/Food",
+      "slug": "paul-bar-food",
+      "oldScope": "la_county",
+      "newScope": "travel",
+      "reason": "Address parsing (CA)"
+    },
+    {
+      "id": "d54bcec1-0c1e-44c9-b75a-5ca563b66d00",
+      "name": "Phnom Penh Noodle Shack",
+      "slug": "phnom-penh-noodle-shack-whittier",
+      "oldScope": "la_county",
+      "newScope": "travel",
+      "reason": "City: Long Beach"
+    },
+    {
+      "id": "1ff846d5-90ed-4598-8e1b-dcd2ccc44363",
+      "name": "Pinyon Ojai",
+      "slug": "pinyon-ojai-ojai",
+      "oldScope": "la_county",
+      "newScope": "travel",
+      "reason": "Address parsing (CA)"
+    },
+    {
+      "id": "42fdbc5b-86ea-482e-86f0-30d72c6a1bc0",
+      "name": "Primitivo Restaurante",
+      "slug": "primitivo-restaurante",
+      "oldScope": "la_county",
+      "newScope": "travel",
+      "reason": "MX"
+    },
+    {
+      "id": "4cce5ce3-7bbe-44aa-9735-f1f2773dd2bb",
+      "name": "Pupuseria La Familiar",
+      "slug": "unknown-4cce5ce3",
+      "oldScope": "la_county",
+      "newScope": "travel",
+      "reason": "Address parsing (CA)"
+    },
+    {
+      "id": "50a39a8f-b57f-490b-9908-b0c0843e9517",
+      "name": "Quintas Papagayo",
+      "slug": "quintas-papagayo",
+      "oldScope": "la_county",
+      "newScope": "travel",
+      "reason": "MX"
+    },
+    {
+      "id": "45e9ab35-6e12-47d3-822f-95b0bfc7a93a",
+      "name": "Rose Haven Heritage Garden",
+      "slug": "heritage-rose-park-south-2",
+      "oldScope": "la_county",
+      "newScope": "travel",
+      "reason": "Address parsing (CA)"
+    },
+    {
+      "id": "b8d9c4e3-9560-42bd-a297-3baa97a19fca",
+      "name": "Smoke and Fire Social Eatery",
+      "slug": "smoke-and-fire-social-eatery-paramount-2",
+      "oldScope": "la_county",
+      "newScope": "travel",
+      "reason": "Address parsing (CA)"
+    },
+    {
+      "id": "2f4a2259-3293-4986-ada3-a22432e64e95",
+      "name": "Splash Café",
+      "slug": "unknown-2f4a2259",
+      "oldScope": "la_county",
+      "newScope": "travel",
+      "reason": "Neighborhood: Downtown"
+    },
+    {
+      "id": "6599bf33-364c-4de2-9ae0-1b71d1e67095",
+      "name": "Tacos Don Carlos",
+      "slug": "unknown-6599bf33",
+      "oldScope": "la_county",
+      "newScope": "travel",
+      "reason": "Address parsing (CA)"
+    },
+    {
+      "id": "4f59d34f-9201-41ad-be58-ea0245b5bf3a",
+      "name": "Tacos Fenix (Fish & Shrimp)",
+      "slug": "tacos-fenix-fish-shrimp",
+      "oldScope": "la_county",
+      "newScope": "travel",
+      "reason": "MX"
+    },
+    {
+      "id": "bc14bcf6-e491-444c-9fc2-dbafefef417c",
+      "name": "Tacos Mi Ranchito El Fenix",
+      "slug": "tacos-mi-ranchito-el-fenix",
+      "oldScope": "la_county",
+      "newScope": "travel",
+      "reason": "MX"
+    },
+    {
+      "id": "0ee21189-7b27-4304-807d-24e19f700d74",
+      "name": "The Breakers Palm Beach",
+      "slug": "the-breakers-palm-beach",
+      "oldScope": "la_county",
+      "newScope": "travel",
+      "reason": "US"
+    },
+    {
+      "id": "e5e618b6-1b6a-4e1b-a525-0f93906a2456",
+      "name": "The Copper Room",
+      "slug": "the-copper-room",
+      "oldScope": "la_county",
+      "newScope": "travel",
+      "reason": "Address parsing (CA)"
+    },
+    {
+      "id": "459921ab-fcd5-4809-b922-caca2911f49d",
+      "name": "Tienda de Quesos y Vinos Los Globos",
+      "slug": "tienda-de-quesos-y-vinos-los-globos",
+      "oldScope": "la_county",
+      "newScope": "travel",
+      "reason": "MX"
+    },
+    {
+      "id": "612cd871-4133-4aa7-b1b9-e8fd82c7739e",
+      "name": "Twelves",
+      "slug": "twelves",
+      "oldScope": "la_county",
+      "newScope": "travel",
+      "reason": "City: Long Beach"
+    },
+    {
+      "id": "4d33d2bd-4245-4741-b275-ad49655969fc",
+      "name": "Unfined Wines LA",
+      "slug": "unfined-wines-la",
+      "oldScope": "la_county",
+      "newScope": "travel",
+      "reason": "No location data"
+    },
+    {
+      "id": "508ed06e-6740-4dfe-a295-4b1b83623398",
+      "name": "Valle Omakase by Chef Quindere",
+      "slug": "valle-omakase-by-chef-quindere",
+      "oldScope": "la_county",
+      "newScope": "travel",
+      "reason": "MX"
+    },
+    {
+      "id": "f6677f93-b5c4-41b0-87d7-0f9787da51b3",
+      "name": "Walker Coffee Company",
+      "slug": "unknown-f6677f93",
+      "oldScope": "la_county",
+      "newScope": "travel",
+      "reason": "Address parsing (CA)"
+    }
+  ]
+}
