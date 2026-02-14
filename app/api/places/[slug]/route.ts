@@ -110,11 +110,7 @@ export async function GET(
       id: mp.lists!.id,
       title: mp.lists!.title,
       slug: mp.lists!.slug,
-      <<<<<<< HEAD
-      const publishedMapPlaces = places.map_places.filter((mp) => mp.lists && mp.lists.status === 'PUBLISHED');
-  =======
-      const publishedMapPlaces = place.map_places.filter((mp) => mp.lists && mp.lists.status === 'PUBLISHED');
-  >>>>>>> df94ee8 (Saiko Maps User Profule)
+
       creatorName: mp.lists!.users?.name || mp.lists!.users?.email?.split('@')[0] || 'Unknown',
       placeCount: (mp.lists as any)._count?.map_places ?? 0,
     }));

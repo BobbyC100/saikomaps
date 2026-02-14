@@ -1,508 +1,264 @@
 /**
- * API Route: Process Import
+ * API Route: Process CSV import into a NEW list
  * POST /api/import/process
- * Create list and enrich locations with Google Places API
+ *
+ * Expects multipart/form-data:
+ * - file: CSV File
+ * - title: string
+ * - templateType?: string
+ * - accessLevel?: 'public' | 'private' (optional)
  */
 
-import { NextRequest, NextResponse } from 'next/server'
-import { randomUUID } from 'crypto'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
-import { db } from '@/lib/db'
-import { randomUUID } from 'crypto'
-import { processImportSchema } from '@/lib/validations'
-import { searchPlace, getPlaceDetails, getNeighborhoodFromPlaceDetails, getNeighborhoodFromCoords } from '@/lib/google-places'
-import { generateSlug } from '@/lib/utils'
-import { extractPlaceId } from '@/lib/utils/googleMapsParser'
+import { NextRequest, NextResponse } from 'next/server';
+import { randomUUID } from 'crypto';
+import Papa from 'papaparse';
+
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import { db } from '@/lib/db';
+
+import { searchPlace, getPlaceDetails, getNeighborhoodFromPlaceDetails, getNeighborhoodFromCoords } from '@/lib/google-places';
+import { extractPlaceId } from '@/lib/utils/googleMapsParser';
+import { generatePlaceSlug, ensureUniqueSlug } from '@/lib/place-slug';
+import { getSaikoCategory, parseCuisineType } from '@/lib/categoryMapping';
 
 function getUserId(session: { user?: { id?: string } } | null): string | null {
-  if (session?.user?.id) return session.user.id
-  if (process.env.NODE_ENV === 'development') return 'demo-user-id'
-  return null
+  if (session?.user?.id) return session.user.id;
+  if (process.env.NODE_ENV === 'development') return 'demo-user-id';
+  return null;
+}
+
+type PlaceInput = { name: string; address?: string; comment?: string; url?: string };
+
+function parseCsvToPlaces(fileContent: string): PlaceInput[] {
+  const parseResult = Papa.parse(fileContent, { header: true, skipEmptyLines: true });
+  if (parseResult.errors.length > 0) throw new Error('Failed to parse CSV');
+
+  const places: PlaceInput[] = [];
+
+  for (const row of parseResult.data as Record<string, unknown>[]) {
+    const name = (row.Title || row.Name || row.name || '') as string;
+    if (!name || String(name).trim() === '') continue;
+
+    places.push({
+      name: String(name).trim(),
+      address: (row.Address || row.address || '') as string | undefined,
+      url: (row.URL || row.url || '') as string | undefined,
+      comment: (row.Comment || row.Note || row.comment || '') as string | undefined,
+    });
+  }
+
+  return places;
+}
+
+function slugifyMapTitle(title: string): string {
+  return title
+    .trim()
+    .toLowerCase()
+    .replace(/[’']/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 80) || `map-${Date.now()}`;
+}
+
+async function ensureUniqueMapSlug(base: string): Promise<string> {
+  let attempt = base;
+  let i = 0;
+
+  while (true) {
+    const exists = await db.lists.findUnique({ where: { slug: attempt } });
+    if (!exists) return attempt;
+    i += 1;
+    attempt = `${base}-${i}`;
+  }
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
-    const userId = getUserId(session)
-
+    const session = await getServerSession(authOptions);
+    const userId = getUserId(session);
     if (!userId) {
-      return NextResponse.json(
-        { error: 'User authentication required' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'User authentication required' }, { status: 401 });
     }
 
-    const body = await request.json()
-    
-    
-    // Validate input
-    const validation = processImportSchema.safeParse(body)
-    if (!validation.success) {
-      console.error('[IMPORT] Validation failed:', validation.error.errors)
+    const formData = await request.formData();
+    const file = formData.get('file') as File | null;
+
+    const titleRaw = (formData.get('title') as string | null) ?? '';
+    const listTitle = titleRaw.trim() || 'Untitled Map';
+
+    const templateType = (formData.get('templateType') as string | null) ?? null;
+    const accessLevel = ((formData.get('accessLevel') as string | null) ?? 'public') as 'public' | 'private';
+
+    if (!file) {
+      return NextResponse.json({ error: 'File is required' }, { status: 400 });
+    }
+    if (!file.name.toLowerCase().endsWith('.csv')) {
+      return NextResponse.json({ error: 'Only CSV files are allowed' }, { status: 400 });
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      return NextResponse.json({ error: 'File size must be less than 10MB' }, { status: 400 });
+    }
+
+    const fileContent = await file.text();
+    const inputs = parseCsvToPlaces(fileContent);
+
+    if (inputs.length === 0) {
       return NextResponse.json(
-        { error: 'Invalid input', details: validation.error.errors },
+        { error: 'No valid places found in CSV. Need at least one row with Title or Name.' },
         { status: 400 }
-      )
+      );
     }
 
-    const { listTitle, templateType, locations } = validation.data
-    
+    if (inputs.length > 500) {
+      return NextResponse.json(
+        { error: 'Maximum 500 places per import. Please split into smaller files.' },
+        { status: 400 }
+      );
+    }
 
-    // Create the list (auto-published)
-    const slug = generateSlug(listTitle)
+    const baseMapSlug = slugifyMapTitle(listTitle);
+    const slug = await ensureUniqueMapSlug(baseMapSlug);
 
-
+    const list = await db.lists.create({
       data: {
         id: randomUUID(),
         userId,
         title: listTitle,
-        slug: `${slug}-${Date.now()}`, // Add timestamp to ensure uniqueness
+        slug,
         templateType,
-        accessLevel: 'public', // Public by default
-        published: true, // Auto-publish
-
+        accessLevel,
+        published: accessLevel === 'public',
+        updatedAt: new Date(),
       },
-    })
-    
+      select: { id: true, slug: true },
+    });
 
-    // Create import job
-    const importJob = await db.import_jobs.create({
-      data: {
-        id: randomUUID(),
-        userId,
-        listId: list.id,
-        status: 'processing',
-        totalLocations: locations.length,
-        processedLocations: 0,
-        failedLocations: 0,
-      },
-    })
-    
+    let nextOrderIndex = 0;
+    let enriched = 0;
+    let failed = 0;
 
-    // Create basic locations synchronously FIRST (so they're available immediately)
-    const createdLocations = []
-    
-    for (let i = 0; i < locations.length; i++) {
-      const location = locations[i]
-      
-      // Clean the name
-      let cleanName = location.name?.trim() || ''
+    for (let i = 0; i < inputs.length; i++) {
+      const input = inputs[i];
+
+      let cleanName = input.name?.trim() || '';
       if (cleanName.startsWith('http')) {
-        const urlMatch = cleanName.match(/\/place\/([^/?]+)/)
-        if (urlMatch) {
-          cleanName = decodeURIComponent(urlMatch[1].replace(/\+/g, ' '))
-        } else {
-          cleanName = 'Untitled Location'
+        const urlMatch = cleanName.match(/\/place\/([^/?]+)/);
+        cleanName = urlMatch ? decodeURIComponent(urlMatch[1].replace(/\+/g, ' ')) : 'Untitled Place';
+      }
+      if (!cleanName) cleanName = 'Untitled Place';
+
+      let placeDetails: any = null;
+      let googlePlaceId: string | null = null;
+
+      if (input.url) {
+        googlePlaceId = extractPlaceId(input.url);
+        if (googlePlaceId && !googlePlaceId.startsWith('cid:')) {
+          try {
+            placeDetails = await getPlaceDetails(googlePlaceId);
+          } catch {
+            // fall through to search
+          }
         }
       }
-      if (!cleanName || cleanName.length === 0) {
-        cleanName = 'Untitled Location'
+
+      if (!placeDetails && process.env.GOOGLE_PLACES_API_KEY) {
+        const cleanAddress = input.address && !input.address.startsWith('http') ? input.address : undefined;
+        const searchQuery = cleanAddress ? `${cleanName}, ${cleanAddress}` : cleanName;
+
+        try {
+          const results = await searchPlace(searchQuery, { maxResults: 1 });
+          if (results.length > 0) {
+            googlePlaceId = results[0].placeId;
+            placeDetails = await getPlaceDetails(googlePlaceId);
+          }
+        } catch {
+          // unresolved
+        }
       }
-      
-      // Clean address
-      const cleanAddress = location.address && !location.address.startsWith('http')
-        ? location.address.trim()
-        : null
-      
-      try {
-        const created = await db.locations.create({
+
+      let place = googlePlaceId ? await db.places.findUnique({ where: { googlePlaceId } }) : null;
+
+      if (!place) {
+        const neighborhood = placeDetails
+          ? (getNeighborhoodFromPlaceDetails(placeDetails) ??
+              (!Number.isNaN(placeDetails.location?.lat) && !Number.isNaN(placeDetails.location?.lng)
+                ? await getNeighborhoodFromCoords(placeDetails.location.lat, placeDetails.location.lng)
+                : null))
+          : null;
+
+        const finalName =
+          placeDetails?.name && !placeDetails.name.startsWith('http') ? placeDetails.name : cleanName;
+
+        const basePlaceSlug = generatePlaceSlug(finalName, neighborhood ?? undefined);
+        const placeSlug = await ensureUniqueSlug(basePlaceSlug, async (s) => {
+          const exists = await db.places.findUnique({ where: { slug: s } });
+          return !!exists;
+        });
+
+        place = await db.places.create({
           data: {
             id: randomUUID(),
-            listId: list.id,
-            name: cleanName,
-            address: cleanAddress,
-            userNote: location.comment?.trim() || null,
-            orderIndex: i,
-            updatedAt: new Date(),
+            slug: placeSlug,
+            googlePlaceId: googlePlaceId ?? undefined,
+            name: finalName,
+            address:
+              placeDetails?.formattedAddress ??
+              (input.address && !input.address.startsWith('http') ? input.address : null),
+            latitude: placeDetails?.location ? placeDetails.location.lat : null,
+            longitude: placeDetails?.location ? placeDetails.location.lng : null,
+            phone: placeDetails?.formattedPhoneNumber ?? null,
+            website: placeDetails?.website ?? null,
+            googleTypes: placeDetails?.types ?? [],
+            priceLevel: placeDetails?.priceLevel ?? null,
+            neighborhood: neighborhood ?? null,
+            cuisineType: placeDetails?.types ? parseCuisineType(placeDetails.types) ?? null : null,
+            category: getSaikoCategory(finalName, placeDetails?.types ?? []),
+            googlePhotos: placeDetails?.photos ? JSON.parse(JSON.stringify(placeDetails.photos)) : undefined,
+            hours: placeDetails?.openingHours ? JSON.parse(JSON.stringify(placeDetails.openingHours)) : null,
           },
-        })
-        createdLocations.push(created)
-      } catch (error) {
-        console.error(`[IMPORT] Failed to create location ${i + 1}:`, error)
-      }
-    }
-    
+        });
 
-    // Enrich locations synchronously (for MVP - ensures coordinates are available)
-    const enrichmentResult = await enrichLocationsSync(list.id, locations, importJob.id)
-    
-    // Continue enrichment in background for any remaining locations
-    if (enrichmentResult.remaining > 0) {
-      const remainingLocations = locations.slice(enrichmentResult.enriched)
-      processLocationsAsync(importJob.id, list.id, remainingLocations, enrichmentResult.enriched).catch((error) => {
-        console.error('[IMPORT] Background enrichment failed:', error)
-      })
+        if (placeDetails) enriched++;
+        else failed++;
+      }
+
+      const existingMapPlace = await db.map_places.findUnique({
+        where: { mapId_placeId: { mapId: list.id, placeId: place.id } },
+      });
+      if (existingMapPlace) continue;
+
+      await db.map_places.create({
+        data: {
+          id: randomUUID(),
+          mapId: list.id,
+          placeId: place.id,
+          userNote: input.comment?.trim() || null,
+          orderIndex: nextOrderIndex++,
+          updatedAt: new Date(),
+        },
+      });
+
+      // keep it light
+      await new Promise((r) => setTimeout(r, 50));
     }
 
     return NextResponse.json({
       success: true,
       data: {
         listId: list.id,
-        importJobId: importJob.id,
         slug: list.slug,
+        added: inputs.length,
+        total: inputs.length,
+        failedToResolve: failed,
+        enriched,
       },
-    })
+    });
   } catch (error) {
-    console.error('Error processing import:', error)
+    console.error('[IMPORT/PROCESS] Error:', error);
     return NextResponse.json(
-      { 
-        error: 'Failed to process import',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      },
+      { error: 'Failed to process import', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
-    )
+    );
   }
 }
-
-// ============================================
-// SYNC ENRICHMENT (for MVP - ensures coordinates available immediately)
-// ============================================
-
-async function enrichLocationsSync(
-  listId: string,
-  locations: Array<{ name: string; address?: string; comment?: string; url?: string }>,
-  importJobId: string
-): Promise<{ enriched: number; remaining: number }> {
-  
-  // Check if Google Places API key is available
-  if (!process.env.GOOGLE_PLACES_API_KEY) {
-    console.warn('[ENRICH SYNC] GOOGLE_PLACES_API_KEY not set! Skipping enrichment.')
-    return { enriched: 0, remaining: locations.length }
-  }
-  
-  // Get existing locations
-  const existingLocations = await db.locations.findMany({
-    where: { listId },
-    orderBy: { orderIndex: 'asc' },
-  })
-  
-  if (existingLocations.length === 0) {
-    console.warn('[ENRICH SYNC] No existing locations found!')
-    return { enriched: 0, remaining: locations.length }
-  }
-  
-  let enriched = 0
-  const maxSyncEnrichment = Math.min(30, locations.length) // Enrich first 30 synchronously
-  
-  
-  for (let i = 0; i < maxSyncEnrichment; i++) {
-    const location = locations[i]
-    const existingLocation = existingLocations[i]
-    
-    if (!existingLocation) continue
-    
-    try {
-      // Try to enrich this location
-      let placeDetails = null
-      let placeId: string | null = null
-      
-      // Strategy 1: Extract place ID from URL
-      if (location.url) {
-        placeId = extractPlaceId(location.url)
-        if (placeId && !placeId.startsWith('cid:')) {
-          try {
-            placeDetails = await getPlaceDetails(placeId)
-          } catch (e) {
-          }
-        }
-      }
-      
-      // Strategy 2: Text search
-      if (!placeDetails) {
-        const cleanName = location.name?.trim() || existingLocation.name
-        const cleanAddress = location.address && !location.address.startsWith('http')
-          ? location.address
-          : undefined
-        
-        const searchQuery = cleanAddress
-          ? `${cleanName}, ${cleanAddress}`
-          : cleanName
-        
-        try {
-          const searchResults = await searchPlace(searchQuery, { maxResults: 1 })
-          if (searchResults.length > 0) {
-            placeId = searchResults[0].placeId
-            placeDetails = await getPlaceDetails(placeId)
-          }
-        } catch (e) {
-        }
-      }
-      
-      // Update location with enriched data
-      if (placeDetails) {
-        const lat = typeof placeDetails.location.lat === 'number' 
-          ? placeDetails.location.lat 
-          : parseFloat(String(placeDetails.location.lat))
-        const lng = typeof placeDetails.location.lng === 'number' 
-          ? placeDetails.location.lng 
-          : parseFloat(String(placeDetails.location.lng))
-        
-        const finalName = placeDetails.name && !placeDetails.name.startsWith('http')
-          ? placeDetails.name
-          : existingLocation.name
-        
-        const finalAddress = placeDetails.formattedAddress && !placeDetails.formattedAddress.startsWith('http')
-          ? placeDetails.formattedAddress
-          : existingLocation.address
-        
-        const neighborhood =
-          getNeighborhoodFromPlaceDetails(placeDetails) ??
-          (!Number.isNaN(lat) && !Number.isNaN(lng) ? await getNeighborhoodFromCoords(lat, lng) : null)
-        
-        await db.locations.update({
-          where: { id: existingLocation.id },
-          data: {
-            googlePlaceId: placeId,
-            name: finalName,
-            address: finalAddress,
-            latitude: !Number.isNaN(lat) ? lat : null,
-            longitude: !Number.isNaN(lng) ? lng : null,
-            phone: placeDetails.formattedPhoneNumber || null,
-            website: placeDetails.website || null,
-            googleTypes: placeDetails.types || [],
-            priceLevel: placeDetails.priceLevel ?? null,
-            neighborhood: neighborhood ?? null,
-            hours: placeDetails.openingHours ? JSON.parse(JSON.stringify(placeDetails.openingHours)) : null,
-            googlePhotos: placeDetails.photos ? JSON.parse(JSON.stringify(placeDetails.photos)) : null,
-            placesDataCachedAt: new Date(),
-            updatedAt: new Date(),
-          },
-        })
-        
-        enriched++
-      }
-      
-      // Update progress every 5 locations
-      if ((i + 1) % 5 === 0) {
-        await db.import_jobs.update({
-          where: { id: importJobId },
-          data: {
-            processedLocations: i + 1,
-          },
-        })
-      }
-      
-      // Rate limiting: wait 100ms between requests
-      await new Promise(resolve => setTimeout(resolve, 100))
-    } catch (error) {
-      console.error(`[ENRICH SYNC] Error enriching location ${i + 1}:`, error)
-    }
-  }
-  
-  return { enriched: maxSyncEnrichment, remaining: locations.length - maxSyncEnrichment }
-}
-
-// ============================================
-// ASYNC PROCESSING (for remaining locations)
-// ============================================
-
-async function processLocationsAsync(
-  importJobId: string,
-  listId: string,
-  locations: Array<{ name: string; address?: string; comment?: string; url?: string }>,
-  startIndex: number = 0
-) {
-  
-  // Check if Google Places API key is available
-  if (!process.env.GOOGLE_PLACES_API_KEY) {
-    console.warn('[IMPORT ASYNC] GOOGLE_PLACES_API_KEY not set! Skipping enrichment.')
-    return
-  }
-  
-  // Get existing locations for this list (created synchronously)
-  const existingLocations = await db.locations.findMany({
-    where: { listId },
-    orderBy: { orderIndex: 'asc' },
-  })
-  
-  
-  const errorLog: any[] = []
-  let processed = 0
-  let failed = 0
-
-  for (let i = 0; i < locations.length; i++) {
-    const location = locations[i]
-    const locationIndex = startIndex + i
-    const existingLocation = existingLocations[locationIndex]
-    
-    if (!existingLocation) {
-      console.warn(`[IMPORT ASYNC] No existing location found for index ${locationIndex}`)
-      failed++
-      processed++
-      continue
-    }
-    
-    try {
-      // Clean the name - ensure it's not empty or a URL
-      let cleanName = location.name?.trim() || ''
-      
-      // If name is a URL, try to extract a meaningful name from it
-      if (cleanName.startsWith('http')) {
-        // Try to extract name from URL path (e.g., "Ocean+Shape" from URL)
-        const urlMatch = cleanName.match(/\/place\/([^/?]+)/)
-        if (urlMatch) {
-          cleanName = decodeURIComponent(urlMatch[1].replace(/\+/g, ' '))
-        } else {
-          // If we can't extract a name, skip this location
-        errorLog.push({
-          location: cleanName,
-          error: 'Location name is a URL and cannot be parsed',
-        })
-        failed++
-        processed++
-        continue
-        }
-      }
-      
-      // Final check - ensure we have a valid name
-      if (!cleanName || cleanName.length === 0) {
-        cleanName = 'Untitled Location'
-      }
-
-      let placeDetails = null
-      let placeId: string | null = null
-
-      // Strategy 1: Try to extract place ID from URL if available
-      if (location.url) {
-        placeId = extractPlaceId(location.url)
-        if (placeId && !placeId.startsWith('cid:')) {
-          // Only use place_id format, not CID
-          try {
-            placeDetails = await getPlaceDetails(placeId)
-          } catch (e) {
-          }
-        }
-      }
-
-      // Strategy 2: If URL extraction failed, try text search
-      if (!placeDetails) {
-        // Clean address - don't use URL as address
-        const cleanAddress = location.address && !location.address.startsWith('http') 
-          ? location.address 
-          : undefined
-
-        const searchQuery = cleanAddress 
-          ? `${cleanName}, ${cleanAddress}`
-          : cleanName
-
-        try {
-          const searchResults = await searchPlace(searchQuery, { maxResults: 1 })
-          
-          if (searchResults.length > 0) {
-            placeId = searchResults[0].placeId
-            placeDetails = await getPlaceDetails(placeId)
-          }
-        } catch (e) {
-        }
-      }
-
-      if (placeDetails) {
-        // Update existing location with enriched data
-        // Ensure coordinates are valid numbers
-        const lat = typeof placeDetails.location.lat === 'number' ? placeDetails.location.lat : parseFloat(String(placeDetails.location.lat))
-        const lng = typeof placeDetails.location.lng === 'number' ? placeDetails.location.lng : parseFloat(String(placeDetails.location.lng))
-        
-        // Ensure name is not empty and not a URL
-        const finalName = placeDetails.name && !placeDetails.name.startsWith('http')
-          ? placeDetails.name
-          : existingLocation.name
-        
-        // Ensure address is not a URL
-        const finalAddress = placeDetails.formattedAddress && !placeDetails.formattedAddress.startsWith('http')
-          ? placeDetails.formattedAddress
-          : existingLocation.address
-
-        const neighborhood =
-          getNeighborhoodFromPlaceDetails(placeDetails) ??
-          (!Number.isNaN(lat) && !Number.isNaN(lng) ? await getNeighborhoodFromCoords(lat, lng) : null)
-
-        const enrichedLocation = await db.locations.update({
-          where: { id: existingLocation.id },
-          data: {
-            googlePlaceId: placeId,
-            name: finalName,
-            address: finalAddress,
-            latitude: !Number.isNaN(lat) ? lat : null,
-            longitude: !Number.isNaN(lng) ? lng : null,
-            phone: placeDetails.formattedPhoneNumber || null,
-            website: placeDetails.website || null,
-            googleTypes: placeDetails.types || [],
-            priceLevel: placeDetails.priceLevel ?? null,
-            neighborhood: neighborhood ?? null,
-            hours: placeDetails.openingHours ? JSON.parse(JSON.stringify(placeDetails.openingHours)) : null,
-            description: null, // PlaceDetails doesn't have description field
-            googlePhotos: placeDetails.photos ? JSON.parse(JSON.stringify(placeDetails.photos)) : null,
-            placesDataCachedAt: new Date(),
-            updatedAt: new Date(),
-          },
-        })
-        
-      } else {
-        // No place found - location already exists from sync creation, just log
-        
-        errorLog.push({
-          location: existingLocation.name,
-          error: 'Place not found in Google Places',
-        })
-        failed++
-      }
-
-      processed++
-
-      // Update progress
-      await db.import_jobs.update({
-        where: { id: importJobId },
-        data: {
-          processedLocations: processed,
-          failedLocations: failed,
-        },
-      })
-
-      // Rate limiting: wait 100ms between requests
-      await new Promise(resolve => setTimeout(resolve, 100))
-    } catch (error) {
-      console.error(`Error processing location ${location.name}:`, error)
-      
-      errorLog.push({
-        location: location.name,
-        error: error instanceof Error ? error.message : 'Unknown error',
-      })
-      
-      failed++
-      processed++
-      
-      // Location already exists from sync creation, just log the error
-      console.error(`[IMPORT ASYNC] Error enriching location ${existingLocation?.id}:`, error)
-    }
-  }
-
-  // Mark import job as complete
-  await db.import_jobs.update({
-    where: { id: importJobId },
-    data: {
-      status: failed === locations.length ? 'failed' : 'completed',
-      processedLocations: processed,
-      failedLocations: failed,
-      completedAt: new Date(),
-      errorLog: errorLog.length > 0 ? errorLog : undefined,
-    },
-  })
-  
-  // Verify locations were created
-  const createdLocations = await db.locations.findMany({
-    where: { listId },
-    select: { id: true, name: true },
-  })
-  
-  
-  if (createdLocations.length === 0) {
-    console.error('[IMPORT ASYNC] WARNING: No locations were created!', {
-      listId,
-      locationsReceived: locations.length,
-      processed,
-      failed,
-    })
-  }
-}
-

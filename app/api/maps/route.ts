@@ -3,15 +3,12 @@
  * GET /api/maps - List current user's maps
  * POST /api/maps - Create a new map
  */
-
 import { NextRequest, NextResponse } from 'next/server';
-import { randomUUID } from 'crypto';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { z } from 'zod';
 import { randomUUID } from 'crypto';
-
 const createMapSchema = z.object({
   title: z.string().optional().default(''),
   template: z.string().optional().default('field-notes'),
@@ -66,6 +63,7 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+
 
 export async function POST(request: NextRequest) {
   try {
