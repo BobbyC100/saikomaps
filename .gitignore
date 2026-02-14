@@ -25,3 +25,4 @@ logs/
 test-*.js
 test-*.csv
 tsx
+.claude/
