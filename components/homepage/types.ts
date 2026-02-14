@@ -1,7 +1,7 @@
 // Homepage Component Type Definitions
 // Quick reference for using homepage components
 
-import { ReactNode } from 'react'
+import { ReactNode, ReactElement } from 'react'
 
 // ======================
 // Hero Component
@@ -9,7 +9,7 @@ import { ReactNode } from 'react'
 // No props - all content is hardcoded
 // To customize, edit: components/homepage/Hero.tsx
 
-export function Hero(): JSX.Element
+export declare function Hero(): ReactElement
 
 // ======================
 // Section Header
@@ -20,7 +20,7 @@ export interface SectionHeaderProps {
   linkHref: string     // URL to link to
 }
 
-export function SectionHeader(props: SectionHeaderProps): JSX.Element
+export declare function SectionHeader(props: SectionHeaderProps): ReactElement
 
 // Example:
 // <SectionHeader 
@@ -39,7 +39,7 @@ export interface NeighborhoodCardProps {
   href: string         // Link destination
 }
 
-export function NeighborhoodCard(props: NeighborhoodCardProps): JSX.Element
+export declare function NeighborhoodCard(props: NeighborhoodCardProps): ReactElement
 
 // Example:
 // <NeighborhoodCard
@@ -60,7 +60,7 @@ export interface CategoryCardProps {
   href: string         // Link destination
 }
 
-export function CategoryCard(props: CategoryCardProps): JSX.Element
+export declare function CategoryCard(props: CategoryCardProps): ReactElement
 
 // Example:
 // <CategoryCard
@@ -77,7 +77,7 @@ export function CategoryCard(props: CategoryCardProps): JSX.Element
 // No props - all content is hardcoded
 // To customize, edit: components/homepage/HomepageFooter.tsx
 
-export function HomepageFooter(): JSX.Element
+export declare function HomepageFooter(): ReactElement
 
 // ======================
 // Usage Example

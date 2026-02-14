@@ -8,8 +8,8 @@ import { fieldNotesMapStyle } from '../../lib/fieldNotesMapStyle';
 export interface PlacePoint {
   id: string;
   name: string;
-  latitude: number | string | null;
-  longitude: number | string | null;
+  latitude: number | string | null | undefined;
+  longitude: number | string | null | undefined;
   isFeatured?: boolean;
 }
 

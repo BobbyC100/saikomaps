@@ -34,7 +34,7 @@ export async function GET(
                 slug: true,
                 status: true,
                 published: true,
-                cover_image_url: true,
+                coverImageUrl: true,
                 users: {
                   select: {
                     name: true,
@@ -63,9 +63,9 @@ export async function GET(
 
     // Get photo URLs (up to 10 for merchant page: 1 hero + up to 9 gallery)
     const photoUrls: string[] = [];
-    if (places.google_photos && Array.isArray(places.google_photos)) {
-      for (let i = 0; i < Math.min(10, places.google_photos.length); i++) {
-        const ref = getPhotoRefFromStored(places.google_photos[i] as { photo_reference?: string; photoReference?: string; name?: string });
+    if (place.googlePhotos && Array.isArray(place.googlePhotos)) {
+      for (let i = 0; i < Math.min(10, place.googlePhotos.length); i++) {
+        const ref = getPhotoRefFromStored(place.googlePhotos[i] as { photo_reference?: string; photoReference?: string; name?: string });
         if (ref) {
           try {
             photoUrls.push(getGooglePhotoUrl(ref, i === 0 ? 800 : 400));
@@ -78,24 +78,24 @@ export async function GET(
 
     // Parse hours
     let hours: Record<string, string> | null = null;
-    if (places.hours) {
+    if (place.hours) {
       try {
         hours =
-          typeof places.hours === 'string'
-            ? JSON.parse(places.hours)
-            : (places.hours as Record<string, string>);
+          typeof place.hours === 'string'
+            ? JSON.parse(place.hours)
+            : (place.hours as Record<string, string>);
       } catch {
         hours = null;
       }
     }
 
     // Format appearsOn (only published maps) and curator note from first map with descriptor
-    const publishedMapPlaces = places.map_places.filter((mp) => mp.lists && mp.lists.status === 'PUBLISHED');
+    const publishedMapPlaces = place.map_places.filter((mp) => mp.lists && mp.lists.status === 'PUBLISHED');
     const appearsOn = publishedMapPlaces.map((mp) => ({
       id: mp.lists!.id,
       title: mp.lists!.title,
       slug: mp.lists!.slug,
-      coverImageUrl: mp.lists!.cover_image_url,
+      coverImageUrl: mp.lists!.coverImageUrl,
       creatorName: mp.lists!.users?.name || mp.lists!.users?.email?.split('@')[0] || 'Unknown',
     }));
     const curatorMapPlace = publishedMapPlaces.find((mp) => mp.descriptor?.trim());
@@ -109,41 +109,41 @@ export async function GET(
       success: true,
       data: {
         location: {
-          id: places.id,
-          slug: places.slug,
-          name: places.name,
-          address: places.address,
-          latitude: places.latitude ? Number(places.latitude) : null,
-          longitude: places.longitude ? Number(places.longitude) : null,
-          phone: places.phone,
-          website: places.website,
-          instagram: places.instagram,
-          description: places.description,
-          category: places.category,
-          neighborhood: places.neighborhood,
-          cuisineType: places.cuisine_type,
-          priceLevel: places.price_level,
+          id: place.id,
+          slug: place.slug,
+          name: place.name,
+          address: place.address,
+          latitude: place.latitude ? Number(place.latitude) : null,
+          longitude: place.longitude ? Number(place.longitude) : null,
+          phone: place.phone,
+          website: place.website,
+          instagram: place.instagram,
+          description: place.description,
+          category: place.category,
+          neighborhood: place.neighborhood,
+          cuisineType: place.cuisineType,
+          priceLevel: place.priceLevel,
           photoUrl: photoUrls[0] ?? null,
           photoUrls,
           hours,
-          googlePlaceId: places.google_place_id,
+          googlePlaceId: place.googlePlaceId,
           curatorNote,
           curatorCreatorName,
-          sources: places.editorial_sources || [],
-          vibeTags: places.vibe_tags || [],
-          tips: places.tips || [],
-          tagline: places.tagline,
-          pullQuote: places.pull_quote,
-          pullQuoteSource: places.pull_quote_source,
-          pullQuoteAuthor: places.pull_quote_author,
-          pullQuoteUrl: places.pull_quote_url,
-          pullQuoteType: places.pull_quote_type,
+          sources: place.editorialSources || [],
+          vibeTags: place.vibeTags || [],
+          tips: place.tips || [],
+          tagline: place.tagline,
+          pullQuote: place.pullQuote,
+          pullQuoteSource: place.pullQuoteSource,
+          pullQuoteAuthor: place.pullQuoteAuthor,
+          pullQuoteUrl: place.pullQuoteUrl,
+          pullQuoteType: place.pullQuoteType,
           // Decision Onset fields
-          intentProfile: places.intent_profile,
-          intentProfileOverride: places.intent_profile_override,
-          reservationUrl: places.reservation_url,
+          intentProfile: place.intentProfile,
+          intentProfileOverride: place.intentProfileOverride,
+          reservationUrl: place.reservationUrl,
           // Restaurant Group
-          restaurantGroup: places.restaurant_groups || null,
+          restaurantGroup: place.restaurant_groups || null,
         },
         guide: appearsOn[0]
           ? {

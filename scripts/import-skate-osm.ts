@@ -167,7 +167,7 @@ async function main() {
   let updated = 0;
 
   for (const s of kept) {
-    const existing = await db.activitySpot.findFirst({
+    const existing = await db.activity_spots.findFirst({
       where: { source: SpotSource.OSM, sourceId: s.sourceId },
     });
 
@@ -190,10 +190,10 @@ async function main() {
     };
 
     if (existing) {
-      await db.activitySpot.update({ where: { id: existing.id }, data: payload });
+      await db.activity_spots.update({ where: { id: existing.id }, data: payload });
       updated++;
     } else {
-      await db.activitySpot.create({ data: payload });
+      await db.activity_spots.create({ data: payload });
       inserted++;
     }
   }

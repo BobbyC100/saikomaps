@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, ReactElement } from 'react';
 import styles from './DetailsCard.module.css';
 
 interface DetailRow {
   label: string;
-  value: string | JSX.Element;
+  value: string | ReactElement;
 }
 
 interface DetailsCardProps {

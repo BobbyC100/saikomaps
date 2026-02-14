@@ -22,7 +22,7 @@ function getUserId(session: { user?: { id?: string } } | null, request?: NextReq
 }
 
 function computeMapStatus(
-  list: { status: MapStatus; mapPlaces: Array<{ descriptor?: string | null }> },
+  list: { status: MapStatus; map_places: Array<{ descriptor?: string | null }> },
   formData: ReturnType<typeof mapToFormData>
 ): MapStatus {
   const placeCount = list.map_places.length;
@@ -44,9 +44,9 @@ export async function GET(
     const list = await db.lists.findUnique({
       where: { id },
       include: {
-        mapPlaces: {
+        map_places: {
           orderBy: { orderIndex: 'asc' },
-          include: { place: true },
+          include: { places: true },
         },
       },
     });
@@ -59,11 +59,11 @@ export async function GET(
     }
 
     // Build locations array from mapPlaces for create flow (expects data.locations)
-    const locations = (list.mapPlaces || []).map((mp) => ({
+    const locations = (list.map_places || []).map((mp) => ({
       id: mp.id,
-      name: mp.place?.name ?? '',
-      address: mp.place?.address ?? null,
-      category: mp.place?.category ?? null,
+      name: mp.places?.name ?? '',
+      address: mp.places?.address ?? null,
+      category: mp.places?.category ?? null,
       orderIndex: mp.orderIndex,
     }));
 
@@ -96,9 +96,9 @@ export async function PATCH(
     const list = await db.lists.findUnique({
       where: { id },
       include: {
-        mapPlaces: {
+        map_places: {
           orderBy: { orderIndex: 'asc' },
-          include: { place: true },
+          include: { places: true },
         },
       },
     });
@@ -140,7 +140,7 @@ export async function PATCH(
     const merged = { ...list, ...updateData };
     const formData = mapToFormData(merged);
     const newStatus = computeMapStatus(
-      { status: list.status, mapPlaces: list.mapPlaces },
+      { status: list.status, map_places: list.map_places },
       formData
     );
     updateData.status = newStatus;
@@ -149,9 +149,9 @@ export async function PATCH(
       where: { id },
       data: updateData,
       include: {
-        mapPlaces: {
+        map_places: {
           orderBy: { orderIndex: 'asc' },
-          include: { place: true },
+          include: { places: true },
         },
       },
     });

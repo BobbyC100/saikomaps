@@ -118,15 +118,15 @@ Hollywood High,34.1016,-118.3222,hollywood,school,"stairs;ledge;rail",mixed,Clas
       enabled: true,
     };
 
-    const existing = await db.activitySpot.findFirst({
+    const existing = await db.activity_spots.findFirst({
       where: { source: SpotSource.EDITORIAL, sourceId },
     });
 
     if (existing) {
-      await db.activitySpot.update({ where: { id: existing.id }, data: payload });
+      await db.activity_spots.update({ where: { id: existing.id }, data: payload });
       updated++;
     } else {
-      await db.activitySpot.create({ data: payload });
+      await db.activity_spots.create({ data: payload });
       inserted++;
     }
   }

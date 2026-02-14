@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
     const lists = await db.lists.findMany({
       where: { userId },
       include: {
-        _count: { select: { mapPlaces: true } },
+        _count: { select: { map_places: true } },
       },
       orderBy: { updatedAt: 'desc' },
     });
@@ -85,6 +85,7 @@ export async function POST(request: NextRequest) {
           email: 'demo@saikomaps.com',
           name: 'Demo User',
           passwordHash: 'demo-hash-not-for-production',
+          updatedAt: new Date(),
         },
       });
     }

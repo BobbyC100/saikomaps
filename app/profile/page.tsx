@@ -30,8 +30,8 @@ export default async function ProfilePage() {
     redirect('/login');
   }
 
-  let userMaps: Awaited<ReturnType<typeof db.lists.findMany>> = [];
-  let savedMapsRows: Awaited<ReturnType<typeof db.savedMap.findMany>> = [];
+  let userMaps: any = [];
+  let savedMapsRows: Awaited<ReturnType<typeof db.saved_maps.findMany>> = [];
   let user: { name: string | null; curatorNote: string | null; scopePills: string[]; coverageSources: string[]; avatarUrl: string | null } | null = null;
 
   try {
@@ -47,8 +47,8 @@ export default async function ProfilePage() {
           _count: { select: { map_places: true } },
         },
         orderBy: { updatedAt: 'desc' },
-      }),
-      db.savedMap.findMany({
+      }) as any,
+      db.saved_maps.findMany({
         where: { userId },
         include: {
           lists: {
@@ -83,11 +83,11 @@ export default async function ProfilePage() {
 
   const stats = {
     mapCount: userMaps.length,
-    placeCount: userMaps.reduce((sum, m) => sum + (m._count?.map_places ?? 0), 0),
+    placeCount: (userMaps as any).reduce((sum: number, m: any) => sum + (m._count?.map_places ?? 0), 0),
     savedCount: savedMapsRows.length,
   };
 
-  const userMapsData = userMaps.map((m) => ({
+  const userMapsData = (userMaps as any).map((m: any) => ({
     id: m.id,
     title: m.title,
     slug: m.slug,
@@ -99,7 +99,7 @@ export default async function ProfilePage() {
     coverPhotos: getCoverPhotos(m.map_places),
   }));
 
-  const savedMapsData = savedMapsRows.map((sm) => ({
+  const savedMapsData = (savedMapsRows as any).map((sm: any) => ({
     id: sm.lists.id,
     title: sm.lists.title,
     slug: sm.lists.slug,

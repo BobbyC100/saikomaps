@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
       where.region = region;
     }
 
-    const spots = await db.activitySpot.findMany({
+    const spots = await db.activity_spots.findMany({
       where,
       orderBy: [{ name: 'asc' }],
     });

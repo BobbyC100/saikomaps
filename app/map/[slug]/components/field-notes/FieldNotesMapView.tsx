@@ -146,7 +146,13 @@ export function FieldNotesMapView({
     }));
   }, [locations]);
 
-  const coverPins = useMemo(
+  const coverPins = useMemo<Array<{
+    id: string;
+    name: string;
+    latitude: number | string | null | undefined;
+    longitude: number | string | null | undefined;
+    isFeatured: boolean;
+  }>>(
     () =>
       locations.map((l, i) => ({
         id: l.id,

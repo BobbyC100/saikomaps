@@ -35,9 +35,9 @@ export async function POST(
     const list = await db.lists.findUnique({
       where: { id },
       include: {
-        mapPlaces: {
+        map_places: {
           orderBy: { orderIndex: 'asc' },
-          include: { place: true },
+          include: { places: true },
         },
       },
     });

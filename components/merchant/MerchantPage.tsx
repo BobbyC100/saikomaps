@@ -49,10 +49,15 @@ export function MerchantPage({ merchant }: MerchantPageProps) {
       />
 
       <PrimaryActionSet
-        phone={merchant.phone}
-        reservationUrl={merchant.reservationUrl}
-        coordinates={merchant.coordinates}
-        merchantName={merchant.name}
+        place={{
+          phone: merchant.phone,
+          reservationUrl: merchant.reservationUrl,
+          website: merchant.websiteUrl,
+          address: typeof merchant.address === 'string' ? merchant.address : merchant.address ? `${merchant.address.street}, ${merchant.address.city}, ${merchant.address.state} ${merchant.address.zip}` : undefined,
+          latitude: merchant.coordinates?.lat,
+          longitude: merchant.coordinates?.lng,
+          instagram: merchant.instagramHandle,
+        }}
       />
 
       {/* Tier 1.5: Instagram (slim treatment) */}

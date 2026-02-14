@@ -18,13 +18,13 @@ interface GeoJSONFeature {
     id: string;
     name: string;
     slug: string | null;
-    layerType: string;
-    spotType: string | null;
+    layer_type: string;
+    spot_type: string | null;
     tags: string[];
     region: string | null;
     city: string | null;
     source: string;
-    sourceUrl: string | null;
+    source_url: string | null;
     surface: string | null;
     description: string | null;
   };
@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    const spots = await db.activitySpot.findMany({
+    const spots = await db.activity_spots.findMany({
       where,
       select: {
         id: true,
@@ -61,13 +61,13 @@ export async function GET(request: NextRequest) {
         slug: true,
         latitude: true,
         longitude: true,
-        layerType: true,
-        spotType: true,
+        layer_type: true,
+        spot_type: true,
         tags: true,
         region: true,
         city: true,
         source: true,
-        sourceUrl: true,
+        source_url: true,
         surface: true,
         description: true,
       },
@@ -83,13 +83,13 @@ export async function GET(request: NextRequest) {
         id: s.id,
         name: s.name,
         slug: s.slug,
-        layerType: s.layerType,
-        spotType: s.spotType,
+        layer_type: s.layer_type,
+        spot_type: s.spot_type,
         tags: s.tags,
         region: s.region,
         city: s.city,
         source: s.source,
-        sourceUrl: s.sourceUrl,
+        source_url: s.source_url,
         surface: s.surface,
         description: s.description,
       },
