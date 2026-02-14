@@ -28,7 +28,7 @@ export async function PATCH(
     const location = await db.locations.findUnique({
       where: { id: locationId },
       include: {
-        list: true,
+        lists: true,
       },
     });
 
@@ -40,7 +40,7 @@ export async function PATCH(
     }
 
     // Check if user owns the map
-    if (location.list.userId !== session.user.id) {
+    if (location.lists.userId !== session.user.id) {
       return NextResponse.json(
         { error: 'You do not have permission to edit this location' },
         { status: 403 }
@@ -101,7 +101,7 @@ export async function DELETE(
     const location = await db.locations.findUnique({
       where: { id: locationId },
       include: {
-        list: true,
+        lists: true,
       },
     });
 
@@ -113,7 +113,7 @@ export async function DELETE(
     }
 
     // Check if user owns the map
-    if (location.list.userId !== session.user.id) {
+    if (location.lists.userId !== session.user.id) {
       return NextResponse.json(
         { error: 'You do not have permission to delete this location' },
         { status: 403 }

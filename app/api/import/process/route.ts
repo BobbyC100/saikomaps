@@ -8,6 +8,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { db } from '@/lib/db'
+import { randomUUID } from 'crypto'
 import { processImportSchema } from '@/lib/validations'
 import { searchPlace, getPlaceDetails, getNeighborhoodFromPlaceDetails, getNeighborhoodFromCoords } from '@/lib/google-places'
 import { generateSlug } from '@/lib/utils'
@@ -63,12 +64,14 @@ export async function POST(request: NextRequest) {
     const slug = generateSlug(listTitle)
     const list = await db.lists.create({
       data: {
+        id: randomUUID(),
         userId,
         title: listTitle,
         slug: `${slug}-${Date.now()}`, // Add timestamp to ensure uniqueness
         templateType,
         accessLevel: 'public', // Public by default
         published: true, // Auto-publish
+        updatedAt: new Date(),
       },
     })
     
@@ -79,8 +82,9 @@ export async function POST(request: NextRequest) {
     })
 
     // Create import job
-    const importJob = await db.importJob.create({
+    const importJob = await db.import_jobs.create({
       data: {
+        id: randomUUID(),
         userId,
         listId: list.id,
         status: 'processing',
@@ -125,11 +129,13 @@ export async function POST(request: NextRequest) {
       try {
         const created = await db.locations.create({
           data: {
+            id: randomUUID(),
             listId: list.id,
             name: cleanName,
             address: cleanAddress,
             userNote: location.comment?.trim() || null,
             orderIndex: i,
+            updatedAt: new Date(),
           },
         })
         createdLocations.push(created)
@@ -299,7 +305,7 @@ async function enrichLocationsSync(
       
       // Update progress every 5 locations
       if ((i + 1) % 5 === 0) {
-        await db.importJob.update({
+        await db.import_jobs.update({
           where: { id: importJobId },
           data: {
             processedLocations: i + 1,
@@ -500,7 +506,7 @@ async function processLocationsAsync(
       processed++
 
       // Update progress
-      await db.importJob.update({
+      await db.import_jobs.update({
         where: { id: importJobId },
         data: {
           processedLocations: processed,
@@ -527,7 +533,7 @@ async function processLocationsAsync(
   }
 
   // Mark import job as complete
-  await db.importJob.update({
+  await db.import_jobs.update({
     where: { id: importJobId },
     data: {
       status: failed === locations.length ? 'failed' : 'completed',

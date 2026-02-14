@@ -8,6 +8,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getPlaceDetails, getNeighborhoodFromPlaceDetails, getNeighborhoodFromCoords } from '@/lib/google-places';
 import { addLocationSchema } from '@/lib/validations';
+import { randomUUID } from 'crypto';
 import { generatePlaceSlug, ensureUniqueSlug } from '@/lib/place-slug';
 import { getSaikoCategory, parseCuisineType, ALL_CATEGORIES } from '@/lib/categoryMapping';
 
@@ -77,6 +78,7 @@ export async function POST(
 
       place = await db.places.create({
         data: {
+          id: randomUUID(),
           slug: slugValue,
           googlePlaceId,
           name: placeDetails.name,
@@ -97,6 +99,7 @@ export async function POST(
           hours: placeDetails.openingHours
             ? JSON.parse(JSON.stringify(placeDetails.openingHours))
             : null,
+          updatedAt: new Date(),
           placesDataCachedAt: new Date(),
         },
       });
@@ -138,14 +141,16 @@ export async function POST(
     // 5. Create MapPlace
     const mapPlace = await db.map_places.create({
       data: {
+        id: randomUUID(),
         mapId: list.id,
         placeId: place.id,
         descriptor: descriptor?.trim() || null,
         userNote: userNote || null,
         userPhotos: [],
         orderIndex: nextOrderIndex,
+        updatedAt: new Date(),
       },
-      include: { place: true },
+      include: { places: true },
     });
 
     return NextResponse.json({

@@ -194,11 +194,11 @@ export function placeCategoryToScopeType(category: string | null | undefined): S
 
 /** Auto-generate title placeholder from places. Same category+neighborhood → "[Category] in [Neighborhood]", etc. */
 export function generateTitleFromPlaces(
-  places: Array<{ place?: { category?: string | null; neighborhood?: string | null } }>
+  places: Array<{ place?: { category?: string | null; neighborhood?: string | null } } | { places?: { category?: string | null; neighborhood?: string | null } }>
 ): string {
   if (places.length < 2) return '';
-  const categories = [...new Set(places.map((p) => p.place?.category).filter(Boolean))] as string[];
-  const neighborhoods = [...new Set(places.map((p) => p.place?.neighborhood).filter(Boolean))] as string[];
+  const categories = [...new Set(places.map((p) => ('place' in p ? p.place?.category : p.places?.category)).filter(Boolean))] as string[];
+  const neighborhoods = [...new Set(places.map((p) => ('place' in p ? p.place?.neighborhood : p.places?.neighborhood)).filter(Boolean))] as string[];
   const sameCategory = categories.length === 1 && categories[0];
   const sameNeighborhood = neighborhoods.length === 1 && neighborhoods[0];
   const primaryCategory = sameCategory ? (CATEGORY_TO_SCOPE[sameCategory] ?? sameCategory) : null;

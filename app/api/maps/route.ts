@@ -9,6 +9,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { z } from 'zod';
+import { randomUUID } from 'crypto';
 
 const createMapSchema = z.object({
   title: z.string().optional().default(''),
@@ -108,11 +109,13 @@ export async function POST(request: NextRequest) {
     const slug = (base ? base + '-' : '') + Math.random().toString(36).substring(2, 10);
 
     const createData = {
+      id: randomUUID(),
       userId,
       title: title.trim(),
       slug,
       templateType: template,
       published: false,
+      updatedAt: new Date(),
     };
     console.log('[API MAPS POST] Prisma create data:', createData);
 
