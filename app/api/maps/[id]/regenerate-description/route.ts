@@ -50,17 +50,17 @@ export async function POST(
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    if (list.mapPlaces.length < 2) {
+    if (list.map_places.length < 2) {
       return NextResponse.json(
         { error: 'Map needs at least 2 places to generate a description' },
         { status: 422 }
       );
     }
 
-    const places = list.mapPlaces.map((mp) => ({
-      name: mp.place.name,
-      category: mp.place.category || 'eat',
-      neighborhood: mp.place.neighborhood ?? undefined,
+    const places = list.map_places.map((mp) => ({
+      name: mp.places.name,
+      category: mp.places.category || 'eat',
+      neighborhood: mp.places.neighborhood ?? undefined,
     }));
 
     const description = await generateMapDescription({

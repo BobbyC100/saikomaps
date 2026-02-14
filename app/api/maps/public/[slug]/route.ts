@@ -46,7 +46,7 @@ export async function GET(
 
     // Fetch identity signals for places
     const googlePlaceIds = list.mapPlaces
-      .map(mp => mp.place.googlePlaceId)
+      .map(mp => mp.places.googlePlaceId)
       .filter((id): id is string => id !== null);
     
     const identitySignals = await db.goldenRecord.findMany({
@@ -72,8 +72,8 @@ export async function GET(
     });
     
     // Enrich mapPlaces with identity signals
-    const enrichedMapPlaces = list.mapPlaces.map(mp => {
-      const signals = mp.place.googlePlaceId ? signalsMap.get(mp.place.googlePlaceId) : null;
+    const enrichedMapPlaces = list.map_places.map(mp => {
+      const signals = mp.places.googlePlaceId ? signalsMap.get(mp.places.googlePlaceId) : null;
       return {
         ...mp,
         place: {

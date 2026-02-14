@@ -63,9 +63,9 @@ export async function GET(
 
     // Get photo URLs (up to 10 for merchant page: 1 hero + up to 9 gallery)
     const photoUrls: string[] = [];
-    if (place.google_photos && Array.isArray(place.google_photos)) {
-      for (let i = 0; i < Math.min(10, place.google_photos.length); i++) {
-        const ref = getPhotoRefFromStored(place.google_photos[i] as { photo_reference?: string; photoReference?: string; name?: string });
+    if (places.google_photos && Array.isArray(places.google_photos)) {
+      for (let i = 0; i < Math.min(10, places.google_photos.length); i++) {
+        const ref = getPhotoRefFromStored(places.google_photos[i] as { photo_reference?: string; photoReference?: string; name?: string });
         if (ref) {
           try {
             photoUrls.push(getGooglePhotoUrl(ref, i === 0 ? 800 : 400));
@@ -78,19 +78,19 @@ export async function GET(
 
     // Parse hours
     let hours: Record<string, string> | null = null;
-    if (place.hours) {
+    if (places.hours) {
       try {
         hours =
-          typeof place.hours === 'string'
-            ? JSON.parse(place.hours)
-            : (place.hours as Record<string, string>);
+          typeof places.hours === 'string'
+            ? JSON.parse(places.hours)
+            : (places.hours as Record<string, string>);
       } catch {
         hours = null;
       }
     }
 
     // Format appearsOn (only published maps) and curator note from first map with descriptor
-    const publishedMapPlaces = place.map_places.filter((mp) => mp.lists && mp.lists.status === 'PUBLISHED');
+    const publishedMapPlaces = places.map_places.filter((mp) => mp.lists && mp.lists.status === 'PUBLISHED');
     const appearsOn = publishedMapPlaces.map((mp) => ({
       id: mp.lists!.id,
       title: mp.lists!.title,
@@ -109,41 +109,41 @@ export async function GET(
       success: true,
       data: {
         location: {
-          id: place.id,
-          slug: place.slug,
-          name: place.name,
-          address: place.address,
-          latitude: place.latitude ? Number(place.latitude) : null,
-          longitude: place.longitude ? Number(place.longitude) : null,
-          phone: place.phone,
-          website: place.website,
-          instagram: place.instagram,
-          description: place.description,
-          category: place.category,
-          neighborhood: place.neighborhood,
-          cuisineType: place.cuisine_type,
-          priceLevel: place.price_level,
+          id: places.id,
+          slug: places.slug,
+          name: places.name,
+          address: places.address,
+          latitude: places.latitude ? Number(places.latitude) : null,
+          longitude: places.longitude ? Number(places.longitude) : null,
+          phone: places.phone,
+          website: places.website,
+          instagram: places.instagram,
+          description: places.description,
+          category: places.category,
+          neighborhood: places.neighborhood,
+          cuisineType: places.cuisine_type,
+          priceLevel: places.price_level,
           photoUrl: photoUrls[0] ?? null,
           photoUrls,
           hours,
-          googlePlaceId: place.google_place_id,
+          googlePlaceId: places.google_place_id,
           curatorNote,
           curatorCreatorName,
-          sources: place.editorial_sources || [],
-          vibeTags: place.vibe_tags || [],
-          tips: place.tips || [],
-          tagline: place.tagline,
-          pullQuote: place.pull_quote,
-          pullQuoteSource: place.pull_quote_source,
-          pullQuoteAuthor: place.pull_quote_author,
-          pullQuoteUrl: place.pull_quote_url,
-          pullQuoteType: place.pull_quote_type,
+          sources: places.editorial_sources || [],
+          vibeTags: places.vibe_tags || [],
+          tips: places.tips || [],
+          tagline: places.tagline,
+          pullQuote: places.pull_quote,
+          pullQuoteSource: places.pull_quote_source,
+          pullQuoteAuthor: places.pull_quote_author,
+          pullQuoteUrl: places.pull_quote_url,
+          pullQuoteType: places.pull_quote_type,
           // Decision Onset fields
-          intentProfile: place.intent_profile,
-          intentProfileOverride: place.intent_profile_override,
-          reservationUrl: place.reservation_url,
+          intentProfile: places.intent_profile,
+          intentProfileOverride: places.intent_profile_override,
+          reservationUrl: places.reservation_url,
           // Restaurant Group
-          restaurantGroup: place.restaurant_groups || null,
+          restaurantGroup: places.restaurant_groups || null,
         },
         guide: appearsOn[0]
           ? {

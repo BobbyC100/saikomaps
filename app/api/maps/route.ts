@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
       title: list.title,
       slug: list.slug,
       published: list.published,
-      locationCount: list._count.mapPlaces,
+      locationCount: list._count.map_places,
       viewCount: list.viewCount,
       createdAt: list.createdAt,
       updatedAt: list.updatedAt,

@@ -62,10 +62,10 @@ function extractSignals(place: any): Array<{ type: string; label: string }> {
   const signals: Array<{ type: string; label: string }> = [];
   
   // Check sources for publication names
-  if (place.sources && Array.isArray(place.sources)) {
+  if (places.sources && Array.isArray(places.sources)) {
     const seenTypes = new Set<string>();
     
-    for (const source of place.sources) {
+    for (const source of places.sources) {
       if (signals.length >= 2) break; // Max 2 signals
       
       const pub = source.publication?.toLowerCase() || '';
@@ -87,7 +87,7 @@ function extractSignals(place: any): Array<{ type: string; label: string }> {
   }
   
   // Check for chef recommendations
-  if (place.chefRecs && Array.isArray(place.chefRecs) && place.chefRecs.length > 0 && signals.length < 2) {
+  if (places.chefRecs && Array.isArray(places.chefRecs) && places.chefRecs.length > 0 && signals.length < 2) {
     signals.push({ type: 'chefrec', label: 'Chef Rec' });
   }
   
@@ -111,7 +111,7 @@ export async function GET(request: NextRequest) {
 
   try {
     // Search places with enriched data for bento grid
-    const places = await prisma.place.findMany({
+    const places = await prisma.places.findMany({
       where: {
         OR: [
           { name: { contains: queryLower, mode: 'insensitive' } },
@@ -204,7 +204,7 @@ export async function GET(request: NextRequest) {
     // Rank and enrich results
     const rankedPlaces = places
       .map((place) => {
-        const nameLower = place.name.toLowerCase()
+        const nameLower = places.name.toLowerCase()
         let score = 0
 
         // Exact name match
@@ -214,17 +214,17 @@ export async function GET(request: NextRequest) {
         // Name contains query
         else if (nameLower.includes(queryLower)) score = 800
         // Neighborhood exact match
-        else if (place.neighborhood?.toLowerCase() === queryLower) score = 700
+        else if (places.neighborhood?.toLowerCase() === queryLower) score = 700
         // Neighborhood contains query
-        else if (place.neighborhood?.toLowerCase().includes(queryLower)) score = 600
+        else if (places.neighborhood?.toLowerCase().includes(queryLower)) score = 600
         // Category/cuisine match
         else if (
-          place.category?.toLowerCase().includes(queryLower) ||
-          place.cuisineType?.toLowerCase().includes(queryLower)
+          places.category?.toLowerCase().includes(queryLower) ||
+          places.cuisineType?.toLowerCase().includes(queryLower)
         )
           score = 500
         // Tag match
-        else if (place.vibeTags?.some((tag) => tag.toLowerCase().includes(queryLower))) score = 400
+        else if (places.vibeTags?.some((tag) => tag.toLowerCase().includes(queryLower))) score = 400
 
         return { ...place, score }
       })
@@ -232,28 +232,28 @@ export async function GET(request: NextRequest) {
       .slice(0, 12) // Get top 12 for bento grid
       .map(({ score, id, googlePlaceId, ...place }) => {
         // Transform to PlaceCardData format
-        const photoUrl = getFirstPhotoUrl(place.googlePhotos);
-        const status = getOpenStatus(place.hours);
+        const photoUrl = getFirstPhotoUrl(places.googlePhotos);
+        const status = getOpenStatus(places.hours);
         const signals = extractSignals(place);
-        const price = mapPriceLevel(place.priceLevel);
-        const distanceMiles = calculateDistance(userLat, userLng, place.latitude, place.longitude);
+        const price = mapPriceLevel(places.priceLevel);
+        const distanceMiles = calculateDistance(userLat, userLng, places.latitude, places.longitude);
         
         // Get place_personality from map
         const placePersonality = googlePlaceId ? personalityMap.get(googlePlaceId) : null;
         
         return {
-          slug: place.slug,
-          name: place.name,
-          neighborhood: place.neighborhood,
-          category: place.category,
-          cuisine: place.cuisineType,
+          slug: places.slug,
+          name: places.name,
+          neighborhood: places.neighborhood,
+          category: places.category,
+          cuisine: places.cuisineType,
           price,
           photoUrl,
           ...status,
           signals,
-          coverageQuote: place.pullQuote,
-          coverageSource: place.pullQuoteSource,
-          vibeTags: place.vibeTags?.slice(0, 3), // Max 3 tags
+          coverageQuote: places.pullQuote,
+          coverageSource: places.pullQuoteSource,
+          vibeTags: places.vibeTags?.slice(0, 3), // Max 3 tags
           distanceMiles: distanceMiles !== undefined ? parseFloat(distanceMiles.toFixed(1)) : undefined,
           placePersonality: placePersonality as any, // Add personality
         };
@@ -262,8 +262,8 @@ export async function GET(request: NextRequest) {
     // Aggregate neighborhoods from all matching places (before ranking)
     const neighborhoodCounts = new Map<string, number>()
     places.forEach((place) => {
-      if (place.neighborhood) {
-        const hood = place.neighborhood
+      if (places.neighborhood) {
+        const hood = places.neighborhood
         neighborhoodCounts.set(hood, (neighborhoodCounts.get(hood) || 0) + 1)
       }
     })

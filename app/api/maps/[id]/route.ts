@@ -25,8 +25,8 @@ function computeMapStatus(
   list: { status: MapStatus; mapPlaces: Array<{ descriptor?: string | null }> },
   formData: ReturnType<typeof mapToFormData>
 ): MapStatus {
-  const placeCount = list.mapPlaces.length;
-  const { canPublish } = validateForPublish(formData, placeCount, list.mapPlaces);
+  const placeCount = list.map_places.length;
+  const { canPublish } = validateForPublish(formData, placeCount, list.map_places);
 
   if (list.status === 'PUBLISHED') return 'PUBLISHED';
   if (list.status === 'ARCHIVED') return 'ARCHIVED';
