@@ -29,8 +29,10 @@ tsconfig.tsbuildinfo
 # zips / archives
 *.zip
 
-# local data exports (ignore by default)
+# local data exports / outputs (keep benchmarks + seed data versioned)
 Takeout/
 uploads/
 files/
-data/
+data/outputs/
+data/exports/
+data/instagram/
