@@ -12,11 +12,8 @@ import { MerchantData } from '@/lib/types/merchant';
  * Returns raw place record with all needed relations
  */
 export async function getMerchantBySlug(slug: string): Promise<MerchantData | null> {
-  const place = await prisma.place.findUnique({
+  const place = await prisma.places.findUnique({
     where: { slug },
-    include: {
-      sources: true, // Only relation that exists in schema
-    },
   });
 
   if (!place) return null;
@@ -28,7 +25,7 @@ export async function getMerchantBySlug(slug: string): Promise<MerchantData | nu
  * Fetch all merchant slugs (for static generation)
  */
 export async function getAllMerchantSlugs(): Promise<string[]> {
-  const places = await prisma.place.findMany({
+  const places = await prisma.places.findMany({
     select: { slug: true },
   });
   

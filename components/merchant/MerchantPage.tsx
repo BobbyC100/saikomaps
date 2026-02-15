@@ -5,6 +5,7 @@
  */
 
 import { MerchantData } from '@/lib/types/merchant';
+import { transformHoursForCard } from '@/lib/utils/hoursHelpers';
 import { HeroHeader } from './HeroHeader';
 import { PrimaryActionSet } from './PrimaryActionSet';
 import { InstagramConfidenceRow } from './InstagramConfidenceRow';
@@ -85,8 +86,7 @@ export function MerchantPage({ merchant }: MerchantPageProps) {
 
       {/* Tier 3: Facts - HOURS ALWAYS RENDERS */}
       <HoursCard
-        hours={merchant.hours}
-        openStatus={merchant.openStatus}
+        {...transformHoursForCard(merchant.hours, merchant.openStatus)}
       />
 
       {merchant.address && (

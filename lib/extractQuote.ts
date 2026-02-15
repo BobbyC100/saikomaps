@@ -86,9 +86,14 @@ function extractBestSentences(content: string): string | null {
   }
   
   // Strategy 2: Just take first 1-2 sentences
-  let quote = sentences[0].trim();
+  let quote = sentences[0]?.trim();
+  if (!quote) return truncateQuote(cleaned, 200);
+  
   if (quote.length < 80 && sentences.length > 1) {
-    quote += ' ' + sentences[1].trim();
+    const secondSentence = sentences[1]?.trim();
+    if (secondSentence) {
+      quote += ' ' + secondSentence;
+    }
   }
   
   return truncateQuote(quote, 200);
