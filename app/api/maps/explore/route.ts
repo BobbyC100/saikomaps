@@ -74,7 +74,7 @@ export async function GET(request: NextRequest) {
             take: 4,
             orderBy: { orderIndex: 'asc' },
             where: {
-              places: publicPlaceWhere(cityId, true), // LA places with approved coverage (or legacy JSON)
+              places: publicPlaceWhere(cityId, false), // LA places with approved coverage only (76% threshold reached)
             },
             include: {
               places: {

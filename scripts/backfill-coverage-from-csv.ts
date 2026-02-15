@@ -6,6 +6,11 @@
  * 
  * Usage:
  *   npx tsx scripts/backfill-coverage-from-csv.ts coverage-backfill.csv
+ *   npx tsx scripts/backfill-coverage-from-csv.ts coverage-backfill.csv --strict --dry-run
+ * 
+ * Flags:
+ *   --strict    Only process slugs from data/uncovered-la.csv (prevents double-coverage)
+ *   --dry-run   Show what would be created without actually writing to DB
  */
 
 import { db } from '@/lib/db';
@@ -22,12 +27,37 @@ interface CoverageRow {
 }
 
 async function main() {
-  const csvPath = process.argv[2] || './coverage-backfill.csv';
+  // Parse command line arguments
+  const args = process.argv.slice(2);
+  const strictMode = args.includes('--strict');
+  const dryRun = args.includes('--dry-run');
+  const csvPath = args.find(arg => !arg.startsWith('--')) || './coverage-backfill.csv';
   
   if (!fs.existsSync(csvPath)) {
     console.error(`❌ CSV file not found: ${csvPath}`);
     process.exit(1);
   }
+
+  // Load uncovered slugs in strict mode
+  let uncoveredSlugs: Set<string> | null = null;
+  if (strictMode) {
+    const uncoveredPath = './data/uncovered-la.csv';
+    if (!fs.existsSync(uncoveredPath)) {
+      console.error(`❌ Strict mode requires ${uncoveredPath}`);
+      console.error('   Run: npx tsx scripts/get-uncovered-places.ts');
+      process.exit(1);
+    }
+    const uncoveredCSV = fs.readFileSync(uncoveredPath, 'utf-8');
+    const slugs = uncoveredCSV.split('\n').slice(1).map(line => line.split(',')[0]).filter(s => s);
+    uncoveredSlugs = new Set(slugs);
+    console.log(`🔒 Strict mode: Only processing ${uncoveredSlugs.size} uncovered places`);
+  }
+
+  if (dryRun) {
+    console.log(`🔍 Dry run mode: No database writes will be performed`);
+  }
+
+  console.log('');
 
   const cityId = await requireActiveCityId();
   const csvContent = fs.readFileSync(csvPath, 'utf-8');
@@ -70,6 +100,13 @@ async function main() {
       const quote = row.quote?.trim() || null;
       const excerpt = row.excerpt?.trim() || null;
 
+      // Strict mode: check if slug is in uncovered list
+      if (strictMode && uncoveredSlugs && !uncoveredSlugs.has(slug)) {
+        console.warn(`⊘ ${slug} (already covered, skipping in strict mode)`);
+        stats.skipped++;
+        continue;
+      }
+
       // Find place by slug (LA only)
       const place = await db.places.findFirst({
         where: { slug, cityId },
@@ -78,6 +115,14 @@ async function main() {
       if (!place) {
         console.warn(`⚠️  Place not found: ${slug}`);
         stats.skipped++;
+        continue;
+      }
+
+      // Dry run: show what would be created
+      if (dryRun) {
+        console.log(`[DRY RUN] Would create: ${slug} → ${publication}`);
+        stats.created++;
+        stats.processed++;
         continue;
       }
 

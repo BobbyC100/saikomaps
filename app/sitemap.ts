@@ -42,7 +42,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Places that appear on at least one published map (LA only + approved coverage)
   const placesOnMaps = await db.places.findMany({
-    where: publicPlaceWhere(cityId, true), // Allow legacy during transition
+    where: publicPlaceWhere(cityId, false), // Strict mode: approved coverage only (76% threshold reached)
     select: {
       slug: true,
       updatedAt: true,
