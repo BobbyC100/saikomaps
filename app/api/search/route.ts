@@ -2,11 +2,19 @@
  * API Route: Search
  * GET /api/search?q=...&lat=...&lng=...
  * Returns neighborhoods + ranked places for Explore/Search UI
+ * 
+ * EOS Integration: Uses editorial ranking system for discovery
+ * - Ranked-only inclusion (rankingScore > 0)
+ * - Human-authored ordering (no ML)
+ * - Diversity constraint enforced
+ * - Max 12 results cap
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getGooglePhotoUrl } from '@/lib/google-places';
+import { applyDiversityFilter } from '@/lib/ranking';
+import { requireActiveCityId } from '@/lib/active-city';
 
 // Helper: Extract first photo URL
 function getFirstPhotoUrl(googlePhotos: any): string | undefined {
@@ -136,9 +144,15 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // Pull a larger set, then rank down to 12
+    // Fetch LA city ID
+    const cityId = await requireActiveCityId();
+
+    // EOS: Fetch ranked places only (rankingScore > 0)
+    // Pull larger set for search matching, then rank and cap
     const places = await (db as any).places.findMany({
       where: {
+        cityId,
+        rankingScore: { gt: 0 }, // EOS: Ranked-only inclusion gate
         OR: [
           { name: { contains: query, mode: 'insensitive' } },
           { neighborhood: { contains: query, mode: 'insensitive' } },
@@ -160,6 +174,7 @@ export async function GET(request: NextRequest) {
         latitude: true,
         longitude: true,
         googlePlaceId: true,
+        rankingScore: true, // EOS: Used for ordering
 
         googlePhotos: true,
         hours: true,
@@ -171,7 +186,10 @@ export async function GET(request: NextRequest) {
         editorialSources: true,
         chefRecs: true,
       },
-      take: 50,
+      take: 100, // Fetch more for diversity filtering
+      orderBy: {
+        rankingScore: 'desc', // EOS: Human-authored editorial ordering
+      },
     });
 
     // Fetch identity signals for places that have googlePlaceId
@@ -191,30 +209,46 @@ export async function GET(request: NextRequest) {
       if (r.google_place_id) personalityMap.set(r.google_place_id, r.place_personality ?? null);
     }
 
-    // Rank
-    const rankedPlaces = places
+    // EOS: Apply relevance scoring for query matching (secondary to rankingScore)
+    // Primary ordering is by rankingScore (editorial), this adds query-relevance boosting
+    const scoredPlaces = places
       .map((place: any) => {
         const nameLower = (place.name || '').toLowerCase();
-        let score = 0;
+        let queryRelevance = 0;
 
-        if (nameLower === queryLower) score = 1000;
-        else if (nameLower.startsWith(queryLower)) score = 900;
-        else if (nameLower.includes(queryLower)) score = 800;
-        else if ((place.neighborhood || '').toLowerCase() === queryLower) score = 700;
-        else if ((place.neighborhood || '').toLowerCase().includes(queryLower)) score = 600;
+        // Query relevance boosts (for sorting within same rankingScore tier)
+        if (nameLower === queryLower) queryRelevance = 1000;
+        else if (nameLower.startsWith(queryLower)) queryRelevance = 900;
+        else if (nameLower.includes(queryLower)) queryRelevance = 800;
+        else if ((place.neighborhood || '').toLowerCase() === queryLower) queryRelevance = 700;
+        else if ((place.neighborhood || '').toLowerCase().includes(queryLower)) queryRelevance = 600;
         else if (
           (place.category || '').toLowerCase().includes(queryLower) ||
           (place.cuisineType || '').toLowerCase().includes(queryLower)
         )
-          score = 500;
+          queryRelevance = 500;
         else if (Array.isArray(place.vibeTags) && place.vibeTags.some((t: string) => t.toLowerCase().includes(queryLower)))
-          score = 400;
+          queryRelevance = 400;
 
-        return { ...place, score };
+        return { ...place, queryRelevance };
       })
-      .sort((a: any, b: any) => b.score - a.score)
-      .slice(0, 12)
-      .map((place: any) => {
+      .sort((a: any, b: any) => {
+        // EOS: Primary sort by editorial ranking
+        if (b.rankingScore !== a.rankingScore) {
+          return b.rankingScore - a.rankingScore;
+        }
+        // Secondary: Query relevance (within same editorial tier)
+        return b.queryRelevance - a.queryRelevance;
+      });
+
+    // EOS: Apply diversity filter (max 3 consecutive same cuisine)
+    const diversePlaces = applyDiversityFilter(scoredPlaces, 3);
+
+    // EOS: Enforce max cap (12 results for search)
+    const cappedPlaces = diversePlaces.slice(0, 12);
+
+    // Transform to response format
+    const rankedPlaces = cappedPlaces.map((place: any) => {
         const photoUrl = getFirstPhotoUrl(place.googlePhotos);
         const status = getOpenStatus(place.hours);
         const signals = extractSignals(place);
@@ -244,6 +278,7 @@ export async function GET(request: NextRequest) {
           vibeTags: Array.isArray(place.vibeTags) ? place.vibeTags.slice(0, 3) : [],
           distanceMiles: distanceMiles !== undefined ? Number(distanceMiles.toFixed(1)) : undefined,
           placePersonality,
+          // Note: rankingScore NOT exposed to client (internal only)
         };
       });
 
