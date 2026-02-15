@@ -49,6 +49,7 @@ This is the canonical index of all active documentation for the Saiko Maps platf
 
 ## Process & Workflow
 
+- [DOC_POLICY.md](./DOC_POLICY.md) — Documentation standards and governance policy
 - [PR_TEMPLATE.md](./PR_TEMPLATE.md) — Pull request template and guidelines
 - [saikoai-extraction-prompt-v2.1.md](./saikoai-extraction-prompt-v2.1.md) — AI extraction prompt specification
 
