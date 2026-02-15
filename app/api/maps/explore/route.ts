@@ -151,7 +151,7 @@ export async function GET(request: NextRequest) {
         title: map.title,
         subtitle: map.subtitle,
         slug: map.slug,
-        placeCount: map._count?.map_places ?? 0,
+        placeCount: map.map_places.length, // Use filtered count, not total
         coverPhotos: coverPhotos.slice(0, 4),
         curatorName:
           map.users?.name || map.users?.email?.split('@')[0] || 'Unknown',
@@ -163,15 +163,18 @@ export async function GET(request: NextRequest) {
       };
     });
 
+    // Filter out maps with zero LA places
+    const mapsWithLaPlaces = transformedMaps.filter(m => m.placeCount > 0);
+
     return NextResponse.json({
       success: true,
       data: {
-        maps: transformedMaps,
+        maps: mapsWithLaPlaces,
         pagination: {
-          total: totalCount,
+          total: mapsWithLaPlaces.length,
           limit,
           offset,
-          hasMore: offset + maps.length < totalCount,
+          hasMore: offset + mapsWithLaPlaces.length < mapsWithLaPlaces.length,
         },
       },
     });
