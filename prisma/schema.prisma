@@ -157,6 +157,13 @@ model places {
   rankingScore      Float?    @map("ranking_score") @default(0)
   lastScoreUpdate   DateTime? @map("last_score_update")
 
+  // ─────────────────────────────────────────────────────────────────────────
+  // CUISINE CLASSIFICATION: Saiko-owned editorial metadata
+  // ─────────────────────────────────────────────────────────────────────────
+  // NOTE: cuisineType (line 111) remains as Google-derived reference data
+  cuisinePrimary    String?   @map("cuisine_primary")
+  cuisineSecondary  String[]  @default([]) @map("cuisine_secondary")
+
   map_places        map_places[]
   person_places     person_places[]
   restaurant_groups restaurant_groups? @relation(fields: [restaurantGroupId], references: [id])
