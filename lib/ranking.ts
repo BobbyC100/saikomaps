@@ -19,7 +19,7 @@ export function applyDiversityFilter<T extends { cuisinePrimary?: string | null;
   maxConsecutive: number = 3
 ): T[] {
   const result: T[] = [];
-  const recentCuisines: (string | null)[] = [];
+  const recentCuisines: (string | null | undefined)[] = [];
   const deferred: T[] = []; // Places to add at the end
 
   for (const place of places) {

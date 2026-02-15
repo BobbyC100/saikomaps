@@ -20,9 +20,9 @@ export interface PlaceCardData {
   slug: string;
   name: string;
   neighborhood: string;
-  category: string;
   
   // Optional (graceful degradation)
+  category?: string;
   photoUrl?: string;
   price?: '$' | '$$' | '$$$';
   cuisine?: string;

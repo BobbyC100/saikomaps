@@ -83,7 +83,7 @@ export async function GET(
     }
 
     // Cross-reference golden_records for enrichment data (Google Places attributes)
-    let googlePlacesAttributes = place.google_places_attributes ?? null;
+    let googlePlacesAttributes = place.googlePlacesAttributes ?? null;
     if (!googlePlacesAttributes && place.googlePlaceId) {
       const goldenRecord = await db.golden_records.findFirst({
         where: { google_place_id: place.googlePlaceId },
