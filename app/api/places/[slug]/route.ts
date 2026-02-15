@@ -1,222 +1,150 @@
 /**
- * API Route: Place Details by Slug
+ * API Route: Place Canonical Data
  * GET /api/places/[slug]
- * Returns canonical Place data + maps that include this place (published only)
+ * 
+ * Returns customer-facing canonical place data for the merchant/place page.
+ * 
+ * Features:
+ * - Canonical fields only (no discovered_* staging data)
+ * - Trust-first editorial content (Saiko summary, coverage, curator notes)
+ * - New crawler-sourced URLs (menu, winelist, about)
+ * - Hours freshness tracking (internal hours refresh signal, QA-only)
+ * - Filtered Google attributes (no Yelp-ish noise)
+ * - City-gated (LA only for now)
+ * - Runtime forbidden-field guard (prevents evidence leakage)
+ * 
+ * @see docs/API-CONTRACT-PLACE-CANONICAL.md
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/db';
-import { getGooglePhotoUrl, getPhotoRefFromStored } from '@/lib/google-places';
+import { getPlaceCanonical } from '@/lib/places/get-place-canonical';
 import { requireActiveCityId } from '@/lib/active-city';
+
+const FORBIDDEN_PREFIXES = ['discovered_'];
+
+const FORBIDDEN_KEYS = [
+  // staging/evidence
+  'discoveredFieldsEvidence',
+  'discoveredFieldsFetchedAt',
+
+  // common raw/vendored fields we never want to leak
+  'googlePlaceId',
+  'googlePlacesAttributes',     // raw
+  'google_places_attributes',   // raw
+];
+
+function assertCustomerSafe(payload: unknown) {
+  const walk = (v: any) => {
+    if (!v || typeof v !== 'object') return;
+    if (Array.isArray(v)) return v.forEach(walk);
+
+    for (const key of Object.keys(v)) {
+      for (const prefix of FORBIDDEN_PREFIXES) {
+        if (key.startsWith(prefix)) {
+          throw new Error(`Forbidden field leaked to customer API: ${key}`);
+        }
+      }
+      if (FORBIDDEN_KEYS.includes(key)) {
+        throw new Error(`Forbidden field leaked to customer API: ${key}`);
+      }
+      walk(v[key]);
+    }
+  };
+
+  walk(payload);
+}
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
+    // ─────────────────────────────────────────────────────────────────────────
+    // 1. Validate slug parameter
+    // ─────────────────────────────────────────────────────────────────────────
     const { slug } = await params;
 
-    if (!slug) {
+    if (!slug || typeof slug !== 'string') {
       return NextResponse.json(
-        { error: 'Place slug is required' },
+        { 
+          success: false,
+          error: 'Place slug is required' 
+        },
         { status: 400 }
       );
     }
 
-    // Gate to LA city only
-    const cityId = await requireActiveCityId();
+    // ─────────────────────────────────────────────────────────────────────────
+    // 2. Get active city ID (LA-gated for now)
+    // ─────────────────────────────────────────────────────────────────────────
+    let cityId: string;
+    
+    try {
+      cityId = await requireActiveCityId();
+    } catch (error) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Active city context is required',
+          details: error instanceof Error ? error.message : 'Unknown error',
+        },
+        { status: 400 }
+      );
+    }
 
-    const place = await db.places.findFirst({
-      where: { 
-        slug,
-        cityId  // LA only
-      },
-      include: {
-        map_places: {
-          include: {
-            lists: {
-              select: {
-                id: true,
-                title: true,
-                slug: true,
-                status: true,
-                published: true,
-                coverImageUrl: true,
-                users: {
-                  select: {
-                    name: true,
-                    email: true,
-                  },
-                },
-                _count: {
-                  select: { map_places: true },
-                },
-              },
-            },
-          },
-        },
-        restaurant_groups: {
-          select: {
-            name: true,
-            slug: true,
-          },
-        },
-        coverages: {
-          where: {
-            status: 'APPROVED',
-          },
-          include: {
-            source: true,
-          },
-          orderBy: {
-            publishedAt: 'desc',
-          },
-        },
-      },
-    });
+    // ─────────────────────────────────────────────────────────────────────────
+    // 3. Fetch canonical place data
+    // ─────────────────────────────────────────────────────────────────────────
+    const place = await getPlaceCanonical(slug, cityId);
 
     if (!place) {
       return NextResponse.json(
-        { error: 'Place not found' },
+        {
+          success: false,
+          error: 'Place not found',
+        },
         { status: 404 }
       );
     }
 
-    // Cross-reference golden_records for enrichment data (Google Places attributes)
-    let googlePlacesAttributes = place.google_places_attributes ?? null;
-    if (!googlePlacesAttributes && place.googlePlaceId) {
-      const goldenRecord = await db.golden_records.findFirst({
-        where: { google_place_id: place.googlePlaceId },
-        select: { google_places_attributes: true },
-      });
-      if (goldenRecord?.google_places_attributes) {
-        googlePlacesAttributes = goldenRecord.google_places_attributes;
-      }
-    }
+    // ─────────────────────────────────────────────────────────────────────────
+    // 4. Assert no forbidden fields leaked
+    // ─────────────────────────────────────────────────────────────────────────
+    assertCustomerSafe(place);
 
-    // Get photo URLs (up to 10 for merchant page: 1 hero + up to 9 gallery)
-    const photoUrls: string[] = [];
-    if (place.googlePhotos && Array.isArray(place.googlePhotos)) {
-      for (let i = 0; i < Math.min(10, place.googlePhotos.length); i++) {
-        const ref = getPhotoRefFromStored(place.googlePhotos[i] as { photo_reference?: string; photoReference?: string; name?: string });
-        if (ref) {
-          try {
-            photoUrls.push(getGooglePhotoUrl(ref, i === 0 ? 800 : 400));
-          } catch {
-            // skip
-          }
-        }
-      }
-    }
-
-    // Parse hours
-    let hours: Record<string, string> | null = null;
-    if (place.hours) {
-      try {
-        hours =
-          typeof place.hours === 'string'
-            ? JSON.parse(place.hours)
-            : (place.hours as Record<string, string>);
-      } catch {
-        hours = null;
-      }
-    }
-
-    // Format appearsOn (only published maps) and curator note from first map with descriptor
-    const publishedMapPlaces = place.map_places.filter((mp) => mp.lists && mp.lists.status === 'PUBLISHED');
-    const appearsOn = publishedMapPlaces.map((mp) => ({
-      id: mp.lists!.id,
-      title: mp.lists!.title,
-      slug: mp.lists!.slug,
-      coverImageUrl: mp.lists!.coverImageUrl,
-      creatorName: mp.lists!.users?.name || mp.lists!.users?.email?.split('@')[0] || 'Unknown',
-      placeCount: (mp.lists as any)._count?.map_places ?? 0,
-    }));
-    const curatorMapPlace = publishedMapPlaces.find((mp) => mp.descriptor?.trim());
-    const curatorNote = curatorMapPlace?.descriptor?.trim() ?? null;
-    const curatorCreatorName =
-      curatorMapPlace?.lists?.users?.name ||
-      curatorMapPlace?.lists?.users?.email?.split('@')[0] ||
-      null;
-
-    // Format sources - prefer coverages, fallback to JSON
-    let sources: unknown[] = [];
-    if (place.coverages && place.coverages.length > 0) {
-      // Use relational data from place_coverages table
-      sources = place.coverages.map((coverage) => ({
-        url: coverage.url,
-        title: coverage.title,
-        publication: coverage.source.name,
-        excerpt: coverage.excerpt,
-        content: coverage.quote,
-        published_at: coverage.publishedAt?.toISOString().split('T')[0],
-        trust_level: 'editorial',
-      }));
-    } else if (place.editorialSources) {
-      // Fallback to legacy JSON
-      sources = (place.editorialSources as unknown[]) || [];
-    }
-
-    return NextResponse.json({
-      success: true,
-      data: {
-        location: {
-          id: place.id,
-          slug: place.slug,
-          name: place.name,
-          address: place.address,
-          latitude: place.latitude ? Number(place.latitude) : null,
-          longitude: place.longitude ? Number(place.longitude) : null,
-          phone: place.phone,
-          website: place.website,
-          instagram: place.instagram,
-          description: place.description,
-          category: place.category,
-          neighborhood: place.neighborhood,
-          cuisineType: place.cuisineType,
-          priceLevel: place.priceLevel,
-          photoUrl: photoUrls[0] ?? null,
-          photoUrls,
-          hours,
-          googlePlaceId: place.googlePlaceId,
-          curatorNote,
-          curatorCreatorName,
-          sources,
-          vibeTags: place.vibeTags || [],
-          tips: place.tips || [],
-          tagline: place.tagline,
-          pullQuote: place.pullQuote,
-          pullQuoteSource: place.pullQuoteSource,
-          pullQuoteAuthor: place.pullQuoteAuthor,
-          pullQuoteUrl: place.pullQuoteUrl,
-          pullQuoteType: place.pullQuoteType,
-          // Decision Onset fields
-          intentProfile: place.intentProfile,
-          intentProfileOverride: place.intentProfileOverride,
-          reservationUrl: place.reservationUrl,
-          // Restaurant Group
-          restaurantGroup: place.restaurant_groups || null,
-          // Google Places structured attributes (from places table or golden_records fallback)
-          googlePlacesAttributes: googlePlacesAttributes || null,
-        },
-        guide: appearsOn[0]
-          ? {
-              id: appearsOn[0].id,
-              title: appearsOn[0].title,
-              slug: appearsOn[0].slug,
-              creatorName: appearsOn[0].creatorName,
-            }
-          : null,
-        appearsOn,
-        isOwner: false,
-      },
-    });
-  } catch (error) {
-    console.error('Error fetching place:', error);
+    // ─────────────────────────────────────────────────────────────────────────
+    // 5. Return successful response
+    // ─────────────────────────────────────────────────────────────────────────
     return NextResponse.json(
       {
+        success: true,
+        data: place,
+      },
+      {
+        status: 200,
+        headers: {
+          // Cache for 5 minutes on CDN
+          'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+        },
+      }
+    );
+  } catch (error) {
+    // ─────────────────────────────────────────────────────────────────────────
+    // 6. Error handling
+    // ─────────────────────────────────────────────────────────────────────────
+    console.error('Error fetching place canonical data:', error);
+
+    // Don't expose internal error details to client
+    const isDevelopment = process.env.NODE_ENV === 'development';
+
+    return NextResponse.json(
+      {
+        success: false,
         error: 'Failed to fetch place',
-        details: error instanceof Error ? error.message : 'Unknown error',
+        ...(isDevelopment && {
+          details: error instanceof Error ? error.message : 'Unknown error',
+          stack: error instanceof Error ? error.stack : undefined,
+        }),
       },
       { status: 500 }
     );

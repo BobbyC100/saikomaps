@@ -37,3 +37,7 @@ data/outputs/
 data/exports/
 data/instagram/
 backup_pre_year1_*.sql
+
+# crawl cache and outputs
+scripts/crawl/cache/
+scripts/crawl/out/

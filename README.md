@@ -114,6 +114,40 @@ Optimized for social sharing. The share is a teaser, not the whole map — tappi
 
 Built with Cursor AI as the primary development tool, with Claude providing structured specifications and troubleshooting guidance. Session-based authentication with database foreign key relationships for user management.
 
+### Database Migrations
+
+**Schema Change Policy:**
+
+- ✅ **Use `prisma migrate dev`** for all schema changes in persistent environments
+- ❌ **Never use `prisma db push`** for persistent databases (development, staging, production)
+- ⚠️ `db push` is acceptable only for ephemeral/throwaway databases
+
+**Why:** `db push` skips migration history, causing drift between your schema files and the actual database state. This breaks reproducibility and makes deployments unreliable.
+
+**Migration Workflow:**
+
+```bash
+# 1. Make schema changes in prisma/schema.prisma
+# 2. Create migration
+npx prisma migrate dev --name descriptive_change_name
+
+# 3. Verify migration was created
+npx prisma migrate status
+
+# 4. Commit both schema.prisma and migration files
+git add prisma/schema.prisma prisma/migrations/
+git commit -m "Add: descriptive schema change"
+```
+
+**Checking for Drift:**
+
+```bash
+# Should always show "Database schema is up to date!"
+npx prisma migrate status
+```
+
+If drift is detected, see `docs/database-drift-resolution.md` for recovery steps.
+
 ---
 
 **Saiko Maps · 2026**

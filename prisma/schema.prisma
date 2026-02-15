@@ -1,7 +1,3 @@
-// schema.prisma — Saiko Maps Year 1 (Comprehensive)
-// Includes: ALL existing tables + Year 1 contract additions
-// Status: Safe migration - no data loss
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,12 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-//
-// ═════════════════════════════════════════════════════════════════════════════
-// CORE APP MODELS (Existing - Keep All)
-// ═════════════════════════════════════════════════════════════════════════════
-//
-
 model users {
   id               String             @id
   email            String             @unique
@@ -24,19 +14,17 @@ model users {
   passwordHash     String?            @map("password_hash")
   avatarUrl        String?            @map("avatar_url")
   subscriptionTier String             @default("free") @map("subscription_tier")
-  curatorNote      String?            @map("curator_note") @db.VarChar(140)
-  scopePills       String[]           @default([]) @map("scope_pills")
-  coverageSources  String[]           @default([]) @map("coverage_sources")
   createdAt        DateTime           @default(now()) @map("created_at")
   updatedAt        DateTime           @updatedAt @map("updated_at")
+  coverageSources  String[]           @default([]) @map("coverage_sources")
+  curatorNote      String?            @map("curator_note") @db.VarChar(140)
+  scopePills       String[]           @default([]) @map("scope_pills")
+  apiCallLogs      api_call_logs[]
   import_jobs      import_jobs[]
   lists            lists[]
-  viewer_bookmarks viewer_bookmarks[]
   saved_maps       saved_maps[]
-
-  // Year 1 relations
-  apiCallLogs     api_call_logs[]
-  approvedSources sources[]       @relation("SourceApprovedBy")
+  approvedSources  sources[]          @relation("SourceApprovedBy")
+  viewer_bookmarks viewer_bookmarks[]
 
   @@index([email])
 }
@@ -71,14 +59,12 @@ model lists {
   viewCount           Int              @default(0) @map("view_count")
   createdAt           DateTime         @default(now()) @map("created_at")
   updatedAt           DateTime         @updatedAt @map("updated_at")
+  apiCallLogs         api_call_logs[]
   import_jobs         import_jobs[]
   users               users            @relation(fields: [userId], references: [id], onDelete: Cascade)
   locations           locations[]
   map_places          map_places[]
   saved_maps          saved_maps[]
-
-  // Year 1 relations
-  apiCallLogs api_call_logs[]
 
   @@index([published])
   @@index([slug])
@@ -87,93 +73,87 @@ model lists {
 }
 
 model places {
-  id                     String      @id
-  slug                   String      @unique
-  googlePlaceId          String?     @unique @map("google_place_id")
-  name                   String
-  address                String?
-  latitude               Decimal?    @db.Decimal(10, 8)
-  longitude              Decimal?    @db.Decimal(11, 8)
-  phone                  String?
-  website                String?
-  instagram              String?
-  hours                  Json?
-  description            String?
-  googlePhotos           Json?       @map("google_photos")
-  googleTypes            String[]    @default([]) @map("google_types")
-  priceLevel             Int?        @map("price_level")
-  neighborhood           String?
-  category               String?
-  placesDataCachedAt     DateTime?   @map("places_data_cached_at")
-  createdAt              DateTime    @default(now()) @map("created_at")
-  updatedAt              DateTime    @updatedAt @map("updated_at")
-  editorialSources       Json?       @map("editorial_sources")
-  cuisineType            String?     @map("cuisine_type")
-  adUnitOverride         Boolean     @default(false) @map("ad_unit_override")
-  adUnitType             String?     @map("ad_unit_type")
-  pullQuote              String?     @map("pull_quote")
-  pullQuoteAuthor        String?     @map("pull_quote_author")
-  pullQuoteSource        String?     @map("pull_quote_source")
-  pullQuoteType          String?     @map("pull_quote_type")
-  pullQuoteUrl           String?     @map("pull_quote_url")
-  tagline                String?
-  taglineCandidates      String[]    @default([]) @map("tagline_candidates")
-  taglineGenerated       DateTime?   @map("tagline_generated")
-  taglinePattern         String?     @map("tagline_pattern")
-  taglineSignals         Json?       @map("tagline_signals")
-  tips                   String[]    @default([])
-  vibeTags               String[]    @default([]) @map("vibe_tags")
-  chefRecs               Json?       @map("chef_recs")
-  restaurantGroupId      String?     @map("restaurant_group_id")
-  status                 PlaceStatus @default(OPEN)
-  intentProfile          String?     @map("intent_profile")
-  intentProfileOverride  Boolean     @default(false) @map("intent_profile_override")
-  reservationUrl         String?     @map("reservation_url")
-  googlePlacesAttributes Json?       @map("google_places_attributes")
-
-  // Geographic data (existing columns to preserve)
-  city    String?
-  state   String?
-  county  String?
-  region  String?
-  zip     String?
-  scope   PlaceScope @default(active)
-  country String?
-
-  // ─────────────────────────────────────────────────────────────────────────
-  // YEAR 1 ADDITIONS: Multi-city + Neighborhood + SaikoAI Provenance
-  // ─────────────────────────────────────────────────────────────────────────
-  cityId                   String?   @map("city_id")
-  neighborhoodId           String?   @map("neighborhood_id")
-  neighborhoodOverride     String?   @map("neighborhood_override")
-  saikoSummary             String?   @map("saiko_summary")
-  saikoSummaryGeneratedAt  DateTime? @map("saiko_summary_generated_at")
-  saikoSummaryModelVersion String?   @map("saiko_summary_model_version")
-  saikoSummaryCoverageIds  String[]  @default([]) @map("saiko_summary_coverage_ids")
-
-  // ─────────────────────────────────────────────────────────────────────────
-  // RANKING SYSTEM: Non-algorithmic editorial scoring
-  // ─────────────────────────────────────────────────────────────────────────
-  rankingScore      Float?    @map("ranking_score") @default(0)
-  lastScoreUpdate   DateTime? @map("last_score_update")
-
-  // ─────────────────────────────────────────────────────────────────────────
-  // CUISINE CLASSIFICATION: Saiko-owned editorial metadata
-  // ─────────────────────────────────────────────────────────────────────────
-  // NOTE: cuisineType (line 111) remains as Google-derived reference data
-  cuisinePrimary    String?   @map("cuisine_primary")
-  cuisineSecondary  String[]  @default([]) @map("cuisine_secondary")
-
-  map_places        map_places[]
-  person_places     person_places[]
-  restaurant_groups restaurant_groups? @relation(fields: [restaurantGroupId], references: [id])
-  viewer_bookmarks  viewer_bookmarks[]
-
-  // Year 1 relations
-  cityRel         cities?           @relation(fields: [cityId], references: [id])
-  neighborhoodRel neighborhoods?    @relation(fields: [neighborhoodId], references: [id])
-  coverages       place_coverages[]
-  apiCallLogs     api_call_logs[]
+  id                           String             @id
+  slug                         String             @unique
+  googlePlaceId                String?            @unique @map("google_place_id")
+  name                         String
+  address                      String?
+  latitude                     Decimal?           @db.Decimal(10, 8)
+  longitude                    Decimal?           @db.Decimal(11, 8)
+  phone                        String?
+  website                      String?
+  instagram                    String?
+  hours                        Json?
+  description                  String?
+  googlePhotos                 Json?              @map("google_photos")
+  googleTypes                  String[]           @default([]) @map("google_types")
+  priceLevel                   Int?               @map("price_level")
+  neighborhood                 String?
+  category                     String?
+  placesDataCachedAt           DateTime?          @map("places_data_cached_at")
+  createdAt                    DateTime           @default(now()) @map("created_at")
+  updatedAt                    DateTime           @updatedAt @map("updated_at")
+  editorialSources             Json?              @map("editorial_sources")
+  cuisineType                  String?            @map("cuisine_type")
+  adUnitOverride               Boolean            @default(false) @map("ad_unit_override")
+  adUnitType                   String?            @map("ad_unit_type")
+  pullQuote                    String?            @map("pull_quote")
+  pullQuoteAuthor              String?            @map("pull_quote_author")
+  pullQuoteSource              String?            @map("pull_quote_source")
+  pullQuoteType                String?            @map("pull_quote_type")
+  pullQuoteUrl                 String?            @map("pull_quote_url")
+  tagline                      String?
+  taglineCandidates            String[]           @default([]) @map("tagline_candidates")
+  taglineGenerated             DateTime?          @map("tagline_generated")
+  taglinePattern               String?            @map("tagline_pattern")
+  taglineSignals               Json?              @map("tagline_signals")
+  tips                         String[]           @default([])
+  vibeTags                     String[]           @default([]) @map("vibe_tags")
+  chefRecs                     Json?              @map("chef_recs")
+  restaurantGroupId            String?            @map("restaurant_group_id")
+  status                       PlaceStatus        @default(OPEN)
+  intentProfile                String?            @map("intent_profile")
+  intentProfileOverride        Boolean            @default(false) @map("intent_profile_override")
+  reservationUrl               String?            @map("reservation_url")
+  city                         String?
+  country                      String?
+  scope                        PlaceScope         @default(active)
+  state                        String?
+  zip                          String?
+  county                       String?
+  region                       String?
+  googlePlacesAttributes       Json?              @map("google_places_attributes")
+  cityId                       String?            @map("city_id")
+  neighborhoodId               String?            @map("neighborhood_id")
+  neighborhoodOverride         String?            @map("neighborhood_override")
+  saikoSummary                 String?            @map("saiko_summary")
+  saikoSummaryCoverageIds      String[]           @default([]) @map("saiko_summary_coverage_ids")
+  saikoSummaryGeneratedAt      DateTime?          @map("saiko_summary_generated_at")
+  saikoSummaryModelVersion     String?            @map("saiko_summary_model_version")
+  lastScoreUpdate              DateTime?          @map("last_score_update")
+  rankingScore                 Float?             @default(0) @map("ranking_score")
+  cuisinePrimary               String?            @map("cuisine_primary")
+  cuisineSecondary             String[]           @default([]) @map("cuisine_secondary")
+  discovered_about_copy        String?
+  discovered_about_url         String?
+  discovered_fields_evidence   Json?
+  discovered_fields_fetched_at DateTime?
+  discovered_instagram_handle  String?
+  discovered_menu_url          String?
+  discovered_phone             String?
+  discovered_reservations_url  String?
+  discovered_winelist_url      String?
+  about_url                    String?
+  menu_url                     String?
+  winelist_url                 String?
+  apiCallLogs                  api_call_logs[]
+  map_places                   map_places[]
+  person_places                person_places[]
+  coverages                    place_coverages[]
+  cityRel                      cities?            @relation(fields: [cityId], references: [id])
+  neighborhoodRel              neighborhoods?     @relation(fields: [neighborhoodId], references: [id])
+  restaurant_groups            restaurant_groups? @relation(fields: [restaurantGroupId], references: [id])
+  viewer_bookmarks             viewer_bookmarks[]
 
   @@index([category])
   @@index([googlePlaceId])
@@ -260,8 +240,8 @@ model saved_maps {
   userId  String   @map("user_id")
   listId  String   @map("list_id")
   savedAt DateTime @default(now()) @map("saved_at")
-  users   users    @relation(fields: [userId], references: [id], onDelete: Cascade)
   lists   lists    @relation(fields: [listId], references: [id], onDelete: Cascade)
+  users   users    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, listId])
   @@index([userId])
@@ -314,12 +294,6 @@ model activity_spots {
   @@index([layer_type, latitude, longitude])
   @@index([source, source_id])
 }
-
-//
-// ═════════════════════════════════════════════════════════════════════════════
-// PEOPLE & RESTAURANT GROUPS (Existing - Keep All)
-// ═════════════════════════════════════════════════════════════════════════════
-//
 
 model people {
   id                  String             @id
@@ -380,28 +354,21 @@ model restaurant_groups {
   @@index([visibility])
 }
 
-//
-// ═════════════════════════════════════════════════════════════════════════════
-// ENTITY RESOLUTION PIPELINE (Existing - Keep All)
-// ═════════════════════════════════════════════════════════════════════════════
-//
-
 model raw_records {
-  raw_id          String    @id @default(uuid())
-  source_name     String
-  external_id     String?
-  source_url      String?
-  placekey        String?
-  h3_index_r9     BigInt?
-  h3_neighbors_r9 BigInt[]
-  raw_json        Json
-  name_normalized String?
-  lat             Decimal?  @db.Decimal(10, 7)
-  lng             Decimal?  @db.Decimal(11, 7)
-  observed_at     DateTime?
-  ingested_at     DateTime  @default(now())
-  is_processed    Boolean   @default(false)
-
+  raw_id            String         @id @default(uuid())
+  source_name       String
+  external_id       String?
+  source_url        String?
+  placekey          String?
+  h3_index_r9       BigInt?
+  h3_neighbors_r9   BigInt[]
+  raw_json          Json
+  name_normalized   String?
+  lat               Decimal?       @db.Decimal(10, 7)
+  lng               Decimal?       @db.Decimal(11, 7)
+  observed_at       DateTime?
+  ingested_at       DateTime       @default(now())
+  is_processed      Boolean        @default(false)
   entity_links_from entity_links[]
   review_queue_a    review_queue[] @relation("ReviewQueueRecordA")
   review_queue_b    review_queue[] @relation("ReviewQueueRecordB")
@@ -416,15 +383,14 @@ model raw_records {
 model entity_links {
   canonical_id     String
   raw_id           String
-  match_confidence Decimal? @db.Decimal(4, 3)
+  match_confidence Decimal?       @db.Decimal(4, 3)
   match_method     String
   match_features   Json?
-  is_active        Boolean  @default(true)
-  linked_at        DateTime @default(now())
+  is_active        Boolean        @default(true)
+  linked_at        DateTime       @default(now())
   linked_by        String?
-
-  raw_record    raw_records    @relation(fields: [raw_id], references: [raw_id])
-  golden_record golden_records @relation(fields: [canonical_id], references: [canonical_id])
+  golden_record    golden_records @relation(fields: [canonical_id], references: [canonical_id])
+  raw_record       raw_records    @relation(fields: [raw_id], references: [raw_id])
 
   @@id([canonical_id, raw_id])
   @@index([raw_id])
@@ -462,51 +428,50 @@ model golden_records {
   pull_quote_source                   String?
   pull_quote_url                      String?
   business_status                     String          @default("operational")
-  lifecycle_status                    LifecycleStatus @default(ACTIVE) @map("lifecycle_status")
-  archive_reason                      ArchiveReason?  @map("archive_reason")
-  archived_at                         DateTime?       @map("archived_at")
-  archived_by                         String?         @map("archived_by")
   source_attribution                  Json
   created_at                          DateTime        @default(now())
   updated_at                          DateTime        @updatedAt
   last_resolved_at                    DateTime?
-  enriched_at                         DateTime?
-  county                              String?
   data_completeness                   Decimal?        @db.Decimal(3, 2)
   source_count                        Int             @default(1)
-  menu_url                            String?
-  menu_source_url                     String?
-  menu_raw_text                       String?
-  winelist_url                        String?
-  winelist_source_url                 String?
-  winelist_raw_text                   String?
+  archive_reason                      ArchiveReason?  @map("archive_reason")
+  archived_at                         DateTime?       @map("archived_at")
+  archived_by                         String?         @map("archived_by")
+  lifecycle_status                    LifecycleStatus @default(ACTIVE) @map("lifecycle_status")
+  enriched_at                         DateTime?
+  county                              String?
   about_copy                          String?
   about_source_url                    String?
-  scraped_at                          DateTime?
+  menu_raw_text                       String?
+  menu_source_url                     String?
+  menu_url                            String?
   scrape_status                       String?
+  scraped_at                          DateTime?
+  winelist_raw_text                   String?
+  winelist_source_url                 String?
+  winelist_url                        String?
   cuisine_posture                     String?
-  service_model                       String?
-  price_tier                          String?
-  wine_program_intent                 String?
-  place_personality                   String?
   identity_signals                    Json?
+  place_personality                   String?
+  price_tier                          String?
+  service_model                       String?
   signals_generated_at                DateTime?
-  signals_version                     Int?
   signals_reviewed                    Boolean         @default(false)
-  signals_reviewed_by                 String?
   signals_reviewed_at                 DateTime?
+  signals_reviewed_by                 String?
+  signals_version                     Int?
+  wine_program_intent                 String?
   tagline                             String?
   tagline_candidates                  String[]        @default([])
-  tagline_pattern                     String?
   tagline_generated_at                DateTime?
+  tagline_pattern                     String?
   tagline_signals                     Json?
   tagline_version                     Int?
   google_places_attributes            Json?
   google_places_attributes_fetched_at DateTime?
-
-  entity_links entity_links[]
-  review_queue review_queue[]
-  provenance   provenance[]
+  entity_links                        entity_links[]
+  provenance                          provenance[]
+  review_queue                        review_queue[]
 
   @@index([neighborhood])
   @@index([category])
@@ -515,26 +480,25 @@ model golden_records {
 }
 
 model review_queue {
-  queue_id           String    @id @default(uuid())
+  queue_id           String             @id @default(uuid())
   canonical_id       String?
   raw_id_a           String
   raw_id_b           String?
   conflict_type      String
-  match_confidence   Decimal?  @db.Decimal(4, 3)
+  match_confidence   Decimal?           @db.Decimal(4, 3)
   conflicting_fields Json?
-  priority           Int       @default(5)
-  status             String    @default("pending")
+  priority           Int                @default(5)
+  status             String             @default("pending")
   resolution         String?
   resolution_notes   String?
-  created_at         DateTime  @default(now())
+  created_at         DateTime           @default(now())
   assigned_to        String?
   resolved_by        String?
   resolved_at        DateTime?
-
-  golden_record golden_records?    @relation(fields: [canonical_id], references: [canonical_id])
-  raw_record_a  raw_records        @relation("ReviewQueueRecordA", fields: [raw_id_a], references: [raw_id])
-  raw_record_b  raw_records?       @relation("ReviewQueueRecordB", fields: [raw_id_b], references: [raw_id])
-  audit_logs    review_audit_log[]
+  audit_logs         review_audit_log[]
+  golden_record      golden_records?    @relation(fields: [canonical_id], references: [canonical_id])
+  raw_record_a       raw_records        @relation("ReviewQueueRecordA", fields: [raw_id_a], references: [raw_id])
+  raw_record_b       raw_records?       @relation("ReviewQueueRecordB", fields: [raw_id_b], references: [raw_id])
 
   @@index([status])
   @@index([priority, status])
@@ -564,23 +528,17 @@ model provenance {
   source_date         DateTime?          @map("source_date")
   notes               String?
   import_batch        String?            @map("import_batch")
+  created_at          DateTime           @default(now()) @map("created_at")
   source_tier         Int?               @map("source_tier")
-  verification_status VerificationStatus @default(UNVERIFIED) @map("verification_status")
   source_verified_at  DateTime?          @map("source_verified_at")
   source_verified_by  String?            @map("source_verified_by")
-  created_at          DateTime           @default(now()) @map("created_at")
+  verification_status VerificationStatus @default(UNVERIFIED) @map("verification_status")
   golden_record       golden_records     @relation(fields: [place_id], references: [canonical_id], onDelete: Cascade)
 
   @@index([place_id])
   @@index([added_by])
   @@index([import_batch])
 }
-
-//
-// ═════════════════════════════════════════════════════════════════════════════
-// YEAR 1 CONTRACT TABLES (New - Safe to Add)
-// ═════════════════════════════════════════════════════════════════════════════
-//
 
 model countries {
   id        String   @id @default(cuid())
@@ -592,18 +550,17 @@ model countries {
 }
 
 model cities {
-  id        String   @id @default(cuid())
-  countryId String   @map("country_id")
-  slug      String   @unique
-  name      String
-  locale    String   @default("en")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
+  id            String            @id @default(cuid())
+  countryId     String            @map("country_id")
+  slug          String            @unique
+  name          String
+  locale        String            @default("en")
+  createdAt     DateTime          @default(now()) @map("created_at")
+  updatedAt     DateTime          @updatedAt @map("updated_at")
   country       countries         @relation(fields: [countryId], references: [id])
   neighborhoods neighborhoods[]
-  places        places[]
   coverages     place_coverages[]
+  places        places[]
 }
 
 model neighborhoods {
@@ -613,26 +570,24 @@ model neighborhoods {
   name      String
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
-
-  city   cities   @relation(fields: [cityId], references: [id])
-  places places[]
+  city      cities   @relation(fields: [cityId], references: [id])
+  places    places[]
 
   @@unique([cityId, slug])
   @@index([cityId])
 }
 
 model sources {
-  id               String       @id @default(cuid())
-  name             String       @unique
+  id               String            @id @default(cuid())
+  name             String            @unique
   type             SourceType
-  status           SourceStatus @default(PENDING)
-  approvedAt       DateTime?    @map("approved_at")
-  approvedByUserId String?      @map("approved_by_user_id")
-  createdAt        DateTime     @default(now()) @map("created_at")
-  updatedAt        DateTime     @updatedAt @map("updated_at")
-
-  approvedBy users?            @relation("SourceApprovedBy", fields: [approvedByUserId], references: [id])
-  coverages  place_coverages[]
+  status           SourceStatus      @default(PENDING)
+  approvedAt       DateTime?         @map("approved_at")
+  approvedByUserId String?           @map("approved_by_user_id")
+  createdAt        DateTime          @default(now()) @map("created_at")
+  updatedAt        DateTime          @updatedAt @map("updated_at")
+  coverages        place_coverages[]
+  approvedBy       users?            @relation("SourceApprovedBy", fields: [approvedByUserId], references: [id])
 
   @@index([status])
 }
@@ -651,10 +606,9 @@ model place_coverages {
   status      CoverageStatus @default(PENDING)
   createdAt   DateTime       @default(now()) @map("created_at")
   updatedAt   DateTime       @updatedAt @map("updated_at")
-
-  place  places  @relation(fields: [placeId], references: [id], onDelete: Cascade)
-  source sources @relation(fields: [sourceId], references: [id])
-  city   cities  @relation(fields: [cityId], references: [id])
+  city        cities         @relation(fields: [cityId], references: [id])
+  place       places         @relation(fields: [placeId], references: [id], onDelete: Cascade)
+  source      sources        @relation(fields: [sourceId], references: [id])
 
   @@index([placeId])
   @@index([sourceId])
@@ -685,23 +639,15 @@ model api_call_logs {
   requestHash      String?    @map("request_hash")
   estimatedCostUsd Decimal?   @map("estimated_cost_usd") @db.Decimal(10, 4)
   createdAt        DateTime   @default(now()) @map("created_at")
-
-  actor users?  @relation(fields: [actorUserId], references: [id])
-  place places? @relation(fields: [placeId], references: [id])
-  map   lists?  @relation(fields: [mapId], references: [id])
+  actor            users?     @relation(fields: [actorUserId], references: [id])
+  map              lists?     @relation(fields: [mapId], references: [id])
+  place            places?    @relation(fields: [placeId], references: [id])
 
   @@index([provider, createdAt])
   @@index([placeId])
   @@index([mapId])
 }
 
-//
-// ═════════════════════════════════════════════════════════════════════════════
-// ENUMS (Existing + New for Year 1)
-// ═════════════════════════════════════════════════════════════════════════════
-//
-
-// Existing enums (keep ALL values - critical!)
 enum PlaceStatus {
   OPEN
   CLOSED
@@ -779,7 +725,6 @@ enum VerificationStatus {
   FOUNDER_VERIFIED
 }
 
-// Year 1 contract enums (new)
 enum SourceType {
   PUBLICATION
   VIDEO_CHANNEL
@@ -813,7 +758,7 @@ enum ApiTrigger {
 
 enum PlaceScope {
   active
-  archive
   future_region
+  archive
   hidden
 }
