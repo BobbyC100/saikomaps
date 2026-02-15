@@ -92,7 +92,10 @@
     "enrich:hours": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/enrich-places-enrichment.ts hours",
     "enrich:contact": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/enrich-places-enrichment.ts contact",
     "enrich:all": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/enrich-places-enrichment.ts all",
-    "enrich:workflow": "npm run enrich:audit && npm run enrich:all && npm run enrich:audit"
+    "enrich:workflow": "npm run enrich:audit && npm run enrich:all && npm run enrich:audit",
+    "score:compute": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/compute-ranking-scores.ts",
+    "score:execute": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/compute-ranking-scores.ts --execute",
+    "score:verify": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/verify-ranking.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.72.1",

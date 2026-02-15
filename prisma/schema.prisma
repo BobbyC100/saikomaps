@@ -151,6 +151,12 @@ model places {
   saikoSummaryModelVersion String?   @map("saiko_summary_model_version")
   saikoSummaryCoverageIds  String[]  @default([]) @map("saiko_summary_coverage_ids")
 
+  // ─────────────────────────────────────────────────────────────────────────
+  // RANKING SYSTEM: Non-algorithmic editorial scoring
+  // ─────────────────────────────────────────────────────────────────────────
+  rankingScore      Float?    @map("ranking_score") @default(0)
+  lastScoreUpdate   DateTime? @map("last_score_update")
+
   map_places        map_places[]
   person_places     person_places[]
   restaurant_groups restaurant_groups? @relation(fields: [restaurantGroupId], references: [id])
@@ -169,6 +175,7 @@ model places {
   @@index([status])
   @@index([cityId])
   @@index([neighborhoodId])
+  @@index([rankingScore(sort: Desc)])
 }
 
 model map_places {
