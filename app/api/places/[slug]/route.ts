@@ -61,6 +61,17 @@ export async function GET(
             slug: true,
           },
         },
+        coverages: {
+          where: {
+            status: 'APPROVED',
+          },
+          include: {
+            source: true,
+          },
+          orderBy: {
+            publishedAt: 'desc',
+          },
+        },
       },
     });
 
@@ -128,6 +139,24 @@ export async function GET(
       curatorMapPlace?.lists?.users?.email?.split('@')[0] ||
       null;
 
+    // Format sources - prefer coverages, fallback to JSON
+    let sources: unknown[] = [];
+    if (place.coverages && place.coverages.length > 0) {
+      // Use relational data from place_coverages table
+      sources = place.coverages.map((coverage) => ({
+        url: coverage.url,
+        title: coverage.title,
+        publication: coverage.source.name,
+        excerpt: coverage.excerpt,
+        content: coverage.quote,
+        published_at: coverage.publishedAt?.toISOString().split('T')[0],
+        trust_level: 'editorial',
+      }));
+    } else if (place.editorialSources) {
+      // Fallback to legacy JSON
+      sources = (place.editorialSources as unknown[]) || [];
+    }
+
     return NextResponse.json({
       success: true,
       data: {
@@ -152,7 +181,7 @@ export async function GET(
           googlePlaceId: place.googlePlaceId,
           curatorNote,
           curatorCreatorName,
-          sources: (place.editorialSources as unknown[]) || [],
+          sources,
           vibeTags: place.vibeTags || [],
           tips: place.tips || [],
           tagline: place.tagline,
