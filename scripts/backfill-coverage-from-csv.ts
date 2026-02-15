@@ -29,9 +29,16 @@ interface CoverageRow {
 async function main() {
   // Parse command line arguments
   const args = process.argv.slice(2);
-  const strictMode = args.includes('--strict');
-  const dryRun = args.includes('--dry-run');
-  const csvPath = args.find(arg => !arg.startsWith('--')) || './coverage-backfill.csv';
+  
+  const hasFlag = (f: string) => args.includes(f);
+  const getArgValue = (f: string) => {
+    const i = args.indexOf(f);
+    return i >= 0 && i + 1 < args.length ? args[i + 1] : null;
+  };
+
+  const strictMode = hasFlag('--strict');
+  const dryRun = hasFlag('--dry-run');
+  const csvPath = getArgValue('--file') || args.find(arg => !arg.startsWith('--')) || './coverage-backfill.csv';
   
   if (!fs.existsSync(csvPath)) {
     console.error(`❌ CSV file not found: ${csvPath}`);
@@ -79,9 +86,10 @@ async function main() {
   console.log(`🚀 Processing ${rows.length} coverage entries...\n`);
   
   let stats = {
-    processed: 0,
+    wouldCreate: 0,
     created: 0,
     skipped: 0,
+    skippedAlreadyCovered: 0,
     errors: 0,
   };
 
@@ -103,7 +111,7 @@ async function main() {
       // Strict mode: check if slug is in uncovered list
       if (strictMode && uncoveredSlugs && !uncoveredSlugs.has(slug)) {
         console.warn(`⊘ ${slug} (already covered, skipping in strict mode)`);
-        stats.skipped++;
+        stats.skippedAlreadyCovered++;
         continue;
       }
 
@@ -121,8 +129,7 @@ async function main() {
       // Dry run: show what would be created
       if (dryRun) {
         console.log(`[DRY RUN] Would create: ${slug} → ${publication}`);
-        stats.created++;
-        stats.processed++;
+        stats.wouldCreate++;
         continue;
       }
 
@@ -173,8 +180,6 @@ async function main() {
         console.log(`✓ Created: ${slug} → ${publication}`);
         stats.created++;
       }
-
-      stats.processed++;
     } catch (error) {
       console.error(`❌ Error processing ${row.slug}:`, error);
       stats.errors++;
@@ -182,9 +187,15 @@ async function main() {
   }
 
   console.log('\n📊 Summary:');
-  console.log(`   Processed: ${stats.processed}`);
-  console.log(`   Created: ${stats.created}`);
-  console.log(`   Skipped: ${stats.skipped}`);
+  if (dryRun) {
+    console.log(`   Would create: ${stats.wouldCreate}`);
+    console.log(`   Would skip (already covered): ${stats.skippedAlreadyCovered}`);
+    console.log(`   Would skip (other): ${stats.skipped}`);
+  } else {
+    console.log(`   Created: ${stats.created}`);
+    console.log(`   Skipped (already covered): ${stats.skippedAlreadyCovered}`);
+    console.log(`   Skipped (other): ${stats.skipped}`);
+  }
   console.log(`   Errors: ${stats.errors}`);
 
   // Show updated coverage rate
