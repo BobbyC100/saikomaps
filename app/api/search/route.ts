@@ -15,6 +15,7 @@ import { db } from '@/lib/db';
 import { getGooglePhotoUrl } from '@/lib/google-places';
 import { applyDiversityFilter } from '@/lib/ranking';
 import { requireActiveCityId } from '@/lib/active-city';
+import { getIntentCategory } from '@/lib/search/intent-map';
 
 // Helper: Extract first photo URL
 function getFirstPhotoUrl(googlePhotos: any): string | undefined {
@@ -147,19 +148,28 @@ export async function GET(request: NextRequest) {
     // Fetch LA city ID
     const cityId = await requireActiveCityId();
 
+    // P0 Fix: Check for intent mapping (dinner → eat, drinks → drink)
+    const intentCategory = getIntentCategory(query);
+
     // EOS: Fetch ranked places only (rankingScore > 0)
     // Pull larger set for search matching, then rank and cap
     const places = await (db as any).places.findMany({
       where: {
         cityId,
         rankingScore: { gt: 0 }, // EOS: Ranked-only inclusion gate
-        OR: [
-          { name: { contains: query, mode: 'insensitive' } },
-          { neighborhood: { contains: query, mode: 'insensitive' } },
-          { category: { contains: query, mode: 'insensitive' } },
-          { cuisineType: { contains: query, mode: 'insensitive' } },
-          { vibeTags: { hasSome: [queryLower] } },
-        ],
+        // If intent matched (e.g., "dinner"), filter by category
+        // Otherwise, search across all text fields
+        ...(intentCategory ? {
+          category: intentCategory,
+        } : {
+          OR: [
+            { name: { contains: query, mode: 'insensitive' } },
+            { neighborhood: { contains: query, mode: 'insensitive' } },
+            { category: { contains: query, mode: 'insensitive' } },
+            { cuisineType: { contains: query, mode: 'insensitive' } },
+            { vibeTags: { hasSome: [queryLower] } },
+          ],
+        }),
         status: 'OPEN',
       },
       select: {
