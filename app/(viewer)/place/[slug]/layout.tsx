@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { db } from '@/lib/db';
 import { getGooglePhotoUrl, getPhotoRefFromStored } from '@/lib/google-places';
+import { requireActiveCityId } from '@/lib/active-city';
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -21,8 +22,12 @@ function getFirstPhotoUrl(googlePhotos: unknown): string | null {
 }
 
 async function getPlaceData(slug: string) {
-  return db.place.findUnique({
-    where: { slug },
+  const cityId = await requireActiveCityId();
+  return db.place.findFirst({
+    where: { 
+      slug,
+      cityId, // LA only
+    },
     select: {
       name: true,
       category: true,

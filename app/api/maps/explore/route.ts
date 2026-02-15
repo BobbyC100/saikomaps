@@ -14,21 +14,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getGooglePhotoUrl, getPhotoRefFromStored } from '@/lib/google-places';
+import { requireActiveCityId } from '@/lib/active-city';
 
 const GOOGLE_MAPS_API_KEY =
   process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || process.env.GOOGLE_PLACES_API_KEY || '';
-
-// ═══════════════════════════════════════════════════════════════════════════
-// CITY GATE: Only show LA places in public Explore
-// ═══════════════════════════════════════════════════════════════════════════
-async function requireActiveCityId(): Promise<string> {
-  const city = await db.cities.findUnique({
-    where: { slug: 'los-angeles' },
-    select: { id: true },
-  });
-  if (!city) throw new Error('Active city (Los Angeles) not found in database');
-  return city.id;
-}
 
 function getCoverPhotoUrl(photos: unknown): string | null {
   if (!photos || !Array.isArray(photos) || photos.length === 0) return null;

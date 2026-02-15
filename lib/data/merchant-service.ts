@@ -4,6 +4,7 @@
  */
 
 import { db } from '@/lib/db'
+import { requireActiveCityId } from '@/lib/active-city';
 
 import { transformDatabaseToMerchant } from './transformers';
 import { MerchantData } from '@/lib/types/merchant';
@@ -13,8 +14,12 @@ import { MerchantData } from '@/lib/types/merchant';
  * Returns raw place record with all needed relations
  */
 export async function getMerchantBySlug(slug: string): Promise<MerchantData | null> {
-  const place = await db.places.findUnique({
-    where: { slug },
+  const cityId = await requireActiveCityId();
+  const place = await db.places.findFirst({
+    where: { 
+      slug,
+      cityId, // LA only
+    },
     include: {
       // Only relation that exists in schema
     },
@@ -27,10 +32,13 @@ export async function getMerchantBySlug(slug: string): Promise<MerchantData | nu
 
 /**
  * Fetch all merchant slugs (for static generation)
+ * Only returns LA places for public site
  */
 export async function getAllMerchantSlugs(): Promise<string[]> {
+  const cityId = await requireActiveCityId();
   const places = await db.places.findMany({
-    select: { slug: true }, // only get slugs
+    where: { cityId }, // LA only
+    select: { slug: true },
   });
 
   return places.map(p => p.slug);

@@ -1,8 +1,10 @@
 import { MetadataRoute } from 'next';
 import { db } from '@/lib/db';
+import { requireActiveCityId } from '@/lib/active-city';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://saikomaps.com';
+  const cityId = await requireActiveCityId();
 
   // Static pages
   const staticPages: MetadataRoute.Sitemap = [
@@ -37,9 +39,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  // Places that appear on at least one published map
+  // Places that appear on at least one published map (LA only)
   const placesOnMaps = await db.places.findMany({
     where: {
+      cityId, // LA only
       map_places: {
         some: {
           lists: {
