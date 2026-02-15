@@ -1,0 +1,6 @@
+{
+  "REPLACE_WITH_PLACE_ID": {
+    "cuisinePrimary": "Sushi",
+    "cuisineSecondary": ["Omakase", "Edomae"]
+  }
+}
