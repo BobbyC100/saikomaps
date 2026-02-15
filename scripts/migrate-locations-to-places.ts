@@ -25,7 +25,7 @@ async function main() {
   for (const loc of locations) {
     // 1. Find or create Place
     let place = loc.googlePlaceId
-      ? await prisma.place.findUnique({
+      ? await prisma.places.findUnique({
           where: { googlePlaceId: loc.googlePlaceId },
         })
       : null;
@@ -33,11 +33,11 @@ async function main() {
     if (!place) {
       const baseSlug = generatePlaceSlug(loc.name, loc.neighborhood ?? undefined);
       const slug = await ensureUniqueSlug(baseSlug, async (s) => {
-        const existing = await prisma.place.findUnique({ where: { slug: s } });
+        const existing = await prisma.places.findUnique({ where: { slug: s } });
         return !!existing;
       });
 
-      place = await prisma.place.create({
+      place = await prisma.places.create({
         data: {
           slug,
           googlePlaceId: loc.googlePlaceId,

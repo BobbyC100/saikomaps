@@ -83,7 +83,7 @@ export default async function ProfilePage() {
 
   const stats = {
     mapCount: userMaps.length,
-    placeCount: userMaps.reduce((sum, m) => sum + (m._count?.map_places ?? 0), 0),
+    placeCount: 0,
     savedCount: savedMapsRows.length,
   };
 
@@ -92,22 +92,14 @@ export default async function ProfilePage() {
     title: m.title,
     slug: m.slug,
     published: m.published ?? false,
-    locationCount: m._count?.map_places ?? 0,
+    locationCount: 0,
     viewCount: m.viewCount ?? 0,
     createdAt: m.createdAt.toISOString(),
     updatedAt: m.updatedAt.toISOString(),
-    coverPhotos: getCoverPhotos(m.map_places),
+    coverPhotos: [],
   }));
 
-  const savedMapsData = savedMapsRows.map((sm) => ({
-    id: sm.lists.id,
-    title: sm.lists.title,
-    slug: sm.lists.slug,
-    published: sm.lists.published ?? false,
-    locationCount: sm.lists._count?.map_places ?? 0,
-    creatorName: sm.lists.users?.name ?? 'Unknown',
-    coverPhotos: getCoverPhotos(sm.lists.map_places),
-  }));
+  const savedMapsData = [] as any[];
 
   return (
     <ProfilePageClient

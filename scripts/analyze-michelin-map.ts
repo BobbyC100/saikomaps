@@ -8,14 +8,14 @@ import { db } from '@/lib/db'
 async function main() {
   const slug = 'la-michelin-essential-restaurants-1770427481342'
   
-  const list = await db.list.findFirst({
+  const list = await db.lists.findFirst({
     where: { slug },
     include: {
-      mapPlaces: {
+      map_places: {
         include: {
-          place: {
+          places: {
             include: {
-              restaurantGroup: true
+              restaurant_groups: true
             }
           }
         },
@@ -30,11 +30,11 @@ async function main() {
   }
 
   console.log(`\n📍 ${list.title}`)
-  console.log(`   ${list.mapPlaces.length} places\n`)
+  console.log(`   ${list.map_places.length} places\n`)
   console.log('═'.repeat(80))
 
-  list.mapPlaces.forEach((mp, idx) => {
-    const p = mp.place
+  list.map_places.forEach((mp, idx) => {
+    const p = mp.places
     const missing = []
     
     if (!p.tagline) missing.push('tagline')
@@ -47,8 +47,8 @@ async function main() {
     console.log(`\n${idx + 1}. ${p.name}`)
     console.log(`   ${p.neighborhood || 'No neighborhood'}`)
     
-    if (p.restaurantGroup) {
-      console.log(`   ✅ Group: ${p.restaurantGroup.name}`)
+    if (p.restaurant_groups) {
+      console.log(`   ✅ Group: ${p.restaurant_groups.name}`)
     }
     
     if (p.tagline) {
@@ -81,7 +81,7 @@ async function main() {
   
   // Summary
   const stats = {
-    total: list.mapPlaces.length,
+    total: list.map_places.length,
     withTagline: 0,
     withPullQuote: 0,
     withVibeTags: 0,
@@ -90,8 +90,8 @@ async function main() {
     withGroup: 0
   }
   
-  list.mapPlaces.forEach(mp => {
-    const p = mp.place
+  list.map_places.forEach(mp => {
+    const p = mp.places
     if (p.tagline) stats.withTagline++
     if (p.pullQuote) stats.withPullQuote++
     if (p.vibeTags && p.vibeTags.length > 0) stats.withVibeTags++

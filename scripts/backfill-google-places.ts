@@ -149,8 +149,9 @@ async function main() {
   }
 
   // Optional: restrict to curated places only (those with provenance)
+  let curatedIds: string[] = [];
   if (CURATED_ONLY && !slug) {
-    const curatedIds = await prisma.provenance.findMany({ select: { place_id: true } }).then((r) => r.map((p) => p.place_id));
+    curatedIds = await prisma.provenance.findMany({ select: { place_id: true } }).then((r) => r.map((p) => p.place_id));
     if (curatedIds.length > 0) {
       where = { ...where, id: { in: curatedIds } };
     }
@@ -162,7 +163,7 @@ async function main() {
     const totalNeedingBackfill = await prisma.places.count({
       where: {
         ...(force ? {} : missingMeta ? { googlePlaceId: { not: null }, OR: [{ neighborhood: null }, { cuisineType: null }] } : { placesDataCachedAt: null }),
-        id: { in: curatedIds },
+        ...(curatedIds.length > 0 && { id: { in: curatedIds } }),
       },
     });
     where = {
@@ -279,6 +280,8 @@ async function main() {
         }
       }
 
+      const hoursData = formatHoursForStore(placeDetails.openingHours);
+      
       const updateData = {
         googlePlaceId: googlePlaceId ?? undefined,
         name: placeDetails.name && !placeDetails.name.startsWith("http")
@@ -302,7 +305,7 @@ async function main() {
         googlePhotos: placeDetails.photos
           ? JSON.parse(JSON.stringify(placeDetails.photos))
           : undefined,
-        hours: formatHoursForStore(placeDetails.openingHours),
+        hours: hoursData ?? undefined,
         placesDataCachedAt: new Date(),
       };
 

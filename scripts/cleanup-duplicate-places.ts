@@ -54,15 +54,15 @@ async function cleanupDuplicatePlaces() {
   const operations: DuplicateGroup[] = [];
 
   for (const dup of duplicates) {
-    const places = await prisma.place.findMany({
+    const places = await prisma.places.findMany({
       where: { googlePlaceId: dup.google_place_id },
       include: {
-        mapPlaces: {
+        map_places: {
           include: {
-            map: { select: { title: true } }
+            lists: { select: { title: true } }
           }
         },
-        viewerBookmarks: true,
+        viewer_bookmarks: true,
       },
       orderBy: { createdAt: 'asc' },
     });
@@ -79,15 +79,15 @@ async function cleanupDuplicatePlaces() {
 
     console.log(`\n📍 ${keepPlace.name} (Google Place ID: ${dup.google_place_id})`);
     console.log(`   ✅ KEEP: "${keepPlace.name}" (${keepPlace.slug})`);
-    console.log(`      Used in ${keepPlace.mapPlaces.length} map(s), ${keepPlace.viewerBookmarks.length} bookmark(s)`);
+    console.log(`      Used in ${keepPlace.map_places.length} map(s), ${keepPlace.viewer_bookmarks.length} bookmark(s)`);
     
     if (removePlaces.length > 0) {
       console.log(`   ❌ REMOVE:`);
       removePlaces.forEach(p => {
         console.log(`      • "${p.name}" (${p.slug})`);
-        console.log(`        ${p.mapPlaces.length} map(s), ${p.viewerBookmarks.length} bookmark(s)`);
+        console.log(`        ${p.map_places.length} map(s), ${p.viewer_bookmarks.length} bookmark(s)`);
         
-        if (p.mapPlaces.length > 0 && !force) {
+        if (p.map_places.length > 0 && !force) {
           console.log(`        ⚠️  SKIP: Place is used in maps (use --force to override)`);
         }
       });
@@ -99,10 +99,10 @@ async function cleanupDuplicatePlaces() {
         id: keepPlace.id,
         name: keepPlace.name,
         slug: keepPlace.slug,
-        mapCount: keepPlace.mapPlaces.length,
+        mapCount: keepPlace.map_places.length,
       },
       removeIds: removePlaces
-        .filter(p => force || p.mapPlaces.length === 0)
+        .filter(p => force || p.map_places.length === 0)
         .map(p => p.id),
     });
   }
@@ -131,23 +131,23 @@ async function cleanupDuplicatePlaces() {
     for (const removeId of op.removeIds) {
       try {
         // Get the place to be removed
-        const placeToRemove = await prisma.place.findUnique({
+        const placeToRemove = await prisma.places.findUnique({
           where: { id: removeId },
           include: {
-            mapPlaces: true,
-            viewerBookmarks: true,
+            map_places: true,
+            viewer_bookmarks: true,
           },
         });
 
         if (!placeToRemove) continue;
 
         // Migrate MapPlace references
-        if (placeToRemove.mapPlaces.length > 0) {
-          console.log(`   Migrating ${placeToRemove.mapPlaces.length} map reference(s) from ${placeToRemove.slug}...`);
+        if (placeToRemove.map_places.length > 0) {
+          console.log(`   Migrating ${placeToRemove.map_places.length} map reference(s) from ${placeToRemove.slug}...`);
           
-          for (const mapPlace of placeToRemove.mapPlaces) {
+          for (const mapPlace of placeToRemove.map_places) {
             // Check if the keep place is already in this map
-            const existingMapPlace = await prisma.mapPlace.findUnique({
+            const existingMapPlace = await prisma.map_places.findUnique({
               where: {
                 mapId_placeId: {
                   mapId: mapPlace.mapId,
@@ -158,13 +158,13 @@ async function cleanupDuplicatePlaces() {
 
             if (existingMapPlace) {
               // Keep place already exists in this map, just delete the old reference
-              await prisma.mapPlace.delete({
+              await prisma.map_places.delete({
                 where: { id: mapPlace.id }
               });
               console.log(`      ✓ Removed duplicate from map (keep place already present)`);
             } else {
               // Update reference to point to keep place
-              await prisma.mapPlace.update({
+              await prisma.map_places.update({
                 where: { id: mapPlace.id },
                 data: { placeId: op.keepPlace.id },
               });
@@ -175,13 +175,13 @@ async function cleanupDuplicatePlaces() {
         }
 
         // Migrate ViewerBookmark references
-        if (placeToRemove.viewerBookmarks.length > 0) {
-          console.log(`   Migrating ${placeToRemove.viewerBookmarks.length} bookmark(s)...`);
+        if (placeToRemove.viewer_bookmarks.length > 0) {
+          console.log(`   Migrating ${placeToRemove.viewer_bookmarks.length} bookmark(s)...`);
           
-          for (const bookmark of placeToRemove.viewerBookmarks) {
+          for (const bookmark of placeToRemove.viewer_bookmarks) {
             // Check if user already has bookmark for keep place
             if (bookmark.viewerUserId) {
-              const existingBookmark = await prisma.viewerBookmark.findUnique({
+              const existingBookmark = await prisma.viewer_bookmarks.findUnique({
                 where: {
                   viewerUserId_placeId: {
                     viewerUserId: bookmark.viewerUserId,
@@ -192,13 +192,13 @@ async function cleanupDuplicatePlaces() {
 
               if (existingBookmark) {
                 // User already has bookmark for keep place, delete old one
-                await prisma.viewerBookmark.delete({
+                await prisma.viewer_bookmarks.delete({
                   where: { id: bookmark.id }
                 });
                 console.log(`      ✓ Removed duplicate bookmark`);
               } else {
                 // Update bookmark to point to keep place
-                await prisma.viewerBookmark.update({
+                await prisma.viewer_bookmarks.update({
                   where: { id: bookmark.id },
                   data: { placeId: op.keepPlace.id },
                 });
@@ -206,7 +206,7 @@ async function cleanupDuplicatePlaces() {
               }
             } else {
               // No user ID, just delete
-              await prisma.viewerBookmark.delete({
+              await prisma.viewer_bookmarks.delete({
                 where: { id: bookmark.id }
               });
             }
@@ -214,7 +214,7 @@ async function cleanupDuplicatePlaces() {
         }
 
         // Delete the duplicate place
-        await prisma.place.delete({
+        await prisma.places.delete({
           where: { id: removeId },
         });
 
@@ -237,10 +237,10 @@ function calculateScore(place: any): number {
   let score = 0;
   
   // Maps usage (highest priority)
-  score += place.mapPlaces.length * 100;
+  score += place.map_places.length * 100;
   
   // Bookmarks
-  score += place.viewerBookmarks.length * 10;
+  score += place.viewer_bookmarks.length * 10;
   
   // Enrichment
   if (place.googlePhotos && Array.isArray(place.googlePhotos) && place.googlePhotos.length > 0) {

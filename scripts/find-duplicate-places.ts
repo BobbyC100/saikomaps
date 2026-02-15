@@ -48,10 +48,10 @@ async function findDuplicatePlaces() {
     const placeId = dup.google_place_id;
     
     // Get all places with this google_place_id
-    const places = await prisma.place.findMany({
+    const places = await prisma.places.findMany({
       where: { googlePlaceId: placeId },
       include: {
-        mapPlaces: {
+        map_places: {
           include: {
             map: {
               select: { title: true, slug: true }
@@ -72,7 +72,7 @@ async function findDuplicatePlaces() {
       hasPhotos: p.googlePhotos !== null && 
                  Array.isArray(p.googlePhotos) && 
                  p.googlePhotos.length > 0,
-      mapCount: p.mapPlaces.length,
+      mapCount: p.map_places.length,
       bookmarkCount: p.viewerBookmarks.length,
       hasNeighborhood: p.neighborhood !== null,
       hasCuisineType: p.cuisineType !== null,

@@ -46,7 +46,7 @@ async function main() {
   const slug = 'silver-lake-natural-wine-' + Date.now().toString(36).slice(-6);
 
   // Create the list (map) with Field Notes template
-  const list = await prisma.list.create({
+  const list = await prisma.lists.create({
     data: {
       userId: user.id,
       title: 'Silver Lake Natural Wine',
@@ -64,7 +64,7 @@ async function main() {
   for (let i = 0; i < SAMPLE_PLACES.length; i++) {
     const p = SAMPLE_PLACES[i];
     const placeSlug = slugify(p.slug);
-    const place = await prisma.place.upsert({
+    const place = await prisma.places.upsert({
       where: { slug: placeSlug },
       update: { latitude: p.lat, longitude: p.lng, neighborhood: p.neighborhood, category: p.category },
       create: {

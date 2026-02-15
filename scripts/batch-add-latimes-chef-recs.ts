@@ -72,7 +72,7 @@ async function main() {
     console.log(`\n[${added + skipped + errors + 1}/${recommendations.length}] ${rec.place} ← ${rec.chef}`)
 
     // Find place
-    const place = await db.place.findFirst({
+    const place = await db.places.findFirst({
       where: {
         name: {
           contains: rec.place,
@@ -124,7 +124,7 @@ async function main() {
 
     // Add to place
     const updatedRecs = [...existingRecs, chefRec]
-    await db.place.update({
+    await db.places.update({
       where: { id: place.id },
       data: { chefRecs: updatedRecs }
     })

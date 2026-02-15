@@ -50,7 +50,7 @@ async function findPotentialDuplicates() {
 
   // 3. Check for similar names at same location
   console.log('\n3️⃣ Checking for similar names at same location...');
-  const placesWithCoords = await prisma.place.findMany({
+  const placesWithCoords = await prisma.places.findMany({
     where: {
       latitude: { not: null },
       longitude: { not: null },
@@ -119,7 +119,7 @@ async function findPotentialDuplicates() {
 
   // 4. Check for places without place IDs that failed backfill
   console.log('\n4️⃣ Checking places that couldn\'t get Google Place IDs...');
-  const placesWithoutIds = await prisma.place.findMany({
+  const placesWithoutIds = await prisma.places.findMany({
     where: {
       placesDataCachedAt: null,
       googlePlaceId: null,

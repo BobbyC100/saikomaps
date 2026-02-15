@@ -100,7 +100,7 @@ async function main() {
     console.log(`\n[${linked + alreadyLinked + placeNotFound + groupNotFound + 1}/${Object.keys(placeToGroup).length}] ${placeName} → ${groupName}`)
 
     // Find place
-    const place = await db.place.findFirst({
+    const place = await db.places.findFirst({
       where: {
         name: {
           contains: placeName,
@@ -141,7 +141,7 @@ async function main() {
     }
 
     // Link
-    await db.place.update({
+    await db.places.update({
       where: { id: place.id },
       data: { restaurantGroupId: group.id }
     })

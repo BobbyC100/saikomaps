@@ -22,10 +22,10 @@ async function investigateBackfillFailures() {
   for (const slug of FAILED_PLACES) {
     console.log('─'.repeat(80));
     
-    const place = await prisma.place.findUnique({
+    const place = await prisma.places.findUnique({
       where: { slug },
       include: {
-        mapPlaces: {
+        map_places: {
           include: {
             map: {
               select: { title: true, slug: true }
@@ -43,11 +43,11 @@ async function investigateBackfillFailures() {
     console.log(`\n📍 ${place.name} (${place.slug})`);
     console.log(`   Current Google Place ID: ${place.googlePlaceId || 'none'}`);
     console.log(`   Address: ${place.address || 'none'}`);
-    console.log(`   Used in ${place.mapPlaces.length} map(s)`);
+    console.log(`   Used in ${place.map_places.length} map(s)`);
 
-    if (place.mapPlaces.length > 0) {
+    if (place.map_places.length > 0) {
       console.log(`   Maps:`);
-      place.mapPlaces.forEach(mp => {
+      place.map_places.forEach(mp => {
         console.log(`      • ${mp.map.title} (${mp.map.slug})`);
       });
     }
@@ -77,13 +77,13 @@ async function investigateBackfillFailures() {
         console.log(`         Address: ${result.address || 'none'}`);
 
         // Check if this Place ID is already used
-        const existingPlace = await prisma.place.findUnique({
+        const existingPlace = await prisma.places.findUnique({
           where: { googlePlaceId: result.placeId },
           select: {
             id: true,
             name: true,
             slug: true,
-            mapPlaces: {
+            map_places: {
               include: {
                 map: { select: { title: true } }
               }
@@ -93,7 +93,7 @@ async function investigateBackfillFailures() {
 
         if (existingPlace) {
           console.log(`         ⚠️  ALREADY USED BY: "${existingPlace.name}" (${existingPlace.slug})`);
-          console.log(`            Used in ${existingPlace.mapPlaces.length} map(s)`);
+          console.log(`            Used in ${existingPlace.map_places.length} map(s)`);
           
           if (existingPlace.id === place.id) {
             console.log(`            (same place record)`);

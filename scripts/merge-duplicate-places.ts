@@ -54,10 +54,10 @@ async function mergeDuplicatePlaces() {
     console.log(`   Reason: ${op.reason}`);
 
     // Find both places
-    const duplicatePlace = await prisma.place.findUnique({
+    const duplicatePlace = await prisma.places.findUnique({
       where: { slug: op.duplicateSlug },
       include: {
-        mapPlaces: {
+        map_places: {
           include: {
             map: { select: { title: true, slug: true } }
           }
@@ -66,10 +66,10 @@ async function mergeDuplicatePlaces() {
       },
     });
 
-    const keepPlace = await prisma.place.findUnique({
+    const keepPlace = await prisma.places.findUnique({
       where: { slug: op.keepSlug },
       include: {
-        mapPlaces: true,
+        map_places: true,
       },
     });
 
@@ -87,9 +87,9 @@ async function mergeDuplicatePlaces() {
     console.log(`   ✅ KEEP:   "${keepPlace.name}" (${keepPlace.slug})`);
 
     // Show what will be migrated
-    if (duplicatePlace.mapPlaces.length > 0) {
-      console.log(`\n   📋 Map references to migrate: ${duplicatePlace.mapPlaces.length}`);
-      duplicatePlace.mapPlaces.forEach(mp => {
+    if (duplicatePlace.map_places.length > 0) {
+      console.log(`\n   📋 Map references to migrate: ${duplicatePlace.map_places.length}`);
+      duplicatePlace.map_places.forEach(mp => {
         console.log(`      • ${mp.map.title} (${mp.map.slug})`);
       });
     }
@@ -106,7 +106,7 @@ async function mergeDuplicatePlaces() {
     // Execute merge
     try {
       // Migrate MapPlace references
-      for (const mapPlace of duplicatePlace.mapPlaces) {
+      for (const mapPlace of duplicatePlace.map_places) {
         // Check if keep place already exists in this map
         const existingMapPlace = await prisma.mapPlace.findUnique({
           where: {
@@ -172,7 +172,7 @@ async function mergeDuplicatePlaces() {
       }
 
       // Delete the duplicate place
-      await prisma.place.delete({
+      await prisma.places.delete({
         where: { id: duplicatePlace.id },
       });
 

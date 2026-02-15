@@ -253,7 +253,7 @@ async function collectWithClaude(
     }
 
     // Clean and parse
-    let parsed: { sources?: unknown[]; search_notes?: string };
+    let parsed: { sources?: unknown[]; search_notes?: string } | null = null;
     try {
       const cleaned = jsonMatch[0].replace(/```json\n?|```\n?/g, "").trim();
       parsed = JSON.parse(cleaned);
@@ -281,6 +281,21 @@ async function collectWithClaude(
           },
         };
       }
+    }
+
+    if (!parsed) {
+      return {
+        result: null,
+        metrics: {
+          slug: place.slug,
+          sourcesFound: 0,
+          timeMs,
+          inputTokens: response.usage.input_tokens,
+          outputTokens: response.usage.output_tokens,
+          searchQueries,
+          file: null,
+        },
+      };
     }
 
     // Validate and clean sources

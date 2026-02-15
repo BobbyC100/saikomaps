@@ -1,13 +1,10 @@
 /**
  * String Similarity Utilities
- * 
+ *
  * Various string comparison algorithms for entity matching
  */
 
-import { JaroWinklerDistance, LevenshteinDistance } from 'natural';
-
-const jaro = new JaroWinklerDistance();
-const lev = new LevenshteinDistance();
+import natural from 'natural';
 
 /**
  * Jaro-Winkler similarity (0 to 1, higher = more similar)
@@ -15,7 +12,7 @@ const lev = new LevenshteinDistance();
  */
 export function jaroWinklerSimilarity(str1: string, str2: string): number {
   if (!str1 || !str2) return 0;
-  return jaro.distance(str1, str2);
+  return natural.JaroWinklerDistance(str1, str2);
 }
 
 /**
@@ -25,7 +22,7 @@ export function levenshteinSimilarity(str1: string, str2: string): number {
   if (!str1 || !str2) return 0;
   const maxLen = Math.max(str1.length, str2.length);
   if (maxLen === 0) return 1;
-  const distance = lev.distance(str1, str2);
+  const distance = natural.LevenshteinDistance(str1, str2);
   return 1 - distance / maxLen;
 }
 
@@ -35,7 +32,7 @@ export function levenshteinSimilarity(str1: string, str2: string): number {
  */
 export function tokenSortRatio(str1: string, str2: string): number {
   if (!str1 || !str2) return 0;
-  
+
   const normalize = (s: string) =>
     s
       .toLowerCase()
@@ -43,27 +40,21 @@ export function tokenSortRatio(str1: string, str2: string): number {
       .filter(Boolean)
       .sort()
       .join(' ');
-  
+
   const norm1 = normalize(str1);
   const norm2 = normalize(str2);
-  
+
   return jaroWinklerSimilarity(norm1, norm2);
 }
 
 /**
  * Normalize a place name for matching
- * - Lowercase
- * - Remove articles (the, a, an)
- * - Remove common suffixes (restaurant, cafe, bar, etc.)
- * - Remove punctuation
- * - Collapse whitespace
  */
 export function normalizeName(name: string | null | undefined): string {
   if (!name) return '';
-  
+
   let normalized = name.toLowerCase().trim();
-  
-  // Common substitutions
+
   const substitutions: [RegExp, string][] = [
     [/\b(the|a|an)\b/g, ''],
     [/[\'"`]/g, ''],
@@ -71,11 +62,11 @@ export function normalizeName(name: string | null | undefined): string {
     [/\b(restaurant|cafe|bar|grill|kitchen|eatery|bistro|brasserie)\b/g, ''],
     [/[^\w\s]/g, ''],
   ];
-  
+
   for (const [pattern, replacement] of substitutions) {
     normalized = normalized.replace(pattern, replacement);
   }
-  
+
   return normalized.trim();
 }
 
@@ -84,10 +75,9 @@ export function normalizeName(name: string | null | undefined): string {
  */
 export function normalizeAddress(address: string | null | undefined): string {
   if (!address) return '';
-  
+
   let normalized = address.toLowerCase().trim();
-  
-  // Common address substitutions
+
   const substitutions: [RegExp, string][] = [
     [/\bstreet\b/g, 'st'],
     [/\bavenue\b/g, 'ave'],
@@ -101,11 +91,11 @@ export function normalizeAddress(address: string | null | undefined): string {
     [/[^\w\s]/g, ''],
     [/\s+/g, ' '],
   ];
-  
+
   for (const [pattern, replacement] of substitutions) {
     normalized = normalized.replace(pattern, replacement);
   }
-  
+
   return normalized.trim();
 }
 

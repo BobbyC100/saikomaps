@@ -5,6 +5,7 @@
  * Criteria: ≤25 locations, operator-led, context not destination
  */
 
+import { randomUUID } from 'crypto'
 import { db } from '@/lib/db'
 import { createSource, createSlug, validateRestaurantGroup } from '@/lib/people-groups'
 
@@ -140,7 +141,7 @@ async function main() {
     const slug = createSlug(groupData.name)
 
     // Check if already exists
-    const existing = await db.restaurantGroup.findUnique({
+    const existing = await db.restaurant_groups.findUnique({
       where: { slug }
     })
 
@@ -162,14 +163,17 @@ async function main() {
 
     // Build group object
     const group = {
+      id: randomUUID(),
       name: groupData.name,
       slug,
       visibility: 'VERIFIED' as any,
       description,
-      anchorCity: 'Los Angeles, CA',
+      anchor_city: 'Los Angeles, CA',
       website: groupData.website,
-      locationCountEstimate: groupData.locationEstimate,
-      sources: [source],
+      location_count_estimate: groupData.locationEstimate,
+      sources: JSON.parse(JSON.stringify([source])),
+      created_at: new Date(),
+      updated_at: new Date(),
     }
 
     // Validate
@@ -183,10 +187,10 @@ async function main() {
 
     // Create group
     try {
-      const createdGroup = await db.restaurantGroup.create({
+      const createdGroup = await db.restaurant_groups.create({
         data: group
       })
-      console.log(`   ✅ Created - ${createdGroup.locationEstimate} locations`)
+      console.log(`   ✅ Created - ${createdGroup.location_count_estimate} locations`)
       console.log(`      ${groupData.restaurants.join(', ')}`)
       created++
     } catch (error: any) {

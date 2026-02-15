@@ -38,7 +38,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
 
   // Places that appear on at least one published map
-  const placesOnMaps = await db.place.findMany({
+  const placesOnMaps = await db.places.findMany({
     where: {
       map_places: {
         some: {

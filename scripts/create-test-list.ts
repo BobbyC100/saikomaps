@@ -24,7 +24,7 @@ async function main() {
   console.log('✓ User created:', user.email);
 
   // Create test list
-  const list = await prisma.list.upsert({
+  const list = await prisma.lists.upsert({
     where: { slug: 'test-guide' },
     update: {
       userId: user.id,

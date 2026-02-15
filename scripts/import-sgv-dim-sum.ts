@@ -54,7 +54,7 @@ async function main() {
   const listTitle = 'SGV Chinese/Cantonese Dim Sum'
   const slug = `${generateSlug(listTitle)}-${Date.now()}`
   
-  const list = await db.list.create({
+  const list = await db.lists.create({
     data: {
       userId: USER_ID,
       title: listTitle,
@@ -124,7 +124,7 @@ async function main() {
     }
 
     // Check if place already exists
-    let place = googlePlaceId ? await db.place.findUnique({ where: { googlePlaceId } }) : null
+    let place = googlePlaceId ? await db.places.findUnique({ where: { googlePlaceId } }) : null
 
     if (!place) {
       const neighborhood = placeDetails
@@ -140,11 +140,11 @@ async function main() {
 
       const baseSlug = generatePlaceSlug(finalName, neighborhood ?? undefined)
       const uniqueSlug = await ensureUniqueSlug(baseSlug, async (s) => {
-        const exists = await db.place.findUnique({ where: { slug: s } })
+        const exists = await db.places.findUnique({ where: { slug: s } })
         return !!exists
       })
 
-      place = await db.place.create({
+      place = await db.places.create({
         data: {
           slug: uniqueSlug,
           googlePlaceId: googlePlaceId ?? undefined,

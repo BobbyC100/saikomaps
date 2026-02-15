@@ -10,22 +10,25 @@ async function main() {
   console.log('═'.repeat(80))
   
   // Get all lists
-  const lists = await db.list.findMany({
+  const lists = await db.lists.findMany({
     where: { userId: 'demo-user-id' },
     include: {
       _count: {
-        select: { mapPlaces: true }
+        select: { map_places: true }
       }
     },
     orderBy: { createdAt: 'desc' }
   })
 
   // Get all places
-  const allPlaces = await db.place.findMany({
-    include: {
-      mapPlaces: {
+  const allPlaces = await db.places.findMany({
+    select: {
+      id: true,
+      name: true,
+      editorialSources: true,
+      map_places: {
         include: {
-          map: true
+          lists: true
         }
       }
     }
@@ -38,14 +41,14 @@ async function main() {
   console.log('\n📍 MAPS OVERVIEW\n')
   lists.forEach((list, index) => {
     console.log(`${index + 1}. ${list.title}`)
-    console.log(`   Places: ${list._count.mapPlaces}`)
+    console.log(`   Places: ${list._count.map_places}`)
     console.log(`   Slug: ${list.slug}`)
     console.log(`   URL: http://localhost:3000/${list.slug}`)
     console.log('')
   })
 
   console.log(`Total Maps: ${lists.length}`)
-  console.log(`Total Place Entries: ${lists.reduce((sum, l) => sum + l._count.mapPlaces, 0)}`)
+  console.log(`Total Place Entries: ${lists.reduce((sum, l) => sum + l._count.map_places, 0)}`)
   console.log(`Unique Places: ${uniquePlaces}`)
 
   // Geographic Coverage
@@ -107,7 +110,7 @@ async function main() {
   console.log('\n\n📰 EDITORIAL SOURCES\n')
   const sourceCounts = new Map<string, number>()
   allPlaces.forEach(place => {
-    const sources = place.sources as any[]
+    const sources = place.editorialSources as any[]
     if (sources && Array.isArray(sources)) {
       sources.forEach(source => {
         if (source.name) {
@@ -152,17 +155,17 @@ async function main() {
 
   // Map Cross-Reference
   console.log('\n\n🔗 PLACES APPEARING ON MULTIPLE MAPS\n')
-  const placesOnMultipleMaps = allPlaces.filter(p => p.mapPlaces.length > 1)
+  const placesOnMultipleMaps = allPlaces.filter(p => p.map_places.length > 1)
   
   if (placesOnMultipleMaps.length > 0) {
     placesOnMultipleMaps
-      .sort((a, b) => b.mapPlaces.length - a.mapPlaces.length)
+      .sort((a, b) => b.map_places.length - a.map_places.length)
       .slice(0, 10)
       .forEach(place => {
         console.log(`   ${place.name}`)
-        console.log(`   → Appears on ${place.mapPlaces.length} maps:`)
-        place.mapPlaces.forEach(mp => {
-          console.log(`      • ${mp.map.title}`)
+        console.log(`   → Appears on ${place.map_places.length} maps:`)
+        place.map_places.forEach(mp => {
+          console.log(`      • ${mp.lists.title}`)
         })
         console.log('')
       })

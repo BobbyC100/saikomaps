@@ -56,9 +56,9 @@ async function main() {
   console.log('═'.repeat(80))
   
   // Get all places
-  const allPlaces = await db.place.findMany({
+  const allPlaces = await db.places.findMany({
     include: {
-      mapPlaces: {
+      map_places: {
         include: {
           map: true
         }
@@ -78,10 +78,10 @@ async function main() {
   })
 
   // Get LA County maps
-  const lists = await db.list.findMany({
+  const lists = await db.lists.findMany({
     where: { userId: 'demo-user-id' },
     include: {
-      mapPlaces: {
+      map_places: {
         include: {
           place: true
         }
@@ -91,7 +91,7 @@ async function main() {
 
   const laCountyMaps = lists.filter(list => {
     // Check if map has any LA County places
-    return list.mapPlaces.some(mp => 
+    return list.map_places.some(mp => 
       mp.place.neighborhood && LA_COUNTY_AREAS.some(area => 
         mp.place.neighborhood?.toLowerCase().includes(area.toLowerCase()) ||
         area.toLowerCase().includes(mp.place.neighborhood!.toLowerCase())
@@ -101,10 +101,10 @@ async function main() {
 
   console.log('\n📍 LA COUNTY MAPS\n')
   laCountyMaps
-    .filter(m => m.mapPlaces.length > 0)
-    .sort((a, b) => b.mapPlaces.length - a.mapPlaces.length)
+    .filter(m => m.map_places.length > 0)
+    .sort((a, b) => b.map_places.length - a.map_places.length)
     .forEach((map, index) => {
-      const laPlacesInMap = map.mapPlaces.filter(mp => 
+      const laPlacesInMap = map.map_places.filter(mp => 
         mp.place.neighborhood && LA_COUNTY_AREAS.some(area => 
           mp.place.neighborhood?.toLowerCase().includes(area.toLowerCase()) ||
           area.toLowerCase().includes(mp.place.neighborhood!.toLowerCase())
@@ -121,7 +121,7 @@ async function main() {
 
   console.log(`\n🎯 SUMMARY\n`)
   console.log(`Total Unique Places in LA County: ${laCountyPlaces.length}`)
-  console.log(`Total Maps with LA County Coverage: ${laCountyMaps.filter(m => m.mapPlaces.length > 0).length}`)
+  console.log(`Total Maps with LA County Coverage: ${laCountyMaps.filter(m => m.map_places.length > 0).length}`)
 
   // Breakdown by region
   console.log('\n\n🗺️  REGIONAL BREAKDOWN\n')

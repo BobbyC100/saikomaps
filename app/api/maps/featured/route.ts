@@ -13,9 +13,9 @@ const PLACEHOLDER_PHOTOS = [
   'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=250&fit=crop',
 ];
 
-function getCoverPhotos(mapPlaces: Array<{ places: { googlePhotos: unknown } }>): string[] {
+function getCoverPhotos(map_places: Array<{ places: { googlePhotos: unknown } }>): string[] {
   const urls: string[] = [];
-  for (const mp of mapPlaces) {
+  for (const mp of map_places) {
     const gp = mp.places?.googlePhotos;
     if (gp && Array.isArray(gp) && gp.length > 0) {
       const first = gp[0] as { url?: string };

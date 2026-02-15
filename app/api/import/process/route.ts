@@ -126,7 +126,7 @@ export async function POST(request: NextRequest) {
         userId,
         title: listTitle,
         slug,
-        templateType,
+templateType: templateType ?? undefined,
         accessLevel,
         published: accessLevel === 'public',
         updatedAt: new Date(),
@@ -216,6 +216,7 @@ export async function POST(request: NextRequest) {
             category: getSaikoCategory(finalName, placeDetails?.types ?? []),
             googlePhotos: placeDetails?.photos ? JSON.parse(JSON.stringify(placeDetails.photos)) : undefined,
             hours: placeDetails?.openingHours ? JSON.parse(JSON.stringify(placeDetails.openingHours)) : null,
+            updatedAt: new Date(),
           },
         });
 

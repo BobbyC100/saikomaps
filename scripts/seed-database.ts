@@ -74,7 +74,7 @@ async function seedPlace(data: MerchantData, scenarioSlug: string) {
   try {
     const placeData = mapToPlaceData(data, scenarioSlug);
     
-    const place = await prisma.place.create({
+    const place = await prisma.places.create({
       data: {
         ...placeData,
         sources: {
@@ -99,7 +99,7 @@ async function main() {
 
   try {
     // Optional: Clear existing scenario places
-    await prisma.place.deleteMany({
+    await prisma.places.deleteMany({
       where: {
         slug: {
           in: ['scenario-a', 'scenario-b', 'scenario-c']

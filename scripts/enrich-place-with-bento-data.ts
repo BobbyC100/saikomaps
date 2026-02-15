@@ -15,7 +15,7 @@ const prisma = new PrismaClient();
 async function enrichPlace(placeSlug: string) {
   console.log(`\n🎨 Enriching place: ${placeSlug}`);
 
-  const place = await prisma.place.findUnique({
+  const place = await prisma.places.findUnique({
     where: { slug: placeSlug },
   });
 
@@ -30,7 +30,7 @@ async function enrichPlace(placeSlug: string) {
   // Example tips (practical visitor advice)
   const tips = generateTips(place);
 
-  await prisma.place.update({
+  await prisma.places.update({
     where: { slug: placeSlug },
     data: {
       vibeTags,
@@ -109,7 +109,7 @@ function generateTips(place: any): string[] {
  */
 async function batchEnrich() {
   // Example: Enrich all places in a specific category
-  const places = await prisma.place.findMany({
+  const places = await prisma.places.findMany({
     where: {
       category: 'Coffee',
       vibeTags: { isEmpty: true }, // Only places without vibe tags
@@ -129,7 +129,7 @@ async function batchEnrich() {
  */
 async function manualEnrich() {
   // Example: Coffee shop
-  await prisma.place.upsert({
+  await prisma.places.upsert({
     where: { slug: 'biarritz-coffee-club' },
     create: {
       slug: 'biarritz-coffee-club',
@@ -148,7 +148,7 @@ async function manualEnrich() {
   console.log('✅ Manually enriched Biarritz Coffee Club');
 
   // Example: Upscale restaurant
-  await prisma.place.upsert({
+  await prisma.places.upsert({
     where: { slug: 'the-breakers-palm-beach' },
     create: {
       slug: 'the-breakers-palm-beach',
@@ -167,7 +167,7 @@ async function manualEnrich() {
   console.log('✅ Manually enriched The Breakers Palm Beach');
 
   // Example: Bar
-  await prisma.place.upsert({
+  await prisma.places.upsert({
     where: { slug: 'bar-leather-apron' },
     create: {
       slug: 'bar-leather-apron',

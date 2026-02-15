@@ -3,7 +3,7 @@
  * Common type definitions used throughout the app
  */
 
-import { User, List, Location, ImportJob } from '@prisma/client'
+import { users, lists, locations, import_jobs } from '@prisma/client'
 
 // ============================================
 // USER TYPES
@@ -11,7 +11,7 @@ import { User, List, Location, ImportJob } from '@prisma/client'
 
 export type SubscriptionTier = 'free' | 'personal' | 'business'
 
-export interface UserProfile extends User {
+export interface UserProfile extends users {
   listCount?: number
 }
 
@@ -22,9 +22,9 @@ export interface UserProfile extends User {
 export type TemplateType = 'field-notes' | 'field_notes'
 export type AccessLevel = 'public' | 'password' | 'private'
 
-export interface ListWithLocations extends List {
-  locations: Location[]
-  user: User
+export interface ListWithLocations extends lists {
+  locations: locations[]
+  user: users
 }
 
 export interface ListMetadata {

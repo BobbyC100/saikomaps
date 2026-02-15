@@ -9,9 +9,9 @@ async function main() {
   console.log('👨‍🍳 MINING CHEF & OWNER RECOMMENDATIONS\n')
   console.log('═'.repeat(80))
 
-  const allPlaces = await db.place.findMany({
+  const allPlaces = await db.places.findMany({
     include: {
-      mapPlaces: true,
+      map_places: true,
     }
   })
 
@@ -75,7 +75,7 @@ async function main() {
     }
 
     // Check user notes from map places
-    for (const mapPlace of place.mapPlaces) {
+    for (const mapPlace of place.map_places) {
       const note = mapPlace.userNote || ''
       
       for (const pattern of patterns) {

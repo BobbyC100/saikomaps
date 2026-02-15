@@ -4,6 +4,7 @@
  * Show divergence between practitioner recommendations and critic awards
  */
 
+import { Prisma } from '@prisma/client'
 import { db } from '@/lib/db'
 import type { ChefRec } from '@/lib/chef-recs'
 
@@ -11,17 +12,17 @@ async function main() {
   console.log('\n🔍 CHEF RECS vs AWARDS ANALYSIS\n')
   console.log('═'.repeat(80))
 
-  const placesWithChefRecs = await db.place.findMany({
+  const placesWithChefRecs = await db.places.findMany({
     where: {
       chefRecs: {
-        not: null
+        not: Prisma.DbNull
       }
     },
     select: {
       name: true,
       neighborhood: true,
       category: true,
-      sources: true,
+      editorialSources: true,
       chefRecs: true,
     },
     orderBy: {
@@ -35,8 +36,8 @@ async function main() {
   const withoutAwards: any[] = []
 
   for (const place of placesWithChefRecs) {
-    const sources = (place.sources as any[]) || []
-    const chefRecs = (place.chefRecs as ChefRec[]) || []
+    const sources = (place.editorialSources as any[]) || []
+    const chefRecs = (place.chefRecs as unknown as ChefRec[]) || []
     
     // Check for award sources
     const hasMichelin = sources.some(s => s.name?.includes('Michelin'))

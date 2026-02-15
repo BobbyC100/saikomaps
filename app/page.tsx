@@ -171,14 +171,14 @@ export default function HomePage() {
       <Hero />
       <SearchBar />
 
-      <BrowseSection items={browse} />
+      <BrowseSection columns={browse} seeAllHref="/explore" />
 
       <section className={styles.categorySection}>
         <div className={styles.section}>
           <SectionHeader
             title="Neighborhoods"
-            subtitle="Start with a part of town"
-            href="/explore?view=neighborhood"
+            linkText="See all"
+            linkHref="/explore?view=neighborhood"
           />
           <div className={styles.grid4}>
             {neighborhoods.map((n) => (
@@ -192,8 +192,8 @@ export default function HomePage() {
         <div className={styles.section}>
           <SectionHeader
             title="Categories"
-            subtitle="Browse by type"
-            href="/explore"
+            linkText="See all"
+            linkHref="/explore"
           />
           <div className={styles.grid2}>
             {categories.map((c) => (
@@ -207,8 +207,8 @@ export default function HomePage() {
         <div className={styles.section}>
           <SectionHeader
             title="Experiences"
-            subtitle="Pick the mood"
-            href="/explore?view=experience"
+            linkText="See all"
+            linkHref="/explore?view=experience"
           />
           <div className={styles.grid3}>
             {experiences.map((e) => (

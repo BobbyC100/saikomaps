@@ -115,6 +115,7 @@ export async function POST(request: NextRequest) {
       slug,
       templateType: template,
       published: false,
+      updatedAt: now,
 
     };
 

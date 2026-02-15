@@ -46,23 +46,23 @@ async function auditGoldenProfiles() {
   console.log(`Required fields: ${REQUIRED_FIELDS.join(', ')}`);
   console.log('');
 
-  const places = await prisma.goldenRecord.findMany({
+  const places = await prisma.golden_records.findMany({
     where: {
-      lifecycleStatus: 'ACTIVE',
+      lifecycle_status: 'ACTIVE',
     },
     select: {
-      id: true,
+      canonical_id: true,
       name: true,
       neighborhood: true,
-      address: true,
+      address_street: true,
+      address_city: true,
       category: true,
       phone: true,
-      hours: true,
-      photos: true,
+      hours_json: true,
       website: true,
-      instagram: true,
-      cuisine: true,
-      priceLevel: true,
+      instagram_handle: true,
+      cuisines: true,
+      price_level: true,
     }
   });
 
@@ -105,7 +105,7 @@ async function auditGoldenProfiles() {
     const score = (fieldsPresent / REQUIRED_FIELDS.length) * 100;
     
     scores.push({
-      id: place.id,
+      id: place.canonical_id,
       name: place.name,
       neighborhood: place.neighborhood,
       score,

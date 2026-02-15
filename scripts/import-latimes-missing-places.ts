@@ -67,7 +67,7 @@ async function main() {
   console.log(`\nImporting ${placesToImport.length} places...\n`)
 
   // Create or find the map
-  let list = await db.list.findFirst({
+  let list = await db.lists.findFirst({
     where: {
       title: 'LA Times: Where Chefs Eat'
     }
@@ -75,7 +75,7 @@ async function main() {
 
   if (!list) {
     const slug = `la-times-where-chefs-eat-${Date.now()}`
-    list = await db.list.create({
+    list = await db.lists.create({
       data: {
         userId: USER_ID,
         title: 'LA Times: Where Chefs Eat',
@@ -103,7 +103,7 @@ async function main() {
     console.log(`${progress} ${input.name}`)
 
     // Check if already exists
-    const existing = await db.place.findFirst({
+    const existing = await db.places.findFirst({
       where: {
         name: {
           contains: input.name,
@@ -147,7 +147,7 @@ async function main() {
 
       const baseSlug = generatePlaceSlug(finalName, neighborhood ?? undefined)
       const uniqueSlug = await ensureUniqueSlug(baseSlug, async (s) => {
-        const exists = await db.place.findUnique({ where: { slug: s } })
+        const exists = await db.places.findUnique({ where: { slug: s } })
         return !!exists
       })
 
@@ -157,7 +157,7 @@ async function main() {
         excerpt: input.comment,
       }]
 
-      const place = await db.place.create({
+      const place = await db.places.create({
         data: {
           slug: uniqueSlug,
           googlePlaceId: googlePlaceId ?? undefined,

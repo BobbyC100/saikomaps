@@ -28,11 +28,11 @@ async function backfillGoogleIds() {
   // Get places with Google IDs
   const placesWithIds = await prisma.places.findMany({
     where: {
-      google_place_id: { not: null }
+      googlePlaceId: { not: null }
     },
     select: {
       name: true,
-      google_place_id: true,
+      googlePlaceId: true,
       neighborhood: true,
       slug: true,
     }
@@ -77,11 +77,11 @@ async function backfillGoogleIds() {
       // Found a match! Copy the Google Place ID
       await prisma.golden_records.update({
         where: { canonical_id: golden.canonical_id },
-        data: { google_place_id: match.google_place_id }
+        data: { google_place_id: match.googlePlaceId }
       });
       
       updated++;
-      console.log(`✓ ${golden.name} → ${match.google_place_id}`);
+      console.log(`✓ ${golden.name} → ${match.googlePlaceId}`);
     } else {
       skipped++;
     }

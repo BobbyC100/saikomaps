@@ -249,7 +249,7 @@ async function checkDeadWebsites() {
   const whereClause = {
     website: { not: null },
     county: county,
-    lifecycle_status: 'ACTIVE', // Only check currently active places
+    lifecycle_status: 'ACTIVE' as const, // Only check currently active places
   };
 
   const records = await prisma.golden_records.findMany({

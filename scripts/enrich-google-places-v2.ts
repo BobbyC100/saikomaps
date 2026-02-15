@@ -90,7 +90,7 @@ async function enrichGoldenRecords() {
   console.log('');
 
   // Find places with Google IDs but missing key data
-  const placesToEnrich = await prisma.goldenRecord.findMany({
+  const placesToEnrich = await prisma.golden_records.findMany({
     where: {
       googlePlaceId: { not: null },
       OR: [
@@ -181,7 +181,7 @@ async function enrichGoldenRecords() {
         
         // Update lifecycle status if closed
         if (details.business_status === 'CLOSED_PERMANENTLY') {
-          updateData.lifecycleStatus = 'CLOSED_PERMANENTLY';
+          updateData.lifecycle_status = 'CLOSED_PERMANENTLY';
           updateData.archiveReason = 'CLOSED';
           updateData.archivedAt = new Date();
           updateData.archivedBy = 'google_sync';
@@ -194,7 +194,7 @@ async function enrichGoldenRecords() {
 
       // Only update if we have new data
       if (Object.keys(updateData).length > 0) {
-        await prisma.goldenRecord.update({
+        await prisma.golden_records.update({
           where: { id: place.id },
           data: {
             ...updateData,
@@ -231,21 +231,21 @@ async function enrichGoldenRecords() {
 }
 
 async function getDataStats() {
-  const total = await prisma.goldenRecord.count();
+  const total = await prisma.golden_records.count();
   
-  const withPhone = await prisma.goldenRecord.count({
+  const withPhone = await prisma.golden_records.count({
     where: { phone: { not: null } }
   });
   
-  const withHours = await prisma.goldenRecord.count({
+  const withHours = await prisma.golden_records.count({
     where: { hours: { not: null } }
   });
   
-  const withPhotos = await prisma.goldenRecord.count({
+  const withPhotos = await prisma.golden_records.count({
     where: { photos: { not: null } }
   });
   
-  const withAddress = await prisma.goldenRecord.count({
+  const withAddress = await prisma.golden_records.count({
     where: { address: { not: null } }
   });
 

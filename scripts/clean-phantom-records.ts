@@ -18,19 +18,21 @@ async function main() {
   const allPlaces = await prisma.places.findMany({
     where: {
       status: 'OPEN',
-      latitude: { not: null },
-      longitude: { not: null },
-      latitude: { not: 0 },
-      longitude: { not: 0 },
+      AND: [
+        { latitude: { not: null } },
+        { latitude: { not: 0 } },
+        { longitude: { not: null } },
+        { longitude: { not: 0 } },
+      ]
     },
     select: {
       id: true,
       name: true,
       address: true,
       neighborhood: true,
-      google_place_id: true,
+      googlePlaceId: true,
       category: true,
-      editorial_sources: true,
+      editorialSources: true,
       latitude: true,
       longitude: true,
     },
@@ -38,8 +40,8 @@ async function main() {
 
   // Filter to Tier 3 only
   const tier3 = allPlaces.filter(place => {
-    if (!place.editorial_sources) return true;
-    if (Array.isArray(place.editorial_sources) && place.editorial_sources.length === 0) return true;
+    if (!place.editorialSources) return true;
+    if (Array.isArray(place.editorialSources) && place.editorialSources.length === 0) return true;
     return false;
   });
 
@@ -48,7 +50,7 @@ async function main() {
   // Identify phantom records (no address AND no Google Place ID)
   const phantoms = tier3.filter(place => {
     const noAddress = !place.address || place.address.trim() === '';
-    const noGoogleId = !place.google_place_id || place.google_place_id.trim() === '';
+    const noGoogleId = !place.googlePlaceId || place.googlePlaceId.trim() === '';
     return noAddress && noGoogleId;
   });
 
@@ -76,7 +78,7 @@ async function main() {
   console.log('PHANTOM vs REAL RECORD COMPARISON (Sample)');
   console.log('════════════════════════════════════════════════════════════\n');
 
-  const realPlaces = tier3.filter(p => p.address && p.google_place_id);
+  const realPlaces = tier3.filter(p => p.address && p.googlePlaceId);
   const realByName = new Map<string, typeof realPlaces>();
   for (const real of realPlaces) {
     const name = real.name?.trim().toLowerCase() || '';
@@ -100,7 +102,7 @@ async function main() {
       
       console.log(`"${phantomRecords[0].name}" - Duplicate found!`);
       console.log(`  ✅ REAL: ${realRecords[0].address}`);
-      console.log(`     Google ID: ${realRecords[0].google_place_id}`);
+      console.log(`     Google ID: ${realRecords[0].googlePlaceId}`);
       console.log(`  ❌ PHANTOM: No address, no Google ID`);
       console.log(`     (${phantomRecords.length} phantom copies)\n`);
     }
@@ -131,7 +133,7 @@ async function main() {
   
   // Delete related records first
   const mapPlacesDeleted = await prisma.map_places.deleteMany({
-    where: { place_id: { in: phantomIds } },
+    where: { placeId: { in: phantomIds } },
   });
   console.log(`  Deleted ${mapPlacesDeleted.count} map_places records`);
 
@@ -141,7 +143,7 @@ async function main() {
   console.log(`  Deleted ${personPlacesDeleted.count} person_places records`);
 
   const bookmarksDeleted = await prisma.viewer_bookmarks.deleteMany({
-    where: { place_id: { in: phantomIds } },
+    where: { placeId: { in: phantomIds } },
   });
   console.log(`  Deleted ${bookmarksDeleted.count} viewer_bookmarks records`);
 

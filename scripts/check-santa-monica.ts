@@ -9,7 +9,7 @@ async function main() {
   console.log('═'.repeat(80))
 
   // Check Santa Monica map
-  const santaMonicaMap = await db.list.findFirst({
+  const santaMonicaMap = await db.lists.findFirst({
     where: {
       title: {
         contains: 'Santa Monica',
@@ -17,9 +17,9 @@ async function main() {
       }
     },
     include: {
-      mapPlaces: {
+      map_places: {
         include: {
-          place: true
+          places: true
         }
       }
     }
@@ -27,18 +27,18 @@ async function main() {
 
   if (santaMonicaMap) {
     console.log(`\n📍 Found map: "${santaMonicaMap.title}"`)
-    console.log(`   Places on map: ${santaMonicaMap.mapPlaces.length}\n`)
+    console.log(`   Places on map: ${santaMonicaMap.map_places.length}\n`)
     
     console.log('Places and their neighborhoods:')
-    santaMonicaMap.mapPlaces.forEach(mp => {
-      console.log(`  • ${mp.place.name}`)
-      console.log(`    Neighborhood: ${mp.place.neighborhood || 'NULL'}`)
-      console.log(`    Address: ${mp.place.address}\n`)
+    santaMonicaMap.map_places.forEach(mp => {
+      console.log(`  • ${mp.places.name}`)
+      console.log(`    Neighborhood: ${mp.places.neighborhood || 'NULL'}`)
+      console.log(`    Address: ${mp.places.address}\n`)
     })
   }
 
   // Search for places with Santa Monica in address
-  const placesWithSM = await db.place.findMany({
+  const placesWithSM = await db.places.findMany({
     where: {
       address: {
         contains: 'Santa Monica',
@@ -61,7 +61,7 @@ async function main() {
   })
 
   // Check all unique neighborhoods
-  const allPlaces = await db.place.findMany({
+  const allPlaces = await db.places.findMany({
     select: {
       neighborhood: true,
     }

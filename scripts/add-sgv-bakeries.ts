@@ -3,6 +3,7 @@
  * Adds places from CSV to the existing SGV Eater LA Picks map
  */
 
+import { randomUUID } from 'crypto'
 import { db } from '@/lib/db'
 import { searchPlace, getPlaceDetails, getNeighborhoodFromPlaceDetails, getNeighborhoodFromCoords } from '@/lib/google-places'
 import { extractPlaceId } from '@/lib/utils/googleMapsParser'
@@ -82,7 +83,7 @@ async function main() {
 
   // Get existing map
   console.log('📋 Finding existing map...')
-  const list = await db.list.findFirst({
+  const list = await db.lists.findFirst({
     where: { slug: MAP_SLUG },
   })
 
@@ -97,7 +98,7 @@ async function main() {
   console.log(`   URL: http://localhost:3000/${list.slug}\n`)
 
   // Get current max order index
-  const lastMapPlace = await db.mapPlace.findFirst({
+  const lastMapPlace = await db.map_places.findFirst({
     where: { mapId: list.id },
     orderBy: { orderIndex: 'desc' },
     select: { orderIndex: true },
@@ -160,7 +161,7 @@ async function main() {
     }
 
     // Check if place already exists
-    let place = googlePlaceId ? await db.place.findUnique({ where: { googlePlaceId } }) : null
+    let place = googlePlaceId ? await db.places.findUnique({ where: { googlePlaceId } }) : null
 
     if (!place) {
       // Create new place
@@ -177,38 +178,30 @@ async function main() {
 
       const baseSlug = generatePlaceSlug(finalName, neighborhood ?? undefined)
       const uniqueSlug = await ensureUniqueSlug(baseSlug, async (s) => {
-        const exists = await db.place.findUnique({ where: { slug: s } })
+        const exists = await db.places.findUnique({ where: { slug: s } })
         return !!exists
       })
 
-      // Parse editorial sources from comment
-      const sources = input.sourceUrl ? [
-        {
-          name: extractSourceName(input.sourceUrl),
-          url: input.sourceUrl,
-          excerpt: input.comment || '',
-        }
-      ] : []
-
-      place = await db.place.create({
+      place = await db.places.create({
         data: {
+          id: randomUUID(),
           slug: uniqueSlug,
           googlePlaceId: googlePlaceId ?? undefined,
           name: finalName,
-          address: placeDetails?.formattedAddress ?? (input.address && !input.address.startsWith('http') ? input.address : null),
-          latitude: placeDetails?.location ? placeDetails.location.lat : null,
-          longitude: placeDetails?.location ? placeDetails.location.lng : null,
-          phone: placeDetails?.formattedPhoneNumber ?? null,
-          website: placeDetails?.website ?? null,
-          googleTypes: placeDetails?.types ?? [],
-          priceLevel: placeDetails?.priceLevel ?? null,
-          neighborhood: neighborhood ?? null,
-          cuisineType: placeDetails?.types ? parseCuisineType(placeDetails.types) ?? null : null,
+          address: placeDetails?.formattedAddress ?? (input.address && !input.address.startsWith('http') ? input.address : undefined),
+          latitude: placeDetails?.location ? placeDetails.location.lat : undefined,
+          longitude: placeDetails?.location ? placeDetails.location.lng : undefined,
+          phone: placeDetails?.formattedPhoneNumber ?? undefined,
+          website: placeDetails?.website ?? undefined,
+          googleTypes: placeDetails?.types ?? undefined,
+          priceLevel: placeDetails?.priceLevel ?? undefined,
+          neighborhood: neighborhood ?? undefined,
+          cuisineType: placeDetails?.types ? parseCuisineType(placeDetails.types) ?? undefined : undefined,
           category: getSaikoCategory(finalName, placeDetails?.types ?? []),
           googlePhotos: placeDetails?.photos ? JSON.parse(JSON.stringify(placeDetails.photos)) : undefined,
-          hours: placeDetails?.openingHours ? JSON.parse(JSON.stringify(placeDetails.openingHours)) : null,
-          placesDataCachedAt: placeDetails ? new Date() : null,
-          sources: sources.length > 0 ? sources : undefined,
+          hours: placeDetails?.openingHours ? JSON.parse(JSON.stringify(placeDetails.openingHours)) : undefined,
+          placesDataCachedAt: placeDetails ? new Date() : undefined,
+          updatedAt: new Date(),
         },
       })
 
@@ -226,7 +219,7 @@ async function main() {
     } else {
       existing++
       // Update existing place with editorial sources if not already present
-      const existingSources = (place.sources as any[]) || []
+      const existingSources = (place.editorialSources as any[]) || []
       const newSource = input.sourceUrl ? {
         name: extractSourceName(input.sourceUrl),
         url: input.sourceUrl,
@@ -234,10 +227,10 @@ async function main() {
       } : null
 
       if (newSource && !existingSources.some((s: any) => s.url === newSource.url)) {
-        place = await db.place.update({
+        place = await db.places.update({
           where: { id: place.id },
           data: {
-            sources: [...existingSources, newSource],
+            editorialSources: [...existingSources, newSource],
           },
         })
         console.log(`   ↻ Updated place with new source: ${place.name}`)
@@ -248,17 +241,19 @@ async function main() {
     }
 
     // Create MapPlace (link place to map)
-    const existingMapPlace = await db.mapPlace.findUnique({
+    const existingMapPlace = await db.map_places.findUnique({
       where: { mapId_placeId: { mapId: list.id, placeId: place.id } },
     })
 
     if (!existingMapPlace) {
-      await db.mapPlace.create({
+      await db.map_places.create({
         data: {
+          id: randomUUID(),
           mapId: list.id,
           placeId: place.id,
           userNote: input.comment?.trim() || null,
           orderIndex: nextOrderIndex++,
+          updatedAt: new Date(),
         },
       })
       addedToMap++

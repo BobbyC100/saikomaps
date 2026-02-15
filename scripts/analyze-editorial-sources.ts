@@ -53,15 +53,17 @@ async function main() {
   const places = await prisma.places.findMany({
     where: {
       status: 'OPEN',
-      latitude: { not: null },
-      longitude: { not: null },
-      latitude: { not: 0 },
-      longitude: { not: 0 },
+      AND: [
+        { latitude: { not: null } },
+        { latitude: { not: 0 } },
+        { longitude: { not: null } },
+        { longitude: { not: 0 } },
+      ]
     },
     select: {
       id: true,
       name: true,
-      editorial_sources: true,
+      editorialSources: true,
       neighborhood: true,
       category: true,
     },
@@ -73,7 +75,7 @@ async function main() {
   const sourceBreakdown = new Map<string, { count: number; examples: string[] }>();
 
   for (const place of places) {
-    const category = categorizeSource(place.editorial_sources);
+    const category = categorizeSource(place.editorialSources);
     
     if (!sourceBreakdown.has(category)) {
       sourceBreakdown.set(category, { count: 0, examples: [] });
@@ -141,13 +143,13 @@ async function main() {
 
     const multiSourcePlaces = places
       .filter(p => {
-        const sources = Array.isArray(p.editorial_sources) ? p.editorial_sources : [];
+        const sources = Array.isArray(p.editorialSources) ? p.editorialSources : [];
         return sources.length >= 2;
       })
       .slice(0, 10);
 
     for (const place of multiSourcePlaces) {
-      const sources = Array.isArray(place.editorial_sources) ? place.editorial_sources : [];
+      const sources = Array.isArray(place.editorialSources) ? place.editorialSources : [];
       console.log(`${place.name} (${place.neighborhood || 'N/A'})`);
       console.log(`  Sources: ${sources.length}`);
       for (const source of sources.slice(0, 3)) {

@@ -23,7 +23,7 @@ async function importSources() {
       const data = JSON.parse(fs.readFileSync(filePath, "utf-8"));
 
       // Update the place with sources
-      const result = await prisma.place.updateMany({
+      const result = await prisma.places.updateMany({
         where: { slug: data.place_slug || slug },
         data: { sources: data.sources },
       });

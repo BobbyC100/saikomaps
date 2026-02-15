@@ -35,7 +35,7 @@ async function diagnoseMissingPhotos() {
   console.log('');
 
   // Fetch all places with their photo data
-  const places = await prisma.place.findMany({
+  const places = await prisma.places.findMany({
     select: {
       id: true,
       name: true,

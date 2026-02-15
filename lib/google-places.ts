@@ -309,11 +309,11 @@ export async function getPlaceDetails(
     businessStatus: place.business_status,
     addressComponents: addressComponents || undefined,
     vicinity: place.vicinity || undefined,
-    zip,
-    city,
-    state,
-    country,
-    county,
+    zip: zip || undefined,
+    city: city || undefined,
+    state: state || undefined,
+    country: country || undefined,
+    county: county || undefined,
   };
 }
 

@@ -10,7 +10,7 @@ import { getSaikoCategory } from '../lib/categoryMapping';
 const prisma = new PrismaClient();
 
 async function main() {
-  const places = await prisma.place.findMany();
+  const places = await prisma.places.findMany();
   let updated = 0;
 
   for (const place of places) {
@@ -19,7 +19,7 @@ async function main() {
       (place.googleTypes as string[]) || []
     );
     if (place.category !== newCategory) {
-      await prisma.place.update({
+      await prisma.places.update({
         where: { id: place.id },
         data: { category: newCategory },
       });

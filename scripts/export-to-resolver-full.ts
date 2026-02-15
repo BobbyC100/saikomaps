@@ -116,12 +116,12 @@ async function exportPlacesToResolver() {
         businessStatus: place.businessStatus,
         
         // Lifecycle (for new editorial system)
-        lifecycleStatus: place.status === 'CLOSED' ? 'CLOSED_PERMANENTLY' : 'ACTIVE',
+        lifecycle_status: place.status === 'CLOSED' ? 'CLOSED_PERMANENTLY' : 'ACTIVE',
       };
 
       if (existing) {
         // Update existing record with full data
-        await prisma.goldenRecord.update({
+        await prisma.golden_records.update({
           where: { slug: place.slug },
           data: {
             ...data,
@@ -131,7 +131,7 @@ async function exportPlacesToResolver() {
         updated++;
       } else {
         // Create new record
-        await prisma.goldenRecord.create({
+        await prisma.golden_records.create({
           data: {
             ...data,
             createdAt: place.createdAt || new Date(),
@@ -154,13 +154,13 @@ async function exportPlacesToResolver() {
   console.log('');
 
   // Verify Google Place IDs
-  const withGoogleId = await prisma.goldenRecord.count({
+  const withGoogleId = await prisma.golden_records.count({
     where: {
       googlePlaceId: { not: null }
     }
   });
 
-  const total = await prisma.goldenRecord.count();
+  const total = await prisma.golden_records.count();
 
   console.log('📊 Google Place ID Coverage:');
   console.log(`   ${withGoogleId} / ${total} places have Google IDs (${Math.round(withGoogleId/total*100)}%)`);

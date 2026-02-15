@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 async function analyzeEnrichmentStatus() {
   console.log('🔍 Analyzing Place Enrichment Status...\n');
 
-  const places = await prisma.place.findMany({
+  const places = await prisma.places.findMany({
     select: {
       id: true,
       name: true,
@@ -21,9 +21,9 @@ async function analyzeEnrichmentStatus() {
       vibeTags: true,
       tips: true,
       pullQuote: true,
-      mapPlaces: {
+      map_places: {
         select: {
-          map: {
+          lists: {
             select: { title: true }
           }
         }
@@ -160,7 +160,7 @@ async function analyzeEnrichmentStatus() {
 
   const needsVoiceEngine = places.filter(p => 
     !p.tagline && p.vibeTags.length === 0 && p.tips.length === 0
-  ).filter(p => p.mapPlaces.length > 0); // Only places used in maps
+  ).filter(p => p.map_places.length > 0); // Only places used in maps
 
   console.log(`📸 Need Google Places enrichment:  ${needsGoogle.length} places`);
   console.log(`🎤 Need Voice Engine enrichment:   ${needsVoiceEngine.length} places (in maps)`);
@@ -168,7 +168,7 @@ async function analyzeEnrichmentStatus() {
   if (needsVoiceEngine.length > 0) {
     console.log(`\n   Top 10 places needing Voice Engine enrichment:`);
     needsVoiceEngine.slice(0, 10).forEach(p => {
-      console.log(`   • ${p.name} (${p.slug}) - Used in ${p.mapPlaces.length} map(s)`);
+      console.log(`   • ${p.name} (${p.slug}) - Used in ${p.map_places.length} map(s)`);
     });
     if (needsVoiceEngine.length > 10) {
       console.log(`   ... and ${needsVoiceEngine.length - 10} more`);

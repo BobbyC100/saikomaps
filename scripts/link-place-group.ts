@@ -23,7 +23,7 @@ async function main() {
   console.log('═'.repeat(80))
 
   // Find place
-  const place = await db.place.findFirst({
+  const place = await db.places.findFirst({
     where: {
       OR: [
         { name: { contains: placeName, mode: 'insensitive' } },
@@ -70,7 +70,7 @@ async function main() {
   console.log(`Restaurant Group: ${group.name}`)
 
   // Link place to group
-  await db.place.update({
+  await db.places.update({
     where: { id: place.id },
     data: { restaurantGroupId: group.id }
   })

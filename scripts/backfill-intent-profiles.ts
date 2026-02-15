@@ -16,7 +16,7 @@ async function main() {
   console.log('🔄 Starting intent profile backfill...\n');
 
   // Fetch all places
-  const places = await prisma.place.findMany({
+  const places = await prisma.places.findMany({
     select: {
       id: true,
       name: true,
@@ -51,7 +51,7 @@ async function main() {
 
     // Update if different from current value
     if (place.intentProfile !== profile) {
-      await prisma.place.update({
+      await prisma.places.update({
         where: { id: place.id },
         data: {
           intentProfile: profile,
