@@ -15,6 +15,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getGooglePhotoUrl, getPhotoRefFromStored } from '@/lib/google-places';
 import { requireActiveCityId } from '@/lib/active-city';
+import { publicPlaceWhere } from '@/lib/coverage-gate';
 
 const GOOGLE_MAPS_API_KEY =
   process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || process.env.GOOGLE_PLACES_API_KEY || '';
@@ -73,9 +74,7 @@ export async function GET(request: NextRequest) {
             take: 4,
             orderBy: { orderIndex: 'asc' },
             where: {
-              places: {
-                cityId: cityId, // Only include LA places in map previews
-              },
+              places: publicPlaceWhere(cityId, true), // LA places with approved coverage (or legacy JSON)
             },
             include: {
               places: {

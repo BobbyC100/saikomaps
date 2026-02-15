@@ -1,6 +1,7 @@
 import { MetadataRoute } from 'next';
 import { db } from '@/lib/db';
 import { requireActiveCityId } from '@/lib/active-city';
+import { publicPlaceWhere } from '@/lib/coverage-gate';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://saikomaps.com';
@@ -39,18 +40,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  // Places that appear on at least one published map (LA only)
+  // Places that appear on at least one published map (LA only + approved coverage)
   const placesOnMaps = await db.places.findMany({
-    where: {
-      cityId, // LA only
-      map_places: {
-        some: {
-          lists: {
-            published: true,
-          },
-        },
-      },
-    },
+    where: publicPlaceWhere(cityId, true), // Allow legacy during transition
     select: {
       slug: true,
       updatedAt: true,
