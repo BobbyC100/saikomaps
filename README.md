@@ -114,6 +114,8 @@ Optimized for social sharing. The share is a teaser, not the whole map — tappi
 
 Built with Cursor AI as the primary development tool, with Claude providing structured specifications and troubleshooting guidance. Session-based authentication with database foreign key relationships for user management.
 
+**All PRs must follow `/docs/PR_TEMPLATE.md`.**
+
 ---
 
 **Saiko Maps · 2026**
