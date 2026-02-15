@@ -18,6 +18,18 @@ import { getGooglePhotoUrl, getPhotoRefFromStored } from '@/lib/google-places';
 const GOOGLE_MAPS_API_KEY =
   process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || process.env.GOOGLE_PLACES_API_KEY || '';
 
+// ═══════════════════════════════════════════════════════════════════════════
+// CITY GATE: Only show LA places in public Explore
+// ═══════════════════════════════════════════════════════════════════════════
+async function requireActiveCityId(): Promise<string> {
+  const city = await db.cities.findUnique({
+    where: { slug: 'los-angeles' },
+    select: { id: true },
+  });
+  if (!city) throw new Error('Active city (Los Angeles) not found in database');
+  return city.id;
+}
+
 function getCoverPhotoUrl(photos: unknown): string | null {
   if (!photos || !Array.isArray(photos) || photos.length === 0) return null;
   const first = photos[0] as { photo_reference?: string; photoReference?: string; name?: string };
@@ -32,6 +44,9 @@ function getCoverPhotoUrl(photos: unknown): string | null {
 
 export async function GET(request: NextRequest) {
   try {
+    // Fetch LA city ID once at the start
+    const cityId = await requireActiveCityId();
+
     const { searchParams } = new URL(request.url);
 
     const q = searchParams.get('q')?.trim() || '';
@@ -68,6 +83,11 @@ export async function GET(request: NextRequest) {
           map_places: {
             take: 4,
             orderBy: { orderIndex: 'asc' },
+            where: {
+              places: {
+                cityId: cityId, // Only include LA places in map previews
+              },
+            },
             include: {
               places: {
                 select: {
