@@ -177,15 +177,26 @@ export function transformDatabaseToMerchant(place: any): MerchantData {
   const { hours } = buildHoursState(place.hours);
   const openStatus = buildOpenStatus(hours);
   
-  // Coverage sources from relation
-  const coverageSources = place.sources?.length > 0
-    ? place.sources.map((source: any) => ({
-        publication: source.publication,
-        quote: normalizeText(source.quote),
-        url: source.url,
-        date: source.date,
-      }))
-    : undefined;
+  // Coverage sources - prefer coverages relation, fallback to editorialSources JSON
+  let coverageSources: any[] | undefined;
+  
+  if (place.coverages && place.coverages.length > 0) {
+    // Use relational data from place_coverages table
+    coverageSources = place.coverages.map((coverage: any) => ({
+      publication: coverage.source.name,
+      quote: normalizeText(coverage.quote || coverage.excerpt),
+      url: coverage.url,
+      date: coverage.publishedAt?.toISOString().split('T')[0],
+    }));
+  } else if (place.editorialSources && Array.isArray(place.editorialSources)) {
+    // Fallback to legacy JSON
+    coverageSources = place.editorialSources.map((source: any) => ({
+      publication: source.publication || source.name,
+      quote: normalizeText(source.content || source.excerpt),
+      url: source.url,
+      date: source.published_at || source.publishedAt,
+    }));
+  }
   
   return {
     id: place.id,

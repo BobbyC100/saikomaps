@@ -21,7 +21,17 @@ export async function getMerchantBySlug(slug: string): Promise<MerchantData | nu
       cityId, // LA only
     },
     include: {
-      // Only relation that exists in schema
+      coverages: {
+        where: {
+          status: 'APPROVED',
+        },
+        include: {
+          source: true,
+        },
+        orderBy: {
+          publishedAt: 'desc',
+        },
+      },
     },
   });
 
