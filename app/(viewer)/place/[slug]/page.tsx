@@ -9,6 +9,7 @@ import { HeroSection } from '@/components/merchant/HeroSection';
 import { ActionStrip } from '@/components/merchant/ActionStrip';
 import { GalleryLightbox } from '@/components/merchant/GalleryLightbox';
 import { HoursCard } from '@/components/merchant/HoursCard';
+import MarketFactsCard from '@/components/merchant/MarketFactsCard';
 import { DetailsCard } from '@/components/merchant/DetailsCard';
 import { CoverageCard } from '@/components/merchant/CoverageCard';
 import { GalleryCard } from '@/components/merchant/GalleryCard';
@@ -68,6 +69,10 @@ interface LocationData {
     name: string;
     slug: string;
   } | null;
+  // Markets UI Gating
+  placeType?: 'venue' | 'activity' | 'public';
+  categorySlug?: string | null;
+  marketSchedule?: any | null;
 }
 
 interface AppearsOnItem {
@@ -306,6 +311,12 @@ export default function PlacePage() {
   }
 
   const { location, appearsOn } = data;
+  
+  // Markets UI Gating: Show MarketFactsCard for scheduled markets (activity + market category)
+  const isMarketActivity = 
+    location.placeType === 'activity' && 
+    location.categorySlug === 'market';
+  
   const { today, isOpen, closesAt, opensAt, fullWeek, isIrregular } = parseHours(location.hours);
   const instagramHandle = normalizeInstagram(location.instagram);
 
@@ -421,15 +432,24 @@ export default function PlacePage() {
             gap: 12,
           }}
         >
-          {/* Row 1: Hours (2) + Details (4) OR Hours (6) */}
-          <HoursCard
-            todayHours={today}
-            isOpen={isOpen}
-            statusText={statusText}
-            fullWeek={fullWeek}
-            isIrregular={isIrregular}
-            span={2}
-          />
+          {/* Row 1: Hours/Market (2) + Details (4) */}
+          {isMarketActivity ? (
+            <MarketFactsCard
+              schedule={location.marketSchedule}
+              website={location.website ?? null}
+              instagram={location.instagram ?? null}
+              span={2}
+            />
+          ) : (
+            <HoursCard
+              todayHours={today}
+              isOpen={isOpen}
+              statusText={statusText}
+              fullWeek={fullWeek}
+              isIrregular={isIrregular}
+              span={2}
+            />
+          )}
 
           <DetailsCard
             address={location.address}
