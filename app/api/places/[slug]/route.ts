@@ -8,6 +8,18 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getGooglePhotoUrl, getPhotoRefFromStored } from '@/lib/google-places';
 
+// ═══════════════════════════════════════════════════════════════════════════
+// CITY GATE: Only show LA places in public place detail pages
+// ═══════════════════════════════════════════════════════════════════════════
+async function requireActiveCityId(): Promise<string> {
+  const city = await db.cities.findUnique({
+    where: { slug: 'los-angeles' },
+    select: { id: true },
+  });
+  if (!city) throw new Error('Active city (Los Angeles) not found in database');
+  return city.id;
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
@@ -22,8 +34,14 @@ export async function GET(
       );
     }
 
-    const place = await db.places.findUnique({
-      where: { slug },
+    // Gate to LA city only
+    const cityId = await requireActiveCityId();
+
+    const place = await db.places.findFirst({
+      where: { 
+        slug,
+        cityId  // LA only
+      },
       include: {
         map_places: {
           include: {
