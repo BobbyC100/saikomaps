@@ -700,3 +700,81 @@ enum VerificationStatus {
   SOURCE_CONFIRMED
   FOUNDER_VERIFIED
 }
+
+// ============================================================================
+// NEWSLETTER INGESTION — APPROVAL FRAMEWORK V1
+// Two-table hybrid for operator-derived operational deltas
+// ============================================================================
+
+enum SignalSourceType {
+  newsletter_email
+}
+
+enum ProposedSignalType {
+  closure
+  hours_override
+  event
+  recurring_program
+  uncertainty
+}
+
+enum ProposedSignalStatus {
+  proposed
+  approved
+  rejected
+  superseded
+}
+
+enum OverlayType {
+  closure
+  hours_override
+  event
+  uncertainty
+}
+
+enum OverlayApprovalMethod {
+  manual
+}
+
+/// Proposed signals - immutable extraction records from newsletters
+model proposed_signals {
+  id                String               @id @default(cuid())
+  placeId           String               @map("place_id")
+  sourceType        SignalSourceType     @map("source_type")
+  sourceId          String               @map("source_id") // email message-id or stored email record id
+  signalType        ProposedSignalType   @map("signal_type")
+  extractedData     Json                 @map("extracted_data")
+  confidenceScore   Float?               @map("confidence_score")
+  evidenceExcerpt   String?              @map("evidence_excerpt")
+  status            ProposedSignalStatus @default(proposed)
+  createdAt         DateTime             @default(now()) @map("created_at")
+  updatedAt         DateTime             @updatedAt @map("updated_at")
+  
+  // Relations
+  operational_overlay operational_overlays?
+
+  @@index([placeId])
+  @@index([status])
+  @@index([signalType])
+  @@index([createdAt])
+}
+
+/// Operational overlays - approved, time-bounded state
+model operational_overlays {
+  id              String                 @id @default(cuid())
+  placeId         String                 @map("place_id")
+  sourceSignalId  String                 @unique @map("source_signal_id")
+  overlayType     OverlayType            @map("overlay_type")
+  startsAt        DateTime               @map("starts_at")
+  endsAt          DateTime               @map("ends_at")
+  overrideData    Json?                  @map("override_data")
+  approvalMethod  OverlayApprovalMethod  @default(manual) @map("approval_method")
+  createdAt       DateTime               @default(now()) @map("created_at")
+
+  // Relations
+  proposed_signal proposed_signals @relation(fields: [sourceSignalId], references: [id])
+
+  @@index([placeId])
+  @@index([startsAt])
+  @@index([endsAt])
+}

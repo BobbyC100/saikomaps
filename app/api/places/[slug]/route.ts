@@ -7,6 +7,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getGooglePhotoUrl, getPhotoRefFromStored } from '@/lib/google-places';
+import { getActiveOverlays } from '@/lib/overlays/getActiveOverlays';
 
 export async function GET(
   request: NextRequest,
@@ -93,6 +94,33 @@ export async function GET(
         hours = null;
       }
     }
+
+    // ============================================================================
+    // NEWSLETTER INGESTION: Read-Path Integration (Phase 1)
+    // Fetch active overlays for this place (debug only, no UI mutation yet)
+    // ============================================================================
+    let activeOverlays: any[] = [];
+    try {
+      activeOverlays = await getActiveOverlays({
+        placeId: place.id,
+        now: new Date(),
+      });
+
+      if (activeOverlays.length > 0) {
+        console.log(`[Newsletter Overlay] Place ${place.slug} has ${activeOverlays.length} active overlay(s):`, {
+          overlays: activeOverlays.map((o) => ({
+            type: o.overlayType,
+            startsAt: o.startsAt,
+            endsAt: o.endsAt,
+            sourceSignalId: o.sourceSignalId,
+          })),
+        });
+      }
+    } catch (error) {
+      console.error(`[Newsletter Overlay] Failed to fetch overlays for place ${place.slug}:`, error);
+      // Don't fail the request if overlay fetch fails
+    }
+    // ============================================================================
 
     // Format appearsOn (only published maps) and curator note from first map with descriptor
     const publishedMapPlaces = place.map_places.filter((mp) => mp.lists && mp.lists.status === 'PUBLISHED');
