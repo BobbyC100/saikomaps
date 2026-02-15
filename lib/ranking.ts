@@ -8,11 +8,13 @@
  * This is an anti-repetition rule, not an algorithm. It ensures variety in discovery
  * without changing the underlying ranking scores.
  * 
- * @param places - Array of places with cuisineType
+ * Uses cuisinePrimary (Saiko-curated taxonomy) with fallback to cuisineType (legacy).
+ * 
+ * @param places - Array of places with cuisinePrimary and/or cuisineType
  * @param maxConsecutive - Maximum number of consecutive places with same cuisine (default: 3)
  * @returns Filtered array with diversity applied
  */
-export function applyDiversityFilter<T extends { cuisineType?: string | null }>(
+export function applyDiversityFilter<T extends { cuisinePrimary?: string | null; cuisineType?: string | null }>(
   places: T[],
   maxConsecutive: number = 3
 ): T[] {
@@ -21,7 +23,8 @@ export function applyDiversityFilter<T extends { cuisineType?: string | null }>(
   const deferred: T[] = []; // Places to add at the end
 
   for (const place of places) {
-    const cuisine = place.cuisineType;
+    // EOS: Prefer curated cuisinePrimary, fallback to legacy cuisineType
+    const cuisine = place.cuisinePrimary || place.cuisineType;
     
     // Count how many of this cuisine type in recent window
     const consecutiveCount = recentCuisines.filter(c => c === cuisine).length;

@@ -4,6 +4,14 @@ import path from "node:path";
 import { db } from "@/lib/db";
 import { requireActiveCityId } from "@/lib/active-city";
 
+const DEBUG = process.argv.includes("--debug");
+const DEBUG_NAME = (() => {
+  const i = process.argv.indexOf("--debug");
+  if (i === -1) return null;
+  const next = process.argv[i + 1];
+  return next && !next.startsWith("--") ? next : null;
+})();
+
 import {
   CuisinePrimary,
   CuisineSecondary,
@@ -94,6 +102,10 @@ function detectPrimaryByName(nameN: string): { primary: CuisinePrimary | null; r
   if (includesAny(nameN, TOKENS.vietnamesePrimary)) return { primary: "Vietnamese", rule: "nameToken=vietnamese" };
   if (includesAny(nameN, TOKENS.indianPrimary)) return { primary: "Indian", rule: "nameToken=indian" };
 
+  // American subcategories (Checkpoint 5.11D: High-yield coverage boost)
+  if (includesAny(nameN, TOKENS.burgersPrimary)) return { primary: "Burgers", rule: "nameToken=burgers" };
+  if (includesAny(nameN, TOKENS.bbqPrimary)) return { primary: "BBQ", rule: "nameToken=bbq" };
+
   // Chinese (primary) is trickier: only set as Chinese if explicit tokens show sub-style
   if (includesAny(nameN, TOKENS.chineseSichuanSecondary) || includesAny(nameN, TOKENS.chineseCantoneseSecondary)) {
     return { primary: "Chinese", rule: "nameToken=chineseSubstyle" };
@@ -148,7 +160,14 @@ function detectLegacyFallback(legacyCuisine: string | null): { primary: CuisineP
   }
   
   if (LEGACY_ALLOWED.has(legacyCuisine)) {
-    return { primary: legacyCuisine as CuisinePrimary, rule: `legacy=${legacyCuisine}` };
+    // Map legacy values to our canonical CuisinePrimary
+    let mapped: CuisinePrimary;
+    if (legacyCuisine === "Barbecue") {
+      mapped = "BBQ";
+    } else {
+      mapped = legacyCuisine as CuisinePrimary;
+    }
+    return { primary: mapped, rule: `legacy=${legacyCuisine}` };
   }
   
   return { primary: null, rule: "legacyNotAllowed" };
@@ -161,7 +180,21 @@ function inferCuisine(
 ): { primary: CuisinePrimary | null; secondary: CuisineSecondary[]; rule: string; confidence: Confidence } {
   const nameN = normalize(name);
 
-  // 1. Try category-based (highest confidence for format categories)
+  // PRECEDENCE ORDER (deterministic, fixed):
+  
+  // 1. Legacy trusted cuisine (highest confidence - already editorially vetted)
+  const legacyResult = detectLegacyFallback(legacyCuisine);
+  if (legacyResult.primary) {
+    const secResult = detectSecondary(legacyResult.primary, nameN, legacyCuisine);
+    return {
+      primary: legacyResult.primary,
+      secondary: secResult.secondary,
+      rule: `${legacyResult.rule} → ${secResult.rule}`,
+      confidence: "high", // Legacy trusted data is HIGH confidence
+    };
+  }
+
+  // 2. Category-based formats (Wine Bar, Cocktail Bar, Brewery, Coffee, Bakery)
   const catResult = detectPrimaryByCategory(nameN, category);
   if (catResult.primary) {
     const secResult = detectSecondary(catResult.primary, nameN, legacyCuisine);
@@ -173,7 +206,7 @@ function inferCuisine(
     };
   }
 
-  // 2. Try name-based tokens
+  // 3. Name-based token inference
   const nameResult = detectPrimaryByName(nameN);
   if (nameResult.primary) {
     const secResult = detectSecondary(nameResult.primary, nameN, legacyCuisine);
@@ -181,18 +214,6 @@ function inferCuisine(
       primary: nameResult.primary,
       secondary: secResult.secondary,
       rule: `${nameResult.rule} → ${secResult.rule}`,
-      confidence: "high",
-    };
-  }
-
-  // 3. Fall back to legacy if allowed
-  const legacyResult = detectLegacyFallback(legacyCuisine);
-  if (legacyResult.primary) {
-    const secResult = detectSecondary(legacyResult.primary, nameN, legacyCuisine);
-    return {
-      primary: legacyResult.primary,
-      secondary: secResult.secondary,
-      rule: `${legacyResult.rule} → ${secResult.rule}`,
       confidence: "medium",
     };
   }
@@ -228,6 +249,7 @@ async function main() {
       neighborhood: true,
       category: true,
       cuisineType: true,
+      cuisinePrimary: true,
       rankingScore: true,
     },
     orderBy: {
@@ -239,11 +261,21 @@ async function main() {
 
   const proposals: Proposal[] = [];
   let overrideCount = 0;
+  let alreadySetCount = 0;
 
   for (const place of places) {
+    // PRECEDENCE 1: Skip if cuisinePrimary already exists (do not propose changes)
+    if (place.cuisinePrimary && !overrides[place.id]) {
+      if (DEBUG) {
+        console.log(`⏭️  ${place.name}: Already set (${place.cuisinePrimary})`);
+      }
+      alreadySetCount++;
+      continue;
+    }
+
     let proposal: Proposal;
 
-    // Check for override first
+    // Check for override
     if (overrides[place.id]) {
       const override = overrides[place.id];
       proposal = {
@@ -278,6 +310,23 @@ async function main() {
       };
     }
 
+    // Debug mode: show specific place
+    if (DEBUG_NAME && place.name.toLowerCase().includes(DEBUG_NAME.toLowerCase())) {
+      console.log('\n🔍 DEBUG MODE - Found:', place.name);
+      console.log('─────────────────────────────────────');
+      console.log('Input:');
+      console.log(`  name: "${place.name}"`);
+      console.log(`  category: "${place.category}"`);
+      console.log(`  cuisineType (legacy): "${place.cuisineType}"`);
+      console.log(`  cuisinePrimary (existing): "${place.cuisinePrimary}"`);
+      console.log('\nProposal:');
+      console.log(`  proposed_primary: "${proposal.proposed_primary}"`);
+      console.log(`  proposed_secondary: [${proposal.proposed_secondary.join(', ')}]`);
+      console.log(`  rule_hit: "${proposal.rule_hit}"`);
+      console.log(`  confidence: "${proposal.confidence}"`);
+      console.log('─────────────────────────────────────\n');
+    }
+
     proposals.push(proposal);
   }
 
@@ -287,7 +336,9 @@ async function main() {
   const noPrimary = proposals.filter((p) => p.proposed_primary === null);
 
   console.log("=== Proposal Summary ===");
-  console.log(`Total: ${proposals.length}`);
+  console.log(`Total: ${places.length}`);
+  console.log(`Already set: ${alreadySetCount}`);
+  console.log(`To process: ${proposals.length}`);
   console.log(`With primary: ${withPrimary.length} (${Math.round((withPrimary.length / proposals.length) * 100)}%)`);
   console.log(`With secondary: ${withSecondary.length} (${Math.round((withSecondary.length / proposals.length) * 100)}%)`);
   console.log(`No primary: ${noPrimary.length} (${Math.round((noPrimary.length / proposals.length) * 100)}%)`);

@@ -15,6 +15,7 @@ export const CUISINE_PRIMARY = [
   "Mediterranean",
   "Middle Eastern",
   "American",
+  "Burgers",
   "Seafood",
   "Steakhouse",
   "BBQ",
@@ -83,17 +84,55 @@ export const TOKENS = {
     "pozole",
     "mole",
     "mariscos",
+    "taquito",
+    "burrito",
+    "quesadilla",
   ],
 
-  koreanPrimary: ["korean", "galbi", "kalbi", "bulgogi", "samgyupsal", "soondubu"],
+  koreanPrimary: [
+    "korean", 
+    "galbi", 
+    "kalbi", 
+    "bulgogi", 
+    "samgyupsal", 
+    "soondubu",
+    "kbbq",
+    "korean bbq",
+  ],
   kbbqSecondary: ["kbbq", "korean bbq", "bbq"],
 
   chineseSichuanSecondary: ["sichuan", "szechuan", "szechwan"],
   chineseCantoneseSecondary: ["cantonese", "dim sum", "wonton", "hong kong", "hk"],
 
-  thaiPrimary: ["thai", "isan", "som tum"],
+  thaiPrimary: [
+    "thai", 
+    "isan", 
+    "som tum",
+    "pad thai",
+    "khao soi",
+    "larb",
+  ],
   vietnamesePrimary: ["pho", "banh mi", "banhmi", "bun bo hue"],
   indianPrimary: ["tandoor", "biryani", "masala", "chaat"],
+
+  // American subcategories
+  burgersPrimary: [
+    "burger",
+    "burgers",
+    "hamburger",
+    "cheeseburger",
+    "smash burger",
+    "smashburger",
+  ],
+  bbqPrimary: [
+    "barbecue",
+    "barbeque",
+    "smokehouse",
+    "smoke house",
+    "pit bbq",
+    "ribs",
+    "brisket",
+  ],
 
   // Drinks formats
   breweryPrimary: ["brewery", "brewing", "alehouse", "brewhouse", "brewpub"],
@@ -142,6 +181,8 @@ export const LEGACY_ALLOWED = new Set([
   "Korean",
   "Vietnamese",
   "Indian",
+  "Barbecue",
+  "BBQ",
 ]);
 
 export const LEGACY_JUNK = new Set([

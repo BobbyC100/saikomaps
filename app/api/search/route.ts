@@ -166,7 +166,8 @@ export async function GET(request: NextRequest) {
             { name: { contains: query, mode: 'insensitive' } },
             { neighborhood: { contains: query, mode: 'insensitive' } },
             { category: { contains: query, mode: 'insensitive' } },
-            { cuisineType: { contains: query, mode: 'insensitive' } },
+            { cuisinePrimary: { contains: query, mode: 'insensitive' } }, // EOS: Search curated cuisine first
+            { cuisineType: { contains: query, mode: 'insensitive' } }, // Fallback to legacy
             { vibeTags: { hasSome: [queryLower] } },
           ],
         }),
@@ -179,6 +180,7 @@ export async function GET(request: NextRequest) {
         neighborhood: true,
         category: true,
         cuisineType: true,
+        cuisinePrimary: true, // EOS: Saiko-curated cuisine taxonomy
         priceLevel: true,
         vibeTags: true,
         latitude: true,
@@ -232,11 +234,9 @@ export async function GET(request: NextRequest) {
         else if (nameLower.includes(queryLower)) queryRelevance = 800;
         else if ((place.neighborhood || '').toLowerCase() === queryLower) queryRelevance = 700;
         else if ((place.neighborhood || '').toLowerCase().includes(queryLower)) queryRelevance = 600;
-        else if (
-          (place.category || '').toLowerCase().includes(queryLower) ||
-          (place.cuisineType || '').toLowerCase().includes(queryLower)
-        )
-          queryRelevance = 500;
+        else if ((place.category || '').toLowerCase().includes(queryLower)) queryRelevance = 500;
+        else if ((place.cuisinePrimary || '').toLowerCase().includes(queryLower)) queryRelevance = 480; // Prefer curated cuisine
+        else if ((place.cuisineType || '').toLowerCase().includes(queryLower)) queryRelevance = 460; // Legacy fallback
         else if (Array.isArray(place.vibeTags) && place.vibeTags.some((t: string) => t.toLowerCase().includes(queryLower)))
           queryRelevance = 400;
 
@@ -278,7 +278,7 @@ export async function GET(request: NextRequest) {
           name: place.name,
           neighborhood: place.neighborhood,
           category: place.category,
-          cuisine: place.cuisineType,
+          cuisine: place.cuisineType, // Keep legacy for client (cuisinePrimary is internal only)
           price,
           photoUrl,
           ...status,
@@ -288,7 +288,7 @@ export async function GET(request: NextRequest) {
           vibeTags: Array.isArray(place.vibeTags) ? place.vibeTags.slice(0, 3) : [],
           distanceMiles: distanceMiles !== undefined ? Number(distanceMiles.toFixed(1)) : undefined,
           placePersonality,
-          // Note: rankingScore NOT exposed to client (internal only)
+          // Note: rankingScore, cuisinePrimary NOT exposed to client (internal only)
         };
       });
 
