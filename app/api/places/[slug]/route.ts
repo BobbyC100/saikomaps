@@ -51,6 +51,11 @@ export async function GET(
             slug: true,
           },
         },
+        category_rel: {
+          select: {
+            slug: true,
+          },
+        },
       },
     });
 
@@ -144,6 +149,10 @@ export async function GET(
           reservationUrl: place.reservationUrl,
           // Restaurant Group
           restaurantGroup: place.restaurant_groups || null,
+          // Markets fields
+          placeType: place.placeType,
+          categorySlug: place.category_rel?.slug ?? (typeof place.category === "string" ? place.category : null),
+          marketSchedule: place.marketSchedule ?? null,
         },
         guide: appearsOn[0]
           ? {
