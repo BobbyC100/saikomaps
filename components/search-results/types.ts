@@ -1,11 +1,21 @@
 // Shared types for bento grid cards
 
-export type SignalType = 'eater38' | 'latimes101' | 'michelin' | 'chefrec' | 'infatuation';
+export type SignalType = 
+  | 'eater38' 
+  | 'latimes101' 
+  | 'michelin' 
+  | 'chefrec' 
+  | 'infatuation'
+  | 'menu_analyzed'      // Internal: menu signals extracted
+  | 'wine_program';      // Internal: winelist signals extracted
 
 export interface Signal {
   type: SignalType;
   label: string;
+  isInternal?: boolean;  // Distinguishes internal vs external badges
 }
+
+export type SignalStatus = 'ok' | 'partial' | 'failed' | null;
 
 export type PlacePersonality = 
   | 'institution' 
@@ -41,6 +51,12 @@ export interface PlaceCardData {
   // Identity Signals
   placePersonality?: PlacePersonality;
   
+  // Internal Signal Status (Badge Ship v1)
+  menuSignalsStatus?: SignalStatus;
+  winelistSignalsStatus?: SignalStatus;
+  menuIdentityPresent?: boolean;     // Optional: only if available
+  winelistIdentityPresent?: boolean; // Optional: only if available
+  
   // Location
   distanceMiles?: number;
 }
@@ -61,4 +77,60 @@ export function getPersonalityLabel(personality?: PlacePersonality): string | nu
   };
   
   return labels[personality] || null;
+}
+
+/**
+ * Compute internal badges based on signal status
+ * Badge Ship v1: Menu Analyzed + Wine Program
+ * 
+ * Display Rules:
+ * - Show badge on "ok" status
+ * - Optionally show on "partial" if identity is present
+ * - Never show on "failed" or missing
+ * - Max 2 internal badges
+ * - Silence > weak signal
+ */
+export function computeInternalBadges(place: PlaceCardData): Signal[] {
+  const badges: Signal[] = [];
+  
+  // Menu badge logic
+  if (place.menuSignalsStatus === 'ok') {
+    badges.push({
+      type: 'menu_analyzed',
+      label: 'Menu Analyzed',
+      isInternal: true,
+    });
+  } else if (
+    place.menuSignalsStatus === 'partial' && 
+    place.menuIdentityPresent === true
+  ) {
+    // Conservative inclusion: only if identity output exists
+    badges.push({
+      type: 'menu_analyzed',
+      label: 'Menu Analyzed',
+      isInternal: true,
+    });
+  }
+  
+  // Wine badge logic
+  if (place.winelistSignalsStatus === 'ok') {
+    badges.push({
+      type: 'wine_program',
+      label: 'Wine Program',
+      isInternal: true,
+    });
+  } else if (
+    place.winelistSignalsStatus === 'partial' && 
+    place.winelistIdentityPresent === true
+  ) {
+    // Conservative inclusion: only if identity output exists
+    badges.push({
+      type: 'wine_program',
+      label: 'Wine Program',
+      isInternal: true,
+    });
+  }
+  
+  // Cap at 2 total internal badges
+  return badges.slice(0, 2);
 }

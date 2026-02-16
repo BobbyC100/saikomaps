@@ -570,9 +570,11 @@ model golden_records {
   google_places_attributes_fetched_at DateTime?
 
   // Relations
-  entity_links entity_links[]
-  review_queue review_queue[]
-  provenance   provenance[]
+  entity_links      entity_links[]
+  review_queue      review_queue[]
+  provenance        provenance[]
+  menu_signals      menu_signals?
+  winelist_signals  winelist_signals?
 
   @@index([neighborhood])
   @@index([category])
@@ -701,6 +703,12 @@ enum VerificationStatus {
   FOUNDER_VERIFIED
 }
 
+enum signal_status {
+  ok
+  partial
+  failed
+}
+
 // ============================================================================
 // NEWSLETTER INGESTION — APPROVAL FRAMEWORK V1
 // Two-table hybrid for operator-derived operational deltas
@@ -777,4 +785,59 @@ model operational_overlays {
   @@index([placeId])
   @@index([startsAt])
   @@index([endsAt])
+}
+
+// ============================================================================
+// SIGNAL EXTRACTION SYSTEM
+// AI analysis of scraped menu + winelist content
+// ============================================================================
+
+/// Menu signals - structured analysis of menu_raw_text
+model menu_signals {
+  id                String         @id @default(cuid())
+  golden_record_id  String         @unique
+  golden_record     golden_records @relation(fields: [golden_record_id], references: [canonical_id], onDelete: Cascade)
+
+  schema_version    Int            @default(1)
+  model_version     String?
+  source_scraped_at DateTime?
+  analyzed_at       DateTime       @default(now())
+  status            signal_status  @default(ok)
+  error             String?
+
+  payload           Json?
+  evidence          Json?
+  confidence        Float?
+
+  created_at        DateTime       @default(now())
+  updated_at        DateTime       @updatedAt
+
+  @@map("menu_signals")
+  @@index([analyzed_at])
+  @@index([status])
+}
+
+/// Winelist signals - structured analysis of winelist_raw_text
+model winelist_signals {
+  id                String         @id @default(cuid())
+  golden_record_id  String         @unique
+  golden_record     golden_records @relation(fields: [golden_record_id], references: [canonical_id], onDelete: Cascade)
+
+  schema_version    Int            @default(1)
+  model_version     String?
+  source_scraped_at DateTime?
+  analyzed_at       DateTime       @default(now())
+  status            signal_status  @default(ok)
+  error             String?
+
+  payload           Json?
+  evidence          Json?
+  confidence        Float?
+
+  created_at        DateTime       @default(now())
+  updated_at        DateTime       @updatedAt
+
+  @@map("winelist_signals")
+  @@index([analyzed_at])
+  @@index([status])
 }

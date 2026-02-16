@@ -1,5 +1,10 @@
 # Saiko Maps — Merchant Page Grid System v1
 
+**Status:** LEGACY REFERENCE  
+**Not canonical. Do not use for new builds.**  
+**Replaced by:** /docs/BENTO_CARDS_LOCKED_SPEC.md (for implementation) and /docs/MERCHANT_PAGE_BENTO_GRID.md (for technical reference)  
+**Date archived:** 2026-02-15
+
 **Locked · February 2026**
 
 ---

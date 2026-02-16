@@ -29,6 +29,7 @@ const samplePlaces: PlaceCardData[] = [
     signals: [{ type: 'latimes101', label: 'LA Times 101' }],
     coverageQuote: 'Braised meats in handmade tortillas — the cochinita pibil is transcendent.',
     distanceMiles: 0.3,
+    menuSignalsStatus: 'ok', // Badge Ship v1: Menu analyzed
   },
   {
     slug: 'burritos-la-palma',
@@ -42,6 +43,8 @@ const samplePlaces: PlaceCardData[] = [
     signals: [{ type: 'eater38', label: 'Eater 38' }],
     coverageQuote: 'Flour tortillas made to order — pillowy, warm, perfect.',
     distanceMiles: 0.4,
+    menuSignalsStatus: 'ok', // Badge Ship v1: Menu analyzed
+    winelistSignalsStatus: 'ok', // Badge Ship v1: Wine program
   },
   {
     slug: 'taco-zone',
@@ -55,6 +58,7 @@ const samplePlaces: PlaceCardData[] = [
     signals: [{ type: 'infatuation', label: 'Infatuation' }],
     coverageQuote: 'The only place open at 2am worth eating at.',
     distanceMiles: 0.8,
+    menuSignalsStatus: 'ok', // Badge Ship v1: Late night spot with menu
   },
   {
     slug: 'cacao-mexicatessen',
@@ -69,6 +73,7 @@ const samplePlaces: PlaceCardData[] = [
     signals: [{ type: 'michelin', label: 'Michelin' }],
     coverageQuote: 'Mole that tastes like it took three days.',
     distanceMiles: 1.2,
+    winelistSignalsStatus: 'ok', // Badge Ship v1: Wine program only
   },
   {
     slug: 'trencher',
@@ -81,6 +86,8 @@ const samplePlaces: PlaceCardData[] = [
     closesAt: '10pm',
     coverageQuote: 'The aguachile is a revelation.',
     distanceMiles: 0.6,
+    menuSignalsStatus: 'ok',
+    winelistSignalsStatus: 'ok',
   },
   {
     slug: 'tacos-delta',
@@ -93,6 +100,7 @@ const samplePlaces: PlaceCardData[] = [
     opensAt: '11am',
     coverageQuote: 'No-frills, just quality.',
     distanceMiles: 0.9,
+    winelistSignalsStatus: 'ok',
   },
   {
     slug: 'carnitas-el-momo',
@@ -105,6 +113,7 @@ const samplePlaces: PlaceCardData[] = [
     closesAt: '8pm',
     coverageQuote: 'Carnitas worth the drive.',
     distanceMiles: 2.1,
+    menuSignalsStatus: 'ok',
   },
   {
     slug: 'el-flamin-taco',
@@ -126,6 +135,8 @@ const samplePlaces: PlaceCardData[] = [
     closesAt: '11pm',
     coverageQuote: 'Flaming margaritas, old school LA vibes.',
     distanceMiles: 1.5,
+    menuSignalsStatus: 'ok',
+    winelistSignalsStatus: 'ok',
   },
   {
     slug: 'tacos-tu-madre',
@@ -138,6 +149,7 @@ const samplePlaces: PlaceCardData[] = [
     closesAt: '10pm',
     coverageQuote: 'Birria everything. Life-changing consommé.',
     distanceMiles: 1.8,
+    winelistSignalsStatus: 'ok',
   },
 ];
 

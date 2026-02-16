@@ -5,7 +5,7 @@
  * for use with the HorizontalBentoCard component.
  */
 
-import { PlaceCardData, Signal, SignalType } from '@/components/search-results/HorizontalBentoCard';
+import { PlaceCardData, Signal, SignalType, SignalStatus } from '@/components/search-results/types';
 
 // Prisma Place type (partial - only fields we need for cards)
 interface PrismaPlace {
@@ -22,6 +22,17 @@ interface PrismaPlace {
   vibeTags: string[];
   latitude: any;
   longitude: any;
+  placePersonality?: string | null;
+  
+  // Badge Ship v1: Menu/Winelist signal status
+  menu_signals?: {
+    status: string;
+    payload: any;
+  } | null;
+  winelist_signals?: {
+    status: string;
+    payload: any;
+  } | null;
 }
 
 /**
@@ -138,6 +149,8 @@ function getLabelForSignal(type: SignalType): string {
     michelin: 'Michelin',
     chefrec: 'Chef Rec',
     infatuation: 'Infatuation',
+    menu_analyzed: 'Menu Analyzed',
+    wine_program: 'Wine Program',
   };
   return labels[type];
 }
@@ -212,6 +225,18 @@ export function transformPlaceToCardData(
     distanceMiles = calculateDistance(userLocation.lat, userLocation.lon, lat, lon);
   }
   
+  // Map signal status from database
+  const menuSignalsStatus = place.menu_signals?.status as SignalStatus;
+  const winelistSignalsStatus = place.winelist_signals?.status as SignalStatus;
+  
+  // Check if identity data is present in payload (for conservative partial inclusion)
+  const menuIdentityPresent = !!(place.menu_signals?.payload && 
+    (place.menu_signals.payload.signature_items?.length > 0 || 
+     place.menu_signals.payload.cuisine_indicators?.length > 0));
+  const winelistIdentityPresent = !!(place.winelist_signals?.payload && 
+    (place.winelist_signals.payload.key_producers?.length > 0 || 
+     place.winelist_signals.payload.style_indicators?.length > 0));
+  
   return {
     slug: place.slug,
     name: place.name,
@@ -228,6 +253,13 @@ export function transformPlaceToCardData(
     coverageSource,
     vibeTags: place.vibeTags && place.vibeTags.length > 0 ? place.vibeTags : undefined,
     distanceMiles,
+    placePersonality: place.placePersonality as any,
+    
+    // Badge Ship v1: Signal status
+    menuSignalsStatus,
+    winelistSignalsStatus,
+    menuIdentityPresent,
+    winelistIdentityPresent,
   };
 }
 

@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { PlaceCardData, getPersonalityLabel } from './types';
+import { PlaceCardData, getPersonalityLabel, computeInternalBadges } from './types';
 
 interface PlaceCard1x2Props {
   place: PlaceCardData;
@@ -26,6 +26,12 @@ export function PlaceCard1x2({ place }: PlaceCard1x2Props) {
   } = place;
   
   const personalityLabel = getPersonalityLabel(placePersonality);
+  
+  // Compute internal badges (Badge Ship v1)
+  const internalBadges = computeInternalBadges(place);
+  
+  // Merge: external badges first, then internal
+  const allBadges = [...signals, ...internalBadges];
 
   const placeholderGradient = 'linear-gradient(135deg, #E8E2D4, #D4CFC0)';
 
@@ -57,7 +63,7 @@ export function PlaceCard1x2({ place }: PlaceCard1x2Props) {
         }}
       >
         {/* Signal badges */}
-        {signals.length > 0 && (
+        {allBadges.length > 0 && (
           <div
             style={{
               position: 'absolute',
@@ -69,7 +75,7 @@ export function PlaceCard1x2({ place }: PlaceCard1x2Props) {
               maxWidth: 'calc(100% - 20px)',
             }}
           >
-            {signals.map((signal, idx) => (
+            {allBadges.map((signal, idx) => (
               <span
                 key={idx}
                 style={{

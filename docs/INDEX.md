@@ -6,6 +6,52 @@ This is the canonical index of all active documentation for the Saiko Maps platf
 
 ---
 
+# Canonical Authority Set
+
+These documents govern system behavior.
+If any other documentation conflicts with these, the documents below take precedence.
+
+---
+
+## Product
+
+- /README.md
+- /docs/APP_OVERVIEW.md
+
+---
+
+## Rendering
+
+- /docs/BENTO_CARDS_LOCKED_SPEC.md
+
+Supporting (non-authoritative unless explicitly referenced):
+- /docs/MERCHANT_PAGE_BENTO_GRID.md
+- /docs/BENTO_CARD_DESIGN_PATTERNS.md
+- /docs/BENTO_GRID_VISUAL_REFERENCE.md
+
+---
+
+## Data
+
+- /docs/DATABASE_SCHEMA.md
+- /lib/signals/README.md
+- /lib/signals/RERUN_GUARD_AND_DATA_INTEGRITY.md
+
+---
+
+## External APIs
+
+- /ENRICHMENT_WORKFLOW.md
+
+---
+
+## Workflow
+
+- /docs/DOC_POLICY.md
+- /docs/PR_TEMPLATE.md
+
+---
+
 ## System Architecture
 
 - [APP_OVERVIEW.md](./APP_OVERVIEW.md) — High-level application architecture
@@ -20,7 +66,6 @@ This is the canonical index of all active documentation for the Saiko Maps platf
 
 - [BENTO_CARD_DESIGN_PATTERNS.md](./BENTO_CARD_DESIGN_PATTERNS.md) — Card component design patterns
 - [BENTO_GRID_VISUAL_REFERENCE.md](./BENTO_GRID_VISUAL_REFERENCE.md) — Visual reference for grid layouts
-- [MERCHANT_PAGE_GRID_SYSTEM_V1.md](./MERCHANT_PAGE_GRID_SYSTEM_V1.md) — Merchant page grid system specification
 - [homepage-design-spec.md](./homepage-design-spec.md) — Homepage design specification
 - [homepage-architecture.md](./homepage-architecture.md) — Homepage architecture and components
 
@@ -67,6 +112,7 @@ This is the canonical index of all active documentation for the Saiko Maps platf
 
 These documents are kept for historical context but are no longer actively maintained:
 
+- [archive/MERCHANT_PAGE_GRID_SYSTEM_V1.md](./archive/MERCHANT_PAGE_GRID_SYSTEM_V1.md) — Legacy grid system spec (superseded by BENTO_CARDS_LOCKED_SPEC.md)
 - [BENTO_CARDS_SPEC_REVIEW.md](./BENTO_CARDS_SPEC_REVIEW.md)
 - [BENTO_CARDS_SPEC_REVIEW_FINAL.md](./BENTO_CARDS_SPEC_REVIEW_FINAL.md)
 - [BENTO_CARDS_SPEC_UPDATE_LOG.md](./BENTO_CARDS_SPEC_UPDATE_LOG.md)

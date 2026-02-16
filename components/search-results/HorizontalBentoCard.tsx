@@ -2,42 +2,7 @@
 
 import Link from 'next/link';
 import React from 'react';
-
-// Signal types from spec
-export type SignalType = 'eater38' | 'latimes101' | 'michelin' | 'chefrec' | 'infatuation';
-
-export interface Signal {
-  type: SignalType;
-  label: string;
-}
-
-// PlaceCard interface from spec
-export interface PlaceCardData {
-  // Required
-  slug: string;
-  name: string;
-  neighborhood: string;
-  category: string;
-  
-  // Optional (graceful degradation)
-  photoUrl?: string;
-  price?: '$' | '$$' | '$$$';
-  cuisine?: string;
-  
-  // Status
-  isOpen?: boolean;
-  closesAt?: string;
-  opensAt?: string;
-  
-  // Editorial (the good stuff)
-  signals?: Signal[];
-  coverageQuote?: string;
-  coverageSource?: string;
-  vibeTags?: string[];
-  
-  // Location
-  distanceMiles?: number;
-}
+import { PlaceCardData, Signal, SignalType, computeInternalBadges } from './types';
 
 interface HorizontalBentoCardProps {
   place: PlaceCardData;
@@ -61,6 +26,12 @@ export function HorizontalBentoCard({ place }: HorizontalBentoCardProps) {
     vibeTags = [],
     distanceMiles,
   } = place;
+  
+  // Compute internal badges (Badge Ship v1)
+  const internalBadges = computeInternalBadges(place);
+  
+  // Merge: external badges first, then internal
+  const allBadges = [...signals, ...internalBadges];
 
   // Gradient placeholder for missing photos
   const placeholderGradient = 'linear-gradient(135deg, #E8E2D4, #D4CFC0)';
@@ -102,7 +73,7 @@ export function HorizontalBentoCard({ place }: HorizontalBentoCardProps) {
         }}
       >
         {/* Signal Badges */}
-        {signals.length > 0 && (
+        {allBadges.length > 0 && (
           <div
             style={{
               position: 'absolute',
@@ -113,7 +84,7 @@ export function HorizontalBentoCard({ place }: HorizontalBentoCardProps) {
               flexWrap: 'wrap',
             }}
           >
-            {signals.map((signal, idx) => (
+            {allBadges.map((signal, idx) => (
               <div
                 key={idx}
                 style={{
