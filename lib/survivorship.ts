@@ -3,10 +3,14 @@
  * 
  * Determines which source "wins" for each field when multiple sources provide
  * conflicting data. Implements the data quality hierarchy for Saiko Maps.
+ * 
+ * V2: Phase 1 fields (hours, phone, address, website) use confidence-based survivorship
+ * with provenance tracking. Other fields use legacy priority-based system.
  */
 
 import { PrismaClient, Prisma } from '@prisma/client';
 import slugify from 'slugify';
+import { pickBestValue, Candidate } from '@/lib/survivorship-v2';
 
 const prisma = new PrismaClient();
 
@@ -179,17 +183,86 @@ export async function updateGoldenRecord(canonicalId: string): Promise<void> {
   const neighborhood = neighborhoodResult?.value;
   if (neighborhoodResult) sourceAttribution.neighborhood = neighborhoodResult.source;
   
+  // Address - v2 (combining address_street field)
+  const addressCandidates: Candidate<string>[] = [];
+  for (const [source, records] of Object.entries(bySource)) {
+    for (const record of records) {
+      const value = extractFieldFromRawJson(record.raw_json, 'address');
+      if (value) {
+        addressCandidates.push({
+          source,
+          value,
+          observed_at: record.created_at,
+        });
+      }
+    }
+  }
+  const addressWinner = pickBestValue('address', addressCandidates);
+  const addressStreet = addressWinner?.value;
+  if (addressWinner) {
+    provenance.address = {
+      source: addressWinner.source,
+      confidence: addressWinner.confidence,
+      observed_at: addressWinner.observed_at,
+    };
+  }
+  
   const categoryResult = getWinningValue('category', bySource);
   const category = categoryResult?.value;
   if (categoryResult) sourceAttribution.category = categoryResult.source;
   
-  const phoneResult = getWinningValue('phone', bySource);
-  const phone = phoneResult?.value;
-  if (phoneResult) sourceAttribution.phone = phoneResult.source;
+  // Phase 1 fields use v2 with provenance tracking
+  const provenance: Record<string, any> = {};
   
-  const websiteResult = getWinningValue('website', bySource);
-  const website = websiteResult?.value;
-  if (websiteResult) sourceAttribution.website = websiteResult.source;
+  // Phone - v2
+  const phoneCandidates: Candidate<string>[] = [];
+  for (const [source, records] of Object.entries(bySource)) {
+    for (const record of records) {
+      const value = extractFieldFromRawJson(record.raw_json, 'phone');
+      if (value) {
+        phoneCandidates.push({
+          source,
+          value,
+          observed_at: record.created_at,
+        });
+      }
+    }
+  }
+  const phoneWinner = pickBestValue('phone', phoneCandidates);
+  const phone = phoneWinner?.value;
+  if (phoneWinner) {
+    sourceAttribution.phone = phoneWinner.source;
+    provenance.phone = {
+      source: phoneWinner.source,
+      confidence: phoneWinner.confidence,
+      observed_at: phoneWinner.observed_at,
+    };
+  }
+  
+  // Website - v2
+  const websiteCandidates: Candidate<string>[] = [];
+  for (const [source, records] of Object.entries(bySource)) {
+    for (const record of records) {
+      const value = extractFieldFromRawJson(record.raw_json, 'website');
+      if (value) {
+        websiteCandidates.push({
+          source,
+          value,
+          observed_at: record.created_at,
+        });
+      }
+    }
+  }
+  const websiteWinner = pickBestValue('website', websiteCandidates);
+  const website = websiteWinner?.value;
+  if (websiteWinner) {
+    sourceAttribution.website = websiteWinner.source;
+    provenance.website = {
+      source: websiteWinner.source,
+      confidence: websiteWinner.confidence,
+      observed_at: websiteWinner.observed_at,
+    };
+  }
   
   const instagramResult = getWinningValue('instagram_handle', bySource);
   const instagramHandle = instagramResult?.value;
@@ -211,9 +284,30 @@ export async function updateGoldenRecord(canonicalId: string): Promise<void> {
   const businessStatus = businessStatusResult?.value || 'operational';
   if (businessStatusResult) sourceAttribution.business_status = businessStatusResult.source;
   
-  const hoursResult = getWinningValue('hours', bySource);
-  const hoursJson = hoursResult?.value;
-  if (hoursResult) sourceAttribution.hours = hoursResult.source;
+  // Hours - v2
+  const hoursCandidates: Candidate<any>[] = [];
+  for (const [source, records] of Object.entries(bySource)) {
+    for (const record of records) {
+      const value = extractFieldFromRawJson(record.raw_json, 'hours');
+      if (value) {
+        hoursCandidates.push({
+          source,
+          value,
+          observed_at: record.created_at,
+        });
+      }
+    }
+  }
+  const hoursWinner = pickBestValue('hours', hoursCandidates);
+  const hoursJson = hoursWinner?.value;
+  if (hoursWinner) {
+    sourceAttribution.hours = hoursWinner.source;
+    provenance.hours = {
+      source: hoursWinner.source,
+      confidence: hoursWinner.confidence,
+      observed_at: hoursWinner.observed_at,
+    };
+  }
   
   // Generate collision-safe slug
   const slug = await generateUniqueSlug(name, neighborhood);
@@ -253,6 +347,7 @@ export async function updateGoldenRecord(canonicalId: string): Promise<void> {
       lat: lat ? new Prisma.Decimal(lat) : new Prisma.Decimal(0),
       lng: lng ? new Prisma.Decimal(lng) : new Prisma.Decimal(0),
       neighborhood,
+      address_street: addressStreet,
       category,
       phone,
       website,
@@ -263,6 +358,7 @@ export async function updateGoldenRecord(canonicalId: string): Promise<void> {
       business_status: businessStatus,
       hours_json: hoursJson as Prisma.JsonValue,
       source_attribution: sourceAttribution as Prisma.JsonValue,
+      provenance_v2: provenance as Prisma.JsonValue,
       data_completeness: new Prisma.Decimal(dataCompleteness),
       source_count: links.length,
       last_resolved_at: new Date(),
@@ -278,6 +374,7 @@ export async function updateGoldenRecord(canonicalId: string): Promise<void> {
       lat: lat ? new Prisma.Decimal(lat) : undefined,
       lng: lng ? new Prisma.Decimal(lng) : undefined,
       neighborhood,
+      address_street: addressStreet,
       category,
       phone,
       website,
@@ -288,6 +385,7 @@ export async function updateGoldenRecord(canonicalId: string): Promise<void> {
       business_status: businessStatus,
       hours_json: hoursJson as Prisma.JsonValue,
       source_attribution: sourceAttribution as Prisma.JsonValue,
+      provenance_v2: provenance as Prisma.JsonValue,
       data_completeness: new Prisma.Decimal(dataCompleteness),
       source_count: links.length,
       last_resolved_at: new Date(),

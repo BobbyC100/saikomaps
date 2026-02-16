@@ -518,6 +518,9 @@ model golden_records {
 
   // Provenance (which source won each field)
   source_attribution Json
+  
+  // Confidence-resolved provenance (v2)
+  provenance_v2 Json?
 
   // Metadata
   created_at       DateTime  @default(now())
