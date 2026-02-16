@@ -114,7 +114,7 @@ async function main() {
   console.log(`Slug: ${slug}`)
 
   // Check if person already exists
-  const existing = await db.person.findUnique({
+  const existing = await db.people.findUnique({
     where: { slug }
   })
 
@@ -141,7 +141,7 @@ async function main() {
   // Find restaurant group if specified
   let restaurantGroupId: string | undefined
   if (args.restaurantGroup) {
-    const group = await db.restaurantGroup.findFirst({
+    const group = await db.restaurant_groups.findFirst({
       where: {
         OR: [
           { name: { contains: args.restaurantGroup, mode: 'insensitive' } },
@@ -181,8 +181,8 @@ async function main() {
   }
 
   // Create person
-  const created = await db.person.create({
-    data: person
+  const created = await db.people.create({
+    data: person as any
   })
 
   console.log('\n✅ Person created successfully!')

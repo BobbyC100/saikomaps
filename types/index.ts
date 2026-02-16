@@ -3,7 +3,7 @@
  * Common type definitions used throughout the app
  */
 
-import { User, List, Location, import_jobs as ImportJob } from '@prisma/client'
+import type { users as User, lists as List, locations as Location, import_jobs as ImportJob } from '@prisma/client'
 
 // ============================================
 // USER TYPES

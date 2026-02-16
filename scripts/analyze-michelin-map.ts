@@ -8,7 +8,7 @@ import { db } from '@/lib/db'
 async function main() {
   const slug = 'la-michelin-essential-restaurants-1770427481342'
   
-  const list = await db.list.findFirst({
+  const list = await db.lists.findFirst({
     where: { slug },
     include: {
       mapPlaces: {

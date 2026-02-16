@@ -56,7 +56,7 @@ async function main() {
   console.log('═'.repeat(80))
   
   // Get all places
-  const allPlaces = await db.place.findMany({
+  const allPlaces = await db.places.findMany({
     include: {
       mapPlaces: {
         include: {
@@ -78,7 +78,7 @@ async function main() {
   })
 
   // Get LA County maps
-  const lists = await db.list.findMany({
+  const lists = await db.lists.findMany({
     where: { userId: 'demo-user-id' },
     include: {
       mapPlaces: {

@@ -83,7 +83,7 @@ async function main() {
   console.log('═'.repeat(80))
 
   // Find person
-  const person = await db.person.findFirst({
+  const person = await db.people.findFirst({
     where: {
       OR: [
         { name: { contains: args.personName, mode: 'insensitive' } },
@@ -101,7 +101,7 @@ async function main() {
   console.log(`\nPerson: ${person.name}`)
 
   // Find place
-  const place = await db.place.findFirst({
+  const place = await db.places.findFirst({
     where: {
       OR: [
         { name: { contains: args.placeName, mode: 'insensitive' } },

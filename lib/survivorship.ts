@@ -183,6 +183,9 @@ export async function updateGoldenRecord(canonicalId: string): Promise<void> {
   const neighborhood = neighborhoodResult?.value;
   if (neighborhoodResult) sourceAttribution.neighborhood = neighborhoodResult.source;
   
+  // Phase 1 fields use v2 with provenance tracking
+  const provenance: Record<string, any> = {};
+  
   // Address - v2 (combining address_street field)
   const addressCandidates: Candidate<string>[] = [];
   for (const [source, records] of Object.entries(bySource)) {
@@ -210,9 +213,6 @@ export async function updateGoldenRecord(canonicalId: string): Promise<void> {
   const categoryResult = getWinningValue('category', bySource);
   const category = categoryResult?.value;
   if (categoryResult) sourceAttribution.category = categoryResult.source;
-  
-  // Phase 1 fields use v2 with provenance tracking
-  const provenance: Record<string, any> = {};
   
   // Phone - v2
   const phoneCandidates: Candidate<string>[] = [];
@@ -356,9 +356,9 @@ export async function updateGoldenRecord(canonicalId: string): Promise<void> {
       vibe_tags: vibeTags,
       price_level: priceLevel,
       business_status: businessStatus,
-      hours_json: hoursJson as Prisma.JsonValue,
-      source_attribution: sourceAttribution as Prisma.JsonValue,
-      provenance_v2: provenance as Prisma.JsonValue,
+      hours_json: hoursJson ? (hoursJson as Prisma.InputJsonValue) : Prisma.JsonNull,
+      source_attribution: sourceAttribution ? (sourceAttribution as Prisma.InputJsonValue) : Prisma.JsonNull,
+      provenance_v2: provenance ? (provenance as Prisma.InputJsonValue) : Prisma.JsonNull,
       data_completeness: new Prisma.Decimal(dataCompleteness),
       source_count: links.length,
       last_resolved_at: new Date(),
@@ -383,9 +383,9 @@ export async function updateGoldenRecord(canonicalId: string): Promise<void> {
       vibe_tags: vibeTags,
       price_level: priceLevel,
       business_status: businessStatus,
-      hours_json: hoursJson as Prisma.JsonValue,
-      source_attribution: sourceAttribution as Prisma.JsonValue,
-      provenance_v2: provenance as Prisma.JsonValue,
+      hours_json: hoursJson ? (hoursJson as Prisma.InputJsonValue) : Prisma.JsonNull,
+      source_attribution: sourceAttribution ? (sourceAttribution as Prisma.InputJsonValue) : Prisma.JsonNull,
+      provenance_v2: provenance ? (provenance as Prisma.InputJsonValue) : Prisma.JsonNull,
       data_completeness: new Prisma.Decimal(dataCompleteness),
       source_count: links.length,
       last_resolved_at: new Date(),

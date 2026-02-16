@@ -21,7 +21,7 @@ async function main() {
   const search = args[0]
 
   // Find person
-  const person = await db.person.findFirst({
+  const person = await db.people.findFirst({
     where: {
       OR: [
         { name: { contains: search, mode: 'insensitive' } },

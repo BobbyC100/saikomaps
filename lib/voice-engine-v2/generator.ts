@@ -67,7 +67,7 @@ export async function generateTaglineCandidatesV2(
     ];
     
     // Validate candidates
-    const validationResults = validateTaglineCandidates(candidates);
+    const validationResults = validateTaglineCandidates(candidates) as [ValidationResult, ValidationResult, ValidationResult, ValidationResult];
     const allValid = validationResults.every(r => r.valid);
     
     return {

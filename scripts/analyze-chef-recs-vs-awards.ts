@@ -11,7 +11,7 @@ async function main() {
   console.log('\n🔍 CHEF RECS vs AWARDS ANALYSIS\n')
   console.log('═'.repeat(80))
 
-  const placesWithChefRecs = await db.place.findMany({
+  const placesWithChefRecs = await db.places.findMany({
     where: {
       chefRecs: {
         not: null

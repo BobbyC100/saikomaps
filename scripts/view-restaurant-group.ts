@@ -21,7 +21,7 @@ async function main() {
   const search = args[0]
 
   // Find group
-  const group = await db.restaurantGroup.findFirst({
+  const group = await db.restaurant_groups.findFirst({
     where: {
       OR: [
         { name: { contains: search, mode: 'insensitive' } },

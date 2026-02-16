@@ -9,7 +9,7 @@ async function main() {
   console.log('═'.repeat(80))
 
   // Check Santa Monica map
-  const santaMonicaMap = await db.list.findFirst({
+  const santaMonicaMap = await db.lists.findFirst({
     where: {
       title: {
         contains: 'Santa Monica',
@@ -38,7 +38,7 @@ async function main() {
   }
 
   // Search for places with Santa Monica in address
-  const placesWithSM = await db.place.findMany({
+  const placesWithSM = await db.places.findMany({
     where: {
       address: {
         contains: 'Santa Monica',
@@ -61,7 +61,7 @@ async function main() {
   })
 
   // Check all unique neighborhoods
-  const allPlaces = await db.place.findMany({
+  const allPlaces = await db.places.findMany({
     select: {
       neighborhood: true,
     }

@@ -63,7 +63,7 @@ function hydrateRawRecord(raw: any): HydratedRecord {
     lng: raw.lng ? parseFloat(raw.lng.toString()) : 0,
     address: json.address_street
       ? `${json.address_street}, ${json.address_city || ''}`
-      : null,
+      : undefined,
     neighborhood: json.neighborhood,
     category: json.category,
     phone: json.phone,
@@ -332,7 +332,7 @@ export async function createReviewQueueItem(params: {
       raw_id_b: rawIdB,
       conflict_type: conflictType,
       match_confidence: matchConfidence ? new Prisma.Decimal(matchConfidence) : null,
-      conflicting_fields: conflictingFields as Prisma.JsonValue,
+      conflicting_fields: conflictingFields ? (conflictingFields as Prisma.InputJsonValue) : Prisma.JsonNull,
       priority,
     },
   });

@@ -1,4 +1,4 @@
-import { PrismaClient, signal_status } from "@prisma/client";
+import { PrismaClient, signal_status, Prisma } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -58,8 +58,8 @@ export async function upsertMenuSignalsV1(args: {
         analyzed_at: new Date(),
         status: signal_status.failed,
         error: "No menu_raw_text available to analyze",
-        payload: null,
-        evidence: null,
+        payload: Prisma.JsonNull,
+        evidence: Prisma.JsonNull,
         confidence: null,
       },
       update: {
@@ -69,8 +69,8 @@ export async function upsertMenuSignalsV1(args: {
         analyzed_at: new Date(),
         status: signal_status.failed,
         error: "No menu_raw_text available to analyze",
-        payload: null,
-        evidence: null,
+        payload: Prisma.JsonNull,
+        evidence: Prisma.JsonNull,
         confidence: null,
         updated_at: new Date(),
       },

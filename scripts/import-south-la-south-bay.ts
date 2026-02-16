@@ -75,7 +75,7 @@ async function main() {
   const listTitle = 'South LA & South Bay Complete'
   const slug = `${generateSlug(listTitle)}-${Date.now()}`
   
-  const list = await db.list.create({
+  const list = await db.lists.create({
     data: {
       userId: USER_ID,
       title: listTitle,
@@ -119,7 +119,7 @@ async function main() {
       }
     }
 
-    let place = googlePlaceId ? await db.place.findUnique({ where: { googlePlaceId } }) : null
+    let place = googlePlaceId ? await db.places.findUnique({ where: { googlePlaceId } }) : null
 
     if (!place) {
       const neighborhood = placeDetails
@@ -135,7 +135,7 @@ async function main() {
 
       const baseSlug = generatePlaceSlug(finalName, neighborhood ?? input.neighborhood ?? undefined)
       const uniqueSlug = await ensureUniqueSlug(baseSlug, async (s) => {
-        const exists = await db.place.findUnique({ where: { slug: s } })
+        const exists = await db.places.findUnique({ where: { slug: s } })
         return !!exists
       })
 
@@ -147,7 +147,7 @@ async function main() {
         }
       ] : []
 
-      place = await db.place.create({
+      place = await db.places.create({
         data: {
           slug: uniqueSlug,
           googlePlaceId: googlePlaceId ?? undefined,
@@ -182,12 +182,12 @@ async function main() {
       console.log(`   ↻ Already exists`)
     }
 
-    const existingMapPlace = await db.mapPlace.findUnique({
+    const existingMapPlace = await db.map_places.findUnique({
       where: { mapId_placeId: { mapId: list.id, placeId: place.id } },
     })
 
     if (!existingMapPlace) {
-      await db.mapPlace.create({
+      await db.map_places.create({
         data: {
           mapId: list.id,
           placeId: place.id,

@@ -4,10 +4,9 @@
  * Various string comparison algorithms for entity matching
  */
 
-import { JaroWinklerDistance, LevenshteinDistance } from 'natural';
+import natural from 'natural';
 
-const jaro = new JaroWinklerDistance();
-const lev = new LevenshteinDistance();
+const { JaroWinklerDistance, LevenshteinDistance } = natural;
 
 /**
  * Jaro-Winkler similarity (0 to 1, higher = more similar)
@@ -15,7 +14,7 @@ const lev = new LevenshteinDistance();
  */
 export function jaroWinklerSimilarity(str1: string, str2: string): number {
   if (!str1 || !str2) return 0;
-  return jaro.distance(str1, str2);
+  return JaroWinklerDistance(str1, str2);
 }
 
 /**
@@ -25,7 +24,7 @@ export function levenshteinSimilarity(str1: string, str2: string): number {
   if (!str1 || !str2) return 0;
   const maxLen = Math.max(str1.length, str2.length);
   if (maxLen === 0) return 1;
-  const distance = lev.distance(str1, str2);
+  const distance = LevenshteinDistance(str1, str2);
   return 1 - distance / maxLen;
 }
 

@@ -10,7 +10,7 @@ async function main() {
   console.log('═'.repeat(80))
   
   // Get all lists
-  const lists = await db.list.findMany({
+  const lists = await db.lists.findMany({
     where: { userId: 'demo-user-id' },
     include: {
       _count: {
@@ -21,7 +21,7 @@ async function main() {
   })
 
   // Get all places
-  const allPlaces = await db.place.findMany({
+  const allPlaces = await db.places.findMany({
     include: {
       mapPlaces: {
         include: {

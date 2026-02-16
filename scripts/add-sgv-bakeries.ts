@@ -82,7 +82,7 @@ async function main() {
 
   // Get existing map
   console.log('📋 Finding existing map...')
-  const list = await db.list.findFirst({
+  const list = await db.lists.findFirst({
     where: { slug: MAP_SLUG },
   })
 
@@ -97,7 +97,7 @@ async function main() {
   console.log(`   URL: http://localhost:3000/${list.slug}\n`)
 
   // Get current max order index
-  const lastMapPlace = await db.mapPlace.findFirst({
+  const lastMapPlace = await db.map_places.findFirst({
     where: { mapId: list.id },
     orderBy: { orderIndex: 'desc' },
     select: { orderIndex: true },
@@ -160,7 +160,7 @@ async function main() {
     }
 
     // Check if place already exists
-    let place = googlePlaceId ? await db.place.findUnique({ where: { googlePlaceId } }) : null
+    let place = googlePlaceId ? await db.places.findUnique({ where: { googlePlaceId } }) : null
 
     if (!place) {
       // Create new place
@@ -177,7 +177,7 @@ async function main() {
 
       const baseSlug = generatePlaceSlug(finalName, neighborhood ?? undefined)
       const uniqueSlug = await ensureUniqueSlug(baseSlug, async (s) => {
-        const exists = await db.place.findUnique({ where: { slug: s } })
+        const exists = await db.places.findUnique({ where: { slug: s } })
         return !!exists
       })
 
@@ -190,7 +190,7 @@ async function main() {
         }
       ] : []
 
-      place = await db.place.create({
+      place = await db.places.create({
         data: {
           slug: uniqueSlug,
           googlePlaceId: googlePlaceId ?? undefined,
@@ -208,7 +208,6 @@ async function main() {
           googlePhotos: placeDetails?.photos ? JSON.parse(JSON.stringify(placeDetails.photos)) : undefined,
           hours: placeDetails?.openingHours ? JSON.parse(JSON.stringify(placeDetails.openingHours)) : null,
           placesDataCachedAt: placeDetails ? new Date() : null,
-          sources: sources.length > 0 ? sources : undefined,
         },
       })
 
@@ -234,7 +233,7 @@ async function main() {
       } : null
 
       if (newSource && !existingSources.some((s: any) => s.url === newSource.url)) {
-        place = await db.place.update({
+        place = await db.places.update({
           where: { id: place.id },
           data: {
             sources: [...existingSources, newSource],
@@ -248,12 +247,12 @@ async function main() {
     }
 
     // Create MapPlace (link place to map)
-    const existingMapPlace = await db.mapPlace.findUnique({
+    const existingMapPlace = await db.map_places.findUnique({
       where: { mapId_placeId: { mapId: list.id, placeId: place.id } },
     })
 
     if (!existingMapPlace) {
-      await db.mapPlace.create({
+      await db.map_places.create({
         data: {
           mapId: list.id,
           placeId: place.id,

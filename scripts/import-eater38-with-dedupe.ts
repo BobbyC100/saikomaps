@@ -76,7 +76,7 @@ async function main() {
   console.log('PHASE 1: DEDUPE SCAN')
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n')
 
-  const allExistingPlaces = await db.place.findMany({
+  const allExistingPlaces = await db.places.findMany({
     select: {
       id: true,
       name: true,
@@ -180,7 +180,7 @@ async function main() {
   const listTitle = 'Eater LA Essential 38'
   const slug = `${generateSlug(listTitle)}-${Date.now()}`
   
-  const list = await db.list.create({
+  const list = await db.lists.create({
     data: {
       userId: USER_ID,
       title: listTitle,
@@ -240,7 +240,7 @@ async function main() {
 
       // Check if place already exists by googlePlaceId
       const existingPlace = googlePlaceId 
-        ? await db.place.findUnique({ where: { googlePlaceId } })
+        ? await db.places.findUnique({ where: { googlePlaceId } })
         : null
 
       let place
@@ -253,7 +253,7 @@ async function main() {
           ? [...existingSources, newSource]
           : existingSources
 
-        place = await db.place.update({
+        place = await db.places.update({
           where: { id: existingPlace.id },
           data: {
             sources: updatedSources,
@@ -266,13 +266,13 @@ async function main() {
         // Create new place
         const baseSlug = generatePlaceSlug(finalName, neighborhood ?? undefined)
         const uniqueSlug = await ensureUniqueSlug(baseSlug, async (s) => {
-          const exists = await db.place.findUnique({ where: { slug: s } })
+          const exists = await db.places.findUnique({ where: { slug: s } })
           return !!exists
         })
 
         const sources = newSource ? [newSource] : []
 
-        place = await db.place.create({
+        place = await db.places.create({
           data: {
             slug: uniqueSlug,
             googlePlaceId: googlePlaceId ?? undefined,
@@ -300,7 +300,7 @@ async function main() {
       }
 
       // Add to map (check if not already on this map)
-      const existingMapPlace = await db.mapPlace.findFirst({
+      const existingMapPlace = await db.map_places.findFirst({
         where: {
           mapId: list.id,
           placeId: place.id,
@@ -308,7 +308,7 @@ async function main() {
       })
 
       if (!existingMapPlace) {
-        await db.mapPlace.create({
+        await db.map_places.create({
           data: {
             mapId: list.id,
             placeId: place.id,

@@ -1,4 +1,4 @@
-import { PrismaClient, OverlayType } from '@prisma/client';
+import { PrismaClient, OverlayType, Prisma } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -116,7 +116,7 @@ export async function approveSignalToOverlay(params: ApproveSignalToOverlayParam
         overlayType,
         startsAt,
         endsAt,
-        overrideData: overrideData || null,
+        overrideData: overrideData || Prisma.JsonNull,
         approvalMethod: 'manual',
       },
     });

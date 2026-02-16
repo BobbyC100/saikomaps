@@ -115,7 +115,7 @@ async function main() {
   console.log(`Slug: ${slug}`)
 
   // Check if group already exists
-  const existing = await db.restaurantGroup.findUnique({
+  const existing = await db.restaurant_groups.findUnique({
     where: { slug }
   })
 
@@ -161,8 +161,8 @@ async function main() {
   }
 
   // Create group
-  const created = await db.restaurantGroup.create({
-    data: group
+  const created = await db.restaurant_groups.create({
+    data: group as any
   })
 
   console.log('\n✅ Restaurant group created successfully!')
