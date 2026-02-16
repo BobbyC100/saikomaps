@@ -124,12 +124,33 @@ export async function GET(
 
     // Format appearsOn (only published maps) and curator note from first map with descriptor
     const publishedMapPlaces = place.map_places.filter((mp) => mp.lists && mp.lists.status === 'PUBLISHED');
+    
+    // Get place counts for all maps in one query (grouped)
+    const mapIds = publishedMapPlaces.map(mp => mp.lists!.id);
+    const placeCounts = await db.map_places.groupBy({
+      by: ['map_id'],
+      where: {
+        map_id: { in: mapIds }
+      },
+      _count: {
+        id: true
+      }
+    });
+    
+    // Create lookup map for counts
+    const countLookup = new Map(
+      placeCounts.map(pc => [pc.map_id, pc._count.id])
+    );
+    
     const appearsOn = publishedMapPlaces.map((mp) => ({
       id: mp.lists!.id,
       title: mp.lists!.title,
       slug: mp.lists!.slug,
       coverImageUrl: mp.lists!.coverImageUrl,
       creatorName: mp.lists!.users?.name || mp.lists!.users?.email?.split('@')[0] || 'Unknown',
+      description: null, // TODO: Add description field to lists table
+      placeCount: countLookup.get(mp.lists!.id) || 0,
+      authorType: (mp.lists!.users?.email?.includes('@saiko.com') ? 'saiko' : 'user') as 'saiko' | 'user',
     }));
     const curatorMapPlace = publishedMapPlaces.find((mp) => mp.descriptor?.trim());
     const curatorNote = curatorMapPlace?.descriptor?.trim() ?? null;

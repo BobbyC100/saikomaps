@@ -9,6 +9,9 @@ interface MapItem {
   slug: string;
   coverImageUrl: string | null;
   creatorName: string;
+  description?: string | null;
+  placeCount?: number;
+  authorType?: 'saiko' | 'user';
 }
 
 interface AlsoOnCardProps {
@@ -18,35 +21,33 @@ interface AlsoOnCardProps {
 export function AlsoOnCard({ maps }: AlsoOnCardProps) {
   if (!maps || maps.length === 0) return null;
 
-  // Deduplicate by slug and take first 3
-  const uniqueMaps = maps
-    .filter((map, index, self) => 
-      index === self.findIndex((m) => m.slug === map.slug)
-    )
-    .slice(0, 3);
+  // Additional safety: filter out any maps without valid placeCount
+  const validMaps = maps.filter(
+    (map) => typeof map.placeCount === 'number' && map.placeCount > 0
+  );
 
-  if (uniqueMaps.length === 0) return null;
+  if (validMaps.length === 0) return null;
 
   return (
-    <div className={`${styles.alsoOnCard} ${styles.col6}`}>
+    <div className={styles.alsoOnCard}>
       <div className={styles.label}>ALSO ON</div>
-      <div className={styles.listContainer}>
-        {uniqueMaps.map((map) => (
+      <div className={styles.mapsContainer}>
+        {validMaps.map((map) => (
           <Link
             key={map.id}
             href={`/map/${map.slug}`}
-            className={styles.listItem}
+            className={styles.mapCard}
           >
-            {/* Thumbnail */}
-            <div className={styles.thumbnail}>
+            {/* Hero Image */}
+            <div className={styles.heroImage}>
               {map.coverImageUrl ? (
                 <div
-                  className={styles.thumbnailImage}
+                  className={styles.heroImageBg}
                   style={{ backgroundImage: `url(${map.coverImageUrl})` }}
                 />
               ) : (
-                <div className={styles.thumbnailPlaceholder}>
-                  <svg className={styles.gridPattern} viewBox="0 0 48 48">
+                <div className={styles.heroImagePlaceholder}>
+                  <svg className={styles.gridPattern} viewBox="0 0 120 80">
                     <defs>
                       <pattern
                         id={`grid-${map.id}`}
@@ -64,16 +65,38 @@ export function AlsoOnCard({ maps }: AlsoOnCardProps) {
                         />
                       </pattern>
                     </defs>
-                    <rect width="48" height="48" fill="url(#grid-${map.id})" />
+                    <rect width="120" height="80" fill="url(#grid-${map.id})" />
                   </svg>
                 </div>
               )}
             </div>
 
-            {/* Info */}
-            <div className={styles.info}>
+            {/* Content */}
+            <div className={styles.content}>
+              {/* Type Label */}
+              <div className={styles.typeLabel}>
+                MAP · {map.placeCount} {map.placeCount === 1 ? 'PLACE' : 'PLACES'}
+              </div>
+
+              {/* Title */}
               <div className={styles.title}>{map.title}</div>
-              <div className={styles.author}>{map.creatorName}</div>
+
+              {/* Description (if available) */}
+              {map.description && (
+                <div className={styles.description}>{map.description}</div>
+              )}
+
+              {/* Attribution */}
+              <div className={styles.meta}>
+                {map.authorType === 'saiko' ? (
+                  <span className={styles.curatorBadge}>
+                    <span className={styles.curatorStar}>★</span>
+                    Curator Pick
+                  </span>
+                ) : (
+                  <span>By @{map.creatorName}</span>
+                )}
+              </div>
             </div>
           </Link>
         ))}

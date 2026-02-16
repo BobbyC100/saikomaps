@@ -22,3 +22,5 @@ Takeout/
 test-*.js
 test-*.csv
 tsx
+.vercel
+.env.vercel*

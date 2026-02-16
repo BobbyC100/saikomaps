@@ -15,6 +15,9 @@ import { CoverageCard } from '@/components/merchant/CoverageCard';
 import { GalleryCard } from '@/components/merchant/GalleryCard';
 import { CuratorCard } from '@/components/merchant/CuratorCard';
 import { VibeCard } from '@/components/merchant/VibeCard';
+import { TipsCard } from '@/components/merchant/TipsCard';
+import { MenuCard } from '@/components/merchant/MenuCard';
+import { WineCard } from '@/components/merchant/WineCard';
 import { AlsoOnCard } from '@/components/merchant/AlsoOnCard';
 
 interface EditorialSource {
@@ -81,6 +84,9 @@ interface AppearsOnItem {
   slug: string;
   coverImageUrl: string | null;
   creatorName: string;
+  description?: string | null;
+  placeCount?: number;
+  authorType?: 'saiko' | 'user';
 }
 
 interface PlacePageData {
@@ -390,6 +396,11 @@ export default function PlacePage() {
     })
     .slice(0, 3);
 
+  // Filter to only maps with valid place counts (no placeholders)
+  const appearsOnRenderable = appearsOnDeduped.filter(
+    (m) => typeof m.placeCount === 'number' && m.placeCount > 0
+  );
+
   return (
     <div style={{ background: '#F5F0E1', minHeight: '100vh' }}>
       <link
@@ -490,14 +501,31 @@ export default function PlacePage() {
             />
           )}
 
-          {/* Row 4: Vibe (6) */}
+          {/* Row 4: Tips (3) + Menu/Wine (3) */}
+          {location.tips && location.tips.length > 0 && (
+            <TipsCard tips={location.tips} span={3} />
+          )}
+
+          {/* Show Menu if available, otherwise show Wine */}
+          {/* TODO: Add menuItems field to location data */}
+          {/* <MenuCard items={location.menuItems} span={3} /> */}
+          
+          {/* Placeholder for Wine card - uncomment when data available */}
+          {/* <WineCard 
+            focus="Italian natural wines"
+            regions={["Sicily", "Friuli"]}
+            priceRange="$45-85"
+            span={3}
+          /> */}
+
+          {/* Row 5: Vibe (6) */}
           {location.vibeTags && location.vibeTags.length > 0 && (
             <VibeCard vibeTags={location.vibeTags} />
           )}
 
-          {/* Row 5: Also On (6) */}
-          {appearsOnDeduped.length > 0 && (
-            <AlsoOnCard maps={appearsOnDeduped} />
+          {/* Row 6: Also On (6) - Now with rich map cards */}
+          {appearsOnRenderable.length > 0 && (
+            <AlsoOnCard maps={appearsOnRenderable} />
           )}
         </div>
       </main>
