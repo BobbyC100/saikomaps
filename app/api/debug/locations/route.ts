@@ -7,7 +7,14 @@
 import { NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 
+function debugEnabled() {
+  return process.env.NODE_ENV !== 'production' && process.env.DEBUG_ROUTES_ENABLED === 'true';
+}
+
 export async function GET() {
+  if (!debugEnabled()) {
+    return new Response('Not Found', { status: 404 });
+  }
   try {
     const locations = await db.locations.findMany({
       take: 10,
