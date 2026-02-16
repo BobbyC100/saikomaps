@@ -1,5 +1,9 @@
--- CreateEnum
-CREATE TYPE "signal_status" AS ENUM ('ok', 'partial', 'failed');
+-- CreateEnum (skip if exists from entity resolution migration)
+DO $$ BEGIN
+  CREATE TYPE "signal_status" AS ENUM ('ok', 'partial', 'failed');
+EXCEPTION
+  WHEN duplicate_object THEN null;
+END $$;
 
 -- CreateTable
 CREATE TABLE "menu_signals" (
