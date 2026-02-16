@@ -19,6 +19,15 @@ import { TipsCard } from '@/components/merchant/TipsCard';
 import { MenuCard } from '@/components/merchant/MenuCard';
 import { WineCard } from '@/components/merchant/WineCard';
 import { AlsoOnCard } from '@/components/merchant/AlsoOnCard';
+import { DescriptionCard } from '@/components/merchant/DescriptionCard';
+import { QuietCard } from '@/components/merchant/QuietCard';
+import { 
+  resolvePlacePageLayout, 
+  validateLayout, 
+  debugLayout,
+  type PlaceData as ResolverPlaceData,
+  type CardConfig
+} from '@/lib/utils/PlacePageLayoutResolver.systemB';
 
 interface EditorialSource {
   source_id?: string;
@@ -282,6 +291,124 @@ export default function PlacePage() {
     }
   };
 
+  // Helper: Render a card based on System B config
+  const renderCard = (config: CardConfig, location: LocationData, key: string) => {
+    const { c, r } = config.span;
+    const style = { 
+      gridColumn: `span ${c}`,
+      gridRow: `span ${r}`,
+      '--c': c, 
+      '--r': r 
+    } as React.CSSProperties;
+
+    switch (config.type) {
+      case 'hours':
+        return (
+          <HoursCard
+            key={key}
+            todayHours={config.data.today}
+            isOpen={config.data.isOpen}
+            statusText={config.data.isOpen ? `Open${config.data.closesAt ? ` · Closes ${config.data.closesAt}` : ''}` : `Closed${config.data.opensAt ? ` · Opens ${config.data.opensAt}` : ''}`}
+            fullWeek={config.data.fullWeek}
+            isIrregular={config.data.isIrregular}
+            span={c}
+          />
+        );
+
+      case 'description':
+        return (
+          <DescriptionCard
+            key={key}
+            content={config.data.content}
+            isCurator={config.data.isCurator}
+            span={c}
+          />
+        );
+
+      case 'vibe':
+        return (
+          <VibeCard
+            key={key}
+            vibeTags={config.data}
+            span={c}
+          />
+        );
+
+      case 'press':
+        return (
+          <CoverageCard
+            key={key}
+            pullQuote={config.data.quote}
+            pullQuoteSource={config.data.source}
+            pullQuoteAuthor={config.data.author}
+            pullQuoteUrl={config.data.url}
+            sources={location.sources}
+            span={c}
+          />
+        );
+
+      case 'gallery':
+        return (
+          <GalleryCard
+            key={key}
+            photos={config.data}
+            onThumbnailClick={(idx) => openGallery(idx + 1)}
+            span={c}
+          />
+        );
+
+      case 'menu':
+        return (
+          <MenuCard
+            key={key}
+            items={config.data}
+            span={c}
+          />
+        );
+
+      case 'wine':
+        return (
+          <WineCard
+            key={key}
+            focus={config.data.focus}
+            regions={config.data.regions}
+            priceRange={config.data.priceRange}
+            description={config.data.description}
+            span={c}
+          />
+        );
+
+      case 'alsoOn':
+        return (
+          <AlsoOnCard
+            key={key}
+            maps={config.data}
+            span={c}
+          />
+        );
+
+      case 'quiet':
+        return (
+          <QuietCard
+            key={key}
+            variant={config.data?.variant || 'grid'}
+            span={c as 1 | 2 | 3}
+          />
+        );
+
+      case 'reservations':
+      case 'links':
+      case 'phone':
+        // TODO: Implement these cards
+        console.warn(`⚠️ Card type "${config.type}" not yet implemented`);
+        return null;
+
+      default:
+        console.error(`❌ Unknown card type: ${config.type}`);
+        return null;
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#F5F0E1' }}>
@@ -401,13 +528,46 @@ export default function PlacePage() {
     (m) => typeof m.placeCount === 'number' && m.placeCount > 0
   );
 
+  // Transform data for System B layout resolver
+  const resolverData: ResolverPlaceData = {
+    hours: { today, isOpen, closesAt, opensAt, fullWeek, isIrregular },
+    description: {
+      curator_note: location.curatorNote || null,
+      about_copy: location.description || null
+    },
+    // NOTE: Reservations, links, phone cards not yet implemented - will be added in follow-up
+    reservations: undefined, // TODO: Implement ReservationsCard component
+    vibe: location.vibeTags && location.vibeTags.length > 0 ? location.vibeTags : null,
+    press: hasCoverage ? {
+      quote: location.pullQuote || '',
+      source: location.pullQuoteSource || '',
+      author: location.pullQuoteAuthor || undefined,
+      url: location.pullQuoteUrl || undefined
+    } : null,
+    gallery: hasGallery ? location.photoUrls!.slice(1) : null,
+    menu: null, // TODO: Add when menu data available
+    wine: null, // TODO: Add when wine data available
+    links: undefined, // TODO: Implement LinksCard component
+    phone: null, // TODO: Implement PhoneCard component
+    alsoOn: appearsOnRenderable.length > 0 ? appearsOnRenderable : null
+  };
+
+  // Resolve layout using System B
+  const tiles = resolvePlacePageLayout(resolverData);
+  
+  // Validate layout
+  const isValid = validateLayout(tiles);
+  
+  if (!isValid) {
+    console.error('❌ System B layout validation failed!');
+    console.log(debugLayout(tiles));
+  } else if (process.env.NODE_ENV === 'development') {
+    console.log('✓ System B layout validation passed');
+    console.log(debugLayout(tiles));
+  }
+
   return (
     <div style={{ background: '#F5F0E1', minHeight: '100vh' }}>
-      <link
-        href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap"
-        rel="stylesheet"
-      />
-
       <GlobalHeader variant="immersive" onShare={handleShare} />
 
       <main style={{ maxWidth: 720, margin: '0 auto' }}>
@@ -434,98 +594,20 @@ export default function PlacePage() {
           instagram={finalInstagramHandle}
         />
 
-        {/* Bento Grid */}
+        {/* Bento Grid - System B: Natural Flow */}
         <div
           style={{
             padding: '16px 20px',
             display: 'grid',
-            gridTemplateColumns: 'repeat(6, 1fr)',
+            gridTemplateColumns: 'repeat(6, minmax(0, 1fr))',
             gap: 12,
+            gridAutoFlow: 'row', // Natural flow, no backfill
+            gridAutoRows: 'auto', // Flexible height
+            alignItems: 'start', // Prevent stretch
           }}
         >
-          {/* Row 1: Hours/Market (2) + Details (4) */}
-          {isMarketActivity ? (
-            <MarketFactsCard
-              schedule={location.marketSchedule}
-              website={location.website ?? null}
-              instagram={location.instagram ?? null}
-              span={2}
-            />
-          ) : (
-            <HoursCard
-              todayHours={today}
-              isOpen={isOpen}
-              statusText={statusText}
-              fullWeek={fullWeek}
-              isIrregular={isIrregular}
-              span={2}
-            />
-          )}
-
-          <DetailsCard
-            address={location.address}
-            neighborhood={location.neighborhood}
-            website={location.website}
-            restaurantGroupName={location.restaurantGroup?.name}
-            restaurantGroupSlug={location.restaurantGroup?.slug}
-            serviceOptions={serviceOptions}
-            reservationsNote={reservationsNote}
-            span={4}
-          />
-
-          {/* Row 2: Coverage (3-5) */}
-          {hasCoverage && (
-            <CoverageCard
-              pullQuote={location.pullQuote}
-              pullQuoteSource={location.pullQuoteSource}
-              pullQuoteAuthor={location.pullQuoteAuthor}
-              pullQuoteUrl={location.pullQuoteUrl}
-              sources={location.sources}
-              vibeTag={location.vibeTags?.[0] || null}
-            />
-          )}
-
-          {/* Row 3: Gallery (3 or 6) + Curator (3) */}
-          {hasGallery && (
-            <GalleryCard
-              photos={location.photoUrls!.slice(1)} // Exclude hero
-              onThumbnailClick={(idx) => openGallery(idx + 1)}
-              span={hasCurator ? 3 : 6}
-            />
-          )}
-
-          {hasCurator && (
-            <CuratorCard 
-              note={location.curatorNote!} 
-              span={3}
-            />
-          )}
-
-          {/* Row 4: Tips (3) + Menu/Wine (3) */}
-          {location.tips && location.tips.length > 0 && (
-            <TipsCard tips={location.tips} span={3} />
-          )}
-
-          {/* Show Menu if available, otherwise show Wine */}
-          {/* TODO: Add menuItems field to location data */}
-          {/* <MenuCard items={location.menuItems} span={3} /> */}
-          
-          {/* Placeholder for Wine card - uncomment when data available */}
-          {/* <WineCard 
-            focus="Italian natural wines"
-            regions={["Sicily", "Friuli"]}
-            priceRange="$45-85"
-            span={3}
-          /> */}
-
-          {/* Row 5: Vibe (6) */}
-          {location.vibeTags && location.vibeTags.length > 0 && (
-            <VibeCard vibeTags={location.vibeTags} />
-          )}
-
-          {/* Row 6: Also On (6) - Now with rich map cards */}
-          {appearsOnRenderable.length > 0 && (
-            <AlsoOnCard maps={appearsOnRenderable} />
+          {tiles.map((tile, idx) => 
+            renderCard(tile, location, `tile-${idx}`)
           )}
         </div>
       </main>
