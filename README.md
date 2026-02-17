@@ -116,6 +116,16 @@ Built with Cursor AI as the primary development tool, with Claude providing stru
 
 **All PRs must follow `/docs/PR_TEMPLATE.md`.**
 
+### Password recovery
+
+Forgot-password flow uses Resend for email. Set in `.env.local`:
+
+- `RESEND_API_KEY` — from [Resend](https://resend.com)
+- `RESEND_FROM_EMAIL` — sender address (e.g. `Saiko Maps <noreply@yourdomain.com>`)
+- `NEXT_PUBLIC_APP_URL` — base URL for reset links (e.g. `https://app.example.com`)
+
+Without `RESEND_API_KEY`, the app still returns success but does not send email (useful for local dev).
+
 ---
 
 **Saiko Maps · 2026**
