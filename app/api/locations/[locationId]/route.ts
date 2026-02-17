@@ -5,8 +5,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { requireUserId, requireOwnership } from '@/lib/auth/guards';
 import { db } from '@/lib/db';
 
 export async function PATCH(
@@ -14,15 +13,8 @@ export async function PATCH(
   { params }: { params: Promise<{ locationId: string }> }
 ) {
   try {
-    const session = await getServerSession(authOptions);
+    const userId = await requireUserId();
     const { locationId } = await params;
-
-    if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
-    }
 
     // Get the location and its list to check ownership
     const location = await db.locations.findUnique({
@@ -40,12 +32,7 @@ export async function PATCH(
     }
 
     // Check if user owns the map
-    if (location.lists.userId !== session.user.id) {
-      return NextResponse.json(
-        { error: 'You do not have permission to edit this location' },
-        { status: 403 }
-      );
-    }
+    await requireOwnership(location.lists.userId);
 
     const body = await request.json();
     const { name, address, phone, website, description, userNote, descriptor, orderIndex } = body;
@@ -87,15 +74,8 @@ export async function DELETE(
   { params }: { params: Promise<{ locationId: string }> }
 ) {
   try {
-    const session = await getServerSession(authOptions);
+    const userId = await requireUserId();
     const { locationId } = await params;
-
-    if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
-    }
 
     // Get the location and its list to check ownership
     const location = await db.locations.findUnique({
@@ -113,12 +93,7 @@ export async function DELETE(
     }
 
     // Check if user owns the map
-    if (location.lists.userId !== session.user.id) {
-      return NextResponse.json(
-        { error: 'You do not have permission to delete this location' },
-        { status: 403 }
-      );
-    }
+    await requireOwnership(location.lists.userId);
 
     // Delete the location
     await db.locations.delete({

@@ -5,8 +5,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { requireUserId, requireOwnership } from '@/lib/auth/guards';
 import { db } from '@/lib/db';
 import { generateShortSlug } from '@/lib/utils';
 import { validateForPublish, mapToFormData, generateTitleFromPlaces } from '@/lib/mapValidation';
@@ -14,23 +13,12 @@ import { generateMapDescription } from '@/lib/generateMapDescription';
 
 const MAX_SLUG_ATTEMPTS = 10;
 
-function getUserId(session: { user?: { id?: string } } | null): string | null {
-  if (session?.user?.id) return session.user.id;
-  if (process.env.NODE_ENV === 'development') return 'demo-user-id';
-  return null;
-}
-
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getServerSession(authOptions);
-    const userId = getUserId(session);
-
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const userId = await requireUserId();
 
     const { id } = await params;
 
@@ -51,9 +39,7 @@ export async function POST(
       );
     }
 
-    if (existing.userId !== userId) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
+    await requireOwnership(existing.userId);
 
     const formData = mapToFormData(existing);
     const { canPublish, errors } = validateForPublish(

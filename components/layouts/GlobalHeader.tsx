@@ -34,6 +34,8 @@ interface GlobalHeaderProps {
 export function GlobalHeader({ variant = 'default', onShare }: GlobalHeaderProps) {
   const { data: session, status } = useSession()
   const pathname = usePathname()
+  
+  // Gracefully handle session failures - don't block public pages
   const isSignedIn = status === 'authenticated' && !!session
   const showLoggedInNav = DEV_SHOW_ALL_UI || isSignedIn
   

@@ -1,13 +1,11 @@
 /**
- * API Route: Process Import
+ * API Route: Process Import (ADMIN ONLY)
  * POST /api/import/process
  * Create list and enrich locations with Google Places API
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-// TEMP: auth disabled for import routes (admin/dev only)
-// import { getServerSession } from 'next-auth'
-// import { authOptions } from '@/lib/auth'
+import { requireAdmin } from '@/lib/auth/guards'
 import { db } from '@/lib/db'
 import { randomUUID } from 'crypto'
 import { processImportSchema } from '@/lib/validations'
@@ -15,26 +13,10 @@ import { searchPlace, getPlaceDetails, getNeighborhoodFromPlaceDetails, getNeigh
 import { generateSlug } from '@/lib/utils'
 import { extractPlaceId } from '@/lib/utils/googleMapsParser'
 
-function getUserId(session: { user?: { id?: string } } | null): string | null {
-  if (session?.user?.id) return session.user.id
-  if (process.env.NODE_ENV === 'development') return 'demo-user-id'
-  return null
-}
-
 export async function POST(request: NextRequest) {
   try {
-    // TEMP: auth disabled for import routes (admin/dev only)
-    // const session = await getServerSession(authOptions)
-    // const userId = getUserId(session)
-    const userId = 'temp-admin-user'
-
-    if (false) {
-      // if (!userId) {
-      return NextResponse.json(
-        { error: 'User authentication required' },
-        { status: 401 }
-      )
-    }
+    // Admin-only: import operations require admin access
+    const userId = await requireAdmin();
 
     const body = await request.json()
     

@@ -1,4 +1,11 @@
+/**
+ * API Route: Upload CSV File
+ * POST /api/import/upload
+ * Saves CSV to temp storage for preview/processing
+ */
+
 import { NextRequest, NextResponse } from 'next/server';
+import { requireUserId } from '@/lib/auth/guards';
 import { writeFile, mkdir } from 'fs/promises';
 
 // Allow up to 60s for large file uploads (Vercel default is 10s)
@@ -9,6 +16,9 @@ import { v4 as uuidv4 } from 'uuid';
 
 export async function POST(request: NextRequest) {
   try {
+    // Require authentication for import operations
+    await requireUserId();
+
     const formData = await request.formData();
     const file = formData.get('file') as File;
 
