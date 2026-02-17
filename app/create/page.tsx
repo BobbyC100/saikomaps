@@ -21,7 +21,6 @@ export default function CreateMapPage() {
     setError('');
 
     try {
-      // Create the map
       const response = await fetch('/api/maps', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -36,8 +35,6 @@ export default function CreateMapPage() {
       }
 
       const { data } = await response.json();
-      
-      // Redirect to add locations step
       router.push(`/create/${data.id}/locations`);
     } catch (err) {
       setError('Failed to create map. Please try again.');
@@ -48,62 +45,49 @@ export default function CreateMapPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#1A1A1A]">
-      {/* Nav */}
-      <nav className="flex items-center justify-between px-8 py-6 border-b border-white/10">
-        <SaikoLogo href="/dashboard" variant="light" className="scale-[1.25]" />
-        <Link href="/dashboard" className="text-white/60 hover:text-white transition-colors">
+    <div className="min-h-screen bg-[var(--parchment)]">
+      <nav className="flex items-center justify-between px-8 py-6 border-b border-[var(--charcoal)]/10">
+        <SaikoLogo href="/dashboard" variant="dark" />
+        <Link href="/dashboard" className="text-[var(--charcoal)]/60 hover:text-[var(--charcoal)] transition-colors text-sm">
           ← Back to Dashboard
         </Link>
       </nav>
 
-      {/* Content */}
       <div className="max-w-4xl mx-auto px-8 py-16">
-        {/* Header */}
         <div className="mb-12">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-6 h-6 bg-[#D64541] flex items-center justify-center text-white font-bold text-xs">1</div>
-            <div className="text-white/40">→</div>
-            <div className="w-6 h-6 bg-white/10 flex items-center justify-center text-white/40 font-bold text-xs">2</div>
-            <div className="text-white/40">→</div>
-            <div className="w-6 h-6 bg-white/10 flex items-center justify-center text-white/40 font-bold text-xs">3</div>
-          </div>
-          <h1 className="text-4xl font-bold text-white mb-2">Create Your Map</h1>
-          <p className="text-xl text-white/60">Give it a name and pick a style</p>
+          <h1 className="text-3xl font-normal text-[var(--charcoal)] mb-2" style={{ fontFamily: 'var(--font-libre)', fontStyle: 'italic' }}>Create Your Map</h1>
+          <p className="text-[var(--charcoal)]/60 text-sm">Give it a name and pick a style</p>
         </div>
 
-        {/* Error */}
         {error && (
-          <div className="mb-6 p-4 bg-[#D64541]/10 border border-[#D64541]/30 rounded-lg">
-            <p className="text-[#D64541]">{error}</p>
+          <div className="mb-6 p-4 bg-[var(--error)]/10 border border-[var(--error)]/30 rounded-xl">
+            <p className="text-sm text-[var(--error)]">{error}</p>
           </div>
         )}
 
-        {/* Map Name */}
         <div className="mb-12">
-          <label className="block text-white font-medium mb-3">Map Name</label>
+          <label className="block text-sm font-medium text-[var(--charcoal)]/80 mb-2">Map Name</label>
           <input
             type="text"
             value={mapName}
             onChange={(e) => setMapName(e.target.value)}
             placeholder="e.g., Tokyo Coffee Guide, NYC Hidden Gems..."
-            className="w-full px-6 py-4 bg-[#2A2A2A] border border-white/10 rounded-xl text-white text-lg placeholder:text-white/30 focus:outline-none focus:border-[#89B4C4] transition-colors"
+            className="w-full px-6 py-4 bg-[var(--warm-white)] border border-[var(--charcoal)]/10 text-[var(--charcoal)] placeholder:text-[var(--charcoal)]/30 focus:outline-none focus:border-[var(--charcoal)]/30 transition-colors rounded-xl"
           />
-          <p className="mt-3 text-white/50 text-sm">Using Field Notes template</p>
+          <p className="mt-3 text-[var(--charcoal)]/50 text-sm">Using Field Notes template</p>
         </div>
 
-        {/* Actions */}
         <div className="flex gap-4">
           <Link
             href="/dashboard"
-            className="px-8 py-4 bg-white/10 text-white font-bold rounded-lg hover:bg-white/20 transition-colors"
+            className="px-8 py-4 border border-[var(--charcoal)]/20 text-[var(--charcoal)] font-semibold rounded-xl hover:border-[var(--charcoal)]/40 transition-colors text-sm tracking-wider uppercase"
           >
             Cancel
           </Link>
           <button
             onClick={handleCreate}
             disabled={isCreating || !mapName.trim()}
-            className="flex-1 px-8 py-4 bg-[#D64541] text-white font-bold rounded-lg hover:bg-[#C13D39] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="flex-1 px-8 py-4 bg-[var(--charcoal)] text-[var(--parchment)] font-semibold rounded-xl hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm tracking-wider uppercase"
           >
             {isCreating ? 'Creating...' : 'Continue to Add Locations →'}
           </button>

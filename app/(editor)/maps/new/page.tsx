@@ -41,21 +41,21 @@ export default function NewMapPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[#FFF8F0] flex items-center justify-center p-6" suppressHydrationWarning>
+      <div className="min-h-screen bg-[var(--parchment)] flex items-center justify-center p-6" suppressHydrationWarning>
         <div className="text-center max-w-md">
-          <p className="text-red-600 mb-4">{error}</p>
-          <p className="text-sm text-[#6B6B6B] mb-4">
-            If the database isn&apos;t set up, run: <code className="bg-white/50 px-1 rounded">npm run db:seed-demo</code>
+          <p className="text-[var(--error)] mb-4">{error}</p>
+          <p className="text-sm text-[var(--charcoal)]/60 mb-4">
+            If the database isn&apos;t set up, run: <code className="bg-[var(--warm-white)] px-1 rounded-xl">npm run db:seed-demo</code>
           </p>
-          <Link href="/" className="text-[#E07A5F] hover:underline">Go home</Link>
+          <Link href="/" className="text-[var(--charcoal)] hover:text-[var(--charcoal)]/80 font-medium text-sm">Go home</Link>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#FFF8F0] flex items-center justify-center" suppressHydrationWarning>
-      <p className="text-[#6B6B6B]">Creating your map...</p>
+    <div className="min-h-screen bg-[var(--parchment)] flex items-center justify-center" suppressHydrationWarning>
+      <p className="text-[var(--charcoal)]/60">Creating your map...</p>
     </div>
   );
 }
