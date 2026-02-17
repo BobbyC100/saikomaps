@@ -56,7 +56,8 @@
     "export:full": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/export-to-golden-full.ts",
     "backfill:google-ids": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/backfill-google-ids.ts",
     "tag:la-county": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/tag-la-county.ts",
-    "enrich:google": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/enrich-google-places.ts"
+    "enrich:google": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/enrich-google-places.ts",
+    "seed:prod:places": "tsx scripts/seed-prod-places.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.72.1",
