@@ -27,6 +27,7 @@ export function QuietCard({
       className={`${styles.quietCard} ${styles[`pattern-${variant}`]} ${className}`}
       style={{
         gridColumn: `span ${span}`,
+        alignSelf: 'stretch',
       }}
       aria-hidden="true"
       data-quiet-card={variant}

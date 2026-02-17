@@ -389,11 +389,12 @@ export default function PlacePage() {
 
       case 'quiet':
         return (
-          <QuietCard
-            key={key}
-            variant={config.data?.variant || 'grid'}
-            span={c as 1 | 2 | 3}
-          />
+          <div key={key} style={{ ...style, alignSelf: 'stretch' }}>
+            <QuietCard
+              variant={config.data?.variant || 'grid'}
+              span={c as 1 | 2 | 3}
+            />
+          </div>
         );
 
       case 'reservations':

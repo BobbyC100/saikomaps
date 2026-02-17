@@ -271,10 +271,16 @@ function applyGalleryGapFill(tiles: CardConfig[]): CardConfig[] {
     columnsSoFar += tiles[i].span.c;
   }
   const galleryRowStart = columnsSoFar % 6;
-  const galleryRowEnd = (galleryRowStart + 4) % 6; // Gallery is span-4
+  const spaceLeftOnRow = 6 - galleryRowStart;
   
-  // Gallery creates 2-col gap? (row positions: 0→4 leaves 4,5 open)
-  const hasGap = galleryRowEnd === 4; // After span-4, we're at column 4 (0-indexed)
+  // CSS Grid auto-wraps if gallery doesn't fit on current row
+  const gallerySpan = 4; // Gallery is always span-4
+  const galleryWrapsToNewRow = gallerySpan > spaceLeftOnRow;
+  const actualGalleryStart = galleryWrapsToNewRow ? 0 : galleryRowStart;
+  const galleryRowEnd = actualGalleryStart + gallerySpan; // 0 + 4 = 4
+  
+  // Gallery creates 2-col gap? (columns 0-3 occupied, 4-5 open)
+  const hasGap = galleryRowEnd === 4;
   
   if (!hasGap) return tiles;
   
