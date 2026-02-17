@@ -12,6 +12,13 @@ import { randomUUID } from 'crypto'
 
 export async function POST(request: NextRequest) {
   try {
+    // DB IDENTITY PROOF
+    console.log('[SIGNUP] DATABASE_URL:', process.env.DATABASE_URL?.replace(/:[^:@]+@/, ':***@'));
+    const [dbId] = await db.$queryRaw<any[]>`
+      select current_database() as db, inet_server_addr()::text as addr, inet_server_port() as port
+    `;
+    console.log('[SIGNUP] DB ID:', dbId);
+    
     const body = await request.json()
 
     // Validate input
@@ -29,6 +36,7 @@ export async function POST(request: NextRequest) {
     const existingUser = await db.users.findUnique({
       where: { email },
     })
+    console.log('[SIGNUP] existingUser query returned:', !!existingUser, 'for email:', email);
 
     if (existingUser) {
       return NextResponse.json(

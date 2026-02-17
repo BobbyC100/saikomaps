@@ -128,4 +128,74 @@ Without `RESEND_API_KEY`, the app still returns success but does not send email 
 
 ---
 
+## Authentication Architecture
+
+### Auth System
+- **Provider:** NextAuth v4 with Credentials provider
+- **Strategy:** JWT sessions (30-day expiration)
+- **Password Hashing:** bcryptjs
+
+### Auth Guards (Centralized)
+
+All authentication logic is centralized in `lib/auth/guards.ts`:
+
+```typescript
+import { requireUserId, requireAdmin, requireOwnership } from '@/lib/auth/guards'
+
+// Require any authenticated user
+export async function POST(req: NextRequest) {
+  const userId = await requireUserId() // Throws 401 if not authed
+}
+
+// Require admin user
+export async function POST(req: NextRequest) {
+  const userId = await requireAdmin() // Throws 403 if not admin
+}
+
+// Require resource ownership
+export async function PATCH(req: NextRequest) {
+  const userId = await requireUserId()
+  const resource = await db.findUnique(...)
+  await requireOwnership(resource.userId) // Throws 403 if not owner
+}
+```
+
+### Environment Variables
+
+Required for authentication:
+```bash
+NEXTAUTH_SECRET=<generate-with-openssl-rand-base64-32>
+ADMIN_EMAILS=admin@example.com,admin2@example.com
+```
+
+### Admin Access
+
+Admin users are determined by email address in `ADMIN_EMAILS` environment variable.
+
+Protected routes:
+- `/admin/*` - Admin panel
+- `/api/admin/*` - Admin API endpoints
+
+### Rate Limiting (Upstash)
+
+AI and other sensitive endpoints use Upstash Redis for rate limiting. Set in `.env.local`:
+
+```bash
+UPSTASH_REDIS_REST_URL=<your-upstash-url>
+UPSTASH_REDIS_REST_TOKEN=<your-upstash-token>
+```
+
+Without these, development allows requests with a warning; production fails closed.
+
+---
+
+## Public Routes
+
+### Coverage Metrics
+- `GET /coverage` - View geographic coverage and data quality metrics
+- Public access (no authentication required)
+- Moved from `/admin/coverage` in v1.2.0
+
+---
+
 **Saiko Maps · 2026**

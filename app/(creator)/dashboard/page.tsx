@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import DashboardLayout from '@/components/layouts/DashboardLayout';
 
 interface MapItem {
@@ -49,92 +48,91 @@ export default function DashboardPage() {
       <div className="space-y-12">
         {/* Header */}
         <div>
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-6 h-6 bg-[#D64541]"></div>
-            <div className="w-6 h-6 rounded-full bg-[#89B4C4]"></div>
-            <div className="w-6 h-6 bg-white"></div>
-          </div>
-          <h1 className="text-5xl font-bold text-white mb-2">Dashboard</h1>
-          <p className="text-xl text-white/60">Your maps at a glance</p>
+          <h1 className="text-3xl font-normal text-[var(--charcoal)] mb-2" style={{ fontFamily: 'var(--font-libre)', fontStyle: 'italic' }}>Dashboard</h1>
+          <p className="text-[var(--charcoal)]/60 text-sm">Your maps at a glance</p>
         </div>
 
         {/* Stats Grid */}
         <div className="grid grid-cols-4 gap-6">
-          <div className="bg-[#2A2A2A] border border-white/10 rounded-xl p-6 hover:border-white/20 transition-colors">
-            <div className="text-sm font-medium text-white/50 uppercase tracking-wider mb-2">
+          <div className="bg-[var(--warm-white)] border border-[var(--charcoal)]/10 rounded-xl p-6 transition-colors">
+            <div className="text-sm font-medium text-[var(--charcoal)]/60 uppercase tracking-wider mb-2">
               Total Maps
             </div>
-            <div className="text-4xl font-bold text-white">{maps.length}</div>
+            <div className="text-4xl font-bold text-[var(--charcoal)]">{maps.length}</div>
           </div>
-          <div className="bg-[#2A2A2A] border border-white/10 rounded-xl p-6 hover:border-white/20 transition-colors">
-            <div className="text-sm font-medium text-white/50 uppercase tracking-wider mb-2">
+          <div className="bg-[var(--warm-white)] border border-[var(--charcoal)]/10 rounded-xl p-6 transition-colors">
+            <div className="text-sm font-medium text-[var(--charcoal)]/60 uppercase tracking-wider mb-2">
               Locations
             </div>
-            <div className="text-4xl font-bold text-white">{totalLocations}</div>
+            <div className="text-4xl font-bold text-[var(--charcoal)]">{totalLocations}</div>
           </div>
-          <div className="bg-[#2A2A2A] border border-white/10 rounded-xl p-6 hover:border-white/20 transition-colors">
-            <div className="text-sm font-medium text-white/50 uppercase tracking-wider mb-2">
+          <div className="bg-[var(--warm-white)] border border-[var(--charcoal)]/10 rounded-xl p-6 transition-colors">
+            <div className="text-sm font-medium text-[var(--charcoal)]/60 uppercase tracking-wider mb-2">
               Total Views
             </div>
-            <div className="text-4xl font-bold text-white">{totalViews}</div>
+            <div className="text-4xl font-bold text-[var(--charcoal)]">{totalViews}</div>
           </div>
-          <div className="bg-[#2A2A2A] border border-white/10 rounded-xl p-6 hover:border-white/20 transition-colors">
-            <div className="text-sm font-medium text-white/50 uppercase tracking-wider mb-2">
+          <div className="bg-[var(--warm-white)] border border-[var(--charcoal)]/10 rounded-xl p-6 transition-colors">
+            <div className="text-sm font-medium text-[var(--charcoal)]/60 uppercase tracking-wider mb-2">
               Published
             </div>
-            <div className="text-4xl font-bold text-[#89B4C4]">
+            <div className="text-4xl font-bold text-[var(--leather)]">
               {publishedCount} / {maps.length || 1}
             </div>
           </div>
         </div>
 
         {/* My Maps */}
-        <div className="bg-[#2A2A2A] border border-white/10 rounded-xl p-8">
-          <h2 className="text-2xl font-bold text-white mb-6">My Maps</h2>
+        <div className="bg-[var(--warm-white)] border border-[var(--charcoal)]/10 rounded-xl p-8">
+          <h2 className="text-lg font-semibold text-[var(--charcoal)] uppercase tracking-wider mb-6">My Maps</h2>
           {isLoading ? (
-            <p className="text-white/60">Loading maps...</p>
+            <p className="text-[var(--charcoal)]/60">Loading maps...</p>
           ) : error ? (
-            <p className="text-[#D64541]">{error}</p>
+            <p className="text-[var(--error)]">{error}</p>
           ) : maps.length === 0 ? (
-            <p className="text-white/60 mb-6">No maps yet. Create your first map to get started.</p>
+            <p className="text-[var(--charcoal)]/60 mb-6">No maps yet. Create your first map to get started.</p>
           ) : (
             <div className="space-y-4">
               {maps.map((map) => (
                 <div
                   key={map.id}
-                  className="flex items-center justify-between gap-4 p-4 bg-[#1A1A1A] border border-white/10 rounded-lg hover:border-white/20 transition-colors"
+                  className="flex items-center justify-between gap-4 p-4 bg-white border border-[var(--charcoal)]/10 rounded-xl transition-colors"
                 >
                   <div className="min-w-0 flex-1">
-                    <h3 className="text-white font-bold text-lg truncate">{map.title}</h3>
-                    <p className="text-white/50 text-sm mt-1">
+                    <h3 className="text-[var(--charcoal)] font-semibold text-lg truncate">{map.title}</h3>
+                    <p className="text-[var(--charcoal)]/50 text-sm mt-1">
                       {map.locationCount} locations
                       {map.published && (
                         <>
                           {' · '}
-                          <span className="text-[#89B4C4]">{map.viewCount} views</span>
+                          <span className="text-[var(--leather)]">{map.viewCount} views</span>
                         </>
                       )}
                     </p>
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">
                     <span
-                      className={`px-2 py-1 text-xs font-medium rounded ${
-                        map.published
-                          ? 'bg-[#89B4C4]/20 text-[#89B4C4]'
-                          : 'bg-white/10 text-white/60'
-                      }`}
+                      className={`px-2 py-1 text-xs font-medium uppercase tracking-wider`}
+                      style={{
+                        borderRadius: '12px',
+                        ...(map.published
+                          ? { backgroundColor: 'rgba(139, 115, 85, 0.15)', color: 'var(--leather)' }
+                          : { backgroundColor: 'rgba(54, 69, 79, 0.08)', color: 'var(--charcoal)' }),
+                      }}
                     >
                       {map.published ? 'Published' : 'Draft'}
                     </span>
                     <Link
                       href={`/maps/${map.id}/edit`}
-                      className="px-3 py-2 text-sm font-medium text-white/80 hover:text-white bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
+                      className="px-3 py-2 text-sm font-semibold text-[var(--charcoal)]/80 hover:text-[var(--charcoal)] uppercase tracking-wider border border-[var(--charcoal)]/20 hover:border-[var(--charcoal)]/40 transition-colors"
+                      style={{ borderRadius: '12px' }}
                     >
                       Edit
                     </Link>
                     <Link
                       href={map.published ? `/map/${map.slug}` : `/create/${map.id}/preview`}
-                      className="px-3 py-2 text-sm font-medium text-white/80 hover:text-white bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
+                      className="px-3 py-2 text-sm font-semibold text-[var(--charcoal)]/80 hover:text-[var(--charcoal)] uppercase tracking-wider border border-[var(--charcoal)]/20 hover:border-[var(--charcoal)]/40 transition-colors"
+                      style={{ borderRadius: '12px' }}
                     >
                       {map.published ? 'View' : 'Preview'}
                     </Link>
@@ -143,7 +141,8 @@ export default function DashboardPage() {
                         href={`/map/${map.slug}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="px-3 py-2 text-sm font-medium text-[#89B4C4] hover:text-[#89B4C4]/80 bg-[#89B4C4]/10 hover:bg-[#89B4C4]/20 rounded-lg transition-colors"
+                        className="px-3 py-2 text-sm font-semibold text-[var(--leather)] hover:opacity-90 uppercase tracking-wider border border-[var(--leather)]/30 hover:border-[var(--leather)]/50 transition-colors"
+                        style={{ borderRadius: '12px' }}
                       >
                         Open
                       </Link>
@@ -156,32 +155,35 @@ export default function DashboardPage() {
         </div>
 
         {/* Quick Actions */}
-        <div className="bg-[#2A2A2A] border border-white/10 rounded-xl p-8">
-          <h2 className="text-2xl font-bold text-white mb-6">Quick Actions</h2>
+        <div className="bg-[var(--warm-white)] border border-[var(--charcoal)]/10 rounded-xl p-8">
+          <h2 className="text-lg font-semibold text-[var(--charcoal)] uppercase tracking-wider mb-6">Quick Actions</h2>
           <div className="grid grid-cols-3 gap-4">
             <Link
               href="/maps/new"
-              className="p-6 bg-[#D64541] rounded-lg hover:bg-[#C13D39] transition-colors text-center"
+              className="p-6 rounded-xl text-center transition-colors bg-[var(--charcoal)] text-[var(--parchment)] hover:opacity-90"
+              style={{ borderRadius: '12px', boxShadow: '0 10px 28px rgba(0,0,0,.10)' }}
             >
               <div className="text-3xl mb-2">✨</div>
-              <div className="text-white font-bold">Create New Map</div>
-              <div className="text-white/70 text-sm mt-1">Start from scratch</div>
+              <div className="font-semibold text-sm tracking-wider uppercase">Create New Map</div>
+              <div className="text-[var(--parchment)]/70 text-xs mt-1">Start from scratch</div>
             </Link>
             <Link
               href="/test-add-location"
-              className="p-6 bg-[#89B4C4] rounded-lg hover:bg-[#7CA4B4] transition-colors text-center"
+              className="p-6 rounded-xl text-center transition-colors border border-[var(--leather)]/40 text-[var(--leather)] hover:bg-[var(--leather)]/10"
+              style={{ borderRadius: '12px' }}
             >
               <div className="text-3xl mb-2">🗺️</div>
-              <div className="text-white font-bold">Add Location</div>
-              <div className="text-white/70 text-sm mt-1">Test the feature</div>
+              <div className="font-semibold text-sm tracking-wider uppercase">Add Location</div>
+              <div className="text-[var(--charcoal)]/60 text-xs mt-1">Test the feature</div>
             </Link>
             <Link
               href="/import"
-              className="p-6 bg-white/10 rounded-lg hover:bg-white/20 transition-colors text-center"
+              className="p-6 rounded-xl text-center transition-colors border border-[var(--charcoal)]/20 text-[var(--charcoal)]/80 hover:border-[var(--charcoal)]/40 hover:bg-[var(--charcoal)]/5"
+              style={{ borderRadius: '12px' }}
             >
               <div className="text-3xl mb-2">📥</div>
-              <div className="text-white font-bold">Import CSV</div>
-              <div className="text-white/70 text-sm mt-1">Bulk import</div>
+              <div className="font-semibold text-sm tracking-wider uppercase">Import CSV</div>
+              <div className="text-[var(--charcoal)]/60 text-xs mt-1">Bulk import</div>
             </Link>
           </div>
         </div>

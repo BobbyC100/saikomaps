@@ -1,20 +1,10 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { getToken } from 'next-auth/jwt'
-
-// Admin email list from env var (comma-separated)
-function getAdminEmails(): string[] {
-  const adminEmailsEnv = process.env.ADMIN_EMAILS || ''
-  return adminEmailsEnv.split(',').map(email => email.trim()).filter(Boolean)
-}
+import { isAdminEmailEdge, getUserEmailEdge } from '@/lib/auth/guards.edge'
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
-
-  // TEMP: Allow unauthenticated access to coverage audit (bypass all auth)
-  if (pathname.startsWith('/admin/coverage')) {
-    return NextResponse.next()
-  }
 
   // Get session token
   const token = await getToken({
@@ -52,6 +42,11 @@ export async function middleware(request: NextRequest) {
       return false
     })
 
+  // Allow /admin/coverage to pass through (handles redirect internally)
+  if (pathname.startsWith('/admin/coverage')) {
+    return NextResponse.next()
+  }
+
   // Check if route requires admin
   const requiresAdmin = 
     adminRoutes.some(route => pathname.startsWith(route)) ||
@@ -73,10 +68,9 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(url)
     }
 
-    const adminEmails = getAdminEmails()
-    const userEmail = token.email as string | undefined
+    const userEmail = await getUserEmailEdge(request)
 
-    if (!userEmail || !adminEmails.includes(userEmail)) {
+    if (!userEmail || !isAdminEmailEdge(userEmail)) {
       // Authenticated but not admin - return 403
       return new NextResponse('Forbidden', { status: 403 })
     }

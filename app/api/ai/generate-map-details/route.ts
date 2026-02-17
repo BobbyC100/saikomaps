@@ -1,47 +1,16 @@
 /**
- * POST /api/ai/generate-map-details
+ * POST /api/ai/generate-map-details (ADMIN ONLY)
  * SaikoAI: Generate map metadata (title, description, scope) from places.
- * Auth: Requires logged-in session.
- * Rate limit: 10 calls per map per hour (in-memory; resets on deploy).
+ * Auth: Requires admin authentication.
+ * Rate limit: 10 requests per hour per admin user.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { requireAdmin } from '@/lib/auth/guards';
+import { rateLimit, RateLimitPresets } from '@/lib/rate-limit';
 import { generateMapDetails } from '@/lib/saikoai/generate-map-details';
 import { SCOPE_PLACE_TYPE_OPTIONS } from '@/lib/mapValidation';
 import type { ScopePlaceType } from '@/lib/mapValidation';
-
-function getUserId(session: { user?: { id?: string } } | null): string | null {
-  if (session?.user?.id) return session.user.id;
-  if (process.env.NODE_ENV === 'development') return 'demo-user-id';
-  return null;
-}
-
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
-const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000;
-const RATE_LIMIT_MAX = 10;
-
-function checkRateLimit(mapId: string): boolean {
-  const now = Date.now();
-  const entry = rateLimitMap.get(mapId);
-  if (!entry) return true;
-  if (now > entry.resetAt) {
-    rateLimitMap.delete(mapId);
-    return true;
-  }
-  return entry.count < RATE_LIMIT_MAX;
-}
-
-function incrementRateLimit(mapId: string): void {
-  const now = Date.now();
-  const entry = rateLimitMap.get(mapId);
-  if (!entry) {
-    rateLimitMap.set(mapId, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
-    return;
-  }
-  entry.count++;
-}
 
 const AI_TYPE_TO_SCOPE: Record<string, ScopePlaceType> = {
   coffee: 'Coffee',
@@ -103,28 +72,41 @@ function mapPlaceTypesToScope(placeTypes: string[]): ScopePlaceType[] {
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    const userId = getUserId(session);
+    // Admin-only: AI generation is cost-bearing
+    const userId = await requireAdmin();
 
-    if (!userId) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+    // Rate limit: 10 requests per hour per admin user
+    const { success, limit, remaining, reset } = await rateLimit(
+      `ai-generate:${userId}`,
+      RateLimitPresets.AI_GENERATION
+    );
+
+    if (!success) {
+      return NextResponse.json(
+        { 
+          error: 'Rate limit exceeded. Please try again later.',
+          limit,
+          remaining: 0,
+          reset,
+        },
+        { 
+          status: 429,
+          headers: {
+            'X-RateLimit-Limit': limit.toString(),
+            'X-RateLimit-Remaining': '0',
+            'X-RateLimit-Reset': reset.toString(),
+          },
+        }
+      );
     }
 
     const body = await request.json();
-    const { places, mapId } = body;
+    const { places } = body;
 
     if (!Array.isArray(places) || places.length < 3) {
       return NextResponse.json(
         { error: 'At least 3 places are required' },
         { status: 400 }
-      );
-    }
-
-    const rateKey = mapId || `user-${userId}`;
-    if (!checkRateLimit(rateKey)) {
-      return NextResponse.json(
-        { error: 'Rate limit exceeded. Try again in an hour.' },
-        { status: 429 }
       );
     }
 
@@ -142,8 +124,6 @@ export async function POST(request: NextRequest) {
       console.log('[AI generate-map-details] Raw AI result:', JSON.stringify(result, null, 2));
       console.log('[AI generate-map-details] Raw placeTypes from AI:', result.scope.placeTypes);
     }
-
-    incrementRateLimit(rateKey);
 
     const scopePlaceTypes = mapPlaceTypesToScope(result.scope.placeTypes);
     if (process.env.NODE_ENV === 'development') {
@@ -166,8 +146,19 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       data: responseData,
+    }, {
+      headers: {
+        'X-RateLimit-Limit': limit.toString(),
+        'X-RateLimit-Remaining': remaining.toString(),
+        'X-RateLimit-Reset': reset.toString(),
+      },
     });
   } catch (error) {
+    // If error is a Response (from auth guards), return it directly
+    if (error instanceof Response) {
+      return error;
+    }
+    
     console.error('Generate map details error:', error);
     return NextResponse.json(
       {

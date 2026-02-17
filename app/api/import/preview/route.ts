@@ -1,4 +1,11 @@
+/**
+ * API Route: Preview CSV
+ * POST /api/import/preview
+ * Parses uploaded CSV and returns preview
+ */
+
 import { NextRequest, NextResponse } from 'next/server';
+import { requireUserId } from '@/lib/auth/guards';
 import { readFile } from 'fs/promises';
 import { existsSync } from 'fs';
 import path from 'path';
@@ -9,6 +16,9 @@ export const maxDuration = 60;
 
 export async function POST(request: NextRequest) {
   try {
+    // Require authentication for import operations
+    await requireUserId();
+
     const body = await request.json();
     const { fileId } = body;
 

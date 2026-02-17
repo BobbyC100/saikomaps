@@ -298,13 +298,14 @@ export default function AddLocationModal({
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-5">
-      <div className="bg-white rounded-xl w-full max-w-[560px] max-h-[90vh] overflow-hidden shadow-2xl animate-slideUp">
+      <div className="bg-[var(--warm-white)] w-full max-w-[560px] max-h-[90vh] overflow-hidden shadow-2xl animate-slideUp" style={{ borderRadius: '12px' }}>
         {/* Header */}
-        <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900">Add Location to Guide</h2>
+        <div className="px-6 py-5 border-b border-[var(--charcoal)]/10 flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-[var(--charcoal)]">Add Location to Guide</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg p-2 transition-colors"
+            className="text-[var(--charcoal)]/60 hover:text-[var(--charcoal)] hover:bg-[var(--charcoal)]/5 p-2 transition-colors"
+            style={{ borderRadius: '12px' }}
           >
             <span className="text-xl leading-none">&times;</span>
           </button>
@@ -314,21 +315,21 @@ export default function AddLocationModal({
         <div className="px-6 py-6 max-h-[calc(90vh-140px)] overflow-y-auto">
           {/* Success Message */}
           {showSuccess && (
-            <div className="mb-4 bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg text-sm animate-slideUp">
+            <div className="mb-4 bg-[var(--charcoal)]/10 border border-[var(--charcoal)]/20 text-[var(--charcoal)] px-4 py-3 text-sm animate-slideUp" style={{ borderRadius: '12px' }}>
               <strong className="font-semibold">✓ Location added!</strong> {selectedPlace?.name} has been added to your guide.
             </div>
           )}
 
           {/* Error Message */}
           {error && (
-            <div className="mb-4 bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg text-sm">
+            <div className="mb-4 bg-[var(--error)]/10 border border-[var(--error)]/30 text-[var(--error)] px-4 py-3 text-sm" style={{ borderRadius: '12px' }}>
               {error}
             </div>
           )}
 
           {/* Link Input */}
           <div className="mb-5">
-            <label className="block text-sm font-medium text-gray-900 mb-2">
+            <label className="block text-sm font-medium text-[var(--charcoal)] mb-2">
               Paste Google Maps link
             </label>
             <input
@@ -336,23 +337,24 @@ export default function AddLocationModal({
               value={linkInput}
               onChange={(e) => handleLinkInput(e.target.value)}
               placeholder="https://maps.app.goo.gl/... or full Google Maps URL"
-              className="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent transition-all"
+              className="w-full px-3.5 py-2.5 border border-[var(--charcoal)]/20 text-[var(--charcoal)] text-sm focus:outline-none focus:border-[var(--charcoal)]/40 transition-colors"
+              style={{ borderRadius: '12px' }}
             />
-            <p className="mt-1.5 text-xs text-gray-500">
+            <p className="mt-1.5 text-xs text-[var(--charcoal)]/50">
               Paste a link from Google Maps
             </p>
           </div>
 
           {/* Divider */}
           <div className="flex items-center text-center my-5">
-            <div className="flex-1 border-t border-gray-200"></div>
-            <span className="px-4 text-xs font-medium text-gray-400">OR</span>
-            <div className="flex-1 border-t border-gray-200"></div>
+            <div className="flex-1 border-t border-[var(--charcoal)]/10"></div>
+            <span className="px-4 text-xs font-medium text-[var(--charcoal)]/50">OR</span>
+            <div className="flex-1 border-t border-[var(--charcoal)]/10"></div>
           </div>
 
           {/* Search Input */}
           <div className="mb-5">
-            <label className="block text-sm font-medium text-gray-900 mb-2">
+            <label className="block text-sm font-medium text-[var(--charcoal)] mb-2">
               Search for a place
             </label>
             <input
@@ -360,29 +362,30 @@ export default function AddLocationModal({
               value={searchInput}
               onChange={(e) => handleSearchInput(e.target.value)}
               placeholder="e.g. Bacchanal Wine Bar, New Orleans"
-              className="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent transition-all"
+              className="w-full px-3.5 py-2.5 border border-[var(--charcoal)]/20 text-[var(--charcoal)] text-sm focus:outline-none focus:border-[var(--charcoal)]/40 transition-colors"
+              style={{ borderRadius: '12px' }}
             />
 
             {/* Search Results */}
             {searchResults.length > 0 && (
-              <div className="mt-3 border border-gray-200 rounded-lg overflow-hidden bg-white">
+              <div className="mt-3 border border-[var(--charcoal)]/10 overflow-hidden bg-[var(--warm-white)]" style={{ borderRadius: '12px' }}>
                 {searchResults.map((result) => (
                   <button
                     key={result.placeId}
                     onClick={() => handleSelectResult(result)}
-                    className="w-full text-left px-3.5 py-3 border-b border-gray-100 last:border-b-0 hover:bg-gray-50 transition-colors"
+                    className="w-full text-left px-3.5 py-3 border-b border-[var(--charcoal)]/10 last:border-b-0 hover:bg-[var(--charcoal)]/5 transition-colors"
                   >
-                    <div className="font-medium text-sm text-gray-900 mb-0.5">
+                    <div className="font-medium text-sm text-[var(--charcoal)] mb-0.5">
                       {result.name}
                     </div>
-                    <div className="text-xs text-gray-500">{result.address}</div>
+                    <div className="text-xs text-[var(--charcoal)]/50">{result.address}</div>
                   </button>
                 ))}
               </div>
             )}
 
             {isSearching && (
-              <div className="mt-3 text-center text-sm text-gray-500">
+              <div className="mt-3 text-center text-sm text-[var(--charcoal)]/50">
                 Searching...
               </div>
             )}
@@ -390,24 +393,24 @@ export default function AddLocationModal({
 
           {/* Divider */}
           <div className="flex items-center text-center my-5">
-            <div className="flex-1 border-t border-gray-200"></div>
-            <span className="px-4 text-xs font-medium text-gray-400">OR</span>
-            <div className="flex-1 border-t border-gray-200"></div>
+            <div className="flex-1 border-t border-[var(--charcoal)]/10"></div>
+            <span className="px-4 text-xs font-medium text-[var(--charcoal)]/50">OR</span>
+            <div className="flex-1 border-t border-[var(--charcoal)]/10"></div>
           </div>
 
           {/* CSV Upload */}
           <div className="mb-5">
-            <label className="block text-sm font-medium text-gray-900 mb-2">
+            <label className="block text-sm font-medium text-[var(--charcoal)] mb-2">
               Upload CSV
             </label>
             {csvStatus === 'processing' && (
-              <div className="py-6 text-center border border-gray-200 rounded-lg bg-gray-50">
-                <div className="inline-block w-8 h-8 border-2 border-gray-200 border-t-gray-600 rounded-full animate-spin mb-2"></div>
-                <div className="text-sm text-gray-600">{csvProgress || 'Processing places...'}</div>
+              <div className="py-6 text-center border border-[var(--charcoal)]/10 bg-[var(--charcoal)]/5" style={{ borderRadius: '12px' }}>
+                <div className="inline-block w-8 h-8 border-2 border-[var(--charcoal)]/20 border-t-[var(--charcoal)]/60 rounded-full animate-spin mb-2"></div>
+                <div className="text-sm text-[var(--charcoal)]/60">{csvProgress || 'Processing places...'}</div>
               </div>
             )}
             {csvStatus === 'done' && csvResult && (
-              <div className="py-4 px-4 bg-green-50 border border-green-200 text-green-800 rounded-lg text-sm">
+              <div className="py-4 px-4 bg-[var(--charcoal)]/10 border border-[var(--charcoal)]/20 text-[var(--charcoal)] text-sm" style={{ borderRadius: '12px' }}>
                 {csvResult.failedToResolve > 0 ? (
                   <>
                     <strong>Added {csvResult.added} of {csvResult.total} places.</strong> {csvResult.failedToResolve} couldn&apos;t be found.
@@ -421,9 +424,10 @@ export default function AddLocationModal({
             )}
             {csvStatus !== 'processing' && csvStatus !== 'done' && (
               <div
-                className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors cursor-pointer ${
-                  isDragOver ? 'border-gray-400 bg-gray-50' : 'border-gray-300 hover:border-gray-400 hover:bg-gray-50/50'
+                className={`border-2 border-dashed p-6 text-center transition-colors cursor-pointer ${
+                  isDragOver ? 'border-[var(--charcoal)]/40 bg-[var(--charcoal)]/5' : 'border-[var(--charcoal)]/20 hover:border-[var(--charcoal)]/40 hover:bg-[var(--charcoal)]/5'
                 }`}
+                style={{ borderRadius: '12px' }}
                 onClick={() => csvFileInputRef.current?.click()}
                 onDrop={handleCsvDrop}
                 onDragOver={handleCsvDragOver}
@@ -439,21 +443,21 @@ export default function AddLocationModal({
                   aria-hidden
                   data-testid="csv-file-input"
                 />
-                <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-gray-100 flex items-center justify-center">
-                  <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-[var(--charcoal)]/10 flex items-center justify-center">
+                  <svg className="w-6 h-6 text-[var(--charcoal)]/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                   </svg>
                 </div>
-                <p className="text-sm font-medium text-gray-700 mb-1">or drag & drop</p>
-                <p className="text-xs text-gray-400 mb-4">Accepts .csv files (e.g. Google Maps export)</p>
+                <p className="text-sm font-medium text-[var(--charcoal)] mb-1">or drag & drop</p>
+                <p className="text-xs text-[var(--charcoal)]/50 mb-4">Accepts .csv files (e.g. Google Maps export)</p>
                 <button
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
                     csvFileInputRef.current?.click();
                   }}
-                  className="inline-block px-4 py-2 text-sm font-medium text-white rounded-lg cursor-pointer transition-colors hover:opacity-90"
-                  style={{ backgroundColor: '#E07A5F' }}
+                  className="inline-block px-4 py-2 text-sm font-semibold text-[var(--parchment)] uppercase tracking-wider cursor-pointer transition-colors hover:opacity-90 bg-[var(--charcoal)]"
+                  style={{ borderRadius: '12px' }}
                   data-testid="csv-choose-file-btn"
                 >
                   Add files
@@ -465,54 +469,54 @@ export default function AddLocationModal({
           {/* Loading State */}
           {isLoading && !showSuccess && (
             <div className="text-center py-8">
-              <div className="inline-block w-8 h-8 border-2 border-gray-200 border-t-gray-600 rounded-full animate-spin mb-2"></div>
-              <div className="text-sm text-gray-500">Fetching location details...</div>
+              <div className="inline-block w-8 h-8 border-2 border-[var(--charcoal)]/20 border-t-[var(--charcoal)]/60 rounded-full animate-spin mb-2"></div>
+              <div className="text-sm text-[var(--charcoal)]/50">Fetching location details...</div>
             </div>
           )}
 
           {/* Preview Card */}
           {selectedPlace && !isLoading && (
-            <div className="mt-5 border border-gray-200 rounded-xl p-4 bg-gray-50 animate-slideUp">
+            <div className="mt-5 border border-[var(--charcoal)]/10 p-4 bg-[var(--charcoal)]/5 animate-slideUp" style={{ borderRadius: '12px' }}>
               <div className="flex items-start gap-3.5 mb-3.5">
-                <div className="w-18 h-18 rounded-lg bg-gray-200 flex-shrink-0"></div>
+                <div className="w-18 h-18 rounded-xl bg-[var(--charcoal)]/10 flex-shrink-0"></div>
                 <div className="flex-1 min-w-0">
-                  <div className="text-base font-semibold text-gray-900 mb-1">
+                  <div className="text-base font-semibold text-[var(--charcoal)] mb-1">
                     {selectedPlace.name}
                   </div>
-                  <div className="text-xs text-gray-500 line-clamp-2">
+                  <div className="text-xs text-[var(--charcoal)]/50 line-clamp-2">
                     {selectedPlace.formattedAddress}
                   </div>
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-3 pt-3.5 border-t border-gray-200">
+              <div className="grid grid-cols-2 gap-3 pt-3.5 border-t border-[var(--charcoal)]/10">
                 {selectedPlace.types && selectedPlace.types.length > 0 && (
                   <div>
-                    <div className="text-[11px] text-gray-500 mb-0.5">Category</div>
-                    <div className="text-xs font-medium text-gray-900 capitalize">
+                    <div className="text-[11px] text-[var(--charcoal)]/50 mb-0.5">Category</div>
+                    <div className="text-xs font-medium text-[var(--charcoal)] capitalize">
                       {selectedPlace.types[0].replace(/_/g, ' ')}
                     </div>
                   </div>
                 )}
                 {selectedPlace.formattedPhoneNumber && (
                   <div>
-                    <div className="text-[11px] text-gray-500 mb-0.5">Phone</div>
-                    <div className="text-xs font-medium text-gray-900">
+                    <div className="text-[11px] text-[var(--charcoal)]/50 mb-0.5">Phone</div>
+                    <div className="text-xs font-medium text-[var(--charcoal)]">
                       {selectedPlace.formattedPhoneNumber}
                     </div>
                   </div>
                 )}
                 {selectedPlace.rating && (
                   <div>
-                    <div className="text-[11px] text-gray-500 mb-0.5">Rating</div>
-                    <div className="text-xs font-medium text-gray-900">
+                    <div className="text-[11px] text-[var(--charcoal)]/50 mb-0.5">Rating</div>
+                    <div className="text-xs font-medium text-[var(--charcoal)]">
                       {selectedPlace.rating} ⭐ ({selectedPlace.userRatingsTotal})
                     </div>
                   </div>
                 )}
                 {selectedPlace.openingHours && (
                   <div>
-                    <div className="text-[11px] text-gray-500 mb-0.5">Status</div>
-                    <div className="text-xs font-medium text-gray-900">
+                    <div className="text-[11px] text-[var(--charcoal)]/50 mb-0.5">Status</div>
+                    <div className="text-xs font-medium text-[var(--charcoal)]">
                       {selectedPlace.openingHours.openNow ? 'Open now' : 'Closed'}
                     </div>
                   </div>
@@ -523,20 +527,19 @@ export default function AddLocationModal({
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-3.5 border-t border-gray-100 flex gap-2.5 justify-end bg-gray-50">
+        <div className="px-6 py-3.5 border-t border-[var(--charcoal)]/10 flex gap-2.5 justify-end bg-[var(--charcoal)]/5">
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 hover:border-gray-400 transition-colors"
+            className="px-4 py-2 text-sm font-semibold text-[var(--charcoal)] uppercase tracking-wider bg-[var(--warm-white)] border border-[var(--charcoal)]/20 hover:border-[var(--charcoal)]/40 transition-colors disabled:cursor-not-allowed"
+            style={{ borderRadius: '12px' }}
           >
             Cancel
           </button>
           <button
             onClick={handleAddLocation}
             disabled={!selectedPlace || isLoading || showSuccess}
-            className="px-4 py-2 rounded-lg text-sm font-medium text-white bg-coral-500 hover:bg-coral-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
-            style={{
-              backgroundColor: selectedPlace && !isLoading && !showSuccess ? '#f59e8d' : undefined,
-            }}
+            className="px-4 py-2 text-sm font-semibold text-[var(--parchment)] uppercase tracking-wider bg-[var(--charcoal)] hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            style={{ borderRadius: '12px' }}
           >
             {showSuccess ? 'Added ✓' : 'Add to Guide'}
           </button>
