@@ -74,10 +74,11 @@ export function EditLocationModal({
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-xl max-w-md w-full max-h-[90vh] overflow-y-auto"
+        className="bg-white max-w-md w-full max-h-[90vh] overflow-y-auto"
         style={{
           backgroundColor: template.bg === '#1A1A1A' ? '#2A2A2A' : '#FFFFFF',
           color: template.text,
+          borderRadius: '12px',
         }}
         onClick={(e) => e.stopPropagation()}
       >

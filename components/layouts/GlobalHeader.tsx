@@ -54,8 +54,8 @@ export function GlobalHeader({ variant = 'default', onShare }: GlobalHeaderProps
           justifyContent: 'space-between',
           alignItems: 'center',
           padding: '14px 24px',
-          backgroundColor: '#FFFFFF',
-          borderBottom: '1px solid #F0F0F0',
+          backgroundColor: 'var(--warm-white)',
+          borderBottom: '1px solid rgba(54, 69, 79, 0.1)',
           height: '56px',
         }}
       >
@@ -73,7 +73,7 @@ export function GlobalHeader({ variant = 'default', onShare }: GlobalHeaderProps
               border: 'none',
               cursor: 'pointer',
               padding: '8px',
-              color: '#C3B091',
+              color: 'var(--charcoal)',
             }}
             aria-label="Open search"
           >
@@ -92,7 +92,7 @@ export function GlobalHeader({ variant = 'default', onShare }: GlobalHeaderProps
                 border: 'none',
                 cursor: 'pointer',
                 padding: '8px',
-                color: '#C3B091',
+                color: 'var(--charcoal)',
               }}
               aria-label="Share"
             >
@@ -113,8 +113,8 @@ export function GlobalHeader({ variant = 'default', onShare }: GlobalHeaderProps
           justifyContent: 'center',
           alignItems: 'center',
           padding: '14px 24px',
-          backgroundColor: '#FFFFFF',
-          borderBottom: '1px solid #F0F0F0',
+          backgroundColor: 'var(--warm-white)',
+          borderBottom: '1px solid rgba(54, 69, 79, 0.1)',
           height: '56px',
           position: 'relative',
         }}
@@ -140,7 +140,7 @@ export function GlobalHeader({ variant = 'default', onShare }: GlobalHeaderProps
               border: 'none',
               cursor: 'pointer',
               padding: '8px',
-              color: '#C3B091',
+              color: 'var(--charcoal)',
             }}
             aria-label="Share"
           >
@@ -188,15 +188,15 @@ export function GlobalHeader({ variant = 'default', onShare }: GlobalHeaderProps
             <Link
               href="/maps/new"
               style={{
-                color: '#E07A5F',
-                fontWeight: 500,
+                color: 'var(--leather)',
+                fontWeight: 600,
                 textDecoration: 'none',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.color = '#D06A4F'
+                e.currentTarget.style.opacity = '0.9'
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.color = '#E07A5F'
+                e.currentTarget.style.opacity = '1'
               }}
               className="nav-link"
             >
@@ -208,14 +208,15 @@ export function GlobalHeader({ variant = 'default', onShare }: GlobalHeaderProps
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
-                color: '#6B6B6B',
+                color: 'var(--charcoal)',
+                opacity: 0.7,
                 textDecoration: 'none',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.color = '#1A1A1A'
+                e.currentTarget.style.opacity = '1'
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.color = '#6B6B6B'
+                e.currentTarget.style.opacity = '0.7'
               }}
               className="nav-link"
               title="Dashboard"
@@ -228,14 +229,15 @@ export function GlobalHeader({ variant = 'default', onShare }: GlobalHeaderProps
             <Link
               href="/login"
               style={{
-                color: '#6B6B6B',
+                color: 'var(--charcoal)',
+                opacity: 0.7,
                 textDecoration: 'none',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.color = '#1A1A1A'
+                e.currentTarget.style.opacity = '1'
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.color = '#6B6B6B'
+                e.currentTarget.style.opacity = '0.7'
               }}
               className="nav-link"
             >
@@ -244,15 +246,15 @@ export function GlobalHeader({ variant = 'default', onShare }: GlobalHeaderProps
             <Link
               href="/maps/new"
               style={{
-                color: '#E07A5F',
-                fontWeight: 500,
+                color: 'var(--leather)',
+                fontWeight: 600,
                 textDecoration: 'none',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.color = '#D06A4F'
+                e.currentTarget.style.opacity = '0.9'
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.color = '#E07A5F'
+                e.currentTarget.style.opacity = '1'
               }}
               className="nav-link"
             >
