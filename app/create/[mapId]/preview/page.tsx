@@ -66,64 +66,46 @@ export default function PreviewPage({ params }: { params: Promise<{ mapId: strin
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#1A1A1A] flex items-center justify-center">
-        <div className="text-white">Loading...</div>
+      <div className="min-h-screen bg-[var(--parchment)] flex items-center justify-center">
+        <div className="text-[var(--charcoal)]/60">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#1A1A1A]">
-      {/* Nav */}
-      <nav className="flex items-center justify-between px-8 py-6 border-b border-white/10">
-        <SaikoLogo href="/dashboard" variant="light" className="scale-[1.25]" />
-        <Link href={`/create/${mapId}/locations`} className="text-white/60 hover:text-white transition-colors">
+    <div className="min-h-screen bg-[var(--parchment)]">
+      <nav className="flex items-center justify-between px-8 py-6 border-b border-[var(--charcoal)]/10">
+        <SaikoLogo href="/dashboard" variant="dark" />
+        <Link href={`/create/${mapId}/locations`} className="text-[var(--charcoal)]/60 hover:text-[var(--charcoal)] transition-colors text-sm">
           ← Back to Edit
         </Link>
       </nav>
 
-      {/* Content */}
       <div className="max-w-4xl mx-auto px-8 py-16">
-        {/* Progress */}
         <div className="mb-12">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-6 h-6 bg-[#89B4C4] flex items-center justify-center text-white font-bold text-xs">✓</div>
-            <div className="text-white/40">→</div>
-            <div className="w-6 h-6 bg-[#89B4C4] flex items-center justify-center text-white font-bold text-xs">✓</div>
-            <div className="text-white/40">→</div>
-            <div className="w-6 h-6 bg-[#D64541] flex items-center justify-center text-white font-bold text-xs">3</div>
-          </div>
-          <h1 className="text-4xl font-bold text-white mb-2">Preview Your Map</h1>
-          <p className="text-xl text-white/60">Review and publish when ready</p>
+          <h1 className="text-3xl font-normal text-[var(--charcoal)] mb-2" style={{ fontFamily: 'var(--font-libre)', fontStyle: 'italic' }}>Preview Your Map</h1>
+          <p className="text-[var(--charcoal)]/60 text-sm">Review and publish when ready</p>
         </div>
 
-        {/* Preview Card */}
-        <div className="bg-[#2A2A2A] border border-white/10 rounded-xl p-8 mb-12">
-          <div className="flex items-center gap-2 mb-6">
-            <div className="w-6 h-6 bg-[#D64541] flex items-center justify-center text-white font-bold text-xs">S</div>
-            <div className="w-6 h-6 rounded-full bg-[#89B4C4] flex items-center justify-center text-white font-bold text-xs">A</div>
-            <div className="w-6 h-6 bg-white flex items-center justify-center text-[#1A1A1A] font-bold text-xs">I</div>
-          </div>
-          
-          <h2 className="text-3xl font-bold text-white mb-4">{mapTitle}</h2>
-          <p className="text-white/60 mb-8">{locations.length} locations</p>
+        <div className="bg-[var(--warm-white)] border border-[var(--charcoal)]/10 rounded-xl p-8 mb-12">
+          <h2 className="text-2xl font-normal text-[var(--charcoal)] mb-2" style={{ fontFamily: 'var(--font-libre)', fontStyle: 'italic' }}>{mapTitle}</h2>
+          <p className="text-[var(--charcoal)]/60 mb-8 text-sm">{locations.length} locations</p>
 
-          {/* Locations Preview */}
           <div className="space-y-3">
             {locations.map((location, index) => (
               <div
                 key={location.id}
-                className="bg-[#1A1A1A] border border-white/10 rounded-lg p-4 flex items-center gap-4"
+                className="bg-white border border-[var(--charcoal)]/10 rounded-xl p-4 flex items-center gap-4"
               >
-                <div className="w-10 h-10 bg-[#D64541] rounded-lg flex items-center justify-center text-white font-bold">
+                <div className="w-10 h-10 bg-[var(--charcoal)] text-[var(--parchment)] rounded-xl flex items-center justify-center font-semibold text-sm">
                   {index + 1}
                 </div>
                 <div className="flex-1">
-                  <div className="text-white font-medium mb-1">{location.name}</div>
-                  <div className="text-white/40 text-sm">{location.address}</div>
+                  <div className="text-[var(--charcoal)] font-medium mb-1">{location.name}</div>
+                  <div className="text-[var(--charcoal)]/50 text-sm">{location.address}</div>
                 </div>
                 {location.category && (
-                  <div className="px-3 py-1 bg-[#89B4C4]/20 text-[#89B4C4] text-xs font-medium rounded">
+                  <div className="px-3 py-1 bg-[var(--leather)]/15 text-[var(--leather)] text-xs font-medium rounded-xl">
                     {location.category}
                   </div>
                 )}
@@ -132,20 +114,19 @@ export default function PreviewPage({ params }: { params: Promise<{ mapId: strin
           </div>
         </div>
 
-        {/* Actions */}
         <div className="flex gap-4">
           <Link
             href={`/create/${mapId}/locations`}
-            className="px-8 py-4 bg-white/10 text-white font-bold rounded-lg hover:bg-white/20 transition-colors"
+            className="px-8 py-4 border border-[var(--charcoal)]/20 text-[var(--charcoal)] font-semibold rounded-xl hover:border-[var(--charcoal)]/40 transition-colors text-sm tracking-wider uppercase"
           >
             ← Add More Locations
           </Link>
           <button
             onClick={handlePublish}
             disabled={isPublishing}
-            className="flex-1 px-8 py-4 bg-[#D64541] text-white font-bold rounded-lg hover:bg-[#C13D39] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="flex-1 px-8 py-4 bg-[var(--charcoal)] text-[var(--parchment)] font-semibold rounded-xl hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm tracking-wider uppercase"
           >
-            {isPublishing ? 'Publishing...' : 'Publish Map 🚀'}
+            {isPublishing ? 'Publishing...' : 'Publish Map'}
           </button>
         </div>
       </div>
