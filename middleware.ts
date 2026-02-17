@@ -11,6 +11,11 @@ function getAdminEmails(): string[] {
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
+  // TEMP: Allow unauthenticated access to coverage audit (bypass all auth)
+  if (pathname.startsWith('/admin/coverage')) {
+    return NextResponse.next()
+  }
+
   // Get session token
   const token = await getToken({
     req: request,
@@ -35,9 +40,6 @@ export async function middleware(request: NextRequest) {
   // Admin routes requiring admin role
   const adminRoutes = ['/admin']
   const adminApiRoutes = ['/api/admin']
-  
-  // Temporary: Allow unauthenticated access to coverage audit
-  const publicAdminRoutes = ['/admin/coverage']
 
   // Check if route requires authentication
   const requiresAuth = 
@@ -52,9 +54,8 @@ export async function middleware(request: NextRequest) {
 
   // Check if route requires admin
   const requiresAdmin = 
-    (adminRoutes.some(route => pathname.startsWith(route)) ||
-    adminApiRoutes.some(route => pathname.startsWith(route))) &&
-    !publicAdminRoutes.some(route => pathname.startsWith(route))
+    adminRoutes.some(route => pathname.startsWith(route)) ||
+    adminApiRoutes.some(route => pathname.startsWith(route))
 
   // Redirect to login if auth required but no token
   if (requiresAuth && !token) {
