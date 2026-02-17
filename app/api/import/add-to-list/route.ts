@@ -5,9 +5,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-// TEMP: auth disabled for import routes (admin/dev only)
-// import { getServerSession } from 'next-auth';
-// import { authOptions } from '@/lib/auth';
+import { requireUserId } from '@/lib/auth/guards';
 import { db } from '@/lib/db';
 import { searchPlace, getPlaceDetails, getNeighborhoodFromPlaceDetails, getNeighborhoodFromCoords } from '@/lib/google-places';
 import { extractPlaceId } from '@/lib/utils/googleMapsParser';
@@ -15,12 +13,6 @@ import { generatePlaceSlug, ensureUniqueSlug } from '@/lib/place-slug';
 import { getSaikoCategory, parseCuisineType } from '@/lib/categoryMapping';
 import Papa from 'papaparse';
 import { randomUUID } from 'crypto';
-
-function getUserId(session: { user?: { id?: string } } | null): string | null {
-  if (session?.user?.id) return session.user.id;
-  if (process.env.NODE_ENV === 'development') return 'demo-user-id';
-  return null;
-}
 
 function inferCategory(types: string[]): string | null {
   const typeMap: Record<string, string> = {
@@ -56,14 +48,8 @@ function parseCsvToPlaces(fileContent: string): PlaceInput[] {
 
 export async function POST(request: NextRequest) {
   try {
-    // TEMP: auth disabled for import routes (admin/dev only)
-    // const session = await getServerSession(authOptions);
-    // const userId = getUserId(session);
-    // if (!userId) {
-    const userId = 'temp-admin-user';
-    if (false) {
-      return NextResponse.json({ error: 'User authentication required' }, { status: 401 });
-    }
+    // Require authentication for import operations
+    const userId = await requireUserId();
 
     const formData = await request.formData();
     const file = formData.get('file') as File | null;

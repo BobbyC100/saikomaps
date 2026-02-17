@@ -5,8 +5,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { requireUserId } from '@/lib/auth/guards';
 import { db } from '@/lib/db';
 import { z } from 'zod';
 import { randomUUID } from 'crypto';
@@ -16,20 +15,9 @@ const createMapSchema = z.object({
   template: z.string().optional().default('field-notes'),
 });
 
-function getUserId(session: { user?: { id?: string } } | null): string | null {
-  if (session?.user?.id) return session.user.id;
-  if (process.env.NODE_ENV === 'development') return 'demo-user-id';
-  return null;
-}
-
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    const userId = getUserId(session);
-
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const userId = await requireUserId();
 
     const lists = await db.lists.findMany({
       where: { userId },
@@ -68,27 +56,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    let userId = getUserId(session);
-
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // In development, ensure demo user exists before creating list (foreign key)
-    if (process.env.NODE_ENV === 'development' && userId === 'demo-user-id') {
-      await db.users.upsert({
-        where: { id: 'demo-user-id' },
-        update: {},
-        create: {
-          id: 'demo-user-id',
-          email: 'demo@saikomaps.com',
-          name: 'Demo User',
-          passwordHash: 'demo-hash-not-for-production',
-          updatedAt: new Date(),
-        },
-      });
-    }
+    const userId = await requireUserId();
 
     const body = await request.json();
     console.log('[API MAPS POST] req.body:', body);

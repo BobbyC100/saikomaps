@@ -5,32 +5,18 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { requireUserId, requireOwnership } from '@/lib/auth/guards';
 import { db } from '@/lib/db';
-
-function getUserId(session: { user?: { id?: string } } | null): string | null {
-  if (session?.user?.id) return session.user.id;
-  if (process.env.NODE_ENV === 'development') return 'demo-user-id';
-  return null;
-}
 
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ mapPlaceId: string }> }
 ) {
   try {
-    const session = await getServerSession(authOptions);
-    const userId = getUserId(session);
+    const userId = await requireUserId();
     const { mapPlaceId } = await params;
 
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
-    }
-
+    // Get the map place and its map to check ownership
     const mapPlace = await db.map_places.findUnique({
       where: { id: mapPlaceId },
       include: { lists: true },
@@ -43,12 +29,8 @@ export async function PATCH(
       );
     }
 
-    if (mapPlace.lists.userId !== userId) {
-      return NextResponse.json(
-        { error: 'You do not have permission to edit this place' },
-        { status: 403 }
-      );
-    }
+    // Check if user owns the map
+    await requireOwnership(mapPlace.lists.userId);
 
     const body = await request.json();
     const { descriptor, userNote, orderIndex, neighborhood, priceLevel, cuisineType } = body;
@@ -103,17 +85,10 @@ export async function DELETE(
   { params }: { params: Promise<{ mapPlaceId: string }> }
 ) {
   try {
-    const session = await getServerSession(authOptions);
-    const userId = getUserId(session);
+    const userId = await requireUserId();
     const { mapPlaceId } = await params;
 
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
-    }
-
+    // Get the map place and its map to check ownership
     const mapPlace = await db.map_places.findUnique({
       where: { id: mapPlaceId },
       include: { lists: true },
@@ -126,12 +101,8 @@ export async function DELETE(
       );
     }
 
-    if (mapPlace.lists.userId !== userId) {
-      return NextResponse.json(
-        { error: 'You do not have permission to delete this place' },
-        { status: 403 }
-      );
-    }
+    // Check if user owns the map
+    await requireOwnership(mapPlace.lists.userId);
 
     await db.map_places.delete({
       where: { id: mapPlaceId },

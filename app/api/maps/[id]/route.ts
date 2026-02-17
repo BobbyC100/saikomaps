@@ -5,21 +5,10 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { requireUserId, requireOwnership } from '@/lib/auth/guards';
 import { db } from '@/lib/db';
 import { validateForPublish, mapToFormData } from '@/lib/mapValidation';
 import type { MapStatus } from '@prisma/client';
-
-function getUserId(session: { user?: { id?: string } } | null, request?: NextRequest): string | null {
-  if (session?.user?.id) return session.user.id;
-  // Dev override: ?devOwner=1 or X-Dev-Owner header lets unauthenticated user act as owner
-  if (process.env.NODE_ENV === 'development' && request?.headers.get('x-dev-owner') === '1') {
-    return '__dev_owner__';
-  }
-  if (process.env.NODE_ENV === 'development') return 'demo-user-id';
-  return null;
-}
 
 function computeMapStatus(
   list: { status: MapStatus; map_places: Array<{ descriptor?: string | null }> },
@@ -85,12 +74,7 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getServerSession(authOptions);
-    const userId = getUserId(session);
-
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const userId = await requireUserId();
 
     const { id } = await params;
     const list = await db.lists.findUnique({
@@ -107,9 +91,7 @@ export async function PATCH(
       return NextResponse.json({ error: 'Map not found' }, { status: 404 });
     }
 
-    if (userId !== '__dev_owner__' && list.userId !== userId) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
+    await requireOwnership(list.userId);
 
     const body = await request.json();
 

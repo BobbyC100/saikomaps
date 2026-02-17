@@ -5,27 +5,15 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { requireUserId, requireOwnership } from '@/lib/auth/guards';
 import { db } from '@/lib/db';
-
-function getUserId(session: { user?: { id?: string } } | null): string | null {
-  if (session?.user?.id) return session.user.id;
-  if (process.env.NODE_ENV === 'development') return 'demo-user-id';
-  return null;
-}
 
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getServerSession(authOptions);
-    const userId = getUserId(session);
-
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const userId = await requireUserId();
 
     const { id } = await params;
     const list = await db.lists.findUnique({ where: { id } });
@@ -34,9 +22,7 @@ export async function POST(
       return NextResponse.json({ error: 'Map not found' }, { status: 404 });
     }
 
-    if (list.userId !== userId) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
+    await requireOwnership(list.userId);
 
     await db.lists.update({
       where: { id },
