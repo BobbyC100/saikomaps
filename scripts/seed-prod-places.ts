@@ -23,7 +23,6 @@ interface SeedPlace {
   cuisineType?: string;
   priceLevel?: number;
   description?: string;
-  curatorNote?: string;
   vibeTags?: string[];
   googlePlaceId?: string;
 }
@@ -45,7 +44,6 @@ const SEED_PLACES: SeedPlace[] = [
     priceLevel: 2,
     instagram: 'secolosangeles',
     description: 'Modern Latin American restaurant with natural wine focus.',
-    curatorNote: 'The best natural wine list on the westside. Unpretentious and always interesting.',
     vibeTags: ['Date Night', 'Lively', 'Cozy'],
   },
   {
@@ -122,7 +120,6 @@ async function seedPlace(place: SeedPlace) {
         cuisineType: place.cuisineType || null,
         priceLevel: place.priceLevel || null,
         description: place.description || null,
-        curatorNote: place.curatorNote || null,
         vibeTags: place.vibeTags || [],
         googlePlaceId: place.googlePlaceId || null,
         hours: null,
@@ -143,9 +140,8 @@ async function seedPlace(place: SeedPlace) {
         intentProfileOverride: false,
         reservationUrl: null,
         placeType: 'venue',
-        categorySlugId: null,
+        categoryId: null,
         marketSchedule: null,
-        googleMapsUri: null,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
@@ -162,7 +158,6 @@ async function seedPlace(place: SeedPlace) {
         cuisineType: place.cuisineType || null,
         priceLevel: place.priceLevel || null,
         description: place.description || null,
-        curatorNote: place.curatorNote || null,
         vibeTags: place.vibeTags || [],
         updatedAt: new Date(),
       },
