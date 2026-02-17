@@ -237,15 +237,12 @@ export function resolvePlacePageLayout(data: PlaceData): CardConfig[] {
   // 
   // WHEN: Gallery (span-4) leaves 2-col gap on same row
   // WHY: Prevents awkward single gap when no companion exists
-  // WHAT: Pulls single Tier 4 card OR inserts QuietCard
+  // WHAT: Inserts QuietCard (span-2, subtle grid pattern)
   // 
   // CONSTRAINTS:
   // - Single gap scenario only (Gallery span-4 → 2 cols remaining)
-  // - Max 1 card reordering per page
-  // - Only pulls from Tier 4 (never Tier 3)
-  // - Never changes spans
-  // - Never cascade reorders
-  // - QuietCard remains visually quiet (no hierarchy)
+  // - Max 1 QuietCard per page
+  // - QuietCard visually quiet (no hierarchy)
   // 
   // This is a post-tier visual optimization layer, not ranking logic.
   // ──────────────────────────────────────────────────────────────────────────
@@ -257,9 +254,7 @@ export function resolvePlacePageLayout(data: PlaceData): CardConfig[] {
  * Gallery Gap Fill Logic — Isolated Function
  * 
  * Detects Gallery (span-4) followed by 2-col gap.
- * Attempts hybrid fill strategy:
- * 1. Reorder: Pull single Tier 4 card (links/phone) if available
- * 2. Fallback: Insert QuietCard with 'quiet' type
+ * Inserts QuietCard (span-2, subtle grid pattern) to fill the gap.
  * 
  * Ensures single-pass, non-cascading behavior.
  */
@@ -293,25 +288,8 @@ function applyGalleryGapFill(tiles: CardConfig[]): CardConfig[] {
   
   if (!needsFill) return tiles;
   
-  // Strategy: Hybrid (Option C)
-  // 1. Try to pull a Tier 4 card (links or phone) from later in array
-  // 2. If none available, insert QuietCard
-  
-  // Search for first Tier 4 card after Gallery
-  const tier4Types = ['links', 'phone'];
-  const tier4CardIndex = tiles.findIndex((t, idx) => 
-    idx > galleryIndex && tier4Types.includes(t.type)
-  );
-  
-  if (tier4CardIndex !== -1) {
-    // REORDER: Pull Tier 4 card up to fill gap
-    const result = [...tiles];
-    const [tier4Card] = result.splice(tier4CardIndex, 1);
-    result.splice(galleryIndex + 1, 0, tier4Card);
-    return result;
-  }
-  
-  // FALLBACK: Insert QuietCard (span-2, 'grid' variant)
+  // Gap fill strategy: Insert QuietCard (span-2, subtle grid pattern).
+  // Phone/Links cards are not part of System B.
   const quietCard: CardConfig = {
     type: 'quiet' as CardType,
     span: { c: 2, r: 1 },
