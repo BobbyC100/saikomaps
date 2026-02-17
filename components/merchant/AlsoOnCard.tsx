@@ -1,3 +1,13 @@
+/**
+ * Also On Card - Stacked Vertical Layout
+ * 
+ * Displays maps this place appears on with:
+ * - Image on top (120px, full width)
+ * - Content below (type, title, description, attribution)
+ * - 3-column grid layout
+ * - Quiet pattern fallback for missing images
+ */
+
 'use client';
 
 import Link from 'next/link';
@@ -16,9 +26,10 @@ interface MapItem {
 
 interface AlsoOnCardProps {
   maps: MapItem[];
+  span?: number; // Grid column span (3 or 6)
 }
 
-export function AlsoOnCard({ maps }: AlsoOnCardProps) {
+export function AlsoOnCard({ maps, span = 6 }: AlsoOnCardProps) {
   if (!maps || maps.length === 0) return null;
 
   // Additional safety: filter out any maps without valid placeCount
@@ -29,7 +40,7 @@ export function AlsoOnCard({ maps }: AlsoOnCardProps) {
   if (validMaps.length === 0) return null;
 
   return (
-    <div className={styles.alsoOnCard}>
+    <div className={styles.alsoOnCard} style={{ gridColumn: `span ${span}` }}>
       <div className={styles.label}>ALSO ON</div>
       <div className={styles.mapsContainer}>
         {validMaps.map((map) => (

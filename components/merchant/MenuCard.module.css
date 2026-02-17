@@ -1,0 +1,55 @@
+.menuCard {
+  background: #FFFDF7;
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: #C3B091;
+}
+
+.menuList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.menuItem {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.itemRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.itemName {
+  font-size: 13px;
+  color: #36454F;
+  line-height: 1.4;
+  flex: 1;
+}
+
+.itemPrice {
+  font-size: 11px;
+  color: #8B7355;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.itemDescription {
+  font-size: 10px;
+  color: #8B7355;
+  line-height: 1.5;
+  opacity: 0.8;
+}

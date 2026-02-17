@@ -33,6 +33,7 @@ interface CoverageCardProps {
   pullQuoteUrl?: string | null;
   sources?: EditorialSource[];
   vibeTag?: string | null;
+  span?: number; // Grid column span (from resolver)
 }
 
 export function CoverageCard({
@@ -42,6 +43,7 @@ export function CoverageCard({
   pullQuoteUrl,
   sources = [],
   vibeTag,
+  span,
 }: CoverageCardProps) {
   // Priority 1: Use explicit pullQuote if available
   let displayQuote = pullQuote?.trim() || null;
@@ -63,10 +65,18 @@ export function CoverageCard({
     return null;
   }
   
-  // Dynamic sizing based on quote length
+  // Use span from resolver if provided, otherwise use dynamic sizing
+  let columnSpan: number;
+  if (span !== undefined) {
+    columnSpan = span;
+  } else {
+    // Legacy: Dynamic sizing based on quote length
+    const isShortQuote = displayQuote.length < 120;
+    const isMediumQuote = displayQuote.length < 180;
+    columnSpan = isShortQuote ? 3 : isMediumQuote ? 4 : 5;
+  }
+  
   const isShortQuote = displayQuote.length < 120;
-  const isMediumQuote = displayQuote.length < 180;
-  const columnSpan = isShortQuote ? 3 : isMediumQuote ? 4 : 5;
 
   return (
     <div 

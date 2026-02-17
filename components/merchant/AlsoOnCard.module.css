@@ -1,8 +1,13 @@
 .alsoOnCard {
-  grid-column: span 6;
+  /* grid-column set via inline style (span 3 or 6) */
+  background: #FFFDF7;
+  border: 1px solid rgba(195, 176, 145, 0.15);
+  border-radius: 12px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
+  margin-top: 8px; /* Extra breathing room from Tips/Vibe section */
 }
 
 .label {
@@ -10,23 +15,25 @@
   text-transform: uppercase;
   letter-spacing: 1.5px;
   color: #C3B091;
-  padding: 0 4px;
+  display: block;
 }
 
 .mapsContainer {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 12px;
 }
 
 /* ==========================================
-   MAP CARD — 2x1 HORIZONTAL LAYOUT
+   MAP CARD — STACKED VERTICAL LAYOUT
+   (Image on top, content below)
    ========================================== */
 
 .mapCard {
   display: flex;
+  flex-direction: column;
   background: #FFFDF7;
-  border-radius: 8px;
+  border-radius: 12px;
   overflow: hidden;
   border: 2px solid #C3B091;
   text-decoration: none;
@@ -35,17 +42,20 @@
 }
 
 .mapCard:hover {
-  box-shadow: 0 4px 20px rgba(139, 115, 85, 0.15);
+  box-shadow: 0 6px 16px rgba(139, 115, 85, 0.12);
   transform: translateY(-2px);
+  border-color: #8B7355;
 }
 
-/* Hero Image (Left Side) */
+/* Hero Image (Top) - Dominant editorial block */
 .heroImage {
-  width: 140px;
-  min-height: 100px;
-  flex-shrink: 0;
+  width: 100%;
+  height: 140px; /* Increased height for stronger presence */
   position: relative;
   overflow: hidden;
+  flex-shrink: 0;
+  background: #F5F1E8; /* Distinct base color */
+  border-bottom: 1px solid rgba(195, 176, 145, 0.25); /* Subtle separator */
 }
 
 .heroImageBg {
@@ -59,26 +69,41 @@
 .heroImagePlaceholder {
   width: 100%;
   height: 100%;
-  background: linear-gradient(145deg, #EDE8D8, #E6E0D4);
+  background: 
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 7px,
+      rgba(195, 176, 145, 0.06) 7px,
+      rgba(195, 176, 145, 0.06) 8px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 7px,
+      rgba(195, 176, 145, 0.06) 7px,
+      rgba(195, 176, 145, 0.06) 8px
+    ),
+    linear-gradient(135deg, #F5F1E8 0%, #EDE8D8 100%);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .gridPattern {
-  width: 100%;
-  height: 100%;
+  opacity: 0.4;
+  width: 60px;
+  height: 60px;
 }
 
-/* Content (Right Side) */
+/* Content (Bottom) - Clear separation from image */
 .content {
-  padding: 12px 16px;
+  padding: 14px 12px 12px 12px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  flex: 1;
-  gap: 4px;
+  gap: 8px;
   min-width: 0;
+  background: #FFFDF7; /* Distinct from image area */
 }
 
 .typeLabel {
@@ -92,7 +117,7 @@
 .title {
   font-family: 'Libre Baskerville', Georgia, serif;
   font-style: italic;
-  font-size: 14px;
+  font-size: 13px;
   color: #36454F;
   line-height: 1.3;
   overflow: hidden;
@@ -103,9 +128,9 @@
 }
 
 .description {
-  font-size: 11px;
+  font-size: 10px;
   color: #8B7355;
-  line-height: 1.5;
+  line-height: 1.4;
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
@@ -115,12 +140,8 @@
 
 .meta {
   font-size: 9px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
   color: #C3B091;
-  display: flex;
-  gap: 8px;
-  margin-top: 2px;
+  margin-top: 4px;
 }
 
 /* Curator Badge */
@@ -144,20 +165,19 @@
 
 /* Mobile Responsive */
 @media (max-width: 640px) {
+  .mapsContainer {
+    grid-template-columns: 1fr;
+  }
+  
   .heroImage {
-    width: 100px;
-    min-height: 80px;
+    height: 180px; /* Taller for mobile */
   }
   
   .content {
-    padding: 10px 12px;
+    padding: 16px 14px 14px 14px;
   }
   
   .title {
-    font-size: 13px;
-  }
-  
-  .description {
-    font-size: 10px;
+    font-size: 14px;
   }
 }

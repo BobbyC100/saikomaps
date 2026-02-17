@@ -4,13 +4,17 @@ import styles from './VibeCard.module.css';
 
 interface VibeCardProps {
   vibeTags: string[] | null;
+  span?: number; // Grid column span (2, 3, or 6)
 }
 
-export function VibeCard({ vibeTags }: VibeCardProps) {
+export function VibeCard({ vibeTags, span = 6 }: VibeCardProps) {
   if (!vibeTags || vibeTags.length === 0) return null;
 
   return (
-    <div className={`${styles.vibeCard} ${styles.col6}`}>
+    <div 
+      className={styles.vibeCard}
+      style={{ gridColumn: `span ${span}` }}
+    >
       <div className={styles.label}>VIBE</div>
       <div className={styles.tagsContainer}>
         {vibeTags.map((tag, idx) => (
