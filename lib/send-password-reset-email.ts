@@ -5,19 +5,19 @@
 
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-
 export type SendPasswordResetEmailParams = {
   to: string
   resetLink: string
 }
 
 export async function sendPasswordResetEmail({ to, resetLink }: SendPasswordResetEmailParams): Promise<{ ok: boolean; error?: string }> {
-  if (!process.env.RESEND_API_KEY) {
+  const apiKey = process.env.RESEND_API_KEY
+  if (!apiKey) {
     console.warn('RESEND_API_KEY not set; skipping password reset email')
     return { ok: false, error: 'Email not configured' }
   }
 
+  const resend = new Resend(apiKey)
   const from = process.env.RESEND_FROM_EMAIL ?? 'Saiko Maps <onboarding@resend.dev>'
   const appName = process.env.NEXT_PUBLIC_APP_NAME ?? 'Saiko Maps'
 
