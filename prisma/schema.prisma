@@ -284,23 +284,38 @@ model restaurant_groups {
 }
 
 model users {
-  id               String             @id
-  email            String             @unique
-  name             String?
-  passwordHash     String?            @map("password_hash")
-  avatarUrl        String?            @map("avatar_url")
-  subscriptionTier String             @default("free") @map("subscription_tier")
-  curatorNote      String?            @map("curator_note") @db.VarChar(140)
-  scopePills       String[]           @default([]) @map("scope_pills")
-  coverageSources  String[]           @default([]) @map("coverage_sources")
-  createdAt        DateTime           @default(now()) @map("created_at")
-  updatedAt        DateTime           @map("updated_at")
-  import_jobs      import_jobs[]
-  lists            lists[]
-  viewer_bookmarks viewer_bookmarks[]
-  saved_maps       saved_maps[]
+  id                   String                 @id
+  email                String                 @unique
+  name                 String?
+  passwordHash         String?                @map("password_hash")
+  avatarUrl            String?                @map("avatar_url")
+  subscriptionTier     String                 @default("free") @map("subscription_tier")
+  curatorNote          String?                @map("curator_note") @db.VarChar(140)
+  scopePills           String[]               @default([]) @map("scope_pills")
+  coverageSources      String[]               @default([]) @map("coverage_sources")
+  createdAt            DateTime               @default(now()) @map("created_at")
+  updatedAt            DateTime               @map("updated_at")
+  import_jobs          import_jobs[]
+  lists                lists[]
+  viewer_bookmarks     viewer_bookmarks[]
+  saved_maps           saved_maps[]
+  password_reset_tokens password_reset_tokens[]
 
   @@index([email])
+}
+
+model password_reset_tokens {
+  id         String    @id @default(cuid())
+  userId     String    @map("user_id")
+  tokenHash  String    @map("token_hash")
+  expiresAt  DateTime  @map("expires_at")
+  usedAt     DateTime? @map("used_at")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  users      users     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([tokenHash])
+  @@index([expiresAt])
 }
 
 model saved_maps {

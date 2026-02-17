@@ -45,6 +45,27 @@ export const signupSchema = z.object({
 });
 
 /**
+ * Forgot password - email only
+ */
+export const forgotPasswordSchema = z.object({
+  email: z.string().email('Invalid email address'),
+});
+
+/**
+ * Reset password - token + new password + confirm
+ */
+export const resetPasswordSchema = z
+  .object({
+    token: z.string().min(1, 'Reset link is invalid or expired'),
+    newPassword: z.string().min(8, 'Password must be at least 8 characters'),
+    confirmPassword: z.string().min(1, 'Please confirm your password'),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: 'Passwords do not match',
+    path: ['confirmPassword'],
+  });
+
+/**
  * Process import validation
  */
 export const processImportSchema = z.object({
@@ -64,3 +85,5 @@ export type AddLocationInput = z.infer<typeof addLocationSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 export type SignupInput = z.infer<typeof signupSchema>;
 export type ProcessImportInput = z.infer<typeof processImportSchema>;
+export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
+export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
