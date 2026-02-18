@@ -587,6 +587,16 @@ model golden_records {
   google_places_attributes            Json?
   google_places_attributes_fetched_at DateTime?
 
+  // Energy + Formality scoring (pipeline-generated, auditable)
+  energy_score         Int?      // 0–100
+  energy_confidence    Float?    // 0–1
+  energy_version       String?   // e.g. "energy_v1_locked"
+  energy_computed_at   DateTime?
+  formality_score      Int?
+  formality_confidence Float?
+  formality_version    String?
+  formality_computed_at DateTime?
+
   // Relations
   entity_links      entity_links[]
   review_queue      review_queue[]

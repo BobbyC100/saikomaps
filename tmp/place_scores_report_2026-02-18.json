@@ -1,0 +1,87 @@
+{
+  "generatedAt": "2026-02-18T01:22:56.958Z",
+  "dryRun": false,
+  "requestedSlugs": [
+    "dunsmoor",
+    "buvons",
+    "dan-tanas",
+    "covell"
+  ],
+  "resolvedToGoldenRecords": 0,
+  "missingSlugs": [
+    "dunsmoor",
+    "buvons",
+    "dan-tanas",
+    "covell"
+  ],
+  "totalPlaces": 0,
+  "energy": {
+    "histogram": {
+      "100": 0,
+      "0-9": 0,
+      "10-19": 0,
+      "20-29": 0,
+      "30-39": 0,
+      "40-49": 0,
+      "50-59": 0,
+      "60-69": 0,
+      "70-79": 0,
+      "80-89": 0,
+      "90-99": 0
+    },
+    "confidenceHistogram": {
+      "100": 0,
+      "0-9": 0,
+      "10-19": 0,
+      "20-29": 0,
+      "30-39": 0,
+      "40-49": 0,
+      "50-59": 0,
+      "60-69": 0,
+      "70-79": 0,
+      "80-89": 0,
+      "90-99": 0
+    },
+    "displayableCount": 0,
+    "displayablePct": 0,
+    "avg": 0,
+    "median": 0,
+    "p10": 0,
+    "p90": 0
+  },
+  "formality": {
+    "histogram": {
+      "100": 0,
+      "0-9": 0,
+      "10-19": 0,
+      "20-29": 0,
+      "30-39": 0,
+      "40-49": 0,
+      "50-59": 0,
+      "60-69": 0,
+      "70-79": 0,
+      "80-89": 0,
+      "90-99": 0
+    },
+    "confidenceHistogram": {
+      "100": 0,
+      "0-9": 0,
+      "10-19": 0,
+      "20-29": 0,
+      "30-39": 0,
+      "40-49": 0,
+      "50-59": 0,
+      "60-69": 0,
+      "70-79": 0,
+      "80-89": 0,
+      "90-99": 0
+    },
+    "displayableCount": 0,
+    "displayablePct": 0,
+    "avg": 0,
+    "median": 0,
+    "p10": 0,
+    "p90": 0
+  },
+  "validationDebug": {}
+}

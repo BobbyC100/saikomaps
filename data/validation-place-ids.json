@@ -1,0 +1,7 @@
+{
+  "_comment": "Optional: set Google Place IDs for the 4 validation slugs so ensure-validation-linkage can complete the graph. Get IDs from Google Maps (share → embed → place ID) or Places API.",
+  "dunsmoor": null,
+  "buvons": null,
+  "dan-tanas": null,
+  "covell": null
+}
