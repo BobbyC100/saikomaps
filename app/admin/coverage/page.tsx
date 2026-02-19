@@ -1,12 +1,11 @@
 /**
- * Redirect: /admin/coverage → /coverage
- * This route has been moved to public access
+ * Admin coverage page — same content as /coverage, available at /admin/coverage
  */
 
-import { redirect } from 'next/navigation'
-
-export default function AdminCoverageRedirect() {
-  redirect('/coverage')
-}
+import { CoverageContent } from '@/app/coverage/CoverageContent'
 
 export const dynamic = 'force-dynamic'
+
+export default function AdminCoveragePage() {
+  return <CoverageContent />
+}

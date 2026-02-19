@@ -20,9 +20,9 @@ const path = require('path');
 
 const nextBin = path.join(__dirname, '..', 'node_modules', '.bin', 'next');
 
-const child = spawn('node', [nextBin, 'dev'], {
+const child = spawn('node', [nextBin, 'dev', '-p', '3000'], {
   stdio: 'inherit',
-  env: process.env
+  env: { ...process.env, PORT: '3000' }
 });
 
 child.on('exit', (code) => {

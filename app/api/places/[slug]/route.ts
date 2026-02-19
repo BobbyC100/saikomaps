@@ -95,47 +95,35 @@ export async function GET(
       }
     }
 
-    // ============================================================================
-    // NEWSLETTER INGESTION: Read-Path Integration (Phase 1)
-    // Fetch active overlays for this place (debug only, no UI mutation yet)
-    // ============================================================================
-    let activeOverlays: any[] = [];
-    try {
-      activeOverlays = await getActiveOverlays({
-        placeId: place.id,
-        now: new Date(),
-      });
-
-      if (activeOverlays.length > 0) {
-        console.log(`[Newsletter Overlay] Place ${place.slug} has ${activeOverlays.length} active overlay(s):`, {
-          overlays: activeOverlays.map((o) => ({
-            type: o.overlayType,
-            startsAt: o.startsAt,
-            endsAt: o.endsAt,
-            sourceSignalId: o.sourceSignalId,
-          })),
-        });
-      }
-    } catch (error) {
-      console.error(`[Newsletter Overlay] Failed to fetch overlays for place ${place.slug}:`, error);
-      // Don't fail the request if overlay fetch fails
-    }
-    // ============================================================================
-
     // Format appearsOn (only published maps) and curator note from first map with descriptor
     const publishedMapPlaces = place.map_places.filter((mp) => mp.lists && mp.lists.status === 'PUBLISHED');
-    
-    // Get place counts for all maps in one query (grouped)
     const mapIds = publishedMapPlaces.map(mp => mp.lists!.id);
-    const placeCounts = await db.map_places.groupBy({
-      by: ['mapId'],
-      where: {
-        mapId: { in: mapIds }
-      },
-      _count: {
-        id: true
-      }
-    });
+
+    // Run overlay fetch and place counts in parallel to reduce latency
+    const [activeOverlays, placeCounts] = await Promise.all([
+      getActiveOverlays({ placeId: place.id, now: new Date() }).catch((err) => {
+        console.error(`[Newsletter Overlay] Failed to fetch overlays for place ${place.slug}:`, err);
+        return [] as Awaited<ReturnType<typeof getActiveOverlays>>;
+      }),
+      mapIds.length > 0
+        ? db.map_places.groupBy({
+            by: ['mapId'],
+            where: { mapId: { in: mapIds } },
+            _count: { id: true },
+          })
+        : Promise.resolve([]),
+    ]);
+
+    if (activeOverlays.length > 0) {
+      console.log(`[Newsletter Overlay] Place ${place.slug} has ${activeOverlays.length} active overlay(s):`, {
+        overlays: activeOverlays.map((o) => ({
+          type: o.overlayType,
+          startsAt: o.startsAt,
+          endsAt: o.endsAt,
+          sourceSignalId: o.sourceSignalId,
+        })),
+      });
+    }
     
     // Create lookup map for counts
     const countLookup = new Map(
@@ -224,9 +212,10 @@ export async function GET(
     }
     // ============================================================================
 
-    return NextResponse.json({
-      success: true,
-      data: {
+    return NextResponse.json(
+      {
+        success: true,
+        data: {
         location: {
           id: place.id,
           slug: place.slug,
@@ -279,7 +268,13 @@ export async function GET(
         appearsOn,
         isOwner: false,
       },
-    });
+    },
+      {
+        headers: {
+          'Cache-Control': 'private, max-age=60, stale-while-revalidate=120',
+        },
+      }
+    );
   } catch (error) {
     console.error('Error fetching place:', error);
     return NextResponse.json(

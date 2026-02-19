@@ -9,6 +9,7 @@ import { generateSlug } from '@/lib/utils'
 import { extractPlaceId } from '@/lib/utils/googleMapsParser'
 import { generatePlaceSlug, ensureUniqueSlug } from '@/lib/place-slug'
 import { getSaikoCategory, parseCuisineType } from '@/lib/categoryMapping'
+import { resolvePrimaryVertical } from '@/lib/primaryVertical'
 import fs from 'fs'
 
 const CSV_PATH = '/Users/bobbyciccaglione/Downloads/sgv-curated-places.csv'
@@ -189,6 +190,7 @@ async function main() {
           neighborhood: neighborhood ?? null,
           cuisineType: placeDetails?.types ? parseCuisineType(placeDetails.types) ?? null : null,
           category: getSaikoCategory(finalName, placeDetails?.types ?? []),
+          primary_vertical: resolvePrimaryVertical(input.category ?? null, finalName, placeDetails?.types ?? []),
           googlePhotos: placeDetails?.photos ? JSON.parse(JSON.stringify(placeDetails.photos)) : undefined,
           hours: placeDetails?.openingHours ? JSON.parse(JSON.stringify(placeDetails.openingHours)) : null,
           placesDataCachedAt: placeDetails ? new Date() : null,

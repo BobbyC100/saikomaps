@@ -217,7 +217,8 @@ model places {
   priceLevel             Int?               @map("price_level")
   neighborhood           String?
   category               String?
-  placesDataCachedAt     DateTime?          @map("places_data_cached_at")
+  primary_vertical       PrimaryVertical     @map("primary_vertical")
+  placesDataCachedAt     DateTime?           @map("places_data_cached_at")
   createdAt              DateTime           @default(now()) @map("created_at")
   updatedAt              DateTime           @map("updated_at")
   editorialSources       Json?              @map("editorial_sources")
@@ -259,6 +260,7 @@ model places {
   @@index([categoryId])
   @@index([googlePlaceId])
   @@index([neighborhood])
+  @@index([primary_vertical])
   @@index([parentId])
   @@index([restaurantGroupId])
   @@index([status])
@@ -408,6 +410,21 @@ enum PlaceType {
   public
 }
 
+enum PrimaryVertical {
+  EAT
+  COFFEE
+  WINE
+  DRINKS
+  SHOP
+  CULTURE
+  NATURE
+  STAY
+  WELLNESS
+  BAKERY
+  PURVEYORS
+  ACTIVITY
+}
+
 // ============================================================================
 // ENTITY RESOLUTION SYSTEM
 // New MDM (Master Data Management) tables for multi-source data integration
@@ -421,6 +438,11 @@ model raw_records {
   source_name String // 'google_places', 'editorial_eater', 'editorial_infatuation', 'foursquare', 'saiko_ai', 'saiko_seed'
   external_id String? // ID from the source (e.g., Google Place ID)
   source_url  String? // Original article/page URL for editorial
+
+  // Golden-first intake (Ken spec)
+  intake_batch_id String?   @map("intake_batch_id")
+  source_type     String?   @map("source_type") // e.g. 'editorial', 'csv', 'seed'
+  imported_at     DateTime? @map("imported_at")
 
   // Standardized identifiers for blocking/matching
   placekey        String? // Placekey if available
@@ -442,14 +464,16 @@ model raw_records {
 
   // Relations
   entity_links_from entity_links[]
-  review_queue_a    review_queue[] @relation("ReviewQueueRecordA")
-  review_queue_b    review_queue[] @relation("ReviewQueueRecordB")
+  resolution_links   resolution_links[]
+  review_queue_a     review_queue[] @relation("ReviewQueueRecordA")
+  review_queue_b     review_queue[] @relation("ReviewQueueRecordB")
 
   @@unique([source_name, external_id])
   @@index([h3_index_r9])
   @@index([placekey])
   @@index([is_processed])
   @@index([name_normalized])
+  @@index([intake_batch_id])
 }
 
 /// Entity links - maps raw records to canonical entities
@@ -550,6 +574,10 @@ model golden_records {
   data_completeness Decimal? @db.Decimal(3, 2) // 0.00 to 1.00
   source_count      Int      @default(1)
 
+  // Golden-first intake (Ken spec): gated promotion
+  confidence       Float?   // 0–1, set by resolver
+  promotion_status PromotionStatus @default(PENDING) @map("promotion_status")
+
   // Menu & Wine List Scraper Fields
   menu_url            String? // Discovered menu page URL
   menu_source_url     String? // Page where menu link was found
@@ -599,6 +627,7 @@ model golden_records {
 
   // Relations
   entity_links      entity_links[]
+  resolution_links  resolution_links[]
   review_queue      review_queue[]
   provenance        provenance[]
   menu_signals      menu_signals?
@@ -608,6 +637,26 @@ model golden_records {
   @@index([category])
   @@index([business_status])
   @@index([slug])
+  @@index([promotion_status])
+}
+
+/// Resolution links - audit trail for raw → golden resolution (Ken spec)
+model resolution_links {
+  id               String          @id @default(uuid())
+  raw_record_id    String          @map("raw_record_id")
+  golden_record_id String?         @map("golden_record_id") // null when resolution_type = ambiguous
+  resolution_type  ResolutionType  @map("resolution_type")
+  confidence       Float?
+  match_method     MatchMethod     @map("match_method")
+  resolver_version String?         @map("resolver_version")
+  created_at       DateTime        @default(now()) @map("created_at")
+
+  raw_record    raw_records     @relation(fields: [raw_record_id], references: [raw_id])
+  golden_record golden_records? @relation(fields: [golden_record_id], references: [canonical_id])
+
+  @@index([raw_record_id])
+  @@index([golden_record_id])
+  @@index([resolution_type])
 }
 
 /// Review queue - human-in-the-loop for ambiguous matches
@@ -715,6 +764,25 @@ enum LifecycleStatus {
   FLAG_FOR_REVIEW
   ARCHIVED
   CLOSED_PERMANENTLY
+}
+
+// Golden-first intake (Ken spec)
+enum PromotionStatus {
+  PENDING
+  VERIFIED
+  PUBLISHED
+}
+
+enum ResolutionType {
+  matched
+  created
+  ambiguous
+}
+
+enum MatchMethod {
+  exact
+  normalized
+  fuzzy
 }
 
 enum ArchiveReason {

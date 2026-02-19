@@ -48,7 +48,7 @@ async function main() {
   }
 
   console.log('\n🎉 Admin user ready!');
-  console.log('\nYou can now log in at http://localhost:3001/login with:');
+  console.log('\nYou can now log in at http://localhost:3000/login with:');
   console.log('  Email:', email);
   console.log('  Password: NewStrongPassword123!');
   console.log('\nThis email is in ADMIN_EMAILS, so you will have admin access.');

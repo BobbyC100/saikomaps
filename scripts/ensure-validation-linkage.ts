@@ -84,6 +84,7 @@ async function main() {
           slug,
           name: displayName,
           googlePlaceId: seedGoogleId,
+          primary_vertical: 'EAT',
           createdAt: now,
           updatedAt: now,
         },

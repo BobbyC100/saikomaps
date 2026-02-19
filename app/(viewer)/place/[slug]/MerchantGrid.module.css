@@ -1,0 +1,95 @@
+.grid {
+  display: grid;
+  max-width: 1200px;
+  margin: 0 auto;
+  gap: 24px 16px;
+  grid-template-columns: 2fr 1fr;
+  padding: 24px 20px;
+}
+
+@media (max-width: 1023px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 16px;
+  }
+}
+
+/* Cell positioning - desktop */
+.cell1 {
+  grid-column: 1 / -1;
+  grid-row: 1;
+}
+
+.cell2 {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.cell3 {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+.cell4 {
+  grid-column: 1;
+  grid-row: 3;
+}
+
+.cell5 {
+  grid-column: 2;
+  grid-row: 3;
+}
+
+.cell6 {
+  grid-column: 1 / -1;
+  grid-row: 4;
+}
+
+/* Mobile: single column, order Identity → Status → Experience → Offerings → Editorial → Utilities */
+@media (max-width: 1023px) {
+  .cell1 { order: 1; }
+  .cell3 { order: 2; } /* Status */
+  .cell2 { order: 3; } /* Experience */
+  .cell4 { order: 4; }
+  .cell5 { order: 5; }
+  .cell6 { order: 6; }
+}
+
+.cell {
+  border: 1px solid rgba(54, 69, 79, 0.15);
+  padding: 24px;
+  background: #fff;
+}
+
+@media (max-width: 1023px) {
+  .cell {
+    padding: 16px;
+  }
+}
+
+.cellExperience {
+  border-left: 3px solid var(--khaki, #C3B091);
+}
+
+.cellStatus {
+  border-left: 3px solid var(--charcoal, #36454F);
+}
+
+.cellStatusOpen {
+  border-left-color: #4A7C59;
+}
+
+.cellStatusClosed {
+  border-left-color: #36454F;
+}
+
+.cellOfferings,
+.cellEditorial {
+  border-left: 3px solid var(--leather, #8B7355);
+}
+
+/* Collapse empty cells - use a wrapper that hides when empty */
+.cellEmpty {
+  display: none;
+}

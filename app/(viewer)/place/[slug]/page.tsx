@@ -6,28 +6,9 @@ import Link from 'next/link';
 import { GlobalHeader } from '@/components/layouts/GlobalHeader';
 import { GlobalFooter } from '@/components/layouts/GlobalFooter';
 import { HeroSection } from '@/components/merchant/HeroSection';
-import { ActionStrip } from '@/components/merchant/ActionStrip';
 import { GalleryLightbox } from '@/components/merchant/GalleryLightbox';
-import { HoursCard } from '@/components/merchant/HoursCard';
-import MarketFactsCard from '@/components/merchant/MarketFactsCard';
-import { DetailsCard } from '@/components/merchant/DetailsCard';
-import { CoverageCard } from '@/components/merchant/CoverageCard';
-import { GalleryCard } from '@/components/merchant/GalleryCard';
-import { CuratorCard } from '@/components/merchant/CuratorCard';
-import { VibeCard } from '@/components/merchant/VibeCard';
-import { TipsCard } from '@/components/merchant/TipsCard';
-import { MenuCard } from '@/components/merchant/MenuCard';
-import { WineCard } from '@/components/merchant/WineCard';
-import { AlsoOnCard } from '@/components/merchant/AlsoOnCard';
-import { DescriptionCard } from '@/components/merchant/DescriptionCard';
-import { QuietCard } from '@/components/merchant/QuietCard';
-import { 
-  resolvePlacePageLayout, 
-  validateLayout, 
-  debugLayout,
-  type PlaceData as ResolverPlaceData,
-  type CardConfig
-} from '@/lib/utils/PlacePageLayoutResolver.systemB';
+import { MerchantGrid } from './components/MerchantGrid';
+import { parseHours } from './lib/parseHours';
 
 interface EditorialSource {
   source_id?: string;
@@ -37,7 +18,6 @@ interface EditorialSource {
   published_at?: string;
   trust_level?: string;
   content?: string;
-  // Legacy fields (old format)
   name?: string;
   excerpt?: string;
 }
@@ -105,146 +85,6 @@ interface PlacePageData {
   isOwner: boolean;
 }
 
-function parseHours(hours: unknown): {
-  today: string | null;
-  isOpen: boolean | null;
-  closesAt: string | null;
-  opensAt: string | null;
-  fullWeek: Array<{ day: string; short: string; hours: string }>;
-  isIrregular: boolean;
-} {
-  const empty = { today: null, isOpen: null, closesAt: null, opensAt: null, fullWeek: [], isIrregular: false };
-  if (!hours || (typeof hours === 'object' && !Object.keys(hours as object).length))
-    return empty;
-
-  const obj =
-    typeof hours === 'string'
-      ? (() => {
-          try {
-            return JSON.parse(hours);
-          } catch {
-            return null;
-          }
-        })()
-      : (hours as Record<string, unknown>);
-  if (!obj) return empty;
-
-  const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-  const shortNames = ['M', 'T', 'W', 'Th', 'F', 'S', 'Su'];
-  const todayIndex = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
-
-  // Parse full week
-  const fullWeek: Array<{ day: string; short: string; hours: string }> = [];
-  const weekdayText = (obj.weekday_text ?? obj.weekdayText) as string[] | undefined;
-  
-  // Check for irregular hours indicators
-  const irregularPatterns = /by appointment|seasonal|varies|call ahead|check website|irregular/i;
-  let isIrregular = false;
-  
-  if (weekdayText?.length) {
-    for (let i = 0; i < weekdayText.length; i++) {
-      const line = weekdayText[i] ?? '';
-      if (irregularPatterns.test(line)) {
-        isIrregular = true;
-      }
-      const match = line.match(/:\s*(.+)$/);
-      fullWeek.push({
-        day: dayNames[i] ?? '',
-        short: shortNames[i] ?? '',
-        hours: match ? match[1].trim() : line,
-      });
-    }
-  } else {
-    const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
-    fullWeek.push(...days.map((day, idx) => {
-      const dayHours = (obj[day] as string) || 'Closed';
-      if (irregularPatterns.test(dayHours)) {
-        isIrregular = true;
-      }
-      return {
-        day: dayNames[idx] ?? '',
-        short: shortNames[idx] ?? '',
-        hours: dayHours,
-      };
-    }));
-  }
-
-  // If all days are irregular or missing proper hours format, mark as irregular
-  const validHoursCount = fullWeek.filter(row => 
-    row.hours !== 'Closed' && 
-    /\d{1,2}/.test(row.hours) && 
-    !irregularPatterns.test(row.hours)
-  ).length;
-  
-  if (validHoursCount < 3) {
-    isIrregular = true;
-  }
-
-  // Determine if open
-  let isOpen: boolean | null = null;
-  if (typeof obj.openNow === 'boolean') {
-    isOpen = obj.openNow;
-  } else if (typeof (obj as { open_now?: boolean }).open_now === 'boolean') {
-    isOpen = (obj as { open_now: boolean }).open_now;
-  } else {
-    const todayRow = fullWeek[todayIndex];
-    const todayHours = todayRow?.hours ?? null;
-    isOpen = todayHours ? !todayHours.toLowerCase().includes('closed') : null;
-  }
-
-  // Extract close time from today's hours
-  const todayRow = fullWeek[todayIndex];
-  const todayHours = todayRow?.hours ?? null;
-  
-  // Check for 24-hour operation
-  const is24Hours = todayHours?.toLowerCase().includes('open 24 hours') || 
-                    todayHours?.toLowerCase().includes('24 hours') ||
-                    todayHours?.toLowerCase().includes('24/7');
-  
-  const closeMatch = !is24Hours ? todayHours?.match(/[–-]\s*(\d{1,2}:?\d{0,2}\s*(?:AM|PM))/i) : null;
-  let closesAt = closeMatch ? closeMatch[1].trim() : (is24Hours ? null : null);
-  
-  // Format close time to match "11 PM" style
-  if (closesAt) {
-    closesAt = closesAt.replace(/(\d+):00/, '$1').replace(/\s+/g, ' ');
-  }
-
-  // Extract open time (for when closed)
-  const openMatch = todayHours?.match(/(\d{1,2}:?\d{0,2}\s*(?:AM|PM))\s*[–-]/i);
-  let opensAt = openMatch ? openMatch[1].trim() : null;
-  
-  // If closed today, find next opening time
-  if (!isOpen && (!opensAt || todayHours?.toLowerCase().includes('closed'))) {
-    // Look for next day that's open
-    for (let i = 1; i <= 7; i++) {
-      const nextDayIndex = (todayIndex + i) % 7;
-      const nextDayHours = fullWeek[nextDayIndex]?.hours;
-      if (nextDayHours && !nextDayHours.toLowerCase().includes('closed')) {
-        const nextOpenMatch = nextDayHours.match(/(\d{1,2}:?\d{0,2}\s*(?:AM|PM))/i);
-        if (nextOpenMatch) {
-          opensAt = nextOpenMatch[1].trim();
-          break;
-        }
-      }
-    }
-  }
-  
-  // Format open time
-  if (opensAt) {
-    opensAt = opensAt.replace(/(\d+):00/, '$1').replace(/\s+/g, ' ');
-  }
-
-  return { today: todayHours, isOpen, closesAt, opensAt, fullWeek, isIrregular };
-}
-
-function normalizeInstagram(handle: string | null | undefined): string | null {
-  if (!handle) return null;
-  let s = handle.trim();
-  s = s.replace(/^https?:\/\/(www\.)?instagram\.com\//i, '');
-  s = s.replace(/^@/, '');
-  return s || null;
-}
-
 export default function PlacePage() {
   const params = useParams();
   const slug = params?.slug as string;
@@ -284,12 +124,6 @@ export default function PlacePage() {
       .finally(() => setLoading(false));
   }, [slug]);
 
-  // Gallery handlers
-  const openGallery = (index: number = 0) => {
-    setLightboxIndex(index);
-    setLightboxOpen(true);
-  };
-
   // Share handler
   const handleShare = async () => {
     if (navigator.share) {
@@ -308,125 +142,6 @@ export default function PlacePage() {
       // Fallback: Copy to clipboard
       navigator.clipboard.writeText(window.location.href);
       alert('Link copied to clipboard!');
-    }
-  };
-
-  // Helper: Render a card based on System B config
-  const renderCard = (config: CardConfig, location: LocationData, key: string) => {
-    const { c, r } = config.span;
-    const style = { 
-      gridColumn: `span ${c}`,
-      gridRow: `span ${r}`,
-      '--c': c, 
-      '--r': r 
-    } as React.CSSProperties;
-
-    switch (config.type) {
-      case 'hours':
-        return (
-          <HoursCard
-            key={key}
-            todayHours={config.data.today}
-            isOpen={config.data.isOpen}
-            statusText={config.data.isOpen ? `Open${config.data.closesAt ? ` · Closes ${config.data.closesAt}` : ''}` : `Closed${config.data.opensAt ? ` · Opens ${config.data.opensAt}` : ''}`}
-            fullWeek={config.data.fullWeek}
-            isIrregular={config.data.isIrregular}
-            span={c}
-          />
-        );
-
-      case 'description':
-        return (
-          <DescriptionCard
-            key={key}
-            content={config.data.content}
-            isCurator={config.data.isCurator}
-            span={c}
-          />
-        );
-
-      case 'vibe':
-        return (
-          <VibeCard
-            key={key}
-            vibeTags={config.data}
-            span={c}
-          />
-        );
-
-      case 'press':
-        return (
-          <CoverageCard
-            key={key}
-            pullQuote={config.data.quote}
-            pullQuoteSource={config.data.source}
-            pullQuoteAuthor={config.data.author}
-            pullQuoteUrl={config.data.url}
-            sources={location.sources}
-            span={c}
-          />
-        );
-
-      case 'gallery':
-        return (
-          <GalleryCard
-            key={key}
-            photos={config.data}
-            onThumbnailClick={(idx) => openGallery(idx + 1)}
-            span={c}
-          />
-        );
-
-      case 'menu':
-        return (
-          <MenuCard
-            key={key}
-            items={config.data}
-            span={c}
-          />
-        );
-
-      case 'wine':
-        return (
-          <WineCard
-            key={key}
-            focus={config.data.focus}
-            regions={config.data.regions}
-            priceRange={config.data.priceRange}
-            description={config.data.description}
-            span={c}
-          />
-        );
-
-      case 'alsoOn':
-        return (
-          <AlsoOnCard
-            key={key}
-            maps={config.data}
-            span={c}
-          />
-        );
-
-      case 'quiet':
-        return (
-          <div key={key} style={{ ...style, alignSelf: 'stretch' }}>
-            <QuietCard
-              variant={config.data?.variant || 'grid'}
-              span={c as 1 | 2 | 3}
-            />
-          </div>
-        );
-
-      case 'reservations':
-      case 'links':
-      case 'phone':
-        // TODO: Implement these cards
-        console.warn(`⚠️ Card type "${config.type}" not yet implemented`);
-        return null;
-
-      default:
-        console.error(`❌ Unknown card type: ${config.type}`);
-        return null;
     }
   };
 
@@ -511,135 +226,23 @@ export default function PlacePage() {
     );
   }
 
-  const { location, appearsOn } = data;
-  
-  // Markets UI Gating: Show MarketFactsCard for scheduled markets (activity + market category)
-  const isMarketActivity = 
-    location.placeType === 'activity' && 
-    location.categorySlug === 'market';
-  
-  const { today, isOpen, closesAt, opensAt, fullWeek, isIrregular } = parseHours(location.hours);
-  const instagramHandle = normalizeInstagram(location.instagram);
-
-  // Extract Instagram from website field if direct field is empty
-  let finalInstagramHandle = instagramHandle;
-  if (!finalInstagramHandle && location.website?.includes('instagram.com')) {
-    const match = location.website.match(/instagram\.com\/([^\/\?]+)/);
-    if (match && match[1]) {
-      finalInstagramHandle = match[1];
-    }
-  }
-
-  // Price symbol
+  const { location } = data;
+  const photoUrls = location.photoUrls ?? (location.photoUrl ? [location.photoUrl] : []);
+  const { isOpen, statusText } = parseHours(location.hours);
   const priceSymbol = location.priceLevel
-    ? '$'.repeat(Math.min(location.priceLevel, 3))
+    ? '$'.repeat(Math.min(location.priceLevel, 4))
     : null;
 
-  // Status text
-  const statusText = isOpen
-    ? `Open${closesAt ? ` · Closes ${closesAt}` : ''}`
-    : `Closed${opensAt ? ` · Opens ${opensAt}` : ''}`;
-
-  // Graceful degradation checks
-  const hasCoverage = (() => {
-    // Has pull quote?
-    if (location.pullQuote?.trim()) return true;
-    
-    // Has source with actual content (full article)?
-    const firstSource = location.sources?.[0];
-    if (firstSource?.content && firstSource.content.length >= 100) {
-      return true; // CoverageCard will extract quote from content
-    }
-    
-    // Has valid excerpt? (not just metadata)
-    if (firstSource?.excerpt) {
-      const excerpt = firstSource.excerpt || '';
-      const sourceName = firstSource.publication || firstSource.name || '';
-      
-      // Valid excerpt must be at least 50 chars and not just source name
-      const isValidExcerpt = excerpt.length >= 50 && 
-        !(sourceName && excerpt.toLowerCase().includes(sourceName.toLowerCase()));
-      
-      if (isValidExcerpt) return true;
-    }
-    
-    return false;
-  })();
-  const hasCurator = !!location.curatorNote?.trim();
-  const hasGallery = (location.photoUrls?.length ?? 0) > 1; // More than just hero
-  
-
-  // Service options (placeholder - add when Google fields available)
-  const serviceOptions: string[] = [];
-  // TODO: When delivery/takeout/dineIn available from Google:
-  // if (location.delivery) serviceOptions.push('Delivery');
-  // if (location.takeout) serviceOptions.push('Takeout');
-  // if (location.dineIn) serviceOptions.push('Dine-in');
-
-  // Reservations note
-  const reservationsNote = location.reservationUrl
-    ? 'Recommended'
-    : null;
-
-  // Deduplicate appearsOn by slug, max 3
-  const seenSlugs = new Set<string>();
-  const appearsOnDeduped = appearsOn
-    .filter((item) => {
-      if (seenSlugs.has(item.slug)) return false;
-      seenSlugs.add(item.slug);
-      return true;
-    })
-    .slice(0, 3);
-
-  // Filter to only maps with valid place counts (no placeholders)
-  const appearsOnRenderable = appearsOnDeduped.filter(
-    (m) => typeof m.placeCount === 'number' && m.placeCount > 0
-  );
-
-  // Transform data for System B layout resolver
-  const resolverData: ResolverPlaceData = {
-    hours: { today, isOpen, closesAt, opensAt, fullWeek, isIrregular },
-    description: {
-      curator_note: location.curatorNote || null,
-      about_copy: location.description || null
-    },
-    // NOTE: Reservations, links, phone cards not yet implemented - will be added in follow-up
-    reservations: undefined, // TODO: Implement ReservationsCard component
-    vibe: location.vibeTags && location.vibeTags.length > 0 ? location.vibeTags : null,
-    press: hasCoverage ? {
-      quote: location.pullQuote || '',
-      source: location.pullQuoteSource || '',
-      author: location.pullQuoteAuthor || undefined,
-      url: location.pullQuoteUrl || undefined
-    } : null,
-    gallery: hasGallery ? location.photoUrls!.slice(1) : null,
-    menu: null, // TODO: Add when menu data available
-    wine: null, // TODO: Add when wine data available
-    links: undefined, // TODO: Implement LinksCard component
-    phone: null, // TODO: Implement PhoneCard component
-    alsoOn: appearsOnRenderable.length > 0 ? appearsOnRenderable : null
+  const openGallery = (index: number) => {
+    setLightboxIndex(index);
+    setLightboxOpen(true);
   };
-
-  // Resolve layout using System B
-  const tiles = resolvePlacePageLayout(resolverData);
-  
-  // Validate layout
-  const isValid = validateLayout(tiles);
-  
-  if (!isValid) {
-    console.error('❌ System B layout validation failed!');
-    console.log(debugLayout(tiles));
-  } else if (process.env.NODE_ENV === 'development') {
-    console.log('✓ System B layout validation passed');
-    console.log(debugLayout(tiles));
-  }
 
   return (
     <div style={{ background: '#F5F0E1', minHeight: '100vh' }}>
       <GlobalHeader variant="immersive" onShare={handleShare} />
 
       <main style={{ maxWidth: 720, margin: '0 auto' }}>
-        {/* Hero Section */}
         <HeroSection
           name={location.name}
           category={location.category}
@@ -647,49 +250,51 @@ export default function PlacePage() {
           price={priceSymbol}
           isOpen={isOpen}
           statusText={statusText}
-          photoUrl={location.photoUrls?.[0] || null}
-          photoCount={location.photoUrls?.length || 0}
+          photoUrl={photoUrls[0] ?? null}
+          photoCount={photoUrls.length}
           onHeroClick={() => openGallery(0)}
           onShareClick={handleShare}
           hours={location.hours}
         />
 
-        {/* Action Strip */}
-        <ActionStrip
-          latitude={location.latitude ? Number(location.latitude) : null}
-          longitude={location.longitude ? Number(location.longitude) : null}
-          phone={location.phone}
-          instagram={finalInstagramHandle}
-        />
-
-        {/* Bento Grid - System B: Natural Flow */}
-        <div
-          style={{
-            padding: '16px 20px',
-            display: 'grid',
-            gridTemplateColumns: 'repeat(6, minmax(0, 1fr))',
-            gap: 12,
-            gridAutoFlow: 'row', // Natural flow, no backfill
-            gridAutoRows: 'auto', // Flexible height
-            alignItems: 'start', // Prevent stretch
+        <MerchantGrid
+          location={{
+            id: location.id,
+            name: location.name,
+            slug: location.slug,
+            address: location.address,
+            latitude: location.latitude ? Number(location.latitude) : null,
+            longitude: location.longitude ? Number(location.longitude) : null,
+            category: location.category,
+            neighborhood: location.neighborhood,
+            tagline: location.tagline,
+            description: location.description,
+            photoUrls: location.photoUrls,
+            vibeTags: location.vibeTags,
+            curatorNote: location.curatorNote,
+            pullQuote: location.pullQuote,
+            pullQuoteSource: location.pullQuoteSource,
+            hours: location.hours,
+            cuisineType: location.cuisineType,
+            tips: location.tips,
+            priceLevel: location.priceLevel,
+            sources: location.sources,
+            instagram: location.instagram,
+            phone: location.phone,
           }}
-        >
-          {tiles.map((tile, idx) => 
-            renderCard(tile, location, `tile-${idx}`)
-          )}
-        </div>
+          onOpenGallery={openGallery}
+        />
       </main>
 
-      <GlobalFooter variant="minimal" />
-
-      {/* Gallery Lightbox */}
-      {lightboxOpen && location.photoUrls && (
+      {lightboxOpen && photoUrls.length > 0 && (
         <GalleryLightbox
-          photos={location.photoUrls}
+          photos={photoUrls}
           initialIndex={lightboxIndex}
           onClose={() => setLightboxOpen(false)}
         />
       )}
+
+      <GlobalFooter variant="minimal" />
     </div>
   );
 }

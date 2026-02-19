@@ -12,6 +12,7 @@
 
 import { PrismaClient, Prisma } from '@prisma/client';
 import slugify from 'slugify';
+import { categoryToPrimaryVertical } from '@/lib/primaryVertical';
 
 const prisma = new PrismaClient();
 
@@ -55,6 +56,7 @@ async function syncGoldenToPlaces() {
             longitude: golden.lng,
             neighborhood: golden.neighborhood,
             category: golden.category,
+            primary_vertical: categoryToPrimaryVertical(golden.category) ?? 'EAT',
             phone: golden.phone,
             website: golden.website,
             instagram: golden.instagram_handle,
@@ -78,6 +80,7 @@ async function syncGoldenToPlaces() {
             longitude: golden.lng,
             neighborhood: golden.neighborhood,
             category: golden.category,
+            primary_vertical: categoryToPrimaryVertical(golden.category) ?? 'EAT',
             phone: golden.phone,
             website: golden.website,
             instagram: golden.instagram_handle,
