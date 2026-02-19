@@ -24,3 +24,4 @@ test-*.csv
 tsx
 .vercel
 .env.vercel*
+tsconfig.tsbuildinfo
