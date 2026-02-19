@@ -9,6 +9,21 @@ import { db } from '@/lib/db';
 import { getGooglePhotoUrl, getPhotoRefFromStored } from '@/lib/google-places';
 import { getActiveOverlays } from '@/lib/overlays/getActiveOverlays';
 
+const BUILD_ID =
+  process.env.VERCEL_GIT_COMMIT_SHA ||
+  process.env.GIT_SHA ||
+  process.env.BUILD_ID ||
+  new Date().toISOString();
+const ENV = process.env.VERCEL_ENV || process.env.NODE_ENV || 'local';
+
+function jsonHeaders(extra: Record<string, string> = {}) {
+  return {
+    'X-Build-Id': BUILD_ID,
+    'X-Env': ENV,
+    ...extra,
+  };
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
@@ -19,7 +34,7 @@ export async function GET(
     if (!slug) {
       return NextResponse.json(
         { error: 'Place slug is required' },
-        { status: 400 }
+        { status: 400, headers: jsonHeaders() }
       );
     }
 
@@ -63,7 +78,7 @@ export async function GET(
     if (!place) {
       return NextResponse.json(
         { error: 'Place not found' },
-        { status: 404 }
+        { status: 404, headers: jsonHeaders() }
       );
     }
 
@@ -270,9 +285,9 @@ export async function GET(
       },
     },
       {
-        headers: {
+        headers: jsonHeaders({
           'Cache-Control': 'private, max-age=60, stale-while-revalidate=120',
-        },
+        }),
       }
     );
   } catch (error) {
@@ -282,7 +297,7 @@ export async function GET(
         error: 'Failed to fetch place',
         details: error instanceof Error ? error.message : 'Unknown error',
       },
-      { status: 500 }
+      { status: 500, headers: jsonHeaders() }
     );
   }
 }

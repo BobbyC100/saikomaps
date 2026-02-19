@@ -96,7 +96,9 @@ export default function PlacePage() {
 
   useEffect(() => {
     if (!slug) return;
-    fetch(`/api/places/${slug}`)
+    fetch(`/api/places/${slug}`, {
+      cache: process.env.NODE_ENV === 'development' ? 'no-store' : 'default',
+    })
       .then(async (res) => {
         if (res.status === 404) {
           setError('not-found');
