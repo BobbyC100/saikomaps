@@ -98,6 +98,10 @@ export default function PlacePage() {
     if (!slug) return;
     fetch(`/api/places/${slug}`, {
       cache: process.env.NODE_ENV === 'development' ? 'no-store' : 'default',
+      headers:
+        process.env.NODE_ENV === 'development'
+          ? { 'Cache-Control': 'no-cache' }
+          : undefined,
     })
       .then(async (res) => {
         if (res.status === 404) {

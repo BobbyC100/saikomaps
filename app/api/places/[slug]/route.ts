@@ -11,30 +11,47 @@ import { getActiveOverlays } from '@/lib/overlays/getActiveOverlays';
 
 const BUILD_ID =
   process.env.VERCEL_GIT_COMMIT_SHA ||
+  process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA ||
   process.env.GIT_SHA ||
   process.env.BUILD_ID ||
-  new Date().toISOString();
+  process.env.NEXT_PUBLIC_BUILD_ID ||
+  'local-dev';
 const ENV = process.env.VERCEL_ENV || process.env.NODE_ENV || 'local';
 
-function jsonHeaders(extra: Record<string, string> = {}) {
-  return {
+function jsonHeaders(extra: Record<string, string> = {}, bypassCache = false): Record<string, string> {
+  const base: Record<string, string> = {
+    'Content-Type': 'application/json',
     'X-Build-Id': BUILD_ID,
     'X-Env': ENV,
+    'X-Server-Time': new Date().toISOString(),
     ...extra,
   };
+  if (bypassCache || process.env.NODE_ENV === 'development') {
+    base['Cache-Control'] = 'no-store, no-cache, must-revalidate';
+    base['Pragma'] = 'no-cache';
+    base['Expires'] = '0';
+  }
+  return base;
 }
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
 ) {
+  const bypassCache = request.nextUrl.searchParams.get('__nocache') === '1';
+
   try {
     const { slug } = await params;
 
+    if (process.env.DEBUG_HEADERS === '1') {
+      console.log('[places API]', { slug, buildId: BUILD_ID, env: ENV, bypassCache });
+    }
+
     if (!slug) {
+      const headers = jsonHeaders(bypassCache ? { 'X-Cache-Bypass': '1' } : {}, bypassCache);
       return NextResponse.json(
         { error: 'Place slug is required' },
-        { status: 400, headers: jsonHeaders() }
+        { status: 400, headers }
       );
     }
 
@@ -76,9 +93,10 @@ export async function GET(
     });
 
     if (!place) {
+      const headers = jsonHeaders(bypassCache ? { 'X-Cache-Bypass': '1' } : {}, bypassCache);
       return NextResponse.json(
         { error: 'Place not found' },
-        { status: 404, headers: jsonHeaders() }
+        { status: 404, headers }
       );
     }
 
@@ -285,9 +303,12 @@ export async function GET(
       },
     },
       {
-        headers: jsonHeaders({
-          'Cache-Control': 'private, max-age=60, stale-while-revalidate=120',
-        }),
+        headers: jsonHeaders(
+          bypassCache
+            ? { 'X-Cache-Bypass': '1' }
+            : { 'Cache-Control': 'private, max-age=60, stale-while-revalidate=120' },
+          bypassCache
+        ),
       }
     );
   } catch (error) {
@@ -297,7 +318,7 @@ export async function GET(
         error: 'Failed to fetch place',
         details: error instanceof Error ? error.message : 'Unknown error',
       },
-      { status: 500, headers: jsonHeaders() }
+      { status: 500, headers: jsonHeaders({}, bypassCache) }
     );
   }
 }
