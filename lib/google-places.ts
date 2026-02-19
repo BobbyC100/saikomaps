@@ -358,3 +358,167 @@ export function buildClientPhotoUrl(
   }
   return `https://maps.googleapis.com/maps/api/place/photo?maxwidth=${maxWidth}&photo_reference=${photoRefOrName}&key=${key}`;
 }
+
+/**
+ * VALADATA: Google Places ingestion contract (v1).
+ * Request allowlist — only these fields are requested from Place Details API.
+ * Forbidden: photos, reviews, editorial summaries, rich media.
+ */
+export const VALADATA_GOOGLE_PLACES_FIELDS_V1 = [
+  'place_id',
+  'types',
+  'price_level',
+  'rating',
+  'user_ratings_total',
+  'serves_beer',
+  'serves_wine',
+  'serves_breakfast',
+  'serves_brunch',
+  'serves_lunch',
+  'serves_dinner',
+  'serves_vegetarian_food',
+  'delivery',
+  'dine_in',
+  'takeout',
+  'reservable',
+  'curbside_pickup',
+] as const;
+
+export const VALADATA_GOOGLE_PLACES_FIELDS_V1_STRING =
+  VALADATA_GOOGLE_PLACES_FIELDS_V1.join(',');
+
+/**
+ * Attributes JSON shape for golden_records.google_places_attributes.
+ * Includes types + Atmosphere fields for energy/tag scoring.
+ * popular_times: NOT available from Google Places API (removed years ago).
+ */
+export interface GooglePlacesAttributes {
+  types?: string[];
+  price_level?: number;
+  rating?: number;
+  user_ratings_total?: number;
+  serves_beer?: boolean;
+  serves_wine?: boolean;
+  serves_breakfast?: boolean;
+  serves_brunch?: boolean;
+  serves_lunch?: boolean;
+  serves_dinner?: boolean;
+  serves_vegetarian_food?: boolean;
+  delivery?: boolean;
+  dine_in?: boolean;
+  takeout?: boolean;
+  reservable?: boolean;
+  curbside_pickup?: boolean;
+  /** Always null — popular_times is NOT available from the official Google Places API. */
+  popular_times?: null;
+  _meta?: {
+    fetched_at: string;
+    popular_times_available: false;
+    source: 'google_places';
+    fields_mask_used?: string;
+  };
+}
+
+/**
+ * Fetch Place Details with Atmosphere fields for golden_records.google_places_attributes.
+ * Returns structured JSON suitable for energy/tag scoring.
+ * popular_times is never available from the public API.
+ */
+export async function getPlaceAttributes(placeId: string): Promise<GooglePlacesAttributes | null> {
+  checkEnabled();
+  if (!GOOGLE_PLACES_API_KEY) {
+    throw new Error('Google Places API key is not configured');
+  }
+
+  const params = new URLSearchParams({
+    place_id: placeId,
+    key: GOOGLE_PLACES_API_KEY,
+    fields: VALADATA_GOOGLE_PLACES_FIELDS_V1_STRING,
+  });
+
+  const response = await fetch(
+    `${PLACES_API_BASE}/details/json?${params.toString()}`
+  );
+
+  if (!response.ok) {
+    throw new Error(`Google Places API error: ${response.statusText}`);
+  }
+
+  const data = await response.json();
+
+  if (data.status === 'NOT_FOUND') {
+    return null;
+  }
+
+  if (data.status !== 'OK') {
+    throw new Error(`Google Places API error: ${data.status}`);
+  }
+
+  const place = data.result;
+  const now = new Date().toISOString();
+
+  const attrs: GooglePlacesAttributes = {
+    types: place.types ?? [],
+    price_level: place.price_level,
+    rating: place.rating,
+    user_ratings_total: place.user_ratings_total,
+    serves_beer: place.serves_beer ?? undefined,
+    serves_wine: place.serves_wine ?? undefined,
+    serves_breakfast: place.serves_breakfast ?? undefined,
+    serves_brunch: place.serves_brunch ?? undefined,
+    serves_lunch: place.serves_lunch ?? undefined,
+    serves_dinner: place.serves_dinner ?? undefined,
+    serves_vegetarian_food: place.serves_vegetarian_food ?? undefined,
+    delivery: place.delivery ?? undefined,
+    dine_in: place.dine_in ?? undefined,
+    takeout: place.takeout ?? undefined,
+    reservable: place.reservable ?? undefined,
+    curbside_pickup: place.curbside_pickup ?? undefined,
+    popular_times: null,
+    _meta: {
+      fetched_at: now,
+      popular_times_available: false,
+      source: 'google_places',
+      fields_mask_used: VALADATA_GOOGLE_PLACES_FIELDS_V1_STRING,
+    },
+  };
+
+  return attrs;
+}
+
+/**
+ * Attributes "present" per CTO brief:
+ * - non-null with types (or equivalent) and at least one atmosphere field
+ */
+export function areAttributesPresent(attrs: unknown): boolean {
+  if (!attrs || typeof attrs !== 'object') return false;
+  const o = attrs as Record<string, unknown>;
+  const hasTypes = Array.isArray(o.types) && o.types.length > 0;
+  const atmosphereFields = [
+    'serves_beer',
+    'serves_wine',
+    'serves_cocktails',
+    'live_music',
+    'good_for_groups',
+    'delivery',
+    'dine_in',
+    'takeout',
+    'reservable',
+  ];
+  const hasAtmosphere = atmosphereFields.some((f) => o[f] === true || o[f] === false);
+  return hasTypes && hasAtmosphere;
+}
+
+/**
+ * popular_times "present" if attrs has non-empty popular_times.
+ * Google API does NOT provide this; always false for our fetches.
+ */
+export function isPopularTimesPresent(attrs: unknown): boolean {
+  if (!attrs || typeof attrs !== 'object') return false;
+  const o = attrs as Record<string, unknown>;
+  const pt = o.popular_times;
+  if (pt == null) return false;
+  if (Array.isArray(pt) && pt.length > 0) return true;
+  if (typeof pt === 'object' && Object.keys(pt).length > 0) return true;
+  return false;
+}

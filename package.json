@@ -25,6 +25,7 @@
     "import:skate-editorial": "tsx scripts/import-skate-editorial.ts",
     "import:sources": "tsx scripts/import-sources.ts",
     "backfill:google": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/backfill-google-places.ts",
+    "backfill:google-attrs": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/backfill-google-places-attrs.ts",
     "test:voice-engine": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/test-voice-engine.ts",
     "analyze:enrichment": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/analyze-enrichment-status.ts",
     "find:duplicates": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/find-duplicate-places.ts",
@@ -62,7 +63,13 @@
     "intake": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/intake-golden-first.ts",
     "resolve": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/resolve-golden-first.ts",
     "promote": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/promote-golden-to-places.ts",
-    "seed:prod:places": "tsx scripts/seed-prod-places.ts"
+    "seed:prod:places": "tsx scripts/seed-prod-places.ts",
+    "backfill:energy-tag": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/backfill-energy-tag-engine.ts",
+    "compute:energy": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/compute-energy.ts",
+    "compute:tag-scores": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/compute-tag-scores.ts",
+    "coverage:census": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/coverage-census.ts",
+    "eval:tag-scores": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/eval-tag-scores.ts",
+    "probe:field-coverage": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/probe-google-places-field-coverage.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.72.1",

@@ -5,6 +5,8 @@
 **Date:** February 17, 2026  
 **Status:** Locked — pipeline-generated, auditable, no mocks. Post-run we only tune weights/lexicons, not dimensions.
 
+**Implementation note (v1):** `popular_times` is NOT available from the Google Places API. Energy v1 ships without the popularity component. Formula = language + flags + sensory. Confidence weights: language 0.50, flags 0.30, sensory 0.20. Schema supports adding popularity later (Option B) without breaking versions.
+
 ---
 
 ## Relationship to Formality
