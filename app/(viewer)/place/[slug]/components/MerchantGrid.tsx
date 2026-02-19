@@ -37,7 +37,11 @@ export interface MerchantGridLocation {
   cuisineType?: string | null;
   tips?: string[] | null;
   priceLevel?: number | null;
+  transitAccessible?: boolean | null;
   sources?: EditorialSource[] | null;
+  thematicTags?: string[] | null;
+  contextualConnection?: string | null;
+  curatorAttribution?: string | null;
   instagram?: string | null;
   phone?: string | null;
 }
@@ -81,15 +85,18 @@ export function MerchantGrid({ location, onOpenGallery }: MerchantGridProps) {
     !!location.cuisineType?.trim() ||
     (location.tips?.length ?? 0) > 0;
 
-  const hasEditorial =
-    (location.sources?.length ?? 0) > 0 &&
-    !!location.sources?.[0]?.url;
+  const hasEditorialContent =
+    ((location.sources?.length ?? 0) > 0 && !!location.sources?.[0]?.url) ||
+    !!location.curatorNote?.trim() ||
+    (location.thematicTags?.length ?? 0) > 0 ||
+    !!location.contextualConnection?.trim() ||
+    !!location.curatorAttribution?.trim();
 
   return (
     <div className={styles.grid}>
       <Cell
         className={`${styles.cell1}`}
-        isEmpty={false}
+        isEmpty={true}
       >
         <IdentityCell
           name={location.name}
@@ -127,6 +134,8 @@ export function MerchantGrid({ location, onOpenGallery }: MerchantGridProps) {
           longitude={location.longitude}
           instagram={location.instagram}
           phone={location.phone}
+          priceLevel={location.priceLevel}
+          transitAccessible={location.transitAccessible}
         />
       </Cell>
 
@@ -137,15 +146,20 @@ export function MerchantGrid({ location, onOpenGallery }: MerchantGridProps) {
         <OfferingsCell
           cuisineType={location.cuisineType}
           tips={location.tips}
-          priceLevel={location.priceLevel}
         />
       </Cell>
 
       <Cell
         className={`${styles.cell5} ${styles.cellEditorial}`}
-        isEmpty={!hasEditorial}
+        isEmpty={!hasEditorialContent}
       >
-        <EditorialCell sources={location.sources} />
+        <EditorialCell
+          sources={location.sources}
+          curatorNote={location.curatorNote}
+          thematicTags={location.thematicTags}
+          contextualConnection={location.contextualConnection}
+          curatorAttribution={location.curatorAttribution}
+        />
       </Cell>
 
       <Cell

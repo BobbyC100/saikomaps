@@ -1,5 +1,6 @@
 'use client';
 
+import { Train } from 'lucide-react';
 import { HoursCard } from '@/components/merchant/HoursCard';
 import { StatusIndicator } from '../StatusIndicator';
 import { parseHours } from '../../lib/parseHours';
@@ -12,6 +13,8 @@ interface StatusCellProps {
   longitude?: number | null;
   instagram?: string | null;
   phone?: string | null;
+  priceLevel?: number | null;
+  transitAccessible?: boolean | null;
 }
 
 function formatPhone(phoneNumber: string): string {
@@ -34,11 +37,34 @@ export function StatusCell({
   longitude,
   instagram,
   phone,
+  priceLevel,
+  transitAccessible,
 }: StatusCellProps) {
   const { today, isOpen, statusText, fullWeek, isIrregular } = parseHours(hours);
+  const priceSymbol = priceLevel
+    ? '$'.repeat(Math.min(priceLevel, 4))
+    : null;
 
   return (
     <div data-source="status">
+      {/* Price + Transit (Status cell) */}
+      {(priceSymbol || transitAccessible === true) && (
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm mb-3">
+          {priceSymbol && (
+            <span className="text-[var(--charcoal)]">{priceSymbol}</span>
+          )}
+          {transitAccessible === true && (
+            <span
+              className="inline-flex items-center gap-1 text-[var(--charcoal)]/80"
+              aria-label="Near public transit"
+            >
+              <Train size={14} strokeWidth={1.5} />
+              Transit nearby
+            </span>
+          )}
+        </div>
+      )}
+
       {/* Status Indicator */}
       <StatusIndicator isOpen={isOpen} statusText={statusText} />
 

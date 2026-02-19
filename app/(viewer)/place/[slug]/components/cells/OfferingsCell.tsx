@@ -3,24 +3,24 @@
 interface OfferingsCellProps {
   cuisineType?: string | null;
   tips?: string[] | null;
-  priceLevel?: number | null;
 }
 
 const MAX_TIPS = 5;
 
+/**
+ * Offerings cell: cuisine/category + notable items (tips).
+ * Price displays in Status cell per directive.
+ * Interim solution until full menu parsing (offeringCategories) is implemented.
+ */
 export function OfferingsCell({
   cuisineType,
   tips,
-  priceLevel,
 }: OfferingsCellProps) {
   const hasCuisine = !!cuisineType?.trim();
   const tipList = (tips ?? []).slice(0, MAX_TIPS).filter(Boolean);
   const hasTips = tipList.length > 0;
-  const priceSymbol = priceLevel
-    ? '$'.repeat(Math.min(priceLevel, 4))
-    : null;
 
-  if (!hasCuisine && !hasTips && !priceSymbol) return null;
+  if (!hasCuisine && !hasTips) return null;
 
   return (
     <div className="space-y-4">
@@ -44,10 +44,6 @@ export function OfferingsCell({
             ))}
           </ul>
         </div>
-      )}
-
-      {priceSymbol && (
-        <p className="text-sm text-[#36454F]/70">{priceSymbol}</p>
       )}
     </div>
   );

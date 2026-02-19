@@ -79,9 +79,15 @@ export function HeroSection({
   };
   
   const mealContext = getMealContext();
-  
-  // Build meta row with meal context instead of category
-  const metaParts = [mealContext, neighborhood, price].filter(Boolean);
+
+  const toTitleCase = (s: string) =>
+    s.split(' ').map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+
+  const metaParts = [
+    mealContext ? toTitleCase(mealContext) : null,
+    neighborhood ? toTitleCase(neighborhood) : null,
+    price,
+  ].filter(Boolean);
   const metaText = metaParts.join(' · ');
 
   return (
@@ -121,10 +127,9 @@ export function HeroSection({
         >
           <ArrowUpRight className={styles.shareIcon} size={16} strokeWidth={1.5} />
         </button>
-      </div>
 
-      {/* Hero Info */}
-      <div className={styles.heroInfo}>
+        {/* Hero Info - overlaid on hero image */}
+        <div className={styles.heroInfoOverlay}>
         {/* Name */}
         <h1 className={styles.placeName}>{name}</h1>
 
@@ -137,21 +142,13 @@ export function HeroSection({
             <span
               className={styles.statusDot}
               style={{
-                background: isOpen ? '#4A7C59' : '#36454F',
-                opacity: isOpen ? 1 : 0.5,
+                background: isOpen ? '#51cf66' : '#ff6b6b',
               }}
             />
-            <span
-              className={styles.statusText}
-              style={{
-                color: isOpen ? '#4A7C59' : '#36454F',
-                opacity: isOpen ? 1 : 0.5,
-              }}
-            >
-              {statusText}
-            </span>
+            <span className={styles.statusText}>{statusText}</span>
           </div>
         )}
+        </div>
       </div>
     </div>
   );

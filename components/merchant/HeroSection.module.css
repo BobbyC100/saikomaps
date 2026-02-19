@@ -80,12 +80,43 @@
   opacity: 0.9;
 }
 
-/* Hero Info */
-.heroInfo {
+/* Hero Info - overlaid on hero image */
+.heroInfoOverlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
   padding: 16px 20px 12px;
   display: flex;
   flex-direction: column;
   gap: 6px;
+  background: linear-gradient(to top, rgba(54, 69, 79, 0.85), transparent 60%);
+}
+
+.heroInfoOverlay .placeName {
+  color: #F5F0E1;
+}
+
+.heroInfoOverlay .metaRow {
+  color: rgba(245, 240, 225, 0.9);
+  font-size: 14px;
+  letter-spacing: 0.5px;
+  text-transform: none;
+}
+
+.heroInfoOverlay .statusRow {
+  margin-top: 8px;
+}
+
+.heroInfoOverlay .statusDot {
+  opacity: 1;
+}
+
+.heroInfoOverlay .statusText {
+  color: rgba(245, 240, 225, 0.85);
+  font-size: 13px;
+  text-transform: none;
+  letter-spacing: 0.3px;
 }
 
 .placeName {

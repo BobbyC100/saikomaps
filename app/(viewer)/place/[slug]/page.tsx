@@ -8,6 +8,7 @@ import { GlobalFooter } from '@/components/layouts/GlobalFooter';
 import { HeroSection } from '@/components/merchant/HeroSection';
 import { GalleryLightbox } from '@/components/merchant/GalleryLightbox';
 import { MerchantGrid } from './components/MerchantGrid';
+import gridStyles from './MerchantGrid.module.css';
 import { parseHours } from './lib/parseHours';
 
 interface EditorialSource {
@@ -47,6 +48,10 @@ interface LocationData {
   vibeTags?: string[] | null;
   tips?: string[] | null;
   tagline?: string | null;
+  transitAccessible?: boolean | null;
+  thematicTags?: string[] | null;
+  contextualConnection?: string | null;
+  curatorAttribution?: string | null;
   pullQuote?: string | null;
   pullQuoteSource?: string | null;
   pullQuoteAuthor?: string | null;
@@ -249,20 +254,23 @@ export default function PlacePage() {
       <GlobalHeader variant="immersive" onShare={handleShare} />
 
       <main style={{ maxWidth: 720, margin: '0 auto' }}>
-        <HeroSection
-          name={location.name}
-          category={location.category}
-          neighborhood={location.neighborhood}
-          price={priceSymbol}
-          isOpen={isOpen}
-          statusText={statusText}
-          photoUrl={photoUrls[0] ?? null}
-          photoCount={photoUrls.length}
-          onHeroClick={() => openGallery(0)}
-          onShareClick={handleShare}
-          hours={location.hours}
-        />
-
+        <div className={gridStyles.pageLayout}>
+          <div className={gridStyles.heroSlot}>
+            <HeroSection
+              name={location.name}
+              category={location.category}
+              neighborhood={location.neighborhood}
+              price={priceSymbol}
+              isOpen={isOpen}
+              statusText={statusText}
+              photoUrl={photoUrls[0] ?? null}
+              photoCount={photoUrls.length}
+              onHeroClick={() => openGallery(0)}
+              onShareClick={handleShare}
+              hours={location.hours}
+            />
+          </div>
+          <div className={gridStyles.gridSlot}>
         <MerchantGrid
           location={{
             id: location.id,
@@ -284,12 +292,18 @@ export default function PlacePage() {
             cuisineType: location.cuisineType,
             tips: location.tips,
             priceLevel: location.priceLevel,
+            transitAccessible: location.transitAccessible,
             sources: location.sources,
+            thematicTags: location.thematicTags,
+            contextualConnection: location.contextualConnection,
+            curatorAttribution: location.curatorAttribution,
             instagram: location.instagram,
             phone: location.phone,
           }}
           onOpenGallery={openGallery}
         />
+          </div>
+        </div>
       </main>
 
       {lightboxOpen && photoUrls.length > 0 && (
