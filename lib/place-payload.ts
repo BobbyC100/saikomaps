@@ -25,8 +25,8 @@ export interface PlaceFactsOutput {
  * Call at macro boundary when assembling API response.
  */
 export function buildPlaceServiceFacts(input: PlaceFactsInput): PlaceFactsOutput {
-  const google = extractServiceFields(input.googleAttrs ?? undefined);
-  const scrape = extractServiceFields(input.scrapeAttrs ?? undefined);
+  const google = extractServiceFields(input.googleAttrs ?? undefined, 'google');
+  const scrape = extractServiceFields(input.scrapeAttrs ?? undefined, 'scrape');
   const manual = input.manualOverrides ?? {};
 
   const resolveInput: ResolveInput = {

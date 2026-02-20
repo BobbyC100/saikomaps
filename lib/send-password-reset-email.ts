@@ -1,11 +1,10 @@
 /**
  * Send password reset email via Resend.
  * Requires RESEND_API_KEY and NEXT_PUBLIC_APP_URL (or similar) in env.
+ * Resend client is created at runtime so build does not require the API key.
  */
 
 import { Resend } from 'resend'
-
-const resend = new Resend(process.env.RESEND_API_KEY)
 
 export type SendPasswordResetEmailParams = {
   to: string
@@ -18,6 +17,7 @@ export async function sendPasswordResetEmail({ to, resetLink }: SendPasswordRese
     return { ok: false, error: 'Email not configured' }
   }
 
+  const resend = new Resend(process.env.RESEND_API_KEY)
   const from = process.env.RESEND_FROM_EMAIL ?? 'Saiko Maps <onboarding@resend.dev>'
   const appName = process.env.NEXT_PUBLIC_APP_NAME ?? 'Saiko Maps'
 

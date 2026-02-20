@@ -155,15 +155,26 @@ export async function GET(
     ]);
 
     // VALADATA: canonical service facts (takeout, delivery, dine_in, reservable, curbside_pickup)
+    // googleAttrs: golden_records.google_places_attributes > places.googlePlacesAttributes
+    // scrapeAttrs: no stored source yet (null)
     const googleAttrs =
       (goldenRecord?.google_places_attributes as Record<string, unknown> | null) ??
       (place.googlePlacesAttributes as Record<string, unknown> | null) ??
       null;
-    const { facts, conflicts } = buildPlaceServiceFacts({
-      googleAttrs,
-      scrapeAttrs: null,
-      manualOverrides: null,
-    });
+    let facts: { service: Partial<Record<string, boolean | null>> };
+    let conflicts: { service: Partial<Record<string, { sources: string[]; values: Record<string, boolean> }>> };
+    try {
+      const out = buildPlaceServiceFacts({
+        googleAttrs: googleAttrs ?? undefined,
+        scrapeAttrs: null,
+        manualOverrides: null,
+      });
+      facts = out.facts;
+      conflicts = out.conflicts;
+    } catch {
+      facts = { service: {} };
+      conflicts = { service: {} };
+    }
 
     if (activeOverlays.length > 0) {
       console.log(`[Newsletter Overlay] Place ${place.slug} has ${activeOverlays.length} active overlay(s):`, {

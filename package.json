@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
     "dev": "node ./scripts/dev.js",
     "dev:clean": "rm -rf .next && node ./scripts/dev.js",
     "build": "prisma generate && next build",
@@ -142,6 +144,7 @@
     "prisma": "^6.0.0",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "vitest": "^4.0.18"
   }
 }
