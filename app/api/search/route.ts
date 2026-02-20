@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { PrismaClient } from '@prisma/client'
 import { getGooglePhotoUrl } from '@/lib/google-places'
+import {
+  sortVibeTagsByPriority,
+  CARD_TAG_LIMIT,
+} from '@/lib/config/vibe-tags'
 
 const prisma = new PrismaClient()
 
@@ -280,7 +284,9 @@ export async function GET(request: NextRequest) {
           signals,
           coverageQuote: place.pullQuote,
           coverageSource: place.pullQuoteSource,
-          vibeTags: place.vibeTags?.slice(0, 3), // Max 3 tags
+          vibeTags: place.vibeTags?.length
+            ? sortVibeTagsByPriority(place.vibeTags).slice(0, CARD_TAG_LIMIT)
+            : [],
           distanceMiles: distanceMiles !== undefined ? parseFloat(distanceMiles.toFixed(1)) : undefined,
           placePersonality: identity?.personality as any,
           

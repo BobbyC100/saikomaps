@@ -100,6 +100,13 @@ export const ENERGY_WEIGHTS = {
   sensory: 0.10,
 } as const;
 
+/** Energy v1 no-popularity: weights when popular_times unavailable (Google API does not provide). */
+export const ENERGY_WEIGHTS_NO_POPULARITY = {
+  language: 0.50,
+  flags: 0.30,
+  sensory: 0.20,
+} as const;
+
 /** Point caps per component (Energy) */
 export const ENERGY_CAPS = {
   popularity: { min: 0, max: 50 },

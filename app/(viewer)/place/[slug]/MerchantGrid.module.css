@@ -1,10 +1,34 @@
-.grid {
+/* Page layout: hero aligns with left column of grid */
+.pageLayout {
   display: grid;
   max-width: 1200px;
   margin: 0 auto;
   gap: 24px 16px;
   grid-template-columns: 2fr 1fr;
   padding: 24px 20px;
+}
+
+.heroSlot {
+  grid-column: 1 / -1;
+}
+
+.gridSlot {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 1023px) {
+  .pageLayout {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 16px;
+  }
+}
+
+.grid {
+  display: grid;
+  width: 100%;
+  gap: 16px;
+  grid-template-columns: repeat(6, 1fr);
 }
 
 @media (max-width: 1023px) {
@@ -15,51 +39,58 @@
   }
 }
 
-/* Cell positioning - desktop */
+/* Cell positioning - 6-column hybrid bento */
 .cell1 {
   grid-column: 1 / -1;
   grid-row: 1;
 }
 
 .cell2 {
-  grid-column: 1;
-  grid-row: 2;
+  grid-column: span 4;
+  grid-row: 2 / 4;
 }
 
 .cell3 {
-  grid-column: 2;
+  grid-column: span 2;
   grid-row: 2;
 }
 
 .cell4 {
-  grid-column: 1;
+  grid-column: span 2;
   grid-row: 3;
 }
 
 .cell5 {
-  grid-column: 2;
-  grid-row: 3;
+  grid-column: span 3;
+  grid-row: 4;
 }
 
 .cell6 {
-  grid-column: 1 / -1;
+  grid-column: span 3;
   grid-row: 4;
 }
 
 /* Mobile: single column, order Identity → Status → Experience → Offerings → Editorial → Utilities */
 @media (max-width: 1023px) {
   .cell1 { order: 1; }
-  .cell3 { order: 2; } /* Status */
-  .cell2 { order: 3; } /* Experience */
+  .cell2 { order: 3; }
+  .cell3 { order: 2; }
   .cell4 { order: 4; }
   .cell5 { order: 5; }
   .cell6 { order: 6; }
 }
 
 .cell {
-  border: 1px solid rgba(54, 69, 79, 0.15);
   padding: 24px;
-  background: #fff;
+  background: #FFFDF7;
+  border-radius: 16px;
+  box-shadow: 0 1px 4px rgba(139, 119, 101, 0.08);
+  border: none;
+  transition: box-shadow 0.2s ease;
+}
+
+.cell:hover {
+  box-shadow: 0 2px 8px rgba(139, 119, 101, 0.12);
 }
 
 @media (max-width: 1023px) {
@@ -68,25 +99,43 @@
   }
 }
 
+.cell1 {
+  background: transparent;
+  box-shadow: none;
+}
+
+.cell1:hover {
+  box-shadow: none;
+}
+
+.cell6 {
+  background: transparent;
+  box-shadow: none;
+}
+
+.cell6:hover {
+  box-shadow: none;
+}
+
 .cellExperience {
-  border-left: 3px solid var(--khaki, #C3B091);
+  border-left: 4px solid rgba(195, 176, 145, 0.5);
 }
 
 .cellStatus {
-  border-left: 3px solid var(--charcoal, #36454F);
+  border-left: 4px solid rgba(54, 69, 79, 0.5);
 }
 
 .cellStatusOpen {
-  border-left-color: #4A7C59;
+  border-left-color: rgba(74, 124, 89, 0.5);
 }
 
 .cellStatusClosed {
-  border-left-color: #36454F;
+  border-left-color: rgba(54, 69, 79, 0.5);
 }
 
 .cellOfferings,
 .cellEditorial {
-  border-left: 3px solid var(--leather, #8B7355);
+  border-left: 4px solid rgba(139, 115, 85, 0.35);
 }
 
 /* Collapse empty cells - use a wrapper that hides when empty */

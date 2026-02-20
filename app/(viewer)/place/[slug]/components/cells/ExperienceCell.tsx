@@ -4,6 +4,10 @@ import { useState } from 'react';
 import { GalleryCard } from '@/components/merchant/GalleryCard';
 import { GalleryLightbox } from '@/components/merchant/GalleryLightbox';
 import { VibeCard } from '@/components/merchant/VibeCard';
+import {
+  sortVibeTagsByPriority,
+  PLACE_PAGE_TAG_LIMIT,
+} from '@/lib/config/vibe-tags';
 
 interface ExperienceCellProps {
   photoUrls?: string[] | null;
@@ -34,7 +38,11 @@ export function ExperienceCell({
   });
 
   const galleryPhotos = (photoUrls?.length ?? 0) > 0 ? photoUrls! : [];
-  const hasVibes = !!vibeTags?.length;
+  const displayVibeTags =
+    vibeTags && vibeTags.length > 0
+      ? sortVibeTagsByPriority(vibeTags).slice(0, PLACE_PAGE_TAG_LIMIT)
+      : [];
+  const hasVibes = displayVibeTags.length > 0;
   const hasCurator = !!curatorNote?.trim();
   const hasPullQuote = !!pullQuote?.trim();
 
@@ -69,7 +77,7 @@ export function ExperienceCell({
         </>
       )}
 
-      {hasVibes && <VibeCard vibeTags={vibeTags} span={6} />}
+      {hasVibes && <VibeCard vibeTags={displayVibeTags} span={6} />}
 
       {hasCurator && (
         <div>

@@ -237,6 +237,10 @@ model places {
   taglineSignals         Json?              @map("tagline_signals")
   tips                   String[]           @default([])
   vibeTags               String[]           @default([]) @map("vibe_tags")
+  transitAccessible      Boolean?           @map("transit_accessible")
+  thematicTags           String[]           @default([]) @map("thematic_tags")
+  contextualConnection   String?            @map("contextual_connection")
+  curatorAttribution     String?            @map("curator_attribution")
   chefRecs               Json?              @map("chef_recs")
   restaurantGroupId      String?            @map("restaurant_group_id")
   status                 PlaceStatus        @default(OPEN)
@@ -255,6 +259,8 @@ model places {
   parent                 places?            @relation("PlaceHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
   children               places[]           @relation("PlaceHierarchy")
   viewer_bookmarks       viewer_bookmarks[]
+  energy_scores          energy_scores[]
+  place_tag_scores       place_tag_scores[]
 
   @@index([category])
   @@index([categoryId])
@@ -936,4 +942,78 @@ model winelist_signals {
   @@map("winelist_signals")
   @@index([analyzed_at])
   @@index([status])
+}
+
+// ============================================================================
+// ENERGY + WEIGHTED TAG ENGINE (v1)
+// CTO Spec: deterministic, versioned classification system
+// ============================================================================
+
+/// energy_versions — version metadata for energy engine
+model energy_versions {
+  version      String          @id
+  weights      Json?
+  lexicon_hash String?         @map("lexicon_hash")
+  created_at   DateTime        @default(now()) @map("created_at")
+
+  energy_scores energy_scores[]
+  tag_versions  tag_versions[]
+}
+
+/// tag_versions — version metadata for tag scoring engine
+model tag_versions {
+  version                  String @id
+  tag_weight_config        Json?  @map("tag_weight_config")
+  depends_on_energy_version String @map("depends_on_energy_version")
+  created_at               DateTime @default(now()) @map("created_at")
+
+  energy_version   energy_versions @relation(fields: [depends_on_energy_version], references: [version])
+  place_tag_scores place_tag_scores[]
+}
+
+/// energy_scores — baseline environmental stimulation per place
+model energy_scores {
+  id                    String   @id @default(uuid())
+  place_id              String   @map("place_id")
+  energy_score          Int
+  energy_confidence     Float
+  popularity_component  Int?     @map("popularity_component")
+  language_component    Int?     @map("language_component")
+  flags_component       Int?     @map("flags_component")
+  sensory_component     Int?     @map("sensory_component")
+  has_popularity        Boolean  @default(false) @map("has_popularity")
+  has_language          Boolean  @default(false) @map("has_language")
+  has_flags             Boolean  @default(false) @map("has_flags")
+  has_sensory           Boolean  @default(false) @map("has_sensory")
+  version               String
+  computed_at           DateTime @default(now()) @map("computed_at")
+
+  place  places         @relation(fields: [place_id], references: [id], onDelete: Cascade)
+  energy_version energy_versions @relation(fields: [version], references: [version])
+
+  @@unique([place_id, version])
+  @@index([place_id])
+  @@index([version])
+}
+
+/// place_tag_scores — weighted tag interpretations (0-1) per place
+model place_tag_scores {
+  id                       String   @id @default(uuid())
+  place_id                 String   @map("place_id")
+  cozy_score               Float
+  date_night_score         Float    @map("date_night_score")
+  late_night_score         Float    @map("late_night_score")
+  after_work_score         Float    @map("after_work_score")
+  scene_score              Float    @map("scene_score")
+  confidence               Float?
+  version                  String
+  depends_on_energy_version String   @map("depends_on_energy_version")
+  computed_at              DateTime @default(now()) @map("computed_at")
+
+  place   places       @relation(fields: [place_id], references: [id], onDelete: Cascade)
+  tag_version tag_versions @relation(fields: [version], references: [version])
+
+  @@unique([place_id, version])
+  @@index([place_id])
+  @@index([version])
 }

@@ -8,6 +8,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getGooglePhotoUrl, getPhotoRefFromStored } from '@/lib/google-places';
 import { getActiveOverlays } from '@/lib/overlays/getActiveOverlays';
+import { buildPlaceServiceFacts } from '@/lib/place-payload';
 
 const BUILD_ID =
   process.env.VERCEL_GIT_COMMIT_SHA ||
@@ -132,8 +133,8 @@ export async function GET(
     const publishedMapPlaces = place.map_places.filter((mp) => mp.lists && mp.lists.status === 'PUBLISHED');
     const mapIds = publishedMapPlaces.map(mp => mp.lists!.id);
 
-    // Run overlay fetch and place counts in parallel to reduce latency
-    const [activeOverlays, placeCounts] = await Promise.all([
+    // Run overlay fetch, place counts, and golden_record (for service facts) in parallel
+    const [activeOverlays, placeCounts, goldenRecord] = await Promise.all([
       getActiveOverlays({ placeId: place.id, now: new Date() }).catch((err) => {
         console.error(`[Newsletter Overlay] Failed to fetch overlays for place ${place.slug}:`, err);
         return [] as Awaited<ReturnType<typeof getActiveOverlays>>;
@@ -145,7 +146,35 @@ export async function GET(
             _count: { id: true },
           })
         : Promise.resolve([]),
+      place.googlePlaceId
+        ? db.golden_records.findFirst({
+            where: { google_place_id: place.googlePlaceId },
+            select: { google_places_attributes: true },
+          })
+        : Promise.resolve(null),
     ]);
+
+    // VALADATA: canonical service facts (takeout, delivery, dine_in, reservable, curbside_pickup)
+    // googleAttrs: golden_records.google_places_attributes > places.googlePlacesAttributes
+    // scrapeAttrs: no stored source yet (null)
+    const googleAttrs =
+      (goldenRecord?.google_places_attributes as Record<string, unknown> | null) ??
+      (place.googlePlacesAttributes as Record<string, unknown> | null) ??
+      null;
+    let facts: { service: Partial<Record<string, boolean | null>> };
+    let conflicts: { service: Partial<Record<string, { sources: string[]; values: Record<string, boolean> }>> };
+    try {
+      const out = buildPlaceServiceFacts({
+        googleAttrs: googleAttrs ?? undefined,
+        scrapeAttrs: null,
+        manualOverrides: null,
+      });
+      facts = out.facts;
+      conflicts = out.conflicts;
+    } catch {
+      facts = { service: {} };
+      conflicts = { service: {} };
+    }
 
     if (activeOverlays.length > 0) {
       console.log(`[Newsletter Overlay] Place ${place.slug} has ${activeOverlays.length} active overlay(s):`, {
@@ -279,6 +308,10 @@ export async function GET(
           pullQuoteAuthor: place.pullQuoteAuthor,
           pullQuoteUrl: place.pullQuoteUrl,
           pullQuoteType: place.pullQuoteType,
+          transitAccessible: place.transitAccessible,
+          thematicTags: place.thematicTags ?? [],
+          contextualConnection: place.contextualConnection,
+          curatorAttribution: place.curatorAttribution,
           // Decision Onset fields
           intentProfile: place.intentProfile,
           intentProfileOverride: place.intentProfileOverride,
@@ -300,6 +333,8 @@ export async function GET(
           : null,
         appearsOn,
         isOwner: false,
+        facts,
+        _conflicts: Object.keys(conflicts.service).length > 0 ? conflicts : undefined,
       },
     },
       {
