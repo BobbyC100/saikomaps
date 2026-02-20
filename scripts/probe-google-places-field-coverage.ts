@@ -10,7 +10,7 @@ import 'dotenv/config';
 import { db } from '@/lib/db';
 import { VALADATA_GOOGLE_PLACES_FIELDS_V1_STRING } from '@/lib/google-places';
 
-const PLACES_API_BASE = 'https://maps.googleapis.com/maps/api/place';
+const PLACES_API_NEW_BASE = 'https://places.googleapis.com/v1';
 const RATE_LIMIT_MS = 200;
 const REQUESTED = VALADATA_GOOGLE_PLACES_FIELDS_V1_STRING.split(',');
 
@@ -75,23 +75,37 @@ async function main() {
 
   for (let i = 0; i < placeIds.length; i++) {
     const placeId = placeIds[i];
-    const url = `${PLACES_API_BASE}/details/json?place_id=${encodeURIComponent(placeId)}&fields=${VALADATA_GOOGLE_PLACES_FIELDS_V1_STRING}&key=${apiKey}`;
+    const url = `${PLACES_API_NEW_BASE}/places/${placeId}`;
     try {
-      const res = await fetch(url);
+      const res = await fetch(url, {
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Goog-Api-Key': apiKey,
+          'X-Goog-FieldMask': VALADATA_GOOGLE_PLACES_FIELDS_V1_STRING,
+        },
+      });
       const data = await res.json();
-      if (data.status === 'NOT_FOUND') {
+      if (res.status === 404) {
         notFound++;
         await sleep(RATE_LIMIT_MS);
         continue;
       }
-      if (data.status !== 'OK') {
+      if (!res.ok) {
         errors++;
-        console.error(`  [${i + 1}/${placeIds.length}] ${placeId}: ${data.status}`);
+        const errMsg = data.error?.message || data.status || String(res.status);
+        console.error(`  [${i + 1}/${placeIds.length}] ${placeId}: ${errMsg}`);
+        if (errors === 1) {
+          console.log('');
+          console.log('--- Raw Google response (first error) ---');
+          console.log(JSON.stringify(data, null, 2));
+          console.log('---');
+          console.log('');
+        }
         await sleep(RATE_LIMIT_MS);
         continue;
       }
       ok++;
-      const result = data.result;
+      const result = data;
       for (const f of REQUESTED) {
         if (!(f in result)) {
           counts[f].missing++;
@@ -133,16 +147,22 @@ async function main() {
   if (ok > 0) {
     console.log('--- Sample raw result (first place) ---');
     const firstId = placeIds[0];
-    const url = `${PLACES_API_BASE}/details/json?place_id=${encodeURIComponent(firstId)}&fields=${VALADATA_GOOGLE_PLACES_FIELDS_V1_STRING}&key=${apiKey}`;
-    const res = await fetch(url);
+    const url = `${PLACES_API_NEW_BASE}/places/${firstId}`;
+    const res = await fetch(url, {
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Goog-Api-Key': apiKey,
+        'X-Goog-FieldMask': VALADATA_GOOGLE_PLACES_FIELDS_V1_STRING,
+      },
+    });
     const data = await res.json();
-    if (data.result) {
+    if (res.ok && data) {
       const safe: Record<string, unknown> = {};
-      for (const [k, v] of Object.entries(data.result)) {
-        if (k === 'place_id') safe[k] = (v as string).slice(0, 12) + '...';
+      for (const [k, v] of Object.entries(data)) {
+        if (k === 'id') safe[k] = (v as string).toString().slice(0, 12) + '...';
         else safe[k] = v;
       }
-      console.log(JSON.stringify({ status: data.status, result: safe }, null, 2));
+      console.log(JSON.stringify(safe, null, 2));
     }
   }
 

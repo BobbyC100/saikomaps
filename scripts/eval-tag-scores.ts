@@ -20,6 +20,7 @@
  */
 
 import { db } from '@/lib/db';
+import { getLaSlugs } from '@/lib/la-scope';
 import { Prisma } from '@prisma/client';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -154,6 +155,14 @@ async function main() {
   const goldArg = args.find((a) => a.startsWith('--gold='));
   const tagVersionArg = args.find((a) => a.startsWith('--tag-version='));
   const thresholdArg = args.find((a) => a.startsWith('--threshold='));
+  const laOnly = args.includes('--la-only');
+  const limitIdx = args.indexOf('--limit');
+  const limitArg = limitIdx >= 0 && args[limitIdx + 1] ? parseInt(args[limitIdx + 1], 10) : null;
+
+  if (laOnly && process.env.SAIKO_DB_FROM_WRAPPER !== '1') {
+    console.error('--la-only requires SAIKO_DB_FROM_WRAPPER=1. Use db-neon.sh or db-local.sh.');
+    process.exit(1);
+  }
 
   const DEFAULT_GOLD = 'data/gold_sets/vibe_tags_v1.csv';
   const goldPath = goldArg?.split('=')[1] ?? DEFAULT_GOLD;
@@ -197,7 +206,32 @@ async function main() {
     };
   }
 
-  const placeIdMap = await resolvePlaceIds(gold);
+  let goldForEval: GoldRow[];
+  let scopeCount: number;
+
+  if (laOnly) {
+    const laSlugs = await getLaSlugs();
+    const laSlugSet = new Set(laSlugs.map((s) => s.trim().toLowerCase()));
+    goldForEval = gold.filter((r) => {
+      const slug = (r.place_slug ?? r.place_id ?? '').trim();
+      return slug && laSlugSet.has(slug.toLowerCase());
+    });
+    scopeCount = laSlugs.length;
+    console.log(`[SCOPE] laOnly=${laOnly} ids=${scopeCount} limit=${limitArg ?? 'none'}`);
+    if (goldForEval.length < 1) {
+      console.error(
+        'No gold rows in LA scope (by place_slug). Run: npm run gold:la:neon -- --gold=<path> --out=<path>'
+      );
+      console.error(`LA slugs (v_places_la_bbox_golden): ${laSlugs.join(', ')}`);
+      process.exit(1);
+    }
+  } else {
+    goldForEval = gold;
+    scopeCount = 0;
+    console.log(`[SCOPE] laOnly=${laOnly} ids=${scopeCount} limit=${limitArg ?? 'none'}`);
+  }
+
+  const placeIdMap = await resolvePlaceIds(goldForEval);
 
   const [
     allScores,
@@ -254,7 +288,7 @@ async function main() {
 
   for (const tag of ['cozy', 'date_night', 'late_night', 'after_work', 'scene'] as TagName[]) {
     const col = TAG_COLUMNS[tag];
-    const rows = gold.filter((r) => r.tag === tag);
+    const rows = goldForEval.filter((r) => r.tag === tag);
     const strongRows = rows.filter((r) => r.bucket === 'strong_yes' || r.bucket === 'strong_no');
 
     let tp = 0,

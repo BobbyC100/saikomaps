@@ -1,7 +1,9 @@
 /**
  * Coverage Census — Exact counts for Energy + Tag Engine diagnostics
  *
- * Usage: npx tsx scripts/coverage-census.ts
+ * Usage: npx tsx scripts/coverage-census.ts [--la-only]
+ *
+ * --la-only: Use v_places_la_bbox (no golden_records dependency). Use when golden_records is empty.
  *
  * Reports: total places, linkage, pipeline completeness, golden record signal coverage
  */
@@ -10,7 +12,21 @@ import { db } from '@/lib/db';
 import * as fs from 'fs';
 import * as path from 'path';
 
+const laOnly = process.argv.includes('--la-only');
+
 async function main() {
+  if (laOnly) {
+    const [total, withGpid] = await Promise.all([
+      db.$queryRaw<[{ count: bigint }]>`SELECT COUNT(*)::bigint as count FROM public.v_places_la_bbox`,
+      db.$queryRaw<[{ count: bigint }]>`SELECT COUNT(*)::bigint as count FROM public.v_places_la_bbox WHERE google_place_id IS NOT NULL AND btrim(COALESCE(google_place_id,'')) != ''`,
+    ]);
+    console.log('--- Coverage Census (LA-only, v_places_la_bbox) ---');
+    console.log('total_places:', Number(total[0]?.count ?? 0));
+    console.log('places_with_googlePlaceId:', Number(withGpid[0]?.count ?? 0));
+    console.log('golden_records: N/A (LA-only mode, no golden_records join)');
+    return;
+  }
+
   const [
     totalPlaces,
     placesWithGooglePlaceId,

@@ -10,7 +10,7 @@ import 'dotenv/config';
 import { db } from '@/lib/db';
 import { VALADATA_GOOGLE_PLACES_FIELDS_V1_STRING } from '@/lib/google-places';
 
-const PLACES_API_BASE = 'https://maps.googleapis.com/maps/api/place';
+const PLACES_API_NEW_BASE = 'https://places.googleapis.com/v1';
 
 async function main() {
   const placeId = process.argv[2];
@@ -40,34 +40,40 @@ async function main() {
     process.exit(1);
   }
 
-  const url = `${PLACES_API_BASE}/details/json?place_id=${encodeURIComponent(id)}&fields=${VALADATA_GOOGLE_PLACES_FIELDS_V1_STRING}&key=${apiKey}`;
+  const url = `${PLACES_API_NEW_BASE}/places/${id}`;
   console.log('--- Request ---');
-  console.log('Endpoint: legacy Place Details (maps.googleapis.com/maps/api/place/details/json)');
+  console.log('Endpoint: Places API (New)');
   console.log('place_id:', id);
-  console.log('fields=', VALADATA_GOOGLE_PLACES_FIELDS_V1_STRING);
+  console.log('X-Goog-FieldMask:', VALADATA_GOOGLE_PLACES_FIELDS_V1_STRING);
   console.log('');
 
-  const response = await fetch(url);
+  const response = await fetch(url, {
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Goog-Api-Key': apiKey,
+      'X-Goog-FieldMask': VALADATA_GOOGLE_PLACES_FIELDS_V1_STRING,
+    },
+  });
   const data = await response.json();
 
   console.log('--- Raw JSON Response ---');
   console.log(JSON.stringify(data, null, 2));
   console.log('');
 
-  if (data.result) {
-    console.log('--- Keys in data.result ---');
-    console.log(Object.keys(data.result).sort().join(', '));
+  if (response.ok && data && typeof data === 'object') {
+    console.log('--- Keys in response ---');
+    console.log(Object.keys(data).sort().join(', '));
     console.log('');
 
     console.log('--- Per-field check (requested vs present) ---');
     const requested = VALADATA_GOOGLE_PLACES_FIELDS_V1_STRING.split(',');
     for (const k of requested) {
-      const v = data.result[k];
-      const present = k in data.result;
+      const v = data[k];
+      const present = k in data;
       const val = v === undefined ? 'undefined' : v === null ? 'null' : typeof v;
       console.log(`  ${k}: ${present ? 'present' : 'MISSING'} (${val})`);
     }
-    const extra = Object.keys(data.result).filter((k) => !requested.includes(k));
+    const extra = Object.keys(data).filter((k) => !requested.includes(k));
     if (extra.length > 0) {
       console.log('');
       console.log('--- Unexpected keys (not in our mask) ---');

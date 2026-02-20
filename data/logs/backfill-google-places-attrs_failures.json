@@ -1,0 +1,177 @@
+[
+  {
+    "place_id": "c9471535-046f-4d70-adfb-3044418bd04c",
+    "googlePlaceId": "ChIJDUyRuV2xwoARPXiy3q2yRLs",
+    "error_code": "Google Places API is disabled. Enable via GOOGLE_PLACES_ENABLED=true",
+    "retry_count": 0,
+    "timestamp": "2026-02-19T23:54:09.781Z"
+  },
+  {
+    "place_id": "753e7391-9bf7-4fa7-a696-a2b7e36ddf27",
+    "googlePlaceId": "ChIJh_9_FP3FwoARxXM2voNmsxw",
+    "error_code": "Google Places API is disabled. Enable via GOOGLE_PLACES_ENABLED=true",
+    "retry_count": 0,
+    "timestamp": "2026-02-19T23:54:09.983Z"
+  },
+  {
+    "place_id": "a7ff49d2-9086-4228-abb7-fc7c5cc67e1b",
+    "googlePlaceId": "ChIJ16VZuxzEwoAR1kpz_PQx_vE",
+    "error_code": "Google Places API is disabled. Enable via GOOGLE_PLACES_ENABLED=true",
+    "retry_count": 0,
+    "timestamp": "2026-02-19T23:54:10.186Z"
+  },
+  {
+    "place_id": "b5a40297-c1f6-4416-87f2-bae8158d5199",
+    "googlePlaceId": "ChIJ3Uy9Zn3GwoAR1S0GNCqzN3Y",
+    "error_code": "Google Places API is disabled. Enable via GOOGLE_PLACES_ENABLED=true",
+    "retry_count": 0,
+    "timestamp": "2026-02-19T23:54:10.388Z"
+  },
+  {
+    "place_id": "8123ac24-99a2-4787-a136-ccc67175c90c",
+    "googlePlaceId": "ChIJQ8DLvEPFwoARd5wfbRi1UEg",
+    "error_code": "Google Places API is disabled. Enable via GOOGLE_PLACES_ENABLED=true",
+    "retry_count": 0,
+    "timestamp": "2026-02-19T23:54:10.589Z"
+  },
+  {
+    "place_id": "482b6edd-951f-4ee0-9b1e-1ea427f848e0",
+    "googlePlaceId": "ChIJtXNObTrGwoARYcpIBbkUuvw",
+    "error_code": "Google Places API is disabled. Enable via GOOGLE_PLACES_ENABLED=true",
+    "retry_count": 0,
+    "timestamp": "2026-02-19T23:54:10.790Z"
+  },
+  {
+    "place_id": "4b259392-27b2-4489-9088-3358368c6985",
+    "googlePlaceId": "ChIJHzYR2G7DwoARSjGzmwr9XUA",
+    "error_code": "Google Places API is disabled. Enable via GOOGLE_PLACES_ENABLED=true",
+    "retry_count": 0,
+    "timestamp": "2026-02-19T23:54:10.992Z"
+  },
+  {
+    "place_id": "71cd6989-0ca3-40a0-b413-daa0818d8ce8",
+    "googlePlaceId": "ChIJi-MAKFjHwoARol5fmX26Xdo",
+    "error_code": "Google Places API is disabled. Enable via GOOGLE_PLACES_ENABLED=true",
+    "retry_count": 0,
+    "timestamp": "2026-02-19T23:54:11.194Z"
+  },
+  {
+    "place_id": "b9fec818-acb5-4198-8877-469ac6156a80",
+    "googlePlaceId": "ChIJ11w60nK4woARd0i6OLGVLWk",
+    "error_code": "Google Places API is disabled. Enable via GOOGLE_PLACES_ENABLED=true",
+    "retry_count": 0,
+    "timestamp": "2026-02-19T23:54:11.397Z"
+  },
+  {
+    "place_id": "b9cf1182-9665-4629-b2ed-80c36fd2cb4a",
+    "googlePlaceId": "ChIJSXug65vHwoARL7woRsKWBV0",
+    "error_code": "Google Places API is disabled. Enable via GOOGLE_PLACES_ENABLED=true",
+    "retry_count": 0,
+    "timestamp": "2026-02-19T23:54:11.600Z"
+  },
+  {
+    "place_id": "c01b573f-16d5-467b-97c9-f5ef6d440ff3",
+    "googlePlaceId": "ChIJyYZtMjO5woARkFJwAY2_cgk",
+    "error_code": "Google Places API is disabled. Enable via GOOGLE_PLACES_ENABLED=true",
+    "retry_count": 0,
+    "timestamp": "2026-02-19T23:54:11.805Z"
+  },
+  {
+    "place_id": "f2002e23-7340-44c6-b7ab-ccefcb779afb",
+    "googlePlaceId": "ChIJ11rwn4elwoARg8nSt4oPvEc",
+    "error_code": "Google Places API is disabled. Enable via GOOGLE_PLACES_ENABLED=true",
+    "retry_count": 0,
+    "timestamp": "2026-02-19T23:54:12.007Z"
+  },
+  {
+    "place_id": "d6256510-bd7c-4045-a496-8fcab196e766",
+    "googlePlaceId": "ChIJ7_ZmZnq_woARM5bhOgi8kXw",
+    "error_code": "Google Places API is disabled. Enable via GOOGLE_PLACES_ENABLED=true",
+    "retry_count": 0,
+    "timestamp": "2026-02-19T23:54:12.210Z"
+  },
+  {
+    "place_id": "4bb34b1f-4151-413c-acc0-2f685a4ce6e6",
+    "googlePlaceId": "ChIJzbINrymxwoARS2brgyK99NQ",
+    "error_code": "Google Places API is disabled. Enable via GOOGLE_PLACES_ENABLED=true",
+    "retry_count": 0,
+    "timestamp": "2026-02-19T23:54:12.412Z"
+  },
+  {
+    "place_id": "945b3e19-15e8-495f-b166-57baccabfabe",
+    "googlePlaceId": "ChIJ6ZgTV7fGwoARNdB3DYX-CYA",
+    "error_code": "Google Places API is disabled. Enable via GOOGLE_PLACES_ENABLED=true",
+    "retry_count": 0,
+    "timestamp": "2026-02-19T23:54:12.613Z"
+  },
+  {
+    "place_id": "882a1f8f-cb53-41c8-bde2-498274789c0e",
+    "googlePlaceId": "ChIJ56US5_HHwoARQNCokuNlpWw",
+    "error_code": "Google Places API is disabled. Enable via GOOGLE_PLACES_ENABLED=true",
+    "retry_count": 0,
+    "timestamp": "2026-02-19T23:54:12.817Z"
+  },
+  {
+    "place_id": "ff2e5acb-332c-477b-a70b-2661f8aa31f7",
+    "googlePlaceId": "ChIJY_oPEgC7woARPQ8HOdumSnM",
+    "error_code": "Google Places API is disabled. Enable via GOOGLE_PLACES_ENABLED=true",
+    "retry_count": 0,
+    "timestamp": "2026-02-19T23:54:13.020Z"
+  },
+  {
+    "place_id": "eaad694e-cb10-4ffd-9a11-7030faa80c31",
+    "googlePlaceId": "ChIJ3V6g2-zbwoAR1t9P_QrSF_E",
+    "error_code": "Google Places API is disabled. Enable via GOOGLE_PLACES_ENABLED=true",
+    "retry_count": 0,
+    "timestamp": "2026-02-19T23:54:13.223Z"
+  },
+  {
+    "place_id": "e9a6481d-7ed5-494a-9a33-f8a7b33e5e75",
+    "googlePlaceId": "ChIJN3DILf67woAR44H7rc70uhY",
+    "error_code": "Google Places API is disabled. Enable via GOOGLE_PLACES_ENABLED=true",
+    "retry_count": 0,
+    "timestamp": "2026-02-19T23:54:13.426Z"
+  },
+  {
+    "place_id": "848eb080-c705-40b3-8e92-fabd939b054a",
+    "googlePlaceId": "ChIJBym2lKK6woARa6L3E6wYRaY",
+    "error_code": "Google Places API is disabled. Enable via GOOGLE_PLACES_ENABLED=true",
+    "retry_count": 0,
+    "timestamp": "2026-02-19T23:54:13.629Z"
+  },
+  {
+    "place_id": "8128a4ac-92e6-4d2b-8974-21f716926da8",
+    "googlePlaceId": "ChIJne7Az-rHwoARQhCf1NoVpsY",
+    "error_code": "Google Places API is disabled. Enable via GOOGLE_PLACES_ENABLED=true",
+    "retry_count": 0,
+    "timestamp": "2026-02-19T23:54:13.832Z"
+  },
+  {
+    "place_id": "e5cc7895-23bb-4577-99f7-e3437377fcba",
+    "googlePlaceId": "ChIJIXKeGv_HwoARtFSSk2sS2AI",
+    "error_code": "Google Places API is disabled. Enable via GOOGLE_PLACES_ENABLED=true",
+    "retry_count": 0,
+    "timestamp": "2026-02-19T23:54:14.035Z"
+  },
+  {
+    "place_id": "ad3b19d6-14c3-4116-bb6c-fe64a65d6a5b",
+    "googlePlaceId": "ChIJVyNuxSwqw4ARkD4L5pjq2D0",
+    "error_code": "Google Places API is disabled. Enable via GOOGLE_PLACES_ENABLED=true",
+    "retry_count": 0,
+    "timestamp": "2026-02-19T23:54:14.238Z"
+  },
+  {
+    "place_id": "bca3d757-e4ca-4aaf-9a96-7c47fed81b1a",
+    "googlePlaceId": "ChIJ7djZNAC5woARVhldJ8DR6hE",
+    "error_code": "Google Places API is disabled. Enable via GOOGLE_PLACES_ENABLED=true",
+    "retry_count": 0,
+    "timestamp": "2026-02-19T23:54:14.441Z"
+  },
+  {
+    "place_id": "df6624b8-3f1d-46bc-aa7c-5a2133c8eae0",
+    "googlePlaceId": "ChIJVd04SYW5woAROE52K0dXeYE",
+    "error_code": "Google Places API is disabled. Enable via GOOGLE_PLACES_ENABLED=true",
+    "retry_count": 0,
+    "timestamp": "2026-02-19T23:54:14.644Z"
+  }
+]

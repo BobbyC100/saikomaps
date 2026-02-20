@@ -40,10 +40,14 @@ export function EditorialCell({
   const excerptFromSource = first ? getExcerpt(first) : null;
   const editorialNote = excerptFromSource ?? curatorNote?.trim() ?? null;
   const sourceAttribution = first?.publication ?? first?.name ?? null;
-  const tagList = (thematicTags ?? []).filter(Boolean);
-  const hasTags = tagList.length > 0;
-  const hasContext = !!contextualConnection?.trim();
-  const hasCuratorByline = !!curatorAttribution?.trim();
+  const filteredTags = (thematicTags ?? []).filter(Boolean);
+  const hasTags = filteredTags.length > 0;
+  const contextTrimmed = contextualConnection?.trim() ?? '';
+  const hasContext = contextTrimmed.length >= 20;
+  const curatorTrimmed = curatorAttribution?.trim() ?? '';
+  const hasCuratorByline =
+    curatorTrimmed.length > 0 &&
+    !/^(unknown|null)$/i.test(curatorTrimmed);
 
   const hasContent =
     editorialNote || hasTags || hasContext || hasCuratorByline;
@@ -70,9 +74,9 @@ export function EditorialCell({
       )}
 
       {/* Thematic tags */}
-      {hasTags && (
+      {filteredTags.length > 0 && (
         <div className="flex flex-wrap gap-2">
-          {tagList.map((tag, idx) => (
+          {filteredTags.map((tag, idx) => (
             <span
               key={idx}
               className="text-xs px-2 py-0.5 rounded-full bg-[#C3B091]/20 text-[#36454F]/90"
@@ -86,13 +90,13 @@ export function EditorialCell({
       {/* Contextual connection */}
       {hasContext && (
         <p className="text-sm italic text-[#36454F]/70">
-          {contextualConnection}
+          {contextTrimmed}
         </p>
       )}
 
       {/* Curator attribution byline */}
       {hasCuratorByline && (
-        <p className="text-xs text-[#36454F]/60">— {curatorAttribution}</p>
+        <p className="text-xs text-[#36454F]/60">— {curatorTrimmed}</p>
       )}
     </div>
   );

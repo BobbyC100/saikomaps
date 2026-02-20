@@ -4,11 +4,13 @@
  * Usage:
  *   npx tsx scripts/compute-tag-scores.ts --place <place_id> --depends energy_v1
  *   npx tsx scripts/compute-tag-scores.ts --all --version tags_v1 --depends energy_v1
+ *   npx tsx scripts/compute-tag-scores.ts --la-only --depends energy_v1 [--limit N]
  *
- * Requirements: Verifies energy_version exists, writes to place_tag_scores, deterministic.
+ * --la-only: Use v_places_la_bbox_golden (requires SAIKO_DB_FROM_WRAPPER=1).
  */
 
 import { db } from '@/lib/db';
+import { getPlaceIds as getPlaceIdsFromLA } from '@/lib/la-scope';
 import { computeTagScores } from '@/lib/energy-tag-engine';
 import type { TagScoreInputs } from '@/lib/energy-tag-engine';
 import { parseAttrs, isBarForward, buildCoverageAboutText } from '@/lib/energy-tag-engine/shared';
@@ -16,8 +18,52 @@ import { randomUUID } from 'crypto';
 
 const DEFAULT_TAG_VERSION = 'tags_v1';
 
-async function getPlaceIds(placeIdArg: string | null): Promise<{ placeIds: string[]; placeIdToGolden: Map<string, { canonical_id: string; slug: string; description: string | null; about_copy: string | null; google_places_attributes: unknown; category: string | null }> }> {
-  const placeIdToGolden = new Map<string, { canonical_id: string; slug: string; description: string | null; about_copy: string | null; google_places_attributes: unknown; category: string | null }>();
+type GoldenRow = { canonical_id: string; slug: string; description: string | null; about_copy: string | null; google_places_attributes: unknown; category: string | null };
+
+async function fetchPlaceIdToGolden(placeIds: string[]): Promise<Map<string, GoldenRow>> {
+  const placeIdToGolden = new Map<string, GoldenRow>();
+  if (placeIds.length === 0) return placeIdToGolden;
+  const places = await db.places.findMany({
+    where: { id: { in: placeIds } },
+    select: { id: true, googlePlaceId: true },
+  });
+  const googleIds = [...new Set(places.map((p) => p.googlePlaceId).filter((id): id is string => id != null))];
+  const golden = await db.golden_records.findMany({
+    where: { google_place_id: { in: googleIds } },
+    select: { canonical_id: true, slug: true, description: true, about_copy: true, google_places_attributes: true, category: true, google_place_id: true },
+  });
+  const googleIdToPlaceId = new Map<string, string>();
+  for (const p of places) {
+    if (p.googlePlaceId) googleIdToPlaceId.set(p.googlePlaceId, p.id);
+  }
+  for (const g of golden) {
+    const placeId = g.google_place_id ? googleIdToPlaceId.get(g.google_place_id) : undefined;
+    if (placeId) {
+      placeIdToGolden.set(placeId, {
+        canonical_id: g.canonical_id,
+        slug: g.slug,
+        description: g.description,
+        about_copy: g.about_copy,
+        google_places_attributes: g.google_places_attributes,
+        category: g.category,
+      });
+    }
+  }
+  return placeIdToGolden;
+}
+
+async function getPlaceIds(placeIdArg: string | null, laOnly: boolean, limitArg: number | null): Promise<{ placeIds: string[]; placeIdToGolden: Map<string, GoldenRow> }> {
+  const placeIdToGolden = new Map<string, GoldenRow>();
+
+  if (laOnly) {
+    if (process.env.SAIKO_DB_FROM_WRAPPER !== '1') {
+      throw new Error('--la-only requires SAIKO_DB_FROM_WRAPPER=1. Use db-neon.sh or db-local.sh.');
+    }
+    const ids = await getPlaceIdsFromLA({ laOnly: true, limit: limitArg });
+    if (!ids || ids.length === 0) return { placeIds: [], placeIdToGolden };
+    const golden = await fetchPlaceIdToGolden(ids);
+    return { placeIds: ids, placeIdToGolden: golden };
+  }
 
   if (placeIdArg) {
     const place = await db.places.findUnique({
@@ -79,18 +125,22 @@ async function main() {
   const args = process.argv.slice(2);
   const placeArg = args.find((a) => a.startsWith('--place='))?.split('=')[1] ?? (args[0] === '--place' ? args[1] : null);
   const all = args.includes('--all');
+  const laOnly = args.includes('--la-only');
+  const explainInputs = args.includes('--explain-inputs');
+  const limitIdx = args.indexOf('--limit');
+  const limitArg = limitIdx >= 0 && args[limitIdx + 1] ? parseInt(args[limitIdx + 1], 10) : null;
   const versionArg = args.find((a) => a.startsWith('--version='))?.split('=')[1];
   const dependsArg = args.find((a) => a.startsWith('--depends='))?.split('=')[1];
   const tagVersion = versionArg ?? DEFAULT_TAG_VERSION;
   const energyVersion = dependsArg;
 
   if (!energyVersion) {
-    console.error('Usage: npx tsx scripts/compute-tag-scores.ts (--place <id> | --all) --depends <energy_version> [--version <tag_version>]');
+    console.error('Usage: npx tsx scripts/compute-tag-scores.ts (--place <id> | --all | --la-only) --depends <energy_version> [--version <tag_version>] [--limit N]');
     console.error('Required: --depends <energy_version>');
     process.exit(1);
   }
-  if (!placeArg && !all) {
-    console.error('Usage: npx tsx scripts/compute-tag-scores.ts --place <id> | --all --depends <energy_version> [--version <tag_version>]');
+  if (!placeArg && !all && !laOnly) {
+    console.error('Usage: npx tsx scripts/compute-tag-scores.ts --place <id> | --all | --la-only --depends <energy_version> [--version <tag_version>]');
     process.exit(1);
   }
 
@@ -105,12 +155,18 @@ async function main() {
     process.exit(1);
   }
 
-  const { placeIds, placeIdToGolden } = await getPlaceIds(placeArg);
-  console.log(`Compute tag scores (version=${tagVersion}, depends=${energyVersion}): ${placeIds.length} place(s)`);
+  const { placeIds, placeIdToGolden } = await getPlaceIds(placeArg, laOnly, limitArg);
+  console.log(`[SCOPE] laOnly=${laOnly} ids=${placeIds.length} limit=${limitArg ?? 'none'}`);
+  if (explainInputs) {
+    console.log('--explain-inputs: per-place input coverage breakdown (no writes)\n');
+  } else {
+    console.log(`Compute tag scores (version=${tagVersion}, depends=${energyVersion}): ${placeIds.length} place(s)`);
+  }
 
   const now = new Date();
   let ok = 0;
   let fail = 0;
+  const explainRows: { slug: string; hasInputCoverage: boolean; highConfidenceEligible: boolean }[] = [];
 
   for (const placeId of placeIds) {
     try {
@@ -127,17 +183,39 @@ async function main() {
       const energy_confidence = existing?.energy_confidence ?? 0.5;
 
       const attrs = parseAttrs(gr.google_places_attributes);
+      const coverageAboutText = buildCoverageAboutText(gr);
       const inputs: TagScoreInputs = {
         energy_score,
         energy_confidence,
-        coverageAboutText: buildCoverageAboutText(gr),
+        coverageAboutText,
         liveMusic: attrs.liveMusic,
         goodForGroups: attrs.goodForGroups,
         barForward: isBarForward(gr),
       };
       const result = computeTagScores(inputs);
 
-      await db.place_tag_scores.upsert({
+      const descTrim = (gr.description ?? '').trim();
+      const aboutTrim = (gr.about_copy ?? '').trim();
+      const hasInputCoverage = descTrim !== '' || aboutTrim !== '';
+      const highConfidenceEligible = result.confidence >= 0.6;
+
+      if (explainInputs) {
+        explainRows.push({ slug: gr.slug, hasInputCoverage, highConfidenceEligible });
+        const gpa = gr.google_places_attributes;
+        const gpaPresent = !!gpa && typeof gpa === 'object';
+        console.log(`[${gr.slug}]`);
+        console.log(`  description: present=${descTrim.length > 0} length=${descTrim.length}`);
+        console.log(`  about_copy: present=${aboutTrim.length > 0} length=${aboutTrim.length}`);
+        console.log(`  coverageAboutText: length=${coverageAboutText.length}`);
+        console.log(`  google_places_attributes: present=${gpaPresent}`);
+        console.log(`  energy_score=${energy_score} energy_confidence=${energy_confidence}`);
+        console.log(`  liveMusic=${attrs.liveMusic} goodForGroups=${attrs.goodForGroups} barForward=${isBarForward(gr)}`);
+        console.log(`  hasInputCoverage=${hasInputCoverage} highConfidenceEligible=${highConfidenceEligible}`);
+        console.log('');
+      }
+
+      if (!explainInputs) {
+        await db.place_tag_scores.upsert({
         where: { place_id_version: { place_id: placeId, version: tagVersion } },
         create: {
           id: randomUUID(),
@@ -163,6 +241,7 @@ async function main() {
           computed_at: now,
         },
       });
+      }
       ok++;
     } catch (err) {
       console.error(`Failed place ${placeId}:`, err);
@@ -170,7 +249,18 @@ async function main() {
     }
   }
 
-  console.log(`Done: ${ok} ok, ${fail} failed`);
+  if (explainInputs && explainRows.length > 0) {
+    const total = explainRows.length;
+    const inputsPresentCount = explainRows.filter((r) => r.hasInputCoverage).length;
+    const input_coverage_pct = total > 0 ? (inputsPresentCount / total) * 100 : 0;
+    console.log('--- Summary ---');
+    console.log(`inputs_present_count=${inputsPresentCount} total=${total}`);
+    console.log(`input_coverage_pct=${input_coverage_pct.toFixed(1)}`);
+  }
+
+  if (!explainInputs) {
+    console.log(`Done: ${ok} ok, ${fail} failed`);
+  }
 }
 
 main().catch((e) => {

@@ -16,6 +16,7 @@
 const GOOGLE_PLACES_API_KEY = process.env.GOOGLE_PLACES_API_KEY;
 const GOOGLE_PLACES_ENABLED = process.env.GOOGLE_PLACES_ENABLED === 'true';
 const PLACES_API_BASE = 'https://maps.googleapis.com/maps/api/place';
+const PLACES_API_NEW_BASE = 'https://places.googleapis.com/v1';
 
 function checkEnabled() {
   if (!GOOGLE_PLACES_ENABLED) {
@@ -104,6 +105,22 @@ export interface SearchOptions {
     longitude: number;
   };
   maxResults?: number;
+}
+
+/**
+ * Find best candidate place_id by text search with location bias.
+ * Returns first result's place_id or null.
+ */
+export async function findPlaceId(
+  query: string,
+  lat: number,
+  lng: number
+): Promise<string | null> {
+  const results = await searchPlace(query, {
+    locationBias: { latitude: lat, longitude: lng },
+    maxResults: 1,
+  });
+  return results[0]?.placeId ?? null;
 }
 
 /**
@@ -361,27 +378,28 @@ export function buildClientPhotoUrl(
 
 /**
  * VALADATA: Google Places ingestion contract (v1).
- * Request allowlist — only these fields are requested from Place Details API.
+ * Places API (New) field mask — only these fields are requested.
  * Forbidden: photos, reviews, editorial summaries, rich media.
+ * Uses new API camelCase names (id, priceLevel, userRatingCount, dineIn, etc.).
  */
 export const VALADATA_GOOGLE_PLACES_FIELDS_V1 = [
-  'place_id',
+  'id',
   'types',
-  'price_level',
+  'priceLevel',
   'rating',
-  'user_ratings_total',
-  'serves_beer',
-  'serves_wine',
-  'serves_breakfast',
-  'serves_brunch',
-  'serves_lunch',
-  'serves_dinner',
-  'serves_vegetarian_food',
+  'userRatingCount',
+  'servesBeer',
+  'servesWine',
+  'servesBreakfast',
+  'servesBrunch',
+  'servesLunch',
+  'servesDinner',
+  'servesVegetarianFood',
   'delivery',
-  'dine_in',
+  'dineIn',
   'takeout',
   'reservable',
-  'curbside_pickup',
+  'curbsidePickup',
 ] as const;
 
 export const VALADATA_GOOGLE_PLACES_FIELDS_V1_STRING =
@@ -420,7 +438,7 @@ export interface GooglePlacesAttributes {
 }
 
 /**
- * Fetch Place Details with Atmosphere fields for golden_records.google_places_attributes.
+ * Fetch Place Details (Places API New) with Atmosphere fields for golden_records.google_places_attributes.
  * Returns structured JSON suitable for energy/tag scoring.
  * popular_times is never available from the public API.
  */
@@ -430,50 +448,56 @@ export async function getPlaceAttributes(placeId: string): Promise<GooglePlacesA
     throw new Error('Google Places API key is not configured');
   }
 
-  const params = new URLSearchParams({
-    place_id: placeId,
-    key: GOOGLE_PLACES_API_KEY,
-    fields: VALADATA_GOOGLE_PLACES_FIELDS_V1_STRING,
+  const url = `${PLACES_API_NEW_BASE}/places/${placeId}`;
+  const response = await fetch(url, {
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Goog-Api-Key': GOOGLE_PLACES_API_KEY,
+      'X-Goog-FieldMask': VALADATA_GOOGLE_PLACES_FIELDS_V1_STRING,
+    },
   });
 
-  const response = await fetch(
-    `${PLACES_API_BASE}/details/json?${params.toString()}`
-  );
-
   if (!response.ok) {
-    throw new Error(`Google Places API error: ${response.statusText}`);
+    if (response.status === 404) return null;
+    const body = await response.json().catch(() => ({}));
+    const msg = body.error?.message || response.statusText;
+    throw new Error(`Google Places API error: ${msg}`);
   }
 
-  const data = await response.json();
-
-  if (data.status === 'NOT_FOUND') {
-    return null;
-  }
-
-  if (data.status !== 'OK') {
-    throw new Error(`Google Places API error: ${data.status}`);
-  }
-
-  const place = data.result;
+  const place = (await response.json()) as Record<string, unknown>;
   const now = new Date().toISOString();
 
+  const priceLevelMap: Record<string, number> = {
+    PRICE_LEVEL_FREE: 0,
+    PRICE_LEVEL_INEXPENSIVE: 1,
+    PRICE_LEVEL_MODERATE: 2,
+    PRICE_LEVEL_EXPENSIVE: 3,
+  };
+  const rawPrice = place.priceLevel;
+  const price_level =
+    typeof rawPrice === 'number'
+      ? rawPrice
+      : typeof rawPrice === 'string' && rawPrice in priceLevelMap
+        ? priceLevelMap[rawPrice]
+        : undefined;
+
   const attrs: GooglePlacesAttributes = {
-    types: place.types ?? [],
-    price_level: place.price_level,
-    rating: place.rating,
-    user_ratings_total: place.user_ratings_total,
-    serves_beer: place.serves_beer ?? undefined,
-    serves_wine: place.serves_wine ?? undefined,
-    serves_breakfast: place.serves_breakfast ?? undefined,
-    serves_brunch: place.serves_brunch ?? undefined,
-    serves_lunch: place.serves_lunch ?? undefined,
-    serves_dinner: place.serves_dinner ?? undefined,
-    serves_vegetarian_food: place.serves_vegetarian_food ?? undefined,
-    delivery: place.delivery ?? undefined,
-    dine_in: place.dine_in ?? undefined,
-    takeout: place.takeout ?? undefined,
-    reservable: place.reservable ?? undefined,
-    curbside_pickup: place.curbside_pickup ?? undefined,
+    types: Array.isArray(place.types) ? place.types : [],
+    price_level,
+    rating: typeof place.rating === 'number' ? place.rating : undefined,
+    user_ratings_total: typeof place.userRatingCount === 'number' ? place.userRatingCount : undefined,
+    serves_beer: place.servesBeer === true || place.servesBeer === false ? place.servesBeer : undefined,
+    serves_wine: place.servesWine === true || place.servesWine === false ? place.servesWine : undefined,
+    serves_breakfast: place.servesBreakfast === true || place.servesBreakfast === false ? place.servesBreakfast : undefined,
+    serves_brunch: place.servesBrunch === true || place.servesBrunch === false ? place.servesBrunch : undefined,
+    serves_lunch: place.servesLunch === true || place.servesLunch === false ? place.servesLunch : undefined,
+    serves_dinner: place.servesDinner === true || place.servesDinner === false ? place.servesDinner : undefined,
+    serves_vegetarian_food: place.servesVegetarianFood === true || place.servesVegetarianFood === false ? place.servesVegetarianFood : undefined,
+    delivery: place.delivery === true || place.delivery === false ? place.delivery : undefined,
+    dine_in: place.dineIn === true || place.dineIn === false ? place.dineIn : undefined,
+    takeout: place.takeout === true || place.takeout === false ? place.takeout : undefined,
+    reservable: place.reservable === true || place.reservable === false ? place.reservable : undefined,
+    curbside_pickup: place.curbsidePickup === true || place.curbsidePickup === false ? place.curbsidePickup : undefined,
     popular_times: null,
     _meta: {
       fetched_at: now,

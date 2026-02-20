@@ -24,4 +24,9 @@ test-*.csv
 tsx
 .vercel
 .env.vercel*
+.env.db.local
+.env.db.neon
 tsconfig.tsbuildinfo
+
+# local eval artifacts
+/tmp/
