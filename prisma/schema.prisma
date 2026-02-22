@@ -539,6 +539,12 @@ model golden_records {
   website          String?
   instagram_handle String?
 
+  // Website provenance (website-only; no enrichment logic yet)
+  website_source       String?  // Source enum: defined in next step
+  website_source_class String?  // first_party | third_party | ai_inferred
+  website_confidence   Decimal? @db.Decimal(3, 2) // 0.00–1.00
+  website_updated_at   DateTime?
+
   // Hours
   hours_json      Json?
   hours_irregular Boolean @default(false)
@@ -638,6 +644,9 @@ model golden_records {
   provenance        provenance[]
   menu_signals      menu_signals?
   winelist_signals  winelist_signals?
+  entityActorRelationships EntityActorRelationship[]
+  fieldsMemberships FieldsMembership[]
+  traceSignalsCache TraceSignalsCache?
 
   @@index([neighborhood])
   @@index([category])
@@ -1016,4 +1025,85 @@ model place_tag_scores {
   @@unique([place_id, version])
   @@index([place_id])
   @@index([version])
+}
+
+// ============================================================================
+// SAIKO FIELDS + SAIKO TRACE v0.2
+// Fields = curated index layer; Trace = signal computation layer
+// ============================================================================
+
+enum ActorKind {
+  organization
+  brand
+  person
+}
+
+enum ActorRole {
+  operator
+  owner
+  parent
+  founder
+}
+
+/// Actors - organizations, brands, people (Saiko Trace)
+model Actor {
+  id        String   @id @default(uuid())
+  name      String
+  kind      ActorKind @default(organization)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  entityRelationships EntityActorRelationship[]
+
+  @@index([name])
+}
+
+/// Entity-Actor relationships (Saiko Trace)
+model EntityActorRelationship {
+  id         String    @id @default(uuid())
+  entityId   String    @map("entity_id")
+  actorId    String    @map("actor_id")
+  role       ActorRole
+  confidence Float?
+  source     String?
+  startDate  DateTime? @map("start_date")
+  endDate    DateTime? @map("end_date")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+
+  entity golden_records @relation(fields: [entityId], references: [canonical_id], onDelete: Cascade)
+  actor  Actor          @relation(fields: [actorId], references: [id], onDelete: Cascade)
+
+  @@index([entityId])
+  @@index([actorId])
+}
+
+/// Fields membership - entities in the curated index (Saiko Fields)
+model FieldsMembership {
+  id         String    @id @default(uuid())
+  entityId   String    @map("entity_id")
+  includedAt DateTime  @map("included_at")
+  removedAt  DateTime? @map("removed_at")
+  curatorId  String?   @map("curator_id")
+  reason     String?
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+
+  entity golden_records @relation(fields: [entityId], references: [canonical_id], onDelete: Cascade)
+
+  @@index([entityId])
+}
+
+/// Trace signals cache - one row per entity, latest only (Saiko Trace)
+model TraceSignalsCache {
+  id         String   @id @default(uuid())
+  entityId   String   @unique @map("entity_id")
+  computedAt DateTime @map("computed_at")
+  signals    Json
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  entity golden_records @relation(fields: [entityId], references: [canonical_id], onDelete: Cascade)
+
+  @@index([entityId])
 }
