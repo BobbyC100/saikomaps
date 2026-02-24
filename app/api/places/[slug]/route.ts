@@ -9,6 +9,7 @@ import { db } from '@/lib/db';
 import { getGooglePhotoUrl, getPhotoRefFromStored } from '@/lib/google-places';
 import { getActiveOverlays } from '@/lib/overlays/getActiveOverlays';
 import { buildPlaceServiceFacts } from '@/lib/place-payload';
+import { assembleSceneSense } from '@/lib/scenesense';
 
 const BUILD_ID =
   process.env.VERCEL_GIT_COMMIT_SHA ||
@@ -149,7 +150,12 @@ export async function GET(
       place.googlePlaceId
         ? db.golden_records.findFirst({
             where: { google_place_id: place.googlePlaceId },
-            select: { google_places_attributes: true },
+            select: {
+              google_places_attributes: true,
+              identity_signals: true,
+              place_personality: true,
+              vibe_tags: true,
+            },
           })
         : Promise.resolve(null),
     ]);
@@ -254,6 +260,46 @@ export async function GET(
     if (isDemoPlace && enhancedVibeTags.length === 0) {
       enhancedVibeTags = ['Date Night', 'Lively', 'Cozy'];
     }
+
+    // SceneSense: PRL + assemble (Voice Engine + Lint) — run after demo injection
+    const assemblyPlace =
+      isDemoPlace && enhancedVibeTags.length > 0
+        ? { ...place, vibeTags: enhancedVibeTags }
+        : place;
+    const identitySignals = goldenRecord?.identity_signals as {
+      place_personality?: string;
+      vibe_words?: string[];
+      signature_dishes?: string[];
+    } | null;
+    const scenesenseResult = assembleSceneSense({
+      name: assemblyPlace.name,
+      address: assemblyPlace.address,
+      latitude: assemblyPlace.latitude,
+      longitude: assemblyPlace.longitude,
+      googlePhotos: assemblyPlace.googlePhotos,
+      hours: assemblyPlace.hours,
+      description: assemblyPlace.description,
+      vibeTags: assemblyPlace.vibeTags,
+      pullQuote: assemblyPlace.pullQuote,
+      category: assemblyPlace.category ?? assemblyPlace.category_rel?.slug ?? null,
+      tagline: assemblyPlace.tagline,
+      tips: assemblyPlace.tips,
+      neighborhood: assemblyPlace.neighborhood,
+      prlOverride: assemblyPlace.prlOverride,
+      curatorNote: curatorNote ?? undefined,
+      editorialSources: place.editorialSources,
+      appearsOnCount: publishedMapPlaces.length,
+      identitySignals: identitySignals
+        ? {
+            place_personality:
+              goldenRecord?.place_personality ?? identitySignals.place_personality ?? null,
+            vibe_words:
+              identitySignals.vibe_words ??
+              (Array.isArray(goldenRecord?.vibe_tags) ? goldenRecord.vibe_tags : []),
+            signature_dishes: identitySignals.signature_dishes ?? [],
+          }
+        : null,
+    });
     
     if (isDemoPlace && enhancedTips.length === 0) {
       enhancedTips = [
@@ -301,6 +347,8 @@ export async function GET(
           curatorCreatorName,
           sources: place.editorialSources || [],
           vibeTags: enhancedVibeTags,
+          prl: scenesenseResult.prl,
+          scenesense: scenesenseResult.scenesense,
           tips: enhancedTips,
           tagline: place.tagline,
           pullQuote: enhancedPullQuote,

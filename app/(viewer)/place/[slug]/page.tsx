@@ -46,6 +46,13 @@ interface LocationData {
   curatorCreatorName?: string | null;
   sources?: EditorialSource[];
   vibeTags?: string[] | null;
+  prl?: number;
+  scenesense?: {
+    vibe: string[];
+    atmosphere: string[];
+    ambiance: string[];
+    scene: string[];
+  } | null;
   tips?: string[] | null;
   tagline?: string | null;
   transitAccessible?: boolean | null;
@@ -285,6 +292,8 @@ export default function PlacePage() {
             description: location.description,
             photoUrls: location.photoUrls,
             vibeTags: location.vibeTags,
+            prl: location.prl,
+            scenesense: location.scenesense,
             curatorNote: location.curatorNote,
             pullQuote: location.pullQuote,
             pullQuoteSource: location.pullQuoteSource,

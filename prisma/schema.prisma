@@ -252,6 +252,7 @@ model places {
   categoryId             String?            @map("category_id")
   parentId               String?            @map("parent_id")
   marketSchedule         Json?              @map("market_schedule")
+  prlOverride            Int?               @map("prl_override") // 1-4 manual override; display PRL = override ?? computed
   map_places             map_places[]
   person_places          person_places[]
   restaurant_groups      restaurant_groups? @relation(fields: [restaurantGroupId], references: [id])
@@ -261,6 +262,7 @@ model places {
   viewer_bookmarks       viewer_bookmarks[]
   energy_scores          energy_scores[]
   place_tag_scores       place_tag_scores[]
+  place_photo_eval       place_photo_eval[]
 
   @@index([category])
   @@index([categoryId])
@@ -353,6 +355,37 @@ model viewer_bookmarks {
   @@unique([viewerUserId, placeId])
   @@index([placeId])
   @@index([viewerUserId])
+}
+
+model place_photo_eval {
+  id                    String             @id @default(cuid())
+  place_id              String             @map("place_id")
+  google_place_id       String             @map("google_place_id")
+  photo_ref             String             @map("photo_ref")
+  width_px              Int                @map("width_px")
+  height_px             Int                @map("height_px")
+  requested_max_width_px Int               @default(1600) @map("requested_max_width_px")
+  tier                  PlacePhotoEvalTier
+  type                  PlacePhotoEvalType? @map("type")
+  created_at            DateTime           @default(now()) @map("created_at")
+  updated_at            DateTime           @updatedAt @map("updated_at")
+  places                places             @relation(fields: [place_id], references: [id], onDelete: Cascade)
+
+  @@unique([place_id, photo_ref])
+  @@index([place_id])
+}
+
+enum PlacePhotoEvalTier {
+  HERO
+  GALLERY
+  REJECT
+}
+
+enum PlacePhotoEvalType {
+  EXTERIOR
+  INTERIOR
+  CONTEXT
+  FOOD
 }
 
 enum LayerType {

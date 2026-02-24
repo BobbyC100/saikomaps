@@ -30,3 +30,6 @@ tsconfig.tsbuildinfo
 
 # local eval artifacts
 /tmp/
+
+# DB dumps (local restore artifacts)
+data/neon-restore.dump
