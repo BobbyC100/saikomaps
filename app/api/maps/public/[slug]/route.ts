@@ -43,8 +43,12 @@ export async function GET(
       );
     }
 
+    const openMapPlaces = list.map_places.filter(
+      (mp) => mp.places.businessStatus !== 'CLOSED_PERMANENTLY'
+    );
+
     // Fetch identity signals for places
-    const googlePlaceIds = list.map_places
+    const googlePlaceIds = openMapPlaces
       .map(mp => mp.places.googlePlaceId)
       .filter((id): id is string => id !== null);
     
@@ -70,8 +74,8 @@ export async function GET(
       }
     });
     
-    // Enrich mapPlaces with identity signals
-    const enrichedMapPlaces = list.map_places.map(mp => {
+    // Enrich mapPlaces with identity signals (closed places already excluded)
+    const enrichedMapPlaces = openMapPlaces.map(mp => {
       const signals = mp.places.googlePlaceId ? signalsMap.get(mp.places.googlePlaceId) : null;
       return {
         ...mp,

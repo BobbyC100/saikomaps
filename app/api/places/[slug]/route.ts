@@ -9,7 +9,10 @@ import { db } from '@/lib/db';
 import { getGooglePhotoUrl, getPhotoRefFromStored } from '@/lib/google-places';
 import { getActiveOverlays } from '@/lib/overlays/getActiveOverlays';
 import { buildPlaceServiceFacts } from '@/lib/place-payload';
-import { assembleSceneSense } from '@/lib/scenesense';
+import {
+  fetchPlaceForPRLBySlug,
+  assembleSceneSenseFromMaterialized,
+} from '@/lib/scenesense';
 
 const BUILD_ID =
   process.env.VERCEL_GIT_COMMIT_SHA ||
@@ -91,10 +94,29 @@ export async function GET(
             slug: true,
           },
         },
+        energy_scores: {
+          where: { version: 'energy_v1' },
+          take: 1,
+        },
+        place_tag_scores: {
+          where: {
+            version: 'tags_v1',
+            depends_on_energy_version: 'energy_v1',
+          },
+          take: 1,
+        },
       },
     });
 
     if (!place) {
+      const headers = jsonHeaders(bypassCache ? { 'X-Cache-Bypass': '1' } : {}, bypassCache);
+      return NextResponse.json(
+        { error: 'Place not found' },
+        { status: 404, headers }
+      );
+    }
+
+    if ((place as { businessStatus?: string | null }).businessStatus === 'CLOSED_PERMANENTLY') {
       const headers = jsonHeaders(bypassCache ? { 'X-Cache-Bypass': '1' } : {}, bypassCache);
       return NextResponse.json(
         { error: 'Place not found' },
@@ -161,11 +183,10 @@ export async function GET(
     ]);
 
     // VALADATA: canonical service facts (takeout, delivery, dine_in, reservable, curbside_pickup)
-    // googleAttrs: golden_records.google_places_attributes > places.googlePlacesAttributes
-    // scrapeAttrs: no stored source yet (null)
+    // googleAttrs: places.googlePlacesAttributes first; golden fallback only when place attrs null/empty
     const googleAttrs =
-      (goldenRecord?.google_places_attributes as Record<string, unknown> | null) ??
       (place.googlePlacesAttributes as Record<string, unknown> | null) ??
+      (goldenRecord?.google_places_attributes as Record<string, unknown> | null) ??
       null;
     let facts: { service: Partial<Record<string, boolean | null>> };
     let conflicts: { service: Partial<Record<string, { sources: string[]; values: Record<string, boolean> }>> };
@@ -261,45 +282,31 @@ export async function GET(
       enhancedVibeTags = ['Date Night', 'Lively', 'Cozy'];
     }
 
-    // SceneSense: PRL + assemble (Voice Engine + Lint) — run after demo injection
-    const assemblyPlace =
-      isDemoPlace && enhancedVibeTags.length > 0
-        ? { ...place, vibeTags: enhancedVibeTags }
-        : place;
+    // SceneSense: PRL + assemble via materializer (single source of truth)
+    const placeForPRL = await fetchPlaceForPRLBySlug(slug);
     const identitySignals = goldenRecord?.identity_signals as {
       place_personality?: string;
       vibe_words?: string[];
       signature_dishes?: string[];
     } | null;
-    const scenesenseResult = assembleSceneSense({
-      name: assemblyPlace.name,
-      address: assemblyPlace.address,
-      latitude: assemblyPlace.latitude,
-      longitude: assemblyPlace.longitude,
-      googlePhotos: assemblyPlace.googlePhotos,
-      hours: assemblyPlace.hours,
-      description: assemblyPlace.description,
-      vibeTags: assemblyPlace.vibeTags,
-      pullQuote: assemblyPlace.pullQuote,
-      category: assemblyPlace.category ?? assemblyPlace.category_rel?.slug ?? null,
-      tagline: assemblyPlace.tagline,
-      tips: assemblyPlace.tips,
-      neighborhood: assemblyPlace.neighborhood,
-      prlOverride: assemblyPlace.prlOverride,
-      curatorNote: curatorNote ?? undefined,
-      editorialSources: place.editorialSources,
-      appearsOnCount: publishedMapPlaces.length,
-      identitySignals: identitySignals
-        ? {
-            place_personality:
-              goldenRecord?.place_personality ?? identitySignals.place_personality ?? null,
-            vibe_words:
-              identitySignals.vibe_words ??
-              (Array.isArray(goldenRecord?.vibe_tags) ? goldenRecord.vibe_tags : []),
-            signature_dishes: identitySignals.signature_dishes ?? [],
-          }
-        : null,
-    });
+    const scenesenseResult = placeForPRL
+      ? assembleSceneSenseFromMaterialized({
+          placeForPRL,
+          vibeTags: isDemoPlace && enhancedVibeTags.length > 0 ? enhancedVibeTags : place.vibeTags,
+          neighborhood: place.neighborhood,
+          category: place.category ?? place.category_rel?.slug ?? null,
+          identitySignals: identitySignals
+            ? {
+                place_personality:
+                  goldenRecord?.place_personality ?? identitySignals.place_personality ?? null,
+                vibe_words:
+                  identitySignals.vibe_words ??
+                  (Array.isArray(goldenRecord?.vibe_tags) ? goldenRecord.vibe_tags : []),
+                signature_dishes: identitySignals.signature_dishes ?? [],
+              }
+            : null,
+        })
+      : { prl: 1 as const, mode: 'LITE' as const, scenesense: null, prlResult: null as never };
     
     if (isDemoPlace && enhancedTips.length === 0) {
       enhancedTips = [
@@ -383,6 +390,8 @@ export async function GET(
         isOwner: false,
         facts,
         _conflicts: Object.keys(conflicts.service).length > 0 ? conflicts : undefined,
+        energyScore: place.energy_scores[0] ?? null,
+        placeTagScores: place.place_tag_scores[0] ?? null,
       },
     },
       {
