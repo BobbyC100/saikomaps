@@ -220,7 +220,7 @@ model places {
   primary_vertical       PrimaryVertical     @map("primary_vertical")
   placesDataCachedAt     DateTime?           @map("places_data_cached_at")
   createdAt              DateTime           @default(now()) @map("created_at")
-  updatedAt              DateTime           @map("updated_at")
+  updatedAt              DateTime           @updatedAt @map("updated_at")
   editorialSources       Json?              @map("editorial_sources")
   cuisineType            String?            @map("cuisine_type")
   adUnitOverride         Boolean            @default(false) @map("ad_unit_override")
@@ -247,6 +247,7 @@ model places {
   intentProfile          String?            @map("intent_profile")
   intentProfileOverride  Boolean            @default(false) @map("intent_profile_override")
   reservationUrl         String?            @map("reservation_url")
+  businessStatus         String?            @map("business_status") // from Google; 'CLOSED_PERMANENTLY' excluded from coverage
   googlePlacesAttributes Json?              @map("google_places_attributes")
   placeType              PlaceType          @default(venue) @map("place_type")
   categoryId             String?            @map("category_id")
@@ -263,6 +264,7 @@ model places {
   energy_scores          energy_scores[]
   place_tag_scores       place_tag_scores[]
   place_photo_eval       place_photo_eval[]
+  place_coverage_status  place_coverage_status[]
 
   @@index([category])
   @@index([categoryId])
@@ -272,6 +274,7 @@ model places {
   @@index([parentId])
   @@index([restaurantGroupId])
   @@index([status])
+  @@index([businessStatus])
 }
 
 model restaurant_groups {
@@ -1139,4 +1142,44 @@ model TraceSignalsCache {
   entity golden_records @relation(fields: [entityId], references: [canonical_id], onDelete: Cascade)
 
   @@index([entityId])
+}
+
+// ============================================================================
+// COVERAGE RUN LEDGER
+// Idempotency + dedupe for coverage enrichment pipeline
+// ============================================================================
+
+/// coverage_runs — metadata for each coverage audit/run
+model coverage_runs {
+  id        String   @id @default(uuid())
+  created_at DateTime @default(now()) @map("created_at")
+  db_host   String   @map("db_host")
+  db_name   String   @map("db_name")
+  git_sha   String?  @map("git_sha")
+  limit_val Int?     @map("limit_val")
+  la_only   Boolean  @default(true) @map("la_only")
+  ttl_days  Int?     @map("ttl_days")
+
+  @@map("coverage_runs")
+}
+
+/// place_coverage_status — per-dedupe_key coverage state (no double spend)
+model place_coverage_status {
+  id                  String   @id @default(cuid())
+  place_id            String   @map("place_id")
+  dedupe_key          String   @unique @map("dedupe_key") // google_place_id or place_id
+  last_success_at     DateTime? @map("last_success_at")
+  last_attempt_at     DateTime? @map("last_attempt_at")
+  last_attempt_status String?  @map("last_attempt_status") // SUCCESS | FAIL | RUNNING
+  last_error_code     String?  @map("last_error_code")
+  last_error_message  String?  @map("last_error_message")
+  last_missing_groups Json?    @map("last_missing_groups") // string[]
+  source              String?  // GOOGLE_PLACES | SCRAPE | MANUAL
+  updated_at          DateTime @updatedAt @map("updated_at")
+
+  places places @relation(fields: [place_id], references: [id], onDelete: Cascade)
+
+  @@index([place_id])
+  @@index([last_attempt_status])
+  @@map("place_coverage_status")
 }

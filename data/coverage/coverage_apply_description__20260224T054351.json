@@ -1,0 +1,20 @@
+{
+  "run_id": "apply_desc_1771911811646",
+  "created_at": "2026-02-24T05:43:31.646Z",
+  "dry_run": false,
+  "params": {
+    "limit": 50,
+    "la_only": true,
+    "ttl_days": 0
+  },
+  "counts": {
+    "candidates_filtered": 39,
+    "processed": 39,
+    "written": 25,
+    "skipped_existing": 0,
+    "skipped_no_google_desc": 14,
+    "failed": 0
+  },
+  "failed_slugs": [],
+  "errors": []
+}

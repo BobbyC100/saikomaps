@@ -10,6 +10,8 @@ export function parseHours(hours: unknown): {
   fullWeek: Array<{ day: string; short: string; hours: string }>;
   isIrregular: boolean;
   statusText: string | null;
+  /** True only when isOpen was set from openNow/open_now; do not show status when inferred from hours. */
+  openNowExplicit: boolean;
 } {
   const empty = {
     today: null,
@@ -19,6 +21,7 @@ export function parseHours(hours: unknown): {
     fullWeek: [],
     isIrregular: false,
     statusText: null,
+    openNowExplicit: false,
   };
   if (!hours || (typeof hours === 'object' && !Object.keys(hours as object).length))
     return empty;
@@ -79,10 +82,13 @@ export function parseHours(hours: unknown): {
   if (validHoursCount < 3) isIrregular = true;
 
   let isOpen: boolean | null = null;
+  let openNowExplicit = false;
   if (typeof obj.openNow === 'boolean') {
     isOpen = obj.openNow;
+    openNowExplicit = true;
   } else if (typeof (obj as { open_now?: boolean }).open_now === 'boolean') {
     isOpen = (obj as { open_now: boolean }).open_now;
+    openNowExplicit = true;
   } else {
     const todayRow = fullWeek[todayIndex];
     const todayHours = todayRow?.hours ?? null;
@@ -124,5 +130,5 @@ export function parseHours(hours: unknown): {
         : `Closed${opensAt ? ` · Opens ${opensAt}` : ''}`
       : null;
 
-  return { today: todayHours, isOpen, closesAt, opensAt, fullWeek, isIrregular, statusText };
+  return { today: todayHours, isOpen, closesAt, opensAt, fullWeek, isIrregular, statusText, openNowExplicit };
 }

@@ -4,6 +4,10 @@ import { getToken } from 'next-auth/jwt'
 import { isAdminEmailEdge, getUserEmailEdge } from '@/lib/auth/guards.edge'
 
 export async function middleware(request: NextRequest) {
+  if (process.env.AUTH_OFF === 'true') {
+    return NextResponse.next()
+  }
+
   const { pathname } = request.nextUrl
 
   // Get session token

@@ -1,0 +1,167 @@
+{
+  "run_id": "run_1771900736496",
+  "created_at": "2026-02-24T02:38:56.496Z",
+  "db_identity": {
+    "host": "ep-spring-sun-aiht1nns-pooler.c-4.us-east-1.aws.neon.tech",
+    "dbname": "neondb",
+    "database_url_host": "ep-spring-sun-aiht1nns-pooler.c-4.us-east-1.aws.neon.tech",
+    "database_url_dbname": "neondb"
+  },
+  "params": {
+    "limit": 200,
+    "la_only": true,
+    "ttl_days": 90,
+    "retry_backoff_hours": 24
+  },
+  "counts": {
+    "total_places": 5,
+    "by_prl": {
+      "prl_1": 5
+    },
+    "by_missing_group": {
+      "NEED_HOURS": 5,
+      "NEED_GOOGLE_ATTRS": 5,
+      "NEED_GOOGLE_PHOTOS": 5
+    },
+    "candidates_count": 5,
+    "excluded_by_ttl": 0,
+    "excluded_by_backoff": 0,
+    "excluded_by_running": 0,
+    "excluded_by_complete": 0
+  },
+  "candidates": [
+    {
+      "place_id": "place_budonoki_1771305000799",
+      "slug": "budonoki",
+      "name": "Budonoki",
+      "google_place_id": "ChIJD5LuBp3HwoARqHfw3wOS7VA",
+      "dedupe_key": "ChIJD5LuBp3HwoARqHfw3wOS7VA",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS"
+    },
+    {
+      "place_id": "place_redbird-downtown-los-angeles_1771305000950",
+      "slug": "redbird-downtown-los-angeles",
+      "name": "Redbird",
+      "google_place_id": "ChIJv4yVGknGwoARC_5zwy3zU5M",
+      "dedupe_key": "ChIJv4yVGknGwoARC_5zwy3zU5M",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS"
+    },
+    {
+      "place_id": "place_republique_1771305001028",
+      "slug": "republique",
+      "name": "Republique",
+      "google_place_id": "ChIJqaA5zt-4woARHGIEp3XlsZo",
+      "dedupe_key": "ChIJqaA5zt-4woARHGIEp3XlsZo",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS"
+    },
+    {
+      "place_id": "place_seco_1771304999483",
+      "slug": "seco",
+      "name": "Seco",
+      "google_place_id": "ChIJqXVPrFnHwoARHRmEYTHmXzw",
+      "dedupe_key": "ChIJqXVPrFnHwoARHRmEYTHmXzw",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS"
+    },
+    {
+      "place_id": "place_tacos-1986_1771305000875",
+      "slug": "tacos-1986",
+      "name": "Tacos 1986",
+      "google_place_id": "ChIJc1UAXfrHwoARkMC2iYyz8R8",
+      "dedupe_key": "ChIJc1UAXfrHwoARkMC2iYyz8R8",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS"
+    }
+  ],
+  "duplicate_groups": [],
+  "top_20_candidates": [
+    {
+      "place_id": "place_budonoki_1771305000799",
+      "slug": "budonoki",
+      "name": "Budonoki",
+      "google_place_id": "ChIJD5LuBp3HwoARqHfw3wOS7VA",
+      "dedupe_key": "ChIJD5LuBp3HwoARqHfw3wOS7VA",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS"
+    },
+    {
+      "place_id": "place_redbird-downtown-los-angeles_1771305000950",
+      "slug": "redbird-downtown-los-angeles",
+      "name": "Redbird",
+      "google_place_id": "ChIJv4yVGknGwoARC_5zwy3zU5M",
+      "dedupe_key": "ChIJv4yVGknGwoARC_5zwy3zU5M",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS"
+    },
+    {
+      "place_id": "place_republique_1771305001028",
+      "slug": "republique",
+      "name": "Republique",
+      "google_place_id": "ChIJqaA5zt-4woARHGIEp3XlsZo",
+      "dedupe_key": "ChIJqaA5zt-4woARHGIEp3XlsZo",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS"
+    },
+    {
+      "place_id": "place_seco_1771304999483",
+      "slug": "seco",
+      "name": "Seco",
+      "google_place_id": "ChIJqXVPrFnHwoARHRmEYTHmXzw",
+      "dedupe_key": "ChIJqXVPrFnHwoARHRmEYTHmXzw",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS"
+    },
+    {
+      "place_id": "place_tacos-1986_1771305000875",
+      "slug": "tacos-1986",
+      "name": "Tacos 1986",
+      "google_place_id": "ChIJc1UAXfrHwoARkMC2iYyz8R8",
+      "dedupe_key": "ChIJc1UAXfrHwoARkMC2iYyz8R8",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS"
+    }
+  ]
+}

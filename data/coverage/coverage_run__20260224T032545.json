@@ -1,0 +1,918 @@
+{
+  "run_id": "run_1771903544252",
+  "created_at": "2026-02-24T03:25:44.252Z",
+  "db_identity": {
+    "host": "ep-spring-sun-aiht1nns-pooler.c-4.us-east-1.aws.neon.tech",
+    "dbname": "neondb",
+    "database_url_host": "ep-spring-sun-aiht1nns-pooler.c-4.us-east-1.aws.neon.tech",
+    "database_url_dbname": "neondb"
+  },
+  "params": {
+    "limit": 200,
+    "la_only": true,
+    "ttl_days": 90,
+    "retry_backoff_hours": 24
+  },
+  "counts": {
+    "total_places": 39,
+    "by_prl": {
+      "prl_1": 39
+    },
+    "by_missing_group": {
+      "NEED_HOURS": 39,
+      "NEED_GOOGLE_ATTRS": 39,
+      "NEED_GOOGLE_PHOTOS": 39,
+      "NEED_DESCRIPTION": 39,
+      "NEED_TAG_SIGNALS": 34
+    },
+    "candidates_count": 39,
+    "excluded_by_ttl": 0,
+    "excluded_by_backoff": 0,
+    "excluded_by_running": 0,
+    "excluded_by_complete": 0
+  },
+  "candidates": [
+    {
+      "place_id": "0b9d4be0-34b2-445c-b4bf-77c5538f0b89",
+      "slug": "alba-los-angeles-restaurant-3-hot2025-italian-open-air-west-hollywood",
+      "name": "Alba Los Angeles,restaurant,3-hot2025,Italian open-air - West Hollywood",
+      "google_place_id": "ChIJK1i52rK_woARSal9_H7GrGc",
+      "dedupe_key": "ChIJK1i52rK_woARSal9_H7GrGc",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "81513430-c4f3-4241-b0ed-51d2c634f8e1",
+      "slug": "alta-adams-restaurant-4-iconic-keith-corbin-south-la",
+      "name": "Alta Adams,restaurant,4-iconic,Keith Corbin - South LA",
+      "google_place_id": "ChIJ5XZfNW65woARIhG9hN44XQ4",
+      "dedupe_key": "ChIJ5XZfNW65woARIhG9hN44XQ4",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "5c5e31f1-d750-45ec-a26c-999f365a6cb5",
+      "slug": "anajak-thai-restaurant-4-iconic-sherman-oaks-massively-acclaimed",
+      "name": "Anajak Thai,restaurant,4-iconic,Sherman Oaks - massively acclaimed",
+      "google_place_id": "ChIJn-ihusWXwoARE6yGp6tPoIM",
+      "dedupe_key": "ChIJn-ihusWXwoARE6yGp6tPoIM",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "3f4461a3-6074-4fa9-b170-364b8e7d282e",
+      "slug": "augustine-wine-bar-wine-bar-5-wine-bar-sherman-oaks",
+      "name": "Augustine Wine Bar,wine bar,5-wine-bar,Sherman Oaks",
+      "google_place_id": "ChIJ0V8uySeWwoARiOu1BAeRCdU",
+      "dedupe_key": "ChIJ0V8uySeWwoARiOu1BAeRCdU",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "59eb5040-1690-4f26-b463-041855c99174",
+      "slug": "baby-bistro-restaurant-3-hot2025-restaurant-of-the-year-contender-echo-park",
+      "name": "Baby Bistro,restaurant,3-hot2025,Restaurant of the year contender - Echo Park",
+      "google_place_id": "ChIJpboOd2HHwoAR0kwNDqK4cgw",
+      "dedupe_key": "ChIJpboOd2HHwoAR0kwNDqK4cgw",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "8e05af40-46d5-4fc1-ae34-e20e8dfdd810",
+      "slug": "bar-covell-wine-bar-5-wine-bar-los-feliz",
+      "name": "Bar Covell,wine bar,5-wine-bar,Los Feliz",
+      "google_place_id": "ChIJD2HKqa3AwoAR8JTi02ZS2Hc",
+      "dedupe_key": "ChIJD2HKqa3AwoAR8JTi02ZS2Hc",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "1466d85c-beb9-4b17-912b-f5462beff6d0",
+      "slug": "bavel-restaurant-1-arts-district-middle-eastern-same-owners-as-bestia",
+      "name": "Bavel,restaurant,1,Arts District Middle Eastern - same owners as Bestia",
+      "google_place_id": "ChIJAQDw5jzGwoARJ0ddsqWyCAQ",
+      "dedupe_key": "ChIJAQDw5jzGwoARJ0ddsqWyCAQ",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "280edc04-605d-4cf7-8be0-fdb91e3c7c0d",
+      "slug": "betsy-restaurant-3-hot2025-altadena-hearth-cooking-tyler-wells-comeback",
+      "name": "Betsy,restaurant,3-hot2025,Altadena hearth cooking - Tyler Wells comeback",
+      "google_place_id": "ChIJyROYYDXDwoARx_7TxDXZi6Q",
+      "dedupe_key": "ChIJyROYYDXDwoARx_7TxDXZi6Q",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "place_budonoki_1771305000799",
+      "slug": "budonoki",
+      "name": "Budonoki",
+      "google_place_id": "ChIJD5LuBp3HwoARqHfw3wOS7VA",
+      "dedupe_key": "ChIJD5LuBp3HwoARqHfw3wOS7VA",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION"
+    },
+    {
+      "place_id": "6ff03197-4613-41f1-99cd-0021e1b2019c",
+      "slug": "camélia-restaurant-3-hot2025-french-japanese-bon-appétit-2025",
+      "name": "Camélia,restaurant,3-hot2025,French-Japanese - Bon Appétit 2025",
+      "google_place_id": "ChIJp01x8r7HwoARHdyVH9NySTs",
+      "dedupe_key": "ChIJp01x8r7HwoARHdyVH9NySTs",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "6e61406d-e9a4-4f6e-b5de-4c539773419f",
+      "slug": "cara-hotel-hotel-hotel-boutique-laid-back-modern-boutique-los-feliz-near-griffit",
+      "name": "Cara Hotel,hotel,hotel-boutique,Laid-back modern boutique - Los Feliz near Griffith Park",
+      "google_place_id": "ChIJ_72WeFC_woARaXeiD_y7hy8",
+      "dedupe_key": "ChIJ_72WeFC_woARaXeiD_y7hy8",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "84cdfb99-80ae-4f9d-8b19-983281497827",
+      "slug": "chi-spacca-restaurant-1-nancy-silverton-meat-focused",
+      "name": "Chi Spacca,restaurant,1,Nancy Silverton meat-focused",
+      "google_place_id": "ChIJwbQBbdO4woARHT4khoXPnok",
+      "dedupe_key": "ChIJwbQBbdO4woARHT4khoXPnok",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "7266e7e5-72b3-422c-b319-5e8b9ac84f4e",
+      "slug": "downtown-l-a-proper-hotel-hotel-hotel-boutique-kelly-wearstler-design-dtla-19-5-",
+      "name": "Downtown L.A. Proper Hotel,hotel,hotel-boutique,Kelly Wearstler design - DTLA - 19.5 rating",
+      "google_place_id": "ChIJPVoyBWbHwoAREu--ZMmvEpA",
+      "dedupe_key": "ChIJPVoyBWbHwoAREu--ZMmvEpA",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "3cd72c30-fc68-45aa-885a-f25c1bf2fae4",
+      "slug": "endorffeine-coffee-6-coffee-arts-district",
+      "name": "Endorffeine,coffee,6-coffee,Arts District",
+      "google_place_id": "ChIJsTjh9VrGwoARfOkMqZCZRXQ",
+      "dedupe_key": "ChIJsTjh9VrGwoARfOkMqZCZRXQ",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "610f7169-e4f0-4740-8c9f-70893715a773",
+      "slug": "esters-wine-shop-and-bar-wine-bar-5-wine-bar-santa-monica",
+      "name": "Esters Wine Shop & Bar,wine bar,5-wine-bar,Santa Monica",
+      "google_place_id": "ChIJ5Zhalc6kwoARm4tOh2YqVZ8",
+      "dedupe_key": "ChIJ5Zhalc6kwoARm4tOh2YqVZ8",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "4850809d-6a43-4701-8fca-036daeb7a3a6",
+      "slug": "freehand-los-angeles-hotel-hotel-neighborhood-dtla-youthful-artsy-vibe-rooftop-b",
+      "name": "Freehand Los Angeles,hotel,hotel-neighborhood,DTLA - youthful artsy vibe - rooftop bar - from $140",
+      "google_place_id": "ChIJE80IjrXHwoARZo6wiQusTrc",
+      "dedupe_key": "ChIJE80IjrXHwoARZo6wiQusTrc",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "70d07bae-98a1-466c-839b-c2c5945c9212",
+      "slug": "gjelina-restaurant-1-venice-institution-eater-all-time-38",
+      "name": "Gjelina,restaurant,1,Venice institution - Eater all-time 38",
+      "google_place_id": "ChIJGU5p6ri7woARaCOqe4haSl0",
+      "dedupe_key": "ChIJGU5p6ri7woARaCOqe4haSl0",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "10da04a9-d760-4dc0-819e-3f56189b1a0d",
+      "slug": "gucci-osteria-da-massimo-bottura-restaurant-2-michelin-1-michelin-star-beverly-h",
+      "name": "Gucci Osteria da Massimo Bottura,restaurant,2-michelin,1 Michelin star - Beverly Hills",
+      "google_place_id": "ChIJmY8Ttaa7woARqE-Ss5DafEo",
+      "dedupe_key": "ChIJmY8Ttaa7woARqE-Ss5DafEo",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "003245fc-ad9b-4225-9440-faaf83dc1f68",
+      "slug": "hayato-restaurant-2-michelin-2-michelin-stars-japanese",
+      "name": "Hayato,restaurant,2-michelin,2 Michelin stars - Japanese",
+      "google_place_id": "ChIJt1RlQi_GwoARja7mYeFk2YI",
+      "dedupe_key": "ChIJt1RlQi_GwoARja7mYeFk2YI",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "0a5864db-e933-4740-a91b-c1936ee33620",
+      "slug": "holbox-restaurant-1-mercado-la-paloma-#1-on-la-times-101-2025",
+      "name": "Holbox,restaurant,1,Mercado La Paloma - #1 on LA Times 101 2025",
+      "google_place_id": "ChIJMc9-jgrIwoARvFaE32ZlJzA",
+      "dedupe_key": "ChIJMc9-jgrIwoARvFaE32ZlJzA",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "4c16c305-f557-4108-9ff8-0e554bbb822b",
+      "slug": "kuya-lord-restaurant-3-hot2025-james-beard-winner-filipino",
+      "name": "Kuya Lord,restaurant,3-hot2025,James Beard winner - Filipino",
+      "google_place_id": "ChIJx-fAMlC5woAR4sMclHgF3NA",
+      "dedupe_key": "ChIJx-fAMlC5woAR4sMclHgF3NA",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "639c93a2-47d5-46f0-9c08-1a373e2ab7dd",
+      "slug": "lasa-restaurant-4-iconic-filipino-chinatown",
+      "name": "Lasa,restaurant,4-iconic,Filipino - Chinatown",
+      "google_place_id": "ChIJk3enX1rGwoARARB8Q8dTh1I",
+      "dedupe_key": "ChIJk3enX1rGwoARARB8Q8dTh1I",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "002a8037-5201-405f-a2db-8e1d7e49793a",
+      "slug": "mori-nozomi-restaurant-2-michelin-1-michelin-star-new-2025",
+      "name": "Mori Nozomi,restaurant,2-michelin,1 Michelin star - new 2025",
+      "google_place_id": "ChIJh_EchAm7woAR_M_f_w6W50c",
+      "dedupe_key": "ChIJh_EchAm7woAR_M_f_w6W50c",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "24e266d3-35c4-48a3-bec4-4986bc264033",
+      "slug": "n-naka-restaurant-2-michelin-2-michelin-stars-kaiseki",
+      "name": "n/naka,restaurant,2-michelin,2 Michelin stars - kaiseki",
+      "google_place_id": "ChIJb7GeyDS6woAROVvLEUiLZEk",
+      "dedupe_key": "ChIJb7GeyDS6woAROVvLEUiLZEk",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "place_redbird-downtown-los-angeles_1771305000950",
+      "slug": "redbird-downtown-los-angeles",
+      "name": "Redbird",
+      "google_place_id": "ChIJv4yVGknGwoARC_5zwy3zU5M",
+      "dedupe_key": "ChIJv4yVGknGwoARC_5zwy3zU5M",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION"
+    },
+    {
+      "place_id": "place_republique_1771305001028",
+      "slug": "republique",
+      "name": "Republique",
+      "google_place_id": "ChIJqaA5zt-4woARHGIEp3XlsZo",
+      "dedupe_key": "ChIJqaA5zt-4woARHGIEp3XlsZo",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION"
+    },
+    {
+      "place_id": "32bb14a1-a90d-4f89-bc97-f6c3a461a98c",
+      "slug": "restaurant-ki-restaurant-2-michelin-1-michelin-star-first-korean-starred-in-la-2",
+      "name": "Restaurant Ki,restaurant,2-michelin,1 Michelin star - first Korean starred in LA (2025)",
+      "google_place_id": "ChIJ6fB8aADHwoARxXCY99wLo0U",
+      "dedupe_key": "ChIJ6fB8aADHwoARxXCY99wLo0U",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "4b9afb9b-5b68-41a8-96bc-9332774fa028",
+      "slug": "santa-canela-restaurant-3-hot2025-highland-park-bakery-eater-award-winner",
+      "name": "Santa Canela,restaurant,3-hot2025,Highland Park bakery - Eater Award winner",
+      "google_place_id": "ChIJowrYmMLFwoARfBaOlCGmRNk",
+      "dedupe_key": "ChIJowrYmMLFwoARfBaOlCGmRNk",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "3d27bf43-bd40-4ea8-98f5-c12b0fbaae2f",
+      "slug": "santa-monica-proper-hotel-hotel-boutique-kelly-wearstler-design-rooftop-ocean-ad",
+      "name": "Santa Monica Proper,hotel,hotel-boutique,Kelly Wearstler design - rooftop - ocean adjacent",
+      "google_place_id": "ChIJGayEIMmkwoARvutBp7SwpfI",
+      "dedupe_key": "ChIJGayEIMmkwoARvutBp7SwpfI",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "place_seco_1771304999483",
+      "slug": "seco",
+      "name": "Seco",
+      "google_place_id": "ChIJqXVPrFnHwoARHRmEYTHmXzw",
+      "dedupe_key": "ChIJqXVPrFnHwoARHRmEYTHmXzw",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION"
+    },
+    {
+      "place_id": "048ab187-5259-4718-bae3-3ad6f7239311",
+      "slug": "silver-lake-pool-and-inn-hotel-hotel-boutique-relaxed-organic-vibe-silver-lake-e",
+      "name": "Silver Lake Pool & Inn,hotel,hotel-boutique,Relaxed organic vibe - Silver Lake essential",
+      "google_place_id": "ChIJB7x_3E7HwoARby2w2st4Mwg",
+      "dedupe_key": "ChIJB7x_3E7HwoARby2w2st4Mwg",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "846ec73b-e777-4b6a-bb0e-1621f43bfb1b",
+      "slug": "somni-restaurant-2-michelin-3-michelin-stars-one-of-only-two-in-la",
+      "name": "Somni,restaurant,2-michelin,3 Michelin stars - one of only two in LA",
+      "google_place_id": "ChIJVa5jok65woARLJWEqmHTCp8",
+      "dedupe_key": "ChIJVa5jok65woARLJWEqmHTCp8",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "88d55b04-61ca-4265-8c35-199f9047b4e1",
+      "slug": "sunset-tower-hotel-hotel-hotel-iconic-classic-art-deco-glam-west-hollywood-icon",
+      "name": "Sunset Tower Hotel,hotel,hotel-iconic,Classic Art Deco glam - West Hollywood icon",
+      "google_place_id": "ChIJPR1jrb--woARjgvrg3cz16I",
+      "dedupe_key": "ChIJPR1jrb--woARjgvrg3cz16I",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "0d3d5e94-88e2-4987-8cdb-85be659cc5c7",
+      "slug": "sushi-masuyoshi-restaurant-3-hot2025-culver-city-omakase-infatuation-#4-$210-val",
+      "name": "Sushi Masuyoshi,restaurant,3-hot2025,Culver City omakase - Infatuation #4 - $210 value",
+      "google_place_id": "ChIJPxfpSgC7woARjS3G6HQDYgI",
+      "dedupe_key": "ChIJPxfpSgC7woARjS3G6HQDYgI",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "place_tacos-1986_1771305000875",
+      "slug": "tacos-1986",
+      "name": "Tacos 1986",
+      "google_place_id": "ChIJc1UAXfrHwoARkMC2iYyz8R8",
+      "dedupe_key": "ChIJc1UAXfrHwoARkMC2iYyz8R8",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION"
+    },
+    {
+      "place_id": "47e1ecb4-bf94-45e9-82f9-70b5c7ec9089",
+      "slug": "the-west-hollywood-edition-hotel-hotel-boutique-ian-schrager-west-hollywood-19-9",
+      "name": "The West Hollywood EDITION,hotel,hotel-boutique,Ian Schrager - West Hollywood - 19.9 rating",
+      "google_place_id": "ChIJr7tLCKG-woARNVvQTdKErgU",
+      "dedupe_key": "ChIJr7tLCKG-woARNVvQTdKErgU",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "0ca1276f-8224-4da4-9a96-e661d89ef355",
+      "slug": "tomat-restaurant-3-hot2025-farm-to-table-michelin-recommended-2025",
+      "name": "Tomat,restaurant,3-hot2025,Farm-to-table - Michelin recommended 2025",
+      "google_place_id": "ChIJDUyRuV2xwoARPXiy3q2yRLs",
+      "dedupe_key": "ChIJDUyRuV2xwoARPXiy3q2yRLs",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "6c7e44dd-07ba-4a78-8b72-51787b023b24",
+      "slug": "vespertine-restaurant-2-michelin-2-michelin-stars-jordan-kahn",
+      "name": "Vespertine,restaurant,2-michelin,2 Michelin stars - Jordan Kahn",
+      "google_place_id": "ChIJVd04SYW5woAROE52K0dXeYE",
+      "dedupe_key": "ChIJVd04SYW5woAROE52K0dXeYE",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "4af76227-25f6-4b54-9d1d-761b20cfd0c1",
+      "slug": "vin-folk-wine-bar-3-hot2025-new-michelin-bib-gourmand-natural-wine",
+      "name": "Vin Folk,wine bar,3-hot2025,New Michelin Bib Gourmand - natural wine",
+      "google_place_id": "ChIJaQ7b8R-zwoARYMTDhwUoHWc",
+      "dedupe_key": "ChIJaQ7b8R-zwoARYMTDhwUoHWc",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    }
+  ],
+  "duplicate_groups": [],
+  "top_20_candidates": [
+    {
+      "place_id": "0b9d4be0-34b2-445c-b4bf-77c5538f0b89",
+      "slug": "alba-los-angeles-restaurant-3-hot2025-italian-open-air-west-hollywood",
+      "name": "Alba Los Angeles,restaurant,3-hot2025,Italian open-air - West Hollywood",
+      "google_place_id": "ChIJK1i52rK_woARSal9_H7GrGc",
+      "dedupe_key": "ChIJK1i52rK_woARSal9_H7GrGc",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "81513430-c4f3-4241-b0ed-51d2c634f8e1",
+      "slug": "alta-adams-restaurant-4-iconic-keith-corbin-south-la",
+      "name": "Alta Adams,restaurant,4-iconic,Keith Corbin - South LA",
+      "google_place_id": "ChIJ5XZfNW65woARIhG9hN44XQ4",
+      "dedupe_key": "ChIJ5XZfNW65woARIhG9hN44XQ4",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "5c5e31f1-d750-45ec-a26c-999f365a6cb5",
+      "slug": "anajak-thai-restaurant-4-iconic-sherman-oaks-massively-acclaimed",
+      "name": "Anajak Thai,restaurant,4-iconic,Sherman Oaks - massively acclaimed",
+      "google_place_id": "ChIJn-ihusWXwoARE6yGp6tPoIM",
+      "dedupe_key": "ChIJn-ihusWXwoARE6yGp6tPoIM",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "3f4461a3-6074-4fa9-b170-364b8e7d282e",
+      "slug": "augustine-wine-bar-wine-bar-5-wine-bar-sherman-oaks",
+      "name": "Augustine Wine Bar,wine bar,5-wine-bar,Sherman Oaks",
+      "google_place_id": "ChIJ0V8uySeWwoARiOu1BAeRCdU",
+      "dedupe_key": "ChIJ0V8uySeWwoARiOu1BAeRCdU",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "59eb5040-1690-4f26-b463-041855c99174",
+      "slug": "baby-bistro-restaurant-3-hot2025-restaurant-of-the-year-contender-echo-park",
+      "name": "Baby Bistro,restaurant,3-hot2025,Restaurant of the year contender - Echo Park",
+      "google_place_id": "ChIJpboOd2HHwoAR0kwNDqK4cgw",
+      "dedupe_key": "ChIJpboOd2HHwoAR0kwNDqK4cgw",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "8e05af40-46d5-4fc1-ae34-e20e8dfdd810",
+      "slug": "bar-covell-wine-bar-5-wine-bar-los-feliz",
+      "name": "Bar Covell,wine bar,5-wine-bar,Los Feliz",
+      "google_place_id": "ChIJD2HKqa3AwoAR8JTi02ZS2Hc",
+      "dedupe_key": "ChIJD2HKqa3AwoAR8JTi02ZS2Hc",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "1466d85c-beb9-4b17-912b-f5462beff6d0",
+      "slug": "bavel-restaurant-1-arts-district-middle-eastern-same-owners-as-bestia",
+      "name": "Bavel,restaurant,1,Arts District Middle Eastern - same owners as Bestia",
+      "google_place_id": "ChIJAQDw5jzGwoARJ0ddsqWyCAQ",
+      "dedupe_key": "ChIJAQDw5jzGwoARJ0ddsqWyCAQ",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "280edc04-605d-4cf7-8be0-fdb91e3c7c0d",
+      "slug": "betsy-restaurant-3-hot2025-altadena-hearth-cooking-tyler-wells-comeback",
+      "name": "Betsy,restaurant,3-hot2025,Altadena hearth cooking - Tyler Wells comeback",
+      "google_place_id": "ChIJyROYYDXDwoARx_7TxDXZi6Q",
+      "dedupe_key": "ChIJyROYYDXDwoARx_7TxDXZi6Q",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "place_budonoki_1771305000799",
+      "slug": "budonoki",
+      "name": "Budonoki",
+      "google_place_id": "ChIJD5LuBp3HwoARqHfw3wOS7VA",
+      "dedupe_key": "ChIJD5LuBp3HwoARqHfw3wOS7VA",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION"
+    },
+    {
+      "place_id": "6ff03197-4613-41f1-99cd-0021e1b2019c",
+      "slug": "camélia-restaurant-3-hot2025-french-japanese-bon-appétit-2025",
+      "name": "Camélia,restaurant,3-hot2025,French-Japanese - Bon Appétit 2025",
+      "google_place_id": "ChIJp01x8r7HwoARHdyVH9NySTs",
+      "dedupe_key": "ChIJp01x8r7HwoARHdyVH9NySTs",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "6e61406d-e9a4-4f6e-b5de-4c539773419f",
+      "slug": "cara-hotel-hotel-hotel-boutique-laid-back-modern-boutique-los-feliz-near-griffit",
+      "name": "Cara Hotel,hotel,hotel-boutique,Laid-back modern boutique - Los Feliz near Griffith Park",
+      "google_place_id": "ChIJ_72WeFC_woARaXeiD_y7hy8",
+      "dedupe_key": "ChIJ_72WeFC_woARaXeiD_y7hy8",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "84cdfb99-80ae-4f9d-8b19-983281497827",
+      "slug": "chi-spacca-restaurant-1-nancy-silverton-meat-focused",
+      "name": "Chi Spacca,restaurant,1,Nancy Silverton meat-focused",
+      "google_place_id": "ChIJwbQBbdO4woARHT4khoXPnok",
+      "dedupe_key": "ChIJwbQBbdO4woARHT4khoXPnok",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "7266e7e5-72b3-422c-b319-5e8b9ac84f4e",
+      "slug": "downtown-l-a-proper-hotel-hotel-hotel-boutique-kelly-wearstler-design-dtla-19-5-",
+      "name": "Downtown L.A. Proper Hotel,hotel,hotel-boutique,Kelly Wearstler design - DTLA - 19.5 rating",
+      "google_place_id": "ChIJPVoyBWbHwoAREu--ZMmvEpA",
+      "dedupe_key": "ChIJPVoyBWbHwoAREu--ZMmvEpA",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "3cd72c30-fc68-45aa-885a-f25c1bf2fae4",
+      "slug": "endorffeine-coffee-6-coffee-arts-district",
+      "name": "Endorffeine,coffee,6-coffee,Arts District",
+      "google_place_id": "ChIJsTjh9VrGwoARfOkMqZCZRXQ",
+      "dedupe_key": "ChIJsTjh9VrGwoARfOkMqZCZRXQ",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "610f7169-e4f0-4740-8c9f-70893715a773",
+      "slug": "esters-wine-shop-and-bar-wine-bar-5-wine-bar-santa-monica",
+      "name": "Esters Wine Shop & Bar,wine bar,5-wine-bar,Santa Monica",
+      "google_place_id": "ChIJ5Zhalc6kwoARm4tOh2YqVZ8",
+      "dedupe_key": "ChIJ5Zhalc6kwoARm4tOh2YqVZ8",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "4850809d-6a43-4701-8fca-036daeb7a3a6",
+      "slug": "freehand-los-angeles-hotel-hotel-neighborhood-dtla-youthful-artsy-vibe-rooftop-b",
+      "name": "Freehand Los Angeles,hotel,hotel-neighborhood,DTLA - youthful artsy vibe - rooftop bar - from $140",
+      "google_place_id": "ChIJE80IjrXHwoARZo6wiQusTrc",
+      "dedupe_key": "ChIJE80IjrXHwoARZo6wiQusTrc",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "70d07bae-98a1-466c-839b-c2c5945c9212",
+      "slug": "gjelina-restaurant-1-venice-institution-eater-all-time-38",
+      "name": "Gjelina,restaurant,1,Venice institution - Eater all-time 38",
+      "google_place_id": "ChIJGU5p6ri7woARaCOqe4haSl0",
+      "dedupe_key": "ChIJGU5p6ri7woARaCOqe4haSl0",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "10da04a9-d760-4dc0-819e-3f56189b1a0d",
+      "slug": "gucci-osteria-da-massimo-bottura-restaurant-2-michelin-1-michelin-star-beverly-h",
+      "name": "Gucci Osteria da Massimo Bottura,restaurant,2-michelin,1 Michelin star - Beverly Hills",
+      "google_place_id": "ChIJmY8Ttaa7woARqE-Ss5DafEo",
+      "dedupe_key": "ChIJmY8Ttaa7woARqE-Ss5DafEo",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "003245fc-ad9b-4225-9440-faaf83dc1f68",
+      "slug": "hayato-restaurant-2-michelin-2-michelin-stars-japanese",
+      "name": "Hayato,restaurant,2-michelin,2 Michelin stars - Japanese",
+      "google_place_id": "ChIJt1RlQi_GwoARja7mYeFk2YI",
+      "dedupe_key": "ChIJt1RlQi_GwoARja7mYeFk2YI",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "0a5864db-e933-4740-a91b-c1936ee33620",
+      "slug": "holbox-restaurant-1-mercado-la-paloma-#1-on-la-times-101-2025",
+      "name": "Holbox,restaurant,1,Mercado La Paloma - #1 on LA Times 101 2025",
+      "google_place_id": "ChIJMc9-jgrIwoARvFaE32ZlJzA",
+      "dedupe_key": "ChIJMc9-jgrIwoARvFaE32ZlJzA",
+      "missing_groups": [
+        "NEED_HOURS",
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_HOURS, NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    }
+  ]
+}

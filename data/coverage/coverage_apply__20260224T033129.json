@@ -1,0 +1,50 @@
+{
+  "run_id": "apply_1771903885152",
+  "created_at": "2026-02-24T03:31:25.152Z",
+  "dry_run": false,
+  "params": {
+    "limit": 20,
+    "photos_per_place": 10,
+    "la_only": true
+  },
+  "counts": {
+    "candidates_filtered": 5,
+    "processed": 5,
+    "succeeded": 0,
+    "failed": 5,
+    "by_group": {
+      "NEED_GOOGLE_PHOTOS": 5,
+      "NEED_HOURS": 0,
+      "NEED_GOOGLE_ATTRS": 5
+    }
+  },
+  "failed_slugs": [
+    "gjusta",
+    "langer-s-delicatessen",
+    "republique",
+    "sonoratown",
+    "sqirl"
+  ],
+  "errors": [
+    {
+      "slug": "gjusta",
+      "error": "\nInvalid `db.place_coverage_status.findUnique()` invocation in\n/Users/bobbyciccaglione/code/saiko-maps/scripts/coverage-apply.ts:155:51\n\n  152   errorCode?: string;\n  153   errorMessage?: string;\n  154 }) {\n→ 155   const existing = await db.place_coverage_status.findUnique(\nThe table `public.place_coverage_status` does not exist in the current database."
+    },
+    {
+      "slug": "langer-s-delicatessen",
+      "error": "\nInvalid `db.place_coverage_status.findUnique()` invocation in\n/Users/bobbyciccaglione/code/saiko-maps/scripts/coverage-apply.ts:155:51\n\n  152   errorCode?: string;\n  153   errorMessage?: string;\n  154 }) {\n→ 155   const existing = await db.place_coverage_status.findUnique(\nThe table `public.place_coverage_status` does not exist in the current database."
+    },
+    {
+      "slug": "republique",
+      "error": "\nInvalid `db.place_coverage_status.findUnique()` invocation in\n/Users/bobbyciccaglione/code/saiko-maps/scripts/coverage-apply.ts:155:51\n\n  152   errorCode?: string;\n  153   errorMessage?: string;\n  154 }) {\n→ 155   const existing = await db.place_coverage_status.findUnique(\nThe table `public.place_coverage_status` does not exist in the current database."
+    },
+    {
+      "slug": "sonoratown",
+      "error": "\nInvalid `db.place_coverage_status.findUnique()` invocation in\n/Users/bobbyciccaglione/code/saiko-maps/scripts/coverage-apply.ts:155:51\n\n  152   errorCode?: string;\n  153   errorMessage?: string;\n  154 }) {\n→ 155   const existing = await db.place_coverage_status.findUnique(\nThe table `public.place_coverage_status` does not exist in the current database."
+    },
+    {
+      "slug": "sqirl",
+      "error": "\nInvalid `db.place_coverage_status.findUnique()` invocation in\n/Users/bobbyciccaglione/code/saiko-maps/scripts/coverage-apply.ts:155:51\n\n  152   errorCode?: string;\n  153   errorMessage?: string;\n  154 }) {\n→ 155   const existing = await db.place_coverage_status.findUnique(\nThe table `public.place_coverage_status` does not exist in the current database."
+    }
+  ]
+}

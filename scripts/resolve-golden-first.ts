@@ -13,8 +13,38 @@ import * as path from 'path'
 import { normalizeNameForMatch, slugForMatch } from '@/lib/intake-normalize'
 import { db } from '@/lib/db'
 
-const RESOLVER_VERSION = 'golden-first-v1'
+const RESOLVER_VERSION = 'golden-first-v2'
 const FUZZY_THRESHOLD = 0.85 // configurable
+
+/** Infer vertical from raw. Checks raw_json.vertical, primary_vertical, category; fallback to name via keyword match. */
+function inferVerticalFromRaw(raw: { raw_json: unknown; name_normalized?: string | null }): string | null {
+  const json = raw.raw_json as Record<string, unknown> | null
+  const fromField = (json?.vertical ?? json?.primary_vertical ?? json?.category) as string | undefined
+  const name = (json?.name ?? raw.name_normalized ?? '') as string
+  const text = `${(fromField ?? '')} ${name}`.toLowerCase()
+  if (/\bhotel\b|\blodging\b|\binn\b|\bmotel\b/.test(text)) return 'hotel'
+  if (/\brestaurant\b|\bcafe\b|\bcafé\b|\bkitchen\b|\bbar\b|\bgrill\b|\beatery\b|\bbistro\b|\bbakery\b|\bbrasserie\b/.test(text)) return 'restaurant'
+  if (/\bgrocery\b|\bmarket\b|\bsupermarket\b/.test(text)) return 'grocery'
+  if (/\bstore\b|\bshop\b|\bboutique\b|\bretail\b/.test(text)) return 'retail'
+  return null
+}
+
+/** Map golden_records.category to vertical bucket. */
+function categoryToVertical(category: string | null | undefined): string | null {
+  if (!category) return null
+  const c = category.toLowerCase().trim()
+  if (/hotel|lodging|inn|motel/.test(c)) return 'hotel'
+  if (/restaurant|cafe|kitchen|bar|grill|eatery|bistro|bakery|brasserie|food/.test(c)) return 'restaurant'
+  if (/grocery|market|supermarket/.test(c)) return 'grocery'
+  if (/store|shop|boutique|retail/.test(c)) return 'retail'
+  return null
+}
+
+/** Hard boundary: do not collapse across verticals. */
+function verticalMismatch(rawVertical: string | null, goldenVertical: string | null): boolean {
+  if (!rawVertical || !goldenVertical) return false
+  return rawVertical !== goldenVertical
+}
 
 function jaroWinkler(s1: string, s2: string): number {
   if (s1 === s2) return 1
@@ -92,10 +122,20 @@ async function main() {
     process.exit(0)
   }
 
-  type GoldenRef = { canonical_id: string; name: string; slug: string }
+  const rawIds = rawRecords.map((r) => r.raw_id)
+
+  // Task 1 — Idempotency: replace strategy. Delete existing resolution_links for this batch before writing.
+  const deleted = await prisma.resolution_links.deleteMany({
+    where: { raw_record_id: { in: rawIds } },
+  })
+  if (deleted.count > 0) {
+    console.log('Cleared %d existing resolution_links for batch %s', deleted.count, batchId)
+  }
+
+  type GoldenRef = { canonical_id: string; name: string; slug: string; category: string | null }
   const goldens: GoldenRef[] = await prisma.golden_records.findMany({
     where: { promotion_status: { in: ['PENDING', 'VERIFIED', 'PUBLISHED'] } },
-    select: { canonical_id: true, name: true, slug: true },
+    select: { canonical_id: true, name: true, slug: true, category: true },
   })
   const byNormalizedName = new Map<string, GoldenRef[]>()
   const bySlug = new Map<string, GoldenRef>()
@@ -130,13 +170,18 @@ async function main() {
     const name = (raw.raw_json as any)?.name ?? raw.name_normalized ?? 'Unknown'
     const normalized = raw.name_normalized ?? normalizeNameForMatch(name)
     const slugCandidate = slugForMatch(name)
+    const rawVertical = inferVerticalFromRaw(raw)
 
     let result: MatchResult | null = null
 
     // 1) Exact normalized name match
     const exactNorm = byNormalizedName.get(normalized)
     if (exactNorm?.length === 1) {
-      result = { kind: 'matched', golden: exactNorm[0], method: 'normalized', confidence: 1 }
+      const golden = exactNorm[0]
+      const goldenVertical = categoryToVertical(golden.category)
+      if (!verticalMismatch(rawVertical, goldenVertical)) {
+        result = { kind: 'matched', golden, method: 'normalized', confidence: 1 }
+      }
     } else if (exactNorm && exactNorm.length > 1) {
       result = { kind: 'ambiguous', reason: 'multiple_normalized_name_matches' }
     }
@@ -145,15 +190,20 @@ async function main() {
     if (!result && slugCandidate) {
       const slugMatch = bySlug.get(slugCandidate.toLowerCase())
       if (slugMatch) {
-        result = { kind: 'matched', golden: slugMatch, method: 'exact', confidence: 1 }
+        const goldenVertical = categoryToVertical(slugMatch.category)
+        if (!verticalMismatch(rawVertical, goldenVertical)) {
+          result = { kind: 'matched', golden: slugMatch, method: 'exact', confidence: 1 }
+        }
       }
     }
 
-    // 3) Fuzzy (single best above threshold)
+    // 3) Fuzzy (single best above threshold) — exclude candidates across vertical boundary
     if (!result) {
       let best: (typeof goldens)[0] | null = null
       let bestScore = 0
       for (const g of goldens) {
+        const goldenVertical = categoryToVertical(g.category)
+        if (verticalMismatch(rawVertical, goldenVertical)) continue
         const gNorm = normalizeNameForMatch(g.name)
         const score = jaroWinkler(normalized, gNorm)
         if (score >= FUZZY_THRESHOLD && score > bestScore) {
@@ -161,7 +211,13 @@ async function main() {
           best = g
         }
       }
-      const ties = best ? goldens.filter((g) => jaroWinkler(normalized, normalizeNameForMatch(g.name)) >= FUZZY_THRESHOLD && jaroWinkler(normalized, normalizeNameForMatch(g.name)) >= bestScore) : []
+      const ties = best
+        ? goldens.filter((g) => {
+            if (verticalMismatch(rawVertical, categoryToVertical(g.category))) return false
+            const score = jaroWinkler(normalized, normalizeNameForMatch(g.name))
+            return score >= FUZZY_THRESHOLD && score >= bestScore
+          })
+        : []
       if (ties.length > 1) {
         result = { kind: 'ambiguous', reason: 'fuzzy_tie' }
       } else if (best) {
@@ -199,6 +255,7 @@ async function main() {
       const lat = raw.lat ? raw.lat : new Prisma.Decimal(0)
       const lng = raw.lng ? raw.lng : new Prisma.Decimal(0)
       const confidence = raw.lat && raw.lng ? 0.8 : 0.5
+      const inferredCategory = rawVertical ? rawVertical.charAt(0).toUpperCase() + rawVertical.slice(1) : null
       await prisma.golden_records.create({
         data: {
           canonical_id: canonicalId,
@@ -206,6 +263,7 @@ async function main() {
           name,
           lat,
           lng,
+          category: inferredCategory,
           source_attribution: {} as Prisma.JsonValue,
           cuisines: [],
           vibe_tags: [],
@@ -226,7 +284,7 @@ async function main() {
         },
       })
       createdRows.push({ raw_id: raw.raw_id, name, golden_id: canonicalId, canonical_slug: slug })
-      registerGolden({ canonical_id: canonicalId, name, slug })
+      registerGolden({ canonical_id: canonicalId, name, slug, category: inferredCategory })
       createdCount++
     } else {
       await prisma.resolution_links.create({
@@ -243,6 +301,13 @@ async function main() {
       ambiguousCount++
     }
   }
+
+  // Task 1 — Idempotency: mark all batch raw_records as processed (resolver has handled them)
+  const processedResult = await prisma.raw_records.updateMany({
+    where: { intake_batch_id: batchId },
+    data: { is_processed: true },
+  })
+  console.log('Marked %d raw_records processed for batch %s', processedResult.count, batchId)
 
   const outDir = path.join(process.cwd(), 'data', 'resolver-output', `batch-${batchId}`)
   fs.mkdirSync(outDir, { recursive: true })

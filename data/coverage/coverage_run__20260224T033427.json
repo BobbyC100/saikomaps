@@ -1,0 +1,36 @@
+{
+  "run_id": "run_1771904065479",
+  "created_at": "2026-02-24T03:34:25.479Z",
+  "db_identity": {
+    "host": "ep-spring-sun-aiht1nns-pooler.c-4.us-east-1.aws.neon.tech",
+    "dbname": "neondb",
+    "database_url_host": "ep-spring-sun-aiht1nns-pooler.c-4.us-east-1.aws.neon.tech",
+    "database_url_dbname": "neondb"
+  },
+  "params": {
+    "limit": 200,
+    "la_only": true,
+    "ttl_days": 90,
+    "retry_backoff_hours": 24
+  },
+  "counts": {
+    "total_places": 39,
+    "by_prl": {
+      "prl_2": 34,
+      "prl_1": 5
+    },
+    "by_missing_group": {
+      "NEED_DESCRIPTION": 39,
+      "NEED_TAG_SIGNALS": 34,
+      "NEED_HOURS": 5
+    },
+    "candidates_count": 0,
+    "excluded_by_ttl": 39,
+    "excluded_by_backoff": 0,
+    "excluded_by_running": 0,
+    "excluded_by_complete": 0
+  },
+  "candidates": [],
+  "duplicate_groups": [],
+  "top_20_candidates": []
+}

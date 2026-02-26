@@ -4,13 +4,19 @@
  * Use: npx tsx scripts/probe-google-places-raw-response.ts [placeId]
  *
  * If no placeId, picks the first linked place from the DB.
+ *
+ * Field mask: displayName, formattedAddress, regularOpeningHours, currentOpeningHours,
+ * utcOffsetMinutes (for sanity + hours debugging).
  */
 
 import 'dotenv/config';
 import { db } from '@/lib/db';
-import { VALADATA_GOOGLE_PLACES_FIELDS_V1_STRING } from '@/lib/google-places';
 
 const PLACES_API_NEW_BASE = 'https://places.googleapis.com/v1';
+
+/** Hours-focused field mask for Places API (New) */
+const HOURS_FIELD_MASK =
+  'id,displayName,formattedAddress,regularOpeningHours,currentOpeningHours,utcOffsetMinutes';
 
 async function main() {
   const placeId = process.argv[2];
@@ -44,14 +50,14 @@ async function main() {
   console.log('--- Request ---');
   console.log('Endpoint: Places API (New)');
   console.log('place_id:', id);
-  console.log('X-Goog-FieldMask:', VALADATA_GOOGLE_PLACES_FIELDS_V1_STRING);
+  console.log('X-Goog-FieldMask:', HOURS_FIELD_MASK);
   console.log('');
 
   const response = await fetch(url, {
     headers: {
       'Content-Type': 'application/json',
       'X-Goog-Api-Key': apiKey,
-      'X-Goog-FieldMask': VALADATA_GOOGLE_PLACES_FIELDS_V1_STRING,
+      'X-Goog-FieldMask': HOURS_FIELD_MASK,
     },
   });
   const data = await response.json();
@@ -60,25 +66,22 @@ async function main() {
   console.log(JSON.stringify(data, null, 2));
   console.log('');
 
-  if (response.ok && data && typeof data === 'object') {
+  if (response.ok && data && typeof data === 'object' && !data.error) {
     console.log('--- Keys in response ---');
     console.log(Object.keys(data).sort().join(', '));
     console.log('');
 
-    console.log('--- Per-field check (requested vs present) ---');
-    const requested = VALADATA_GOOGLE_PLACES_FIELDS_V1_STRING.split(',');
-    for (const k of requested) {
-      const v = data[k];
-      const present = k in data;
-      const val = v === undefined ? 'undefined' : v === null ? 'null' : typeof v;
-      console.log(`  ${k}: ${present ? 'present' : 'MISSING'} (${val})`);
-    }
-    const extra = Object.keys(data).filter((k) => !requested.includes(k));
-    if (extra.length > 0) {
-      console.log('');
-      console.log('--- Unexpected keys (not in our mask) ---');
-      console.log(extra.join(', '));
-    }
+    console.log('--- Sanity fields ---');
+    console.log('displayName:', JSON.stringify(data.displayName));
+    console.log('formattedAddress:', data.formattedAddress ?? '(missing)');
+    console.log('');
+
+    console.log('--- Hours fields ---');
+    console.log('utcOffsetMinutes:', data.utcOffsetMinutes ?? '(missing)');
+    console.log('regularOpeningHours:', data.regularOpeningHours ? JSON.stringify(data.regularOpeningHours, null, 2) : '(missing)');
+    console.log('currentOpeningHours:', data.currentOpeningHours ? JSON.stringify(data.currentOpeningHours, null, 2) : '(missing)');
+  } else if (data?.error) {
+    console.error('API error:', data.error);
   }
 
   await db.$disconnect();

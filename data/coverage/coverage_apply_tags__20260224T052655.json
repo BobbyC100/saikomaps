@@ -1,0 +1,19 @@
+{
+  "run_id": "apply_tags_1771910805328",
+  "created_at": "2026-02-24T05:26:45.328Z",
+  "dry_run": false,
+  "params": {
+    "limit": 34,
+    "la_only": true,
+    "ttl_days": 0
+  },
+  "counts": {
+    "candidates_filtered": 34,
+    "processed": 34,
+    "succeeded": 34,
+    "failed": 0,
+    "skipped_idempotent": 0
+  },
+  "failed_slugs": [],
+  "errors": []
+}

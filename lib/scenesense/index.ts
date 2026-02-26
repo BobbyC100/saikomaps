@@ -21,6 +21,11 @@ export {
 export { lintSceneSenseOutput, type LintResult } from './lint';
 export { mapPlaceToPlaceForPRL, mapToCanonicalSceneSense } from './mappers';
 export {
+  fetchPlaceForPRLBySlug,
+  fetchPlaceForPRLBatch,
+} from './prl-materialize';
+export {
   assembleSceneSense,
+  assembleSceneSenseFromMaterialized,
   type SceneSenseAssemblyResult,
 } from './assembly';

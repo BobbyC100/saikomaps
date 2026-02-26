@@ -1,0 +1,470 @@
+/* Saiko Place Page — Canonical Spec v1 */
+
+/* ---------------------------------------------------------------------------
+   0. Document Frame (global posture)
+   --------------------------------------------------------------------------- */
+#document-frame {
+  padding-top: max(96px, env(safe-area-inset-top));
+  min-height: 100vh;
+}
+
+/* ---------------------------------------------------------------------------
+   1. Page Canvas + Grid
+   --------------------------------------------------------------------------- */
+#page-canvas {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 32px 72px;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 24px;
+}
+
+/* ---------------------------------------------------------------------------
+   2. Top Section: Identity (left) + Rail (right)
+   --------------------------------------------------------------------------- */
+#top-section {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 24px;
+}
+
+#identity-column {
+  grid-column: 1 / span 8;
+}
+
+#rail-column {
+  grid-column: 9 / span 4;
+}
+
+/* Identity stack order: H1 → Subline → Signals → Description → Facts Band */
+#identity-column h1 {
+  margin: 0 0 0.25em;
+  font-size: clamp(1.75rem, 4vw, 2.25rem);
+  font-weight: 600;
+  color: #36454F;
+  line-height: 1.2;
+}
+
+#identity-subline {
+  margin: 0 0 0.5em;
+  font-size: 14px;
+  color: #36454F;
+  opacity: 0.8;
+}
+
+#identity-signals {
+  margin: 0 0 0.75em;
+  font-size: 13px;
+  color: #36454F;
+  opacity: 0.85;
+  line-height: 1.4;
+}
+
+#identity-description {
+  margin: 0 0 0;
+  font-size: 15px;
+  line-height: 1.65;
+  color: #36454F;
+}
+
+/* Facts Band: between two rules, min-height 44px, horizontal left-aligned */
+#facts-band {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0 1.5em;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  margin-top: 1.25em;
+  padding: 10px 0;
+  font-size: 13px;
+  color: #36454F;
+  opacity: 0.85;
+}
+
+#facts-band a {
+  color: #8B7355;
+  text-decoration: none;
+}
+
+#facts-band a:hover {
+  text-decoration: underline;
+}
+
+/* ---------------------------------------------------------------------------
+   3. Right Rail (v1): margin notes, crown lane, muted, fragmented
+   --------------------------------------------------------------------------- */
+#rail-column {
+  border-left: 1px solid rgba(0, 0, 0, 0.08);
+  padding-left: 16px;
+  position: relative;
+}
+
+/* Crown lane: rail content starts lower than H1 */
+#rail-column::before {
+  content: '';
+  display: block;
+  height: 56px;
+}
+
+.rail-block {
+  font-size: 12px;
+  color: #36454F;
+  opacity: 0.75;
+  margin-bottom: 1em;
+}
+
+.rail-block:last-child {
+  margin-bottom: 0;
+}
+
+.rail-block strong {
+  font-weight: 600;
+  opacity: 0.9;
+}
+
+/* ---------------------------------------------------------------------------
+   4. Section containers with provenance diamond (bottom-right)
+   --------------------------------------------------------------------------- */
+.section-with-provenance {
+  position: relative;
+  padding-bottom: 28px;
+}
+
+/* Provenance diamond: glyph ~12px, hit target 24px, opacity .5 default / .8 hover, 8px inset bottom-right */
+.provenance-diamond {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(0, 0, 0, 0.25);
+  background: transparent;
+  cursor: pointer;
+  text-decoration: none;
+  color: #36454F;
+  opacity: 0.5;
+  font-size: 12px;
+  line-height: 1;
+  transition: opacity 0.15s;
+}
+
+.provenance-diamond:hover {
+  opacity: 0.8;
+}
+
+.provenance-diamond::after {
+  content: '◆';
+}
+
+/* ---------------------------------------------------------------------------
+   5. Editorial Stack (below top section)
+   --------------------------------------------------------------------------- */
+#editorial-stack {
+  grid-column: 1 / span 8;
+  margin-top: 2em;
+}
+
+#editorial-stack hr {
+  border: none;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  margin: 1.5em 0;
+}
+
+.editorial-block {
+  margin-bottom: 0;
+}
+
+.editorial-block h2 {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #36454F;
+  opacity: 0.7;
+  margin: 0 0 0.5em;
+}
+
+#curator-note p {
+  font-family: 'Libre Baskerville', Georgia, serif;
+  font-size: 15px;
+  font-style: italic;
+  color: #36454F;
+  line-height: 1.6;
+  margin: 0;
+}
+
+#curator-note .curator-byline {
+  font-size: 12px;
+  color: #36454F;
+  opacity: 0.5;
+  margin-top: 8px;
+  margin-bottom: 0;
+  font-style: normal;
+  font-family: inherit;
+}
+
+#tips-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 13px;
+  color: #36454F;
+  line-height: 1.6;
+}
+
+#tips-list li {
+  padding-left: 12px;
+  position: relative;
+  margin-bottom: 6px;
+}
+
+#tips-list li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: #C3B091;
+}
+
+#pull-quote {
+  margin: 0;
+  border-left: 3px solid rgba(195, 176, 145, 0.3);
+  padding-left: 16px;
+}
+
+#pull-quote p {
+  font-family: 'Libre Baskerville', Georgia, serif;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #36454F;
+  opacity: 0.85;
+  margin: 0;
+}
+
+#pull-quote cite {
+  font-size: 12px;
+  color: #36454F;
+  opacity: 0.6;
+  font-style: normal;
+  display: block;
+  margin-top: 6px;
+}
+
+/* ---------------------------------------------------------------------------
+   6. Photos Section (3-col, 4/3 aspect, no hero)
+   --------------------------------------------------------------------------- */
+#photos-section {
+  grid-column: 1 / -1;
+  margin-top: 2em;
+  padding-top: 1.5em;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+#photos-section h2 {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #36454F;
+  opacity: 0.7;
+  margin: 0 0 1em;
+}
+
+#photos-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+#photos-grid .photo-tile {
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.06);
+}
+
+#photos-grid .photo-tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ---------------------------------------------------------------------------
+   7. Recognitions (capped display, hide if 0)
+   --------------------------------------------------------------------------- */
+#recognitions-section {
+  grid-column: 1 / -1;
+  margin-top: 2em;
+  padding-top: 1.5em;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+#recognitions-section h2 {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #36454F;
+  opacity: 0.7;
+  margin: 0 0 0.75em;
+}
+
+#recognitions-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 13px;
+  color: #36454F;
+  opacity: 0.9;
+}
+
+#recognitions-list li {
+  margin-bottom: 4px;
+}
+
+/* ---------------------------------------------------------------------------
+   8. Reference Ledger (bottom, calm typography)
+   --------------------------------------------------------------------------- */
+#reference-ledger {
+  grid-column: 1 / -1;
+  margin-top: 3em;
+  padding-top: 2em;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+#reference-ledger h2 {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #36454F;
+  opacity: 0.7;
+  margin: 0 0 1em;
+}
+
+.ledger-group {
+  margin-bottom: 1.5em;
+}
+
+.ledger-group:last-child {
+  margin-bottom: 0;
+}
+
+.ledger-group h3 {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #36454F;
+  opacity: 0.6;
+  margin: 0 0 0.5em;
+}
+
+.ledger-entries {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 12px;
+  color: #36454F;
+  opacity: 0.85;
+  line-height: 1.5;
+}
+
+.ledger-entries li {
+  margin-bottom: 4px;
+}
+
+.ledger-entries .ledger-date {
+  opacity: 0.65;
+  margin-left: 0.5em;
+}
+
+#reference-ledger .methodology-link {
+  margin-top: 1.5em;
+  font-size: 12px;
+}
+
+#reference-ledger .methodology-link a {
+  color: #8B7355;
+  text-decoration: none;
+}
+
+#reference-ledger .methodology-link a:hover {
+  text-decoration: underline;
+}
+
+/* ---------------------------------------------------------------------------
+   9. Unsupported tablet (768–1024px)
+   --------------------------------------------------------------------------- */
+#unsupported-tablet {
+  display: none;
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+  #document-frame #page-canvas {
+    display: none;
+  }
+
+  #unsupported-tablet {
+    display: block;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 2em 32px;
+    text-align: center;
+  }
+
+  #unsupported-tablet p {
+    margin: 0;
+    color: #36454F;
+    font-size: 15px;
+    opacity: 0.85;
+    max-width: 360px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+  10. Minimal mobile fallback (stack vertically)
+  --------------------------------------------------------------------------- */
+@media (max-width: 767px) {
+  #page-canvas {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  #top-section {
+    grid-template-columns: 1fr;
+  }
+
+  #identity-column,
+  #rail-column,
+  #editorial-stack,
+  #photos-section,
+  #recognitions-section,
+  #reference-ledger {
+    grid-column: 1 / -1;
+  }
+
+  #rail-column {
+    border-left: none;
+    padding-left: 0;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    padding-top: 1em;
+    margin-top: 1em;
+  }
+
+  #rail-column::before {
+    height: 0;
+  }
+
+  #photos-grid {
+    grid-template-columns: 1fr;
+  }
+}

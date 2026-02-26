@@ -1,0 +1,178 @@
+{
+  "run_id": "run_1771900218163",
+  "created_at": "2026-02-24T02:30:18.163Z",
+  "db_identity": {
+    "host": "localhost:5432",
+    "dbname": "saiko_maps",
+    "database_url_host": "localhost:5432",
+    "database_url_dbname": "saiko_maps"
+  },
+  "params": {
+    "limit": 200,
+    "la_only": true,
+    "ttl_days": 90,
+    "retry_backoff_hours": 24
+  },
+  "counts": {
+    "total_places": 5,
+    "by_prl": {
+      "prl_1": 5
+    },
+    "by_missing_group": {
+      "NEED_GOOGLE_ATTRS": 5,
+      "NEED_GOOGLE_PHOTOS": 5,
+      "NEED_DESCRIPTION": 5,
+      "NEED_TAG_SIGNALS": 5
+    },
+    "candidates_count": 5,
+    "excluded_by_ttl": 0,
+    "excluded_by_backoff": 0,
+    "excluded_by_running": 0,
+    "excluded_by_complete": 0
+  },
+  "candidates": [
+    {
+      "place_id": "06c269ab-bb46-414c-9090-d5a7b11c69bc",
+      "slug": "gjusta",
+      "name": "Gjusta",
+      "google_place_id": "ChIJIb5F-cW6woARd4CTt6yz_pg",
+      "dedupe_key": "ChIJIb5F-cW6woARd4CTt6yz_pg",
+      "missing_groups": [
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "9f2ff267-5be3-46b6-b24b-11a76226d0a7",
+      "slug": "langer-s-delicatessen",
+      "name": "Langer's Delicatessen",
+      "google_place_id": "ChIJP1rAZZ_HwoARAcX96y-BrjY",
+      "dedupe_key": "ChIJP1rAZZ_HwoARAcX96y-BrjY",
+      "missing_groups": [
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "28438f25-f5f7-4671-83ce-b0baef7cc478",
+      "slug": "republique",
+      "name": "Republique",
+      "google_place_id": "ChIJqaA5zt-4woARHGIEp3XlsZo",
+      "dedupe_key": "ChIJqaA5zt-4woARHGIEp3XlsZo",
+      "missing_groups": [
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "e46fdd45-9795-48c2-965c-87b524181cff",
+      "slug": "sonoratown",
+      "name": "Sonoratown",
+      "google_place_id": "ChIJ45QjyjTGwoARVNFElqulM0U",
+      "dedupe_key": "ChIJ45QjyjTGwoARVNFElqulM0U",
+      "missing_groups": [
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "419423b1-18db-482b-b8e6-8676faa7ad7c",
+      "slug": "sqirl",
+      "name": "Sqirl",
+      "google_place_id": "ChIJDX_-xETHwoARf6zx7LePHCo",
+      "dedupe_key": "ChIJDX_-xETHwoARf6zx7LePHCo",
+      "missing_groups": [
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    }
+  ],
+  "duplicate_groups": [],
+  "top_20_candidates": [
+    {
+      "place_id": "06c269ab-bb46-414c-9090-d5a7b11c69bc",
+      "slug": "gjusta",
+      "name": "Gjusta",
+      "google_place_id": "ChIJIb5F-cW6woARd4CTt6yz_pg",
+      "dedupe_key": "ChIJIb5F-cW6woARd4CTt6yz_pg",
+      "missing_groups": [
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "9f2ff267-5be3-46b6-b24b-11a76226d0a7",
+      "slug": "langer-s-delicatessen",
+      "name": "Langer's Delicatessen",
+      "google_place_id": "ChIJP1rAZZ_HwoARAcX96y-BrjY",
+      "dedupe_key": "ChIJP1rAZZ_HwoARAcX96y-BrjY",
+      "missing_groups": [
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "28438f25-f5f7-4671-83ce-b0baef7cc478",
+      "slug": "republique",
+      "name": "Republique",
+      "google_place_id": "ChIJqaA5zt-4woARHGIEp3XlsZo",
+      "dedupe_key": "ChIJqaA5zt-4woARHGIEp3XlsZo",
+      "missing_groups": [
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "e46fdd45-9795-48c2-965c-87b524181cff",
+      "slug": "sonoratown",
+      "name": "Sonoratown",
+      "google_place_id": "ChIJ45QjyjTGwoARVNFElqulM0U",
+      "dedupe_key": "ChIJ45QjyjTGwoARVNFElqulM0U",
+      "missing_groups": [
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "419423b1-18db-482b-b8e6-8676faa7ad7c",
+      "slug": "sqirl",
+      "name": "Sqirl",
+      "google_place_id": "ChIJDX_-xETHwoARf6zx7LePHCo",
+      "dedupe_key": "ChIJDX_-xETHwoARf6zx7LePHCo",
+      "missing_groups": [
+        "NEED_GOOGLE_ATTRS",
+        "NEED_GOOGLE_PHOTOS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_GOOGLE_ATTRS, NEED_GOOGLE_PHOTOS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    }
+  ]
+}

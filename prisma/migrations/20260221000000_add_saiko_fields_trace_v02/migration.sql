@@ -1,11 +1,19 @@
--- CreateEnum
-CREATE TYPE "ActorKind" AS ENUM ('organization', 'brand', 'person');
+-- CreateEnum (idempotent: skip if already exists)
+DO $$ BEGIN
+  CREATE TYPE "ActorKind" AS ENUM ('organization', 'brand', 'person');
+EXCEPTION
+  WHEN duplicate_object THEN NULL;
+END $$;
 
--- CreateEnum
-CREATE TYPE "ActorRole" AS ENUM ('operator', 'owner', 'parent', 'founder');
+-- CreateEnum (idempotent: skip if already exists)
+DO $$ BEGIN
+  CREATE TYPE "ActorRole" AS ENUM ('operator', 'owner', 'parent', 'founder');
+EXCEPTION
+  WHEN duplicate_object THEN NULL;
+END $$;
 
--- CreateTable
-CREATE TABLE "Actor" (
+-- CreateTable (idempotent)
+CREATE TABLE IF NOT EXISTS "Actor" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "kind" "ActorKind" NOT NULL DEFAULT 'organization',
@@ -15,8 +23,8 @@ CREATE TABLE "Actor" (
     CONSTRAINT "Actor_pkey" PRIMARY KEY ("id")
 );
 
--- CreateTable
-CREATE TABLE "EntityActorRelationship" (
+-- CreateTable (idempotent)
+CREATE TABLE IF NOT EXISTS "EntityActorRelationship" (
     "id" TEXT NOT NULL,
     "entity_id" TEXT NOT NULL,
     "actor_id" TEXT NOT NULL,
@@ -31,8 +39,8 @@ CREATE TABLE "EntityActorRelationship" (
     CONSTRAINT "EntityActorRelationship_pkey" PRIMARY KEY ("id")
 );
 
--- CreateTable
-CREATE TABLE "FieldsMembership" (
+-- CreateTable (idempotent)
+CREATE TABLE IF NOT EXISTS "FieldsMembership" (
     "id" TEXT NOT NULL,
     "entity_id" TEXT NOT NULL,
     "included_at" TIMESTAMP(3) NOT NULL,
@@ -45,8 +53,8 @@ CREATE TABLE "FieldsMembership" (
     CONSTRAINT "FieldsMembership_pkey" PRIMARY KEY ("id")
 );
 
--- CreateTable
-CREATE TABLE "TraceSignalsCache" (
+-- CreateTable (idempotent)
+CREATE TABLE IF NOT EXISTS "TraceSignalsCache" (
     "id" TEXT NOT NULL,
     "entity_id" TEXT NOT NULL,
     "computed_at" TIMESTAMP(3) NOT NULL,
@@ -57,32 +65,24 @@ CREATE TABLE "TraceSignalsCache" (
     CONSTRAINT "TraceSignalsCache_pkey" PRIMARY KEY ("id")
 );
 
--- CreateIndex
-CREATE INDEX "Actor_name_idx" ON "Actor"("name");
+-- CreateIndex (idempotent)
+CREATE INDEX IF NOT EXISTS "Actor_name_idx" ON "Actor"("name");
+CREATE INDEX IF NOT EXISTS "EntityActorRelationship_entity_id_idx" ON "EntityActorRelationship"("entity_id");
+CREATE INDEX IF NOT EXISTS "EntityActorRelationship_actor_id_idx" ON "EntityActorRelationship"("actor_id");
+CREATE INDEX IF NOT EXISTS "FieldsMembership_entity_id_idx" ON "FieldsMembership"("entity_id");
+CREATE UNIQUE INDEX IF NOT EXISTS "TraceSignalsCache_entity_id_key" ON "TraceSignalsCache"("entity_id");
+CREATE INDEX IF NOT EXISTS "TraceSignalsCache_entity_id_idx" ON "TraceSignalsCache"("entity_id");
 
--- CreateIndex
-CREATE INDEX "EntityActorRelationship_entity_id_idx" ON "EntityActorRelationship"("entity_id");
-
--- CreateIndex
-CREATE INDEX "EntityActorRelationship_actor_id_idx" ON "EntityActorRelationship"("actor_id");
-
--- CreateIndex
-CREATE INDEX "FieldsMembership_entity_id_idx" ON "FieldsMembership"("entity_id");
-
--- CreateIndex
-CREATE UNIQUE INDEX "TraceSignalsCache_entity_id_key" ON "TraceSignalsCache"("entity_id");
-
--- CreateIndex
-CREATE INDEX "TraceSignalsCache_entity_id_idx" ON "TraceSignalsCache"("entity_id");
-
--- AddForeignKey
-ALTER TABLE "EntityActorRelationship" ADD CONSTRAINT "EntityActorRelationship_entity_id_fkey" FOREIGN KEY ("entity_id") REFERENCES "golden_records"("canonical_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "EntityActorRelationship" ADD CONSTRAINT "EntityActorRelationship_actor_id_fkey" FOREIGN KEY ("actor_id") REFERENCES "Actor"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "FieldsMembership" ADD CONSTRAINT "FieldsMembership_entity_id_fkey" FOREIGN KEY ("entity_id") REFERENCES "golden_records"("canonical_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "TraceSignalsCache" ADD CONSTRAINT "TraceSignalsCache_entity_id_fkey" FOREIGN KEY ("entity_id") REFERENCES "golden_records"("canonical_id") ON DELETE CASCADE ON UPDATE CASCADE;
+-- AddForeignKey (idempotent)
+DO $$ BEGIN
+  ALTER TABLE "EntityActorRelationship" ADD CONSTRAINT "EntityActorRelationship_entity_id_fkey" FOREIGN KEY ("entity_id") REFERENCES "golden_records"("canonical_id") ON DELETE CASCADE ON UPDATE CASCADE;
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  ALTER TABLE "EntityActorRelationship" ADD CONSTRAINT "EntityActorRelationship_actor_id_fkey" FOREIGN KEY ("actor_id") REFERENCES "Actor"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  ALTER TABLE "FieldsMembership" ADD CONSTRAINT "FieldsMembership_entity_id_fkey" FOREIGN KEY ("entity_id") REFERENCES "golden_records"("canonical_id") ON DELETE CASCADE ON UPDATE CASCADE;
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  ALTER TABLE "TraceSignalsCache" ADD CONSTRAINT "TraceSignalsCache_entity_id_fkey" FOREIGN KEY ("entity_id") REFERENCES "golden_records"("canonical_id") ON DELETE CASCADE ON UPDATE CASCADE;
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;

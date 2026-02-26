@@ -1,9 +1,11 @@
 /**
  * SceneSense assembly — bridge place data → Voice Engine → Lint → output
  * Used at place API / cache generation boundary
+ * Accepts materialized PlaceForPRL (preferred) or legacy PlaceForAssembly.
  */
 
 import { computePRL } from './prl';
+import type { PlaceForPRL } from './prl';
 import { generateSceneSenseCopy, type Mode, type VoiceOutput } from './voice-engine';
 import { lintSceneSenseOutput } from './lint';
 import { mapPlaceToPlaceForPRL } from './mappers';
@@ -50,9 +52,76 @@ export interface SceneSenseAssemblyResult {
   prlResult: ReturnType<typeof computePRL>;
 }
 
+/** Assemble with materialized PlaceForPRL (from fetchPlaceForPRLBySlug) + Voice Engine inputs */
+export function assembleSceneSenseFromMaterialized(args: {
+  placeForPRL: PlaceForPRL & { prlOverride?: number | null };
+  vibeTags?: string[] | null;
+  neighborhood?: string | null;
+  category?: string | null;
+  identitySignals?: {
+    place_personality?: string | null;
+    vibe_words?: string[];
+    signature_dishes?: string[];
+  } | null;
+}): SceneSenseAssemblyResult {
+  const prlOverride =
+    args.placeForPRL.prlOverride != null &&
+    args.placeForPRL.prlOverride >= 1 &&
+    args.placeForPRL.prlOverride <= 4
+      ? args.placeForPRL.prlOverride
+      : null;
+
+  const prlResult = computePRL(args.placeForPRL, prlOverride);
+  const { prl } = prlResult;
+
+  if (prl < 3) {
+    return {
+      prl,
+      mode: 'LITE',
+      scenesense: null,
+      prlResult,
+    };
+  }
+
+  const mode: Mode = prl >= 4 ? 'FULL' : 'LITE';
+  const canonical = mapToCanonicalSceneSense({
+    vibe_words: args.identitySignals?.vibe_words ?? args.vibeTags ?? [],
+    place_personality: args.identitySignals?.place_personality ?? null,
+    signature_dishes: args.identitySignals?.signature_dishes ?? [],
+    neighborhood: args.neighborhood ?? null,
+    category: args.category ?? null,
+  });
+
+  const hasVibeWords =
+    (args.identitySignals?.vibe_words ?? args.vibeTags ?? []).length > 0;
+  const hasDishes =
+    (args.identitySignals?.signature_dishes?.length ?? 0) > 0;
+  const confidence = {
+    overall: 0.6,
+    vibe: hasVibeWords ? 0.8 : 0.5,
+    atmosphere: 0.6,
+    ambiance: 0.6,
+    scene: hasDishes ? 0.7 : 0.5,
+  };
+
+  let output = generateSceneSenseCopy(canonical, {
+    prl: prl as 3 | 4,
+    mode,
+    confidence,
+  });
+
+  const lint = lintSceneSenseOutput({ prl, mode, confidence, output });
+  if (lint.status === 'FAIL' && lint.actions.includes('DROP_ALL_SCENESENSE')) {
+    return { prl, mode, scenesense: null, prlResult };
+  }
+  output = lint.cleaned_output;
+
+  return { prl, mode, scenesense: output, prlResult };
+}
+
 /**
- * Assemble SceneSense for a place.
- * PRL-1/2: returns scenesense: null (no interpretive text; legacy tags only at render)
+ * Assemble SceneSense for a place (legacy path).
+ * PRL-1/2: returns scenesense: null
  * PRL-3: Lite (max 2/surface)
  * PRL-4: Full (max 4/surface)
  */

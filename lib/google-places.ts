@@ -69,6 +69,8 @@ export interface PlaceDetails {
   businessStatus?: string;
   addressComponents?: AddressComponent[];
   vicinity?: string;
+  /** Google editorial summary (overview). Requires editorial_summary in fields. */
+  editorialSummary?: string;
 }
 
 /**
@@ -211,6 +213,7 @@ export async function getPlaceDetails(
       'business_status',
       'address_components',
       'vicinity',
+      'editorial_summary',
     ].join(','),
   });
 
@@ -268,6 +271,10 @@ export async function getPlaceDetails(
     businessStatus: place.business_status,
     addressComponents: addressComponents || undefined,
     vicinity: place.vicinity || undefined,
+    editorialSummary:
+      typeof place.editorial_summary?.overview === 'string'
+        ? place.editorial_summary.overview.trim()
+        : undefined,
   };
 }
 
@@ -511,26 +518,36 @@ export async function getPlaceAttributes(placeId: string): Promise<GooglePlacesA
 }
 
 /**
- * Attributes "present" per CTO brief:
- * - non-null with types (or equivalent) and at least one atmosphere field
+ * Attributes "present": types present and at least one meaningful attribute
+ * (any boolean attr true/false, or any numeric: rating / user_ratings_total / price_level).
  */
 export function areAttributesPresent(attrs: unknown): boolean {
   if (!attrs || typeof attrs !== 'object') return false;
   const o = attrs as Record<string, unknown>;
+
   const hasTypes = Array.isArray(o.types) && o.types.length > 0;
-  const atmosphereFields = [
+
+  const boolFields = [
     'serves_beer',
     'serves_wine',
-    'serves_cocktails',
-    'live_music',
-    'good_for_groups',
+    'serves_breakfast',
+    'serves_brunch',
+    'serves_lunch',
+    'serves_dinner',
+    'serves_vegetarian_food',
     'delivery',
     'dine_in',
     'takeout',
     'reservable',
+    'curbside_pickup',
   ];
-  const hasAtmosphere = atmosphereFields.some((f) => o[f] === true || o[f] === false);
-  return hasTypes && hasAtmosphere;
+
+  const numFields = ['price_level', 'rating', 'user_ratings_total'];
+
+  const hasBool = boolFields.some((f) => o[f] === true || o[f] === false);
+  const hasNum = numFields.some((f) => typeof o[f] === 'number' && Number.isFinite(o[f] as number));
+
+  return hasTypes && (hasBool || hasNum);
 }
 
 /**
