@@ -41,7 +41,7 @@ export async function GET() {
 
   let placesCount: number;
   try {
-    const result = await db.places.count();
+    const result = await db.entities.count();
     placesCount = result;
   } catch {
     placesCount = -1;

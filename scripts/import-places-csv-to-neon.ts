@@ -1,6 +1,7 @@
 /**
  * Import places from a Supabase (or any) CSV into Neon public.places.
- * Uses slug as the stable key; id/created_at are not overwritten for existing rows.
+ * GPID-first: resolve GPID (row / Nearby 200m / Text "${name} Los Angeles") → upsert by GPID.
+ * Never create without GPID; skip row with SKIP_NO_GPID when not MATCH.
  *
  * Usage:
  *   node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/import-places-csv-to-neon.ts --file /path/to/file.csv [--apply] [--force]
@@ -8,12 +9,13 @@
  * Dry run by default. Pass --apply to write. Pass --force to allow non-Neon target.
  */
 
-const IMPORT_SCRIPT_VERSION = "2026-02-24-gpid-normalize-v2";
+const IMPORT_SCRIPT_VERSION = "2026-02-26-gpid-first";
 
 import { readFileSync } from "fs";
 import { parse } from "papaparse";
 import { randomUUID } from "crypto";
 import { db } from "@/lib/db";
+import { resolveGpid } from "@/lib/gpid-resolve";
 
 type CsvRow = Record<string, string>;
 
@@ -119,7 +121,13 @@ function rowToPayload(row: CsvRow): Record<string, unknown> {
   return payload;
 }
 
-/** Remove id, created_at, slug from payload — used for collision updates only. */
+const RATE_LIMIT_MS = 200;
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((r) => setTimeout(r, ms));
+}
+
+/** Remove id, created_at, slug from payload — used for updates. Never include googlePlaceId in update (do not overwrite). */
 function stripImmutable(payload: Record<string, unknown>): Record<string, unknown> {
   const out = { ...payload };
   delete out.id;
@@ -127,6 +135,8 @@ function stripImmutable(payload: Record<string, unknown>): Record<string, unknow
   delete out.createdAt;
   delete out.slug;
   delete out.primary_vertical;
+  delete out.googlePlaceId;
+  delete out.google_place_id;
   return out;
 }
 
@@ -169,7 +179,7 @@ async function main() {
     process.exit(1);
   }
 
-  const placesCount = await db.places.count();
+  const placesCount = await db.entities.count();
   console.log(`IMPORT SCRIPT VERSION: ${IMPORT_SCRIPT_VERSION}`);
   console.log(`TARGET DB: ${host}/${database} places_count=${placesCount}`);
 
@@ -186,116 +196,88 @@ async function main() {
     return;
   }
 
-  const existingSlugs = new Set(
-    (await db.places.findMany({ select: { slug: true } })).map((p) => p.slug)
-  );
+  let processed = 0;
+  let matchedGpid = 0;
+  let upserted = 0;
+  let skippedNoGpid = 0;
+  let ambiguous = 0;
+  let errors = 0;
 
-  let wouldInsert = 0;
-  let wouldUpdate = 0;
-  const payloads: { slug: string; payload: Record<string, unknown>; isNew: boolean }[] = [];
-
-  for (const row of rows) {
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
     const payload = rowToPayload(row);
     if (!payload.slug || !payload.name) continue;
-    const slug = payload.slug as string;
-    const isNew = !existingSlugs.has(slug);
-    if (isNew) {
-      wouldInsert++;
-      if (!payload.id) payload.id = randomUUID();
-      if (!payload.createdAt) payload.createdAt = new Date();
-      if (!payload.primary_vertical) payload.primary_vertical = "EAT";
-    } else {
-      wouldUpdate++;
-      delete payload.id;
-      delete payload.createdAt;
-      delete payload.primary_vertical;
-    }
-    payloads.push({ slug, payload, isNew });
-  }
 
-  console.log(`CSV rows: ${rows.length} → would insert: ${wouldInsert}, would update: ${wouldUpdate}`);
+    processed++;
+    const name = payload.name as string;
+    const gpidRaw = normalizeGpid(payload.googlePlaceId ?? payload.google_place_id);
+    const lat = typeof payload.latitude === "number" ? payload.latitude : null;
+    const lng = typeof payload.longitude === "number" ? payload.longitude : null;
 
-  if (!apply) {
-    console.log("Dry run. Re-run with --apply to write to Neon.");
-    return;
-  }
+    const result = await resolveGpid({ name, gpid: gpidRaw ?? undefined, lat, lng });
+    await sleep(RATE_LIMIT_MS);
 
-  let inserted = 0;
-  let updated = 0;
-  let invalidGpidRows = 0;
-
-  for (let i = 0; i < payloads.length; i += BATCH_SIZE) {
-    const batch = payloads.slice(i, i + BATCH_SIZE);
-    for (const { slug, payload, isNew } of batch) {
-      const gpid = normalizeGpid(payload.googlePlaceId ?? payload.google_place_id);
-      if (gpid === null) invalidGpidRows++;
-      clearInvalidGpidFromPayload(payload);
-
-      try {
-        if (isNew) {
-          if (gpid !== null) {
-            const existing = await db.places.findFirst({
-              where: { googlePlaceId: gpid },
-              select: { id: true, slug: true },
-            });
-            if (existing) {
-              const updateData = stripImmutable(payload) as Parameters<
-                typeof db.places.update
-              >[0]["data"];
-              await db.places.update({ where: { id: existing.id }, data: updateData });
-              console.log(
-                `GOOGLE_PLACE_ID COLLISION: csvSlug=${slug} existingSlug=${existing.slug} google_place_id=${JSON.stringify(gpid)} → updated existing row`
-              );
-              updated++;
-              continue;
-            }
-          }
-          const createData = payload as Parameters<typeof db.places.create>[0]["data"];
-          await db.places.create({ data: createData });
-          inserted++;
-        } else {
-          await db.places.update({
-            where: { slug },
-            data: payload as Parameters<typeof db.places.update>[0]["data"],
-          });
-          updated++;
-        }
-      } catch (err: unknown) {
-        const code = (err as { code?: string })?.code;
-        const meta = (err as { meta?: { target?: string[] } })?.meta;
-        const isGpidP2002 =
-          code === "P2002" &&
-          Array.isArray(meta?.target) &&
-          meta.target.includes("google_place_id");
-        if (isGpidP2002 && gpid !== null) {
-          const existing = await db.places.findFirst({
-            where: { googlePlaceId: gpid },
-            select: { id: true, slug: true },
-          });
-          if (existing) {
-            const updateData = stripImmutable(payload) as Parameters<
-              typeof db.places.update
-            >[0]["data"];
-            await db.places.update({ where: { id: existing.id }, data: updateData });
-            console.log(
-              `GOOGLE_PLACE_ID COLLISION (P2002 fallback): csvSlug=${slug} existingSlug=${existing.slug} google_place_id=${JSON.stringify(gpid)} → updated existing row`
-            );
-            updated++;
-          } else {
-            console.error(`Failed slug=${slug}:`, err);
-          }
-        } else {
-          console.error(`Failed slug=${slug}:`, err);
-        }
+    if (result.status !== "MATCH") {
+      if (result.status === "AMBIGUOUS") ambiguous++;
+      else if (result.status === "ERROR") errors++;
+      else skippedNoGpid++;
+      if (skippedNoGpid + ambiguous + errors <= 15) {
+        console.log(`  SKIP_NO_GPID slug=${payload.slug} reason=${result.reason}`);
       }
+      continue;
     }
-    if (i + BATCH_SIZE < payloads.length) {
-      console.log(`Progress: ${Math.min(i + BATCH_SIZE, payloads.length)}/${payloads.length}`);
+
+    matchedGpid++;
+    const resolvedGpid = result.gpid!;
+    clearInvalidGpidFromPayload(payload);
+    payload.googlePlaceId = resolvedGpid;
+
+    if (!apply) {
+      upserted++;
+      continue;
+    }
+
+    const existing = await db.entities.findFirst({
+      where: { googlePlaceId: resolvedGpid },
+      select: { id: true },
+    });
+
+    try {
+      if (existing) {
+        const updateData = stripImmutable(payload) as Parameters<typeof db.entities.update>[0]["data"];
+        await db.entities.update({ where: { id: existing.id }, data: updateData });
+        upserted++;
+      } else {
+        if (!resolvedGpid) {
+          throw new Error("Cannot create place without google_place_id (GPID-first). Skip row or resolve GPID first.");
+        }
+        if (!payload.id) payload.id = randomUUID();
+        if (!payload.createdAt) payload.createdAt = new Date();
+        if (!payload.primary_vertical) payload.primary_vertical = "EAT";
+        const createData = payload as Parameters<typeof db.entities.create>[0]["data"];
+        await db.entities.create({ data: createData });
+        upserted++;
+      }
+    } catch (err: unknown) {
+      errors++;
+      console.error(`Failed slug=${payload.slug}:`, err);
+    }
+
+    if ((i + 1) % 100 === 0) {
+      console.log(`Progress: ${i + 1}/${rows.length}`);
     }
   }
 
-  console.log(`Done. inserted=${inserted} updated=${updated}`);
-  console.log(`CSV rows with INVALID google_place_id: ${invalidGpidRows}`);
+  console.log("\n--- Summary ---");
+  console.log(`  processed:       ${processed}`);
+  console.log(`  matched_gpid:    ${matchedGpid}`);
+  console.log(`  upserted:       ${upserted}`);
+  console.log(`  skipped_no_gpid: ${skippedNoGpid}`);
+  console.log(`  ambiguous:      ${ambiguous}`);
+  console.log(`  errors:         ${errors}`);
+  if (!apply) {
+    console.log("  (Dry run — use --apply to write to Neon.)");
+  }
 
   if (apply) {
     try {
@@ -305,7 +287,7 @@ async function main() {
       const dupes = await db.$queryRawUnsafe<
         { google_place_id: string | null; count: bigint }[]
       >(
-        "SELECT google_place_id, count(*)::bigint AS count FROM public.places WHERE google_place_id IS NOT NULL GROUP BY google_place_id HAVING count(*) > 1 LIMIT 20"
+        "SELECT google_place_id, count(*)::bigint AS count FROM public.places WHERE google_place_id IS NOT NULL AND btrim(google_place_id) <> '' GROUP BY google_place_id HAVING count(*) > 1 LIMIT 20"
       );
       console.log(`\nSanity: places with NULL google_place_id: ${nullCount[0]?.count ?? 0}`);
       console.log(

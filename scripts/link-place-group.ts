@@ -1,10 +1,16 @@
 #!/usr/bin/env node
 /**
- * Link Place to Restaurant Group
- * Associates a place with a restaurant group
+ * Link Place to Operator (Actor)
+ * Creates PlaceActorRelationship. Uses restaurant_groups as lookup source for Actor.
+ * DEPRECATED writes to restaurantGroupId — uses PlaceActorRelationship only.
  */
 
 import { db } from '@/lib/db'
+
+function mergeSources(existing: unknown, extra: Record<string, unknown>): Record<string, unknown> {
+  const base = typeof existing === 'object' && existing !== null ? { ...(existing as Record<string, unknown>) } : {}
+  return { ...base, ...extra }
+}
 
 async function main() {
   const args = process.argv.slice(2)
@@ -23,7 +29,7 @@ async function main() {
   console.log('═'.repeat(80))
 
   // Find place
-  const place = await db.places.findFirst({
+  const place = await db.entities.findFirst({
     where: {
       OR: [
         { name: { contains: placeName, mode: 'insensitive' } },
@@ -31,7 +37,10 @@ async function main() {
       ]
     },
     include: {
-      restaurantGroup: true
+      place_actor_relationships: {
+        where: { role: 'operator', isPrimary: true },
+        include: { actor: true }
+      }
     }
   })
 
@@ -45,13 +54,14 @@ async function main() {
     console.log(`Neighborhood: ${place.neighborhood}`)
   }
 
-  if (place.restaurantGroup) {
-    console.log(`\n⚠️  Already linked to: ${place.restaurantGroup.name}`)
-    console.log('\nUnlink first if you want to change the group association\n')
+  const primaryOp = place.place_actor_relationships?.[0]
+  if (primaryOp) {
+    console.log(`\n⚠️  Already linked to operator: ${primaryOp.actor.name}`)
+    console.log('\nUnlink first if you want to change the operator association\n')
     process.exit(1)
   }
 
-  // Find group
+  // Find group (used to look up Actor by slug)
   const group = await db.restaurant_groups.findFirst({
     where: {
       OR: [
@@ -67,20 +77,40 @@ async function main() {
     process.exit(1)
   }
 
-  console.log(`Restaurant Group: ${group.name}`)
+  // Find or create Actor (backfill creates from restaurant_groups; script creates if needed)
+  let actor = await db.actor.findUnique({ where: { slug: group.slug } })
+  if (!actor) {
+    actor = await db.actor.create({
+      data: {
+        name: group.name,
+        kind: 'operator',
+        slug: group.slug,
+        website: group.website ?? undefined,
+        description: group.description ?? undefined,
+        visibility: group.visibility,
+        sources: mergeSources(group.sources, { _migration_source: 'restaurant_groups', restaurant_group_id: group.id })
+      }
+    })
+  }
 
-  // Link place to group
-  await db.places.update({
-    where: { id: place.id },
-    data: { restaurantGroupId: group.id }
+  // Create PlaceActorRelationship (no write to restaurantGroupId)
+  await db.placeActorRelationship.create({
+    data: {
+      entityId: place.id,
+      actorId: actor.id,
+      role: 'operator',
+      isPrimary: true,
+      sources: { _script: 'link-place-group', restaurant_group_id: group.id },
+      confidence: 1
+    }
   })
 
-  console.log('\n✅ Place linked to restaurant group successfully!')
+  console.log(`\n✅ Place linked to operator: ${actor.name}`)
   
   console.log('\n═'.repeat(80))
   console.log('\nNext steps:')
-  console.log(`1. View group: npx tsx scripts/view-restaurant-group.ts "${group.name}"`)
-  console.log(`2. Link more places: npx tsx scripts/link-place-group.ts "<another-place>" "${group.name}"`)
+  console.log(`1. View group: npx tsx scripts/view-restaurant-group.ts "${group.name}" (or /actor/${actor.slug})`)
+  console.log(`2. Link more places: npx tsx scripts/link-place-group.ts "<another-place>" "${actor.name}"`)
   console.log()
 }
 

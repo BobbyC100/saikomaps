@@ -12,7 +12,7 @@ async function main() {
   console.log('════════════════════════════════════════════════════════════\n');
 
   // Get all Tier 3 places
-  const allPlaces = await prisma.places.findMany({
+  const allPlaces = await prisma.entities.findMany({
     where: {
       status: 'OPEN',
       latitude: { not: null },

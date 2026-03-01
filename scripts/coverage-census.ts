@@ -35,8 +35,8 @@ async function main() {
     goldenWithDescriptionOrAbout,
     goldenWithAttributes,
   ] = await Promise.all([
-    db.places.count(),
-    db.places.count({ where: { googlePlaceId: { not: null } } }),
+    db.entities.count(),
+    db.entities.count({ where: { googlePlaceId: { not: null } } }),
     db.golden_records.count({ where: { google_place_id: { not: null } } }),
     db.$queryRaw<[{ count: bigint }]>`
       SELECT COUNT(DISTINCT p.id)::bigint as count

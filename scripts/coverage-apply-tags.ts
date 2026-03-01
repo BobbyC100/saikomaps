@@ -98,7 +98,7 @@ async function fetchPlaceIdToGolden(
   const map = new Map<string, GoldenRow>();
   if (placeIds.length === 0) return map;
 
-  const places = await db.places.findMany({
+  const places = await db.entities.findMany({
     where: { id: { in: placeIds } },
     select: { id: true, googlePlaceId: true },
   });
@@ -145,9 +145,9 @@ async function fetchPlaceIdToGolden(
 // ---------------------------------------------------------------------------
 async function hasTagSignals(placeId: string): Promise<boolean> {
   const [energyCount, tagCount, place] = await Promise.all([
-    db.energy_scores.count({ where: { place_id: placeId, version: ENERGY_VERSION } }),
-    db.place_tag_scores.count({ where: { place_id: placeId, version: TAG_VERSION } }),
-    db.places.findUnique({
+    db.energy_scores.count({ where: { entityId: placeId, version: ENERGY_VERSION } }),
+    db.place_tag_scores.count({ where: { entityId: placeId, version: TAG_VERSION } }),
+    db.entities.findUnique({
       where: { id: placeId },
       select: { vibeTags: true },
     }),
@@ -318,7 +318,7 @@ async function main() {
 
       if (!dryRun) {
         await db.energy_scores.upsert({
-          where: { place_id_version: { place_id, version: ENERGY_VERSION } },
+          where: { entityId_version: { entityId: place_id, version: ENERGY_VERSION } },
           create: {
             id: randomUUID(),
             place_id,
@@ -351,7 +351,7 @@ async function main() {
         });
 
         await db.place_tag_scores.upsert({
-          where: { place_id_version: { place_id, version: TAG_VERSION } },
+          where: { entityId_version: { entityId: place_id, version: TAG_VERSION } },
           create: {
             id: randomUUID(),
             place_id,

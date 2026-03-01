@@ -103,7 +103,7 @@ async function main() {
     console.log(`${progress} ${input.name}`)
 
     // Check if already exists
-    const existing = await db.places.findFirst({
+    const existing = await db.entities.findFirst({
       where: {
         name: {
           contains: input.name,
@@ -147,7 +147,7 @@ async function main() {
 
       const baseSlug = generatePlaceSlug(finalName, neighborhood ?? undefined)
       const uniqueSlug = await ensureUniqueSlug(baseSlug, async (s) => {
-        const exists = await db.places.findUnique({ where: { slug: s } })
+        const exists = await db.entities.findUnique({ where: { slug: s } })
         return !!exists
       })
 
@@ -157,7 +157,7 @@ async function main() {
         excerpt: input.comment,
       }]
 
-      const place = await db.places.create({
+      const place = await db.entities.create({
         data: {
           slug: uniqueSlug,
           googlePlaceId: googlePlaceId ?? undefined,
@@ -182,7 +182,7 @@ async function main() {
       await db.map_places.create({
         data: {
           mapId: list.id,
-          placeId: place.id,
+          entityId: place.id,
           userNote: input.comment,
           orderIndex: i,
         },

@@ -1,22 +1,33 @@
 #!/usr/bin/env node
 /**
- * Sync Golden Records to Places Table
+ * Sync Golden Records to Places Table (GPID-first)
  *
- * Copies all golden_records to the places table so the public site
- * can display all 1,456 places (not just the original 673).
+ * Resolves GPID per golden: use existing, or Nearby (200m) then Text "${name} Los Angeles".
+ * Only accepts MATCH (strong nearby or text single + sim >= 85). Skips row with SKIP_NO_GPID otherwise.
+ * Upserts by google_place_id; never creates without GPID. Never overwrites existing google_place_id on update.
  *
- * Resolves lat/lng from: (1) golden_records, (2) linked raw_records via entity_links,
- * (3) existing places by google_place_id. Skips creates with no valid coords.
- * Never writes 0/0 — preserves existing coords on update when unresolved.
- *
- * Usage: npm run sync:places
+ * Usage (Neon): ./scripts/db-neon.sh node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/sync-golden-to-places.ts [--dry-run]
+ *       or:     npm run sync:places   (add --dry-run to skip DB writes)
  */
 
 import { PrismaClient, Prisma } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
 import { categoryToPrimaryVertical } from '@/lib/primaryVertical';
+import { computePlaceConfidence, normalizeSourceId } from '@/lib/confidence';
+import { assertDbTargetAllowed } from '@/lib/db-guard';
+import { resolveGpid } from '@/lib/gpid-resolve';
 
 const prisma = new PrismaClient();
+const RATE_LIMIT_MS = 200;
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((r) => setTimeout(r, ms));
+}
+
+function parseArgs(): { dryRun: boolean } {
+  const args = process.argv.slice(2);
+  return { dryRun: args.includes('--dry-run') };
+}
 
 /** Returns { lat, lng } if valid (non-null, not 0), else null */
 function validCoords(
@@ -55,24 +66,47 @@ function resolveLatLng(
 }
 
 async function syncGoldenToPlaces() {
-  console.log('🔄 Syncing golden_records → places\n');
+  assertDbTargetAllowed();
+  const { dryRun } = parseArgs();
+  if (dryRun) console.log('🔄 Syncing golden_records → places (DRY RUN — no writes)\n');
+  else console.log('🔄 Syncing golden_records → places\n');
 
   const goldenRecords = await prisma.golden_records.findMany({
     where: { lifecycle_status: 'ACTIVE' },
-    include: {
+    select: {
+      canonical_id: true,
+      slug: true,
+      name: true,
+      address_street: true,
+      neighborhood: true,
+      category: true,
+      phone: true,
+      website: true,
+      instagram_handle: true,
+      hours_json: true,
+      description: true,
+      google_place_id: true,
+      vibe_tags: true,
+      lat: true,
+      lng: true,
       entity_links: {
-        include: {
+        where: { is_active: true },
+        select: {
           raw_record: {
-            select: { lat: true, lng: true },
+            select: { lat: true, lng: true, raw_json: true, source_name: true },
           },
         },
       },
     },
   });
 
+  const sourcesRows = await prisma.sources.findMany({ select: { id: true, trust_tier: true } });
+  const trustTiersBySource: Record<string, number> = {};
+  for (const s of sourcesRows) trustTiersBySource[s.id] = s.trust_tier;
+
   console.log(`Found ${goldenRecords.length} active golden records\n`);
 
-  const existingPlaces = await prisma.places.findMany({
+  const existingPlaces = await prisma.entities.findMany({
     select: { id: true, slug: true, latitude: true, longitude: true, googlePlaceId: true },
   });
 
@@ -102,25 +136,95 @@ async function syncGoldenToPlaces() {
 
   console.log(`Existing places: ${existingPlaces.length} (${coordsByGpid.size} with valid coords by google_place_id)\n`);
 
-  let created = 0;
-  let updated = 0;
-  let skipped = 0;
-  const skipReasons: Record<string, number> = {};
+  let processed = 0;
+  let matchedGpid = 0;
+  let upserted = 0;
+  let skippedNoGpid = 0;
+  let ambiguous = 0;
+  let errors = 0;
+  let conflictsGpidVsSlug = 0;
+  const unknownSourceCounts: Record<string, number> = {};
 
   for (const golden of goldenRecords) {
+    processed++;
     const rawCoords = golden.entity_links
       ?.map((el) => el.raw_record)
       .filter(Boolean) as { lat: Decimal | null; lng: Decimal | null }[] | null;
     const coords = resolveLatLng(golden, rawCoords, coordsByGpid);
-    const existingBySlug = placesBySlug.get(golden.slug);
-    const gpid = golden.google_place_id?.trim();
-    const existingByGpid = gpid ? placesByGpid.get(gpid) : undefined;
-    // Prefer existing place by google_place_id so we never create a duplicate (unique constraint).
-    const existingPlace = existingByGpid ?? existingBySlug;
+    const latNum = coords ? Number(coords.lat) : null;
+    const lngNum = coords ? Number(coords.lng) : null;
+
+    const resolveResult = await resolveGpid({
+      name: golden.name,
+      gpid: golden.google_place_id?.trim() || null,
+      lat: latNum,
+      lng: lngNum,
+    });
+    await sleep(RATE_LIMIT_MS);
+
+    if (resolveResult.status !== 'MATCH') {
+      if (resolveResult.status === 'AMBIGUOUS') ambiguous++;
+      else if (resolveResult.status === 'ERROR') errors++;
+      else skippedNoGpid++;
+      if (skippedNoGpid + ambiguous + errors <= 15) {
+        console.warn(`  SKIP_NO_GPID ${golden.slug}: ${resolveResult.reason}`);
+      }
+      continue;
+    }
+
+    const resolvedGpid = resolveResult.gpid!;
+    matchedGpid++;
+
+    const byGpid = resolvedGpid ? placesByGpid.get(resolvedGpid) : undefined;
+    const bySlug = placesBySlug.get(golden.slug);
+
+    let existingPlace: (typeof existingPlaces)[0] | undefined;
+
+    if (byGpid) {
+      existingPlace = byGpid;
+    } else if (bySlug) {
+      const existingGpid = (bySlug.googlePlaceId ?? '').toString().trim();
+      const resolvedTrimmed = (resolvedGpid ?? '').trim();
+      if (existingGpid && resolvedTrimmed && existingGpid !== resolvedTrimmed) {
+        conflictsGpidVsSlug++;
+        console.warn(
+          `CONFLICT_GPID_VS_SLUG | slug=${golden.slug} | golden=${golden.name} | resolved=${resolvedTrimmed} | place=${existingGpid} | place_id=${bySlug.id}`
+        );
+        continue;
+      }
+      existingPlace = bySlug;
+    } else {
+      existingPlace = undefined;
+    }
     const existingCoords =
       existingPlace != null ? validCoords(existingPlace.latitude, existingPlace.longitude) : null;
 
     try {
+      const rawRecords = (golden.entity_links ?? [])
+        .map((el) => el.raw_record)
+        .filter(Boolean) as { raw_json: unknown; source_name: string }[];
+      for (const r of rawRecords) {
+        const canonical = normalizeSourceId(r.source_name);
+        if (trustTiersBySource[canonical] === undefined) {
+          unknownSourceCounts[r.source_name] = (unknownSourceCounts[r.source_name] ?? 0) + 1;
+        }
+      }
+      const { confidence, overall_confidence } = computePlaceConfidence(
+        {
+          name: golden.name,
+          address_street: golden.address_street,
+          phone: golden.phone,
+          website: golden.website,
+          hours_json: golden.hours_json,
+          description: golden.description,
+          lat: golden.lat,
+          lng: golden.lng,
+        },
+        rawRecords,
+        trustTiersBySource
+      );
+      const now = new Date();
+
       const baseData = {
         name: golden.name,
         address: golden.address_street,
@@ -132,79 +236,113 @@ async function syncGoldenToPlaces() {
         instagram: golden.instagram_handle,
         hours: golden.hours_json as Prisma.JsonValue,
         description: golden.description,
-        googlePlaceId: golden.google_place_id,
+        googlePlaceId: resolvedGpid,
         vibeTags: golden.vibe_tags,
+        confidence: (Object.keys(confidence).length ? confidence : {}) as Prisma.InputJsonValue,
+        overall_confidence: overall_confidence >= 0 ? overall_confidence : 0.5,
+        confidence_updated_at: now,
       };
 
       if (existingPlace) {
         const latLng = coords ?? existingCoords;
-        // Map golden.lat → places.latitude, golden.lng → places.longitude (do not overwrite with 0/0)
         const data = latLng
           ? { ...baseData, latitude: latLng.lat, longitude: latLng.lng }
-          : baseData;
-        const updatePayload =
-          existingByGpid && !existingBySlug ? data : { ...data, slug: golden.slug };
-        await prisma.places.update({
-          where: { id: existingPlace.id },
-          data: updatePayload,
-        });
-        updated++;
-        if (existingByGpid && existingBySlug && existingByGpid.id !== existingBySlug.id) {
-          console.warn(
-            `  Note: golden "${golden.name}" matched both by slug and by google_place_id (updated by gpid place id=${existingPlace.id})`
-          );
+          : { ...baseData };
+        delete (data as Record<string, unknown>).googlePlaceId;
+        const updatePayload = byGpid && !bySlug ? data : { ...data, slug: golden.slug };
+        if (!dryRun) {
+          await prisma.entities.update({
+            where: { id: existingPlace.id },
+            data: updatePayload,
+          });
         }
+        upserted++;
+        const newSlug = byGpid && !bySlug ? existingPlace.slug : golden.slug;
+        const newLat = latLng?.lat ?? existingPlace.latitude;
+        const newLng = latLng?.lng ?? existingPlace.longitude;
+        placesByGpid.set(resolvedGpid, { id: existingPlace.id, slug: newSlug, latitude: newLat, longitude: newLng, googlePlaceId: resolvedGpid });
+        placesBySlug.set(golden.slug, { id: existingPlace.id, slug: golden.slug, latitude: newLat, longitude: newLng, googlePlaceId: resolvedGpid });
       } else {
-        if (!coords) {
-          const reason = 'no_valid_lat_lng';
-          skipReasons[reason] = (skipReasons[reason] ?? 0) + 1;
-          if (skipped < 10) {
-            console.warn(
-              `  Skip ${golden.slug}: ${reason} (golden 0/0, no linked raw coords, no existing place by google_place_id)`
-            );
-          }
-          skipped++;
-          continue;
+        if (!resolvedGpid) {
+          throw new Error('Cannot create place without google_place_id (GPID-first). Skip row or resolve GPID first.');
         }
-        await prisma.places.create({
-          data: {
-            id: golden.canonical_id,
-            slug: golden.slug,
-            ...baseData,
-            latitude: coords.lat,
-            longitude: coords.lng,
-          },
-        });
-        created++;
-        placesBySlug.set(golden.slug, { id: golden.canonical_id, slug: golden.slug, latitude: coords.lat, longitude: coords.lng, googlePlaceId: golden.google_place_id });
-        if (gpid) placesByGpid.set(gpid, { id: golden.canonical_id, slug: golden.slug, latitude: coords.lat, longitude: coords.lng, googlePlaceId: golden.google_place_id });
+        const latLng = coords ?? null;
+        if (!dryRun) {
+          await prisma.entities.create({
+            data: {
+              id: golden.canonical_id,
+              slug: golden.slug,
+              ...baseData,
+              latitude: latLng?.lat ?? undefined,
+              longitude: latLng?.lng ?? undefined,
+            },
+          });
+        }
+        upserted++;
+        const latForMap = latLng?.lat ?? null;
+        const lngForMap = latLng?.lng ?? null;
+        placesBySlug.set(golden.slug, { id: golden.canonical_id, slug: golden.slug, latitude: latForMap, longitude: lngForMap, googlePlaceId: resolvedGpid });
+        placesByGpid.set(resolvedGpid, { id: golden.canonical_id, slug: golden.slug, latitude: latForMap, longitude: lngForMap, googlePlaceId: resolvedGpid });
       }
 
-      if ((created + updated) % 100 === 0) {
-        console.log(`Progress: ${created + updated}/${goldenRecords.length}...`);
+      if (upserted % 100 === 0) {
+        console.log(`Progress: ${upserted}/${goldenRecords.length}...`);
       }
-    } catch (error: any) {
-      console.error(`✗ Failed to sync ${golden.name}:`, error.message);
-      skipped++;
+    } catch (error: unknown) {
+      errors++;
+      const msg = error instanceof Error ? error.message : String(error);
+      console.error(`✗ Failed to sync ${golden.name}:`, msg);
     }
   }
 
-  const totalPlaces = existingPlaces.length + created;
-  console.log(`\n✅ Sync complete!`);
-  console.log(`   Created: ${created}`);
-  console.log(`   Updated: ${updated}`);
-  console.log(`   Skipped: ${skipped}`);
-  if (Object.keys(skipReasons).length) {
-    console.log(`   Skip reasons: ${JSON.stringify(skipReasons)}`);
+  if (Object.keys(unknownSourceCounts).length > 0) {
+    console.log('\n[Confidence] Unknown source names (add to RAW_SOURCE_TO_CANONICAL if needed):', unknownSourceCounts);
   }
+
+  let csvHeaderDeletedCount = 0;
+  if (!dryRun) {
+    const csvHeaderDeleted = await prisma.entities.deleteMany({
+      where: {
+        OR: [
+          { slug: 'name', name: { in: ['name', 'Name'] } },
+          { name: 'name', slug: 'name' },
+          { name: 'Name', slug: 'name' },
+        ],
+      },
+    });
+    csvHeaderDeletedCount = csvHeaderDeleted.count;
+    if (csvHeaderDeletedCount > 0) {
+      console.log(`   Removed ${csvHeaderDeletedCount} CSV header-row place(s).`);
+    }
+  }
+
+  const totalPlaces = dryRun ? existingPlaces.length + upserted : existingPlaces.length + upserted - csvHeaderDeletedCount;
+  console.log(`\n--- Summary ---`);
+  console.log(`   processed:       ${processed}`);
+  console.log(`   matched_gpid:   ${matchedGpid}`);
+  console.log(`   upserted:       ${upserted}`);
+  console.log(`   skipped_no_gpid: ${skippedNoGpid}`);
+  console.log(`   conflicts_gpid_vs_slug: ${conflictsGpidVsSlug}`);
+  console.log(`   ambiguous:      ${ambiguous}`);
+  console.log(`   errors:         ${errors}`);
   console.log(`   Total in places: ${totalPlaces}`);
+  if (dryRun) {
+    console.log(`   (Dry run — omit --dry-run to write.)`);
+  }
 }
 
 async function main() {
   try {
     await syncGoldenToPlaces();
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error during sync:', error);
+    const msg = error instanceof Error ? error.message : String(error);
+    if (msg.includes('does not exist') || (error as { code?: string })?.code === 'P2021' || (error as { code?: string })?.code === 'P2022') {
+      console.error('\nTip: Confirm DB target with npm run db:whoami. If schema is behind, run: npm run db:generate');
+    }
+    if ((error as { code?: string })?.code === 'P2002') {
+      console.error('\nTip: Unique constraint (e.g. google_place_id): another place already has this id. Run sync again; idempotent logic will update instead of create.');
+    }
     process.exit(1);
   } finally {
     await prisma.$disconnect();

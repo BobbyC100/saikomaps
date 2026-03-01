@@ -50,7 +50,7 @@ async function main() {
   console.log('════════════════════════════════════════════════════════════\n');
 
   // Get launch-ready places (OPEN + valid coordinates)
-  const places = await prisma.places.findMany({
+  const places = await prisma.entities.findMany({
     where: {
       status: 'OPEN',
       latitude: { not: null },

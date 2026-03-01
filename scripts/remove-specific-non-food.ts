@@ -29,7 +29,7 @@ async function main() {
   console.log('');
 
   // Find these places
-  const places = await prisma.places.findMany({
+  const places = await prisma.entities.findMany({
     where: {
       name: {
         in: placesToRemove,
@@ -79,29 +79,29 @@ async function main() {
 
   // Delete related records
   const mapPlacesDeleted = await prisma.map_places.deleteMany({
-    where: { place_id: { in: placeIds } },
+    where: { entityId: { in: placeIds } },
   });
   console.log(`  Deleted ${mapPlacesDeleted.count} map_places records`);
 
   const personPlacesDeleted = await prisma.person_places.deleteMany({
-    where: { place_id: { in: placeIds } },
+    where: { entityId: { in: placeIds } },
   });
   console.log(`  Deleted ${personPlacesDeleted.count} person_places records`);
 
   const bookmarksDeleted = await prisma.viewer_bookmarks.deleteMany({
-    where: { place_id: { in: placeIds } },
+    where: { entityId: { in: placeIds } },
   });
   console.log(`  Deleted ${bookmarksDeleted.count} viewer_bookmarks records`);
 
   // Delete places
-  const deletedPlaces = await prisma.places.deleteMany({
+  const deletedPlaces = await prisma.entities.deleteMany({
     where: { id: { in: placeIds } },
   });
 
   console.log(`\n✅ Successfully deleted ${deletedPlaces.count} non-food places`);
 
   // Get final count
-  const finalCount = await prisma.places.count({
+  const finalCount = await prisma.entities.count({
     where: {
       status: 'OPEN',
       latitude: { not: null },

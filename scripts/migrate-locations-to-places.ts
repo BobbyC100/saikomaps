@@ -25,7 +25,7 @@ async function main() {
   for (const loc of locations) {
     // 1. Find or create Place
     let place = loc.googlePlaceId
-      ? await prisma.place.findUnique({
+      ? await prisma.entities.findUnique({
           where: { googlePlaceId: loc.googlePlaceId },
         })
       : null;
@@ -33,11 +33,11 @@ async function main() {
     if (!place) {
       const baseSlug = generatePlaceSlug(loc.name, loc.neighborhood ?? undefined);
       const slug = await ensureUniqueSlug(baseSlug, async (s) => {
-        const existing = await prisma.place.findUnique({ where: { slug: s } });
+        const existing = await prisma.entities.findUnique({ where: { slug: s } });
         return !!existing;
       });
 
-      place = await prisma.place.create({
+      place = await prisma.entities.create({
         data: {
           slug,
           googlePlaceId: loc.googlePlaceId,
@@ -62,11 +62,11 @@ async function main() {
     }
 
     // 2. Check if MapPlace already exists (idempotent)
-    const existingMapPlace = await prisma.mapPlace.findUnique({
+    const existingMapPlace = await prisma.map_places.findUnique({
       where: {
-        mapId_placeId: {
+        mapId_entityId: {
           mapId: loc.listId,
-          placeId: place.id,
+          entityId: place.id,
         },
       },
     });
@@ -76,10 +76,10 @@ async function main() {
       continue;
     }
 
-    const mapPlace = await prisma.mapPlace.create({
+    const mapPlace = await prisma.map_places.create({
       data: {
         mapId: loc.listId,
-        placeId: place.id,
+        entityId: place.id,
         descriptor: loc.descriptor,
         userNote: loc.userNote,
         userPhotos: loc.userPhotos,

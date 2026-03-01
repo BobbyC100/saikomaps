@@ -36,7 +36,7 @@ export async function PATCH(
     const { descriptor, userNote, orderIndex, neighborhood, priceLevel, cuisineType } = body;
 
     if (neighborhood !== undefined || priceLevel !== undefined || cuisineType !== undefined) {
-      await db.places.update({
+      await db.entities.update({
         where: { id: mapPlace.placeId },
         data: {
           ...(neighborhood !== undefined && {

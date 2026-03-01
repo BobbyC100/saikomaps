@@ -58,7 +58,7 @@ async function main(): Promise<void> {
   let rows: Row[] = [];
 
   if (ids?.length) {
-    const res = await db.places.findMany({
+    const res = await db.entities.findMany({
       where: { id: { in: ids }, googlePlaceId: { not: null } },
       select: { id: true, slug: true, name: true, latitude: true, longitude: true, googlePlaceId: true },
     });

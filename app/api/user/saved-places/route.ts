@@ -19,14 +19,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'slug is required' }, { status: 400 });
     }
 
-    const place = await db.places.findUnique({ where: { slug } });
+    const place = await db.entities.findUnique({ where: { slug } });
     if (!place) {
       return NextResponse.json({ error: 'Place not found' }, { status: 404 });
     }
 
     const existing = await db.viewer_bookmarks.findUnique({
       where: {
-        viewerUserId_placeId: { viewerUserId: userId, placeId: place.id },
+        viewerUserId_entityId: { viewerUserId: userId, entityId: place.id },
       },
     });
 
@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
       data: {
         id: randomUUID(),
         viewerUserId: userId,
-        placeId: place.id,
+        entityId: place.id,
         updatedAt: new Date(),
       },
     });
@@ -69,14 +69,14 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'slug query param is required' }, { status: 400 });
     }
 
-    const place = await db.places.findUnique({ where: { slug } });
+    const place = await db.entities.findUnique({ where: { slug } });
     if (!place) {
       return NextResponse.json({ error: 'Place not found' }, { status: 404 });
     }
 
     const bookmark = await db.viewer_bookmarks.findUnique({
       where: {
-        viewerUserId_placeId: { viewerUserId: userId, placeId: place.id },
+        viewerUserId_entityId: { viewerUserId: userId, entityId: place.id },
       },
     });
 

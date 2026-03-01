@@ -133,7 +133,7 @@ export async function POST(request: NextRequest) {
         }
       }
 
-      let place = googlePlaceId ? await db.places.findUnique({ where: { googlePlaceId } }) : null;
+      let place = googlePlaceId ? await db.entities.findUnique({ where: { googlePlaceId } }) : null;
 
       if (!place) {
         const neighborhood = placeDetails
@@ -147,11 +147,11 @@ export async function POST(request: NextRequest) {
           : cleanName;
         const baseSlug = generatePlaceSlug(finalName, neighborhood ?? undefined);
         const slug = await ensureUniqueSlug(baseSlug, async (s) => {
-          const exists = await db.places.findUnique({ where: { slug: s } });
+          const exists = await db.entities.findUnique({ where: { slug: s } });
           return !!exists;
         });
 
-        place = await db.places.create({
+        place = await db.entities.create({
           data: {
             id: randomUUID(),
             slug,
@@ -179,7 +179,7 @@ export async function POST(request: NextRequest) {
       }
 
       const existingMapPlace = await db.map_places.findUnique({
-        where: { mapId_placeId: { mapId: list.id, placeId: place.id } },
+        where: { mapId_entityId: { mapId: list.id, entityId: place.id } },
       });
       if (existingMapPlace) continue;
 
@@ -187,7 +187,7 @@ export async function POST(request: NextRequest) {
         data: {
           id: randomUUID(),
           mapId: list.id,
-          placeId: place.id,
+          entityId: place.id,
           userNote: input.comment?.trim() || null,
           orderIndex: nextOrderIndex++,
           updatedAt: new Date(),

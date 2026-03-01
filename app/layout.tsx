@@ -1,3 +1,6 @@
+// Debug: confirm root layout loads (remove after port binding debug)
+console.log('[layout] Root layout loading');
+
 import type { Metadata } from "next";
 import { Playfair_Display, Nunito, Libre_Baskerville, Crimson_Text, DM_Sans, Instrument_Serif } from "next/font/google";
 import "./globals.css";

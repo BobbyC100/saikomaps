@@ -9,7 +9,7 @@ async function main() {
   console.log('👨‍🍳 MINING CHEF & OWNER RECOMMENDATIONS\n')
   console.log('═'.repeat(80))
 
-  const allPlaces = await db.places.findMany({
+  const allPlaces = await db.entities.findMany({
     include: {
       mapPlaces: true,
     }

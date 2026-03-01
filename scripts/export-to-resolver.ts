@@ -72,7 +72,7 @@ async function main() {
   }
   
   // Fetch all places
-  const places = await prisma.places.findMany({
+  const places = await prisma.entities.findMany({
     select: {
       id: true,
       slug: true,

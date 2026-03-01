@@ -21,7 +21,7 @@ export async function getPlaceIds(options: GetPlaceIdsOptions): Promise<string[]
   const { laOnly, ids, limit } = options;
 
   if (ids?.length) {
-    const found = await db.places.findMany({
+    const found = await db.entities.findMany({
       where: { id: { in: ids } },
       select: { id: true },
     });

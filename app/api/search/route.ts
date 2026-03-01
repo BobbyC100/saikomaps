@@ -115,7 +115,7 @@ export async function GET(request: NextRequest) {
 
   try {
     // Search places with enriched data for bento grid
-    const places = await prisma.places.findMany({
+    const places = await prisma.entities.findMany({
       where: {
         OR: [
           { name: { contains: queryLower, mode: 'insensitive' } },

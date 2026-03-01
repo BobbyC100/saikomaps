@@ -305,7 +305,7 @@ export async function runCoverageAudit(options?: {
     map_places: { descriptor: string | null }[];
   };
 
-  const places = await db.places.findMany({
+  const places = await db.entities.findMany({
     where: whereClause,
     take: limit,
     orderBy: [{ slug: 'asc' }],

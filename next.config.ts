@@ -19,7 +19,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  serverExternalPackages: ['jellyfish', 'jsdom', 'zombie'],
+  serverExternalPackages: ['jellyfish', 'jsdom', 'zombie', '@prisma/client', 'prisma'],
 };
 
 export default nextConfig;

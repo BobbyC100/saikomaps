@@ -81,7 +81,7 @@ async function main() {
 
   if (placeSlugList?.length) {
     requestedSlugs = placeSlugList;
-    const places = await db.places.findMany({
+    const places = await db.entities.findMany({
       where: { slug: { in: placeSlugList } },
       select: { slug: true, googlePlaceId: true },
     });

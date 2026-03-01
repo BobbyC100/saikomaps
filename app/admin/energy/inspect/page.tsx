@@ -50,7 +50,7 @@ export default async function AdminEnergyInspectPage({ searchParams }: Props) {
   const query = q.trim();
   const isUuid = /^[0-9a-f-]{36}$/i.test(query);
 
-  const place = await db.places.findFirst({
+  const place = await db.entities.findFirst({
     where: isUuid ? { id: query } : { slug: query },
     select: {
       id: true,

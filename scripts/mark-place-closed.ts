@@ -22,7 +22,7 @@ async function main() {
   }
   
   // Find the place
-  const place = await prisma.places.findUnique({
+  const place = await prisma.entities.findUnique({
     where: { slug },
     select: {
       id: true,
@@ -43,7 +43,7 @@ async function main() {
   }
   
   // Mark as closed
-  await prisma.places.update({
+  await prisma.entities.update({
     where: { slug },
     data: {
       status: PlaceStatus.CLOSED,

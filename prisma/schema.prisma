@@ -134,7 +134,7 @@ model locations {
 model map_places {
   id         String   @id
   mapId      String   @map("map_id")
-  placeId    String   @map("place_id")
+  entityId   String   @map("entity_id")
   descriptor String?  @db.VarChar(120)
   userNote   String?  @map("user_note")
   userPhotos String[] @map("user_photos")
@@ -142,12 +142,12 @@ model map_places {
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @map("updated_at")
   lists      lists    @relation(fields: [mapId], references: [id], onDelete: Cascade)
-  places     places   @relation(fields: [placeId], references: [id])
+  entities   entities @relation(fields: [entityId], references: [id])
 
-  @@unique([mapId, placeId])
+  @@unique([mapId, entityId])
   @@index([mapId])
   @@index([mapId, orderIndex])
-  @@index([placeId])
+  @@index([entityId])
 }
 
 model categories {
@@ -156,7 +156,7 @@ model categories {
   label     String
   is_active Boolean @default(true)
 
-  places places[]
+  entities entities[]
 }
 
 model people {
@@ -182,7 +182,7 @@ model people {
 model person_places {
   id         String          @id
   person_id  String
-  place_id   String
+  entityId   String          @map("entity_id")
   role       PersonPlaceRole
   current    Boolean         @default(true)
   start_year Int?
@@ -191,15 +191,15 @@ model person_places {
   created_at DateTime        @default(now())
   updated_at DateTime
   people     people          @relation(fields: [person_id], references: [id], onDelete: Cascade)
-  places     places          @relation(fields: [place_id], references: [id], onDelete: Cascade)
+  entities   entities        @relation(fields: [entityId], references: [id], onDelete: Cascade)
 
-  @@unique([person_id, place_id, role])
+  @@unique([person_id, entityId, role])
   @@index([current])
   @@index([person_id])
-  @@index([place_id])
+  @@index([entityId])
 }
 
-model places {
+model entities {
   id                     String             @id
   slug                   String             @unique
   googlePlaceId          String?            @unique @map("google_place_id")
@@ -242,14 +242,14 @@ model places {
   contextualConnection   String?            @map("contextual_connection")
   curatorAttribution     String?            @map("curator_attribution")
   chefRecs               Json?              @map("chef_recs")
-  restaurantGroupId      String?            @map("restaurant_group_id")
+  restaurantGroupId      String?            @map("restaurant_group_id") // DEPRECATED: use place_actor_relationships. No new writes.
   status                 PlaceStatus        @default(OPEN)
   intentProfile          String?            @map("intent_profile")
   intentProfileOverride  Boolean            @default(false) @map("intent_profile_override")
   reservationUrl         String?            @map("reservation_url")
   businessStatus         String?            @map("business_status") // from Google; 'CLOSED_PERMANENTLY' excluded from coverage
   googlePlacesAttributes Json?              @map("google_places_attributes")
-  placeType              PlaceType          @default(venue) @map("place_type")
+  entityType             PlaceType          @default(venue) @map("entity_type")
   categoryId             String?            @map("category_id")
   parentId               String?            @map("parent_id")
   marketSchedule         Json?              @map("market_schedule")
@@ -258,14 +258,34 @@ model places {
   person_places          person_places[]
   restaurant_groups      restaurant_groups? @relation(fields: [restaurantGroupId], references: [id])
   category_rel           categories?        @relation(fields: [categoryId], references: [id])
-  parent                 places?            @relation("PlaceHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
-  children               places[]           @relation("PlaceHierarchy")
+  parent                 entities?          @relation("PlaceHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  children               entities[]         @relation("PlaceHierarchy")
   viewer_bookmarks       viewer_bookmarks[]
   energy_scores          energy_scores[]
   place_tag_scores       place_tag_scores[]
   place_photo_eval       place_photo_eval[]
   place_coverage_status  place_coverage_status[]
+  gpid_resolution_queue   gpid_resolution_queue[]
+  place_actor_relationships PlaceActorRelationship[]
+  operatorPlaceCandidates OperatorPlaceCandidate[]
+  place_appearances_as_subject place_appearances[] @relation("AppearanceSubject")
+  place_appearances_as_host    place_appearances[] @relation("AppearanceHost")
 
+  // Confidence System v1: field-level JSONB, computed at sync (not at query time)
+  confidence           Json?    // { field: { value, score, sources, winner, conflicts } }
+  overall_confidence   Float?   @default(0.5) @map("overall_confidence")
+  confidence_updated_at DateTime? @map("confidence_updated_at")
+
+  // Website enrichment (SAIKO spec v1.1)
+  last_enriched_at   DateTime? @map("last_enriched_at")
+  enrichment_stage  String?   @map("enrichment_stage") // e.g. ENRICHED_WEBSITE
+  needs_human_review Boolean  @default(false) @map("needs_human_review")
+  category_enrich_attempted_at DateTime? @map("category_enrich_attempted_at") // throttle category-only re-enrich
+
+  merchant_enrichment_runs merchant_enrichment_runs[]
+  merchant_signals         merchant_signals?
+
+  @@map("entities")
   @@index([category])
   @@index([categoryId])
   @@index([googlePlaceId])
@@ -275,6 +295,74 @@ model places {
   @@index([restaurantGroupId])
   @@index([status])
   @@index([businessStatus])
+  @@index([last_enriched_at])
+  @@index([needs_human_review])
+}
+
+/// Website enrichment runs — append-only audit (SAIKO spec v1.1)
+model merchant_enrichment_runs {
+  id             String    @id @default(uuid())
+  entityId       String    @map("entity_id")
+  source_url     String    @map("source_url")
+  final_url      String?   @map("final_url")
+  fetched_at     DateTime  @default(now()) @map("fetched_at")
+  http_status    Int?      @map("http_status")
+  extraction_json Json     @default("{}") @map("extraction_json")
+  confidence     Decimal?  @db.Decimal(4, 2)
+  cost_usd       Decimal   @default(0) @map("cost_usd") @db.Decimal(10, 6)
+  created_at     DateTime  @default(now()) @map("created_at")
+
+  entities entities @relation(fields: [entityId], references: [id], onDelete: Cascade)
+
+  @@index([entityId])
+  @@index([fetched_at])
+}
+
+/// Merchant signals — current best per entity (upsert)
+model merchant_signals {
+  entityId               String   @id @map("entity_id")
+  inferred_category      String?  @map("inferred_category")
+  inferred_cuisine       Json?    @map("inferred_cuisine")
+  reservation_provider   String?  @map("reservation_provider")
+  reservation_url        String?  @map("reservation_url")
+  ordering_provider      String?  @map("ordering_provider")
+  ordering_url           String?  @map("ordering_url")
+  menu_url               String?  @map("menu_url")
+  social_links           Json?    @map("social_links")
+  extraction_confidence  Decimal?  @map("extraction_confidence") @db.Decimal(4, 2)
+  last_updated_at        DateTime @default(now()) @updatedAt @map("last_updated_at")
+
+  entities entities @relation(fields: [entityId], references: [id], onDelete: Cascade)
+}
+
+/// Place appearances — subject (pop-up/mobile) appears at host place OR raw location (sidewalk)
+/// Constraint: either hostPlaceId IS NOT NULL OR (latitude AND longitude AND addressText) all present
+enum PlaceAppearanceStatus {
+  ACTIVE
+  ENDED
+  ANNOUNCED
+}
+
+model place_appearances {
+  id               String                 @id @default(uuid())
+  subjectEntityId  String                 @map("subject_entity_id")
+  hostEntityId     String?                @map("host_entity_id")
+  latitude         Decimal?               @db.Decimal(10, 8)
+  longitude        Decimal?               @db.Decimal(11, 8)
+  addressText      String?                @map("address_text") @db.Text
+  scheduleText     String                 @map("schedule_text") @db.Text
+  status           PlaceAppearanceStatus  @default(ACTIVE)
+  sources          Json?
+  confidence       Float?
+  createdAt        DateTime               @default(now()) @map("created_at")
+  updatedAt        DateTime               @updatedAt @map("updated_at")
+
+  subjectEntity entities @relation("AppearanceSubject", fields: [subjectEntityId], references: [id], onDelete: Cascade)
+  hostEntity    entities? @relation("AppearanceHost", fields: [hostEntityId], references: [id], onDelete: SetNull)
+
+  @@index([subjectEntityId, status])
+  @@index([hostEntityId, status])
+  @@map("place_appearances")
 }
 
 model restaurant_groups {
@@ -290,7 +378,7 @@ model restaurant_groups {
   created_at              DateTime   @default(now())
   updated_at              DateTime
   people                  people[]
-  places                  places[]
+  entities                entities[]
 
   @@index([slug])
   @@index([visibility])
@@ -347,22 +435,22 @@ model saved_maps {
 model viewer_bookmarks {
   id           String   @id
   viewerUserId String?  @map("viewer_user_id")
-  placeId      String   @map("place_id")
+  entityId     String   @map("entity_id")
   visited      Boolean  @default(false)
   personalNote String?  @map("personal_note")
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @map("updated_at")
-  places       places   @relation(fields: [placeId], references: [id], onDelete: Cascade)
+  entities     entities @relation(fields: [entityId], references: [id], onDelete: Cascade)
   users        users?   @relation(fields: [viewerUserId], references: [id], onDelete: Cascade)
 
-  @@unique([viewerUserId, placeId])
-  @@index([placeId])
+  @@unique([viewerUserId, entityId])
+  @@index([entityId])
   @@index([viewerUserId])
 }
 
 model place_photo_eval {
   id                    String             @id @default(cuid())
-  place_id              String             @map("place_id")
+  entityId              String             @map("entity_id")
   google_place_id       String             @map("google_place_id")
   photo_ref             String             @map("photo_ref")
   width_px              Int                @map("width_px")
@@ -372,10 +460,10 @@ model place_photo_eval {
   type                  PlacePhotoEvalType? @map("type")
   created_at            DateTime           @default(now()) @map("created_at")
   updated_at            DateTime           @updatedAt @map("updated_at")
-  places                places             @relation(fields: [place_id], references: [id], onDelete: Cascade)
+  entities              entities           @relation(fields: [entityId], references: [id], onDelete: Cascade)
 
-  @@unique([place_id, photo_ref])
-  @@index([place_id])
+  @@unique([entityId, photo_ref])
+  @@index([entityId])
 }
 
 enum PlacePhotoEvalTier {
@@ -557,8 +645,8 @@ model golden_records {
   name_display String?
 
   // Location
-  lat            Decimal @db.Decimal(10, 7)
-  lng            Decimal @db.Decimal(11, 7)
+  lat            Decimal? @db.Decimal(10, 7)
+  lng            Decimal? @db.Decimal(11, 7)
   address_street String?
   address_city   String?
   address_state  String?
@@ -625,6 +713,13 @@ model golden_records {
   // Golden-first intake (Ken spec): gated promotion
   confidence       Float?   // 0–1, set by resolver
   promotion_status PromotionStatus @default(PENDING) @map("promotion_status")
+
+  // Merge quality & field-level provenance (sources table + batch recompute)
+  match_confidence  Float?  @map("match_confidence")   // 0–1, resolution confidence
+  merge_quality     Float?  @map("merge_quality")      // 0–1, overall merge quality
+  field_confidences Json?   @map("field_confidences")  // critical fields only: name, address, lat, lng, phone, website, hours, category, instagram, etc.
+  winner_sources    Json?   @map("winner_sources")     // field -> source slug (references sources.slug)
+  field_conflicts   Json?   @map("field_conflicts")    // array of field names that had conflicts
 
   // Menu & Wine List Scraper Fields
   menu_url            String? // Discovered menu page URL
@@ -761,6 +856,21 @@ model review_audit_log {
 
   @@index([queue_id])
   @@index([resolved_at])
+}
+
+// ============================================================================
+// SOURCES REGISTRY (trust tiers + domain for merge / winner_sources)
+// ============================================================================
+
+// Confidence System v1: trust tiers 0–1, editable in DB (not hardcoded)
+model sources {
+  id         String   @id // e.g. 'google_places', 'michelin' — editable trust tiers
+  name       String
+  trust_tier Float    @map("trust_tier") // 0–1, CHECK in DB
+  domain     String[] @default([]) // optional domains for validation
+  created_at DateTime @default(now()) @map("created_at")
+
+  @@index([trust_tier])
 }
 
 // ============================================================================
@@ -1016,10 +1126,10 @@ model tag_versions {
   place_tag_scores place_tag_scores[]
 }
 
-/// energy_scores — baseline environmental stimulation per place
+/// energy_scores — baseline environmental stimulation per entity
 model energy_scores {
   id                    String   @id @default(uuid())
-  place_id              String   @map("place_id")
+  entityId              String   @map("entity_id")
   energy_score          Int
   energy_confidence     Float
   popularity_component  Int?     @map("popularity_component")
@@ -1033,18 +1143,18 @@ model energy_scores {
   version               String
   computed_at           DateTime @default(now()) @map("computed_at")
 
-  place  places         @relation(fields: [place_id], references: [id], onDelete: Cascade)
+  entity  entities      @relation(fields: [entityId], references: [id], onDelete: Cascade)
   energy_version energy_versions @relation(fields: [version], references: [version])
 
-  @@unique([place_id, version])
-  @@index([place_id])
+  @@unique([entityId, version])
+  @@index([entityId])
   @@index([version])
 }
 
-/// place_tag_scores — weighted tag interpretations (0-1) per place
+/// place_tag_scores — weighted tag interpretations (0-1) per entity
 model place_tag_scores {
   id                       String   @id @default(uuid())
-  place_id                 String   @map("place_id")
+  entityId                 String   @map("entity_id")
   cozy_score               Float
   date_night_score         Float    @map("date_night_score")
   late_night_score         Float    @map("late_night_score")
@@ -1055,11 +1165,11 @@ model place_tag_scores {
   depends_on_energy_version String   @map("depends_on_energy_version")
   computed_at              DateTime @default(now()) @map("computed_at")
 
-  place   places       @relation(fields: [place_id], references: [id], onDelete: Cascade)
+  entity  entities     @relation(fields: [entityId], references: [id], onDelete: Cascade)
   tag_version tag_versions @relation(fields: [version], references: [version])
 
-  @@unique([place_id, version])
-  @@index([place_id])
+  @@unique([entityId, version])
+  @@index([entityId])
   @@index([version])
 }
 
@@ -1070,31 +1180,86 @@ model place_tag_scores {
 
 enum ActorKind {
   organization
+  operator
   brand
   person
+  collective
 }
 
 enum ActorRole {
   operator
   owner
-  parent
   founder
+  brand
+  parent
+  collective
 }
 
-/// Actors - organizations, brands, people (Saiko Trace)
+/// Actors - canonical identity (Saiko Fields relationship layer).
+/// Migrated from restaurant_groups (kind=operator).
 model Actor {
-  id        String   @id @default(uuid())
-  name      String
-  kind      ActorKind @default(organization)
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id          String     @id @default(uuid())
+  name        String
+  kind        ActorKind  @default(operator)
+  slug        String?    @unique
+  website     String?
+  description String?
+  visibility  Visibility?
+  sources     Json?
+  confidence  Float?
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
 
-  entityRelationships EntityActorRelationship[]
+  entityRelationships   EntityActorRelationship[]
+  placeActorRelationships PlaceActorRelationship[]
+  operatorPlaceCandidates OperatorPlaceCandidate[]
 
   @@index([name])
+  @@index([slug])
+}
+
+/// Operator → Place link candidates (human review). Idempotent on (actor_id, candidate_url) or (actor_id, candidate_name, candidate_address).
+enum OperatorPlaceCandidateStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  STALE
+}
+
+enum ConfidenceBucket {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+model OperatorPlaceCandidate {
+  id                String                        @id @default(uuid())
+  actorId           String                        @map("actor_id")
+  entityId          String?                       @map("entity_id")
+  candidateName     String                        @map("candidate_name")
+  candidateUrl      String?                       @map("candidate_url")
+  candidateAddress  String?                       @map("candidate_address")
+  sourceUrl         String                        @map("source_url")
+  matchScore        Float                         @default(0) @map("match_score")
+  matchReason       String?                       @map("match_reason")
+  status            OperatorPlaceCandidateStatus @default(PENDING)
+  rejectionReason   String?                       @map("rejection_reason")
+  reviewedAt        DateTime?                     @map("reviewed_at")
+  approvedBy        String?                       @map("approved_by")
+  confidenceBucket  ConfidenceBucket?             @map("confidence_bucket")
+  createdAt         DateTime                     @default(now()) @map("created_at")
+  updatedAt         DateTime                     @updatedAt @map("updated_at")
+
+  actor  Actor     @relation(fields: [actorId], references: [id], onDelete: Cascade)
+  entity entities? @relation(fields: [entityId], references: [id], onDelete: SetNull)
+
+  @@index([actorId, status])
+  @@index([entityId])
+  @@map("operator_place_candidates")
 }
 
 /// Entity-Actor relationships (Saiko Trace)
+/// Canonical for golden_records. Do not use for app-facing Place UI.
 model EntityActorRelationship {
   id         String    @id @default(uuid())
   entityId   String    @map("entity_id")
@@ -1112,6 +1277,35 @@ model EntityActorRelationship {
 
   @@index([entityId])
   @@index([actorId])
+}
+
+/// Place-Actor relationships — app-facing projection layer.
+/// Materialized when place ↔ golden exists; temporary canonical when place has no golden.
+/// Written only by ingestion/sync logic. UI reads from here.
+///
+/// Note: @@unique([placeId, actorId, role]) prevents duplicate rows but does NOT enforce
+/// "at most one isPrimary=true per (place, role)". Later consider a partial unique index
+/// e.g. UNIQUE (place_id) WHERE is_primary AND role = 'operator'.
+model PlaceActorRelationship {
+  id         String    @id @default(cuid())
+  entityId   String    @map("entity_id")
+  actorId    String    @map("actor_id")
+  role       ActorRole
+  isPrimary  Boolean   @default(false) @map("is_primary")
+  startDate  DateTime? @map("start_date")
+  endDate    DateTime? @map("end_date")
+  sources    Json?
+  confidence Float?
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+
+  entity entities @relation(fields: [entityId], references: [id], onDelete: Cascade)
+  actor  Actor    @relation(fields: [actorId], references: [id], onDelete: Cascade)
+
+  @@unique([entityId, actorId, role])
+  @@index([entityId])
+  @@index([actorId])
+  @@map("place_actor_relationships")
 }
 
 /// Fields membership - entities in the curated index (Saiko Fields)
@@ -1163,11 +1357,65 @@ model coverage_runs {
   @@map("coverage_runs")
 }
 
+// ============================================================================
+// GPID RESOLUTION QUEUE (Identity Queue v1)
+// Human-in-the-loop for unresolved Google Place ID matches
+// Extensible: later add enrichment_queue, data_completion_queue as separate queue types
+// ============================================================================
+
+enum GpidResolverStatus {
+  MATCH
+  AMBIGUOUS
+  NO_MATCH
+  ERROR
+}
+
+enum GpidHumanStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  NEEDS_MORE_INFO
+}
+
+enum GpidHumanDecision {
+  APPLY_GPID
+  MARK_NO_MATCH
+  MARK_AMBIGUOUS
+}
+
+model gpid_resolution_queue {
+  id                 String            @id @default(uuid())
+  entityId           String            @map("entity_id")
+  candidate_gpid     String?           @map("candidate_gpid") // best single candidate (for MATCH)
+  resolver_status    GpidResolverStatus @map("resolver_status")
+  reason_code        String?           @map("reason_code") // TEXT_LOW_SIM, TEXT_MULTI_RESULTS, etc.
+  similarity_score   Float?            @map("similarity_score") // 0-100
+  candidates_json    Json?             @map("candidates_json") // all candidates + meta
+  source_run_id      String?           @map("source_run_id")
+  created_at         DateTime          @default(now()) @map("created_at")
+  updated_at         DateTime          @updatedAt @map("updated_at")
+
+  // Human review
+  human_status       GpidHumanStatus    @default(PENDING) @map("human_status")
+  human_decision     GpidHumanDecision? @map("human_decision")
+  human_note         String?            @map("human_note")
+  reviewed_by        String?            @map("reviewed_by")
+  reviewed_at        DateTime?          @map("reviewed_at")
+
+  entities           entities          @relation(fields: [entityId], references: [id], onDelete: Cascade)
+
+  @@index([human_status])
+  @@index([resolver_status])
+  @@index([entityId])
+  @@index([reason_code])
+  @@map("gpid_resolution_queue")
+}
+
 /// place_coverage_status — per-dedupe_key coverage state (no double spend)
 model place_coverage_status {
   id                  String   @id @default(cuid())
-  place_id            String   @map("place_id")
-  dedupe_key          String   @unique @map("dedupe_key") // google_place_id or place_id
+  entityId            String   @map("entity_id")
+  dedupe_key          String   @unique @map("dedupe_key") // google_place_id or entity_id
   last_success_at     DateTime? @map("last_success_at")
   last_attempt_at     DateTime? @map("last_attempt_at")
   last_attempt_status String?  @map("last_attempt_status") // SUCCESS | FAIL | RUNNING
@@ -1177,9 +1425,31 @@ model place_coverage_status {
   source              String?  // GOOGLE_PLACES | SCRAPE | MANUAL
   updated_at          DateTime @updatedAt @map("updated_at")
 
-  places places @relation(fields: [place_id], references: [id], onDelete: Cascade)
+  entities entities @relation(fields: [entityId], references: [id], onDelete: Cascade)
 
-  @@index([place_id])
+  @@index([entityId])
   @@index([last_attempt_status])
   @@map("place_coverage_status")
+}
+
+// ============================================================================
+// PLACE JOB LOG — cost/metric audit (identity, operator_link, scan jobs)
+// No UI. Minimal fields for pages_fetched, ai_calls, duration_ms, estimated_cost.
+// ============================================================================
+
+model place_job_log {
+  id              String   @id @default(uuid())
+  entity_id       String   @map("entity_id")
+  entity_type     String   @map("entity_type") // 'place' | 'actor' | 'golden_record' | 'batch'
+  job_type        String   @map("job_type")    // 'IDENTITY' | 'OPERATOR_LINK' | 'SCAN'
+  pages_fetched   Int      @default(0) @map("pages_fetched")
+  ai_calls        Int      @default(0) @map("ai_calls")
+  duration_ms     Int?     @map("duration_ms")
+  estimated_cost  Decimal? @map("estimated_cost") @db.Decimal(10, 6)
+  created_at      DateTime @default(now()) @map("created_at")
+
+  @@index([entity_id])
+  @@index([job_type])
+  @@index([created_at])
+  @@map("place_job_log")
 }

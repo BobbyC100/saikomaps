@@ -7,7 +7,7 @@
 
 import { useState } from 'react'
 import { signIn } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { SaikoLogo } from '@/components/ui/SaikoLogo'
 import { useForm } from 'react-hook-form'
@@ -16,6 +16,7 @@ import { loginSchema, type LoginInput } from '@/lib/validations'
 
 export default function LoginPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -43,8 +44,10 @@ export default function LoginPage() {
         return
       }
 
-      // Redirect to dashboard on success
-      router.push('/dashboard')
+      // Redirect to intended page or dashboard
+      const next = searchParams.get('next')
+      const redirectUrl = next && next.startsWith('/') ? next : '/dashboard'
+      router.push(redirectUrl)
       router.refresh()
     } catch (err) {
       setError('Something went wrong. Please try again.')

@@ -12,7 +12,7 @@ async function testValidation() {
   console.log('🧪 Testing approveSignalToOverlay validation\n');
 
   // Get a place
-  const place = await prisma.places.findFirst({
+  const place = await prisma.entities.findFirst({
     select: { id: true, name: true },
   });
 

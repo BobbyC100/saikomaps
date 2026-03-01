@@ -15,7 +15,7 @@ async function testIntegration() {
   console.log('Flow: Newsletter → Signal → Approval → Overlay → Read Path\n');
 
   // Get a test place
-  const place = await prisma.places.findFirst({
+  const place = await prisma.entities.findFirst({
     select: { id: true, name: true, slug: true },
   });
 

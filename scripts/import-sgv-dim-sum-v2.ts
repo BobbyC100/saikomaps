@@ -168,7 +168,7 @@ async function main() {
     }
 
     // Check if place already exists
-    let place = googlePlaceId ? await db.places.findUnique({ where: { googlePlaceId } }) : null
+    let place = googlePlaceId ? await db.entities.findUnique({ where: { googlePlaceId } }) : null
 
     if (!place) {
       // Create new place
@@ -185,7 +185,7 @@ async function main() {
 
       const baseSlug = generatePlaceSlug(finalName, neighborhood ?? undefined)
       const uniqueSlug = await ensureUniqueSlug(baseSlug, async (s) => {
-        const exists = await db.places.findUnique({ where: { slug: s } })
+        const exists = await db.entities.findUnique({ where: { slug: s } })
         return !!exists
       })
 
@@ -198,7 +198,7 @@ async function main() {
         }
       ] : []
 
-      place = await db.places.create({
+      place = await db.entities.create({
         data: {
           slug: uniqueSlug,
           googlePlaceId: googlePlaceId ?? undefined,
@@ -241,7 +241,7 @@ async function main() {
       } : null
 
       if (newSource && !existingSources.some((s: any) => s.url === newSource.url)) {
-        place = await db.places.update({
+        place = await db.entities.update({
           where: { id: place.id },
           data: {
             sources: [...existingSources, newSource],
@@ -257,14 +257,14 @@ async function main() {
 
     // Create MapPlace (link place to map)
     const existingMapPlace = await db.map_places.findUnique({
-      where: { mapId_placeId: { mapId: list.id, placeId: place.id } },
+      where: { mapId_entityId: { mapId: list.id, entityId: place.id } },
     })
 
     if (!existingMapPlace) {
       await db.map_places.create({
         data: {
           mapId: list.id,
-          placeId: place.id,
+          entityId: place.id,
           userNote: input.comment?.trim() || null,
           orderIndex: i,
         },
@@ -275,7 +275,7 @@ async function main() {
       // Update the user note if it has changed
       if (existingMapPlace.userNote !== (input.comment?.trim() || null)) {
         await db.map_places.update({
-          where: { mapId_placeId: { mapId: list.id, placeId: place.id } },
+          where: { mapId_entityId: { mapId: list.id, entityId: place.id } },
           data: { userNote: input.comment?.trim() || null },
         })
         console.log(`   ✓ Updated note on map`)

@@ -15,7 +15,7 @@ async function main() {
   console.log(`Mode: ${dryRun ? '🚧 DRY RUN' : '❌ DELETION MODE'}\n`);
 
   // Find all Tier 3 places
-  const allPlaces = await prisma.places.findMany({
+  const allPlaces = await prisma.entities.findMany({
     where: {
       status: 'OPEN',
       latitude: { not: null },
@@ -131,22 +131,22 @@ async function main() {
   
   // Delete related records first
   const mapPlacesDeleted = await prisma.map_places.deleteMany({
-    where: { place_id: { in: phantomIds } },
+    where: { entityId: { in: phantomIds } },
   });
   console.log(`  Deleted ${mapPlacesDeleted.count} map_places records`);
 
   const personPlacesDeleted = await prisma.person_places.deleteMany({
-    where: { place_id: { in: phantomIds } },
+    where: { entityId: { in: phantomIds } },
   });
   console.log(`  Deleted ${personPlacesDeleted.count} person_places records`);
 
   const bookmarksDeleted = await prisma.viewer_bookmarks.deleteMany({
-    where: { place_id: { in: phantomIds } },
+    where: { entityId: { in: phantomIds } },
   });
   console.log(`  Deleted ${bookmarksDeleted.count} viewer_bookmarks records`);
 
   // Delete phantom places
-  const deletedPlaces = await prisma.places.deleteMany({
+  const deletedPlaces = await prisma.entities.deleteMany({
     where: { id: { in: phantomIds } },
   });
 

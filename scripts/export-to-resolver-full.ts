@@ -20,7 +20,7 @@ async function exportPlacesToResolver() {
   console.log('');
 
   // Get all places from the original table
-  const places = await prisma.places.findMany({
+  const places = await prisma.entities.findMany({
     select: {
       id: true,
       name: true,

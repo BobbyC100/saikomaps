@@ -28,6 +28,17 @@ if (!rawUrl || typeof rawUrl !== 'string' || !rawUrl.trim()) {
   process.exit(1);
 }
 
+// Detect possible DATABASE_URL corruption (e.g. concatenated with placeholder)
+if (
+  rawUrl.includes('YOUR_NEON') ||
+  rawUrl.includes('requireDATABASE_URL') ||
+  rawUrl.includes('DATABASE_URL=')
+) {
+  console.error('\n[dev.js] FATAL: DATABASE_URL appears corrupted (contains placeholder or concatenation).');
+  console.error('[dev.js] DATABASE_URL length:', rawUrl.length, '| snippet:', rawUrl.substring(0, 80) + '...');
+  process.exit(1);
+}
+
 function redactPassword(url) {
   try {
     return url.replace(/^([^:]+:\/\/[^:]+):([^@]+)(@.*)$/, '$1:***$3');
@@ -149,16 +160,22 @@ function runNextDev(nextBinPath, args) {
   if (!hasPort) {
     devArgs.push('-p', String(DEV_PORT));
   }
-  devArgs.push('-H', '0.0.0.0');
+  // Skip -H 0.0.0.0 for diagnostics: NEXT_DEV_SKIP_HOST=1 npm run dev
+  if (!process.env.NEXT_DEV_SKIP_HOST) {
+    devArgs.push('-H', '0.0.0.0');
+  } else {
+    console.log('[dev.js] NEXT_DEV_SKIP_HOST=1 — using default host (no -H 0.0.0.0)');
+  }
 
   const env = {
     ...process.env,
-    NEXT_DISABLE_TURBOPACK: '1',
+    // Skip Turbopack disable for diagnostics: NEXT_DEV_USE_TURBOPACK=1 npm run dev
+    NEXT_DISABLE_TURBOPACK: process.env.NEXT_DEV_USE_TURBOPACK ? '0' : '1',
   };
 
   const cmd = ['node', nextBinPath, 'dev', ...devArgs];
   console.log('[dev.js] Command:', cmd.join(' '));
-  console.log('[dev.js] NEXT_DISABLE_TURBOPACK=1 (Turbopack disabled)');
+  console.log('[dev.js] NEXT_DISABLE_TURBOPACK=' + env.NEXT_DISABLE_TURBOPACK);
 
   const child = spawn('node', [nextBinPath, 'dev', ...devArgs], {
     stdio: 'inherit',
@@ -168,7 +185,7 @@ function runNextDev(nextBinPath, args) {
   console.log('[dev.js] child.pid:', child.pid);
 
   child.on('exit', (code, signal) => {
-    console.log('[dev.js] child exit code=', code, 'signal=', signal ?? 'none');
+    console.error('\n[dev.js] *** CHILD EXIT *** code=', code, 'signal=', signal ?? 'none');
   });
 
   const forward = (sig) => {
@@ -180,7 +197,7 @@ function runNextDev(nextBinPath, args) {
   process.on('SIGTERM', () => forward('SIGTERM'));
 
   child.on('error', (err) => {
-    console.error('[dev.js] Failed to start next dev:', err);
+    console.error('\n[dev.js] *** CHILD ERROR *** Failed to start next dev:', err);
   });
 
   const startTime = Date.now();
@@ -195,6 +212,15 @@ function runNextDev(nextBinPath, args) {
       if (ok) {
         bindCheckSucceeded = true;
         console.log('[dev.js] Port', DEV_PORT, 'LISTENING');
+        // Log whether child is still alive 5s after bind (helps debug premature exit)
+        setTimeout(() => {
+          try {
+            process.kill(child.pid, 0);
+            console.log('[dev.js] Child still alive 5s after Port LISTENING (pid=', child.pid, ')');
+          } catch (_) {
+            console.error('[dev.js] *** Child EXITED within 5s of Port LISTENING ***');
+          }
+        }, 5000);
         return;
       }
       const now = Date.now();
@@ -215,8 +241,8 @@ function runNextDev(nextBinPath, args) {
 
   return new Promise((resolve) => {
     child.on('close', (code, signal) => {
+      console.error('\n[dev.js] *** CHILD CLOSE *** code=', code, 'signal=', signal ?? 'none');
       if (signal) {
-        console.log('[dev.js] next dev exited via signal', signal);
         resolve(1);
       } else {
         resolve(code ?? 0);

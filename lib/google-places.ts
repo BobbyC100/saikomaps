@@ -35,6 +35,8 @@ export interface PlaceSearchResult {
   types?: string[];
   rating?: number;
   userRatingsTotal?: number;
+  /** Present when the search API returns it (e.g. some endpoints). */
+  website?: string;
 }
 
 export interface AddressComponent {
@@ -178,7 +180,59 @@ export async function searchPlace(
       types: place.types,
       rating: place.rating,
       userRatingsTotal: place.user_ratings_total,
+      website: place.website,
     }));
+
+  return results;
+}
+
+/**
+ * Nearby Search (legacy Places API). Returns places within radius (meters) of lat/lng.
+ * No type filter — use for GPID resolution by location + name match.
+ */
+export async function nearbySearch(
+  lat: number,
+  lng: number,
+  radiusMeters: number
+): Promise<PlaceSearchResult[]> {
+  checkEnabled();
+  if (!GOOGLE_PLACES_API_KEY) {
+    throw new Error('Google Places API key is not configured');
+  }
+
+  const params = new URLSearchParams({
+    location: `${lat},${lng}`,
+    radius: String(radiusMeters),
+    key: GOOGLE_PLACES_API_KEY,
+  });
+
+  const response = await fetch(
+    `${PLACES_API_BASE}/nearbysearch/json?${params.toString()}`
+  );
+
+  if (!response.ok) {
+    throw new Error(`Google Places API error: ${response.statusText}`);
+  }
+
+  const data = await response.json();
+
+  if (data.status !== 'OK' && data.status !== 'ZERO_RESULTS') {
+    throw new Error(`Google Places API error: ${data.status}`);
+  }
+
+  const results: PlaceSearchResult[] = (data.results || []).map((place: any) => ({
+    placeId: place.place_id,
+    name: place.name,
+    address: place.formatted_address,
+    location: {
+      lat: place.geometry?.location?.lat ?? lat,
+      lng: place.geometry?.location?.lng ?? lng,
+    },
+    types: place.types,
+    rating: place.rating,
+    userRatingsTotal: place.user_ratings_total,
+    website: place.website,
+  }));
 
   return results;
 }

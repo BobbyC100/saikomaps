@@ -11,7 +11,7 @@ const { PrismaClient } = require('@prisma/client');
 
   try {
     // Pick 3 most recent places
-    const places = await prisma.places.findMany({
+    const places = await prisma.entities.findMany({
       take: 3,
       orderBy: { createdAt: 'desc' },
       select: {

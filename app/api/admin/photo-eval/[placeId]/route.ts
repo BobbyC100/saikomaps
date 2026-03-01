@@ -14,7 +14,7 @@ export async function GET(
   const { placeId } = await params;
   const mode = request.nextUrl.searchParams.get('mode');
 
-  const place = await prisma.places.findUnique({
+  const place = await prisma.entities.findUnique({
     where: { id: placeId },
     select: { id: true, slug: true, name: true, googlePlaceId: true },
   });

@@ -98,7 +98,7 @@ Examples:
   console.log(`\n🔍 Looking for place: "${placeName}"...\n`)
 
   // Find place
-  const place = await db.places.findFirst({
+  const place = await db.entities.findFirst({
     where: {
       name: {
         contains: placeName,
@@ -146,7 +146,7 @@ Examples:
   const updatedRecs = [...existingRecs, chefRec]
 
   // Update place
-  await db.places.update({
+  await db.entities.update({
     where: { id: place.id },
     data: {
       chefRecs: updatedRecs

@@ -35,7 +35,7 @@ async function fetchPlaceIdToPlaceData(
 ): Promise<Map<string, PlaceInputRow>> {
   const map = new Map<string, PlaceInputRow>();
   if (placeIds.length === 0) return map;
-  const places = await db.places.findMany({
+  const places = await db.entities.findMany({
     where: { id: { in: placeIds } },
     select: {
       id: true,
@@ -85,7 +85,7 @@ async function getPlaceIds(placeIdArg: string | null, laOnly: boolean, limitArg:
   }
 
   if (placeIdArg) {
-    const place = await db.places.findUnique({
+    const place = await db.entities.findUnique({
       where: { id: placeIdArg },
       select: { id: true },
     });
@@ -96,7 +96,7 @@ async function getPlaceIds(placeIdArg: string | null, laOnly: boolean, limitArg:
     return [place.id];
   }
 
-  const places = await db.places.findMany({
+  const places = await db.entities.findMany({
     where: { googlePlaceId: { not: null } },
     select: { id: true },
   });
@@ -213,10 +213,10 @@ async function main() {
 
       if (!explainInputs) {
         await db.place_tag_scores.upsert({
-        where: { place_id_version: { place_id: placeId, version: tagVersion } },
+        where: { entityId_version: { entityId: placeId, version: tagVersion } },
         create: {
           id: randomUUID(),
-          place_id: placeId,
+          entityId: placeId,
           cozy_score: result.cozy_score,
           date_night_score: result.date_night_score,
           late_night_score: result.late_night_score,

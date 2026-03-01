@@ -18,7 +18,7 @@ async function exportPlacesToGoldenRecords() {
   console.log('');
 
   // Get all places from the original table
-  const places = await prisma.places.findMany({
+  const places = await prisma.entities.findMany({
     where: {
       status: 'OPEN' // Only export open places
     }

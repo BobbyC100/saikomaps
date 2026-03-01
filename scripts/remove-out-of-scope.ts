@@ -14,7 +14,7 @@ async function main() {
   console.log(`   ${dryRun ? '🚧 DRY RUN MODE' : '❌ DELETION MODE'}\n`);
   
   // Get places with clear non-LA addresses
-  const allPlaces = await prisma.places.findMany({
+  const allPlaces = await prisma.entities.findMany({
     where: {
       OR: [
         { address: { contains: ', HI ' } },
@@ -105,7 +105,7 @@ async function main() {
   console.log('  Step 1: Deleting related map_places records...');
   const mapPlacesDeleted = await prisma.map_places.deleteMany({
     where: {
-      place_id: {
+      entityId: {
         in: Array.from(allIds),
       },
     },
@@ -116,7 +116,7 @@ async function main() {
   console.log('  Step 2: Deleting related person_places records...');
   const personPlacesDeleted = await prisma.person_places.deleteMany({
     where: {
-      place_id: {
+      entityId: {
         in: Array.from(allIds),
       },
     },
@@ -127,7 +127,7 @@ async function main() {
   console.log('  Step 3: Deleting related viewer_bookmarks records...');
   const bookmarksDeleted = await prisma.viewer_bookmarks.deleteMany({
     where: {
-      place_id: {
+      entityId: {
         in: Array.from(allIds),
       },
     },
@@ -142,7 +142,7 @@ async function main() {
 
   for (let i = 0; i < idArray.length; i += batchSize) {
     const batch = idArray.slice(i, i + batchSize);
-    const result = await prisma.places.deleteMany({
+    const result = await prisma.entities.deleteMany({
       where: {
         id: {
           in: batch,

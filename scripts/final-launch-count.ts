@@ -12,7 +12,7 @@ async function main() {
   console.log('════════════════════════════════════════════════════════════\n');
 
   // Get all OPEN places with valid coords
-  const allPlaces = await prisma.places.findMany({
+  const allPlaces = await prisma.entities.findMany({
     where: {
       status: 'OPEN',
       latitude: { not: null },

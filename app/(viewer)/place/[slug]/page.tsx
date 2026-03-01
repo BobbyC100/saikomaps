@@ -62,11 +62,28 @@ interface LocationData {
   pullQuoteUrl?: string | null;
   pullQuoteType?: string | null;
   slug?: string;
-  restaurantGroup?: { name: string; slug: string } | null;
+  primaryOperator?: { actorId: string; name: string; slug: string; website?: string } | null;
   placeType?: 'venue' | 'activity' | 'public';
   categorySlug?: string | null;
   marketSchedule?: unknown;
   recognitions?: { name: string; source?: string; year?: string }[] | null;
+  appearancesAsSubject?: {
+    id: string;
+    hostPlaceId: string | null;
+    hostPlace: { id: string; name: string; slug: string } | null;
+    latitude: number | null;
+    longitude: number | null;
+    addressText: string | null;
+    scheduleText: string;
+    status: string;
+  }[];
+  appearancesAsHost?: {
+    id: string;
+    subjectPlaceId: string;
+    subjectPlace: { id: string; name: string; slug: string } | null;
+    scheduleText: string;
+    status: string;
+  }[];
 }
 
 interface AppearsOnItem {
@@ -275,7 +292,7 @@ export default function PlacePage() {
   };
 
   const statusLabel = openNowExplicit && isOpen !== null ? (isOpen ? 'Open' : 'Closed') : null;
-  const hasFacts = statusLabel || statusText || today || location.address || location.website;
+  const hasFacts = statusLabel || statusText || today || location.address || location.website || !!location.primaryOperator;
 
   return (
     <div style={{ background: '#F5F0E1', minHeight: '100vh' }}>
@@ -311,6 +328,11 @@ export default function PlacePage() {
                     {location.address && <span>{location.address}</span>}
                     {location.website && (
                       <a href={location.website} target="_blank" rel="noopener noreferrer">Website</a>
+                    )}
+                    {location.primaryOperator && (
+                      <Link href={`/actor/${location.primaryOperator.slug}`}>
+                        Part of the {location.primaryOperator.name} family
+                      </Link>
                     )}
                     {mapRefUrl && (
                       <a href={mapRefUrl} target="_blank" rel="noopener noreferrer">Map ↗</a>
@@ -382,6 +404,48 @@ export default function PlacePage() {
                     </div>
                   ))}
                 </div>
+              </section>
+            )}
+
+            {/* Where to find this (subject appearances) */}
+            {location.appearancesAsSubject && location.appearancesAsSubject.length > 0 && (
+              <section id="appearances-as-subject" className="section-with-provenance">
+                <h2>Where to find this</h2>
+                <ul id="appearances-as-subject-list" className="space-y-2">
+                  {location.appearancesAsSubject.map((a) => (
+                    <li key={a.id}>
+                      {a.hostPlace ? (
+                        <Link href={`/place/${a.hostPlace.slug}`} className="text-[#5BA7A7] hover:underline">
+                          {a.hostPlace.name}
+                        </Link>
+                      ) : (
+                        <span>{a.addressText ?? 'Specific location'}</span>
+                      )}
+                      <span className="text-[#8B7355] ml-2">— {a.scheduleText}</span>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+
+            {/* Currently hosting / Appearances here */}
+            {location.appearancesAsHost && location.appearancesAsHost.length > 0 && (
+              <section id="appearances-as-host" className="section-with-provenance">
+                <h2>Currently hosting</h2>
+                <ul id="appearances-as-host-list" className="space-y-2">
+                  {location.appearancesAsHost.map((a) => (
+                    <li key={a.id}>
+                      {a.subjectPlace ? (
+                        <Link href={`/place/${a.subjectPlace.slug}`} className="text-[#5BA7A7] hover:underline">
+                          {a.subjectPlace.name}
+                        </Link>
+                      ) : (
+                        <span>Place</span>
+                      )}
+                      <span className="text-[#8B7355] ml-2">— {a.scheduleText}</span>
+                    </li>
+                  ))}
+                </ul>
               </section>
             )}
 

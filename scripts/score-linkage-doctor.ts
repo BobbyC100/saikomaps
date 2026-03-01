@@ -18,7 +18,7 @@ async function main() {
   console.log('');
 
   for (const slug of slugs) {
-    const place = await db.places.findUnique({
+    const place = await db.entities.findUnique({
       where: { slug },
       select: { id: true, name: true, googlePlaceId: true },
     });

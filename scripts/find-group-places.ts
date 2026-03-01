@@ -9,7 +9,7 @@ async function main() {
   // Last Word Hospitality places
   console.log('\n🔍 LAST WORD HOSPITALITY PLACES:\n')
   
-  const lwPlaces = await db.places.findMany({
+  const lwPlaces = await db.entities.findMany({
     where: {
       OR: [
         { name: { contains: 'Found Oyster', mode: 'insensitive' } },
@@ -29,7 +29,7 @@ async function main() {
   // Rustic Canyon Family places
   console.log('\n🔍 RUSTIC CANYON FAMILY PLACES:\n')
   
-  const rcPlaces = await db.places.findMany({
+  const rcPlaces = await db.entities.findMany({
     where: {
       OR: [
         { name: { contains: 'Rustic Canyon', mode: 'insensitive' } },

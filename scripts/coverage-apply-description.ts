@@ -200,7 +200,7 @@ async function main() {
 
   // Idempotency: fetch current descriptions for candidates
   const placeIds = toProcess.map((c) => c.place_id);
-  const placesWithDesc = await db.places.findMany({
+  const placesWithDesc = await db.entities.findMany({
     where: { id: { in: placeIds } },
     select: { id: true, description: true },
   });
@@ -241,7 +241,7 @@ async function main() {
       }
 
       if (!dryRun) {
-        await db.places.update({
+        await db.entities.update({
           where: { id: place_id },
           data: { description: desc },
         });

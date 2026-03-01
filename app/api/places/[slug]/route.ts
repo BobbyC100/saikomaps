@@ -60,7 +60,7 @@ export async function GET(
       );
     }
 
-    const place = await db.places.findUnique({
+    const place = await db.entities.findUnique({
       where: { slug },
       include: {
         map_places: {
@@ -83,10 +83,13 @@ export async function GET(
             },
           },
         },
-        restaurant_groups: {
-          select: {
-            name: true,
-            slug: true,
+        place_actor_relationships: {
+          where: { role: 'operator', isPrimary: true },
+          take: 1,
+          include: {
+            actor: {
+              select: { id: true, name: true, slug: true, website: true },
+            },
           },
         },
         category_rel: {
@@ -104,6 +107,18 @@ export async function GET(
             depends_on_energy_version: 'energy_v1',
           },
           take: 1,
+        },
+        place_appearances_as_subject: {
+          where: { status: { in: ['ACTIVE', 'ANNOUNCED'] } },
+          include: {
+            hostEntity: { select: { id: true, name: true, slug: true } },
+          },
+        },
+        place_appearances_as_host: {
+          where: { status: { in: ['ACTIVE', 'ANNOUNCED'] } },
+          include: {
+            subjectEntity: { select: { id: true, name: true, slug: true } },
+          },
         },
       },
     });
@@ -371,12 +386,35 @@ export async function GET(
           intentProfile: place.intentProfile,
           intentProfileOverride: place.intentProfileOverride,
           reservationUrl: place.reservationUrl,
-          // Restaurant Group
-          restaurantGroup: place.restaurant_groups || null,
+          // Primary operator (PlaceActorRelationship)
+          primaryOperator: (() => {
+            const rel = place.place_actor_relationships?.[0];
+            const actor = rel?.actor;
+            if (!actor) return null;
+            return { actorId: actor.id, name: actor.name, slug: actor.slug ?? actor.id, website: actor.website ?? undefined };
+          })(),
           // Markets fields
           placeType: place.placeType,
           categorySlug: place.category_rel?.slug ?? (typeof place.category === "string" ? place.category : null),
           marketSchedule: place.marketSchedule ?? null,
+          // Appearances (Where to find / Currently hosting)
+          appearancesAsSubject: (place.place_appearances_as_subject ?? []).map((a) => ({
+            id: a.id,
+            hostEntityId: a.hostEntityId,
+            hostEntity: a.hostEntity ? { id: a.hostEntity.id, name: a.hostEntity.name, slug: a.hostEntity.slug } : null,
+            latitude: a.latitude ? Number(a.latitude) : null,
+            longitude: a.longitude ? Number(a.longitude) : null,
+            addressText: a.addressText,
+            scheduleText: a.scheduleText,
+            status: a.status,
+          })),
+          appearancesAsHost: (place.place_appearances_as_host ?? []).map((a) => ({
+            id: a.id,
+            subjectEntityId: a.subjectEntityId,
+            subjectEntity: a.subjectEntity ? { id: a.subjectEntity.id, name: a.subjectEntity.name, slug: a.subjectEntity.slug } : null,
+            scheduleText: a.scheduleText,
+            status: a.status,
+          })),
         },
         guide: appearsOn[0]
           ? {

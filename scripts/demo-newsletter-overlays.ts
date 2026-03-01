@@ -26,7 +26,7 @@ async function main() {
 
   if (!placeId) {
     console.log('⚠️  No PLACE_ID provided, fetching first available place...');
-    const firstPlace = await prisma.places.findFirst({
+    const firstPlace = await prisma.entities.findFirst({
       select: { id: true, name: true, slug: true },
     });
 
@@ -40,7 +40,7 @@ async function main() {
   }
 
   // Verify the place exists
-  const place = await prisma.places.findUnique({
+  const place = await prisma.entities.findUnique({
     where: { id: placeId },
     select: { id: true, name: true, slug: true },
   });

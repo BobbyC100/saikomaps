@@ -102,10 +102,10 @@ async function main() {
   for (const g of missing) {
     if (g.p_google_place_id?.trim()) {
       if (apply) {
-        await db.golden_records.update({
-          where: { canonical_id: g.canonical_id },
-          data: { google_place_id: g.p_google_place_id.trim() },
-        });
+        await db.$executeRaw`
+          UPDATE golden_records SET google_place_id = ${g.p_google_place_id.trim()}
+          WHERE canonical_id = ${g.canonical_id}
+        `;
       }
       updatedFromPlaces++;
       if (updatedFromPlaces <= 5) {
@@ -150,10 +150,10 @@ async function main() {
       if (results.length === 1) {
         const placeId = results[0].placeId;
         if (apply) {
-          await db.golden_records.update({
-            where: { canonical_id: g.canonical_id },
-            data: { google_place_id: placeId },
-          });
+          await db.$executeRaw`
+            UPDATE golden_records SET google_place_id = ${placeId}
+            WHERE canonical_id = ${g.canonical_id}
+          `;
         }
         updatedFromApi++;
         if (updatedFromApi <= 5) {

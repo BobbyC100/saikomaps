@@ -39,13 +39,13 @@ export async function POST(
     const { placeId: googlePlaceId, category, userNote, descriptor } = validation.data;
 
     // 1. Check if MapPlace already exists (place already on this map)
-    const existingPlace = await db.places.findUnique({
+    const existingPlace = await db.entities.findUnique({
       where: { googlePlaceId },
     });
     if (existingPlace) {
       const existingMapPlace = await db.map_places.findUnique({
         where: {
-          mapId_placeId: { mapId: list.id, placeId: existingPlace.id },
+          mapId_entityId: { mapId: list.id, entityId: existingPlace.id },
         },
       });
       if (existingMapPlace) {
@@ -73,11 +73,11 @@ export async function POST(
         ));
       const baseSlug = generatePlaceSlug(placeDetails.name, neighborhood ?? undefined);
       const slugValue = await ensureUniqueSlug(baseSlug, async (s) => {
-        const exists = await db.places.findUnique({ where: { slug: s } });
+        const exists = await db.entities.findUnique({ where: { slug: s } });
         return !!exists;
       });
 
-      place = await db.places.create({
+      place = await db.entities.create({
         data: {
           id: randomUUID(),
           slug: slugValue,
@@ -121,7 +121,7 @@ export async function POST(
             : undefined;
         const cuisineType = needsCuisineType ? parseCuisineType(placeDetails.types || []) ?? null : undefined;
         const priceLevel = needsPriceLevel ? placeDetails.priceLevel ?? null : undefined;
-        place = await db.places.update({
+        place = await db.entities.update({
           where: { id: place.id },
           data: {
             ...(neighborhood !== undefined && { neighborhood: neighborhood ?? null }),
@@ -145,14 +145,14 @@ export async function POST(
       data: {
         id: randomUUID(),
         mapId: list.id,
-        placeId: place.id,
+        entityId: place.id,
         descriptor: descriptor?.trim() || null,
         userNote: userNote || null,
         userPhotos: [],
         orderIndex: nextOrderIndex,
         updatedAt: new Date(),
       },
-      include: { places: true },
+      include: { entities: true },
     });
 
     return NextResponse.json({

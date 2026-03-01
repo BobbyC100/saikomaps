@@ -64,7 +64,7 @@ async function main() {
   for (let i = 0; i < SAMPLE_PLACES.length; i++) {
     const p = SAMPLE_PLACES[i];
     const placeSlug = slugify(p.slug);
-    const place = await prisma.place.upsert({
+    const place = await prisma.entities.upsert({
       where: { slug: placeSlug },
       update: { latitude: p.lat, longitude: p.lng, neighborhood: p.neighborhood, category: p.category },
       create: {
@@ -76,10 +76,10 @@ async function main() {
         category: p.category,
       },
     });
-    await prisma.mapPlace.create({
+    await prisma.map_places.create({
       data: {
         mapId: list.id,
-        placeId: place.id,
+        entityId: place.id,
         orderIndex: i,
         descriptor: i === 0 ? "The best natural wine list on the eastside. Unpretentious and always interesting." : undefined,
       },

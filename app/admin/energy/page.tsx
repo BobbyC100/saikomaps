@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function AdminEnergyPage() {
   const [totalPlaces, energyRows, lastCompute] = await Promise.all([
-    db.places.count(),
+    db.entities.count(),
     db.energy_scores.findMany({
       where: { version: 'energy_v1' },
       select: { energy_score: true, energy_confidence: true },

@@ -1,10 +1,15 @@
 #!/usr/bin/env node
 /**
- * Auto-Link Places to Restaurant Groups
- * Finds places in database and links them to their groups
+ * Auto-Link Places to Operators (Actor + PlaceActorRelationship)
+ * Finds places and creates PlaceActorRelationship. No writes to restaurantGroupId.
  */
 
 import { db } from '@/lib/db'
+
+function mergeSources(existing: unknown, extra: Record<string, unknown>): Record<string, unknown> {
+  const base = typeof existing === 'object' && existing !== null ? { ...(existing as Record<string, unknown>) } : {}
+  return { ...base, ...extra }
+}
 
 // Map of place names to group names (from the doc)
 const placeToGroup: Record<string, string> = {
@@ -100,7 +105,7 @@ async function main() {
     console.log(`\n[${linked + alreadyLinked + placeNotFound + groupNotFound + 1}/${Object.keys(placeToGroup).length}] ${placeName} → ${groupName}`)
 
     // Find place
-    const place = await db.places.findFirst({
+    const place = await db.entities.findFirst({
       where: {
         name: {
           contains: placeName,
@@ -108,7 +113,10 @@ async function main() {
         }
       },
       include: {
-        restaurantGroup: true
+        place_actor_relationships: {
+          where: { role: 'operator', isPrimary: true },
+          include: { actor: true }
+        }
       }
     })
 
@@ -118,13 +126,14 @@ async function main() {
       continue
     }
 
-    if (place.restaurantGroup) {
-      console.log(`   ⤷ Already linked to: ${place.restaurantGroup.name}`)
+    const primaryOp = place.place_actor_relationships?.[0]
+    if (primaryOp) {
+      console.log(`   ⤷ Already linked to operator: ${primaryOp.actor.name}`)
       alreadyLinked++
       continue
     }
 
-    // Find group
+    // Find group (used to look up/create Actor)
     const group = await db.restaurant_groups.findFirst({
       where: {
         name: {
@@ -140,13 +149,35 @@ async function main() {
       continue
     }
 
-    // Link
-    await db.places.update({
-      where: { id: place.id },
-      data: { restaurantGroupId: group.id }
+    // Find or create Actor
+    let actor = await db.actor.findUnique({ where: { slug: group.slug } })
+    if (!actor) {
+      actor = await db.actor.create({
+        data: {
+          name: group.name,
+          kind: 'operator',
+          slug: group.slug,
+          website: group.website ?? undefined,
+          description: group.description ?? undefined,
+          visibility: group.visibility,
+          sources: mergeSources(group.sources, { _migration_source: 'restaurant_groups', restaurant_group_id: group.id })
+        }
+      })
+    }
+
+    // Create PlaceActorRelationship (no restaurantGroupId write)
+    await db.placeActorRelationship.create({
+      data: {
+        entityId: place.id,
+        actorId: actor.id,
+        role: 'operator',
+        isPrimary: true,
+        sources: { _script: 'link-groups-to-places', restaurant_group_id: group.id },
+        confidence: 1
+      }
     })
 
-    console.log(`   ✅ Linked to ${group.name}`)
+    console.log(`   ✅ Linked to operator: ${actor.name}`)
     linked++
   }
 

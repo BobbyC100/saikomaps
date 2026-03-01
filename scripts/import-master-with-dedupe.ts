@@ -76,7 +76,7 @@ async function main() {
   console.log('PHASE 1: DEDUPE SCAN')
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n')
 
-  const allExistingPlaces = await db.places.findMany({
+  const allExistingPlaces = await db.entities.findMany({
     select: {
       id: true,
       name: true,
@@ -243,7 +243,7 @@ async function main() {
 
       // Check if place already exists by googlePlaceId
       const existingPlace = googlePlaceId 
-        ? await db.places.findUnique({ where: { googlePlaceId } })
+        ? await db.entities.findUnique({ where: { googlePlaceId } })
         : null
 
       let place
@@ -256,7 +256,7 @@ async function main() {
           ? [...existingSources, newSource]
           : existingSources
 
-        place = await db.places.update({
+        place = await db.entities.update({
           where: { id: existingPlace.id },
           data: {
             sources: updatedSources,
@@ -269,13 +269,13 @@ async function main() {
         // Create new place
         const baseSlug = generatePlaceSlug(finalName, neighborhood ?? undefined)
         const uniqueSlug = await ensureUniqueSlug(baseSlug, async (s) => {
-          const exists = await db.places.findUnique({ where: { slug: s } })
+          const exists = await db.entities.findUnique({ where: { slug: s } })
           return !!exists
         })
 
         const sources = newSource ? [newSource] : []
 
-        place = await db.places.create({
+        place = await db.entities.create({
           data: {
             slug: uniqueSlug,
             googlePlaceId: googlePlaceId ?? undefined,
@@ -306,7 +306,7 @@ async function main() {
       const existingMapPlace = await db.map_places.findFirst({
         where: {
           mapId: list.id,
-          placeId: place.id,
+          entityId: place.id,
         },
       })
 
@@ -314,7 +314,7 @@ async function main() {
         await db.map_places.create({
           data: {
             mapId: list.id,
-            placeId: place.id,
+            entityId: place.id,
             userNote: input.comment?.trim() || null,
             orderIndex: i,
           },

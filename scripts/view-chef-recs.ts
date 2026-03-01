@@ -32,7 +32,7 @@ Usage:
 }
 
 async function showStats() {
-  const placesWithRecs = await db.places.findMany({
+  const placesWithRecs = await db.entities.findMany({
     where: {
       chefRecs: {
         not: null
@@ -97,7 +97,7 @@ async function showStats() {
 }
 
 async function showAll() {
-  const places = await db.places.findMany({
+  const places = await db.entities.findMany({
     where: {
       chefRecs: {
         not: null
@@ -136,7 +136,7 @@ async function showAll() {
 }
 
 async function showPlaceRecs(searchTerm: string) {
-  const place = await db.places.findFirst({
+  const place = await db.entities.findFirst({
     where: {
       name: {
         contains: searchTerm,

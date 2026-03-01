@@ -12,8 +12,8 @@ interface DetailsCardProps {
   address?: string | null;
   neighborhood?: string | null;
   website?: string | null;
-  restaurantGroupName?: string | null;
-  restaurantGroupSlug?: string | null;
+  primaryOperatorName?: string | null;
+  primaryOperatorSlug?: string | null;
   serviceOptions?: string[] | null; // ['Dine-in', 'Takeout', 'Delivery']
   reservationsNote?: string | null; // 'Not accepted', 'Recommended', 'Required'
   parkingNote?: string | null;
@@ -25,8 +25,8 @@ export function DetailsCard({
   address,
   neighborhood,
   website,
-  restaurantGroupName,
-  restaurantGroupSlug,
+  primaryOperatorName,
+  primaryOperatorSlug,
   serviceOptions,
   reservationsNote,
   parkingNote,
@@ -73,13 +73,13 @@ export function DetailsCard({
     });
   }
 
-  // 2. Part of (Restaurant Group)
-  if (restaurantGroupName) {
-    const groupText = `Part of the ${restaurantGroupName} family`;
+  // 2. Part of (Operator / Actor)
+  if (primaryOperatorName) {
+    const groupText = `Part of the ${primaryOperatorName} family`;
     rows.push({
       label: 'Part of',
-      value: restaurantGroupSlug ? (
-        <a href={`/group/${restaurantGroupSlug}`} className={styles.link}>
+      value: primaryOperatorSlug ? (
+        <a href={`/actor/${primaryOperatorSlug}`} className={styles.link}>
           {groupText}
         </a>
       ) : (

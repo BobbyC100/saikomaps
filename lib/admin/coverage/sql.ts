@@ -1,10 +1,10 @@
 /**
  * Data Coverage Audit — SQL Queries
  * 
- * Cohort Definitions (targeting places table):
- * - Reachable: places on at least one PUBLISHED list (via map_places → lists)
- * - Addressable: active places with slug
- * - Total DB: all active places (status != 'PERMANENTLY_CLOSED')
+ * Cohort Definitions (targeting entities table):
+ * - Reachable: entities on at least one PUBLISHED list (via map_places → lists)
+ * - Addressable: active entities with slug
+ * - Total DB: all active entities (status != 'PERMANENTLY_CLOSED')
  * 
  * All queries are SELECT-only, designed for <5s execution.
  */
@@ -15,25 +15,25 @@
 
 export const OVERVIEW_COUNTS_SQL = `
 WITH
-active_places AS (
+active_entities AS (
   SELECT p.id
-  FROM places p
+  FROM entities p
   WHERE p.status != 'PERMANENTLY_CLOSED'
 ),
 reachable AS (
-  SELECT DISTINCT mp.place_id
+  SELECT DISTINCT mp.entity_id
   FROM map_places mp
   JOIN lists l ON l.id = mp.map_id
   WHERE l.status = 'PUBLISHED'
 ),
 addressable AS (
   SELECT p.id
-  FROM places p
+  FROM entities p
   WHERE p.status != 'PERMANENTLY_CLOSED'
     AND p.slug IS NOT NULL
 )
 SELECT
-  (SELECT COUNT(*) FROM active_places) AS total_db,
+  (SELECT COUNT(*) FROM active_entities) AS total_db,
   (SELECT COUNT(*) FROM addressable) AS addressable,
   (SELECT COUNT(*) FROM reachable) AS reachable,
   ((SELECT COUNT(*) FROM addressable) - (SELECT COUNT(*) FROM reachable)) AS dark_inventory;
@@ -42,12 +42,12 @@ SELECT
 export const REACHABLE_NOT_ACTIVE_SANITY_SQL = `
 SELECT COUNT(*) AS reachable_not_active
 FROM (
-  SELECT DISTINCT mp.place_id
+  SELECT DISTINCT mp.entity_id
   FROM map_places mp
   JOIN lists l ON l.id = mp.map_id
   WHERE l.status = 'PUBLISHED'
 ) r
-LEFT JOIN places p ON p.id = r.place_id
+LEFT JOIN entities p ON p.id = r.entity_id
 WHERE p.id IS NULL OR p.status = 'PERMANENTLY_CLOSED';
 `;
 
@@ -57,15 +57,15 @@ WHERE p.id IS NULL OR p.status = 'PERMANENTLY_CLOSED';
 
 export const REACHABLE_MISSING_FIELDS_SQL = `
 WITH reachable AS (
-  SELECT DISTINCT mp.place_id
+  SELECT DISTINCT mp.entity_id
   FROM map_places mp
   JOIN lists l ON l.id = mp.map_id
   WHERE l.status = 'PUBLISHED'
 ),
 r AS (
   SELECT p.*
-  FROM places p
-  JOIN reachable rc ON rc.place_id = p.id
+  FROM entities p
+  JOIN reachable rc ON rc.entity_id = p.id
   WHERE p.status != 'PERMANENTLY_CLOSED'
 )
 SELECT 'slug'            AS field, COUNT(*) AS missing FROM r WHERE r.slug IS NULL
@@ -94,7 +94,7 @@ ORDER BY missing DESC;
 
 export const REACHABLE_NEIGHBORHOOD_SCORECARD_SQL = `
 WITH reachable AS (
-  SELECT DISTINCT mp.place_id
+  SELECT DISTINCT mp.entity_id
   FROM map_places mp
   JOIN lists l ON l.id = mp.map_id
   WHERE l.status = 'PUBLISHED'
@@ -105,14 +105,14 @@ r AS (
     COALESCE(NULLIF(p.neighborhood,''), 'Unknown') AS neighborhood,
     p.slug, p.name, p.latitude, p.longitude, p.google_place_id,
     p.hours, p.phone, p.website
-  FROM places p
-  JOIN reachable rc ON rc.place_id = p.id
+  FROM entities p
+  JOIN reachable rc ON rc.entity_id = p.id
   WHERE p.status != 'PERMANENTLY_CLOSED'
 ),
 agg AS (
   SELECT
     neighborhood,
-    COUNT(*) AS places,
+    COUNT(*) AS entities,
     SUM(CASE WHEN slug IS NOT NULL THEN 1 ELSE 0 END) AS has_slug,
     SUM(CASE WHEN name IS NOT NULL AND name <> '' THEN 1 ELSE 0 END) AS has_name,
     SUM(CASE WHEN latitude IS NOT NULL AND longitude IS NOT NULL THEN 1 ELSE 0 END) AS has_latlng,
@@ -133,8 +133,8 @@ agg AS (
 )
 SELECT *
 FROM agg
-WHERE places >= 5
-ORDER BY (tier1_complete::float / places) ASC, places DESC;
+WHERE entities >= 5
+ORDER BY (tier1_complete::float / entities) ASC, entities DESC;
 `;
 
 // ============================================================================
@@ -143,15 +143,15 @@ ORDER BY (tier1_complete::float / places) ASC, places DESC;
 
 export const REACHABLE_REDFLAGS_SQL = `
 WITH reachable AS (
-  SELECT DISTINCT mp.place_id
+  SELECT DISTINCT mp.entity_id
   FROM map_places mp
   JOIN lists l ON l.id = mp.map_id
   WHERE l.status = 'PUBLISHED'
 ),
 r AS (
   SELECT p.*
-  FROM places p
-  JOIN reachable rc ON rc.place_id = p.id
+  FROM entities p
+  JOIN reachable rc ON rc.entity_id = p.id
   WHERE p.status != 'PERMANENTLY_CLOSED'
 )
 SELECT
@@ -191,13 +191,13 @@ LIMIT 200;
 export const FIELDS_BREAKDOWN_REACHABLE_SQL = `
 WITH cohort AS (
   SELECT p.*
-  FROM places p
+  FROM entities p
   JOIN (
-    SELECT DISTINCT mp.place_id
+    SELECT DISTINCT mp.entity_id
     FROM map_places mp
     JOIN lists l ON l.id = mp.map_id
     WHERE l.status = 'PUBLISHED'
-  ) rc ON rc.place_id = p.id
+  ) rc ON rc.entity_id = p.id
   WHERE p.status != 'PERMANENTLY_CLOSED'
 )
 SELECT
@@ -217,7 +217,7 @@ FROM cohort;
 export const FIELDS_BREAKDOWN_ADDRESSABLE_SQL = `
 WITH cohort AS (
   SELECT p.*
-  FROM places p
+  FROM entities p
   WHERE p.status != 'PERMANENTLY_CLOSED'
     AND p.slug IS NOT NULL
 )
@@ -238,7 +238,7 @@ FROM cohort;
 export const FIELDS_BREAKDOWN_TOTALDB_SQL = `
 WITH cohort AS (
   SELECT p.*
-  FROM places p
+  FROM entities p
   WHERE p.status != 'PERMANENTLY_CLOSED'
 )
 SELECT

@@ -101,7 +101,7 @@ async function main() {
   console.log(`\nPerson: ${person.name}`)
 
   // Find place
-  const place = await db.places.findFirst({
+  const place = await db.entities.findFirst({
     where: {
       OR: [
         { name: { contains: args.placeName, mode: 'insensitive' } },
@@ -118,11 +118,11 @@ async function main() {
   console.log(`Place: ${place.name}`)
 
   // Check if association already exists
-  const existing = await db.personPlace.findUnique({
+  const existing = await db.person_places.findUnique({
     where: {
-      personId_placeId_role: {
-        personId: person.id,
-        placeId: place.id,
+      person_id_entityId_role: {
+        person_id: person.id,
+        entityId: place.id,
         role: args.role!.toUpperCase().replace(/-/g, '_') as any
       }
     }
@@ -149,7 +149,7 @@ async function main() {
   if (args.endYear) console.log(`End Year: ${args.endYear}`)
   console.log(`Source: ${args.source}`)
 
-  // Build association
+  // Build association (for validation - lib expects personId/placeId)
   const association = {
     personId: person.id,
     placeId: place.id,
@@ -169,9 +169,19 @@ async function main() {
     process.exit(1)
   }
 
-  // Create association
-  const created = await db.personPlace.create({
-    data: association
+  // Create association (Prisma expects person_id, entityId)
+  const created = await db.person_places.create({
+    data: {
+      id: crypto.randomUUID(),
+      person_id: person.id,
+      entityId: place.id,
+      role: association.role,
+      current: association.current,
+      start_year: association.startYear,
+      end_year: association.endYear,
+      source: association.source,
+      updated_at: new Date(),
+    }
   })
 
   console.log('\n✅ Association created successfully!')

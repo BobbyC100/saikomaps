@@ -291,7 +291,7 @@ async function main(): Promise<void> {
   }
 
   // Fetch places with map_places and golden_records (for place_personality)
-  const places = await db.places.findMany({
+  const places = await db.entities.findMany({
     where: baseWhere,
     take: limit ?? undefined,
     select: {
@@ -389,7 +389,7 @@ async function main(): Promise<void> {
     }
 
     if (apply) {
-      await db.places.update({
+      await db.entities.update({
         where: { id: p.id },
         data: updates as Prisma.placesUpdateInput,
       });

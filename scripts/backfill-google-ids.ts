@@ -26,7 +26,7 @@ async function backfillGoogleIds() {
   console.log('');
 
   // Get places with Google IDs
-  const placesWithIds = await prisma.places.findMany({
+  const placesWithIds = await prisma.entities.findMany({
     where: {
       google_place_id: { not: null }
     },

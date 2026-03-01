@@ -57,7 +57,7 @@ export async function fetchPlaceForPRLBySlug(
 async function fetchPlaceForPRLBySlugFull(
   slug: string
 ): Promise<(PlaceForPRL & { prlOverride: number | null }) | null> {
-  const place = await db.places.findUnique({
+  const place = await db.entities.findUnique({
     where: { slug },
     select: {
       id: true,
@@ -104,7 +104,7 @@ async function fetchPlaceForPRLBySlugFull(
 
   const mapPlacesPublished = await db.map_places.count({
     where: {
-      placeId: place.id,
+      entityId: place.id,
       lists: { status: 'PUBLISHED' },
     },
   });
@@ -196,7 +196,7 @@ async function fetchPlaceForPRLBySlugFull(
 async function fetchPlaceForPRLBySlugMinimal(
   slug: string
 ): Promise<(PlaceForPRL & { prlOverride: number | null }) | null> {
-  const place = await db.places.findUnique({
+  const place = await db.entities.findUnique({
     where: { slug },
     select: MINIMAL_PLACE_SELECT,
   });
@@ -208,7 +208,7 @@ async function fetchPlaceForPRLBySlugMinimal(
 
   try {
     mapPlacesPublished = await db.map_places.count({
-      where: { placeId: place.id, lists: { status: 'PUBLISHED' } },
+      where: { entityId: place.id, lists: { status: 'PUBLISHED' } },
     });
   } catch {
     /* map_places may not exist */
@@ -281,7 +281,7 @@ async function fetchPlaceForPRLBySlugMinimal(
 async function getCuratorNoteForPlace(placeId: string): Promise<string | null> {
   const mp = await db.map_places.findFirst({
     where: {
-      placeId,
+      entityId: placeId,
       descriptor: { not: null },
       lists: { status: 'PUBLISHED' },
     },
@@ -319,7 +319,7 @@ async function fetchPlaceForPRLBatchFull(args?: {
 }): Promise<(PlaceForPRL & { slug: string; prlOverride: number | null })[]> {
   const { limit = 500, laOnly = false } = args ?? {};
 
-  const places = await db.places.findMany({
+  const places = await db.entities.findMany({
     where: laOnly
       ? {
           latitude: { gte: LA_BBOX.latMin, lte: LA_BBOX.latMax },
@@ -372,9 +372,9 @@ async function fetchPlaceForPRLBatchFull(args?: {
 
   const [mapCounts, goldenRecs] = await Promise.all([
     db.map_places.groupBy({
-      by: ['placeId'],
+      by: ['entityId'],
       where: {
-        placeId: { in: placeIds },
+        entityId: { in: placeIds },
         lists: { status: 'PUBLISHED' },
       },
       _count: { id: true },
@@ -388,7 +388,7 @@ async function fetchPlaceForPRLBatchFull(args?: {
   ]);
 
   const mapCountByPlace = new Map(
-    mapCounts.map((m) => [m.placeId, m._count.id])
+    mapCounts.map((m) => [m.entityId, m._count.id])
   );
   const canonicalIdByGpid = new Map(
     goldenRecs.map((g) => [g.google_place_id, g.canonical_id])
@@ -490,7 +490,7 @@ async function fetchPlaceForPRLBatchMinimal(args?: {
 }): Promise<(PlaceForPRL & { slug: string; prlOverride: number | null })[]> {
   const { limit = 500, laOnly = false } = args ?? {};
 
-  const places = await db.places.findMany({
+  const places = await db.entities.findMany({
     where: laOnly
       ? {
           latitude: { gte: LA_BBOX.latMin, lte: LA_BBOX.latMax },
@@ -512,8 +512,8 @@ async function fetchPlaceForPRLBatchMinimal(args?: {
   try {
     const [mapCounts, goldenRecs] = await Promise.all([
       db.map_places.groupBy({
-        by: ['placeId'],
-        where: { placeId: { in: placeIds }, lists: { status: 'PUBLISHED' } },
+        by: ['entityId'],
+        where: { entityId: { in: placeIds }, lists: { status: 'PUBLISHED' } },
         _count: { id: true },
       }),
       gpids.length > 0
@@ -523,7 +523,7 @@ async function fetchPlaceForPRLBatchMinimal(args?: {
           })
         : Promise.resolve([]),
     ]);
-    mapCountByPlace = new Map(mapCounts.map((m) => [m.placeId, m._count.id]));
+    mapCountByPlace = new Map(mapCounts.map((m) => [m.entityId, m._count.id]));
     const grMap = new Map<string, string>();
     for (const g of goldenRecs) {
       if (g.google_place_id && g.canonical_id) {

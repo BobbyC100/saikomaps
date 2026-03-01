@@ -384,7 +384,7 @@ async function main() {
         if (i < 5) console.log(`  ✓ ${slug} (no new data to write)`);
       } else if (!dryRun) {
         updates.placesDataCachedAt = new Date();
-        await db.places.update({
+        await db.entities.update({
           where: { id: place_id },
           data: updates,
         });

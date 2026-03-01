@@ -54,22 +54,22 @@ async function mergeDuplicatePlaces() {
     console.log(`   Reason: ${op.reason}`);
 
     // Find both places
-    const duplicatePlace = await prisma.place.findUnique({
+    const duplicatePlace = await prisma.entities.findUnique({
       where: { slug: op.duplicateSlug },
       include: {
-        mapPlaces: {
+        map_places: {
           include: {
-            map: { select: { title: true, slug: true } }
+            lists: { select: { title: true, slug: true } }
           }
         },
-        viewerBookmarks: true,
+        viewer_bookmarks: true,
       },
     });
 
-    const keepPlace = await prisma.place.findUnique({
+    const keepPlace = await prisma.entities.findUnique({
       where: { slug: op.keepSlug },
       include: {
-        mapPlaces: true,
+        map_places: true,
       },
     });
 
@@ -87,15 +87,15 @@ async function mergeDuplicatePlaces() {
     console.log(`   ✅ KEEP:   "${keepPlace.name}" (${keepPlace.slug})`);
 
     // Show what will be migrated
-    if (duplicatePlace.mapPlaces.length > 0) {
-      console.log(`\n   📋 Map references to migrate: ${duplicatePlace.mapPlaces.length}`);
-      duplicatePlace.mapPlaces.forEach(mp => {
-        console.log(`      • ${mp.map.title} (${mp.map.slug})`);
+    if (duplicatePlace.map_places.length > 0) {
+      console.log(`\n   📋 Map references to migrate: ${duplicatePlace.map_places.length}`);
+      duplicatePlace.map_places.forEach(mp => {
+        console.log(`      • ${mp.lists.title} (${mp.lists.slug})`);
       });
     }
 
-    if (duplicatePlace.viewerBookmarks.length > 0) {
-      console.log(`\n   🔖 Bookmarks to migrate: ${duplicatePlace.viewerBookmarks.length}`);
+    if (duplicatePlace.viewer_bookmarks.length > 0) {
+      console.log(`\n   🔖 Bookmarks to migrate: ${duplicatePlace.viewer_bookmarks.length}`);
     }
 
     if (!execute) {
@@ -106,73 +106,73 @@ async function mergeDuplicatePlaces() {
     // Execute merge
     try {
       // Migrate MapPlace references
-      for (const mapPlace of duplicatePlace.mapPlaces) {
+      for (const mapPlace of duplicatePlace.map_places) {
         // Check if keep place already exists in this map
-        const existingMapPlace = await prisma.mapPlace.findUnique({
+        const existingMapPlace = await prisma.map_places.findUnique({
           where: {
-            mapId_placeId: {
+            mapId_entityId: {
               mapId: mapPlace.mapId,
-              placeId: keepPlace.id,
+              entityId: keepPlace.id,
             }
           }
         });
 
         if (existingMapPlace) {
           // Keep place already in map, just delete the duplicate reference
-          await prisma.mapPlace.delete({
+          await prisma.map_places.delete({
             where: { id: mapPlace.id }
           });
-          console.log(`      ✓ Removed duplicate from ${mapPlace.map.title} (keep place already present)`);
+          console.log(`      ✓ Removed duplicate from ${mapPlace.lists.title} (keep place already present)`);
         } else {
           // Update reference to point to keep place
-          await prisma.mapPlace.update({
+          await prisma.map_places.update({
             where: { id: mapPlace.id },
             data: { 
-              placeId: keepPlace.id,
+              entityId: keepPlace.id,
               // Optionally preserve descriptor if keep place doesn't have one
             },
           });
-          console.log(`      ✓ Migrated to ${mapPlace.map.title}`);
+          console.log(`      ✓ Migrated to ${mapPlace.lists.title}`);
           mapsMigrated++;
         }
       }
 
       // Migrate ViewerBookmarks
-      for (const bookmark of duplicatePlace.viewerBookmarks) {
+      for (const bookmark of duplicatePlace.viewer_bookmarks) {
         if (bookmark.viewerUserId) {
-          const existingBookmark = await prisma.viewerBookmark.findUnique({
+          const existingBookmark = await prisma.viewer_bookmarks.findUnique({
             where: {
-              viewerUserId_placeId: {
+              viewerUserId_entityId: {
                 viewerUserId: bookmark.viewerUserId,
-                placeId: keepPlace.id,
+                entityId: keepPlace.id,
               }
             }
           });
 
           if (existingBookmark) {
             // User already has bookmark for keep place
-            await prisma.viewerBookmark.delete({
+            await prisma.viewer_bookmarks.delete({
               where: { id: bookmark.id }
             });
             console.log(`      ✓ Removed duplicate bookmark`);
           } else {
             // Migrate bookmark
-            await prisma.viewerBookmark.update({
+            await prisma.viewer_bookmarks.update({
               where: { id: bookmark.id },
-              data: { placeId: keepPlace.id },
+              data: { entityId: keepPlace.id },
             });
             console.log(`      ✓ Migrated bookmark`);
             bookmarksMigrated++;
           }
         } else {
-          await prisma.viewerBookmark.delete({
+          await prisma.viewer_bookmarks.delete({
             where: { id: bookmark.id }
           });
         }
       }
 
       // Delete the duplicate place
-      await prisma.place.delete({
+      await prisma.entities.delete({
         where: { id: duplicatePlace.id },
       });
 

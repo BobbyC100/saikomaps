@@ -1,6 +1,6 @@
 raw_id,name,golden_id,golden_name,match_method,confidence
+seed:gjusta:goods,Gjusta Goods,a3ed77b6-e92f-41c0-9790-b52d4f63ad72,Gjusta Goods,normalized,1
 seed:gjelina:restaurant,Gjelina,86425fe6-895b-4329-94cb-8b70a3872a9f,Gjelina,normalized,1
 seed:gjelina:hotel,Gjelina Hotel,5962af04-29b6-408d-bcb1-d219a6544c0f,Gjelina Hotel,normalized,1
 seed:gjusta:grocer,Gjusta Grocer,2bfb7090-bdd4-41be-9bdb-dcf23a7b45be,Gjusta Grocer,normalized,1
-seed:gjusta:goods,Gjusta Goods,a3ed77b6-e92f-41c0-9790-b52d4f63ad72,Gjusta Goods,normalized,1
 seed:gjusta:flower-shop,Gjusta Flower Shop,a3ed77b6-e92f-41c0-9790-b52d4f63ad72,Gjusta Goods,fuzzy,0.8577777777777778

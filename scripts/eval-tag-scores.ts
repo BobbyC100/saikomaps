@@ -119,7 +119,7 @@ async function resolvePlaceIds(rows: GoldRow[]): Promise<Map<string, string>> {
   const byId = new Map<string, string>();
 
   if (slugs.length > 0) {
-    const placesBySlug = await db.places.findMany({
+    const placesBySlug = await db.entities.findMany({
       where: { slug: { in: slugs } },
       select: { id: true, slug: true },
     });
@@ -128,7 +128,7 @@ async function resolvePlaceIds(rows: GoldRow[]): Promise<Map<string, string>> {
     }
   }
   if (ids.length > 0) {
-    const placesById = await db.places.findMany({
+    const placesById = await db.entities.findMany({
       where: { id: { in: ids } },
       select: { id: true },
     });
@@ -242,7 +242,7 @@ async function main() {
     inputCoverageWithHighConfResult,
   ] = await Promise.all([
     db.place_tag_scores.findMany({ where: { version: tagVersion } }),
-    db.places.count(),
+    db.entities.count(),
     db.place_tag_scores.count({ where: { version: tagVersion } }),
     db.$queryRaw<[{ count: bigint }]>`
       SELECT COUNT(DISTINCT p.id)::bigint as count

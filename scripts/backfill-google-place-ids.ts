@@ -78,13 +78,13 @@ async function main(): Promise<void> {
   let places: PlaceRow[] = [];
 
   if (slugs?.length) {
-    const rows = await db.places.findMany({
+    const rows = await db.entities.findMany({
       where: { slug: { in: slugs } },
       select: { id: true, slug: true, name: true, address: true, latitude: true, longitude: true, googlePlaceId: true },
     });
     places = rows as PlaceRow[];
   } else if (ids?.length) {
-    const rows = await db.places.findMany({
+    const rows = await db.entities.findMany({
       where: { id: { in: ids } },
       select: { id: true, slug: true, name: true, address: true, latitude: true, longitude: true, googlePlaceId: true },
     });
@@ -97,7 +97,7 @@ async function main(): Promise<void> {
     `;
     places = limit ? rows.slice(0, limit) : rows;
   } else {
-    const rows = await db.places.findMany({
+    const rows = await db.entities.findMany({
       where: { OR: [{ googlePlaceId: null }, { googlePlaceId: '' }] },
       take: limit ?? undefined,
       select: { id: true, slug: true, name: true, address: true, latitude: true, longitude: true, googlePlaceId: true },
@@ -134,7 +134,7 @@ async function main(): Promise<void> {
         if (verbose) console.log(`  ${p.slug}: ${placeId}`);
         wouldUpdate++;
         if (apply) {
-          await db.places.update({ where: { id: p.id }, data: { googlePlaceId: placeId } });
+          await db.entities.update({ where: { id: p.id }, data: { googlePlaceId: placeId } });
           updated++;
         }
       } else {

@@ -90,7 +90,7 @@ async function main(): Promise<void> {
   let rows: GrRow[] = [];
 
   if (ids?.length) {
-    const places = await db.places.findMany({
+    const places = await db.entities.findMany({
       where: { id: { in: ids }, googlePlaceId: { not: null } },
       select: { googlePlaceId: true },
     });

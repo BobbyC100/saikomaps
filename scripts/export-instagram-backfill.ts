@@ -21,7 +21,7 @@ async function main() {
   console.log('📥 Exporting places missing Instagram handles...\n');
   
   // Find all places without Instagram but with Google Place ID
-  const places = await prisma.places.findMany({
+  const places = await prisma.entities.findMany({
     where: {
       instagram: null,
       google_place_id: { not: null },

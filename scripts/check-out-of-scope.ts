@@ -20,7 +20,7 @@ async function main() {
 
   console.log('\n🔍 Checking for out-of-scope places (not LA County)...\n');
   
-  const places = await prisma.places.findMany({
+  const places = await prisma.entities.findMany({
     where: {
       OR: [
         {

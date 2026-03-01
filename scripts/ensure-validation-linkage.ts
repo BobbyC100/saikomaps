@@ -72,13 +72,13 @@ async function main() {
     const displayName = DEFAULT_DISPLAY_NAMES[slug] ?? slug;
     const seedGoogleId = seedIds[slug] ?? null;
 
-    let place = await db.places.findUnique({
+    let place = await db.entities.findUnique({
       where: { slug },
       select: { id: true, name: true, googlePlaceId: true, latitude: true, longitude: true },
     });
 
     if (!place && !dryRun) {
-      await db.places.create({
+      await db.entities.create({
         data: {
           id: randomUUID(),
           slug,
@@ -90,7 +90,7 @@ async function main() {
         },
       });
       console.log(`[${slug}] Created place (slug=${slug}, name=${displayName}${seedGoogleId ? ', googlePlaceId from seed' : ''}).`);
-      place = await db.places.findUnique({
+      place = await db.entities.findUnique({
         where: { slug },
         select: { id: true, name: true, googlePlaceId: true, latitude: true, longitude: true },
       })!;
@@ -100,7 +100,7 @@ async function main() {
     }
 
     if (seedGoogleId && place && !place.googlePlaceId && !dryRun) {
-      await db.places.update({
+      await db.entities.update({
         where: { slug },
         data: { googlePlaceId: seedGoogleId, updatedAt: now },
       });
@@ -155,7 +155,7 @@ async function main() {
     let googlePlaceId = golden.google_place_id ?? place?.googlePlaceId ?? null;
 
     if (!googlePlaceId) {
-      const placeByName = await db.places.findFirst({
+      const placeByName = await db.entities.findFirst({
         where: { name: { in: names }, googlePlaceId: { not: null } },
         select: { googlePlaceId: true },
       });
@@ -177,7 +177,7 @@ async function main() {
 
     if (place && place.googlePlaceId !== googlePlaceId) {
       if (!place.googlePlaceId && !dryRun) {
-        await db.places.update({
+        await db.entities.update({
           where: { slug },
           data: { googlePlaceId, updatedAt: now },
         });

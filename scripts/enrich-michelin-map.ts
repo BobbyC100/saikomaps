@@ -151,7 +151,7 @@ async function main() {
   for (const data of enrichmentData) {
     console.log(`\n📍 ${data.name}`)
 
-    const place = await db.places.findFirst({
+    const place = await db.entities.findFirst({
       where: {
         name: {
           contains: data.name,
@@ -181,7 +181,7 @@ async function main() {
       updateData.pullQuoteType = data.pullQuoteType
     }
 
-    await db.places.update({
+    await db.entities.update({
       where: { id: place.id },
       data: updateData
     })

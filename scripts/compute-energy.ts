@@ -25,7 +25,7 @@ type GoldenRow = { canonical_id: string; slug: string; description: string | nul
 async function fetchPlaceIdToGolden(placeIds: string[]): Promise<Map<string, GoldenRow>> {
   const placeIdToGolden = new Map<string, GoldenRow>();
   if (placeIds.length === 0) return placeIdToGolden;
-  const places = await db.places.findMany({
+  const places = await db.entities.findMany({
     where: { id: { in: placeIds } },
     select: { id: true, googlePlaceId: true },
   });
@@ -68,7 +68,7 @@ async function getPlaceIds(placeIdArg: string | null, laOnly: boolean, limitArg:
   }
 
   if (placeIdArg) {
-    const place = await db.places.findUnique({
+    const place = await db.entities.findUnique({
       where: { id: placeIdArg },
       select: { id: true, googlePlaceId: true },
     });
@@ -92,7 +92,7 @@ async function getPlaceIds(placeIdArg: string | null, laOnly: boolean, limitArg:
     return { placeIds: [place.id], placeIdToGolden };
   }
 
-  const places = await db.places.findMany({
+  const places = await db.entities.findMany({
     where: { googlePlaceId: { not: null } },
     select: { id: true, googlePlaceId: true },
   });
@@ -170,10 +170,10 @@ async function main() {
       const result = computeEnergy(inputs);
 
       await db.energy_scores.upsert({
-        where: { place_id_version: { place_id: placeId, version } },
+        where: { entityId_version: { entityId: placeId, version } },
         create: {
           id: randomUUID(),
-          place_id: placeId,
+          entityId: placeId,
           energy_score: result.energy_score,
           energy_confidence: result.energy_confidence,
           popularity_component: result.popularity_component,

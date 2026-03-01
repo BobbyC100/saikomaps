@@ -38,7 +38,7 @@ async function main() {
   }
 
   // Search for places with Santa Monica in address
-  const placesWithSM = await db.places.findMany({
+  const placesWithSM = await db.entities.findMany({
     where: {
       address: {
         contains: 'Santa Monica',
@@ -61,7 +61,7 @@ async function main() {
   })
 
   // Check all unique neighborhoods
-  const allPlaces = await db.places.findMany({
+  const allPlaces = await db.entities.findMany({
     select: {
       neighborhood: true,
     }

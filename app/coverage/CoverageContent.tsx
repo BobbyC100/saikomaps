@@ -45,7 +45,7 @@ export async function CoverageContent() {
       take: 20
     }),
     // Places: neighborhood × primary_vertical (reporting uses primary_vertical)
-    db.places.groupBy({
+    db.entities.groupBy({
       by: ['neighborhood', 'primary_vertical'],
       _count: true
     })

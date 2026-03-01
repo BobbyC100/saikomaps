@@ -21,7 +21,7 @@ async function main() {
   })
 
   // Get all places
-  const allPlaces = await db.places.findMany({
+  const allPlaces = await db.entities.findMany({
     include: {
       mapPlaces: {
         include: {

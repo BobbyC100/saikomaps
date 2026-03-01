@@ -78,54 +78,80 @@ async function main() {
       (ALLOWED_PROMOTION as string[]).includes(String(g.promotion_status ?? ''))
   )
 
-  const existingSlugs = new Set(
-    (await db.places.findMany({ select: { slug: true } })).map((p) => p.slug)
-  )
-  let promotedCount = 0
-  let skippedCount = 0
+  // Identity precedence: google_place_id > slug. Build maps and keep them updated so re-runs don't duplicate.
+  const existingPlaces = await db.entities.findMany({
+    select: { id: true, slug: true, googlePlaceId: true },
+  })
+  const placesByGpid = new Map<string, { id: string }>()
+  const placesBySlug = new Map<string, { id: string }>()
+  for (const p of existingPlaces) {
+    if (p.slug) placesBySlug.set(p.slug, { id: p.id })
+    if (p.googlePlaceId) placesByGpid.set(p.googlePlaceId, { id: p.id })
+  }
+
+  let wouldCreate = 0
+  let wouldUpdate = 0
+  let createdCount = 0
+  let updatedCount = 0
 
   for (const g of candidates) {
     const slug = g.slug
-    const existing = existingSlugs.has(slug)
-    if (existing) {
-      skippedCount++
-      continue
+    const gpid = g.google_place_id ?? ''
+    const existingByGpid = gpid ? placesByGpid.get(gpid) : undefined
+    const existingBySlug = placesBySlug.get(slug)
+    const existing = existingByGpid ?? existingBySlug
+
+    const payload = {
+      slug,
+      name: g.name,
+      address: g.address_street,
+      latitude: g.lat,
+      longitude: g.lng,
+      neighborhood: g.neighborhood,
+      category: g.category,
+      primary_vertical: categoryToPrimaryVertical(g.category) ?? 'EAT',
+      phone: g.phone,
+      website: g.website,
+      instagram: g.instagram_handle,
+      hours: g.hours_json as Prisma.JsonValue,
+      description: g.description,
+      googlePlaceId: g.google_place_id,
+      vibeTags: g.vibe_tags ?? [],
+      updatedAt: new Date(),
     }
-    if (commit && allowPlacesWrite) {
-      await db.places.create({
-        data: {
-          id: g.canonical_id,
-          slug,
-          name: g.name,
-          address: g.address_street,
-          latitude: g.lat,
-          longitude: g.lng,
-          neighborhood: g.neighborhood,
-          category: g.category,
-          primary_vertical: categoryToPrimaryVertical(g.category) ?? 'EAT',
-          phone: g.phone,
-          website: g.website,
-          instagram: g.instagram_handle,
-          hours: g.hours_json as Prisma.JsonValue,
-          description: g.description,
-          googlePlaceId: g.google_place_id,
-          vibeTags: g.vibe_tags ?? [],
-          updatedAt: new Date(),
-        },
-      })
-      existingSlugs.add(slug)
-      promotedCount++
+
+    if (existing) {
+      wouldUpdate++
+      if (commit && allowPlacesWrite) {
+        await db.entities.update({
+          where: { id: existing.id },
+          data: payload,
+        })
+        updatedCount++
+        placesBySlug.set(slug, { id: existing.id })
+        if (gpid) placesByGpid.set(gpid, { id: existing.id })
+      }
     } else {
-      promotedCount++
+      wouldCreate++
+      if (commit && allowPlacesWrite) {
+        await db.entities.create({
+          data: {
+            id: g.canonical_id,
+            ...payload,
+          },
+        })
+        createdCount++
+        placesBySlug.set(slug, { id: g.canonical_id })
+        if (gpid) placesByGpid.set(gpid, { id: g.canonical_id })
+      }
     }
   }
 
   console.log('Promote summary')
   console.log('  candidates (confidence >= %s, lat/lng present): %d', confidenceThreshold, candidates.length)
-  console.log('  would_promote (new places): %d', promotedCount)
-  console.log('  skipped (slug already in places): %d', skippedCount)
+  console.log('  would_create: %d  would_update: %d', wouldCreate, wouldUpdate)
   if (commit && allowPlacesWrite) {
-    console.log('  promoted_count: %d', promotedCount)
+    console.log('  created: %d  updated: %d', createdCount, updatedCount)
   } else {
     console.log('  (dry-run: no places written)')
   }
@@ -134,6 +160,14 @@ async function main() {
 main()
   .catch((e) => {
     console.error(e)
+    const code = (e as { code?: string })?.code
+    const msg = (e as Error)?.message ?? ''
+    if (code === 'P2002') {
+      console.error('\nRe-run promote. Existing place will be updated.')
+    }
+    if (code === 'P2022' || msg.includes('does not exist')) {
+      console.error('\nCheck DB target (npm run db:whoami) and regenerate client (npm run db:generate).')
+    }
     process.exit(1)
   })
   .finally(() => db.$disconnect())

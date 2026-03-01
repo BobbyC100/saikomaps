@@ -29,7 +29,7 @@ export async function createProposedSignal(params: CreateProposedSignalParams) {
   } = params;
 
   // Validate place exists (service-layer enforcement)
-  const placeExists = await prisma.places.findUnique({
+  const placeExists = await prisma.entities.findUnique({
     where: { id: placeId },
     select: { id: true },
   });

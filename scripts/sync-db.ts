@@ -48,14 +48,14 @@ type SchemaCheck = {
 async function checkSchema(client: PrismaClient): Promise<SchemaCheck> {
   const rows = await client.$queryRawUnsafe<SchemaCheck[]>(`
     SELECT
-      to_regclass('public.places') IS NOT NULL AS has_places,
+      to_regclass('public.entities') IS NOT NULL AS has_places,
       EXISTS(
         SELECT 1 FROM information_schema.columns
-        WHERE table_schema='public' AND table_name='places' AND column_name='business_status'
+        WHERE table_schema='public' AND table_name='entities' AND column_name='business_status'
       ) AS has_business_status,
       EXISTS(
         SELECT 1 FROM information_schema.columns
-        WHERE table_schema='public' AND table_name='places' AND column_name='google_places_attributes'
+        WHERE table_schema='public' AND table_name='entities' AND column_name='google_places_attributes'
       ) AS has_google_places_attributes
   `);
   return rows[0] ?? { has_places: false, has_business_status: false, has_google_places_attributes: false };
@@ -63,7 +63,7 @@ async function checkSchema(client: PrismaClient): Promise<SchemaCheck> {
 
 async function getCounts(client: PrismaClient): Promise<Record<string, number>> {
   const [places, energy_scores, place_tag_scores, place_coverage_status] = await Promise.all([
-    client.places.count(),
+    client.entities.count(),
     client.energy_scores.count(),
     client.place_tag_scores.count(),
     client.place_coverage_status.count(),
@@ -94,7 +94,7 @@ async function main() {
       !sourceSchema.has_google_places_attributes
     ) {
       console.error(
-        "FATAL: SOURCE DB schema missing required elements (places table with business_status, google_places_attributes)."
+        "FATAL: SOURCE DB schema missing required elements (entities table with business_status, google_places_attributes)."
       );
       process.exit(1);
     }
@@ -104,7 +104,7 @@ async function main() {
       !targetSchema.has_google_places_attributes
     ) {
       console.error(
-        "FATAL: TARGET DB schema missing required elements (places table with business_status, google_places_attributes)."
+        "FATAL: TARGET DB schema missing required elements (entities table with business_status, google_places_attributes)."
       );
       process.exit(1);
     }
@@ -131,13 +131,13 @@ async function main() {
       "parent", "children", "viewer_bookmarks", "energy_scores", "place_tag_scores",
       "place_photo_eval", "place_coverage_status",
     ];
-    const places = await sourceClient.places.findMany();
+    const places = await sourceClient.entities.findMany();
     let placesUpserted = 0;
     for (const p of places) {
       const scalar = Object.fromEntries(
         Object.entries(p).filter(([k]) => !placeRelationKeys.includes(k))
-      ) as Parameters<typeof targetClient.places.upsert>[1]["create"];
-      await targetClient.places.upsert({
+      ) as Parameters<typeof targetClient.entities.upsert>[1]["create"];
+      await targetClient.entities.upsert({
         where: { id: p.id },
         create: scalar,
         update: scalar,
@@ -152,11 +152,11 @@ async function main() {
     for (const e of energyScores) {
       await targetClient.energy_scores.upsert({
         where: {
-          place_id_version: { place_id: e.place_id, version: e.version },
+          entityId_version: { entityId: e.entityId, version: e.version },
         },
         create: {
           id: e.id,
-          place_id: e.place_id,
+          entityId: e.entityId,
           energy_score: e.energy_score,
           energy_confidence: e.energy_confidence,
           version: e.version,
@@ -194,11 +194,11 @@ async function main() {
     for (const t of tagScores) {
       await targetClient.place_tag_scores.upsert({
         where: {
-          place_id_version: { place_id: t.place_id, version: t.version },
+          entityId_version: { entityId: t.entityId, version: t.version },
         },
         create: {
           id: t.id,
-          place_id: t.place_id,
+          entityId: t.entityId,
           cozy_score: t.cozy_score,
           date_night_score: t.date_night_score,
           late_night_score: t.late_night_score,
@@ -231,7 +231,7 @@ async function main() {
         where: { dedupe_key: c.dedupe_key },
         create: {
           id: c.id,
-          place_id: c.place_id,
+          entityId: c.entityId,
           dedupe_key: c.dedupe_key,
           last_success_at: c.last_success_at,
           last_attempt_at: c.last_attempt_at,

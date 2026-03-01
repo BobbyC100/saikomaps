@@ -208,7 +208,7 @@ async function main() {
   }
   
   // Fetch places missing Instagram
-  const places = await prisma.places.findMany({
+  const places = await prisma.entities.findMany({
     where: {
       instagram: null,
       google_place_id: { not: null },

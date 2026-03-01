@@ -103,7 +103,7 @@ async function seedPlace(place: SeedPlace) {
   console.log(`Seeding: ${place.name} (${place.slug})...`);
 
   try {
-    await db.places.upsert({
+    await db.entities.upsert({
       where: { slug: place.slug },
       create: {
         id: `place_${place.slug}_${Date.now()}`,
@@ -186,7 +186,7 @@ async function main() {
     }
 
     // Verify
-    const count = await db.places.count();
+    const count = await db.entities.count();
     console.log(`\n✅ Seed complete! Total places: ${count}`);
     console.log('\nTest URLs:');
     for (const place of SEED_PLACES) {

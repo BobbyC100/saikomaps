@@ -12,7 +12,7 @@ async function main() {
   console.log('════════════════════════════════════════════════════════════\n');
 
   // Get a sample of places
-  const places = await prisma.places.findMany({
+  const places = await prisma.entities.findMany({
     where: {
       status: 'OPEN',
       latitude: { not: null },
@@ -64,7 +64,7 @@ async function main() {
   console.log(`  Populated: ${populatedCount}`);
   
   // Now get full counts
-  const total = await prisma.places.count({
+  const total = await prisma.entities.count({
     where: {
       status: 'OPEN',
       latitude: { not: null },

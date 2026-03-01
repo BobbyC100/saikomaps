@@ -12,13 +12,13 @@ async function main() {
   console.log('════════════════════════════════════════════════════════════\n');
 
   // Total count
-  const total = await prisma.places.count();
+  const total = await prisma.entities.count();
   console.log(`Total places: ${total}`);
 
   // By status
-  const open = await prisma.places.count({ where: { status: 'OPEN' } });
-  const closed = await prisma.places.count({ where: { status: 'CLOSED' } });
-  const permClosed = await prisma.places.count({ where: { status: 'PERMANENTLY_CLOSED' } });
+  const open = await prisma.entities.count({ where: { status: 'OPEN' } });
+  const closed = await prisma.entities.count({ where: { status: 'CLOSED' } });
+  const permClosed = await prisma.entities.count({ where: { status: 'PERMANENTLY_CLOSED' } });
 
   console.log(`\nBy Status:`);
   console.log(`  OPEN:                ${open} (${((open / total) * 100).toFixed(1)}%)`);
@@ -26,7 +26,7 @@ async function main() {
   console.log(`  PERMANENTLY_CLOSED:  ${permClosed} (${((permClosed / total) * 100).toFixed(1)}%)`);
 
   // With websites
-  const withWebsite = await prisma.places.count({ where: { website: { not: null } } });
+  const withWebsite = await prisma.entities.count({ where: { website: { not: null } } });
   const withoutWebsite = total - withWebsite;
 
   console.log(`\nBy Website:`);
@@ -34,7 +34,7 @@ async function main() {
   console.log(`  Without website: ${withoutWebsite} (${((withoutWebsite / total) * 100).toFixed(1)}%)`);
 
   // With coordinates
-  const withCoords = await prisma.places.count({
+  const withCoords = await prisma.entities.count({
     where: {
       AND: [
         { latitude: { not: null } },
@@ -51,7 +51,7 @@ async function main() {
   console.log(`  Missing/0,0 coords:     ${withoutCoords} (${((withoutCoords / total) * 100).toFixed(1)}%)`);
 
   // Launch-ready count
-  const launchReady = await prisma.places.count({
+  const launchReady = await prisma.entities.count({
     where: {
       AND: [
         { status: 'OPEN' },

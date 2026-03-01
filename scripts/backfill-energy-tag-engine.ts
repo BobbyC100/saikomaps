@@ -76,7 +76,7 @@ async function main() {
   const placeIdToGolden = new Map<string, GoldenRow>();
 
   if (placeSlugList?.length) {
-    const places = await db.places.findMany({
+    const places = await db.entities.findMany({
       where: { slug: { in: placeSlugList } },
       select: { id: true, googlePlaceId: true },
     });
@@ -116,7 +116,7 @@ async function main() {
       }
     }
   } else {
-    const places = await db.places.findMany({
+    const places = await db.entities.findMany({
       where: { googlePlaceId: { not: null } },
       select: { id: true, googlePlaceId: true },
     });
@@ -179,11 +179,11 @@ async function main() {
       if (!dryRun) {
         await db.energy_scores.upsert({
           where: {
-            place_id_version: { place_id: placeId, version: ENERGY_VERSION },
+            entityId_version: { entityId: placeId, version: ENERGY_VERSION },
           },
           create: {
             id: randomUUID(),
-            place_id: placeId,
+            entityId: placeId,
             energy_score: result.energy_score,
             energy_confidence: result.energy_confidence,
             popularity_component: result.popularity_component,
@@ -238,7 +238,7 @@ async function main() {
         energy_confidence = er.energy_confidence;
       } else {
         const existing = await db.energy_scores.findUnique({
-          where: { place_id_version: { place_id: placeId, version: ENERGY_VERSION } },
+          where: { entityId_version: { entityId: placeId, version: ENERGY_VERSION } },
         });
         if (existing) {
           energy_score = existing.energy_score;
@@ -258,11 +258,11 @@ async function main() {
       if (!dryRun) {
         await db.place_tag_scores.upsert({
           where: {
-            place_id_version: { place_id: placeId, version: TAG_VERSION },
+            entityId_version: { entityId: placeId, version: TAG_VERSION },
           },
           create: {
             id: randomUUID(),
-            place_id: placeId,
+            entityId: placeId,
             cozy_score: tagResult.cozy_score,
             date_night_score: tagResult.date_night_score,
             late_night_score: tagResult.late_night_score,
