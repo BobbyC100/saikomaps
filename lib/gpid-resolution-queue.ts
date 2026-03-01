@@ -83,7 +83,7 @@ export async function getGpidQueueItems(params: GetGpidQueueParams = {}): Promis
       skip: offset,
       orderBy: orderBy as never,
       include: {
-        places: {
+        entities: {
           select: {
             id: true,
             name: true,
@@ -104,7 +104,7 @@ export async function getGpidQueueItems(params: GetGpidQueueParams = {}): Promis
 
   const hydrated = items.map((row) => ({
     ...row,
-    place: row.places,
+    place: row.entities,
     places: undefined,
   })) as unknown as GpidQueueItem[];
 
@@ -119,7 +119,7 @@ export async function getGpidQueueItem(id: string): Promise<GpidQueueItem | null
   const row = await prisma.gpid_resolution_queue.findUnique({
     where: { id },
     include: {
-      places: {
+      entities: {
         select: {
           id: true,
           name: true,
@@ -135,7 +135,7 @@ export async function getGpidQueueItem(id: string): Promise<GpidQueueItem | null
   if (!row) return null;
   return {
     ...row,
-    place: row.places,
+    place: row.entities,
     places: undefined,
   } as unknown as GpidQueueItem;
 }

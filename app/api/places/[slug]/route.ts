@@ -394,7 +394,7 @@ export async function GET(
             return { actorId: actor.id, name: actor.name, slug: actor.slug ?? actor.id, website: actor.website ?? undefined };
           })(),
           // Markets fields
-          placeType: place.placeType,
+          placeType: place.entityType,
           categorySlug: place.category_rel?.slug ?? (typeof place.category === "string" ? place.category : null),
           marketSchedule: place.marketSchedule ?? null,
           // Appearances (Where to find / Currently hosting)

@@ -71,8 +71,8 @@ export async function runEnrichmentForPlace(
   payload.raw.homepage_text_sample = homeParsed.visibleText.slice(0, 2000);
 
   const schemaExtraction = extractFromSchemaBlocks(homeParsed.schemaBlocks);
-  payload.schema_types = schemaExtraction.schema_types ?? [];
-  if ((schemaExtraction.schema_types ?? []).length > 0) notes.push("schema present");
+  payload.schema_types = schemaExtraction.schemaTypes ?? [];
+  if ((schemaExtraction.schemaTypes ?? []).length > 0) notes.push("schema present");
 
   const allLinks = [...homeParsed.links];
   let aboutText: string | null = null;
@@ -135,7 +135,7 @@ export async function runEnrichmentForPlace(
   }
 
   const hasStrongSchema =
-    (schemaExtraction.schema_types ?? []).length > 0 &&
+    (schemaExtraction.schemaTypes ?? []).length > 0 &&
     schemaExtraction.saikoCategory != null;
 
   payload.confidence = computeConfidence({

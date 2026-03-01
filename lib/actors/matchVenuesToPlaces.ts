@@ -75,7 +75,7 @@ export async function matchVenueToPlaces(
   client?: PrismaClient
 ): Promise<MatchResult> {
   const prisma = client ?? db;
-  const placesDelegate = prisma?.places;
+  const placesDelegate = prisma?.entities;
   if (!placesDelegate?.findFirst) {
     throw new Error("Prisma client not initialized: places delegate missing");
   }

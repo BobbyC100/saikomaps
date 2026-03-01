@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const { db } = await import("@/lib/db");
-    if (!db?.actor || !db?.places || !db?.operatorPlaceCandidate) {
+    if (!db?.actor || !db?.entities || !db?.operatorPlaceCandidate) {
       return NextResponse.json(
         {
           error: "Prisma client not ready",

@@ -62,7 +62,7 @@ export async function PATCH(
   const hostPlaceId =
     body.hostPlaceId !== undefined
       ? (body.hostPlaceId?.trim() || null)
-      : existing.hostPlaceId;
+      : existing.hostEntityId;
   const latitude =
     body.latitude !== undefined
       ? (body.latitude != null ? Number(body.latitude) : null)
@@ -104,19 +104,19 @@ export async function PATCH(
 
   const updateData: Record<string, unknown> = {
     scheduleText,
-    ...(body.subjectPlaceId?.trim() && { subjectPlaceId: body.subjectPlaceId.trim() }),
+    ...(body.subjectPlaceId?.trim() && { subjectEntityId: body.subjectPlaceId.trim() }),
     ...(status !== undefined && { status }),
     ...(body.sources !== undefined && { sources: body.sources }),
     ...(body.confidence !== undefined && { confidence: body.confidence }),
   };
 
   if (hostPlaceId != null && hostPlaceId !== '') {
-    updateData.hostPlaceId = hostPlaceId;
+    updateData.hostEntityId = hostPlaceId;
     updateData.latitude = null;
     updateData.longitude = null;
     updateData.addressText = null;
   } else {
-    updateData.hostPlaceId = null;
+    updateData.hostEntityId = null;
     updateData.latitude = latitude;
     updateData.longitude = longitude;
     updateData.addressText = addressText;
@@ -127,8 +127,8 @@ export async function PATCH(
       where: { id },
       data: updateData,
       include: {
-        subjectPlace: { select: { id: true, name: true, slug: true } },
-        hostPlace: { select: { id: true, name: true, slug: true } },
+        subjectEntity: { select: { id: true, name: true, slug: true } },
+        hostEntity: { select: { id: true, name: true, slug: true } },
       },
     });
 
@@ -136,8 +136,8 @@ export async function PATCH(
       success: true,
       data: {
         id: appearance.id,
-        subjectPlaceId: appearance.subjectPlaceId,
-        hostPlaceId: appearance.hostPlaceId,
+        subjectPlaceId: appearance.subjectEntityId,
+        hostPlaceId: appearance.hostEntityId,
         latitude: appearance.latitude ? Number(appearance.latitude) : null,
         longitude: appearance.longitude ? Number(appearance.longitude) : null,
         addressText: appearance.addressText,
@@ -147,8 +147,8 @@ export async function PATCH(
         confidence: appearance.confidence,
         createdAt: appearance.createdAt,
         updatedAt: appearance.updatedAt,
-        subjectPlace: appearance.subjectPlace,
-        hostPlace: appearance.hostPlace,
+        subjectPlace: appearance.subjectEntity,
+        hostPlace: appearance.hostEntity,
       },
     });
   } catch (err) {

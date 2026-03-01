@@ -45,6 +45,7 @@
     "import:curated:local": "./scripts/db-local.sh node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/import-curated-csv-to-golden.ts",
     "backfill:google": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/backfill-google-places.ts",
     "backfill:google-attrs": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/backfill-google-places-attrs.ts",
+    "backfill:entities-address": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/backfill-entities-address-from-google.ts",
     "test:voice-engine": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/test-voice-engine.ts",
     "analyze:enrichment": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/analyze-enrichment-status.ts",
     "find:duplicates": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/find-duplicate-places.ts",

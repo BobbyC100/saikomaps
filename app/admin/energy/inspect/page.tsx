@@ -77,10 +77,10 @@ export default async function AdminEnergyInspectPage({ searchParams }: Props) {
 
   const [energy, tags] = await Promise.all([
     db.energy_scores.findUnique({
-      where: { place_id_version: { place_id: place.id, version: 'energy_v1' } },
+      where: { entityId_version: { entityId: place.id, version: 'energy_v1' } },
     }),
     db.place_tag_scores.findUnique({
-      where: { place_id_version: { place_id: place.id, version: 'tags_v1' } },
+      where: { entityId_version: { entityId: place.id, version: 'tags_v1' } },
     }),
   ]);
 

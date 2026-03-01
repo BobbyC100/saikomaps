@@ -42,7 +42,7 @@ export default async function ProfilePage() {
           map_places: {
             take: 4,
             orderBy: { orderIndex: 'asc' },
-            include: { places: { select: { googlePhotos: true } } },
+            include: { entities: { select: { googlePhotos: true } } },
           },
           _count: { select: { map_places: true } },
         },
@@ -57,7 +57,7 @@ export default async function ProfilePage() {
               map_places: {
                 take: 4,
                 orderBy: { orderIndex: 'asc' },
-                include: { places: { select: { googlePhotos: true } } },
+                include: { entities: { select: { googlePhotos: true } } },
               },
               _count: { select: { map_places: true } },
             },
@@ -126,11 +126,11 @@ export default async function ProfilePage() {
 }
 
 function getCoverPhotos(
-  mapPlaces: Array<{ places: { googlePhotos: unknown } }>
+  mapPlaces: Array<{ entities: { googlePhotos: unknown } }>
 ): string[] {
   const urls: string[] = [];
   for (const mp of mapPlaces) {
-    const gp = mp.places?.googlePhotos;
+    const gp = mp.entities?.googlePhotos;
     if (gp && Array.isArray(gp) && gp.length > 0) {
       const first = gp[0] as { url?: string; photo_reference?: string; photoReference?: string };
       if (first.url) {

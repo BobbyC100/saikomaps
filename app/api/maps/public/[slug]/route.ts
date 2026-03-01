@@ -31,7 +31,7 @@ export async function GET(
         },
         map_places: {
           orderBy: { orderIndex: 'asc' },
-          include: { places: true },
+          include: { entities: true },
         },
       },
     });
@@ -44,12 +44,12 @@ export async function GET(
     }
 
     const openMapPlaces = list.map_places.filter(
-      (mp) => mp.places.businessStatus !== 'CLOSED_PERMANENTLY'
+      (mp) => mp.entities.businessStatus !== 'CLOSED_PERMANENTLY'
     );
 
     // Fetch identity signals for places
     const googlePlaceIds = openMapPlaces
-      .map(mp => mp.places.googlePlaceId)
+      .map(mp => mp.entities.googlePlaceId)
       .filter((id): id is string => id !== null);
     
     const identitySignals = await db.golden_records.findMany({
@@ -76,11 +76,11 @@ export async function GET(
     
     // Enrich mapPlaces with identity signals (closed places already excluded)
     const enrichedMapPlaces = openMapPlaces.map(mp => {
-      const signals = mp.places.googlePlaceId ? signalsMap.get(mp.places.googlePlaceId) : null;
+      const signals = mp.entities.googlePlaceId ? signalsMap.get(mp.entities.googlePlaceId) : null;
       return {
         ...mp,
         places: {
-          ...mp.places,
+          ...mp.entities,
           place_personality: signals?.place_personality || null,
           price_tier: signals?.price_tier || null,
         },

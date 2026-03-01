@@ -52,7 +52,7 @@ export async function POST(
 
     await approveCandidateAndCreateRelationship({
       candidate,
-      placeId,
+      entityId: placeId,
       approvedBy,
       confidence: 0.9,
     });

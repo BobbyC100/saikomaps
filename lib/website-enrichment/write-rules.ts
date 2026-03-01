@@ -24,7 +24,7 @@ export async function applyWriteRules(payload: EnrichmentPayload): Promise<void>
 
   await db.merchant_enrichment_runs.create({
     data: {
-      place_id,
+      entityId: place_id,
       source_url,
       final_url: final_url ?? undefined,
       fetched_at: new Date(),
@@ -37,9 +37,9 @@ export async function applyWriteRules(payload: EnrichmentPayload): Promise<void>
 
   if (confidence >= CONFIDENCE_MEDIUM) {
     await db.merchant_signals.upsert({
-      where: { place_id },
+      where: { entityId: place_id },
       create: {
-        place_id,
+        entityId: place_id,
         inferred_category: signals.inferred_category ?? undefined,
         inferred_cuisine: signals.inferred_cuisine ?? undefined,
         reservation_provider: signals.reservation_provider ?? undefined,
@@ -161,7 +161,7 @@ export async function applyWriteRulesCategoryOnly(
   if (!dryRun) {
   await db.merchant_enrichment_runs.create({
     data: {
-      place_id,
+      entityId: place_id,
       source_url,
       final_url: final_url ?? undefined,
       fetched_at: new Date(),
@@ -174,9 +174,9 @@ export async function applyWriteRulesCategoryOnly(
 
   if (confidence >= CONFIDENCE_MEDIUM) {
     await db.merchant_signals.upsert({
-      where: { place_id },
+      where: { entityId: place_id },
       create: {
-        place_id,
+        entityId: place_id,
         inferred_category: signals.inferred_category ?? undefined,
         inferred_cuisine: signals.inferred_cuisine ?? undefined,
         reservation_provider: signals.reservation_provider ?? undefined,

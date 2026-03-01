@@ -79,7 +79,7 @@ export async function upsertOperatorPlaceCandidates(
       candidateUrl: row.candidateUrl,
       candidateAddress: row.candidateAddress,
       sourceUrl: row.sourceUrl,
-      placeId: row.placeId,
+      entityId: row.placeId,
       matchScore: row.matchScore,
       matchReason: row.matchReason,
       status: OperatorPlaceCandidateStatus.PENDING,
@@ -116,7 +116,8 @@ function serializeCandidate(
     candidateUrl: string | null;
     candidateAddress: string | null;
     sourceUrl: string;
-    placeId: string | null;
+    entityId?: string | null;
+    placeId?: string | null;
     matchScore: number;
     matchReason: string | null;
     status: OperatorPlaceCandidateStatus;
@@ -129,7 +130,7 @@ function serializeCandidate(
     candidateUrl: c.candidateUrl,
     candidateAddress: c.candidateAddress,
     sourceUrl: c.sourceUrl,
-    placeId: c.placeId,
+    placeId: c.entityId ?? c.placeId ?? null,
     matchScore: c.matchScore,
     matchReason: c.matchReason,
     status: c.status,

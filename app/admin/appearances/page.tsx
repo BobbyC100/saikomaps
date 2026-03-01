@@ -12,6 +12,29 @@ interface PlaceOption {
   id: string;
   name: string;
   slug: string;
+  entityType?: string;
+  address?: string | null;
+  neighborhood?: string | null;
+}
+
+function parseStreetShort(address: string | null | undefined): string {
+  const s = address?.trim();
+  if (!s) return '';
+  const segments = s.split(',').map((x) => x.trim()).filter(Boolean);
+  if (segments.length === 1) return segments[0];
+  // "Granada, 1451 Carroll Ave, ..." → first segment is name, second is street
+  const first = segments[0];
+  const hasDigit = /\d/.test(first);
+  if (hasDigit) return first; // "1451 Carroll Ave, Los Angeles, CA ..."
+  return segments[1] ?? first; // name-first format
+}
+
+function formatSecondaryLine(p: PlaceOption): string {
+  const typeLabel = p.entityType ?? '';
+  const streetShort = parseStreetShort(p.address);
+  const neighborhood = p.neighborhood?.trim() ?? '';
+  const parts = [typeLabel, streetShort, neighborhood].filter(Boolean);
+  return parts.join(' · ');
 }
 
 interface AppearanceItem {
@@ -256,7 +279,10 @@ export default function AdminAppearancesPage() {
                     className="px-4 py-2 cursor-pointer hover:bg-[#F5F0E1]/60 text-sm"
                     onClick={() => selectSubject(p)}
                   >
-                    {p.name} <span className="text-[#8B7355]">({p.slug})</span>
+                    <div className="font-semibold text-[#36454F]">{p.name}</div>
+                    {formatSecondaryLine(p) ? (
+                      <div className="text-xs text-[#8B7355] mt-0.5">{formatSecondaryLine(p)}</div>
+                    ) : null}
                   </li>
                 ))}
               </ul>
@@ -320,7 +346,10 @@ export default function AdminAppearancesPage() {
                       className="px-4 py-2 cursor-pointer hover:bg-[#F5F0E1]/60 text-sm"
                       onClick={() => selectHost(p)}
                     >
-                      {p.name} <span className="text-[#8B7355]">({p.slug})</span>
+                      <div className="font-semibold text-[#36454F]">{p.name}</div>
+                      {formatSecondaryLine(p) ? (
+                        <div className="text-xs text-[#8B7355] mt-0.5">{formatSecondaryLine(p)}</div>
+                      ) : null}
                     </li>
                   ))}
                 </ul>

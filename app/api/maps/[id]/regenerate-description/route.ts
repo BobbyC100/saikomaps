@@ -21,7 +21,7 @@ export async function POST(
       include: {
         map_places: {
           orderBy: { orderIndex: 'asc' },
-          include: { places: true },
+          include: { entities: true },
         },
       },
     });
@@ -41,9 +41,9 @@ export async function POST(
     }
 
     const places = list.map_places.map((mp) => ({
-      name: mp.places.name,
-      category: mp.places.category || 'eat',
-      neighborhood: mp.places.neighborhood ?? undefined,
+      name: mp.entities.name,
+      category: mp.entities.category || 'eat',
+      neighborhood: mp.entities.neighborhood ?? undefined,
     }));
 
     const description = await generateMapDescription({

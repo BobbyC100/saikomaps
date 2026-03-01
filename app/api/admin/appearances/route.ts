@@ -24,8 +24,8 @@ export async function GET(request: NextRequest) {
   const status = request.nextUrl.searchParams.get('status');
 
   const where: Record<string, unknown> = {};
-  if (subjectPlaceId) where.subjectPlaceId = subjectPlaceId;
-  if (hostPlaceId) where.hostPlaceId = hostPlaceId;
+  if (subjectPlaceId) where.subjectEntityId = subjectPlaceId;
+  if (hostPlaceId) where.hostEntityId = hostPlaceId;
   if (status && ['ACTIVE', 'ENDED', 'ANNOUNCED'].includes(status)) {
     where.status = status;
   }
@@ -33,8 +33,8 @@ export async function GET(request: NextRequest) {
   const appearances = await db.place_appearances.findMany({
     where,
     include: {
-      subjectPlace: { select: { id: true, name: true, slug: true } },
-      hostPlace: { select: { id: true, name: true, slug: true } },
+      subjectEntity: { select: { id: true, name: true, slug: true } },
+      hostEntity: { select: { id: true, name: true, slug: true } },
     },
     orderBy: { createdAt: 'desc' },
   });
@@ -43,8 +43,8 @@ export async function GET(request: NextRequest) {
     success: true,
     data: appearances.map((a) => ({
       id: a.id,
-      subjectPlaceId: a.subjectPlaceId,
-      hostPlaceId: a.hostPlaceId,
+      subjectPlaceId: a.subjectEntityId,
+      hostPlaceId: a.hostEntityId,
       latitude: a.latitude ? Number(a.latitude) : null,
       longitude: a.longitude ? Number(a.longitude) : null,
       addressText: a.addressText,
@@ -54,8 +54,8 @@ export async function GET(request: NextRequest) {
       confidence: a.confidence,
       createdAt: a.createdAt,
       updatedAt: a.updatedAt,
-      subjectPlace: a.subjectPlace,
-      hostPlace: a.hostPlace,
+      subjectPlace: a.subjectEntity,
+      hostPlace: a.hostEntity,
     })),
   });
 }
@@ -130,8 +130,8 @@ export async function POST(request: NextRequest) {
   try {
     const appearance = await db.place_appearances.create({
       data: {
-        subjectPlaceId,
-        hostPlaceId: hostPlaceId || undefined,
+        subjectEntityId: subjectPlaceId,
+        hostEntityId: hostPlaceId || undefined,
         latitude: hostPlaceId ? undefined : latitude ?? undefined,
         longitude: hostPlaceId ? undefined : longitude ?? undefined,
         addressText: hostPlaceId ? undefined : addressText ?? undefined,
@@ -141,8 +141,8 @@ export async function POST(request: NextRequest) {
         confidence: body.confidence ?? undefined,
       },
       include: {
-        subjectPlace: { select: { id: true, name: true, slug: true } },
-        hostPlace: { select: { id: true, name: true, slug: true } },
+        subjectEntity: { select: { id: true, name: true, slug: true } },
+        hostEntity: { select: { id: true, name: true, slug: true } },
       },
     });
 
@@ -150,8 +150,8 @@ export async function POST(request: NextRequest) {
       success: true,
       data: {
         id: appearance.id,
-        subjectPlaceId: appearance.subjectPlaceId,
-        hostPlaceId: appearance.hostPlaceId,
+        subjectPlaceId: appearance.subjectEntityId,
+        hostPlaceId: appearance.hostEntityId,
         latitude: appearance.latitude ? Number(appearance.latitude) : null,
         longitude: appearance.longitude ? Number(appearance.longitude) : null,
         addressText: appearance.addressText,
@@ -161,8 +161,8 @@ export async function POST(request: NextRequest) {
         confidence: appearance.confidence,
         createdAt: appearance.createdAt,
         updatedAt: appearance.updatedAt,
-        subjectPlace: appearance.subjectPlace,
-        hostPlace: appearance.hostPlace,
+        subjectPlace: appearance.subjectEntity,
+        hostPlace: appearance.hostEntity,
       },
     });
   } catch (err) {

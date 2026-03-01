@@ -24,7 +24,7 @@ export async function GET(
           where: { role: 'operator' },
           orderBy: { isPrimary: 'desc' },
           include: {
-            place: {
+            entity: {
               select: { id: true, slug: true, name: true, category: true, neighborhood: true },
             },
           },
@@ -37,7 +37,7 @@ export async function GET(
     }
 
     const places = actor.placeActorRelationships
-      .map((r) => r.place)
+      .map((r) => r.entity)
       .filter((p): p is NonNullable<typeof p> => p != null);
 
     return NextResponse.json({

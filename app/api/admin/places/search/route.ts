@@ -30,7 +30,14 @@ export async function GET(request: NextRequest) {
       ],
     },
     take: 10,
-    select: { id: true, name: true, slug: true },
+    select: {
+      id: true,
+      name: true,
+      slug: true,
+      entityType: true,
+      address: true,
+      neighborhood: true,
+    },
   });
 
   return NextResponse.json({ places });

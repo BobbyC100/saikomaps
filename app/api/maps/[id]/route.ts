@@ -35,7 +35,7 @@ export async function GET(
       include: {
         map_places: {
           orderBy: { orderIndex: 'asc' },
-          include: { places: true },
+          include: { entities: true },
         },
       },
     });
@@ -50,9 +50,9 @@ export async function GET(
     // Build locations array from mapPlaces for create flow (expects data.locations)
     const locations = (list.map_places || []).map((mp) => ({
       id: mp.id,
-      name: mp.places?.name ?? '',
-      address: mp.places?.address ?? null,
-      category: mp.places?.category ?? null,
+      name: mp.entities?.name ?? '',
+      address: mp.entities?.address ?? null,
+      category: mp.entities?.category ?? null,
       orderIndex: mp.orderIndex,
     }));
 
@@ -82,7 +82,7 @@ export async function PATCH(
       include: {
         map_places: {
           orderBy: { orderIndex: 'asc' },
-          include: { places: true },
+          include: { entities: true },
         },
       },
     });
@@ -133,7 +133,7 @@ export async function PATCH(
       include: {
         map_places: {
           orderBy: { orderIndex: 'asc' },
-          include: { places: true },
+          include: { entities: true },
         },
       },
     });

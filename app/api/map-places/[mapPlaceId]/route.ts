@@ -37,7 +37,7 @@ export async function PATCH(
 
     if (neighborhood !== undefined || priceLevel !== undefined || cuisineType !== undefined) {
       await db.entities.update({
-        where: { id: mapPlace.placeId },
+        where: { id: mapPlace.entityId },
         data: {
           ...(neighborhood !== undefined && {
             neighborhood: neighborhood?.trim() || null,
@@ -61,7 +61,7 @@ export async function PATCH(
         ...(userNote !== undefined && { userNote: userNote?.trim() || null }),
         ...(typeof orderIndex === 'number' && { orderIndex }),
       },
-      include: { places: true },
+      include: { entities: true },
     });
 
     return NextResponse.json({

@@ -27,7 +27,7 @@ export async function POST(
       include: {
         map_places: {
           orderBy: { orderIndex: 'asc' },
-          include: { places: true },
+          include: { entities: true },
         },
       },
     });
@@ -88,7 +88,10 @@ export async function POST(
         // ignore
       }
       if (!titleToSet && existing.map_places.length >= 2) {
-        titleToSet = generateTitleFromPlaces(existing.map_places) || 'Untitled Map';
+        const mapPlacesForTitle = existing.map_places.map((mp) => ({
+          place: { category: mp.entities.category, neighborhood: mp.entities.neighborhood },
+        }));
+        titleToSet = generateTitleFromPlaces(mapPlacesForTitle) || 'Untitled Map';
       }
       if (!titleToSet) {
         titleToSet = 'Untitled Map';
@@ -107,9 +110,9 @@ export async function POST(
     if (existing.description == null && existing.map_places.length >= 2) {
       try {
         const places = existing.map_places.map((mp) => ({
-          name: mp.places.name,
-          category: mp.places.category || 'eat',
-          neighborhood: mp.places.neighborhood ?? undefined,
+          name: mp.entities.name,
+          category: mp.entities.category || 'eat',
+          neighborhood: mp.entities.neighborhood ?? undefined,
         }));
         const description = await generateMapDescription({
           title: titleToSet,
