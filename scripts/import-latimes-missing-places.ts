@@ -3,12 +3,13 @@
  * Nov. 26, 2024 - "These 13 standout restaurants are where L.A. chefs eat on their nights off"
  */
 
+import { randomUUID } from 'crypto'
 import { db } from '@/lib/db'
 import { searchPlace, getPlaceDetails, getNeighborhoodFromPlaceDetails, getNeighborhoodFromCoords } from '@/lib/google-places'
 import { generatePlaceSlug, ensureUniqueSlug } from '@/lib/place-slug'
 import { getSaikoCategory, parseCuisineType } from '@/lib/categoryMapping'
 
-const USER_ID = 'demo-user-id'
+const USER_ID = '24af122c-7f1d-4225-964d-94815397ca23'
 const SOURCE_URL = 'https://www.latimes.com/food/list/los-angeles-chefs-share-favorite-local-restaurants'
 const SOURCE_NAME = 'LA Times'
 
@@ -77,6 +78,8 @@ async function main() {
     const slug = `la-times-where-chefs-eat-${Date.now()}`
     list = await db.lists.create({
       data: {
+        id: randomUUID(),
+        updatedAt: new Date(),
         userId: USER_ID,
         title: 'LA Times: Where Chefs Eat',
         slug,
@@ -115,6 +118,21 @@ async function main() {
     if (existing) {
       console.log(`   ↻ Already exists: ${existing.name}`)
       alreadyExists++
+      // Still try to link to the list map if not already linked
+      try {
+        await db.map_places.upsert({
+          where: { mapId_entityId: { mapId: list.id, entityId: existing.id } },
+          update: {},
+          create: {
+            id: randomUUID(),
+            updatedAt: new Date(),
+            mapId: list.id,
+            entityId: existing.id,
+            userNote: input.comment,
+            orderIndex: i,
+          },
+        })
+      } catch {}
       continue
     }
 
@@ -151,7 +169,7 @@ async function main() {
         return !!exists
       })
 
-      const sources = [{
+      const editorialSources = [{
         name: SOURCE_NAME,
         url: SOURCE_URL,
         excerpt: input.comment,
@@ -159,6 +177,7 @@ async function main() {
 
       const place = await db.entities.create({
         data: {
+          id: randomUUID(),
           slug: uniqueSlug,
           googlePlaceId: googlePlaceId ?? undefined,
           name: finalName,
@@ -172,15 +191,20 @@ async function main() {
           neighborhood: neighborhood ?? null,
           cuisineType: placeDetails.types ? parseCuisineType(placeDetails.types) ?? null : null,
           category: getSaikoCategory(finalName, placeDetails.types ?? []),
+          primary_vertical: 'EAT',
           googlePhotos: placeDetails.photos ? JSON.parse(JSON.stringify(placeDetails.photos)) : undefined,
           hours: placeDetails.openingHours ? JSON.parse(JSON.stringify(placeDetails.openingHours)) : null,
           placesDataCachedAt: new Date(),
-          sources: sources,
+          editorialSources: editorialSources,
         },
       })
 
-      await db.map_places.create({
-        data: {
+      await db.map_places.upsert({
+        where: { mapId_entityId: { mapId: list.id, entityId: place.id } },
+        update: {},
+        create: {
+          id: randomUUID(),
+          updatedAt: new Date(),
           mapId: list.id,
           entityId: place.id,
           userNote: input.comment,

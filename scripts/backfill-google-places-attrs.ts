@@ -211,18 +211,18 @@ async function runPreflight(opts: {
       g.canonical_id,
       g.slug,
       g.google_place_id,
-      p.id AS place_id,
+      e.id AS place_id,
       g.county,
       g.lat::float AS gr_lat,
       g.lng::float AS gr_lng,
-      p.latitude::float AS p_lat,
-      p.longitude::float AS p_lng,
+      e.latitude::float AS p_lat,
+      e.longitude::float AS p_lng,
       g.google_places_attributes,
       g.google_places_attributes_fetched_at
     FROM golden_records g
-    INNER JOIN places p ON p.google_place_id = g.google_place_id
+    INNER JOIN entities e ON e.google_place_id = g.google_place_id
     WHERE g.google_place_id IS NOT NULL
-      AND p.google_place_id IS NOT NULL
+      AND e.google_place_id IS NOT NULL
   `;
 
   const eligible_total = linked.length;

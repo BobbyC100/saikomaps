@@ -36,7 +36,7 @@ async function main() {
   >`
     SELECT g.google_place_id, g.category, g.name
     FROM golden_records g
-    INNER JOIN places p ON p.google_place_id = g.google_place_id
+    INNER JOIN entities e ON e.google_place_id = g.google_place_id
     WHERE g.google_place_id IS NOT NULL
     ORDER BY g.category NULLS LAST, g.canonical_id
     LIMIT 500
