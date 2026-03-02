@@ -65,7 +65,7 @@ async function main() {
   const endsAt = new Date(now.getTime() + 1000 * 60 * 60 * 2); // 2 hours from now
 
   const proposedSignal = await createProposedSignal({
-    placeId: place.id,
+    entityId: place.id,
     sourceId: 'demo-newsletter-email-001',
     signalType: 'hours_override',
     extractedData: {
@@ -120,7 +120,7 @@ async function main() {
 
   for (const { label, time } of testTimes) {
     const activeOverlays = await getActiveOverlays({
-      placeId: place.id,
+      entityId: place.id,
       now: time,
     });
 

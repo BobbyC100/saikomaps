@@ -212,7 +212,7 @@ async function main() {
       }
 
       if (!explainInputs) {
-        await db.place_tag_scores.upsert({
+        await db.entity_tag_scores.upsert({
         where: { entityId_version: { entityId: placeId, version: tagVersion } },
         create: {
           id: randomUUID(),

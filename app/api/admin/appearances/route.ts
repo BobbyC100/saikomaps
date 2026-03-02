@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
     where.status = status;
   }
 
-  const appearances = await db.place_appearances.findMany({
+  const appearances = await db.entity_appearances.findMany({
     where,
     include: {
       subjectEntity: { select: { id: true, name: true, slug: true } },
@@ -128,7 +128,7 @@ export async function POST(request: NextRequest) {
       : 'ACTIVE';
 
   try {
-    const appearance = await db.place_appearances.create({
+    const appearance = await db.entity_appearances.create({
       data: {
         subjectEntityId: subjectPlaceId,
         hostEntityId: hostPlaceId || undefined,
@@ -167,7 +167,7 @@ export async function POST(request: NextRequest) {
     });
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'Unknown error';
-    if (msg.includes('place_appearances_location_check') || msg.includes('violates check constraint')) {
+    if (msg.includes('entity_appearances_location_check') || msg.includes('violates check constraint')) {
       return NextResponse.json(
         { success: false, error: loc.error },
         { status: 400 }

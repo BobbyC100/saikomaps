@@ -1,6 +1,6 @@
 /**
  * Approval and attach logic for OperatorPlaceCandidate.
- * Writes place_actor_relationships (role=operator, is_primary=true).
+ * Writes entity_actor_relationships (role=operator, is_primary=true).
  * Primary override: if place already has primary operator, set existing to is_primary=false.
  */
 
@@ -24,7 +24,7 @@ export async function approveCandidateAndCreateRelationship(
   const { candidate, entityId, approvedBy, confidence } = params;
   const relConfidence = confidence ?? candidate.matchScore ?? 0.9;
 
-  const existingPrimary = await db.placeActorRelationship.findFirst({
+  const existingPrimary = await db.entity_actor_relationships.findFirst({
     where: {
       entityId,
       role: "operator",
@@ -34,7 +34,7 @@ export async function approveCandidateAndCreateRelationship(
   });
 
   if (existingPrimary && existingPrimary.actorId !== candidate.actorId) {
-    await db.placeActorRelationship.update({
+    await db.entity_actor_relationships.update({
       where: { id: existingPrimary.id },
       data: { isPrimary: false, updatedAt: new Date() },
     });
@@ -48,7 +48,7 @@ export async function approveCandidateAndCreateRelationship(
     approved_by: approvedBy,
   };
 
-  await db.placeActorRelationship.upsert({
+  await db.entity_actor_relationships.upsert({
     where: {
       entityId_actorId_role: {
         entityId,

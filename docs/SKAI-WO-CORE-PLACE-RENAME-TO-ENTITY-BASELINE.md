@@ -22,7 +22,7 @@
 | `place_photo_eval` | `place_id` | FK → places.id |
 | `energy_scores` | `place_id` | FK → places.id |
 | `place_tag_scores` | `place_id` | FK → places.id |
-| `place_coverage_status` | `place_id` | FK → places.id |
+| `entity_coverage_status` | `entity_id` | FK → entities.id |
 | `gpid_resolution_queue` | `place_id` | FK → places.id |
 | `operator_place_candidates` | `place_id` | FK → places.id (nullable) |
 | `place_actor_relationships` | `place_id` | FK → places.id |
@@ -35,8 +35,8 @@
 
 ## 4. Out of scope (NOT renaming)
 
-- `place_job_log` table (references `entity_id`/`entity_type` → golden_records, not places)
-- Table names: `map_places`, `person_places`, `place_appearances`, `place_photo_eval`, `place_tag_scores`, `place_coverage_status`, `place_actor_relationships`, etc.
+- `entity_job_log` table (references `entity_id`/`entity_type` → golden_records, not places)
+- Table names: `map_places`, `person_places`, `place_appearances`, `place_photo_eval`, `place_tag_scores`, `place_actor_relationships`, etc. (`place_coverage_status` → `entity_coverage_status` done 2026-03-01.)
 - `proposed_signals.place_id`, `operational_overlays.place_id` — these reference golden/identity; TBD if they point at places or golden_records. Schema shows no Prisma relation to places; likely golden/denormalized. **Leave as place_id for now** per “no sweeping rename” rule.
 
 ## 5. Raw SQL / files referencing `places` or `place_id`

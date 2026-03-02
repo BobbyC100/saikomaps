@@ -1,6 +1,7 @@
 /**
  * Run matching and upsert OperatorPlaceCandidate rows (PENDING).
  * Idempotent: by (actor_id, candidate_url) when url set; else (actor_id, candidate_name, candidate_address).
+ * Operator ↔ Entity candidate (identity primitive).
  */
 
 import type { ConfidenceBucket } from "@prisma/client";
@@ -25,7 +26,7 @@ export interface CandidateRecord {
   candidateUrl: string | null;
   candidateAddress: string | null;
   sourceUrl: string;
-  placeId: string | null;
+  entityId: string | null;
   matchScore: number;
   matchReason: string | null;
   status: OperatorPlaceCandidateStatus;
@@ -55,6 +56,8 @@ export async function upsertOperatorPlaceCandidates(
   const results: CandidateRecord[] = [];
 
   for (const row of rows) {
+    const entityId = row.entityId ?? null;
+
     let existing = null;
 
     if (row.candidateUrl) {
@@ -79,7 +82,7 @@ export async function upsertOperatorPlaceCandidates(
       candidateUrl: row.candidateUrl,
       candidateAddress: row.candidateAddress,
       sourceUrl: row.sourceUrl,
-      entityId: row.placeId,
+      entityId,
       matchScore: row.matchScore,
       matchReason: row.matchReason,
       status: OperatorPlaceCandidateStatus.PENDING,
@@ -117,7 +120,6 @@ function serializeCandidate(
     candidateAddress: string | null;
     sourceUrl: string;
     entityId?: string | null;
-    placeId?: string | null;
     matchScore: number;
     matchReason: string | null;
     status: OperatorPlaceCandidateStatus;
@@ -130,7 +132,7 @@ function serializeCandidate(
     candidateUrl: c.candidateUrl,
     candidateAddress: c.candidateAddress,
     sourceUrl: c.sourceUrl,
-    placeId: c.entityId ?? c.placeId ?? null,
+    entityId: c.entityId ?? null,
     matchScore: c.matchScore,
     matchReason: c.matchReason,
     status: c.status,

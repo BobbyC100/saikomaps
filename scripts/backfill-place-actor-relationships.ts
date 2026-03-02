@@ -1,11 +1,11 @@
 /**
- * Backfill PlaceActorRelationship from restaurant_groups.
+ * Backfill entity_actor_relationships from restaurant_groups.
  *
  * Step 1: Create Actor(kind=organization) for each restaurant_group.
  *         Migrate: name, slug, website, description, visibility, sources.
  *         Store migration source flag in sources.
  *
- * Step 2: For every place with restaurantGroupId, create PlaceActorRelationship
+ * Step 2: For every place with restaurantGroupId, create entity_actor_relationships
  *         role=operator, isPrimary=true.
  *
  * Idempotent. Use --dry-run (default) or --apply.
@@ -17,7 +17,7 @@
 import * as path from 'path';
 import { db } from '@/lib/db';
 
-const AUDIT_PATH = path.join(process.cwd(), 'data/logs/backfill_place_actor_relationships.csv');
+const AUDIT_PATH = path.join(process.cwd(), 'data/logs/backfill_entity_actor_relationships.csv');
 
 function parseArgs(): { apply: boolean } {
   const argv = process.argv.slice(2);
@@ -37,7 +37,7 @@ async function main() {
   const { apply } = parseArgs();
   const auditRows: AuditRow[] = [];
 
-  console.log('Backfill PlaceActorRelationship from restaurant_groups\n');
+  console.log('Backfill entity_actor_relationships from restaurant_groups\n');
   if (!apply) console.log('DRY RUN (no writes). Use --apply to persist.\n');
 
   // Step 1: Create Actor for each restaurant_group
@@ -73,7 +73,7 @@ async function main() {
     }
   }
 
-  // Step 2: Create PlaceActorRelationship for every place with restaurantGroupId
+  // Step 2: Create entity_actor_relationships for every place with restaurantGroupId
   const placesWithGroup = await db.entities.findMany({
     where: { restaurantGroupId: { not: null } },
     select: { id: true, restaurantGroupId: true, name: true },
@@ -99,7 +99,7 @@ async function main() {
       continue;
     }
 
-    const existing = await db.placeActorRelationship.findFirst({
+    const existing = await db.entity_actor_relationships.findFirst({
       where: { entityId: p.id, actorId, role: 'operator' },
     });
     if (existing) {
@@ -109,7 +109,7 @@ async function main() {
     }
 
     if (apply) {
-      await db.placeActorRelationship.create({
+      await db.entity_actor_relationships.create({
         data: {
           entityId: p.id,
           actorId,
@@ -134,7 +134,7 @@ async function main() {
 
   console.log('Summary:');
   console.log(`  Actors: ${actorsCreated} created, ${actorsSkipped} skipped`);
-  console.log(`  PlaceActorRelationships: ${relsCreated} created, ${relsSkipped} skipped`);
+  console.log(`  entity_actor_relationships: ${relsCreated} created, ${relsSkipped} skipped`);
 
   // Audit output
   const { writeFileSync, mkdirSync } = await import('fs');

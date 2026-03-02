@@ -1,6 +1,6 @@
 /**
  * PATCH /api/admin/actors/candidates/[candidateId]
- * body: { action: "approve" | "reject", placeId?: string, rejectionReason?: string }
+ * body: { action: "approve" | "reject", entityId?: string, rejectionReason?: string }
  */
 
 export const runtime = "nodejs";
@@ -27,7 +27,7 @@ export async function PATCH(
     const { candidateId } = await params;
     const body = await request.json();
     const action = body?.action as string | undefined;
-    const placeId = typeof body?.placeId === "string" ? body.placeId.trim() : undefined;
+    const entityIdFromBody = typeof body?.entityId === "string" ? body.entityId.trim() : undefined;
     const rejectionReason =
       typeof body?.rejectionReason === "string" ? body.rejectionReason.trim() : undefined;
 
@@ -62,16 +62,16 @@ export async function PATCH(
       return NextResponse.json({ success: true, status: "REJECTED" });
     }
 
-    const resolvedPlaceId = candidate.entityId ?? placeId;
-    if (!resolvedPlaceId) {
+    const resolvedEntityId = candidate.entityId ?? entityIdFromBody;
+    if (!resolvedEntityId) {
       return NextResponse.json(
-        { error: "placeId required when candidate has no suggested place" },
+        { error: "entityId is required when candidate has no suggested entity" },
         { status: 400 }
       );
     }
 
     const place = await db.entities.findUnique({
-      where: { id: resolvedPlaceId },
+      where: { id: resolvedEntityId },
       select: { id: true },
     });
     if (!place) {
@@ -83,7 +83,7 @@ export async function PATCH(
 
     await approveCandidateAndCreateRelationship({
       candidate,
-      entityId: resolvedPlaceId,
+      entityId: resolvedEntityId,
       approvedBy,
       confidence: candidate.matchScore,
     });

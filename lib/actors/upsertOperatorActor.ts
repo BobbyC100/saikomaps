@@ -1,7 +1,7 @@
 /**
  * Upsert Actor(kind=operator) from URL ingestion.
  * Website is the idempotency key. Lookup by normalized website only.
- * Does NOT write to place_actor_relationships or restaurant_groups.
+ * Does NOT write to entity_actor_relationships or restaurant_groups.
  */
 
 import { ActorKind, Visibility } from "@prisma/client";

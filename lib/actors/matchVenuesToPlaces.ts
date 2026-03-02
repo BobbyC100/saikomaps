@@ -1,7 +1,7 @@
 /**
- * Conservative venue → place matching for operator ingestion.
- * Same-origin URL slug match → ~0.85; else name token overlap vs small place set.
- * Only set place_id when score >= 0.70 and best match clearly beats runner-up.
+ * Conservative venue → entity matching for operator ingestion.
+ * Same-origin URL slug match → ~0.85; else name token overlap vs small entity set.
+ * Only set entityId when score >= 0.70 and best match clearly beats runner-up.
  */
 
 import type { PrismaClient } from "@prisma/client";
@@ -14,7 +14,9 @@ const NAME_QUERY_LIMIT = 5;
 const MIN_GAP_TO_DECIDE = 0.15;
 
 export interface MatchResult {
-  placeId: string | null;
+  entityId: string | null;
+  /** @deprecated Use entityId. Legacy alias for backwards compatibility. */
+  placeId?: string | null;
   matchScore: number;
   matchReason: string;
 }
@@ -66,7 +68,7 @@ function jaccardScore(a: string, b: string): number {
 }
 
 /**
- * Match a single venue to places. Returns placeId only when confident.
+ * Match a single venue to entities. Returns entityId only when confident.
  * @param client - Optional Prisma client (use when db from static import is undefined in runtime)
  */
 export async function matchVenueToPlaces(
@@ -75,37 +77,39 @@ export async function matchVenueToPlaces(
   client?: PrismaClient
 ): Promise<MatchResult> {
   const prisma = client ?? db;
-  const placesDelegate = prisma?.entities;
-  if (!placesDelegate?.findFirst) {
-    throw new Error("Prisma client not initialized: places delegate missing");
+  const entitiesDelegate = prisma?.entities;
+  if (!entitiesDelegate?.findFirst) {
+    throw new Error("Prisma client not initialized: entities delegate missing");
   }
   const actorOrigin = getOrigin(actorWebsite);
   if (!actorOrigin) {
-    return { placeId: null, matchScore: 0, matchReason: "no_actor_origin" };
+    return { entityId: null, placeId: null, matchScore: 0, matchReason: "no_actor_origin" };
   }
 
-  // 1) Same-origin URL → slug match (places.slug contains token)
+  // 1) Same-origin URL → slug match (entities.slug contains token)
   if (venue.url) {
     const slugToken = slugFromSameOriginUrl(venue.url, actorOrigin);
     if (slugToken) {
-      const exact = await placesDelegate.findFirst({
+      const exact = await entitiesDelegate.findFirst({
         where: { slug: slugToken },
         select: { id: true },
       });
       if (exact) {
         return {
+          entityId: exact.id,
           placeId: exact.id,
           matchScore: SAME_ORIGIN_SLUG_SCORE,
           matchReason: "same_origin_url_slug_match",
         };
       }
-      const contains = await placesDelegate.findMany({
+      const contains = await entitiesDelegate.findMany({
         where: { slug: { contains: slugToken, mode: "insensitive" } },
         select: { id: true },
         take: 2,
       });
       if (contains.length === 1) {
         return {
+          entityId: contains[0].id,
           placeId: contains[0].id,
           matchScore: SAME_ORIGIN_SLUG_SCORE,
           matchReason: "same_origin_url_slug_match",
@@ -114,13 +118,13 @@ export async function matchVenueToPlaces(
     }
   }
 
-  // 2) Name similarity vs small place set (by name search)
+  // 2) Name similarity vs small entity set (by name search)
   const name = venue.name.trim();
   if (!name) {
-    return { placeId: null, matchScore: 0, matchReason: "no_match_found" };
+    return { entityId: null, placeId: null, matchScore: 0, matchReason: "no_match_found" };
   }
 
-  const candidates = await placesDelegate.findMany({
+  const candidates = await entitiesDelegate.findMany({
     where: {
       name: { contains: name.split(/\s+/)[0], mode: "insensitive" },
     },
@@ -129,25 +133,26 @@ export async function matchVenueToPlaces(
   });
 
   if (candidates.length === 0) {
-    return { placeId: null, matchScore: 0, matchReason: "no_match_found" };
+    return { entityId: null, placeId: null, matchScore: 0, matchReason: "no_match_found" };
   }
 
-  const scored = candidates.map((p) => ({
-    id: p.id,
-    score: jaccardScore(name, p.name),
+  const scored = candidates.map((entity) => ({
+    id: entity.id,
+    score: jaccardScore(name, entity.name),
   }));
   scored.sort((a, b) => b.score - a.score);
   const best = scored[0];
   const second = scored[1];
 
   if (best.score < MIN_SCORE_TO_LINK) {
-    return { placeId: null, matchScore: best.score, matchReason: "no_match_found" };
+    return { entityId: null, placeId: null, matchScore: best.score, matchReason: "no_match_found" };
   }
   if (second && best.score - second.score < MIN_GAP_TO_DECIDE) {
-    return { placeId: null, matchScore: best.score, matchReason: "ambiguous" };
+    return { entityId: null, placeId: null, matchScore: best.score, matchReason: "ambiguous" };
   }
 
   return {
+    entityId: best.id,
     placeId: best.id,
     matchScore: best.score,
     matchReason: "jaccard",
@@ -159,13 +164,15 @@ export interface CandidateRow {
   candidateUrl: string | null;
   candidateAddress: string | null;
   sourceUrl: string;
-  placeId: string | null;
+  entityId: string | null;
+  /** @deprecated Use entityId. Legacy alias for backwards compatibility. */
+  placeId?: string | null;
   matchScore: number;
   matchReason: string;
 }
 
 /**
- * Match all venues to places; return candidate rows for persistence.
+ * Match all venues to entities; return candidate rows for persistence.
  * @param client - Optional Prisma client (use when db from static import is undefined in runtime)
  */
 export async function matchVenuesToPlaces(
@@ -181,7 +188,8 @@ export async function matchVenuesToPlaces(
       candidateUrl: venue.url ?? null,
       candidateAddress: venue.address ?? null,
       sourceUrl: venue.source_url,
-      placeId: result.placeId,
+      entityId: result.entityId,
+      placeId: result.entityId,
       matchScore: result.matchScore,
       matchReason: result.matchReason,
     });

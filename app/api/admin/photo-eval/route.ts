@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
   }
 
   for (const p of photos) {
-    await prisma.place_photo_eval.upsert({
+    await prisma.entity_photo_eval.upsert({
       where: {
         entityId_photo_ref: { entityId: place_id, photo_ref: p.photo_ref },
       },

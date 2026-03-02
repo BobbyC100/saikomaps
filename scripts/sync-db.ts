@@ -62,17 +62,17 @@ async function checkSchema(client: PrismaClient): Promise<SchemaCheck> {
 }
 
 async function getCounts(client: PrismaClient): Promise<Record<string, number>> {
-  const [places, energy_scores, place_tag_scores, place_coverage_status] = await Promise.all([
+  const [places, energy_scores, entity_tag_scores, entity_coverage_status] = await Promise.all([
     client.entities.count(),
     client.energy_scores.count(),
-    client.place_tag_scores.count(),
-    client.place_coverage_status.count(),
+    client.entity_tag_scores.count(),
+    client.entity_coverage_status.count(),
   ]);
   return {
     places,
     energy_scores,
-    place_tag_scores,
-    place_coverage_status,
+    entity_tag_scores,
+    entity_coverage_status,
   };
 }
 
@@ -128,8 +128,8 @@ async function main() {
     // Sync places (upsert by id). Omit relation keys so Prisma accepts create/update.
     const placeRelationKeys = [
       "map_places", "person_places", "restaurant_groups", "category_rel",
-      "parent", "children", "viewer_bookmarks", "energy_scores", "place_tag_scores",
-      "place_photo_eval", "place_coverage_status",
+      "parent", "children", "viewer_bookmarks", "energy_scores", "entity_tag_scores",
+      "entity_photo_eval", "entity_coverage_status",
     ];
     const places = await sourceClient.entities.findMany();
     let placesUpserted = 0;
@@ -188,11 +188,11 @@ async function main() {
     }
     console.log("  energy_scores: inserted/updated =", energyUpserted);
 
-    // Sync place_tag_scores (upsert by place_id + version)
-    const tagScores = await sourceClient.place_tag_scores.findMany();
+    // Sync entity_tag_scores (upsert by entity_id + version)
+    const tagScores = await sourceClient.entity_tag_scores.findMany();
     let tagScoresUpserted = 0;
     for (const t of tagScores) {
-      await targetClient.place_tag_scores.upsert({
+      await targetClient.entity_tag_scores.upsert({
         where: {
           entityId_version: { entityId: t.entityId, version: t.version },
         },
@@ -221,13 +221,13 @@ async function main() {
       });
       tagScoresUpserted++;
     }
-    console.log("  place_tag_scores: inserted/updated =", tagScoresUpserted);
+    console.log("  entity_tag_scores: inserted/updated =", tagScoresUpserted);
 
-    // Sync place_coverage_status (upsert by dedupe_key)
-    const coverageStatus = await sourceClient.place_coverage_status.findMany();
+    // Sync entity_coverage_status (upsert by dedupe_key)
+    const coverageStatus = await sourceClient.entity_coverage_status.findMany();
     let coverageUpserted = 0;
     for (const c of coverageStatus) {
-      await targetClient.place_coverage_status.upsert({
+      await targetClient.entity_coverage_status.upsert({
         where: { dedupe_key: c.dedupe_key },
         create: {
           id: c.id,
@@ -255,7 +255,7 @@ async function main() {
       });
       coverageUpserted++;
     }
-    console.log("  place_coverage_status: inserted/updated =", coverageUpserted);
+    console.log("  entity_coverage_status: inserted/updated =", coverageUpserted);
 
     console.log("Done.");
   } finally {

@@ -3,7 +3,7 @@
  * Single source of truth for PRL computation. Used by API + cron evaluator.
  * Read-only. Deterministic.
  *
- * Resilient: if optional tables (place_photo_eval, energy_scores, place_tag_scores)
+ * Resilient: if optional tables (entity_photo_eval, energy_scores, entity_tag_scores)
  * do not exist, falls back to minimal query using only core tables + vibeTags bridge.
  */
 
@@ -18,7 +18,7 @@ function isMissingTableError(e: unknown): boolean {
   );
 }
 
-/** Minimal select: no place_photo_eval, energy_scores, place_tag_scores (avoids P2021 when tables missing) */
+/** Minimal select: no entity_photo_eval, energy_scores, entity_tag_scores (avoids P2021 when tables missing) */
 const MINIMAL_PLACE_SELECT = {
   id: true,
   slug: true,
@@ -83,13 +83,13 @@ async function fetchPlaceForPRLBySlugFull(
       googlePlacesAttributes: true,
       _count: {
         select: {
-          place_photo_eval: true,
+          entity_photo_eval: true,
           energy_scores: true,
-          place_tag_scores: true,
+          entity_tag_scores: true,
           map_places: true,
         },
       },
-      place_photo_eval: {
+      entity_photo_eval: {
         select: { tier: true, type: true },
       },
       energy_scores: {
@@ -119,8 +119,8 @@ async function fetchPlaceForPRLBySlugFull(
     ? googlePhotosArr.length
     : 0;
 
-  const heroApproved = place.place_photo_eval.some((e) => e.tier === 'HERO');
-  const hasInteriorOrContextApproved = place.place_photo_eval.some(
+  const heroApproved = place.entity_photo_eval.some((e) => e.tier === 'HERO');
+  const hasInteriorOrContextApproved = place.entity_photo_eval.some(
     (e) =>
       (e.tier === 'HERO' || e.tier === 'GALLERY') &&
       (e.type === 'INTERIOR' || e.type === 'CONTEXT')
@@ -131,7 +131,7 @@ async function fetchPlaceForPRLBySlugFull(
       ? place.energy_scores[0].energy_score
       : null;
 
-  const hasTagScores = place._count.place_tag_scores > 0;
+  const hasTagScores = place._count.entity_tag_scores > 0;
   const hasLegacyVibeTags = (place.vibeTags?.length ?? 0) > 0;
   const hasTagSignals = hasTagScores || hasLegacyVibeTags; // v1 bridge
 
@@ -192,7 +192,7 @@ async function fetchPlaceForPRLBySlugFull(
   return result;
 }
 
-/** Minimal fetch when optional tables (place_photo_eval, etc.) are missing. Uses vibeTags bridge. */
+/** Minimal fetch when optional tables (entity_photo_eval, etc.) are missing. Uses vibeTags bridge. */
 async function fetchPlaceForPRLBySlugMinimal(
   slug: string
 ): Promise<(PlaceForPRL & { prlOverride: number | null }) | null> {
@@ -350,12 +350,12 @@ async function fetchPlaceForPRLBatchFull(args?: {
       prlOverride: true,
       _count: {
         select: {
-          place_photo_eval: true,
+          entity_photo_eval: true,
           energy_scores: true,
-          place_tag_scores: true,
+          entity_tag_scores: true,
         },
       },
-      place_photo_eval: {
+      entity_photo_eval: {
         select: { tier: true, type: true },
       },
       energy_scores: {
@@ -420,8 +420,8 @@ async function fetchPlaceForPRLBatchFull(args?: {
       ? googlePhotosArr.length
       : 0;
 
-    const heroApproved = place.place_photo_eval.some((e) => e.tier === 'HERO');
-    const hasInteriorOrContextApproved = place.place_photo_eval.some(
+    const heroApproved = place.entity_photo_eval.some((e) => e.tier === 'HERO');
+    const hasInteriorOrContextApproved = place.entity_photo_eval.some(
       (e) =>
         (e.tier === 'HERO' || e.tier === 'GALLERY') &&
         (e.type === 'INTERIOR' || e.type === 'CONTEXT')
@@ -432,7 +432,7 @@ async function fetchPlaceForPRLBatchFull(args?: {
         ? place.energy_scores[0].energy_score
         : null;
 
-    const hasTagScores = place._count.place_tag_scores > 0;
+    const hasTagScores = place._count.entity_tag_scores > 0;
     const hasLegacyVibeTags = (place.vibeTags?.length ?? 0) > 0;
     const hasTagSignals = hasTagScores || hasLegacyVibeTags; // v1 bridge
 

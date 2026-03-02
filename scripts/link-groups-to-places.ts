@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
- * Auto-Link Places to Operators (Actor + PlaceActorRelationship)
- * Finds places and creates PlaceActorRelationship. No writes to restaurantGroupId.
+ * Auto-Link Places to Operators (Actor + entity_actor_relationships)
+ * Finds places and creates entity_actor_relationships. No writes to restaurantGroupId.
  */
 
 import { db } from '@/lib/db'
@@ -113,7 +113,7 @@ async function main() {
         }
       },
       include: {
-        place_actor_relationships: {
+        entity_actor_relationships: {
           where: { role: 'operator', isPrimary: true },
           include: { actor: true }
         }
@@ -126,7 +126,7 @@ async function main() {
       continue
     }
 
-    const primaryOp = place.place_actor_relationships?.[0]
+    const primaryOp = place.entity_actor_relationships?.[0]
     if (primaryOp) {
       console.log(`   ⤷ Already linked to operator: ${primaryOp.actor.name}`)
       alreadyLinked++
@@ -165,7 +165,7 @@ async function main() {
       })
     }
 
-    // Create PlaceActorRelationship (no restaurantGroupId write)
+    // Create entity_actor_relationships (no restaurantGroupId write)
     await db.placeActorRelationship.create({
       data: {
         entityId: place.id,

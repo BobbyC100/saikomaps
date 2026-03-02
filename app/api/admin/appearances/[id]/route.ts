@@ -49,7 +49,7 @@ export async function PATCH(
     );
   }
 
-  const existing = await db.place_appearances.findUnique({
+  const existing = await db.entity_appearances.findUnique({
     where: { id },
   });
   if (!existing) {
@@ -123,7 +123,7 @@ export async function PATCH(
   }
 
   try {
-    const appearance = await db.place_appearances.update({
+    const appearance = await db.entity_appearances.update({
       where: { id },
       data: updateData,
       include: {
@@ -153,7 +153,7 @@ export async function PATCH(
     });
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'Unknown error';
-    if (msg.includes('place_appearances_location_check') || msg.includes('violates check constraint')) {
+    if (msg.includes('entity_appearances_location_check') || msg.includes('violates check constraint')) {
       return NextResponse.json(
         { success: false, error: loc.error },
         { status: 400 }

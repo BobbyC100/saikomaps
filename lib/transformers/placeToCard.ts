@@ -1,7 +1,7 @@
 /**
  * Data transformation utilities for HorizontalBentoCard
  * 
- * Transforms Prisma Place model data into PlaceCardData format
+ * Transforms Prisma Entity model data into PlaceCardData format
  * for use with the HorizontalBentoCard component.
  */
 
@@ -11,8 +11,8 @@ import {
   CARD_TAG_LIMIT,
 } from '@/lib/config/vibe-tags';
 
-// Prisma Place type (partial - only fields we need for cards)
-interface PrismaPlace {
+// Prisma Entity type (partial - only fields we need for cards)
+interface PrismaEntity {
   id: string;
   slug: string;
   name: string;
@@ -71,7 +71,7 @@ function formatPrice(priceLevel: number | null): '$' | '$$' | '$$$' | undefined 
 }
 
 /**
- * Parse hours JSON to determine if place is currently open
+ * Parse hours JSON to determine if entity is currently open
  */
 function parseOpenStatus(hours: any): {
   isOpen?: boolean;
@@ -209,58 +209,58 @@ function calculateDistance(
 }
 
 /**
- * Transform Prisma Place to PlaceCardData
+ * Transform Prisma Entity to PlaceCardData
  * 
- * @param place - Place from Prisma query
+ * @param entity - Entity from Prisma query
  * @param userLocation - Optional user coordinates for distance calculation
  */
 export function transformPlaceToCardData(
-  place: PrismaPlace,
+  entity: PrismaEntity,
   userLocation?: { lat: number; lon: number }
 ): PlaceCardData {
-  const { isOpen, closesAt, opensAt } = parseOpenStatus(place.hours);
-  const { coverageQuote, coverageSource } = extractCoverageQuote(place.sources);
+  const { isOpen, closesAt, opensAt } = parseOpenStatus(entity.hours);
+  const { coverageQuote, coverageSource } = extractCoverageQuote(entity.sources);
   
   // Calculate distance if user location provided
   let distanceMiles: number | undefined;
-  if (userLocation && place.latitude && place.longitude) {
-    const lat = typeof place.latitude === 'object' ? parseFloat(place.latitude.toString()) : place.latitude;
-    const lon = typeof place.longitude === 'object' ? parseFloat(place.longitude.toString()) : place.longitude;
+  if (userLocation && entity.latitude && entity.longitude) {
+    const lat = typeof entity.latitude === 'object' ? parseFloat(entity.latitude.toString()) : entity.latitude;
+    const lon = typeof entity.longitude === 'object' ? parseFloat(entity.longitude.toString()) : entity.longitude;
     distanceMiles = calculateDistance(userLocation.lat, userLocation.lon, lat, lon);
   }
   
   // Map signal status from database
-  const menuSignalsStatus = place.menu_signals?.status as SignalStatus;
-  const winelistSignalsStatus = place.winelist_signals?.status as SignalStatus;
+  const menuSignalsStatus = entity.menu_signals?.status as SignalStatus;
+  const winelistSignalsStatus = entity.winelist_signals?.status as SignalStatus;
   
   // Check if identity data is present in payload (for conservative partial inclusion)
-  const menuIdentityPresent = !!(place.menu_signals?.payload && 
-    (place.menu_signals.payload.signature_items?.length > 0 || 
-     place.menu_signals.payload.cuisine_indicators?.length > 0));
-  const winelistIdentityPresent = !!(place.winelist_signals?.payload && 
-    (place.winelist_signals.payload.key_producers?.length > 0 || 
-     place.winelist_signals.payload.style_indicators?.length > 0));
+  const menuIdentityPresent = !!(entity.menu_signals?.payload && 
+    (entity.menu_signals.payload.signature_items?.length > 0 || 
+     entity.menu_signals.payload.cuisine_indicators?.length > 0));
+  const winelistIdentityPresent = !!(entity.winelist_signals?.payload && 
+    (entity.winelist_signals.payload.key_producers?.length > 0 || 
+     entity.winelist_signals.payload.style_indicators?.length > 0));
   
   return {
-    slug: place.slug,
-    name: place.name,
-    category: place.category || 'Place',
-    neighborhood: place.neighborhood || '',
-    photoUrl: getPhotoUrl(place.googlePhotos),
-    price: formatPrice(place.priceLevel),
-    cuisine: place.cuisineType || undefined,
+    slug: entity.slug,
+    name: entity.name,
+    category: entity.category || 'Place',
+    neighborhood: entity.neighborhood || '',
+    photoUrl: getPhotoUrl(entity.googlePhotos),
+    price: formatPrice(entity.priceLevel),
+    cuisine: entity.cuisineType || undefined,
     isOpen,
     closesAt,
     opensAt,
-    signals: extractSignals(place.sources),
+    signals: extractSignals(entity.sources),
     coverageQuote,
     coverageSource,
     vibeTags:
-      place.vibeTags && place.vibeTags.length > 0
-        ? sortVibeTagsByPriority(place.vibeTags).slice(0, CARD_TAG_LIMIT)
+      entity.vibeTags && entity.vibeTags.length > 0
+        ? sortVibeTagsByPriority(entity.vibeTags).slice(0, CARD_TAG_LIMIT)
         : undefined,
     distanceMiles,
-    placePersonality: place.placePersonality as any,
+    placePersonality: entity.placePersonality as any,
     
     // Badge Ship v1: Signal status
     menuSignalsStatus,
@@ -271,11 +271,11 @@ export function transformPlaceToCardData(
 }
 
 /**
- * Batch transform multiple places
+ * Batch transform multiple entities
  */
 export function transformPlacesToCardData(
-  places: PrismaPlace[],
+  entities: PrismaEntity[],
   userLocation?: { lat: number; lon: number }
 ): PlaceCardData[] {
-  return places.map(place => transformPlaceToCardData(place, userLocation));
+  return entities.map(entity => transformPlaceToCardData(entity, userLocation));
 }

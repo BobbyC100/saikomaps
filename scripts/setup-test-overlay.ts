@@ -27,7 +27,7 @@ async function setupTestOverlay() {
   const in30Min = new Date(now.getTime() + 30 * 60 * 1000);
 
   const signal = await processNewsletterToSignal({
-    placeId: place.id,
+    entityId: place.id,
     newsletterId: 'test-read-path-001',
     extractedTemporalData: {
       startsAt: now.toISOString(),

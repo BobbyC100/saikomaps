@@ -1,6 +1,6 @@
 /**
  * POST /api/admin/actors/candidates/[candidateId]/attach
- * body: { placeId: string } — manual attach when no match or wrong match
+ * body: { entityId: string } — manual attach when no match or wrong match
  */
 
 export const runtime = "nodejs";
@@ -26,10 +26,10 @@ export async function POST(
   try {
     const { candidateId } = await params;
     const body = await request.json();
-    const placeId = typeof body?.placeId === "string" ? body.placeId.trim() : null;
+    const entityIdTrimmed = typeof body?.entityId === "string" ? body.entityId.trim() : null;
 
-    if (!placeId) {
-      return NextResponse.json({ error: "placeId is required" }, { status: 400 });
+    if (!entityIdTrimmed) {
+      return NextResponse.json({ error: "entityId is required" }, { status: 400 });
     }
 
     const candidate = await db.operatorPlaceCandidate.findUnique({
@@ -40,7 +40,7 @@ export async function POST(
     }
 
     const place = await db.entities.findUnique({
-      where: { id: placeId },
+      where: { id: entityIdTrimmed },
       select: { id: true },
     });
     if (!place) {
@@ -52,7 +52,7 @@ export async function POST(
 
     await approveCandidateAndCreateRelationship({
       candidate,
-      entityId: placeId,
+      entityId: entityIdTrimmed,
       approvedBy,
       confidence: 0.9,
     });

@@ -83,7 +83,7 @@ export async function GET(
             },
           },
         },
-        place_actor_relationships: {
+        entity_actor_relationships: {
           where: { role: 'operator', isPrimary: true },
           take: 1,
           include: {
@@ -101,20 +101,20 @@ export async function GET(
           where: { version: 'energy_v1' },
           take: 1,
         },
-        place_tag_scores: {
+        entity_tag_scores: {
           where: {
             version: 'tags_v1',
             depends_on_energy_version: 'energy_v1',
           },
           take: 1,
         },
-        place_appearances_as_subject: {
+        entity_appearances_as_subject: {
           where: { status: { in: ['ACTIVE', 'ANNOUNCED'] } },
           include: {
             hostEntity: { select: { id: true, name: true, slug: true } },
           },
         },
-        place_appearances_as_host: {
+        entity_appearances_as_host: {
           where: { status: { in: ['ACTIVE', 'ANNOUNCED'] } },
           include: {
             subjectEntity: { select: { id: true, name: true, slug: true } },
@@ -173,7 +173,7 @@ export async function GET(
 
     // Run overlay fetch, place counts, and golden_record (for service facts) in parallel
     const [activeOverlays, placeCounts, goldenRecord] = await Promise.all([
-      getActiveOverlays({ placeId: place.id, now: new Date() }).catch((err) => {
+      getActiveOverlays({ entityId: place.id, now: new Date() }).catch((err) => {
         console.error(`[Newsletter Overlay] Failed to fetch overlays for place ${place.slug}:`, err);
         return [] as Awaited<ReturnType<typeof getActiveOverlays>>;
       }),
@@ -388,7 +388,7 @@ export async function GET(
           reservationUrl: place.reservationUrl,
           // Primary operator (PlaceActorRelationship)
           primaryOperator: (() => {
-            const rel = place.place_actor_relationships?.[0];
+            const rel = place.entity_actor_relationships?.[0];
             const actor = rel?.actor;
             if (!actor) return null;
             return { actorId: actor.id, name: actor.name, slug: actor.slug ?? actor.id, website: actor.website ?? undefined };
@@ -398,7 +398,7 @@ export async function GET(
           categorySlug: place.category_rel?.slug ?? (typeof place.category === "string" ? place.category : null),
           marketSchedule: place.marketSchedule ?? null,
           // Appearances (Where to find / Currently hosting)
-          appearancesAsSubject: (place.place_appearances_as_subject ?? []).map((a) => ({
+          appearancesAsSubject: (place.entity_appearances_as_subject ?? []).map((a) => ({
             id: a.id,
             hostEntityId: a.hostEntityId,
             hostEntity: a.hostEntity ? { id: a.hostEntity.id, name: a.hostEntity.name, slug: a.hostEntity.slug } : null,
@@ -408,7 +408,7 @@ export async function GET(
             scheduleText: a.scheduleText,
             status: a.status,
           })),
-          appearancesAsHost: (place.place_appearances_as_host ?? []).map((a) => ({
+          appearancesAsHost: (place.entity_appearances_as_host ?? []).map((a) => ({
             id: a.id,
             subjectEntityId: a.subjectEntityId,
             subjectEntity: a.subjectEntity ? { id: a.subjectEntity.id, name: a.subjectEntity.name, slug: a.subjectEntity.slug } : null,
@@ -429,7 +429,7 @@ export async function GET(
         facts,
         _conflicts: Object.keys(conflicts.service).length > 0 ? conflicts : undefined,
         energyScore: place.energy_scores[0] ?? null,
-        placeTagScores: place.place_tag_scores[0] ?? null,
+        placeTagScores: place.entity_tag_scores[0] ?? null,
       },
     },
       {

@@ -57,7 +57,7 @@ export interface TagScoreInputs {
   lateNightEnergyScore?: number | null;
 }
 
-/** Full result for place_tag_scores table */
+/** Full result for entity_tag_scores table */
 export interface TagScoresResult {
   cozy_score: number;
   date_night_score: number;

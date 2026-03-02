@@ -2,7 +2,7 @@ import { ProposedSignalType } from '@prisma/client';
 import { createProposedSignal } from '../signals/createProposedSignal';
 
 interface ProcessNewsletterToSignalParams {
-  placeId: string;
+  entityId: string;
   newsletterId: string;
   extractedTemporalData: {
     startsAt?: string;
@@ -33,7 +33,7 @@ interface ProcessNewsletterToSignalParams {
  */
 export async function processNewsletterToSignal(params: ProcessNewsletterToSignalParams) {
   const {
-    placeId,
+    entityId,
     newsletterId,
     extractedTemporalData,
     signalType,
@@ -42,13 +42,13 @@ export async function processNewsletterToSignal(params: ProcessNewsletterToSigna
   } = params;
 
   // Validate required fields
-  if (!placeId || !newsletterId || !signalType) {
-    throw new Error('placeId, newsletterId, and signalType are required');
+  if (!entityId || !newsletterId || !signalType) {
+    throw new Error('entityId, newsletterId, and signalType are required');
   }
 
-  // Call createProposedSignal (which validates place existence)
+  // Call createProposedSignal (which validates entity existence)
   const signal = await createProposedSignal({
-    placeId,
+    entityId,
     sourceId: newsletterId,
     signalType,
     extractedData: extractedTemporalData,

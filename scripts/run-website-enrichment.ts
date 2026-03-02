@@ -2,6 +2,12 @@
 /**
  * SAIKO Website Enrichment Spec v1.1 — runner script
  *
+ * Idempotency verified — safe for re-run:
+ *   - merchant_enrichment_runs: append-only audit (each run = new row; no overwrite)
+ *   - merchant_signals: upsert by entityId
+ *   - entities: deterministic overwrite (last_enriched_at, category, etc.)
+ *   - No append-only arrays that grow per run
+ *
  * Usage:
  *   npm run enrich:website [-- --limit=N] [--refresh] [--dry-run]
  *   npm run enrich:website [-- --mode=categoryOnly --limit=N] [--dry-run]
@@ -13,6 +19,7 @@
  * --ignoreCategoryThrottle: (categoryOnly only) bypass throttle; keep allowlist, conf≥0.65, STAY exclusion
  */
 
+import { EnrichmentStage } from "@prisma/client";
 import { db } from "../lib/db";
 import {
   runEnrichmentForPlace,
@@ -98,6 +105,12 @@ async function main() {
   for (const place of candidates) {
     const website = place.website!.trim();
     if (!website) continue;
+    if (!dryRun) {
+      await db.entities.update({
+        where: { id: place.id },
+        data: { last_enrichment_attempt_at: new Date() },
+      });
+    }
     try {
       const payload = await runEnrichmentForPlace({
         place_id: place.id,
@@ -124,6 +137,21 @@ async function main() {
         await applyWriteRules(payload);
       }
     } catch (e) {
+      const errMsg = e instanceof Error ? e.message : String(e);
+      if (!dryRun) {
+        const row = await db.entities.findUnique({
+          where: { id: place.id },
+          select: { enrichment_retry_count: true },
+        });
+        await db.entities.update({
+          where: { id: place.id },
+          data: {
+            last_enrichment_error: errMsg.slice(0, 2000),
+            enrichment_retry_count: (row?.enrichment_retry_count ?? 0) + 1,
+            enrichment_stage: EnrichmentStage.FAILED,
+          },
+        });
+      }
       console.error(`  ${place.name} FULL ERROR:`);
       console.error(e);
     }

@@ -58,11 +58,16 @@ export async function approveSignalToOverlay(params: ApproveSignalToOverlayParam
     );
   }
 
+  const entityId = signal.entityId;
+  if (!entityId) {
+    throw new Error('entityId is required');
+  }
+
   // Check for overlapping overlays (defensive overlap check)
-  // Blocks ANY overlap for same place (safest strategy for Phase 1)
+  // Blocks ANY overlap for same entity (safest strategy for Phase 1)
   const overlappingOverlays = await prisma.operational_overlays.findMany({
     where: {
-      placeId: signal.placeId,
+      entityId,
       OR: [
         // New overlay starts during existing overlay
         {
@@ -101,7 +106,7 @@ export async function approveSignalToOverlay(params: ApproveSignalToOverlayParam
       .map((o) => `${o.overlayType} [${o.startsAt.toISOString()} → ${o.endsAt.toISOString()}]`)
       .join(', ');
     throw new Error(
-      `Cannot approve: ${overlappingOverlays.length} overlapping overlay(s) exist for place ${signal.placeId} ` +
+      `Cannot approve: ${overlappingOverlays.length} overlapping overlay(s) exist for entity ${entityId} ` +
         `in time range [${startsAt.toISOString()}, ${endsAt.toISOString()}]. ` +
         `Existing: ${overlayDetails}`
     );
@@ -111,7 +116,7 @@ export async function approveSignalToOverlay(params: ApproveSignalToOverlayParam
   const result = await prisma.$transaction(async (tx) => {
     const overlay = await tx.operational_overlays.create({
       data: {
-        placeId: signal.placeId,
+        entityId,
         sourceSignalId: proposedSignalId,
         overlayType,
         startsAt,

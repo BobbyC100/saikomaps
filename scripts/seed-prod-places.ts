@@ -1,13 +1,18 @@
 /**
  * Production Place Seed Script
- * 
+ *
  * Seeds a curated set of real LA places for production testing.
- * Run manually only: DATABASE_URL="<prod-url>" npx tsx scripts/seed-prod-places.ts
- * 
- * Idempotent: uses upsert by slug
+ * Run: npx tsx scripts/seed-prod-places.ts
+ *
+ * Requires: .env.local with DATABASE_URL and DB_ENV (dev|staging|prod)
+ * Uses db.admin (DIRECT) for writes.
+ * Idempotent: uses upsert by slug.
  */
 
-import { db } from '../lib/db';
+import { env } from '@/config/env';
+import { db } from '@/config/db';
+
+const prisma = db.admin;
 
 interface SeedPlace {
   slug: string;
@@ -103,7 +108,7 @@ async function seedPlace(place: SeedPlace) {
   console.log(`Seeding: ${place.name} (${place.slug})...`);
 
   try {
-    await db.entities.upsert({
+    await prisma.entities.upsert({
       where: { slug: place.slug },
       create: {
         id: `place_${place.slug}_${Date.now()}`,
@@ -171,13 +176,10 @@ async function seedPlace(place: SeedPlace) {
 }
 
 async function main() {
+  const url = env.DATABASE_URL;
+  const snippet = url ? url.substring(0, 40).replace(/:[^:@]+@/, ':***@') + '...' : '?';
   console.log('🌱 Seeding production database with curated places...\n');
-  console.log(`DATABASE: ${process.env.DATABASE_URL?.substring(0, 40)}...\n`);
-
-  // Safety check
-  if (!process.env.DATABASE_URL) {
-    throw new Error('DATABASE_URL not set');
-  }
+  console.log(`DATABASE: ${snippet}\n`);
 
   try {
     // Seed all places
@@ -186,7 +188,7 @@ async function main() {
     }
 
     // Verify
-    const count = await db.entities.count();
+    const count = await prisma.entities.count();
     console.log(`\n✅ Seed complete! Total places: ${count}`);
     console.log('\nTest URLs:');
     for (const place of SEED_PLACES) {
@@ -196,7 +198,7 @@ async function main() {
     console.error('❌ Seed failed:', error);
     process.exit(1);
   } finally {
-    await db.$disconnect();
+    await prisma.$disconnect();
   }
 }
 

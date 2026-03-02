@@ -21,7 +21,7 @@ interface Candidate {
   candidateUrl: string | null;
   candidateAddress: string | null;
   sourceUrl: string;
-  placeId: string | null;
+  entityId: string | null;
   place: PlaceRef | null;
   matchScore: number;
   matchReason: string | null;
@@ -79,13 +79,13 @@ export default function ActorCandidatesPage() {
   }, [slug, fetchActorBySlug, fetchCandidates]);
 
   const handleApprove = async (c: Candidate) => {
-    if (!c.placeId) return;
+    if (!c.entityId) return;
     setActionLoading(c.id);
     try {
       const res = await fetch(`/api/admin/actors/candidates/${c.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'approve', placeId: c.placeId }),
+        body: JSON.stringify({ action: 'approve', entityId: c.entityId }),
       });
       if (res.ok && actorId) {
         setCandidates(await fetchCandidates(actorId));
@@ -114,14 +114,14 @@ export default function ActorCandidatesPage() {
   };
 
   const handleAttach = async (c: Candidate) => {
-    const placeId = attachPlaceId[c.id]?.trim();
-    if (!placeId) return;
+    const entityId = attachPlaceId[c.id]?.trim();
+    if (!entityId) return;
     setActionLoading(c.id);
     try {
       const res = await fetch(`/api/admin/actors/candidates/${c.id}/attach`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ placeId }),
+        body: JSON.stringify({ entityId }),
       });
       if (res.ok && actorId) {
         setCandidates(await fetchCandidates(actorId));
@@ -270,7 +270,7 @@ export default function ActorCandidatesPage() {
                     )}
                   </div>
                   <div className="flex flex-col gap-2 items-end">
-                    {c.placeId ? (
+                    {c.entityId ? (
                       <div className="flex flex-col gap-1 items-end">
                         {c.existingPrimaryOperator && (
                           <p className="text-xs text-amber-700 bg-amber-50 px-2 py-1 rounded">

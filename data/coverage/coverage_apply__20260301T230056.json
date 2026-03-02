@@ -1,0 +1,23 @@
+{
+  "run_id": "apply_1772406053299",
+  "created_at": "2026-03-01T23:00:53.299Z",
+  "dry_run": true,
+  "params": {
+    "limit": 2,
+    "photos_per_place": 10,
+    "la_only": true
+  },
+  "counts": {
+    "candidates_filtered": 42,
+    "processed": 2,
+    "succeeded": 2,
+    "failed": 0,
+    "by_group": {
+      "NEED_GOOGLE_PHOTOS": 0,
+      "NEED_HOURS": 0,
+      "NEED_GOOGLE_ATTRS": 2
+    }
+  },
+  "failed_slugs": [],
+  "errors": []
+}

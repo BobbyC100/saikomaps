@@ -2,15 +2,15 @@
  * Coverage Run v1 — READ-ONLY audit + deterministic candidate selection
  *
  * Usage:
- *   REQUIRE_DB_HOST=localhost REQUIRE_DB_NAME=saiko_maps npm run coverage:run:local
- *   REQUIRE_DB_HOST=ep-spring-sun... REQUIRE_DB_NAME=neondb npm run coverage:run:neon
+ *   npm run coverage:run:local
+ *   npm run coverage:run:neon
+ *
+ * Requires: .env.local with DATABASE_URL and DB_ENV (dev|staging|prod)
  *
  * --la-only   Filter to LA bbox (default: true)
  * --limit=N   Max places to consider (default: 200)
  *
  * Env:
- *   REQUIRE_DB_HOST    If set, fail unless DATABASE_URL host matches
- *   REQUIRE_DB_NAME    If set, fail unless DATABASE_URL dbname matches
  *   COVERAGE_TTL_DAYS  Days after success to skip re-coverage (default: 90)
  *   RETRY_BACKOFF_HOURS Hours after FAIL to skip retry (default: 24)
  *
@@ -20,7 +20,10 @@
  */
 
 import { Prisma } from '@prisma/client';
-import { db } from '@/lib/db';
+import { db } from '@/config/db';
+import { env } from '@/config/env';
+
+const prisma = db.ingestion;
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -86,47 +89,15 @@ export interface CoverageRunReport {
 }
 
 // ---------------------------------------------------------------------------
-// DB identity + source-of-truth enforcement
+// Connection identity for report (from v3.0 config)
 // ---------------------------------------------------------------------------
-
-function parseDatabaseUrl(): { host: string; dbname: string } {
-  const u = process.env.DATABASE_URL ?? '';
-  // postgresql://user:pass@host:port/dbname?sslmode=...
-  const hostMatch = u.match(/@([^/]+)\//);
-  const dbMatch = u.match(/@[^/]+\/([^?]+)/);
-  const host = hostMatch ? hostMatch[1] : '?';
-  const dbname = dbMatch ? dbMatch[1] : '?';
-  return { host, dbname };
-}
-
-function hostMatches(parsed: string, required: string): boolean {
-  if (parsed === required) return true;
-  return parsed.startsWith(required + ':');
-}
-
-function assertDbIdentity(): { host: string; dbname: string } {
-  const { host, dbname } = parseDatabaseUrl();
-  const requireHost = process.env.REQUIRE_DB_HOST;
-  const requireName = process.env.REQUIRE_DB_NAME;
-
-  if (requireHost && !hostMatches(host, requireHost)) {
-    console.error(
-      `[COVERAGE RUN] Source-of-truth mismatch: REQUIRE_DB_HOST=${requireHost} but DATABASE_URL host is "${host}"`
-    );
-    console.error(`  DATABASE_URL host: ${host}`);
-    console.error(`  Failing to prevent operating on wrong database.`);
-    process.exit(1);
-  }
-  if (requireName && dbname !== requireName) {
-    console.error(
-      `[COVERAGE RUN] Source-of-truth mismatch: REQUIRE_DB_NAME=${requireName} but DATABASE_URL dbname is "${dbname}"`
-    );
-    console.error(`  DATABASE_URL dbname: ${dbname}`);
-    console.error(`  Failing to prevent operating on wrong database.`);
-    process.exit(1);
-  }
-
-  return { host, dbname };
+function parseConnectionIdentity(url: string): { host: string; dbname: string } {
+  const hostMatch = url.match(/@([^/]+)\//);
+  const dbMatch = url.match(/@[^/]+\/([^?]+)/);
+  return {
+    host: hostMatch ? hostMatch[1] : '?',
+    dbname: dbMatch ? dbMatch[1] : '?',
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -206,7 +177,7 @@ function computePrlBucket(place: {
   vibeTags: string[];
   has_energy?: boolean;
   has_pts?: boolean;
-  place_photo_eval?: { tier: string }[];
+  entity_photo_eval?: { tier: string }[];
   curatorNote?: string | null;
 }): number {
   const hasHours = !!place.hours;
@@ -222,7 +193,7 @@ function computePrlBucket(place: {
     place.has_energy === true ||
     place.has_pts === true ||
     (place.vibeTags?.length ?? 0) > 0;
-  const hasHero = (place.place_photo_eval ?? []).some((e) => e.tier === 'HERO');
+  const hasHero = (place.entity_photo_eval ?? []).some((e) => e.tier === 'HERO');
 
   // PRL 1: missing launch essentials (photos, attrs, tag signals)
   if (!hasPhoto || !hasAttrs || !hasTags) return 1;
@@ -247,7 +218,7 @@ export async function runCoverageAudit(options?: {
   const ttlDays = options?.ttlDays ?? 90;
   const retryBackoffHours = options?.retryBackoffHours ?? 24;
 
-  const { host, dbname } = parseDatabaseUrl();
+  const { host, dbname } = parseConnectionIdentity(env.DATABASE_URL);
 
   const report: CoverageRunReport = {
     run_id: `run_${Date.now()}`,
@@ -301,11 +272,11 @@ export async function runCoverageAudit(options?: {
     googlePhotos: unknown;
     googlePlacesAttributes: unknown;
     vibeTags: string[];
-    place_photo_eval: { tier: string }[];
+    entity_photo_eval: { tier: string }[];
     map_places: { descriptor: string | null }[];
   };
 
-  const places = await db.entities.findMany({
+  const places = await prisma.entities.findMany({
     where: whereClause,
     take: limit,
     orderBy: [{ slug: 'asc' }],
@@ -320,7 +291,7 @@ export async function runCoverageAudit(options?: {
       googlePhotos: true,
       googlePlacesAttributes: true,
       vibeTags: true,
-      place_photo_eval: { select: { tier: true } },
+      entity_photo_eval: { select: { tier: true } },
       map_places: {
         where: { lists: { status: 'PUBLISHED' } },
         take: 1,
@@ -334,13 +305,13 @@ export async function runCoverageAudit(options?: {
   const placeIds = places.map((p) => p.id);
   let tagSignalsByPlaceId = new Map<string, { has_energy: boolean; has_pts: boolean }>();
   if (placeIds.length > 0) {
-    const rows = await db.$queryRaw<
+    const rows = await prisma.$queryRaw<
       { id: string; has_energy: boolean; has_pts: boolean }[]
     >(Prisma.sql`
       SELECT p.id,
-        exists(SELECT 1 FROM energy_scores es WHERE es.place_id = p.id) AS has_energy,
-        exists(SELECT 1 FROM place_tag_scores pts WHERE pts.place_id = p.id) AS has_pts
-      FROM places p
+        exists(SELECT 1 FROM energy_scores es WHERE es.entity_id = p.id) AS has_energy,
+        exists(SELECT 1 FROM entity_tag_scores pts WHERE pts.entity_id = p.id) AS has_pts
+      FROM entities p
       WHERE p.id IN (${Prisma.join(placeIds)})
     `);
     for (const r of rows) {
@@ -384,7 +355,7 @@ export async function runCoverageAudit(options?: {
   >();
 
   try {
-    const statuses = await db.place_coverage_status.findMany({
+    const statuses = await prisma.entity_coverage_status.findMany({
       select: {
         dedupe_key: true,
         last_success_at: true,
@@ -510,7 +481,7 @@ export async function runCoverageAudit(options?: {
   const gpids = places.map((p) => p.googlePlaceId).filter(Boolean) as string[];
   if (gpids.length > 0) {
     try {
-      const grCounts = await db.golden_records.groupBy({
+      const grCounts = await prisma.golden_records.groupBy({
         by: ['google_place_id'],
         where: { google_place_id: { in: gpids } },
         _count: { canonical_id: true },
@@ -538,8 +509,6 @@ export async function runCoverageAudit(options?: {
 // ---------------------------------------------------------------------------
 
 async function main() {
-  assertDbIdentity();
-
   const laOnlyFlag = !process.argv.includes('--no-la-only');
   const limitArg = process.argv.find((a) => a.startsWith('--limit='));
   const limit = limitArg ? parseInt(limitArg.split('=')[1] ?? '200', 10) : 200;

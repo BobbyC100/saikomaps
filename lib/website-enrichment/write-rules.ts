@@ -2,6 +2,7 @@
  * Write rules (SAIKO spec §9): append run, upsert signals, update places by confidence.
  */
 
+import { EnrichmentStage } from "@prisma/client";
 import { db } from "../db";
 import type { EnrichmentPayload } from "./types";
 
@@ -72,15 +73,16 @@ export async function applyWriteRules(payload: EnrichmentPayload): Promise<void>
   const status = http_status ?? 0;
   const isBlocked = status === 403;
   const isLowConf = confidence < CONFIDENCE_HIGH;
-  const enrichmentStage = isBlocked ? "BLOCKED" : isLowConf ? "LOW_CONF" : "OK";
   const needsReview = isBlocked || isLowConf;
 
   await db.entities.update({
     where: { id: place_id },
     data: {
       last_enriched_at: new Date(),
+      last_enrichment_error: null,
+      enrichment_retry_count: 0,
+      enrichment_stage: EnrichmentStage.MERCHANT_ENRICHED,
       needs_human_review: needsReview,
-      enrichment_stage: enrichmentStage,
       ...(confidence >= CONFIDENCE_HIGH &&
         place &&
         (!place.category || place.category.trim() === "")

@@ -31,7 +31,7 @@ async function testIntegration() {
   console.log('─────────────────────────────────────────────');
 
   const signal = await processNewsletterToSignal({
-    placeId: place.id,
+    entityId: place.id,
     newsletterId: 'test-newsletter-email-001',
     extractedTemporalData: {
       startsAt: new Date(Date.now() + 3600000).toISOString(), // 1 hour from now
@@ -78,11 +78,11 @@ async function testIntegration() {
   const duringOverlay = new Date(Date.now() + 5400000); // 1.5 hours from now (during overlay)
 
   console.log(`Query 1: Active overlays NOW (before overlay starts)`);
-  const overlaysNow = await getActiveOverlays({ placeId: place.id, now });
+  const overlaysNow = await getActiveOverlays({ entityId: place.id, now });
   console.log(`  Result: ${overlaysNow.length} active overlay(s)\n`);
 
   console.log(`Query 2: Active overlays DURING overlay window`);
-  const overlaysDuring = await getActiveOverlays({ placeId: place.id, now: duringOverlay });
+  const overlaysDuring = await getActiveOverlays({ entityId: place.id, now: duringOverlay });
   console.log(`  Result: ${overlaysDuring.length} active overlay(s)`);
   if (overlaysDuring.length > 0) {
     overlaysDuring.forEach((o) => {
@@ -97,7 +97,7 @@ async function testIntegration() {
 
   try {
     await processNewsletterToSignal({
-      placeId: 'nonexistent-place-id',
+      entityId: 'nonexistent-place-id',
       newsletterId: 'test-invalid-place',
       extractedTemporalData: {
         startsAt: new Date().toISOString(),

@@ -1,15 +1,15 @@
 /**
  * Dev server wrapper
- * Loads env vars and starts Next.js dev server
- * Bypasses NODE_OPTIONS issues by not using -r flag
+ * Uses v3.0 config: loads .env.local only via config/env (Zod validation).
+ * Bypasses NODE_OPTIONS issues by not using -r flag.
  * Prints DATABASE banner + lightweight probes once at startup.
+ *
+ * Run via: npx tsx scripts/dev.js (tsx required to load config/env.ts)
  */
 
-// Load env before any imports
-require('./load-env.js');
+const { env } = require('../config/env.ts');
 
 // Guardrail: Clear NODE_OPTIONS unconditionally (dev doesn't need it)
-// Prevents: /usr/local/bin/node: --r= is not allowed in NODE_OPTIONS
 if (process.env.NODE_OPTIONS) {
   console.warn('⚠️  Clearing NODE_OPTIONS (was:', process.env.NODE_OPTIONS, ')');
   delete process.env.NODE_OPTIONS;
@@ -20,24 +20,9 @@ const net = require('node:net');
 const path = require('path');
 
 // ---------------------------------------------------------------------------
-// STARTUP DATABASE BANNER (runs once)
+// STARTUP DATABASE BANNER (v3.0 — from validated env)
 // ---------------------------------------------------------------------------
-const rawUrl = process.env.DATABASE_URL;
-if (!rawUrl || typeof rawUrl !== 'string' || !rawUrl.trim()) {
-  console.error('\nFATAL: DATABASE_URL not defined.\n');
-  process.exit(1);
-}
-
-// Detect possible DATABASE_URL corruption (e.g. concatenated with placeholder)
-if (
-  rawUrl.includes('YOUR_NEON') ||
-  rawUrl.includes('requireDATABASE_URL') ||
-  rawUrl.includes('DATABASE_URL=')
-) {
-  console.error('\n[dev.js] FATAL: DATABASE_URL appears corrupted (contains placeholder or concatenation).');
-  console.error('[dev.js] DATABASE_URL length:', rawUrl.length, '| snippet:', rawUrl.substring(0, 80) + '...');
-  process.exit(1);
-}
+process.env.DATABASE_URL = env.DATABASE_URL;
 
 function redactPassword(url) {
   try {
@@ -73,18 +58,19 @@ function parseDbUrl(url) {
   }
 }
 
-const classification = classifyDb(rawUrl);
-const { host, db, schema } = parseDbUrl(rawUrl);
+const databaseUrl = env.DATABASE_URL;
+const classification = classifyDb(databaseUrl);
+const { host, db, schema } = parseDbUrl(databaseUrl);
 
 console.log('\n' + '='.repeat(60));
 console.log('  DEV DATABASE BANNER (npm run dev)');
 console.log('='.repeat(60));
-console.log('  DATABASE_URL:', redactPassword(rawUrl));
+console.log('  DATABASE_URL:', redactPassword(databaseUrl));
 console.log('  CLASSIFICATION:', classification);
 console.log('  HOST:', host);
 console.log('  DATABASE:', db);
 console.log('  SCHEMA:', schema);
-console.log('  ENV LOAD ORDER: .env → .env.local (override=true)');
+console.log('  DB_ENV:', env.DB_ENV);
 console.log('='.repeat(60) + '\n');
 
 // ---------------------------------------------------------------------------

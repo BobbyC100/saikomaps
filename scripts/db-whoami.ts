@@ -1,13 +1,14 @@
 #!/usr/bin/env node
 /**
- * DB sanity check: print DATABASE_URL target and confirm schema (tables/columns).
- * Uses whatever DATABASE_URL is in env (run with load-env and/or db-neon.sh/db-local.sh).
+ * DB sanity check: print connection target and confirm schema (tables/columns).
+ * Uses config/env — requires .env.local with DATABASE_URL and DB_ENV (dev|staging|prod).
  *
  * Usage: npm run db:whoami
  *        ./scripts/db-neon.sh node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/db-whoami.ts
  */
 
-import { PrismaClient } from '@prisma/client';
+import { env } from '@/config/env';
+import { db } from '@/config/db';
 
 function parseDatabaseUrl(url: string | undefined): { host: string; database: string } {
   if (!url || typeof url !== 'string') return { host: '', database: '' };
@@ -25,18 +26,15 @@ function parseDatabaseUrl(url: string | undefined): { host: string; database: st
 }
 
 async function main() {
-  const url = process.env.DATABASE_URL;
+  const url = env.DATABASE_URL;
   const { host, database } = parseDatabaseUrl(url);
 
   console.log('--- DB whoami ---');
-  console.log('DATABASE_URL host:', host || '(unset or unparseable)');
-  console.log('DATABASE_URL database:', database || '(unset or unparseable)');
-  if (!url) {
-    console.log('\nDATABASE_URL is not set. Set it or run via ./scripts/db-neon.sh or ./scripts/db-local.sh');
-    process.exit(1);
-  }
+  console.log('DB_ENV:', env.DB_ENV);
+  console.log('host:', host || '(unparseable)');
+  console.log('database:', database || '(unparseable)');
 
-  const prisma = new PrismaClient();
+  const prisma = db.admin;
   try {
     const row = await prisma.$queryRaw<[{ current_database: string; current_schema: string }]>`
       SELECT current_database() AS "current_database", current_schema() AS "current_schema"

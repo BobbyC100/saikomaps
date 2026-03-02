@@ -39,12 +39,12 @@ export function mapPlaceToPlaceForPRL(place: {
   curatorNote?: string | null;
   editorialSources?: unknown;
   prlOverride?: number | null;
-  /** From golden_records or place_photo_eval */
+  /** From golden_records or entity_photo_eval */
   heroApproved?: boolean;
   hasInteriorOrContextApproved?: boolean;
   /** From energy_scores */
   energyScore?: number | null;
-  /** From place_tag_scores */
+  /** From entity_tag_scores */
   hasTagSignals?: boolean;
   hasFormality?: boolean;
   /** From identity_signals */

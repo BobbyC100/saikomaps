@@ -1,11 +1,13 @@
 /**
- * Import places from a Supabase (or any) CSV into Neon public.places.
+ * Import places from a Supabase (or any) CSV into Neon.
  * GPID-first: resolve GPID (row / Nearby 200m / Text "${name} Los Angeles") → upsert by GPID.
  * Never create without GPID; skip row with SKIP_NO_GPID when not MATCH.
  *
  * Usage:
- *   node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/import-places-csv-to-neon.ts --file /path/to/file.csv [--apply] [--force]
+ *   npx tsx scripts/import-places-csv-to-neon.ts --file /path/to/file.csv [--apply] [--force]
  *
+ * Requires: .env.local with DATABASE_URL and DB_ENV (dev|staging|prod)
+ * Uses db.admin (DIRECT) for writes.
  * Dry run by default. Pass --apply to write. Pass --force to allow non-Neon target.
  */
 
@@ -14,8 +16,11 @@ const IMPORT_SCRIPT_VERSION = "2026-02-26-gpid-first";
 import { readFileSync } from "fs";
 import { parse } from "papaparse";
 import { randomUUID } from "crypto";
-import { db } from "@/lib/db";
+import { env } from "@/config/env";
+import { db } from "@/config/db";
 import { resolveGpid } from "@/lib/gpid-resolve";
+
+const prisma = db.admin;
 
 type CsvRow = Record<string, string>;
 
@@ -164,12 +169,7 @@ const BATCH_SIZE = 500;
 async function main() {
   const { file, apply, force } = parseArgs();
 
-  const url = process.env.DATABASE_URL;
-  if (!url) {
-    console.error("FATAL: DATABASE_URL not set. Run with node -r ./scripts/load-env.js ...");
-    process.exit(1);
-  }
-
+  const url = env.DATABASE_URL;
   const { host, database } = parseUrl(url);
   const isNeon = host.includes("neon.tech");
   if (!isNeon && !force) {
@@ -179,7 +179,7 @@ async function main() {
     process.exit(1);
   }
 
-  const placesCount = await db.entities.count();
+  const placesCount = await prisma.entities.count();
   console.log(`IMPORT SCRIPT VERSION: ${IMPORT_SCRIPT_VERSION}`);
   console.log(`TARGET DB: ${host}/${database} places_count=${placesCount}`);
 
@@ -237,15 +237,15 @@ async function main() {
       continue;
     }
 
-    const existing = await db.entities.findFirst({
+    const existing = await prisma.entities.findFirst({
       where: { googlePlaceId: resolvedGpid },
       select: { id: true },
     });
 
     try {
       if (existing) {
-        const updateData = stripImmutable(payload) as Parameters<typeof db.entities.update>[0]["data"];
-        await db.entities.update({ where: { id: existing.id }, data: updateData });
+        const updateData = stripImmutable(payload) as Parameters<typeof prisma.entities.update>[0]["data"];
+        await prisma.entities.update({ where: { id: existing.id }, data: updateData });
         upserted++;
       } else {
         if (!resolvedGpid) {
@@ -254,8 +254,8 @@ async function main() {
         if (!payload.id) payload.id = randomUUID();
         if (!payload.createdAt) payload.createdAt = new Date();
         if (!payload.primary_vertical) payload.primary_vertical = "EAT";
-        const createData = payload as Parameters<typeof db.entities.create>[0]["data"];
-        await db.entities.create({ data: createData });
+        const createData = payload as Parameters<typeof prisma.entities.create>[0]["data"];
+        await prisma.entities.create({ data: createData });
         upserted++;
       }
     } catch (err: unknown) {
@@ -281,10 +281,10 @@ async function main() {
 
   if (apply) {
     try {
-      const nullCount = await db.$queryRawUnsafe<
+      const nullCount = await prisma.$queryRawUnsafe<
         { count: bigint }[]
       >("SELECT count(*)::bigint AS count FROM public.places WHERE google_place_id IS NULL");
-      const dupes = await db.$queryRawUnsafe<
+      const dupes = await prisma.$queryRawUnsafe<
         { google_place_id: string | null; count: bigint }[]
       >(
         "SELECT google_place_id, count(*)::bigint AS count FROM public.places WHERE google_place_id IS NOT NULL AND btrim(google_place_id) <> '' GROUP BY google_place_id HAVING count(*) > 1 LIMIT 20"

@@ -48,7 +48,7 @@ interface TagMetrics {
   falsePositives: number;
   falseNegatives: number;
   confidenceDistribution: { p50: number; p90: number };
-  /** Operational: % places with place_tag_scores row */
+  /** Operational: % places with entity_tag_scores row */
   pipeline_coverage_pct: number;
   /** % places with required linkage (googlePlaceId + matching golden_record) */
   linkage_coverage_pct: number;
@@ -241,27 +241,27 @@ async function main() {
     inputCoverageResult,
     inputCoverageWithHighConfResult,
   ] = await Promise.all([
-    db.place_tag_scores.findMany({ where: { version: tagVersion } }),
+    db.entity_tag_scores.findMany({ where: { version: tagVersion } }),
     db.entities.count(),
-    db.place_tag_scores.count({ where: { version: tagVersion } }),
+    db.entity_tag_scores.count({ where: { version: tagVersion } }),
     db.$queryRaw<[{ count: bigint }]>`
       SELECT COUNT(DISTINCT p.id)::bigint as count
-      FROM places p
+      FROM entities p
       INNER JOIN golden_records g ON g.google_place_id = p.google_place_id
       WHERE p.google_place_id IS NOT NULL
     `,
     db.$queryRaw<[{ count: bigint }]>`
       SELECT COUNT(DISTINCT p.id)::bigint as count
-      FROM places p
+      FROM entities p
       INNER JOIN golden_records g ON g.google_place_id = p.google_place_id
       WHERE p.google_place_id IS NOT NULL
         AND (TRIM(COALESCE(g.description, '')) != '' OR TRIM(COALESCE(g.about_copy, '')) != '')
     `,
     db.$queryRaw<[{ count: bigint }]>(Prisma.sql`
       SELECT COUNT(DISTINCT p.id)::bigint as count
-      FROM places p
+      FROM entities p
       INNER JOIN golden_records g ON g.google_place_id = p.google_place_id
-      INNER JOIN place_tag_scores pts ON pts.place_id = p.id AND pts.version = ${tagVersion}
+      INNER JOIN entity_tag_scores pts ON pts.entity_id = p.id AND pts.version = ${tagVersion}
       WHERE p.google_place_id IS NOT NULL
         AND (TRIM(COALESCE(g.description, '')) != '' OR TRIM(COALESCE(g.about_copy, '')) != '')
         AND pts.confidence >= 0.6

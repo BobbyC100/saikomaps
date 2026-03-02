@@ -2,17 +2,25 @@
  * Coverage Apply — Fills NEED_GOOGLE_PHOTOS, NEED_HOURS, NEED_GOOGLE_ATTRS
  * for queued places via Google Places API.
  *
+ * Idempotency verified — safe for re-run:
+ *   - entity_coverage_status: upsert by dedupe_key
+ *   - entities: deterministic overwrite (hours, googlePhotos, googlePlacesAttributes, placesDataCachedAt)
+ *   - No append-only arrays
+ *
  * Hard rules:
  *   - Default DRY RUN; writes only with --apply
  *   - Caps: --limit default 20; --photos-per-place default 10 (max 10)
  *   - Rate limit: 200–300ms between Google calls
  *   - Idempotent: never re-fetch if fields already present
- *   - Updates place_coverage_status on success/fail
+ *   - Updates entity_coverage_status on success/fail
  *   - No description, no tag signals in this phase
  *
  * Usage:
- *   REQUIRE_DB_HOST=... REQUIRE_DB_NAME=... npm run coverage:apply:neon -- --la-only --limit=20
- *   ... --apply   # persist changes
+ *   npm run coverage:apply:neon -- --la-only --limit=20
+ *   ... --dry-run   # simulate (default; no DB writes)
+ *   ... --apply     # persist changes
+ *
+ * Requires: .env.local with DATABASE_URL and DB_ENV (dev|staging|prod)
  *
  * Output:
  *   Terminal summary: succeeded/failed + counts per group
@@ -21,9 +29,13 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import { db } from '@/lib/db';
+import pLimit from 'p-limit';
+import { EnrichmentStage } from '@prisma/client';
+import { db } from '@/config/db';
 import { getPlaceDetails, getPlaceAttributes } from '@/lib/google-places';
 import { runCoverageAudit, type CoverageCandidate, type MissingGroup } from './coverage-run';
+
+const prisma = db.admin;
 
 // ---------------------------------------------------------------------------
 // Apply phase: only these groups
@@ -41,41 +53,10 @@ const DEFAULT_LIMIT = 20;
 const DEFAULT_PHOTOS_PER_PLACE = 10;
 const MAX_PHOTOS_PER_PLACE = 10;
 
-// ---------------------------------------------------------------------------
-// DB identity (mirrors coverage-run)
-// ---------------------------------------------------------------------------
-function parseDatabaseUrl(): { host: string; dbname: string } {
-  const u = process.env.DATABASE_URL ?? '';
-  const hostMatch = u.match(/@([^/]+)\//);
-  const dbMatch = u.match(/@[^/]+\/([^?]+)/);
-  return {
-    host: hostMatch ? hostMatch[1] : '?',
-    dbname: dbMatch ? dbMatch[1] : '?',
-  };
-}
-
-function hostMatches(parsed: string, required: string): boolean {
-  return parsed === required || parsed.startsWith(required + ':');
-}
-
-function assertDbIdentity(): void {
-  const { host, dbname } = parseDatabaseUrl();
-  const requireHost = process.env.REQUIRE_DB_HOST;
-  const requireName = process.env.REQUIRE_DB_NAME;
-
-  if (requireHost && !hostMatches(host, requireHost)) {
-    console.error(
-      `[COVERAGE APPLY] Source-of-truth mismatch: REQUIRE_DB_HOST=${requireHost} but DATABASE_URL host is "${host}"`
-    );
-    process.exit(1);
-  }
-  if (requireName && dbname !== requireName) {
-    console.error(
-      `[COVERAGE APPLY] Source-of-truth mismatch: REQUIRE_DB_NAME=${requireName} but DATABASE_URL dbname is "${dbname}"`
-    );
-    process.exit(1);
-  }
-}
+// Concurrency + throughput guard (SKAI-WO-ENRICHMENT-PRE-FLIGHT-CHECK)
+const BATCH_SIZE = 25;
+const CONCURRENCY = 5;
+const SLEEP_MS = 100;
 
 // ---------------------------------------------------------------------------
 // Hours format (compatible with Place API / imports)
@@ -142,7 +123,7 @@ function filterToApplyGroups(candidates: CoverageCandidate[]): {
 }
 
 // ---------------------------------------------------------------------------
-// Upsert place_coverage_status
+// Upsert entity_coverage_status
 // ---------------------------------------------------------------------------
 async function upsertCoverageStatus(params: {
   placeId: string;
@@ -152,13 +133,13 @@ async function upsertCoverageStatus(params: {
   errorCode?: string;
   errorMessage?: string;
 }) {
-  const existing = await db.place_coverage_status.findUnique({
+  const existing = await prisma.entity_coverage_status.findUnique({
     where: { dedupe_key: params.dedupeKey },
   });
 
   const now = new Date();
   const data = {
-    place_id: params.placeId,
+    entityId: params.placeId,
     dedupe_key: params.dedupeKey,
     last_attempt_at: now,
     last_attempt_status: params.status,
@@ -170,12 +151,12 @@ async function upsertCoverageStatus(params: {
   };
 
   if (existing) {
-    await db.place_coverage_status.update({
+    await prisma.entity_coverage_status.update({
       where: { id: existing.id },
       data,
     });
   } else {
-    await db.place_coverage_status.create({
+    await prisma.entity_coverage_status.create({
       data,
     });
   }
@@ -189,6 +170,7 @@ function parseArgs(): {
   limit: number;
   photosPerPlace: number;
   laOnly: boolean;
+  dryRun: boolean;
 } {
   const argv = process.argv.slice(2);
   const limitArg = argv.find((a) => a.startsWith('--limit=')) ?? argv.find((a) => a === '--limit');
@@ -214,11 +196,13 @@ function parseArgs(): {
       )
     : DEFAULT_PHOTOS_PER_PLACE;
 
+  const dryRun = argv.includes('--dry-run') || !argv.includes('--apply');
   return {
-    apply: argv.includes('--apply'),
+    apply: !dryRun,
     limit,
     photosPerPlace,
     laOnly: !argv.includes('--no-la-only'),
+    dryRun,
   };
 }
 
@@ -243,10 +227,8 @@ export interface CoverageApplyReport {
 }
 
 async function main() {
-  assertDbIdentity();
 
-  const { apply, limit, photosPerPlace, laOnly } = parseArgs();
-  const dryRun = !apply;
+  const { apply, limit, photosPerPlace, laOnly, dryRun } = parseArgs();
 
   if (!process.env.GOOGLE_PLACES_API_KEY) {
     console.error('❌ GOOGLE_PLACES_API_KEY is not set.');
@@ -296,6 +278,7 @@ async function main() {
   console.log('\n=== Coverage Apply (Place Pages Phase) ===\n');
   console.log(`DB: ${auditReport.db_identity.host} / ${auditReport.db_identity.dbname}`);
   console.log(`Params: limit=${limit} photos_per_place=${photosPerPlace} la_only=${laOnly}`);
+  console.log(`Throughput: BATCH_SIZE=${BATCH_SIZE} CONCURRENCY=${CONCURRENCY} SLEEP_MS=${SLEEP_MS}`);
   console.log(`Candidates (apply groups only): ${filtered.length} (processing up to ${toProcess.length})`);
   if (dryRun) {
     console.log('\nDRY RUN — no writes. Use --apply to persist.\n');
@@ -310,16 +293,31 @@ async function main() {
   }
 
   const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+  const limitPool = pLimit(CONCURRENCY);
 
-  for (let i = 0; i < toProcess.length; i++) {
-    const { candidate, needsDetails, needsAttrs } = toProcess[i];
+  const processOne = async (
+    item: { candidate: CoverageCandidate; needsDetails: boolean; needsAttrs: boolean },
+    index: number
+  ) => {
+    const { candidate, needsDetails, needsAttrs } = item;
     const { place_id, slug, google_place_id, dedupe_key, missing_groups } = candidate;
     const gpid = google_place_id!.trim();
-    report.counts.processed++;
 
+    console.log(`  [start] ${slug} (${place_id})`);
+    if (!dryRun) {
+      await prisma.entities.update({
+        where: { id: place_id },
+        data: { last_enrichment_attempt_at: new Date() },
+      });
+    }
     let details: Awaited<ReturnType<typeof getPlaceDetails>> = null;
     let attrs: Awaited<ReturnType<typeof getPlaceAttributes>> = null;
     let error: string | null = null;
+    const byGroupDelta = {
+      NEED_GOOGLE_PHOTOS: 0,
+      NEED_HOURS: 0,
+      NEED_GOOGLE_ATTRS: 0,
+    };
 
     try {
       if (needsDetails) {
@@ -347,21 +345,21 @@ async function main() {
           const hours = formatHoursForStore(details.openingHours);
           if (hours) {
             updates.hours = hours;
-            report.counts.by_group.NEED_HOURS++;
+            byGroupDelta.NEED_HOURS = 1;
           }
         }
         if (missing_groups.includes('NEED_GOOGLE_PHOTOS') && details.photos?.length) {
           const photos = formatPhotosForStore(details.photos, photosPerPlace);
           if (photos?.length) {
             updates.googlePhotos = photos;
-            report.counts.by_group.NEED_GOOGLE_PHOTOS++;
+            byGroupDelta.NEED_GOOGLE_PHOTOS = 1;
           }
         }
       }
 
       if (attrs && missing_groups.includes('NEED_GOOGLE_ATTRS')) {
         updates.googlePlacesAttributes = attrs as object;
-        report.counts.by_group.NEED_GOOGLE_ATTRS++;
+        byGroupDelta.NEED_GOOGLE_ATTRS = 1;
       }
 
       const remainingMissing = missing_groups.filter((g) => {
@@ -373,6 +371,14 @@ async function main() {
 
       if (Object.keys(updates).length === 0) {
         if (!dryRun) {
+          await prisma.entities.update({
+            where: { id: place_id },
+            data: {
+              last_enrichment_error: null,
+              enrichment_retry_count: 0,
+              enrichment_stage: EnrichmentStage.GOOGLE_COVERAGE_COMPLETE,
+            },
+          });
           await upsertCoverageStatus({
             placeId: place_id,
             dedupeKey: dedupe_key,
@@ -380,13 +386,18 @@ async function main() {
             lastMissingGroups: remainingMissing,
           });
         }
-        report.counts.succeeded++;
-        if (i < 5) console.log(`  ✓ ${slug} (no new data to write)`);
+        console.log(`  [finish] ${slug} (no new data to write)`);
+        return { succeeded: true, failed: false, slug, error: null, byGroupDelta };
       } else if (!dryRun) {
         updates.placesDataCachedAt = new Date();
-        await db.entities.update({
+        await prisma.entities.update({
           where: { id: place_id },
-          data: updates,
+          data: {
+            ...updates,
+            last_enrichment_error: null,
+            enrichment_retry_count: 0,
+            enrichment_stage: EnrichmentStage.GOOGLE_COVERAGE_COMPLETE,
+          },
         });
         await upsertCoverageStatus({
           placeId: place_id,
@@ -394,24 +405,29 @@ async function main() {
           status: 'SUCCESS',
           lastMissingGroups: remainingMissing,
         });
-        report.counts.succeeded++;
-        if (i < 10)
-          console.log(
-            `  ✓ ${slug} → ${Object.keys(updates).filter((k) => k !== 'placesDataCachedAt').join(', ')}`
-          );
+        const keys = Object.keys(updates).filter((k) => k !== 'placesDataCachedAt').join(', ');
+        console.log(`  [finish] ${slug} → ${keys}`);
+        return { succeeded: true, failed: false, slug, error: null, byGroupDelta };
       } else {
-        report.counts.succeeded++;
-        if (i < 10)
-          console.log(
-            `  [DRY] ${slug} would write: ${Object.keys(updates).filter((k) => k !== 'placesDataCachedAt').join(', ')}`
-          );
+        const keys = Object.keys(updates).filter((k) => k !== 'placesDataCachedAt').join(', ');
+        console.log(`  [finish] [DRY] ${slug} would write: ${keys}`);
+        return { succeeded: true, failed: false, slug, error: null, byGroupDelta };
       }
     } catch (e) {
       error = e instanceof Error ? e.message : String(e);
-      report.counts.failed++;
-      report.failed_slugs.push(slug);
-      report.errors.push({ slug, error });
       if (!dryRun) {
+        const row = await prisma.entities.findUnique({
+          where: { id: place_id },
+          select: { enrichment_retry_count: true },
+        });
+        await prisma.entities.update({
+          where: { id: place_id },
+          data: {
+            last_enrichment_error: error.slice(0, 2000),
+            enrichment_retry_count: (row?.enrichment_retry_count ?? 0) + 1,
+            enrichment_stage: EnrichmentStage.FAILED,
+          },
+        }).catch(() => {});
         await upsertCoverageStatus({
           placeId: place_id,
           dedupeKey: dedupe_key,
@@ -421,8 +437,28 @@ async function main() {
           errorMessage: error.slice(0, 500),
         }).catch(() => {});
       }
-      if (report.counts.failed <= 5) console.warn(`  ✗ ${slug}: ${error}`);
+      console.warn(`  [finish] ✗ ${slug}: ${error}`);
+      return { succeeded: false, failed: true, slug, error, byGroupDelta };
     }
+  };
+
+  const results = await Promise.all(
+    toProcess.map((item, i) =>
+      limitPool(() => processOne(item, i))
+    )
+  );
+
+  for (const r of results) {
+    report.counts.processed++;
+    if (r.succeeded) report.counts.succeeded++;
+    if (r.failed) {
+      report.counts.failed++;
+      report.failed_slugs.push(r.slug);
+      if (r.error) report.errors.push({ slug: r.slug, error: r.error });
+    }
+    report.counts.by_group.NEED_GOOGLE_PHOTOS += r.byGroupDelta.NEED_GOOGLE_PHOTOS;
+    report.counts.by_group.NEED_HOURS += r.byGroupDelta.NEED_HOURS;
+    report.counts.by_group.NEED_GOOGLE_ATTRS += r.byGroupDelta.NEED_GOOGLE_ATTRS;
   }
 
   console.log('\n--- Summary ---');
@@ -459,4 +495,4 @@ main()
     console.error(e);
     process.exit(1);
   })
-  .finally(() => db.$disconnect());
+  .finally(() => prisma.$disconnect());

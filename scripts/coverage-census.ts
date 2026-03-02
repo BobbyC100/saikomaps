@@ -83,7 +83,7 @@ async function main() {
   try {
     [placesWithEnergyScores, placesWithTagScores] = await Promise.all([
       db.energy_scores.count({ where: { version: 'energy_v1' } }),
-      db.place_tag_scores.count({ where: { version: 'tags_v1' } }),
+      db.entity_tag_scores.count({ where: { version: 'tags_v1' } }),
     ]);
   } catch {
     // Tables may not exist before migration
@@ -113,7 +113,7 @@ async function main() {
   console.log('golden_records_with_google_place_id:', goldenWithPlaceId);
   console.log('places_with_matching_golden_record:', linkageCount);
   console.log('places_with_energy_scores_v1:', placesWithEnergyScores);
-  console.log('places_with_place_tag_scores_v1:', placesWithTagScores);
+  console.log('places_with_entity_tag_scores_v1:', placesWithTagScores);
   console.log('golden_records_with_description_or_about_copy:', goldenWithDescriptionOrAbout);
   console.log('golden_records_with_google_places_attributes:', goldenWithAttributes);
   console.log('golden_records_with_attrs_present:', goldenWithAttrsPresent);

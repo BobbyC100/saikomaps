@@ -3,7 +3,7 @@ import { PrismaClient, SignalSourceType, ProposedSignalType } from '@prisma/clie
 const prisma = new PrismaClient();
 
 interface CreateProposedSignalParams {
-  placeId: string;
+  entityId: string;
   sourceId: string;
   signalType: ProposedSignalType;
   extractedData: Record<string, any>;
@@ -19,8 +19,12 @@ interface CreateProposedSignalParams {
  * @returns The created proposed signal
  */
 export async function createProposedSignal(params: CreateProposedSignalParams) {
+  const { entityId } = params;
+  if (!entityId) {
+    throw new Error('entityId is required');
+  }
+
   const {
-    placeId,
     sourceId,
     signalType,
     extractedData,
@@ -28,14 +32,14 @@ export async function createProposedSignal(params: CreateProposedSignalParams) {
     confidenceScore,
   } = params;
 
-  // Validate place exists (service-layer enforcement)
-  const placeExists = await prisma.entities.findUnique({
-    where: { id: placeId },
+  // Validate entity exists (service-layer enforcement)
+  const entityExists = await prisma.entities.findUnique({
+    where: { id: entityId },
     select: { id: true },
   });
 
-  if (!placeExists) {
-    throw new Error(`Place with id '${placeId}' does not exist`);
+  if (!entityExists) {
+    throw new Error(`Entity with id '${entityId}' does not exist`);
   }
 
   // Validate that extractedData has required temporal markers for operational overlays
@@ -50,7 +54,7 @@ export async function createProposedSignal(params: CreateProposedSignalParams) {
 
   const signal = await prisma.proposed_signals.create({
     data: {
-      placeId,
+      entityId,
       sourceType: 'newsletter_email' as SignalSourceType,
       sourceId,
       signalType,

@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 /**
  * Link Place to Operator (Actor)
- * Creates PlaceActorRelationship. Uses restaurant_groups as lookup source for Actor.
- * DEPRECATED writes to restaurantGroupId — uses PlaceActorRelationship only.
+ * Creates entity_actor_relationships. Uses restaurant_groups as lookup source for Actor.
+ * DEPRECATED writes to restaurantGroupId — uses entity_actor_relationships only.
  */
 
 import { db } from '@/lib/db'
@@ -37,7 +37,7 @@ async function main() {
       ]
     },
     include: {
-      place_actor_relationships: {
+      entity_actor_relationships: {
         where: { role: 'operator', isPrimary: true },
         include: { actor: true }
       }
@@ -54,7 +54,7 @@ async function main() {
     console.log(`Neighborhood: ${place.neighborhood}`)
   }
 
-  const primaryOp = place.place_actor_relationships?.[0]
+  const primaryOp = place.entity_actor_relationships?.[0]
   if (primaryOp) {
     console.log(`\n⚠️  Already linked to operator: ${primaryOp.actor.name}`)
     console.log('\nUnlink first if you want to change the operator association\n')
@@ -93,7 +93,7 @@ async function main() {
     })
   }
 
-  // Create PlaceActorRelationship (no write to restaurantGroupId)
+  // Create entity_actor_relationships (no write to restaurantGroupId)
   await db.placeActorRelationship.create({
     data: {
       entityId: place.id,

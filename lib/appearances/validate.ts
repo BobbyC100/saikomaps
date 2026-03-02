@@ -1,5 +1,5 @@
 /**
- * Validation for place_appearances constraint:
+ * Validation for entity_appearances constraint:
  * Either hostPlaceId IS NOT NULL OR (latitude AND longitude AND addressText) are ALL NOT NULL
  */
 

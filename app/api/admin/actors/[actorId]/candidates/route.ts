@@ -47,7 +47,7 @@ export async function GET(
     const entityIds = [...new Set(candidates.map((c) => c.entityId).filter(Boolean))] as string[];
     const existingPrimary =
       entityIds.length > 0
-        ? await db.placeActorRelationship.findMany({
+        ? await db.entity_actor_relationships.findMany({
             where: {
               entityId: { in: entityIds },
               role: "operator",
@@ -69,7 +69,7 @@ export async function GET(
         candidateUrl: c.candidateUrl,
         candidateAddress: c.candidateAddress,
         sourceUrl: c.sourceUrl,
-        placeId: c.entityId,
+        entityId: c.entityId,
         place: c.entity,
         matchScore: c.matchScore,
         matchReason: c.matchReason,

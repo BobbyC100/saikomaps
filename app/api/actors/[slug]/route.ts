@@ -1,7 +1,7 @@
 /**
  * API Route: Actor by Slug
  * GET /api/actors/[slug]
- * Returns Actor + related places via PlaceActorRelationship
+ * Returns Actor + related places via entity_actor_relationships
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -20,7 +20,7 @@ export async function GET(
     const actor = await db.actor.findFirst({
       where: { slug },
       include: {
-        placeActorRelationships: {
+        entityActorRelationships: {
           where: { role: 'operator' },
           orderBy: { isPrimary: 'desc' },
           include: {
@@ -36,7 +36,7 @@ export async function GET(
       return NextResponse.json({ error: 'Actor not found', success: false }, { status: 404 });
     }
 
-    const places = actor.placeActorRelationships
+    const places = actor.entityActorRelationships
       .map((r) => r.entity)
       .filter((p): p is NonNullable<typeof p> => p != null);
 

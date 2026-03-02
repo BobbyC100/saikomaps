@@ -7,7 +7,7 @@
  *   npm run place:close -- guisados-restaurant "Permanently closed"
  */
 
-import { PrismaClient, PlaceStatus } from '@prisma/client';
+import { PrismaClient, EntityStatus } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -37,7 +37,7 @@ async function main() {
     process.exit(1);
   }
   
-  if (place.status === PlaceStatus.CLOSED) {
+  if (place.status === EntityStatus.CLOSED) {
     console.log(`⚠️  ${place.name} is already marked as CLOSED`);
     return;
   }
@@ -46,7 +46,7 @@ async function main() {
   await prisma.entities.update({
     where: { slug },
     data: {
-      status: PlaceStatus.CLOSED,
+      status: EntityStatus.CLOSED,
       // Note: You might want to add a closed_at field and closed_reason field to schema
     },
   });

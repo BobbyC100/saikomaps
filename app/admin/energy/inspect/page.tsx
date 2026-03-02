@@ -79,7 +79,7 @@ export default async function AdminEnergyInspectPage({ searchParams }: Props) {
     db.energy_scores.findUnique({
       where: { entityId_version: { entityId: place.id, version: 'energy_v1' } },
     }),
-    db.place_tag_scores.findUnique({
+    db.entity_tag_scores.findUnique({
       where: { entityId_version: { entityId: place.id, version: 'tags_v1' } },
     }),
   ]);

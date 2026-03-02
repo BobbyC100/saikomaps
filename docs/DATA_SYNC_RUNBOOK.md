@@ -18,7 +18,7 @@ export NEON_URL="postgresql://..."   # paste from .env or .env.vercel.prod
 psql "$NEON_URL" -c "SELECT count(*) AS places FROM public.places;"
 psql "$NEON_URL" -c "SELECT count(*) AS lists FROM public.lists;"
 psql "$NEON_URL" -c "SELECT count(*) AS map_places FROM public.map_places;"
-psql "$NEON_URL" -c "SELECT count(*) AS place_coverage_status FROM public.place_coverage_status;"
+psql "$NEON_URL" -c "SELECT count(*) AS entity_coverage_status FROM public.entity_coverage_status;"
 psql "$NEON_URL" -c "SELECT count(*) AS place_tag_scores FROM public.place_tag_scores;"
 psql "$NEON_URL" -c "SELECT count(*) AS energy_scores FROM public.energy_scores;"
 psql "$NEON_URL" -c "SELECT slug FROM public.places ORDER BY updated_at DESC NULLS LAST LIMIT 10;"
@@ -34,7 +34,7 @@ export SUPABASE_URL="postgresql://..."   # paste from .env.vercel
 psql "$SUPABASE_URL" -c "SELECT count(*) AS places FROM public.places;"
 psql "$SUPABASE_URL" -c "SELECT count(*) AS lists FROM public.lists;"
 psql "$SUPABASE_URL" -c "SELECT count(*) AS map_places FROM public.map_places;"
-psql "$SUPABASE_URL" -c "SELECT count(*) AS place_coverage_status FROM public.place_coverage_status;"
+psql "$SUPABASE_URL" -c "SELECT count(*) AS entity_coverage_status FROM public.entity_coverage_status;"
 psql "$SUPABASE_URL" -c "SELECT count(*) AS place_tag_scores FROM public.place_tag_scores;"
 psql "$SUPABASE_URL" -c "SELECT count(*) AS energy_scores FROM public.energy_scores;"
 psql "$SUPABASE_URL" -c "SELECT slug FROM public.places ORDER BY updated_at DESC NULLS LAST LIMIT 10;"
@@ -66,7 +66,7 @@ npx tsx scripts/sync-db.ts --source "postgresql://user:pass@source-host/db" --ta
 npx tsx scripts/sync-db.ts --source "$SOURCE_URL" --target "$TARGET_URL" --apply
 ```
 
-Sync order: `places` → `energy_scores` → `place_tag_scores` → `place_coverage_status`. All upserts; no schema changes, no drops.
+Sync order: `places` → `energy_scores` → `place_tag_scores` → `entity_coverage_status`. All upserts; no schema changes, no drops.
 
 ---
 

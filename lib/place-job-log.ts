@@ -22,7 +22,7 @@ export async function logPlaceJob(
   client?: PrismaClient
 ): Promise<void> {
   const db = client ?? (await import("@/lib/db")).db;
-  await db.place_job_log.create({
+  await db.entity_job_log.create({
     data: {
       entity_id: input.entityId,
       entity_type: input.entityType,

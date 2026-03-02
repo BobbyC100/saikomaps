@@ -1,10 +1,12 @@
+// Identity-level script: operates on entities (root primitive).
+
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
 interface DuplicateGroup {
   googlePlaceId: string;
-  keepPlace: {
+  keepEntity: {
     id: string;
     name: string;
     slug: string;
@@ -20,10 +22,10 @@ function parseArgs() {
   return { execute, force };
 }
 
-async function cleanupDuplicatePlaces() {
+async function cleanupDuplicateEntities() {
   const { execute, force } = parseArgs();
   
-  console.log('🧹 Cleaning up duplicate places...\n');
+  console.log('🧹 Cleaning up duplicate entities...\n');
   
   if (!execute) {
     console.log('⚠️  DRY RUN MODE - No changes will be made');
@@ -48,13 +50,13 @@ async function cleanupDuplicatePlaces() {
     return;
   }
 
-  console.log(`Found ${duplicates.length} duplicate group(s)\n`);
+  console.log(`Found ${duplicates.length} duplicate entity group(s)\n`);
   console.log('─'.repeat(80));
 
   const operations: DuplicateGroup[] = [];
 
   for (const dup of duplicates) {
-    const places = await prisma.entities.findMany({
+    const entities = await prisma.entities.findMany({
       where: { googlePlaceId: dup.google_place_id },
       include: {
         map_places: {
@@ -68,42 +70,42 @@ async function cleanupDuplicatePlaces() {
     });
 
     // Score and recommend which to keep
-    const scored = places.map(p => ({
-      place: p,
-      score: calculateScore(p),
+    const scored = entities.map(e => ({
+      entity: e,
+      score: calculateScore(e),
     }));
 
     scored.sort((a, b) => b.score - a.score);
-    const keepPlace = scored[0].place;
-    const removePlaces = scored.slice(1).map(s => s.place);
+    const keepEntity = scored[0].entity;
+    const removeEntities = scored.slice(1).map(s => s.entity);
 
-    console.log(`\n📍 ${keepPlace.name} (Google Place ID: ${dup.google_place_id})`);
-    console.log(`   ✅ KEEP: "${keepPlace.name}" (${keepPlace.slug})`);
-    console.log(`      Used in ${keepPlace.map_places.length} map(s), ${keepPlace.viewer_bookmarks.length} bookmark(s)`);
+    console.log(`\n📍 ${keepEntity.name} (Google Place ID: ${dup.google_place_id})`);
+    console.log(`   ✅ KEEP: "${keepEntity.name}" (${keepEntity.slug})`);
+    console.log(`      Used in ${keepEntity.map_places.length} map(s), ${keepEntity.viewer_bookmarks.length} bookmark(s)`);
     
-    if (removePlaces.length > 0) {
+    if (removeEntities.length > 0) {
       console.log(`   ❌ REMOVE:`);
-      removePlaces.forEach(p => {
-        console.log(`      • "${p.name}" (${p.slug})`);
-        console.log(`        ${p.map_places.length} map(s), ${p.viewer_bookmarks.length} bookmark(s)`);
+      removeEntities.forEach(e => {
+        console.log(`      • "${e.name}" (${e.slug})`);
+        console.log(`        ${e.map_places.length} map(s), ${e.viewer_bookmarks.length} bookmark(s)`);
         
-        if (p.map_places.length > 0 && !force) {
-          console.log(`        ⚠️  SKIP: Place is used in maps (use --force to override)`);
+        if (e.map_places.length > 0 && !force) {
+          console.log(`        ⚠️  SKIP: Entity is used in maps (use --force to override)`);
         }
       });
     }
 
     operations.push({
       googlePlaceId: dup.google_place_id,
-      keepPlace: {
-        id: keepPlace.id,
-        name: keepPlace.name,
-        slug: keepPlace.slug,
-        mapCount: keepPlace.mapPlaces.length,
+      keepEntity: {
+        id: keepEntity.id,
+        name: keepEntity.name,
+        slug: keepEntity.slug,
+        mapCount: keepEntity.map_places.length,
       },
-      removeIds: removePlaces
-        .filter(p => force || p.mapPlaces.length === 0)
-        .map(p => p.id),
+      removeIds: removeEntities
+        .filter(e => force || e.map_places.length === 0)
+        .map(e => e.id),
     });
   }
 
@@ -111,10 +113,10 @@ async function cleanupDuplicatePlaces() {
 
   if (!execute) {
     console.log('\n📊 Summary (DRY RUN):');
-    console.log(`   Would delete ${operations.reduce((sum, op) => sum + op.removeIds.length, 0)} duplicate place(s)`);
+    console.log(`   Would delete ${operations.reduce((sum, op) => sum + op.removeIds.length, 0)} duplicate entity(ies)`);
     console.log(`\n💡 Run with --execute to apply these changes`);
     if (!force) {
-      console.log(`   Add --force to also remove duplicates that are used in maps`);
+      console.log(`   Add --force to also remove duplicate entities that are used in maps`);
     }
     return;
   }
@@ -128,79 +130,79 @@ async function cleanupDuplicatePlaces() {
   for (const op of operations) {
     if (op.removeIds.length === 0) continue;
 
-    for (const removeId of op.removeIds) {
+    for (const entityId of op.removeIds) {
       try {
-        // Get the place to be removed
-        const placeToRemove = await prisma.entities.findUnique({
-          where: { id: removeId },
+        // Get the entity to be removed
+        const entityToRemove = await prisma.entities.findUnique({
+          where: { id: entityId },
           include: {
             map_places: true,
             viewer_bookmarks: true,
           },
         });
 
-        if (!placeToRemove) continue;
+        if (!entityToRemove) continue;
 
         // Migrate MapPlace references
-        if (placeToRemove.map_places.length > 0) {
-          console.log(`   Migrating ${placeToRemove.map_places.length} map reference(s) from ${placeToRemove.slug}...`);
+        if (entityToRemove.map_places.length > 0) {
+          console.log(`   Migrating ${entityToRemove.map_places.length} map reference(s) from ${entityToRemove.slug}...`);
           
-          for (const mapPlace of placeToRemove.map_places) {
-            // Check if the keep place is already in this map
+          for (const mapPlace of entityToRemove.map_places) {
+            // Check if the keep entity is already in this map
             const existingMapPlace = await prisma.map_places.findUnique({
               where: {
                 mapId_entityId: {
                   mapId: mapPlace.mapId,
-                  entityId: op.keepPlace.id,
+                  entityId: op.keepEntity.id,
                 }
               }
             });
 
             if (existingMapPlace) {
-              // Keep place already exists in this map, just delete the old reference
+              // Keep entity already exists in this map, just delete the old reference
               await prisma.map_places.delete({
                 where: { id: mapPlace.id }
               });
-              console.log(`      ✓ Removed duplicate from map (keep place already present)`);
+              console.log(`      ✓ Removed duplicate from map (keep entity already present)`);
             } else {
-              // Update reference to point to keep place
+              // Update reference to point to keep entity
               await prisma.map_places.update({
                 where: { id: mapPlace.id },
-                data: { entityId: op.keepPlace.id },
+                data: { entityId: op.keepEntity.id },
               });
-              console.log(`      ✓ Migrated to ${op.keepPlace.slug}`);
+              console.log(`      ✓ Migrated to ${op.keepEntity.slug}`);
               migrated++;
             }
           }
         }
 
         // Migrate ViewerBookmark references
-        if (placeToRemove.viewer_bookmarks.length > 0) {
-          console.log(`   Migrating ${placeToRemove.viewer_bookmarks.length} bookmark(s)...`);
+        if (entityToRemove.viewer_bookmarks.length > 0) {
+          console.log(`   Migrating ${entityToRemove.viewer_bookmarks.length} bookmark(s)...`);
           
-          for (const bookmark of placeToRemove.viewer_bookmarks) {
-            // Check if user already has bookmark for keep place
+          for (const bookmark of entityToRemove.viewer_bookmarks) {
+            // Check if user already has bookmark for keep entity
             if (bookmark.viewerUserId) {
               const existingBookmark = await prisma.viewer_bookmarks.findUnique({
                 where: {
                   viewerUserId_entityId: {
                     viewerUserId: bookmark.viewerUserId,
-                    entityId: op.keepPlace.id,
+                    entityId: op.keepEntity.id,
                   }
                 }
               });
 
               if (existingBookmark) {
-                // User already has bookmark for keep place, delete old one
+                // User already has bookmark for keep entity, delete old one
                 await prisma.viewer_bookmarks.delete({
                   where: { id: bookmark.id }
                 });
                 console.log(`      ✓ Removed duplicate bookmark`);
               } else {
-                // Update bookmark to point to keep place
+                // Update bookmark to point to keep entity
                 await prisma.viewer_bookmarks.update({
                   where: { id: bookmark.id },
-                  data: { entityId: op.keepPlace.id },
+                  data: { entityId: op.keepEntity.id },
                 });
                 console.log(`      ✓ Migrated bookmark`);
               }
@@ -213,46 +215,46 @@ async function cleanupDuplicatePlaces() {
           }
         }
 
-        // Delete the duplicate place
+        // Delete the duplicate entity
         await prisma.entities.delete({
-          where: { id: removeId },
+          where: { id: entityId },
         });
 
         deleted++;
-        console.log(`   ✅ Deleted duplicate: ${placeToRemove.name} (${placeToRemove.slug})`);
+        console.log(`   ✅ Deleted duplicate entity: ${entityToRemove.name} (${entityToRemove.slug})`);
 
       } catch (error) {
-        console.error(`   ❌ Error removing place ${removeId}:`, error);
+        console.error(`   ❌ Error removing entity ${entityId}:`, error);
       }
     }
   }
 
   console.log('\n' + '─'.repeat(80));
   console.log('\n✅ Cleanup complete!');
-  console.log(`   Deleted: ${deleted} duplicate place(s)`);
+  console.log(`   Deleted: ${deleted} duplicate entity(ies)`);
   console.log(`   Migrated: ${migrated} map reference(s)`);
 }
 
-function calculateScore(place: any): number {
+function calculateScore(entity: any): number {
   let score = 0;
   
   // Maps usage (highest priority)
-  score += place.mapPlaces.length * 100;
+  score += entity.map_places.length * 100;
   
   // Bookmarks
-  score += place.viewerBookmarks.length * 10;
+  score += entity.viewer_bookmarks.length * 10;
   
   // Enrichment
-  if (place.googlePhotos && Array.isArray(place.googlePhotos) && place.googlePhotos.length > 0) {
+  if (entity.googlePhotos && Array.isArray(entity.googlePhotos) && entity.googlePhotos.length > 0) {
     score += 5;
   }
-  if (place.neighborhood) score += 5;
-  if (place.cuisineType) score += 5;
-  if (place.tagline) score += 5;
+  if (entity.neighborhood) score += 5;
+  if (entity.cuisineType) score += 5;
+  if (entity.tagline) score += 5;
   
   // Age (older is better, slight preference)
   const daysOld = Math.min(
-    Math.floor((Date.now() - place.createdAt.getTime()) / (1000 * 60 * 60 * 24)),
+    Math.floor((Date.now() - entity.createdAt.getTime()) / (1000 * 60 * 60 * 24)),
     365
   );
   score += daysOld / 365;
@@ -260,7 +262,7 @@ function calculateScore(place: any): number {
   return score;
 }
 
-cleanupDuplicatePlaces()
+cleanupDuplicateEntities()
   .catch((e) => {
     console.error('❌ Error:', e);
     process.exit(1);

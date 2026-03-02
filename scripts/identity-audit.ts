@@ -3,14 +3,18 @@
  * Identity audit: read-only snapshot of places identity health.
  * - Total places, missing GPID, duplicate GPIDs (non-empty)
  * - Latest GPID dry-run CSV: status + reason counts (if CSV exists)
- * No DB writes.
+ * No DB writes. Uses db.ingestion (POOLED).
  *
  * Usage: npm run identity:audit
+ * Requires: .env.local with DATABASE_URL and DB_ENV (dev|staging|prod)
  */
 
 import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
-import { db } from '@/lib/db';
+import { env } from '@/config/env';
+import { db } from '@/config/db';
+
+const prisma = db.ingestion;
 
 const LOGS_DIR = join(process.cwd(), 'data', 'logs');
 const CANONICAL_CSV = join(LOGS_DIR, 'gpid_resolution_dryrun.csv');
@@ -84,16 +88,8 @@ function parseCsvLine(line: string): string[] {
 }
 
 async function main() {
-  const url = process.env.DATABASE_URL;
+  const url = env.DATABASE_URL;
   const label = parseDatabaseLabel(url);
-
-  if (!url) {
-    console.log('IDENTITY AUDIT (no DB)');
-    console.log('DATABASE_URL not set. Set it to run DB queries.');
-    process.exit(1);
-  }
-
-  const prisma = db;
 
   let totalPlaces = 0;
   let missingGpid = 0;
@@ -182,4 +178,4 @@ main()
     console.error(err);
     process.exit(1);
   })
-  .finally(() => db.$disconnect());
+  .finally(() => prisma.$disconnect());

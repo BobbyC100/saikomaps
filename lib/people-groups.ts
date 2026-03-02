@@ -17,7 +17,7 @@ export type PersonPlaceRole =
 
 export type Visibility = 'internal' | 'verified'
 
-export type PlaceStatus = 'open' | 'closed' | 'permanently-closed'
+export type EntityStatusDisplay = 'open' | 'closed' | 'permanently-closed'
 
 export type SourceType = 'restaurant-website' | 'editorial' | 'award' | 'manual'
 
@@ -48,12 +48,12 @@ export interface Person {
 
 /**
  * PersonPlace Association
- * Links people to places with role context
+ * Links people to entities (identity) with role context
  */
 export interface PersonPlace {
   id: string
   personId: string
-  placeId: string
+  entityId: string
   role: PersonPlaceRole
   current: boolean
   startYear?: number
@@ -225,8 +225,8 @@ export function validatePersonPlace(assoc: Partial<PersonPlace>): { valid: boole
     errors.push('Association must have personId')
   }
 
-  if (!assoc.placeId) {
-    errors.push('Association must have placeId')
+  if (!assoc.entityId || (typeof assoc.entityId === 'string' && assoc.entityId.trim() === '')) {
+    errors.push('Association must have entityId')
   }
 
   if (!assoc.role) {

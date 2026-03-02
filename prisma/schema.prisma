@@ -242,14 +242,14 @@ model entities {
   contextualConnection   String?            @map("contextual_connection")
   curatorAttribution     String?            @map("curator_attribution")
   chefRecs               Json?              @map("chef_recs")
-  restaurantGroupId      String?            @map("restaurant_group_id") // DEPRECATED: use place_actor_relationships. No new writes.
-  status                 PlaceStatus        @default(OPEN)
+  restaurantGroupId      String?            @map("restaurant_group_id") // DEPRECATED: use entity_actor_relationships. No new writes.
+  status                 EntityStatus       @default(OPEN)
   intentProfile          String?            @map("intent_profile")
   intentProfileOverride  Boolean            @default(false) @map("intent_profile_override")
   reservationUrl         String?            @map("reservation_url")
   businessStatus         String?            @map("business_status") // from Google; 'CLOSED_PERMANENTLY' excluded from coverage
   googlePlacesAttributes Json?              @map("google_places_attributes")
-  entityType             PlaceType          @default(venue) @map("entity_type")
+  entityType             EntityType         @default(venue) @map("entity_type")
   categoryId             String?            @map("category_id")
   parentId               String?            @map("parent_id")
   marketSchedule         Json?              @map("market_schedule")
@@ -262,14 +262,14 @@ model entities {
   children               entities[]         @relation("PlaceHierarchy")
   viewer_bookmarks       viewer_bookmarks[]
   energy_scores          energy_scores[]
-  place_tag_scores       place_tag_scores[]
-  place_photo_eval       place_photo_eval[]
-  place_coverage_status  place_coverage_status[]
+  entity_tag_scores       entity_tag_scores[]
+  entity_photo_eval       entity_photo_eval[]
+  entity_coverage_status entity_coverage_status[]
   gpid_resolution_queue   gpid_resolution_queue[]
-  place_actor_relationships PlaceActorRelationship[]
+  entity_actor_relationships entity_actor_relationships[]
   operatorPlaceCandidates OperatorPlaceCandidate[]
-  place_appearances_as_subject place_appearances[] @relation("AppearanceSubject")
-  place_appearances_as_host    place_appearances[] @relation("AppearanceHost")
+  entity_appearances_as_subject entity_appearances[] @relation("AppearanceSubject")
+  entity_appearances_as_host    entity_appearances[] @relation("AppearanceHost")
 
   // Confidence System v1: field-level JSONB, computed at sync (not at query time)
   confidence           Json?    // { field: { value, score, sources, winner, conflicts } }
@@ -278,7 +278,10 @@ model entities {
 
   // Website enrichment (SAIKO spec v1.1)
   last_enriched_at   DateTime? @map("last_enriched_at")
-  enrichment_stage  String?   @map("enrichment_stage") // e.g. ENRICHED_WEBSITE
+  last_enrichment_attempt_at DateTime? @map("last_enrichment_attempt_at")
+  last_enrichment_error String? @map("last_enrichment_error")
+  enrichment_retry_count Int @default(0) @map("enrichment_retry_count")
+  enrichment_stage  EnrichmentStage? @map("enrichment_stage")
   needs_human_review Boolean  @default(false) @map("needs_human_review")
   category_enrich_attempted_at DateTime? @map("category_enrich_attempted_at") // throttle category-only re-enrich
 
@@ -337,13 +340,13 @@ model merchant_signals {
 
 /// Place appearances — subject (pop-up/mobile) appears at host place OR raw location (sidewalk)
 /// Constraint: either hostPlaceId IS NOT NULL OR (latitude AND longitude AND addressText) all present
-enum PlaceAppearanceStatus {
+enum EntityAppearanceStatus {
   ACTIVE
   ENDED
   ANNOUNCED
 }
 
-model place_appearances {
+model entity_appearances {
   id               String                 @id @default(uuid())
   subjectEntityId  String                 @map("subject_entity_id")
   hostEntityId     String?                @map("host_entity_id")
@@ -351,7 +354,7 @@ model place_appearances {
   longitude        Decimal?               @db.Decimal(11, 8)
   addressText      String?                @map("address_text") @db.Text
   scheduleText     String                 @map("schedule_text") @db.Text
-  status           PlaceAppearanceStatus  @default(ACTIVE)
+  status           EntityAppearanceStatus @default(ACTIVE)
   sources          Json?
   confidence       Float?
   createdAt        DateTime               @default(now()) @map("created_at")
@@ -362,7 +365,7 @@ model place_appearances {
 
   @@index([subjectEntityId, status])
   @@index([hostEntityId, status])
-  @@map("place_appearances")
+  @@map("entity_appearances")
 }
 
 model restaurant_groups {
@@ -448,7 +451,7 @@ model viewer_bookmarks {
   @@index([viewerUserId])
 }
 
-model place_photo_eval {
+model entity_photo_eval {
   id                    String             @id @default(cuid())
   entityId              String             @map("entity_id")
   google_place_id       String             @map("google_place_id")
@@ -464,6 +467,7 @@ model place_photo_eval {
 
   @@unique([entityId, photo_ref])
   @@index([entityId])
+  @@map("entity_photo_eval")
 }
 
 enum PlacePhotoEvalTier {
@@ -516,10 +520,17 @@ enum PersonRole {
   PARTNER
 }
 
-enum PlaceStatus {
+enum EntityStatus {
   OPEN
   CLOSED
   PERMANENTLY_CLOSED
+}
+
+enum EnrichmentStage {
+  NOT_STARTED
+  GOOGLE_COVERAGE_COMPLETE
+  MERCHANT_ENRICHED
+  FAILED
 }
 
 enum SpotSource {
@@ -534,7 +545,7 @@ enum Visibility {
   VERIFIED
 }
 
-enum PlaceType {
+enum EntityType {
   venue
   activity
   public
@@ -1004,7 +1015,7 @@ enum OverlayApprovalMethod {
 /// Proposed signals - immutable extraction records from newsletters
 model proposed_signals {
   id                String               @id @default(cuid())
-  placeId           String               @map("place_id")
+  entityId          String               @map("entity_id")
   sourceType        SignalSourceType     @map("source_type")
   sourceId          String               @map("source_id") // email message-id or stored email record id
   signalType        ProposedSignalType   @map("signal_type")
@@ -1018,7 +1029,7 @@ model proposed_signals {
   // Relations
   operational_overlay operational_overlays?
 
-  @@index([placeId])
+  @@index([entityId])
   @@index([status])
   @@index([signalType])
   @@index([createdAt])
@@ -1027,7 +1038,7 @@ model proposed_signals {
 /// Operational overlays - approved, time-bounded state
 model operational_overlays {
   id              String                 @id @default(cuid())
-  placeId         String                 @map("place_id")
+  entityId        String                 @map("entity_id")
   sourceSignalId  String                 @unique @map("source_signal_id")
   overlayType     OverlayType            @map("overlay_type")
   startsAt        DateTime               @map("starts_at")
@@ -1039,7 +1050,7 @@ model operational_overlays {
   // Relations
   proposed_signal proposed_signals @relation(fields: [sourceSignalId], references: [id])
 
-  @@index([placeId])
+  @@index([entityId])
   @@index([startsAt])
   @@index([endsAt])
 }
@@ -1123,7 +1134,7 @@ model tag_versions {
   created_at               DateTime @default(now()) @map("created_at")
 
   energy_version   energy_versions @relation(fields: [depends_on_energy_version], references: [version])
-  place_tag_scores place_tag_scores[]
+  entity_tag_scores entity_tag_scores[]
 }
 
 /// energy_scores — baseline environmental stimulation per entity
@@ -1151,8 +1162,8 @@ model energy_scores {
   @@index([version])
 }
 
-/// place_tag_scores — weighted tag interpretations (0-1) per entity
-model place_tag_scores {
+/// entity_tag_scores — weighted tag interpretations (0-1) per entity
+model entity_tag_scores {
   id                       String   @id @default(uuid())
   entityId                 String   @map("entity_id")
   cozy_score               Float
@@ -1171,6 +1182,7 @@ model place_tag_scores {
   @@unique([entityId, version])
   @@index([entityId])
   @@index([version])
+  @@map("entity_tag_scores")
 }
 
 // ============================================================================
@@ -1211,7 +1223,7 @@ model Actor {
   updatedAt   DateTime   @updatedAt @map("updated_at")
 
   entityRelationships   EntityActorRelationship[]
-  placeActorRelationships PlaceActorRelationship[]
+  entityActorRelationships entity_actor_relationships[]
   operatorPlaceCandidates OperatorPlaceCandidate[]
 
   @@index([name])
@@ -1279,14 +1291,14 @@ model EntityActorRelationship {
   @@index([actorId])
 }
 
-/// Place-Actor relationships — app-facing projection layer.
-/// Materialized when place ↔ golden exists; temporary canonical when place has no golden.
+/// Entity-Actor relationships — app-facing projection layer.
+/// Materialized when entity ↔ golden exists; temporary canonical when entity has no golden.
 /// Written only by ingestion/sync logic. UI reads from here.
 ///
-/// Note: @@unique([placeId, actorId, role]) prevents duplicate rows but does NOT enforce
-/// "at most one isPrimary=true per (place, role)". Later consider a partial unique index
-/// e.g. UNIQUE (place_id) WHERE is_primary AND role = 'operator'.
-model PlaceActorRelationship {
+/// Note: @@unique([entityId, actorId, role]) prevents duplicate rows but does NOT enforce
+/// "at most one isPrimary=true per (entity, role)". Later consider a partial unique index
+/// e.g. UNIQUE (entity_id) WHERE is_primary AND role = 'operator'.
+model entity_actor_relationships {
   id         String    @id @default(cuid())
   entityId   String    @map("entity_id")
   actorId    String    @map("actor_id")
@@ -1305,7 +1317,7 @@ model PlaceActorRelationship {
   @@unique([entityId, actorId, role])
   @@index([entityId])
   @@index([actorId])
-  @@map("place_actor_relationships")
+  @@map("entity_actor_relationships")
 }
 
 /// Fields membership - entities in the curated index (Saiko Fields)
@@ -1411,8 +1423,8 @@ model gpid_resolution_queue {
   @@map("gpid_resolution_queue")
 }
 
-/// place_coverage_status — per-dedupe_key coverage state (no double spend)
-model place_coverage_status {
+/// entity_coverage_status — per-dedupe_key coverage state (no double spend)
+model entity_coverage_status {
   id                  String   @id @default(cuid())
   entityId            String   @map("entity_id")
   dedupe_key          String   @unique @map("dedupe_key") // google_place_id or entity_id
@@ -1425,19 +1437,25 @@ model place_coverage_status {
   source              String?  // GOOGLE_PLACES | SCRAPE | MANUAL
   updated_at          DateTime @updatedAt @map("updated_at")
 
+  // Launch readiness v0 (coverage-launch-readiness-v0.ts --write-status)
+  launchReadinessScore     Int?      @map("launch_readiness_score")
+  launchReadinessStatus    String?   @map("launch_readiness_status") // LAUNCH_READY | NEEDS_WORK
+  launchReadinessComputedAt DateTime? @map("launch_readiness_computed_at")
+  launchReadinessMissing   Json?     @map("launch_readiness_missing") // string[]
+
   entities entities @relation(fields: [entityId], references: [id], onDelete: Cascade)
 
   @@index([entityId])
   @@index([last_attempt_status])
-  @@map("place_coverage_status")
+  @@map("entity_coverage_status")
 }
 
 // ============================================================================
-// PLACE JOB LOG — cost/metric audit (identity, operator_link, scan jobs)
+// ENTITY JOB LOG — cost/metric audit (identity, operator_link, scan jobs)
 // No UI. Minimal fields for pages_fetched, ai_calls, duration_ms, estimated_cost.
 // ============================================================================
 
-model place_job_log {
+model entity_job_log {
   id              String   @id @default(uuid())
   entity_id       String   @map("entity_id")
   entity_type     String   @map("entity_type") // 'place' | 'actor' | 'golden_record' | 'batch'
@@ -1451,5 +1469,5 @@ model place_job_log {
   @@index([entity_id])
   @@index([job_type])
   @@index([created_at])
-  @@map("place_job_log")
+  @@map("entity_job_log")
 }

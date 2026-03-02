@@ -5,10 +5,10 @@ WHERE table_name = 'operator_place_candidates'
   AND column_name IN ('reviewed_at', 'approved_by', 'confidence_bucket', 'match_score')
 ORDER BY column_name;
 
--- B) Confirm place_job_log table exists
+-- B) Confirm entity_job_log table exists
 SELECT column_name, data_type
 FROM information_schema.columns
-WHERE table_name = 'place_job_log'
+WHERE table_name = 'entity_job_log'
 ORDER BY ordinal_position;
 
 -- C) Quick counts by confidence_bucket

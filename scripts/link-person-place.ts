@@ -149,10 +149,10 @@ async function main() {
   if (args.endYear) console.log(`End Year: ${args.endYear}`)
   console.log(`Source: ${args.source}`)
 
-  // Build association (for validation - lib expects personId/placeId)
+  // Build association (for validation - lib expects personId/entityId)
   const association = {
     personId: person.id,
-    placeId: place.id,
+    entityId: place.id,
     role: args.role!.toUpperCase().replace(/-/g, '_') as any,
     current: args.current!,
     startYear: args.startYear,

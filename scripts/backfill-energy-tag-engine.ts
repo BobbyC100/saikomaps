@@ -9,7 +9,7 @@
  *   npx tsx scripts/backfill-energy-tag-engine.ts --place-slugs=a,b [--dry-run]
  *
  * Reads from golden_records (description, about_copy, google_places_attributes).
- * Writes to energy_scores and place_tag_scores keyed by places.id.
+ * Writes to energy_scores and entity_tag_scores keyed by places.id.
  */
 
 import { db } from '@/lib/db';
@@ -256,7 +256,7 @@ async function main() {
       const tagResult = computeTagScores(tagInputs);
 
       if (!dryRun) {
-        await db.place_tag_scores.upsert({
+        await db.entity_tag_scores.upsert({
           where: {
             entityId_version: { entityId: placeId, version: TAG_VERSION },
           },

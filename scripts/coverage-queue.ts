@@ -2,8 +2,10 @@
  * Coverage Queue v1 — Stub that prints what WOULD be queued (no API calls)
  *
  * Usage:
- *   REQUIRE_DB_HOST=localhost REQUIRE_DB_NAME=saiko_maps npm run coverage:queue:local
- *   REQUIRE_DB_HOST=ep-spring-sun... REQUIRE_DB_NAME=neondb npm run coverage:queue:neon
+ *   npm run coverage:queue:local
+ *   npm run coverage:queue:neon
+ *
+ * Requires: .env.local with DATABASE_URL and DB_ENV (dev|staging|prod)
  *
  * --la-only   Filter to LA bbox (default: true)
  * --limit=N   Max places to consider (default: 200)
@@ -12,39 +14,10 @@
  * Does NOT call external APIs.
  */
 
+// Triggers v3.0 validation via coverage-run's config/db import
 import { runCoverageAudit } from './coverage-run';
 
-function hostMatches(parsed: string, required: string): boolean {
-  if (parsed === required) return true;
-  return parsed.startsWith(required + ':');
-}
-
-function assertDbIdentity(): void {
-  const u = process.env.DATABASE_URL ?? '';
-  const hostMatch = u.match(/@([^/]+)\//);
-  const dbMatch = u.match(/@[^/]+\/([^?]+)/);
-  const host = hostMatch ? hostMatch[1] : '?';
-  const dbname = dbMatch ? dbMatch[1] : '?';
-
-  const requireHost = process.env.REQUIRE_DB_HOST;
-  const requireName = process.env.REQUIRE_DB_NAME;
-
-  if (requireHost && !hostMatches(host, requireHost)) {
-    console.error(
-      `[COVERAGE QUEUE] Source-of-truth mismatch: REQUIRE_DB_HOST=${requireHost} but DATABASE_URL host is "${host}"`
-    );
-    process.exit(1);
-  }
-  if (requireName && dbname !== requireName) {
-    console.error(
-      `[COVERAGE QUEUE] Source-of-truth mismatch: REQUIRE_DB_NAME=${requireName} but DATABASE_URL dbname is "${dbname}"`
-    );
-    process.exit(1);
-  }
-}
-
 async function main() {
-  assertDbIdentity();
 
   const laOnlyFlag = !process.argv.includes('--no-la-only');
   const limitArg = process.argv.find((a) => a.startsWith('--limit='));

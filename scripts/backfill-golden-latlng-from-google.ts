@@ -62,7 +62,7 @@ async function main() {
     SELECT g.canonical_id, g.slug,
       COALESCE(NULLIF(btrim(g.google_place_id), ''), NULLIF(btrim(p.google_place_id), '')) AS google_place_id
     FROM golden_records g
-    LEFT JOIN places p ON p.slug = g.slug AND p.google_place_id IS NOT NULL AND btrim(p.google_place_id) != ''
+    LEFT JOIN entities p ON p.slug = g.slug AND p.google_place_id IS NOT NULL AND btrim(p.google_place_id) != ''
     WHERE (g.lat IS NULL OR g.lng IS NULL OR g.lat::float = 0 OR g.lng::float = 0)
       AND (
         (g.google_place_id IS NOT NULL AND btrim(COALESCE(g.google_place_id, '')) != '')
@@ -150,7 +150,7 @@ async function main() {
         AND lat::float != 0 AND lng::float != 0
     `,
     db.$queryRaw<[{ count: bigint }]>`
-      SELECT COUNT(*)::bigint AS count FROM places
+      SELECT COUNT(*)::bigint AS count FROM entities
       WHERE latitude IS NOT NULL AND longitude IS NOT NULL
         AND latitude::float != 0 AND longitude::float != 0
     `,
@@ -174,7 +174,7 @@ async function main() {
     });
     const [placesAfter, laAfter] = await Promise.all([
       db.$queryRaw<[{ count: bigint }]>`
-        SELECT COUNT(*)::bigint AS count FROM places
+        SELECT COUNT(*)::bigint AS count FROM entities
         WHERE latitude IS NOT NULL AND longitude IS NOT NULL
           AND latitude::float != 0 AND longitude::float != 0
       `,

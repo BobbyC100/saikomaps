@@ -1,13 +1,15 @@
 /**
  * Coverage Apply Tags — Fills NEED_TAG_SIGNALS for queued places
- * via the existing energy + tag pipeline (energy_scores, place_tag_scores).
+ * via the existing energy + tag pipeline (energy_scores, entity_tag_scores).
  *
  * Uses runCoverageAudit(); only processes places with NEED_TAG_SIGNALS.
  * Idempotent: skips places that already have tag signals.
  *
  * Usage:
- *   REQUIRE_DB_HOST=... REQUIRE_DB_NAME=... npm run coverage:apply:tags:neon -- --la-only --limit=20
+ *   npm run coverage:apply:tags:neon -- --la-only --limit=20
  *   ... --apply   # persist changes
+ *
+ * Requires: .env.local with DATABASE_URL and DB_ENV (dev|staging|prod)
  *
  * Flags:
  *   --limit=N     Max places to process (default 20)
@@ -23,7 +25,8 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { randomUUID } from 'crypto';
-import { db } from '@/lib/db';
+import { db } from '@/config/db';
+const prisma = db.admin;
 import { computeEnergy, computeTagScores } from '@/lib/energy-tag-engine';
 import type { EnergyInputs, TagScoreInputs } from '@/lib/energy-tag-engine';
 import { parseAttrs, isBarForward, buildCoverageAboutText } from '@/lib/energy-tag-engine/shared';
@@ -32,42 +35,6 @@ import { runCoverageAudit, type CoverageCandidate } from './coverage-run';
 const ENERGY_VERSION = 'energy_v1';
 const TAG_VERSION = 'tags_v1';
 const DEFAULT_LIMIT = 20;
-
-// ---------------------------------------------------------------------------
-// DB identity (mirrors coverage-run)
-// ---------------------------------------------------------------------------
-function parseDatabaseUrl(): { host: string; dbname: string } {
-  const u = process.env.DATABASE_URL ?? '';
-  const hostMatch = u.match(/@([^/]+)\//);
-  const dbMatch = u.match(/@[^/]+\/([^?]+)/);
-  return {
-    host: hostMatch ? hostMatch[1] : '?',
-    dbname: dbMatch ? dbMatch[1] : '?',
-  };
-}
-
-function hostMatches(parsed: string, required: string): boolean {
-  return parsed === required || parsed.startsWith(required + ':');
-}
-
-function assertDbIdentity(): void {
-  const { host, dbname } = parseDatabaseUrl();
-  const requireHost = process.env.REQUIRE_DB_HOST;
-  const requireName = process.env.REQUIRE_DB_NAME;
-
-  if (requireHost && !hostMatches(host, requireHost)) {
-    console.error(
-      `[COVERAGE APPLY TAGS] Source-of-truth mismatch: REQUIRE_DB_HOST=${requireHost} but DATABASE_URL host is "${host}"`
-    );
-    process.exit(1);
-  }
-  if (requireName && dbname !== requireName) {
-    console.error(
-      `[COVERAGE APPLY TAGS] Source-of-truth mismatch: REQUIRE_DB_NAME=${requireName} but DATABASE_URL dbname is "${dbname}"`
-    );
-    process.exit(1);
-  }
-}
 
 // ---------------------------------------------------------------------------
 // Filter candidates to NEED_TAG_SIGNALS only
@@ -98,7 +65,7 @@ async function fetchPlaceIdToGolden(
   const map = new Map<string, GoldenRow>();
   if (placeIds.length === 0) return map;
 
-  const places = await db.entities.findMany({
+  const places = await prisma.entities.findMany({
     where: { id: { in: placeIds } },
     select: { id: true, googlePlaceId: true },
   });
@@ -107,7 +74,7 @@ async function fetchPlaceIdToGolden(
   ];
   if (googleIds.length === 0) return map;
 
-  const golden = await db.golden_records.findMany({
+  const golden = await prisma.golden_records.findMany({
     where: { google_place_id: { in: googleIds } },
     select: {
       canonical_id: true,
@@ -145,9 +112,9 @@ async function fetchPlaceIdToGolden(
 // ---------------------------------------------------------------------------
 async function hasTagSignals(placeId: string): Promise<boolean> {
   const [energyCount, tagCount, place] = await Promise.all([
-    db.energy_scores.count({ where: { entityId: placeId, version: ENERGY_VERSION } }),
-    db.place_tag_scores.count({ where: { entityId: placeId, version: TAG_VERSION } }),
-    db.entities.findUnique({
+    prisma.energy_scores.count({ where: { entityId: placeId, version: ENERGY_VERSION } }),
+    prisma.entity_tag_scores.count({ where: { entityId: placeId, version: TAG_VERSION } }),
+    prisma.entities.findUnique({
       where: { id: placeId },
       select: { vibeTags: true },
     }),
@@ -216,7 +183,6 @@ export interface CoverageApplyTagsReport {
 // Main
 // ---------------------------------------------------------------------------
 async function main() {
-  assertDbIdentity();
 
   const { apply, limit, laOnly, ttlDays } = parseArgs();
   const dryRun = !apply;
@@ -317,7 +283,7 @@ async function main() {
       const tagResult = computeTagScores(tagInputs);
 
       if (!dryRun) {
-        await db.energy_scores.upsert({
+        await prisma.energy_scores.upsert({
           where: { entityId_version: { entityId: place_id, version: ENERGY_VERSION } },
           create: {
             id: randomUUID(),
@@ -350,7 +316,7 @@ async function main() {
           },
         });
 
-        await db.place_tag_scores.upsert({
+        await prisma.entity_tag_scores.upsert({
           where: { entityId_version: { entityId: place_id, version: TAG_VERSION } },
           create: {
             id: randomUUID(),
@@ -381,7 +347,7 @@ async function main() {
       report.counts.succeeded++;
       if (i < 10) {
         const label = dryRun ? '[DRY]' : '✓';
-        console.log(`  ${label} ${slug} → energy_scores, place_tag_scores`);
+        console.log(`  ${label} ${slug} → energy_scores, entity_tag_scores`);
       }
     } catch (e) {
       const error = e instanceof Error ? e.message : String(e);
@@ -423,4 +389,4 @@ main()
     console.error(e);
     process.exit(1);
   })
-  .finally(() => db.$disconnect());
+  .finally(() => prisma.$disconnect());

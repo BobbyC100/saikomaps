@@ -4,6 +4,8 @@
  * ALLOW_LOCAL_DB=1 to proceed when DATABASE_URL points at localhost/127.0.0.1.
  */
 
+export type DbEnv = { DATABASE_URL: string; DB_ENV: 'dev' | 'staging' | 'prod' };
+
 function parseDatabaseUrl(url: string | undefined): { host: string; database: string } {
   if (!url || typeof url !== 'string') {
     return { host: '', database: '' };
@@ -31,7 +33,17 @@ function isLocalHost(host: string, url?: string): boolean {
 
 /** Call at script start. Prints DB target; exits process if local and ALLOW_LOCAL_DB is not set. */
 export function assertDbTargetAllowed(): void {
+  const dbEnv = process.env.DB_ENV;
   const url = process.env.DATABASE_URL;
+
+  if (!dbEnv || (dbEnv !== 'dev' && dbEnv !== 'staging' && dbEnv !== 'prod')) {
+    console.error('DB_ENV must be set (dev|staging|prod). Set in .env.local or process.env.');
+    process.exit(1);
+  }
+  if (!url || typeof url !== 'string' || url.trim() === '') {
+    console.error('DATABASE_URL must be set in .env.local or process.env.');
+    process.exit(1);
+  }
   const { host, database } = parseDatabaseUrl(url);
 
   const dbLabel = host || database ? `${host || '?'} / ${database || '?'}` : url ? '(unparseable)' : '(DATABASE_URL unset)';
@@ -42,15 +54,24 @@ export function assertDbTargetAllowed(): void {
     if (allow !== '1' && allow !== 'true') {
       console.error(
         '[DB] Blocked: DATABASE_URL points at localhost. Production scripts must run against Neon.\n' +
-          '  To use Neon: run via db-neon.sh, e.g. ./scripts/db-neon.sh node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/sync-golden-to-places.ts\n' +
-          '  Or set DATABASE_URL to your Neon URL (e.g. in .env or .env.db.neon) and run with that env loaded.\n' +
+          '  Set DATABASE_URL in .env.local to your Neon URL.\n' +
           '  To allow local anyway (e.g. for dev): ALLOW_LOCAL_DB=1 npm run <script>\n' +
-          '  Sanity check target: npm run db:whoami   (ensure Prisma matches DB: npm run db:generate)\n'
+          '  Sanity check target: npm run db:whoami\n'
       );
       process.exit(1);
     }
     console.log('[DB] ALLOW_LOCAL_DB=1 set — proceeding against local.\n');
   }
+}
+
+/** Call at start of destructive scripts when DB_ENV=prod. Exits unless CONFIRM_PROD=1. */
+export function requireProdConfirmation(message?: string): void {
+  if (process.env.DB_ENV !== 'prod') return;
+  if (process.env.CONFIRM_PROD === '1' || process.env.CONFIRM_PROD === 'true') return;
+  console.error(
+    message ?? 'Destructive run against prod. Set CONFIRM_PROD=1 to proceed.'
+  );
+  process.exit(1);
 }
 
 /** Returns a one-line banner string (host + database) for logging. */

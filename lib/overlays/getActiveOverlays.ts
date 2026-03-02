@@ -3,23 +3,26 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 interface GetActiveOverlaysParams {
-  placeId: string;
+  entityId: string;
   now?: Date;
 }
 
 /**
- * Queries active overlays for a place at a given time.
+ * Queries active overlays for an entity at a given time.
  * Returns overlays where startsAt <= now AND endsAt > now.
  * 
  * @param params - Query parameters
  * @returns Array of active operational overlays
  */
 export async function getActiveOverlays(params: GetActiveOverlaysParams) {
-  const { placeId, now = new Date() } = params;
+  const { entityId, now = new Date() } = params;
+  if (!entityId) {
+    throw new Error('entityId is required');
+  }
 
   const activeOverlays = await prisma.operational_overlays.findMany({
     where: {
-      placeId,
+      entityId,
       startsAt: { lte: now },
       endsAt: { gt: now },
     },
