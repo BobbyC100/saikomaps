@@ -1,0 +1,131 @@
+{
+  "run_id": "run_1772489180000",
+  "created_at": "2026-03-02T22:06:20.000Z",
+  "db_identity": {
+    "host": "ep-spring-sun-aiht1nns-pooler.c-4.us-east-1.aws.neon.tech",
+    "dbname": "neondb",
+    "database_url_host": "ep-spring-sun-aiht1nns-pooler.c-4.us-east-1.aws.neon.tech",
+    "database_url_dbname": "neondb"
+  },
+  "params": {
+    "limit": 300,
+    "la_only": true,
+    "ttl_days": 90,
+    "retry_backoff_hours": 24
+  },
+  "counts": {
+    "total_places": 103,
+    "by_prl": {
+      "prl_1": 66,
+      "prl_2": 37
+    },
+    "by_missing_group": {
+      "NEED_HOURS": 53,
+      "NEED_DESCRIPTION": 101,
+      "NEED_TAG_SIGNALS": 66,
+      "NEED_GOOGLE_PHOTOS": 3,
+      "NEED_GOOGLE_ATTRS": 3
+    },
+    "candidates_count": 3,
+    "excluded_by_ttl": 100,
+    "excluded_by_backoff": 0,
+    "excluded_by_running": 0,
+    "excluded_by_complete": 0
+  },
+  "candidates": [
+    {
+      "place_id": "f3f5b567-12ef-4c67-a835-c3f2fe43cb61",
+      "slug": "bridgetown-roti-east-hollywood",
+      "name": "Bridgetown Roti",
+      "google_place_id": "ChIJne7Az-rHwoARQhCf1NoVpsY",
+      "dedupe_key": "ChIJne7Az-rHwoARQhCf1NoVpsY",
+      "missing_groups": [
+        "NEED_GOOGLE_ATTRS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_GOOGLE_ATTRS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "054d9ffa-0bb8-4067-b5c2-f84d16066d3a",
+      "slug": "great-white-central-la",
+      "name": "Great White",
+      "google_place_id": "ChIJ_Vof54W5woAReyLh-5XMF90",
+      "dedupe_key": "ChIJ_Vof54W5woAReyLh-5XMF90",
+      "missing_groups": [
+        "NEED_GOOGLE_ATTRS",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_GOOGLE_ATTRS, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "22c98e53-0a12-4ca8-b4cf-a5aaf7f47e74",
+      "slug": "night-market-weho-sunset-strip",
+      "name": "Night + Market Weho",
+      "google_place_id": "ChIJ93f0oKG-woAR1g08r2EtyRY",
+      "dedupe_key": "ChIJ93f0oKG-woAR1g08r2EtyRY",
+      "missing_groups": [
+        "NEED_GOOGLE_ATTRS",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_GOOGLE_ATTRS, NEED_TAG_SIGNALS"
+    }
+  ],
+  "duplicate_groups": [
+    {
+      "key": "google_place_id",
+      "value": "golden:ChIJw39VcmTHwoAR41_JNE9f480",
+      "place_ids": [],
+      "slugs": [
+        "2 golden records"
+      ]
+    },
+    {
+      "key": "google_place_id",
+      "value": "golden:ChIJu7pgbh7HwoARFzTtEnYYM4Y",
+      "place_ids": [],
+      "slugs": [
+        "2 golden records"
+      ]
+    }
+  ],
+  "top_20_candidates": [
+    {
+      "place_id": "f3f5b567-12ef-4c67-a835-c3f2fe43cb61",
+      "slug": "bridgetown-roti-east-hollywood",
+      "name": "Bridgetown Roti",
+      "google_place_id": "ChIJne7Az-rHwoARQhCf1NoVpsY",
+      "dedupe_key": "ChIJne7Az-rHwoARQhCf1NoVpsY",
+      "missing_groups": [
+        "NEED_GOOGLE_ATTRS",
+        "NEED_DESCRIPTION",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_GOOGLE_ATTRS, NEED_DESCRIPTION, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "054d9ffa-0bb8-4067-b5c2-f84d16066d3a",
+      "slug": "great-white-central-la",
+      "name": "Great White",
+      "google_place_id": "ChIJ_Vof54W5woAReyLh-5XMF90",
+      "dedupe_key": "ChIJ_Vof54W5woAReyLh-5XMF90",
+      "missing_groups": [
+        "NEED_GOOGLE_ATTRS",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_GOOGLE_ATTRS, NEED_TAG_SIGNALS"
+    },
+    {
+      "place_id": "22c98e53-0a12-4ca8-b4cf-a5aaf7f47e74",
+      "slug": "night-market-weho-sunset-strip",
+      "name": "Night + Market Weho",
+      "google_place_id": "ChIJ93f0oKG-woAR1g08r2EtyRY",
+      "dedupe_key": "ChIJ93f0oKG-woAR1g08r2EtyRY",
+      "missing_groups": [
+        "NEED_GOOGLE_ATTRS",
+        "NEED_TAG_SIGNALS"
+      ],
+      "reason": "Missing: NEED_GOOGLE_ATTRS, NEED_TAG_SIGNALS"
+    }
+  ]
+}

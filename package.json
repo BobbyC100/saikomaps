@@ -124,6 +124,7 @@
     "backfill:google-place-ids:neon": "./scripts/db-neon.sh node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/backfill-google-place-ids.ts",
     "backfill:golden-from-places:local": "./scripts/db-local.sh node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/backfill-golden-from-places.ts",
     "backfill:golden-from-places:neon": "./scripts/db-neon.sh node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/backfill-golden-from-places.ts",
+    "promote:orphans:neon": "./scripts/db-neon.sh node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/promote-orphans-to-golden.ts",
     "backfill:golden-latlng:neon": "./scripts/db-neon.sh node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/backfill-golden-latlng-from-google.ts",
     "backfill:golden-latlng:local": "./scripts/db-local.sh node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/backfill-golden-latlng-from-google.ts",
     "backfill:golden-google-place-id:neon": "./scripts/db-neon.sh node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/backfill-golden-google-place-id.ts",

@@ -13,3 +13,4 @@ ALTER TABLE public.place_coverage_status RENAME CONSTRAINT place_coverage_status
 ALTER TABLE public.place_photo_eval RENAME CONSTRAINT place_photo_eval_place_id_fkey TO place_photo_eval_entity_id_fkey;
 ALTER TABLE public.place_tag_scores RENAME CONSTRAINT place_tag_scores_place_id_fkey TO place_tag_scores_entity_id_fkey;
 ALTER TABLE public.viewer_bookmarks RENAME CONSTRAINT viewer_bookmarks_place_id_fkey TO viewer_bookmarks_entity_id_fkey;
+export DB_ENV=local

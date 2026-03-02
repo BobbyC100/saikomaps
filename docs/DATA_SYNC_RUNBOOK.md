@@ -105,3 +105,72 @@ Returns JSON: `classification`, `host`, `database`, `places_count`. Only availab
 - **Counts (Neon vs Supabase):** Set `NEON_URL` or `SUPABASE_URL`, run the `psql ... -c "SELECT count(*) ..."` blocks above.
 - **Sync to prod Neon:** `npx tsx scripts/sync-db.ts --source <url> --target <prod-neon-url>` then add `--apply` to write.
 - **Dev DB choice:** `npm run dev:local` or `npm run dev:neon`; banner confirms which DB.
+
+---
+
+## 6. Canonical drift KPI — promote orphan entities → golden_records
+
+One KPI, one decision tree, one loop. No spelunking.
+
+### Command
+
+```bash
+./scripts/db-neon.sh psql -c "
+SELECT
+  COUNT(*) AS entities_without_golden,
+  COUNT(*) FILTER (
+    WHERE e.google_place_id IS NOT NULL
+      AND btrim(COALESCE(e.google_place_id,'')) != ''
+  ) AS promotable_with_gpid,
+  COUNT(*) FILTER (
+    WHERE e.google_place_id IS NULL
+      OR btrim(COALESCE(e.google_place_id,'')) = ''
+  ) AS need_gpid_first
+FROM entities e
+LEFT JOIN golden_records g ON g.slug = e.slug
+WHERE g.canonical_id IS NULL;
+"
+```
+
+### Output columns
+
+| Column | Meaning |
+|-------|---------|
+| **entities_without_golden** | Total orphan entities (canonical drift KPI). |
+| **promotable_with_gpid** | Orphans that already have a google_place_id. Can be promoted immediately. |
+| **need_gpid_first** | Orphans missing google_place_id. Must run GPID backfill first. |
+
+### What to do based on the numbers
+
+**If promotable_with_gpid > 0**
+
+Run the automated loop:
+
+```bash
+npm run promote:orphans:neon -- --apply --limit 20
+```
+
+Repeat until promotable_with_gpid = 0.
+
+**If need_gpid_first > 0**
+
+Run:
+
+```bash
+npm run backfill:golden-gpid-from-places:neon -- --apply
+```
+
+Then re-run the KPI and return to promotion.
+
+### Done condition
+
+You're done when:
+
+- **entities_without_golden = 0**, or
+- All remaining orphans are intentionally excluded (no GPID, low confidence, manual review bucket).
+
+### Manual fallback (zsh-safe)
+
+```bash
+npm run backfill:golden-from-places:neon -- --apply --ids 'id1,id2,id3'
+```
