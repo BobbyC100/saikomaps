@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "tsx:env": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx",
+    "psql:neon": "node -e \"require('dotenv').config({path:'.env'}); require('dotenv').config({path:'.env.local',override:true}); const u=process.env.DATABASE_URL||process.env.DATABASE_URL_DIRECT; if(!u){console.error('DATABASE_URL or DATABASE_URL_DIRECT required in .env.local'); process.exit(1);} require('child_process').spawnSync('psql',[u],{stdio:'inherit'});\"",
+    "google:websites:dry": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/backfill-websites-from-google.ts --dry-run --la-only",
+    "google:websites": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/backfill-websites-from-google.ts --la-only",
     "test": "vitest run",
     "test:watch": "vitest",
     "dev": "npx tsx scripts/dev.js",

@@ -13,6 +13,7 @@
  * - UI components
  */
 
+/** Canonical env var. Use GOOGLE_PLACES_API_KEY only. */
 const GOOGLE_PLACES_API_KEY = process.env.GOOGLE_PLACES_API_KEY;
 const GOOGLE_PLACES_ENABLED = process.env.GOOGLE_PLACES_ENABLED === 'true';
 const PLACES_API_BASE = 'https://maps.googleapis.com/maps/api/place';

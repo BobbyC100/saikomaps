@@ -6,8 +6,11 @@
  * Requires: GOOGLE_PLACES_API_KEY
  */
 
-import 'dotenv/config';
+import { config } from 'dotenv';
 import { db } from '@/lib/db';
+
+config({ path: '.env' });
+config({ path: '.env.local', override: true });
 import { VALADATA_GOOGLE_PLACES_FIELDS_V1_STRING } from '@/lib/google-places';
 
 const PLACES_API_NEW_BASE = 'https://places.googleapis.com/v1';
@@ -20,13 +23,10 @@ async function sleep(ms: number) {
 
 async function main() {
   const limit = parseInt(process.argv[2] || '20', 10) || 20;
-  const apiKey =
-    process.env.GOOGLE_PLACES_API_KEY || process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+  const apiKey = process.env.GOOGLE_PLACES_API_KEY;
 
   if (!apiKey) {
-    console.error(
-      'No API key. Set GOOGLE_PLACES_API_KEY or NEXT_PUBLIC_GOOGLE_MAPS_API_KEY in .env.local'
-    );
+    console.error('No API key. Set GOOGLE_PLACES_API_KEY in .env.local');
     process.exit(1);
   }
 

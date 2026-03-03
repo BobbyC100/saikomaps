@@ -1,5 +1,7 @@
 # Google Places API — Unblock Legacy Text Search
 
+**Use `GOOGLE_PLACES_API_KEY` only.** Do not use `GOOGLE_PLACES_API_KEY_NEW` or other variants.
+
 Use when `backfill-google-place-ids` returns `REQUEST_DENIED`.
 
 ## 1) Enable the correct API in GCP
@@ -18,13 +20,22 @@ Console → APIs & Services → Credentials → your API key
 
 (Re‑restrict after it works.)
 
-## 3) Env vars (load-env loads .env then .env.local)
+## 3) Env vars
 
-In `.env.local`:
+`scripts/load-env.js` loads `.env` then `.env.local` (override). In `.env.local`:
 
 ```
 GOOGLE_PLACES_ENABLED=true
 GOOGLE_PLACES_API_KEY=YOUR_REAL_KEY
+```
+
+**Curl example (uses env var, never paste raw key):**
+
+```bash
+source .env.local 2>/dev/null || true
+curl -s "https://places.googleapis.com/v1/places/ChIJGU5p6ri7woARaCOqe4haSl0" \
+  -H "X-Goog-Api-Key: ${GOOGLE_PLACES_API_KEY}" \
+  -H "X-Goog-FieldMask: id,displayName"
 ```
 
 ## 4) Proof test

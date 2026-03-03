@@ -7,10 +7,11 @@ export async function GET() {
     return new Response('Not Found', { status: 404 });
   }
 
+  const key = process.env.GOOGLE_PLACES_API_KEY ?? '';
   return Response.json({
-    R2_BUCKET_NAME: process.env.R2_BUCKET_NAME,
-    R2_ENDPOINT: process.env.R2_ENDPOINT,
-    hasAccessKey: Boolean(process.env.R2_ACCESS_KEY_ID),
-    hasSecretKey: Boolean(process.env.R2_SECRET_ACCESS_KEY),
+    NODE_ENV: process.env.NODE_ENV,
+    GOOGLE_PLACES_API_KEY_hasKey: !!key?.trim(),
+    GOOGLE_PLACES_API_KEY_length: key?.length ?? 0,
+    GOOGLE_PLACES_API_KEY_prefix: key?.length >= 6 ? key.slice(0, 6) : null,
   });
 }

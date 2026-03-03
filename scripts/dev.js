@@ -109,8 +109,12 @@ async function runProbes() {
       console.log('  WARNING: LOCAL DB HAS LOW DATA — EXPECT 404s');
     }
   } catch (err) {
-    console.log('DB PROBE schema: (query failed:', err && err.message ? err.message : err, ')');
+    const msg = err && err.message ? err.message : String(err);
+    console.log('DB PROBE schema: (query failed:', msg, ')');
     console.log('DB PROBE data: (skipped)');
+    if (msg.includes('does not exist') || msg.includes('relation')) {
+      console.log('  TIP: Ensure DATABASE_URL in .env.local points at Neon/project DB with full schema (places, etc.).');
+    }
   } finally {
     await prisma.$disconnect();
   }

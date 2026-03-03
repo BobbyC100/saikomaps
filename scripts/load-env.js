@@ -7,4 +7,5 @@
  * Use: node -r ./scripts/load-env.js ... (for scripts that need GOOGLE_PLACES_*, etc.)
  * Scripts that touch DB should import config/db (which triggers config/env validation).
  */
-require('dotenv').config({ path: '.env.local' });
+require('dotenv').config({ path: '.env' });
+require('dotenv').config({ path: '.env.local', override: true });

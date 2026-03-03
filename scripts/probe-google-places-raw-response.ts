@@ -9,8 +9,11 @@
  * utcOffsetMinutes (for sanity + hours debugging).
  */
 
-import 'dotenv/config';
+import { config } from 'dotenv';
 import { db } from '@/lib/db';
+
+config({ path: '.env' });
+config({ path: '.env.local', override: true });
 
 const PLACES_API_NEW_BASE = 'https://places.googleapis.com/v1';
 
@@ -20,8 +23,7 @@ const HOURS_FIELD_MASK =
 
 async function main() {
   const placeId = process.argv[2];
-  const apiKey =
-    process.env.GOOGLE_PLACES_API_KEY || process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+  const apiKey = process.env.GOOGLE_PLACES_API_KEY;
 
   let id = placeId;
   if (!id) {
@@ -40,9 +42,7 @@ async function main() {
     process.exit(1);
   }
   if (!apiKey) {
-    console.error(
-      'No API key. Set GOOGLE_PLACES_API_KEY or NEXT_PUBLIC_GOOGLE_MAPS_API_KEY in .env.local'
-    );
+    console.error('No API key. Set GOOGLE_PLACES_API_KEY in .env.local');
     process.exit(1);
   }
 
