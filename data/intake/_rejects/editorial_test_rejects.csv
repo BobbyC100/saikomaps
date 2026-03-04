@@ -1,0 +1,3 @@
+name,street_address,google_place_id,google_maps_url,reject_reason,reject_message
+Missing anchor,,,,NO_GOOGLE_PLACE_ID,"No identity anchor: missing GooglePlaceID, GoogleMapsURL, and Address"
+,123 Main St,ChIJxxx,https://maps.google.com/?cid=123,MISSING_NAME,Name is empty or missing

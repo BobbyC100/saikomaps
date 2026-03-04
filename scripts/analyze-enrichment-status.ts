@@ -1,204 +1,128 @@
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { db } from '../lib/db';
+import { EnrichmentStage } from '@prisma/client';
 
 async function analyzeEnrichmentStatus() {
-  console.log('🔍 Analyzing Place Enrichment Status...\n');
+  console.log('🔍 Analyzing Entity Enrichment Status...\n');
 
-  const places = await prisma.place.findMany({
+  const entities = await db.entities.findMany({
     select: {
       id: true,
       name: true,
       slug: true,
       googlePlaceId: true,
-      googlePhotos: true,
-      placesDataCachedAt: true,
       neighborhood: true,
-      cuisineType: true,
-      tagline: true,
-      taglineGenerated: true,
-      taglinePattern: true,
-      vibeTags: true,
-      tips: true,
-      pullQuote: true,
-      mapPlaces: {
-        select: {
-          map: {
-            select: { title: true }
-          }
-        }
+      category: true,
+      enrichment_stage: true,
+      needs_human_review: true,
+      last_enriched_at: true,
+      status: true,
+      map_places: {
+        select: { id: true },
       },
     },
   });
 
-  // Categorize places by enrichment level
   let hasGooglePlaceId = 0;
-  let hasPhotos = 0;
   let hasNeighborhood = 0;
-  let hasCuisineType = 0;
-  let hasTagline = 0;
-  let hasVibeTags = 0;
-  let hasTips = 0;
-  let hasPullQuote = 0;
-  let fullyEnriched = 0;
+  let hasCategory = 0;
+  let merchantEnriched = 0;
+  let needsHumanReview = 0;
 
-  const enrichmentLevels: Record<string, any[]> = {
-    'Full Stack (All)': [],
-    'Voice Engine + Google': [],
-    'Google Only': [],
-    'Minimal': [],
+  const enrichmentLevels: Record<string, typeof entities> = {
+    'Merchant Enriched': [],
+    'Google Coverage Complete': [],
+    'Minimal (GPID only)': [],
     'None': [],
   };
 
-  places.forEach((place) => {
-    const hasGPID = !!place.googlePlaceId;
-    const hasGPhotos = place.googlePhotos !== null && 
-                       Array.isArray(place.googlePhotos) && 
-                       place.googlePhotos.length > 0;
-    const hasNH = !!place.neighborhood;
-    const hasCT = !!place.cuisineType;
-    const hasTL = !!place.tagline;
-    const hasVT = place.vibeTags.length > 0;
-    const hasTI = place.tips.length > 0;
-    const hasPQ = !!place.pullQuote;
+  entities.forEach((entity) => {
+    const hasGPID = !!entity.googlePlaceId;
+    const hasNH = !!entity.neighborhood;
+    const hasCat = !!entity.category;
+    const isMerchantEnriched = entity.enrichment_stage === EnrichmentStage.MERCHANT_ENRICHED;
+    const isGoogleComplete = entity.enrichment_stage === EnrichmentStage.GOOGLE_COVERAGE_COMPLETE;
 
-    // Count enrichments
     if (hasGPID) hasGooglePlaceId++;
-    if (hasGPhotos) hasPhotos++;
     if (hasNH) hasNeighborhood++;
-    if (hasCT) hasCuisineType++;
-    if (hasTL) hasTagline++;
-    if (hasVT) hasVibeTags++;
-    if (hasTI) hasTips++;
-    if (hasPQ) hasPullQuote++;
+    if (hasCat) hasCategory++;
+    if (isMerchantEnriched) merchantEnriched++;
+    if (entity.needs_human_review) needsHumanReview++;
 
-    // Categorize
-    const voiceEnriched = hasTL || hasVT || hasTI || hasPQ;
-    const googleEnriched = hasGPID && hasGPhotos;
-
-    if (googleEnriched && voiceEnriched) {
-      fullyEnriched++;
-      enrichmentLevels['Full Stack (All)'].push(place);
-    } else if (voiceEnriched && !googleEnriched) {
-      enrichmentLevels['Voice Engine + Google'].push(place);
-    } else if (googleEnriched && !voiceEnriched) {
-      enrichmentLevels['Google Only'].push(place);
-    } else if (hasGPID || hasNH || hasCT) {
-      enrichmentLevels['Minimal'].push(place);
+    if (isMerchantEnriched) {
+      enrichmentLevels['Merchant Enriched'].push(entity);
+    } else if (isGoogleComplete) {
+      enrichmentLevels['Google Coverage Complete'].push(entity);
+    } else if (hasGPID) {
+      enrichmentLevels['Minimal (GPID only)'].push(entity);
     } else {
-      enrichmentLevels['None'].push(place);
+      enrichmentLevels['None'].push(entity);
     }
   });
 
-  // Display results
+  const total = entities.length;
+  const pct = (n: number) => total > 0 ? Math.round(n * 100 / total) : 0;
+
   console.log('📊 Overall Enrichment Coverage:');
   console.log('─'.repeat(80));
-  console.log(`Total Places:                    ${places.length}`);
-  console.log(`Google Place ID:                 ${hasGooglePlaceId} (${Math.round(hasGooglePlaceId * 100 / places.length)}%)`);
-  console.log(`Photos:                          ${hasPhotos} (${Math.round(hasPhotos * 100 / places.length)}%)`);
-  console.log(`Neighborhood:                    ${hasNeighborhood} (${Math.round(hasNeighborhood * 100 / places.length)}%)`);
-  console.log(`Cuisine Type:                    ${hasCuisineType} (${Math.round(hasCuisineType * 100 / places.length)}%)`);
+  console.log(`Total Entities:                  ${total}`);
+  console.log(`Google Place ID:                 ${hasGooglePlaceId} (${pct(hasGooglePlaceId)}%)`);
+  console.log(`Neighborhood:                    ${hasNeighborhood} (${pct(hasNeighborhood)}%)`);
+  console.log(`Category:                        ${hasCategory} (${pct(hasCategory)}%)`);
+  console.log(`Merchant Enriched:               ${merchantEnriched} (${pct(merchantEnriched)}%)`);
+  console.log(`Needs Human Review:              ${needsHumanReview} (${pct(needsHumanReview)}%)`);
   console.log('');
-  console.log('🎤 Voice Engine Enrichment:');
-  console.log(`Tagline:                         ${hasTagline} (${Math.round(hasTagline * 100 / places.length)}%)`);
-  console.log(`Vibe Tags:                       ${hasVibeTags} (${Math.round(hasVibeTags * 100 / places.length)}%)`);
-  console.log(`Tips:                            ${hasTips} (${Math.round(hasTips * 100 / places.length)}%)`);
-  console.log(`Pull Quote:                      ${hasPullQuote} (${Math.round(hasPullQuote * 100 / places.length)}%)`);
-  console.log('');
-  console.log(`🎯 Fully Enriched (All fields):  ${fullyEnriched} (${Math.round(fullyEnriched * 100 / places.length)}%)`);
 
-  console.log('\n' + '─'.repeat(80));
-  console.log('\n📈 Enrichment Level Breakdown:\n');
-
-  Object.entries(enrichmentLevels).forEach(([level, levelPlaces]) => {
-    const count = levelPlaces.length;
-    const pct = Math.round(count * 100 / places.length);
-    console.log(`${level.padEnd(30)} ${count.toString().padStart(3)} places (${pct}%)`);
+  console.log('\n📈 Enrichment Stage Breakdown:\n');
+  Object.entries(enrichmentLevels).forEach(([level, rows]) => {
+    const count = rows.length;
+    console.log(`${level.padEnd(35)} ${count.toString().padStart(4)} entities (${pct(count)}%)`);
   });
 
-  // Show places researched with Voice Engine
   console.log('\n' + '─'.repeat(80));
-  console.log('\n🎤 Places with Voice Engine Research:\n');
+  console.log('\n⚠️  Entities Needing Enrichment:\n');
 
-  const voiceEnrichedPlaces = places.filter(p => 
-    p.tagline || p.vibeTags.length > 0 || p.tips.length > 0 || p.pullQuote
-  ).sort((a, b) => (b.taglineGenerated?.getTime() || 0) - (a.taglineGenerated?.getTime() || 0));
+  const needsGoogle = entities.filter((e) => !e.googlePlaceId);
+  const needsWebsite = entities.filter(
+    (e) => e.enrichment_stage === EnrichmentStage.GOOGLE_COVERAGE_COMPLETE && e.status === 'OPEN'
+  ).filter((e) => e.map_places.length > 0);
 
-  if (voiceEnrichedPlaces.length > 0) {
-    console.log(`Found ${voiceEnrichedPlaces.length} places with Voice Engine enrichment:\n`);
-    
-    voiceEnrichedPlaces.slice(0, 20).forEach((place) => {
-      const enrichments = [];
-      if (place.tagline) enrichments.push(`tagline: "${place.tagline.substring(0, 40)}..."`);
-      if (place.vibeTags.length > 0) enrichments.push(`vibeTags: ${place.vibeTags.length}`);
-      if (place.tips.length > 0) enrichments.push(`tips: ${place.tips.length}`);
-      if (place.pullQuote) enrichments.push('pull quote');
-      
-      console.log(`📍 ${place.name} (${place.slug})`);
-      console.log(`   ${enrichments.join(', ')}`);
-      if (place.taglineGenerated) {
-        console.log(`   Generated: ${place.taglineGenerated.toISOString().split('T')[0]}`);
-      }
-      console.log('');
+  console.log(`📸 Missing Google Place ID:        ${needsGoogle.length} entities`);
+  console.log(`🌐 Ready for website enrichment:   ${needsWebsite.length} entities (in maps, OPEN, stage=GOOGLE_COVERAGE_COMPLETE)`);
+
+  if (needsWebsite.length > 0) {
+    console.log(`\n   Top 10 entities ready for website enrichment:`);
+    needsWebsite.slice(0, 10).forEach((e) => {
+      console.log(`   • ${e.name} (${e.slug}) — in ${e.map_places.length} map(s)`);
     });
-
-    if (voiceEnrichedPlaces.length > 20) {
-      console.log(`... and ${voiceEnrichedPlaces.length - 20} more\n`);
-    }
-  } else {
-    console.log('No places with Voice Engine enrichment found.\n');
-  }
-
-  // Show places needing enrichment
-  console.log('─'.repeat(80));
-  console.log('\n⚠️  Places Needing Enrichment:\n');
-
-  const needsGoogle = places.filter(p => 
-    !p.googlePlaceId || !p.googlePhotos || 
-    (Array.isArray(p.googlePhotos) && p.googlePhotos.length === 0)
-  );
-
-  const needsVoiceEngine = places.filter(p => 
-    !p.tagline && p.vibeTags.length === 0 && p.tips.length === 0
-  ).filter(p => p.mapPlaces.length > 0); // Only places used in maps
-
-  console.log(`📸 Need Google Places enrichment:  ${needsGoogle.length} places`);
-  console.log(`🎤 Need Voice Engine enrichment:   ${needsVoiceEngine.length} places (in maps)`);
-
-  if (needsVoiceEngine.length > 0) {
-    console.log(`\n   Top 10 places needing Voice Engine enrichment:`);
-    needsVoiceEngine.slice(0, 10).forEach(p => {
-      console.log(`   • ${p.name} (${p.slug}) - Used in ${p.mapPlaces.length} map(s)`);
-    });
-    if (needsVoiceEngine.length > 10) {
-      console.log(`   ... and ${needsVoiceEngine.length - 10} more`);
+    if (needsWebsite.length > 10) {
+      console.log(`   ... and ${needsWebsite.length - 10} more`);
     }
   }
 
   console.log('\n' + '─'.repeat(80));
   console.log('\n💡 Recommended Actions:\n');
-  
+
   if (needsGoogle.length > 0) {
-    console.log(`1. Run backfill for ${needsGoogle.length} places missing Google data:`);
+    console.log(`1. Backfill ${needsGoogle.length} entities missing Google data:`);
     console.log(`   npm run backfill:google`);
   }
-  
-  if (needsVoiceEngine.length > 0) {
-    console.log(`\n2. Run Voice Engine enrichment for ${needsVoiceEngine.length} places in maps:`);
-    console.log(`   npm run test:voice-engine`);
+
+  if (needsWebsite.length > 0) {
+    console.log(`\n2. Run website enrichment (LA-only):`);
+    console.log(`   npm run enrich:website -- --la-only --limit=50`);
   }
 
   console.log('\n3. Check enrichment status regularly:');
   console.log(`   npm run analyze:enrichment`);
-  
+
   console.log('─'.repeat(80));
 }
 
 analyzeEnrichmentStatus()
   .catch((e) => {
-    console.error('❌ Error:', e);
+    console.error('Error:', e);
     process.exit(1);
   })
   .finally(async () => {
-    await prisma.$disconnect();
+    await db.$disconnect();
   });

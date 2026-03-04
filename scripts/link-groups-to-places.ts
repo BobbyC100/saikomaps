@@ -2,9 +2,15 @@
 /**
  * Auto-Link Places to Operators (Actor + entity_actor_relationships)
  * Finds places and creates entity_actor_relationships. No writes to restaurantGroupId.
+ *
+ * Usage:
+ *   npx tsx scripts/link-groups-to-places.ts
+ *   npx tsx scripts/link-groups-to-places.ts --la-only  # Only link places in LA scope
  */
 
 import { db } from '@/lib/db'
+import { getPlaceIds } from '@/lib/la-scope'
+import { writeTrace, TraceSource, TraceEventType } from '@/lib/traces'
 
 function mergeSources(existing: unknown, extra: Record<string, unknown>): Record<string, unknown> {
   const base = typeof existing === 'object' && existing !== null ? { ...(existing as Record<string, unknown>) } : {}
@@ -92,7 +98,21 @@ const placeToGroup: Record<string, string> = {
 }
 
 async function main() {
+  const laOnly = process.argv.includes('--la-only')
+  const dryRun = process.argv.includes('--dry-run')
+  let laEntityIds: Set<string> | null = null
+  if (laOnly) {
+    const ids = await getPlaceIds({ laOnly: true, limit: null })
+    if (!ids?.length) {
+      console.error('--la-only: no entities in LA scope')
+      process.exit(1)
+    }
+    laEntityIds = new Set(ids)
+  }
+
   console.log('\n🔗 AUTO-LINK PLACES TO RESTAURANT GROUPS\n')
+  if (laOnly) console.log('🔸 LA-only mode')
+  if (dryRun) console.log('🔸 DRY RUN — no writes\n')
   console.log('═'.repeat(80))
   console.log(`\nAttempting to link ${Object.keys(placeToGroup).length} place-group pairs\n`)
 
@@ -105,13 +125,17 @@ async function main() {
     console.log(`\n[${linked + alreadyLinked + placeNotFound + groupNotFound + 1}/${Object.keys(placeToGroup).length}] ${placeName} → ${groupName}`)
 
     // Find place
+    const placeWhere: Record<string, unknown> = {
+      name: {
+        contains: placeName,
+        mode: 'insensitive'
+      }
+    }
+    if (laEntityIds) {
+      placeWhere.id = { in: Array.from(laEntityIds) }
+    }
     const place = await db.entities.findFirst({
-      where: {
-        name: {
-          contains: placeName,
-          mode: 'insensitive'
-        }
-      },
+      where: placeWhere,
       include: {
         entity_actor_relationships: {
           where: { role: 'operator', isPrimary: true },
@@ -166,18 +190,43 @@ async function main() {
     }
 
     // Create entity_actor_relationships (no restaurantGroupId write)
-    await db.placeActorRelationship.create({
-      data: {
-        entityId: place.id,
-        actorId: actor.id,
-        role: 'operator',
-        isPrimary: true,
-        sources: { _script: 'link-groups-to-places', restaurant_group_id: group.id },
-        confidence: 1
-      }
-    })
+    if (!dryRun) {
+      await db.entity_actor_relationships.create({
+        data: {
+          entityId: place.id,
+          actorId: actor.id,
+          role: 'operator',
+          isPrimary: true,
+          sources: { _script: 'link-groups-to-places', restaurant_group_id: group.id },
+          confidence: 1
+        }
+      })
 
-    console.log(`   ✅ Linked to operator: ${actor.name}`)
+      // TRACES: IDENTITY_ATTACHED — actor relationship created by batch link script
+      try {
+        await writeTrace({
+          entityId: place.id,
+          source: TraceSource.enrichment,
+          eventType: TraceEventType.IDENTITY_ATTACHED,
+          fieldName: 'actor_relationship',
+          oldValue: null,
+          newValue: {
+            actor_id: actor.id,
+            actor_name: actor.name,
+            role: 'operator',
+            is_primary: true,
+            relationship_table: 'entity_actor_relationships',
+            script: 'link-groups-to-places',
+          },
+          confidence: 1,
+        })
+      } catch (e) {
+        // FK may fail if place.id is not in golden_records; non-fatal
+        console.warn('   ⚠️  Trace write skipped (entity may not be in golden_records):', (e as Error).message)
+      }
+    }
+
+    console.log(`   ${dryRun ? '[DRY-RUN] would link' : '✅ Linked'} to operator: ${actor.name}`)
     linked++
   }
 

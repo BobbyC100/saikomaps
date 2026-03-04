@@ -88,6 +88,8 @@ export interface MerchantData {
   instagramHandle?: string;
   reservationUrl?: string;
   websiteUrl?: string;
+  intentProfile?: string | null;
+  intentProfileOverride?: boolean;
   
   // Tier 1: Visual Identity
   photos?: Photo[]; // Excludes hero for collage

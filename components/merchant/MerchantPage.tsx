@@ -58,6 +58,8 @@ export function MerchantPage({ merchant }: MerchantPageProps) {
           latitude: merchant.coordinates?.lat,
           longitude: merchant.coordinates?.lng,
           instagram: merchant.instagramHandle,
+          intentProfile: merchant.intentProfile,
+          intentProfileOverride: merchant.intentProfileOverride,
         }}
       />
 

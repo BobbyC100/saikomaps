@@ -22,6 +22,7 @@
  */
 
 import { PrismaClient } from '@prisma/client';
+import { getLaCanonicalIds } from '../lib/la-scope';
 import {
   GoldenRecordInput,
   WebsiteIdentitySnapshot,
@@ -50,20 +51,20 @@ interface CliArgs {
   limit: number | null;
   verbose: boolean;
   placeName: string | null;
+  laOnly: boolean;
 }
 
 function parseArgs(): CliArgs {
   const args = process.argv.slice(2);
-  
+  const limitArg = args.find((a) => a.startsWith('--limit=')) ?? (args.includes('--limit') ? args[args.indexOf('--limit') + 1] : null);
   return {
     dryRun: args.includes('--dry-run'),
-    limit: args.find(a => a.startsWith('--limit='))
-      ? parseInt(args.find(a => a.startsWith('--limit='))!.split('=')[1])
-      : null,
+    limit: limitArg ? parseInt(String(limitArg).replace(/^--limit=/, ''), 10) : null,
     verbose: args.includes('--verbose'),
-    placeName: args.find(a => a.startsWith('--place='))
-      ? args.find(a => a.startsWith('--place='))!.split('=')[1].replace(/"/g, '')
+    placeName: args.find((a) => a.startsWith('--place='))
+      ? args.find((a) => a.startsWith('--place='))!.split('=')[1].replace(/"/g, '')
       : null,
+    laOnly: args.includes('--la-only'),
   };
 }
 
@@ -270,14 +271,27 @@ async function main() {
   if (args.dryRun) console.log('🔸 DRY RUN MODE — no database writes');
   if (args.limit) console.log(`🔸 Limit: ${args.limit} records`);
   if (args.placeName) console.log(`🔸 Single place: "${args.placeName}"`);
+  if (args.laOnly) console.log('🔸 LA-only mode (lib/la-scope bbox)');
   if (args.verbose) console.log('🔸 Verbose mode enabled');
   console.log('');
 
   // Fetch records (skip already scraped places unless doing a specific place)
-  const whereClause: any = {
+  const whereClause: Record<string, unknown> = {
     website: { not: null },
-    county: 'Los Angeles',
   };
+
+  // LA scope: use lib/la-scope canonical_ids (bbox) for consistency with other scripts
+  if (args.laOnly) {
+    const laCanonicalIds = await getLaCanonicalIds({ limit: null });
+    if (!laCanonicalIds.length) {
+      console.log('No LA records in scope. Exiting.');
+      return;
+    }
+    whereClause.canonical_id = { in: laCanonicalIds };
+  } else {
+    // Legacy: county filter when not --la-only
+    whereClause.county = 'Los Angeles';
+  }
 
   // Skip already scraped places (unless testing a specific place)
   if (!args.placeName) {

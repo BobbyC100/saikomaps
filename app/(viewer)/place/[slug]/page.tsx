@@ -7,6 +7,7 @@ import { GlobalHeader } from '@/components/layouts/GlobalHeader';
 import { GlobalFooter } from '@/components/layouts/GlobalFooter';
 import { GalleryLightbox } from '@/components/merchant/GalleryLightbox';
 import { parseHours } from './lib/parseHours';
+import { getIntentProfile } from '@/lib/intent-profile';
 import './place.css';
 
 interface EditorialSource {
@@ -67,6 +68,11 @@ interface LocationData {
   categorySlug?: string | null;
   marketSchedule?: unknown;
   recognitions?: { name: string; source?: string; year?: string }[] | null;
+  timefoldPhrase?: string | null;
+  reservationUrl?: string | null;
+  intentProfile?: string | null;
+  intentProfileOverride?: boolean;
+  primaryVertical?: string | null;
   appearancesAsSubject?: {
     id: string;
     hostPlaceId: string | null;
@@ -286,13 +292,24 @@ export default function PlacePage() {
   const recognitions = (location.recognitions ?? []).slice(0, RECOGNITIONS_CAP);
   const ledgerGroups = buildLedgerEntries(location, appearsOn.length);
 
+  // Intent profile — respects DB override when set; falls back to computed
+  const effectiveIntentProfile = getIntentProfile({
+    primaryVertical: location.primaryVertical as import('@/lib/primaryVertical').PrimaryVertical | null | undefined,
+    reservationUrl: location.reservationUrl,
+    phone: location.phone,
+    intentProfile: location.intentProfile,
+    intentProfileOverride: location.intentProfileOverride,
+  });
+  const intentSource = location.intentProfileOverride && location.intentProfile ? 'override' : 'computed';
+  const isDevMode = process.env.NODE_ENV !== 'production';
+
   const openGallery = (index: number) => {
     setLightboxIndex(index);
     setLightboxOpen(true);
   };
 
   const statusLabel = openNowExplicit && isOpen !== null ? (isOpen ? 'Open' : 'Closed') : null;
-  const hasFacts = statusLabel || statusText || today || location.address || location.website || !!location.primaryOperator;
+  const hasFacts = statusLabel || statusText || today || location.address || location.website || location.reservationUrl || !!location.primaryOperator;
 
   return (
     <div style={{ background: '#F5F0E1', minHeight: '100vh' }}>
@@ -321,11 +338,18 @@ export default function PlacePage() {
                     <a href="#ledger-description" className="provenance-diamond" aria-label="Sources for this section" />
                   </div>
                 )}
+                {location.timefoldPhrase && (
+                  <p id="timefold-line">{location.timefoldPhrase}</p>
+                )}
                 {hasFacts && (
                   <div id="facts-band">
                     {statusLabel && <span>{statusLabel}</span>}
                     {(statusText ?? today) && <span>{statusText ?? today}</span>}
                     {location.address && <span>{location.address}</span>}
+                    {/* Reserve action: shown when intent is transactional and a reservation URL exists */}
+                    {effectiveIntentProfile === 'transactional' && location.reservationUrl && (
+                      <a href={location.reservationUrl} target="_blank" rel="noopener noreferrer">Reserve</a>
+                    )}
                     {location.website && (
                       <a href={location.website} target="_blank" rel="noopener noreferrer">Website</a>
                     )}
@@ -338,6 +362,12 @@ export default function PlacePage() {
                       <a href={mapRefUrl} target="_blank" rel="noopener noreferrer">Map ↗</a>
                     )}
                   </div>
+                )}
+                {/* Dev-only intent profile indicator — never visible in production */}
+                {isDevMode && (
+                  <p id="intent-profile-debug" style={{ fontSize: '11px', color: '#888', margin: '4px 0 0' }}>
+                    Intent: {effectiveIntentProfile} ({intentSource})
+                  </p>
                 )}
               </div>
 

@@ -6,8 +6,9 @@ import { EnrichmentStage } from "@prisma/client";
 import { db } from "../db";
 import type { EnrichmentPayload } from "./types";
 
-const CONFIDENCE_HIGH = 0.75;
-const CONFIDENCE_MEDIUM = 0.5;
+const CONFIDENCE_HIGH = 0.75;   // threshold for signals upsert + needs_human_review gate
+const CONFIDENCE_MEDIUM = 0.5;  // threshold for merchant_signals upsert
+const CATEGORY_WRITE_CONF = 0.65; // threshold for writing category to entities
 
 export async function applyWriteRules(payload: EnrichmentPayload): Promise<void> {
   const { place_id, source_url, final_url, http_status, signals, confidence, notes } = payload;
@@ -75,6 +76,13 @@ export async function applyWriteRules(payload: EnrichmentPayload): Promise<void>
   const isLowConf = confidence < CONFIDENCE_HIGH;
   const needsReview = isBlocked || isLowConf;
 
+  const inferredCategory = signals.inferred_category ?? null;
+  const categoryMissing = !place?.category || place.category.trim() === "";
+  const shouldWriteCategory =
+    !!inferredCategory &&
+    confidence >= CATEGORY_WRITE_CONF &&
+    categoryMissing;
+
   await db.entities.update({
     where: { id: place_id },
     data: {
@@ -83,16 +91,17 @@ export async function applyWriteRules(payload: EnrichmentPayload): Promise<void>
       enrichment_retry_count: 0,
       enrichment_stage: EnrichmentStage.MERCHANT_ENRICHED,
       needs_human_review: needsReview,
-      ...(confidence >= CONFIDENCE_HIGH &&
-        place &&
-        (!place.category || place.category.trim() === "")
-        ? { category: payload.signals.inferred_category ?? undefined }
-        : {}),
+      ...(shouldWriteCategory ? { category: inferredCategory! } : {}),
     },
   });
+
+  console.log(
+    `  WRITE entity=${place_id}` +
+    (shouldWriteCategory ? ` category="${inferredCategory}"` : " category=unchanged") +
+    ` stage=MERCHANT_ENRICHED conf=${confidence.toFixed(2)}`
+  );
 }
 
-const CATEGORY_WRITE_CONF = 0.65;
 const CATEGORY_ALLOWLIST = new Set([
   "Restaurant",
   "Cafe",

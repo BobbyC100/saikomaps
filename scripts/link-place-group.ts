@@ -6,6 +6,7 @@
  */
 
 import { db } from '@/lib/db'
+import { writeTrace, TraceSource, TraceEventType } from '@/lib/traces'
 
 function mergeSources(existing: unknown, extra: Record<string, unknown>): Record<string, unknown> {
   const base = typeof existing === 'object' && existing !== null ? { ...(existing as Record<string, unknown>) } : {}
@@ -94,7 +95,7 @@ async function main() {
   }
 
   // Create entity_actor_relationships (no write to restaurantGroupId)
-  await db.placeActorRelationship.create({
+  await db.entity_actor_relationships.create({
     data: {
       entityId: place.id,
       actorId: actor.id,
@@ -104,6 +105,29 @@ async function main() {
       confidence: 1
     }
   })
+
+  // TRACES: IDENTITY_ATTACHED — actor relationship created by manual link script
+  try {
+    await writeTrace({
+      entityId: place.id,
+      source: TraceSource.human,
+      eventType: TraceEventType.IDENTITY_ATTACHED,
+      fieldName: 'actor_relationship',
+      oldValue: null,
+      newValue: {
+        actor_id: actor.id,
+        actor_name: actor.name,
+        role: 'operator',
+        is_primary: true,
+        relationship_table: 'entity_actor_relationships',
+        script: 'link-place-group',
+      },
+      confidence: 1,
+    })
+  } catch (e) {
+    // FK may fail if place.id is not in golden_records; non-fatal
+    console.warn('⚠️  Trace write skipped (entity may not be in golden_records):', (e as Error).message)
+  }
 
   console.log(`\n✅ Place linked to operator: ${actor.name}`)
   

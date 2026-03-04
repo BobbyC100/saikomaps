@@ -15,12 +15,12 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('🔄 Starting intent profile backfill...\n');
 
-  // Fetch all places
-  const places = await prisma.place.findMany({
+  const places = await prisma.entities.findMany({
+    where: { status: { not: 'PERMANENTLY_CLOSED' } },
     select: {
       id: true,
       name: true,
-      category: true,
+      primary_vertical: true,
       reservationUrl: true,
       intentProfile: true,
       intentProfileOverride: true,
@@ -45,13 +45,13 @@ async function main() {
 
     // Assign intent profile
     const profile = assignIntentProfile({
-      category: place.category,
+      primaryVertical: place.primary_vertical,
       reservationUrl: place.reservationUrl,
     });
 
     // Update if different from current value
     if (place.intentProfile !== profile) {
-      await prisma.place.update({
+      await prisma.entities.update({
         where: { id: place.id },
         data: {
           intentProfile: profile,

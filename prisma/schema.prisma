@@ -242,7 +242,7 @@ model entities {
   contextualConnection   String?            @map("contextual_connection")
   curatorAttribution     String?            @map("curator_attribution")
   chefRecs               Json?              @map("chef_recs")
-  restaurantGroupId      String?            @map("restaurant_group_id") // DEPRECATED: use entity_actor_relationships. No new writes.
+  restaurantGroupId      String?            @map("restaurant_group_id") // DEPRECATED + CONSTRAINED: DB CHECK enforces NULL. Kept for FK ref only; do not write.
   status                 EntityStatus       @default(OPEN)
   intentProfile          String?            @map("intent_profile")
   intentProfileOverride  Boolean            @default(false) @map("intent_profile_override")
@@ -284,6 +284,19 @@ model entities {
   enrichment_stage  EnrichmentStage? @map("enrichment_stage")
   needs_human_review Boolean  @default(false) @map("needs_human_review")
   category_enrich_attempted_at DateTime? @map("category_enrich_attempted_at") // throttle category-only re-enrich
+
+  // TimeFOLD v1 — Temporal classification and publication state
+  // Phrase text is NOT stored here; it is hardcoded at the application layer.
+  // Public rendering requires timefold_status = 'APPROVED'.
+  // WO: S.K.A.I./WO-TIMEFOLD-001 v1.1
+  timefoldClass         String?   @map("timefold_class")         // 'STABILITY' | 'NEWNESS' (CHECK enforced in DB)
+  timefoldStatus        String?   @map("timefold_status")        // 'PROPOSED' | 'APPROVED' | 'SUPPRESSED' (CHECK enforced in DB)
+  timefoldProposedAt    DateTime? @map("timefold_proposed_at")
+  timefoldProposedBy    String?   @map("timefold_proposed_by")
+  timefoldApprovedAt    DateTime? @map("timefold_approved_at")
+  timefoldApprovedBy    String?   @map("timefold_approved_by")
+  timefoldSuppressedAt  DateTime? @map("timefold_suppressed_at")
+  timefoldSuppressedBy  String?   @map("timefold_suppressed_by")
 
   merchant_enrichment_runs merchant_enrichment_runs[]
   merchant_signals         merchant_signals?
@@ -789,12 +802,62 @@ model golden_records {
   entityActorRelationships EntityActorRelationship[]
   fieldsMemberships FieldsMembership[]
   traceSignalsCache TraceSignalsCache?
+  traces            traces[]
 
   @@index([neighborhood])
   @@index([category])
   @@index([business_status])
   @@index([slug])
   @@index([promotion_status])
+}
+
+// ============================================================================
+// TRACES — Temporal Record & Change Events System
+// Append-only ledger for entity lifecycle and attribute changes.
+// See lib/traces.ts and docs/TRACES.md for when to write vs not.
+// ============================================================================
+
+enum TraceSource {
+  ingest
+  resolver
+  enrichment
+  human
+  admin
+}
+
+enum TraceEventType {
+  ENTITY_CREATED
+  STATUS_CHANGED
+  FIELD_UPDATED
+  IDENTITY_ATTACHED
+  IDENTITY_REMOVED
+  ENRICHMENT_APPLIED
+  HUMAN_OVERRIDE
+  INGEST_SEEN
+  RESOLVER_DECISION
+}
+
+model traces {
+  id         String   @id @default(uuid())
+  entity_id  String?  @map("entity_id") // golden_records.canonical_id; null for pre-entity events (e.g. INGEST_SEEN)
+  raw_id     String?  @map("raw_id") // raw_records.raw_id; for ingest/resolver events
+  source     TraceSource
+  event_type TraceEventType @map("event_type")
+  field_name String?
+  old_value  Json?
+  new_value  Json?
+  confidence Float?
+  observed_at DateTime @map("observed_at")
+  created_at DateTime  @default(now()) @map("created_at")
+
+  golden_record golden_records? @relation(fields: [entity_id], references: [canonical_id], onDelete: SetNull)
+
+  @@index([entity_id])
+  @@index([raw_id])
+  @@index([event_type])
+  @@index([observed_at])
+  @@index([created_at])
+  @@map("traces")
 }
 
 /// Resolution links - audit trail for raw → golden resolution (Ken spec)

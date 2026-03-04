@@ -94,12 +94,12 @@
 
 | Job | Script | Trigger | Writes |
 |-----|--------|---------|--------|
-| Website enrichment | `run-website-enrichment.ts` | Manual CLI (`npm run enrich:website`) | places (category, merchant_signals, last_enriched_at, etc.), merchant_enrichment_runs |
-| Website category-only | Same script, `--mode=categoryOnly` | Manual CLI | places.category, category_enrich_attempted_at |
-| Backfill websites | `backfill-websites-from-google.ts` | Manual CLI | places.website |
-| Google Places enrich | `enrich-google-places.ts` | Manual CLI | places (from Google API) |
-| Backfill Google attrs | `backfill-google-places-attrs.ts` | Manual CLI | places.google_places_attributes |
-| Backfill confidence | `backfill-confidence.ts` | Manual CLI | places confidence, golden_records |
+| Website enrichment | `run-website-enrichment.ts` | Manual CLI (`npm run enrich:website -- --la-only`) | entities (category, last_enriched_at, etc.), merchant_signals, merchant_enrichment_runs |
+| Website category-only | Same script, `--mode=categoryOnly --la-only` | Manual CLI | entities.category, category_enrich_attempted_at |
+| Backfill websites | `backfill-websites-from-google.ts` | Manual CLI | entities.website |
+| Google Places enrich | `enrich-google-places.ts` | Manual CLI | entities (from Google API) |
+| Backfill Google attrs | `backfill-google-places-attrs.ts` | Manual CLI | entities.google_places_attributes |
+| Backfill confidence | `backfill-confidence.ts` | Manual CLI | entities confidence, golden_records |
 | Energy compute | `compute-energy.ts` | Manual CLI | energy_scores |
 | Tag scores | `compute-tag-scores.ts` | Manual CLI | place_tag_scores |
 
@@ -109,17 +109,24 @@
 
 ### Tables for Enrichment Results
 
-- **places:** last_enriched_at, enrichment_stage, needs_human_review, category_enrich_attempted_at, confidence, overall_confidence, google_places_attributes
+- **entities:** last_enriched_at, enrichment_stage, needs_human_review, category_enrich_attempted_at, confidence, overall_confidence, google_places_attributes
 - **merchant_enrichment_runs:** append-only audit per fetch
-- **merchant_signals:** current best per place (upsert)
+- **merchant_signals:** current best per entity (upsert)
 - **energy_scores:** energy_score, energy_confidence, version
-- **place_tag_scores:** tag scores per place
+- **place_tag_scores:** tag scores per entity
 
-### Per-Place Enrichment History
+### Per-Entity Enrichment History
 
-- `merchant_enrichment_runs` stores runs per place_id; no single “summary” view in admin.
-- `places.last_enriched_at`, `enrichment_stage` indicate last full enrichment.
+- `merchant_enrichment_runs` stores runs per entity_id; no single "summary" view in admin.
+- `entities.last_enriched_at`, `enrichment_stage` indicate last full enrichment.
 - No admin UI showing enrichment history.
+
+### LA Scoping
+
+- Website enrichment defaults to **LA-only** via `entities.neighborhood IS NOT NULL`.
+- `--la-only` flag is required for default mode; omitting it fails fast with a clear error.
+- LA proxy field: `neighborhood`. Travel/global entities (Palm Beach, Honolulu, etc.) have null neighborhood and are excluded automatically.
+- Future: migrate to `entities.market = 'los_angeles'` when market column is added.
 
 ### Admin Surface
 

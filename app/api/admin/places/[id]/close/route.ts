@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, TraceSource, TraceEventType } from '@prisma/client';
+import { writeTrace } from '@/lib/traces';
 
 const prisma = new PrismaClient();
 
@@ -18,11 +19,19 @@ export async function POST(
 
     console.log('[Close Place API] Marking place as closed:', { id, status, reason });
 
+    const newLifecycleStatus = status === 'PERMANENTLY_CLOSED' ? 'CLOSED_PERMANENTLY' : 'ARCHIVED';
+
+    // Fetch current state for TRACES
+    const existing = await prisma.golden_records.findUnique({
+      where: { canonical_id: id },
+      select: { lifecycle_status: true },
+    });
+
     // Update golden_record
     const updated = await prisma.golden_records.update({
       where: { canonical_id: id },
       data: {
-        lifecycle_status: status === 'PERMANENTLY_CLOSED' ? 'CLOSED_PERMANENTLY' : 'ARCHIVED',
+        lifecycle_status: newLifecycleStatus,
         archive_reason: 'CLOSED',
         archived_at: new Date(),
         archived_by: 'admin',
@@ -38,6 +47,16 @@ export async function POST(
     console.log('[Close Place API] Successfully closed:', {
       name: updated.name,
       status: updated.lifecycle_status,
+    });
+
+    // TRACES: HUMAN_OVERRIDE — manual admin status change
+    await writeTrace({
+      entityId: id,
+      source: TraceSource.admin,
+      eventType: TraceEventType.HUMAN_OVERRIDE,
+      fieldName: 'lifecycle_status',
+      oldValue: existing?.lifecycle_status ?? null,
+      newValue: { lifecycle_status: newLifecycleStatus, reason: reason ?? 'admin_close' },
     });
 
     return NextResponse.json({

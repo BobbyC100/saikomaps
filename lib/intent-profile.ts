@@ -10,47 +10,35 @@
  * - Go-There: "This is a place, not a business" (Parks, beaches, spots)
  */
 
+import type { PrimaryVertical } from './primaryVertical';
+
 export type IntentProfile = 'transactional' | 'visit-now' | 'go-there';
 
 export interface PlaceForIntent {
-  category?: string | null;
+  primaryVertical?: PrimaryVertical | null;
   reservationUrl?: string | null;
   phone?: string | null;
   intentProfile?: string | null;
   intentProfileOverride?: boolean;
+  /** @deprecated Use primaryVertical. Kept for legacy callers during migration. */
+  category?: string | null;
 }
 
+const GO_THERE_VERTICALS: Set<PrimaryVertical> = new Set(['NATURE', 'ACTIVITY']);
+
 /**
- * Assign default intent profile based on place category
- * Auto-promotes to transactional if reservation URL exists
+ * Assign default intent profile based on primary_vertical.
+ * Auto-promotes to transactional if reservation URL exists.
  */
 export function assignIntentProfile(place: PlaceForIntent): IntentProfile {
-  // Auto-promotion: reservation URL = transactional
   if (place.reservationUrl) {
     return 'transactional';
   }
 
-  // Default mapping from category
-  const category = place.category?.toLowerCase() || '';
-  
-  // Go-There: Natural places without business operations
-  if (
-    category.includes('park') ||
-    category.includes('beach') ||
-    category.includes('trail') ||
-    category.includes('nature') ||
-    category.includes('skate') ||
-    category.includes('surf')
-  ) {
+  if (place.primaryVertical && GO_THERE_VERTICALS.has(place.primaryVertical)) {
     return 'go-there';
   }
 
-  // Transactional: Places that typically require booking/coordination
-  // (Only if they DON'T have reservation URL - that's handled above)
-  // Most restaurants default to visit-now unless they explicitly add reservation URL
-  
-  // Visit-Now: Default for most businesses
-  // Restaurants, bars, cafes, retail, galleries, etc.
   return 'visit-now';
 }
 

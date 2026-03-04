@@ -1,13 +1,16 @@
 #!/usr/bin/env node
 /**
  * Mark Place as Closed
- * 
+ *
+ * Updates entities table (legacy). For golden_records, use admin close API.
+ *
  * Usage:
  *   npm run place:close -- <slug> [reason]
  *   npm run place:close -- guisados-restaurant "Permanently closed"
  */
 
-import { PrismaClient, EntityStatus } from '@prisma/client';
+import { PrismaClient, EntityStatus, TraceSource, TraceEventType } from '@prisma/client';
+import { writeTrace } from '@/lib/traces';
 
 const prisma = new PrismaClient();
 
@@ -47,10 +50,24 @@ async function main() {
     where: { slug },
     data: {
       status: EntityStatus.CLOSED,
-      // Note: You might want to add a closed_at field and closed_reason field to schema
     },
   });
-  
+
+  // TRACES: HUMAN_OVERRIDE — manual status change (entity_id = canonical_id when synced from golden)
+  try {
+    await writeTrace({
+      entityId: place.id,
+      source: TraceSource.admin,
+      eventType: TraceEventType.HUMAN_OVERRIDE,
+      fieldName: 'status',
+      oldValue: place.status,
+      newValue: { status: EntityStatus.CLOSED, reason: reason ?? 'script' },
+    });
+  } catch (e) {
+    // FK may fail if entity is legacy (not in golden_records); non-fatal
+    console.warn('Trace write skipped (entity may not be in golden_records):', (e as Error).message);
+  }
+
   console.log(`\n✅ Marked as CLOSED: ${place.name}`);
   console.log(`   Slug: ${slug}`);
   console.log(`   Reason: ${reason}`);

@@ -5,6 +5,7 @@
  */
 
 import { db } from "@/lib/db";
+import { writeTrace, TraceSource, TraceEventType } from "@/lib/traces";
 import type { OperatorPlaceCandidate } from "@prisma/client";
 
 export interface ApproveParams {
@@ -82,4 +83,30 @@ export async function approveCandidateAndCreateRelationship(
       updatedAt: new Date(),
     },
   });
+
+  // TRACES: IDENTITY_ATTACHED — actor relationship created or promoted via admin approval
+  try {
+    await writeTrace({
+      entityId,
+      source: TraceSource.admin,
+      eventType: TraceEventType.IDENTITY_ATTACHED,
+      fieldName: "actor_relationship",
+      oldValue: null,
+      newValue: {
+        actor_id: candidate.actorId,
+        role: "operator",
+        is_primary: true,
+        relationship_table: "entity_actor_relationships",
+        approved_by: approvedBy,
+        candidate_id: candidate.id,
+      },
+      confidence: relConfidence,
+    });
+  } catch (e) {
+    // FK may fail if entityId is app-layer only (not in golden_records); non-fatal
+    console.warn(
+      "[approveCandidate] Trace write skipped (entity may not be in golden_records):",
+      (e as Error).message
+    );
+  }
 }

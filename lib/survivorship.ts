@@ -8,9 +8,10 @@
  * with provenance tracking. Other fields use legacy priority-based system.
  */
 
-import { PrismaClient, Prisma } from '@prisma/client';
+import { PrismaClient, Prisma, TraceSource, TraceEventType } from '@prisma/client';
 import slugify from 'slugify';
 import { pickBestValue, Candidate } from '@/lib/survivorship-v2';
+import { writeTrace } from '@/lib/traces';
 
 const prisma = new PrismaClient();
 
@@ -334,7 +335,13 @@ export async function updateGoldenRecord(canonicalId: string): Promise<void> {
   const requiredFields = ['name', 'lat', 'lng', 'neighborhood', 'category', 'phone', 'website'];
   const filledFields = [name, lat, lng, neighborhood, category, phone, website].filter(Boolean);
   const dataCompleteness = filledFields.length / requiredFields.length;
-  
+
+  // Fetch existing golden for TRACES (old values)
+  const existing = await prisma.golden_records.findUnique({
+    where: { canonical_id: canonicalId },
+    select: { business_status: true, google_place_id: true },
+  });
+
   // Upsert golden record
   await prisma.golden_records.upsert({
     where: { canonical_id: canonicalId },
@@ -392,6 +399,29 @@ export async function updateGoldenRecord(canonicalId: string): Promise<void> {
       updated_at: new Date(),
     },
   });
+
+  // TRACES: STATUS_CHANGED when business_status changes; IDENTITY_ATTACHED when google_place_id newly set
+  if (existing) {
+    if (existing.business_status !== businessStatus) {
+      await writeTrace({
+        entityId: canonicalId,
+        source: TraceSource.enrichment,
+        eventType: TraceEventType.STATUS_CHANGED,
+        fieldName: 'business_status',
+        oldValue: existing.business_status,
+        newValue: businessStatus,
+      });
+    }
+    if (!existing.google_place_id && googlePlaceId) {
+      await writeTrace({
+        entityId: canonicalId,
+        source: TraceSource.enrichment,
+        eventType: TraceEventType.IDENTITY_ATTACHED,
+        fieldName: 'google_place_id',
+        newValue: googlePlaceId,
+      });
+    }
+  }
 }
 
 /**

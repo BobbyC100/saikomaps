@@ -1,0 +1,271 @@
+{
+  "generatedAt": "2026-03-03T20:51:44.891Z",
+  "config": {
+    "continuityWindowDays": 730,
+    "newWindowDays": 30,
+    "autoConfidenceThreshold": 0.85,
+    "changeTransitionWindowDays": 90
+  },
+  "rows": [
+    {
+      "canonicalId": "1731a327-023d-4f1f-a39d-9694c0054e56",
+      "entityId": null,
+      "hadEntityId": false,
+      "name": "Tacos 1986",
+      "outputClass": "new_recently_opened",
+      "outputText": "Recently opened",
+      "approvalGate": "EDITORIAL",
+      "inputsUsed": [
+        "golden:created_at"
+      ],
+      "notes": "no traces found for canonicalId"
+    },
+    {
+      "canonicalId": "d29f4839-83d0-4802-a014-d92cf2564a8e",
+      "entityId": null,
+      "hadEntityId": false,
+      "name": "Budonoki",
+      "outputClass": "new_recently_opened",
+      "outputText": "Recently opened",
+      "approvalGate": "EDITORIAL",
+      "inputsUsed": [
+        "golden:created_at"
+      ],
+      "notes": "no traces found for canonicalId"
+    },
+    {
+      "canonicalId": "28438f25-f5f7-4671-83ce-b0baef7cc478",
+      "entityId": null,
+      "hadEntityId": false,
+      "name": "Republique",
+      "outputClass": "new_recently_opened",
+      "outputText": "Recently opened",
+      "approvalGate": "EDITORIAL",
+      "inputsUsed": [
+        "golden:created_at"
+      ],
+      "notes": "no traces found for canonicalId"
+    },
+    {
+      "canonicalId": "1466d85c-beb9-4b17-912b-f5462beff6d0",
+      "entityId": "1466d85c-beb9-4b17-912b-f5462beff6d0",
+      "hadEntityId": true,
+      "name": "Bavel",
+      "outputClass": "new_recently_opened",
+      "outputText": "Recently opened",
+      "approvalGate": "EDITORIAL",
+      "inputsUsed": [
+        "golden:created_at"
+      ],
+      "notes": "no traces found for canonicalId"
+    },
+    {
+      "canonicalId": "70d07bae-98a1-466c-839b-c2c5945c9212",
+      "entityId": "70d07bae-98a1-466c-839b-c2c5945c9212",
+      "hadEntityId": true,
+      "name": "Gjelina",
+      "outputClass": "new_recently_opened",
+      "outputText": "Recently opened",
+      "approvalGate": "EDITORIAL",
+      "inputsUsed": [
+        "golden:created_at"
+      ],
+      "notes": "no traces found for canonicalId"
+    },
+    {
+      "canonicalId": "84cdfb99-80ae-4f9d-8b19-983281497827",
+      "entityId": "84cdfb99-80ae-4f9d-8b19-983281497827",
+      "hadEntityId": true,
+      "name": "Chi Spacca",
+      "outputClass": "new_recently_opened",
+      "outputText": "Recently opened",
+      "approvalGate": "EDITORIAL",
+      "inputsUsed": [
+        "golden:created_at"
+      ],
+      "notes": "no traces found for canonicalId"
+    },
+    {
+      "canonicalId": "0a5864db-e933-4740-a91b-c1936ee33620",
+      "entityId": "0a5864db-e933-4740-a91b-c1936ee33620",
+      "hadEntityId": true,
+      "name": "Holbox",
+      "outputClass": "new_recently_opened",
+      "outputText": "Recently opened",
+      "approvalGate": "EDITORIAL",
+      "inputsUsed": [
+        "golden:created_at"
+      ],
+      "notes": "no traces found for canonicalId"
+    },
+    {
+      "canonicalId": "846ec73b-e777-4b6a-bb0e-1621f43bfb1b",
+      "entityId": "846ec73b-e777-4b6a-bb0e-1621f43bfb1b",
+      "hadEntityId": true,
+      "name": "Somni",
+      "outputClass": "new_recently_opened",
+      "outputText": "Recently opened",
+      "approvalGate": "EDITORIAL",
+      "inputsUsed": [
+        "golden:created_at"
+      ],
+      "notes": "no traces found for canonicalId"
+    },
+    {
+      "canonicalId": "24e266d3-35c4-48a3-bec4-4986bc264033",
+      "entityId": "24e266d3-35c4-48a3-bec4-4986bc264033",
+      "hadEntityId": true,
+      "name": "n/naka",
+      "outputClass": "new_recently_opened",
+      "outputText": "Recently opened",
+      "approvalGate": "EDITORIAL",
+      "inputsUsed": [
+        "golden:created_at"
+      ],
+      "notes": "no traces found for canonicalId"
+    },
+    {
+      "canonicalId": "003245fc-ad9b-4225-9440-faaf83dc1f68",
+      "entityId": "003245fc-ad9b-4225-9440-faaf83dc1f68",
+      "hadEntityId": true,
+      "name": "Hayato",
+      "outputClass": "new_recently_opened",
+      "outputText": "Recently opened",
+      "approvalGate": "EDITORIAL",
+      "inputsUsed": [
+        "golden:created_at"
+      ],
+      "notes": "no traces found for canonicalId"
+    },
+    {
+      "canonicalId": "e9b4f22f-f59e-4e27-997b-4e55e23fdd7e",
+      "entityId": null,
+      "hadEntityId": false,
+      "name": "Del Re Wine Bar",
+      "outputClass": "new_recently_opened",
+      "outputText": "Recently opened",
+      "approvalGate": "EDITORIAL",
+      "inputsUsed": [
+        "golden:created_at"
+      ],
+      "notes": "no traces found for canonicalId"
+    },
+    {
+      "canonicalId": "c8b97015-5b7f-4451-a22b-e93967720bab",
+      "entityId": null,
+      "hadEntityId": false,
+      "name": "Bar Covell",
+      "outputClass": "new_recently_opened",
+      "outputText": "Recently opened",
+      "approvalGate": "EDITORIAL",
+      "inputsUsed": [
+        "golden:created_at"
+      ],
+      "notes": "no traces found for canonicalId"
+    },
+    {
+      "canonicalId": "504dce52-5961-49cf-9147-d77703f10b14",
+      "entityId": null,
+      "hadEntityId": false,
+      "name": "Belle’s Bagels",
+      "outputClass": "new_recently_opened",
+      "outputText": "Recently opened",
+      "approvalGate": "EDITORIAL",
+      "inputsUsed": [
+        "golden:created_at"
+      ],
+      "notes": "no traces found for canonicalId"
+    },
+    {
+      "canonicalId": "a93782c5-d963-49a5-b195-f948b2e09528",
+      "entityId": null,
+      "hadEntityId": false,
+      "name": "Andrew’s Cheese Shop",
+      "outputClass": "new_recently_opened",
+      "outputText": "Recently opened",
+      "approvalGate": "EDITORIAL",
+      "inputsUsed": [
+        "golden:created_at"
+      ],
+      "notes": "no traces found for canonicalId"
+    },
+    {
+      "canonicalId": "356b4dbe-0cf7-47d0-9b5a-b82015d67548",
+      "entityId": null,
+      "hadEntityId": false,
+      "name": "Courage Bagels",
+      "outputClass": "new_recently_opened",
+      "outputText": "Recently opened",
+      "approvalGate": "EDITORIAL",
+      "inputsUsed": [
+        "golden:created_at"
+      ],
+      "notes": "no traces found for canonicalId"
+    },
+    {
+      "canonicalId": "77735399-6290-428c-8b36-b2e62612e89b",
+      "entityId": null,
+      "hadEntityId": false,
+      "name": "Buvon’s Restaurant (Santa Monica)",
+      "outputClass": "new_recently_opened",
+      "outputText": "Recently opened",
+      "approvalGate": "EDITORIAL",
+      "inputsUsed": [
+        "golden:created_at"
+      ],
+      "notes": "no traces found for canonicalId"
+    },
+    {
+      "canonicalId": "0e9d06d0-2e8f-41b0-98c0-1c9cba876225",
+      "entityId": null,
+      "hadEntityId": false,
+      "name": "Wake & Late",
+      "outputClass": "new_recently_opened",
+      "outputText": "Recently opened",
+      "approvalGate": "EDITORIAL",
+      "inputsUsed": [
+        "golden:created_at"
+      ],
+      "notes": "no traces found for canonicalId"
+    },
+    {
+      "canonicalId": "7238618a-b515-45ba-8fdd-e6530d5a8712",
+      "entityId": null,
+      "hadEntityId": false,
+      "name": "Tabula Rasa Bar",
+      "outputClass": "new_recently_opened",
+      "outputText": "Recently opened",
+      "approvalGate": "EDITORIAL",
+      "inputsUsed": [
+        "golden:created_at"
+      ],
+      "notes": "no traces found for canonicalId"
+    },
+    {
+      "canonicalId": "1fb41fda-7e64-4675-82ca-89deb38e5927",
+      "entityId": null,
+      "hadEntityId": false,
+      "name": "The Cheese Store of Beverly Hills",
+      "outputClass": "new_recently_opened",
+      "outputText": "Recently opened",
+      "approvalGate": "EDITORIAL",
+      "inputsUsed": [
+        "golden:created_at"
+      ],
+      "notes": "no traces found for canonicalId"
+    },
+    {
+      "canonicalId": "6d7f0826-a87e-4014-b4c3-6a0cab945491",
+      "entityId": null,
+      "hadEntityId": false,
+      "name": "Grá Restaurant",
+      "outputClass": "new_recently_opened",
+      "outputText": "Recently opened",
+      "approvalGate": "EDITORIAL",
+      "inputsUsed": [
+        "golden:created_at"
+      ],
+      "notes": "no traces found for canonicalId"
+    }
+  ]
+}

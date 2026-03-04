@@ -10,9 +10,11 @@
  *   node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/resolver-pipeline.ts --dry-run
  */
 
-import { PrismaClient, Prisma } from '@prisma/client';
+import { PrismaClient, Prisma, TraceSource, TraceEventType } from '@prisma/client';
 import { haversineDistance } from '../lib/haversine';
 import { createReviewQueueItem } from '../lib/review-queue';
+import { writeTrace } from '../lib/traces';
+import { RESOLVER_CONFIG } from '../lib/resolver/config';
 
 // Simple string similarity without external deps
 function jaroWinklerSimilarity(s1: string, s2: string): number {
@@ -108,11 +110,6 @@ const prisma = new PrismaClient();
 
 const isDryRun = process.argv.includes('--dry-run');
 
-// Matching thresholds
-const AUTO_LINK_THRESHOLD = 0.90;  // Above this, auto-link
-const REVIEW_THRESHOLD = 0.70;      // Between this and auto-link, send to review
-// Below review threshold, treat as separate entities
-
 async function main() {
   console.log('🔍 Running resolver pipeline\n');
   
@@ -152,10 +149,13 @@ async function googlePlaceIdPrepass() {
   console.log(`Found ${recordsWithGoogleId.length} unprocessed records with Google Place IDs`);
   
   let autoLinked = 0;
-  
+  let mintedNew = 0;
+
   for (const record of recordsWithGoogleId) {
-    const googlePlaceId = record.raw_json?.google_place_id;
-    if (!googlePlaceId) continue;
+    const gpid =
+      (record as { google_place_id?: string }).google_place_id ??
+      (record.raw_json as { google_place_id?: string } | null)?.google_place_id;
+    if (!gpid) continue;
     
     // Find existing raw_record with same Google Place ID that's already linked
     const existingRecord = await prisma.raw_records.findFirst({
@@ -164,7 +164,7 @@ async function googlePlaceIdPrepass() {
         is_processed: true,
         raw_json: {
           path: ['google_place_id'],
-          equals: googlePlaceId,
+          equals: gpid,
         },
       },
       include: {
@@ -176,9 +176,9 @@ async function googlePlaceIdPrepass() {
     });
     
     if (existingRecord && existingRecord.entity_links_from[0]) {
-      // Auto-link to same canonical entity
+      // Existing canonical found — link this record to it
       const canonicalId = existingRecord.entity_links_from[0].canonical_id;
-      
+
       if (!isDryRun) {
         await prisma.entity_links.create({
           data: {
@@ -189,19 +189,140 @@ async function googlePlaceIdPrepass() {
             linked_by: 'system:google_place_id_prepass',
           },
         });
-        
+
         await prisma.raw_records.update({
           where: { raw_id: record.raw_id },
           data: { is_processed: true },
         });
+
+        // TRACES: IDENTITY_ATTACHED + RESOLVER_DECISION (linked)
+        await writeTrace({
+          entityId: canonicalId,
+          rawId: record.raw_id,
+          source: TraceSource.resolver,
+          eventType: TraceEventType.IDENTITY_ATTACHED,
+          fieldName: 'google_place_id',
+          newValue: gpid,
+          confidence: 1.0,
+        });
+        await writeTrace({
+          entityId: canonicalId,
+          rawId: record.raw_id,
+          source: TraceSource.resolver,
+          eventType: TraceEventType.RESOLVER_DECISION,
+          newValue: { decision: 'linked', match_method: 'google_place_id_exact' },
+        });
       }
-      
+
       autoLinked++;
-      console.log(`✓ Auto-linked via Google Place ID: ${record.name_normalized} (${googlePlaceId})`);
+      console.log(`✓ Auto-linked via Google Place ID: ${record.name_normalized} (${gpid})`);
+
+    } else if (record.source_name === 'editorial_era_la') {
+      // No existing canonical, but GPID is present and source is ERA — mint new golden
+      // Idempotent: check golden_records for this GPID first to avoid duplicates on rerun
+      const existingGolden = await prisma.golden_records.findFirst({
+        where: { google_place_id: gpid },
+        select: { canonical_id: true },
+      });
+
+      if (existingGolden) {
+        // Golden already exists for this GPID — just link the raw record to it
+        if (!isDryRun) {
+          try {
+            await prisma.entity_links.create({
+              data: {
+                canonical_id: existingGolden.canonical_id,
+                raw_id: record.raw_id,
+                match_confidence: new Prisma.Decimal(1.0),
+                match_method: 'google_place_id_exact',
+                linked_by: 'system:era_gpid_relink',
+              },
+            });
+          } catch {
+            // Link already exists (unique constraint) — fine
+          }
+          await prisma.raw_records.update({
+            where: { raw_id: record.raw_id },
+            data: { is_processed: true },
+          });
+        }
+        autoLinked++;
+        console.log(`✓ Re-linked to existing golden: ${record.name_normalized} (${gpid})`);
+      } else {
+        // Mint a new canonical identity
+        const canonicalId = crypto.randomUUID();
+        const rawJson = record.raw_json as Record<string, unknown>;
+        const name = (rawJson.name as string | undefined) || record.name_normalized || 'Unknown';
+        const slug = `era-${gpid.toLowerCase().replace(/[^a-z0-9]/g, '-')}-${canonicalId.split('-')[0]}`;
+
+        if (!isDryRun) {
+          await prisma.golden_records.create({
+            data: {
+              canonical_id: canonicalId,
+              google_place_id: gpid,
+              slug,
+              name,
+              lat: record.lat ?? new Prisma.Decimal(0),
+              lng: record.lng ?? new Prisma.Decimal(0),
+              address_street: (rawJson.address_street as string | undefined) ?? null,
+              address_city: (rawJson.address_city as string | undefined) ?? null,
+              neighborhood: (rawJson.neighborhood as string | undefined) ?? null,
+              source_attribution: { name: record.source_name } as Prisma.JsonValue,
+              cuisines: [],
+              vibe_tags: [],
+              signature_dishes: [],
+              pro_tips: [],
+            },
+          });
+
+          await prisma.entity_links.create({
+            data: {
+              canonical_id: canonicalId,
+              raw_id: record.raw_id,
+              match_confidence: new Prisma.Decimal(1.0),
+              match_method: 'google_place_id_era_mint',
+              linked_by: 'system:era_gpid_mint',
+            },
+          });
+
+          await prisma.raw_records.update({
+            where: { raw_id: record.raw_id },
+            data: { is_processed: true },
+          });
+
+          // TRACES: ENTITY_CREATED + IDENTITY_ATTACHED + RESOLVER_DECISION
+          await writeTrace({
+            entityId: canonicalId,
+            rawId: record.raw_id,
+            source: TraceSource.resolver,
+            eventType: TraceEventType.ENTITY_CREATED,
+            newValue: { name, google_place_id: gpid, source: record.source_name },
+          });
+          await writeTrace({
+            entityId: canonicalId,
+            rawId: record.raw_id,
+            source: TraceSource.resolver,
+            eventType: TraceEventType.IDENTITY_ATTACHED,
+            fieldName: 'google_place_id',
+            newValue: gpid,
+            confidence: 1.0,
+          });
+          await writeTrace({
+            entityId: canonicalId,
+            rawId: record.raw_id,
+            source: TraceSource.resolver,
+            eventType: TraceEventType.RESOLVER_DECISION,
+            newValue: { decision: 'created_new', reason: 'gpid_no_match_era_mint', google_place_id: gpid },
+          });
+        }
+
+        mintedNew++;
+        console.log(`✨ Minted new golden: ${name} (${gpid})`);
+      }
     }
   }
-  
-  console.log(`\n✅ Google Place ID pre-pass: ${autoLinked} records auto-linked\n`);
+
+  console.log(`\n✅ Google Place ID pre-pass: ${autoLinked} records linked, ${mintedNew} new goldens minted\n`);
 }
 
 /**
@@ -267,14 +388,28 @@ async function placekeyPrepass() {
               linked_by: 'system:placekey_prepass',
             },
           });
-          
+
           await prisma.raw_records.update({
             where: { raw_id: record.raw_id },
             data: { is_processed: true },
           });
         }
+
+        // TRACES: ENTITY_CREATED + RESOLVER_DECISION (linked)
+        await writeTrace({
+          entityId: canonicalId,
+          source: TraceSource.resolver,
+          eventType: TraceEventType.ENTITY_CREATED,
+          newValue: { name: firstRecord.raw_json?.name, match_method: 'placekey_exact' },
+        });
+        await writeTrace({
+          entityId: canonicalId,
+          source: TraceSource.resolver,
+          eventType: TraceEventType.RESOLVER_DECISION,
+          newValue: { decision: 'linked', match_method: 'placekey_exact', record_count: records.length },
+        });
       }
-      
+
       autoLinked += records.length;
       console.log(`✓ Auto-linked ${records.length} records with Placekey: ${placekey}`);
     }
@@ -291,7 +426,7 @@ async function resolveUnprocessedRecords() {
   
   const unprocessed = await prisma.raw_records.findMany({
     where: { is_processed: false },
-    take: 100, // Process in batches
+    take: RESOLVER_CONFIG.h3BatchSize,
   });
   
   console.log(`Found ${unprocessed.length} unprocessed records\n`);
@@ -339,11 +474,27 @@ async function resolveUnprocessedRecords() {
           where: { raw_id: record.raw_id },
           data: { is_processed: true },
         });
+
+        // TRACES: ENTITY_CREATED + RESOLVER_DECISION (kept_separate, no candidates)
+        await writeTrace({
+          entityId: canonicalId,
+          rawId: record.raw_id,
+          source: TraceSource.resolver,
+          eventType: TraceEventType.ENTITY_CREATED,
+          newValue: { name: record.raw_json?.name, match_method: 'new_entity' },
+        });
+        await writeTrace({
+          entityId: canonicalId,
+          rawId: record.raw_id,
+          source: TraceSource.resolver,
+          eventType: TraceEventType.RESOLVER_DECISION,
+          newValue: { decision: 'kept_separate', reason: 'no_candidates' },
+        });
       }
       keptSeparate++;
       continue;
     }
-    
+
     // Find best match
     let bestMatch = null;
     let bestScore = 0;
@@ -358,7 +509,7 @@ async function resolveUnprocessedRecords() {
     
     if (!bestMatch) continue;
     
-    if (bestScore >= AUTO_LINK_THRESHOLD) {
+    if (bestScore >= RESOLVER_CONFIG.autoLinkThreshold) {
       // Auto-link
       if (!isDryRun) {
         const canonicalId = bestMatch.canonical_id || crypto.randomUUID();
@@ -377,12 +528,34 @@ async function resolveUnprocessedRecords() {
           where: { raw_id: record.raw_id },
           data: { is_processed: true },
         });
+
+        // TRACES: RESOLVER_DECISION (linked) + IDENTITY_ATTACHED if raw has GPID
+        await writeTrace({
+          entityId: canonicalId,
+          rawId: record.raw_id,
+          source: TraceSource.resolver,
+          eventType: TraceEventType.RESOLVER_DECISION,
+          newValue: { decision: 'linked', match_method: 'dedupe_ml', confidence: bestScore },
+          confidence: bestScore,
+        });
+        const gpid = (record.raw_json as { google_place_id?: string })?.google_place_id;
+        if (gpid) {
+          await writeTrace({
+            entityId: canonicalId,
+            rawId: record.raw_id,
+            source: TraceSource.resolver,
+            eventType: TraceEventType.IDENTITY_ATTACHED,
+            fieldName: 'google_place_id',
+            newValue: gpid,
+            confidence: bestScore,
+          });
+        }
       }
-      
+
       autoLinked++;
       console.log(`✓ Auto-linked: ${record.name_normalized} (${(bestScore * 100).toFixed(1)}%)`);
       
-    } else if (bestScore >= REVIEW_THRESHOLD) {
+    } else if (bestScore >= RESOLVER_CONFIG.reviewThreshold) {
       // Send to review queue
       if (!isDryRun) {
         await createReviewQueueItem({
@@ -434,12 +607,29 @@ async function resolveUnprocessedRecords() {
           where: { raw_id: record.raw_id },
           data: { is_processed: true },
         });
+
+        // TRACES: ENTITY_CREATED + RESOLVER_DECISION (kept_separate, low score)
+        await writeTrace({
+          entityId: canonicalId,
+          rawId: record.raw_id,
+          source: TraceSource.resolver,
+          eventType: TraceEventType.ENTITY_CREATED,
+          newValue: { name: record.raw_json?.name, match_method: 'new_entity' },
+        });
+        await writeTrace({
+          entityId: canonicalId,
+          rawId: record.raw_id,
+          source: TraceSource.resolver,
+          eventType: TraceEventType.RESOLVER_DECISION,
+          newValue: { decision: 'kept_separate', reason: 'below_threshold', best_score: bestScore },
+          confidence: bestScore,
+        });
       }
-      
+
       keptSeparate++;
     }
   }
-  
+
   console.log(`\n✅ Resolution complete:`);
   console.log(`   Auto-linked: ${autoLinked}`);
   console.log(`   Sent to review: ${sentToReview}`);

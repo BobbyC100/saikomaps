@@ -1,0 +1,109 @@
+[
+  {
+    "canonicalId": "1731a327-023d-4f1f-a39d-9694c0054e56",
+    "entityId": null,
+    "label": "continuity_established"
+  },
+  {
+    "canonicalId": "d29f4839-83d0-4802-a014-d92cf2564a8e",
+    "entityId": null,
+    "label": "continuity_established"
+  },
+  {
+    "canonicalId": "28438f25-f5f7-4671-83ce-b0baef7cc478",
+    "entityId": null,
+    "label": "continuity_established"
+  },
+  {
+    "canonicalId": "1466d85c-beb9-4b17-912b-f5462beff6d0",
+    "entityId": "1466d85c-beb9-4b17-912b-f5462beff6d0",
+    "label": "expected_silence",
+    "_enrichment_note": "Bavel — no actor rels, no appearances, traces=0; entityId added to exercise BLIS-only path"
+  },
+  {
+    "canonicalId": "70d07bae-98a1-466c-839b-c2c5945c9212",
+    "entityId": "70d07bae-98a1-466c-839b-c2c5945c9212",
+    "label": "change_transition",
+    "_enrichment_note": "Gjelina — operator relationship exists (actorRels=1); active appearances=1; no IDENTITY_ATTACHED trace yet so temporariness_seasonal expected as fallback"
+  },
+  {
+    "canonicalId": "84cdfb99-80ae-4f9d-8b19-983281497827",
+    "entityId": "84cdfb99-80ae-4f9d-8b19-983281497827",
+    "label": "expected_silence",
+    "_enrichment_note": "Chi Spacca — no actor rels confirmed, no appearances, traces=0; entityId added to confirm no spurious signals"
+  },
+  {
+    "canonicalId": "0a5864db-e933-4740-a91b-c1936ee33620",
+    "entityId": "0a5864db-e933-4740-a91b-c1936ee33620",
+    "label": "temporariness_seasonal",
+    "_enrichment_note": "Holbox — active appearance record exists (appearances=1); should surface temporariness_seasonal"
+  },
+  {
+    "canonicalId": "846ec73b-e777-4b6a-bb0e-1621f43bfb1b",
+    "entityId": "846ec73b-e777-4b6a-bb0e-1621f43bfb1b",
+    "label": "temporariness_seasonal",
+    "_enrichment_note": "Somni — active appearance record exists (appearances=1); should surface temporariness_seasonal"
+  },
+  {
+    "canonicalId": "24e266d3-35c4-48a3-bec4-4986bc264033",
+    "entityId": "24e266d3-35c4-48a3-bec4-4986bc264033",
+    "label": "temporariness_seasonal",
+    "_enrichment_note": "n/naka — active appearance record exists (appearances=1); should surface temporariness_seasonal"
+  },
+  {
+    "canonicalId": "003245fc-ad9b-4225-9440-faaf83dc1f68",
+    "entityId": "003245fc-ad9b-4225-9440-faaf83dc1f68",
+    "label": "expected_silence",
+    "_enrichment_note": "Hayato — appearances=0, actorRels=0 (validate-traces cleaned up its rows); traces=0; entityId added to confirm silence path"
+  },
+  {
+    "canonicalId": "e9b4f22f-f59e-4e27-997b-4e55e23fdd7e",
+    "entityId": null,
+    "label": "new_recently_opened"
+  },
+  {
+    "canonicalId": "c8b97015-5b7f-4451-a22b-e93967720bab",
+    "entityId": null,
+    "label": "new_recently_opened"
+  },
+  {
+    "canonicalId": "504dce52-5961-49cf-9147-d77703f10b14",
+    "entityId": null,
+    "label": "new_recently_opened"
+  },
+  {
+    "canonicalId": "a93782c5-d963-49a5-b195-f948b2e09528",
+    "entityId": null,
+    "label": "new_recently_opened"
+  },
+  {
+    "canonicalId": "356b4dbe-0cf7-47d0-9b5a-b82015d67548",
+    "entityId": null,
+    "label": "new_recently_opened"
+  },
+  {
+    "canonicalId": "77735399-6290-428c-8b36-b2e62612e89b",
+    "entityId": null,
+    "label": "new_recently_opened"
+  },
+  {
+    "canonicalId": "0e9d06d0-2e8f-41b0-98c0-1c9cba876225",
+    "entityId": null,
+    "label": "new_recently_opened"
+  },
+  {
+    "canonicalId": "7238618a-b515-45ba-8fdd-e6530d5a8712",
+    "entityId": null,
+    "label": "new_recently_opened"
+  },
+  {
+    "canonicalId": "1fb41fda-7e64-4675-82ca-89deb38e5927",
+    "entityId": null,
+    "label": "new_recently_opened"
+  },
+  {
+    "canonicalId": "6d7f0826-a87e-4014-b4c3-6a0cab945491",
+    "entityId": null,
+    "label": "new_recently_opened"
+  }
+]

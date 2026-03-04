@@ -52,6 +52,11 @@
     "backfill:entities-address": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/backfill-entities-address-from-google.ts",
     "test:voice-engine": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/test-voice-engine.ts",
     "analyze:enrichment": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/analyze-enrichment-status.ts",
+    "entities:report": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/entity-state-report.ts",
+    "taxonomy:discover": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/taxonomy-discovery.ts",
+    "enrichment:snapshot": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/enrichment-snapshot.ts",
+    "entities:enrichment-snapshot": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/enrichment-snapshot-ca.ts",
+    "enrichment:test": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/enrichment-test.ts",
     "find:duplicates": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/find-duplicate-places.ts",
     "find:potential-duplicates": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/find-potential-duplicates.ts",
     "investigate:backfill-failures": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/investigate-backfill-failures.ts",
@@ -142,7 +147,12 @@
     "gpid:seed-queue": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/seed-gpid-resolution-queue.ts",
     "backfill:websites": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/backfill-websites-from-google.ts",
     "backfill:place-actor:neon": "./scripts/db-neon.sh node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/backfill-place-actor-relationships.ts",
-    "backfill:place-actor:apply:neon": "./scripts/db-neon.sh node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/backfill-place-actor-relationships.ts --apply"
+    "backfill:place-actor:apply:neon": "./scripts/db-neon.sh node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/backfill-place-actor-relationships.ts --apply",
+    "tier2:dry": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/run-tier2-website-enrichment.ts --dry-run",
+    "tier2:run": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/run-tier2-website-enrichment.ts",
+    "tier2:human-review-sweep": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/sweep-human-review-tier2.ts",
+    "la:rollout:dry": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/la-rollout-runner.ts --dry-run --la-only",
+    "la:rollout": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/la-rollout-runner.ts --la-only"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.72.1",

@@ -26,6 +26,11 @@ async function fetchRobotsTxt(origin: string): Promise<string | null> {
 
 /**
  * Simple check: if path is disallowed by robots.txt we skip. No crawler delay parsing.
+ *
+ * Disallow patterns from robots.txt may contain regex metacharacters (+, ?, (, ), etc.)
+ * that must be escaped before building a RegExp. We escape everything except *, then
+ * convert * → .* for glob-style matching. A try/catch guards against any remaining
+ * edge-case patterns that produce invalid RegExp.
  */
 function isPathDisallowed(robotsTxt: string, path: string, userAgent: string): boolean {
   const lines = robotsTxt.split(/\r?\n/).map((l) => l.trim().toLowerCase());
@@ -39,9 +44,17 @@ function isPathDisallowed(robotsTxt: string, path: string, userAgent: string): b
     if (inRelevantGroup && line.startsWith("disallow:")) {
       const disallowPath = line.slice(9).trim();
       if (!disallowPath) continue;
-      const pattern = disallowPath.replace(/\*/g, ".*");
-      const re = new RegExp(`^${pattern}`);
-      if (re.test(path)) return true;
+      // Escape all regex metacharacters except *, then convert * to .*
+      const escaped = disallowPath.replace(/[.+^${}()|[\]\\]/g, "\\$&");
+      const pattern = escaped.replace(/\*/g, ".*");
+      try {
+        const re = new RegExp(`^${pattern}`);
+        if (re.test(path)) return true;
+      } catch {
+        // Malformed pattern — fall back to simple prefix match (safe degradation)
+        const prefix = disallowPath.split("*")[0];
+        if (prefix && path.startsWith(prefix)) return true;
+      }
     }
   }
   return false;

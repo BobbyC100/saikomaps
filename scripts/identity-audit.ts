@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
- * Identity audit: read-only snapshot of places identity health.
- * - Total places, missing GPID, duplicate GPIDs (non-empty)
+ * Identity audit: read-only snapshot of entity identity health.
+ * - Total entities, missing GPID, duplicate GPIDs (non-empty)
  * - Latest GPID dry-run CSV: status + reason counts (if CSV exists)
  * No DB writes. Uses db.ingestion (POOLED).
  *
@@ -91,24 +91,24 @@ async function main() {
   const url = env.DATABASE_URL;
   const label = parseDatabaseLabel(url);
 
-  let totalPlaces = 0;
+  let totalEntities = 0;
   let missingGpid = 0;
   let duplicateGpids = 0;
 
   try {
     const [totalRow] = await prisma.$queryRawUnsafe<[{ count: bigint }]>(
-      'select count(*) as count from public.places'
+      'select count(*) as count from public.entities'
     );
-    totalPlaces = Number(totalRow?.count ?? 0);
+    totalEntities = Number(totalRow?.count ?? 0);
 
     const [missingRow] = await prisma.$queryRawUnsafe<[{ count: bigint }]>(
-      "select count(*) as count from public.places where google_place_id is null or btrim(coalesce(google_place_id,'')) = ''"
+      "select count(*) as count from public.entities where google_place_id is null or btrim(coalesce(google_place_id,'')) = ''"
     );
     missingGpid = Number(missingRow?.count ?? 0);
 
     const [dupRow] = await prisma.$queryRawUnsafe<[{ count: bigint }]>(
       `select count(*) as count from (
-        select google_place_id from public.places
+        select google_place_id from public.entities
         where google_place_id is not null and btrim(google_place_id) <> ''
         group by 1 having count(*) > 1
       ) d`
@@ -120,7 +120,7 @@ async function main() {
   }
 
   console.log(`IDENTITY AUDIT (${label})`);
-  console.log(`Total places: ${totalPlaces}`);
+  console.log(`Total entities: ${totalEntities}`);
   console.log(`Missing GPID: ${missingGpid}`);
   console.log(`Duplicate GPIDs (non-empty): ${duplicateGpids}`);
   console.log('');

@@ -12,7 +12,7 @@
  * 
  * Usage: npm run enrich:google [--dry-run] [--limit=100]
  * 
- * Requires: GOOGLE_MAPS_API_KEY in .env or .env.local
+ * Requires: GOOGLE_PLACES_API_KEY (or GOOGLE_MAPS_API_KEY) in .env.local
  */
 
 // Load environment variables from .env and .env.local
@@ -60,10 +60,10 @@ interface GooglePlaceDetails {
 }
 
 async function fetchPlaceDetails(placeId: string): Promise<GooglePlaceDetails | null> {
-  const apiKey = process.env.GOOGLE_MAPS_API_KEY;
-  
+  const apiKey = process.env.GOOGLE_PLACES_API_KEY || process.env.GOOGLE_MAPS_API_KEY;
+
   if (!apiKey) {
-    throw new Error('GOOGLE_MAPS_API_KEY not found in environment');
+    throw new Error('No Google API key found — set GOOGLE_PLACES_API_KEY or GOOGLE_MAPS_API_KEY in .env.local');
   }
   
   const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=name,formatted_address,formatted_phone_number,website,opening_hours,photos,types,geometry,address_components,price_level&key=${apiKey}`;
@@ -130,8 +130,8 @@ function mapPrimaryType(types: string[] | undefined): string | null {
 async function enrichPlaces() {
   console.log('🔍 Google Places Data Enrichment\n');
   
-  if (!process.env.GOOGLE_MAPS_API_KEY) {
-    console.error('❌ GOOGLE_MAPS_API_KEY not found in .env');
+  if (!process.env.GOOGLE_PLACES_API_KEY && !process.env.GOOGLE_MAPS_API_KEY) {
+    console.error('❌ No Google API key found. Set GOOGLE_PLACES_API_KEY or GOOGLE_MAPS_API_KEY in .env.local');
     console.error('Get an API key: https://console.cloud.google.com/apis/credentials');
     process.exit(1);
   }

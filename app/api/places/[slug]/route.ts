@@ -9,10 +9,12 @@ import { db } from '@/lib/db';
 import { getGooglePhotoUrl, getPhotoRefFromStored } from '@/lib/google-places';
 import { getActiveOverlays } from '@/lib/overlays/getActiveOverlays';
 import { buildPlaceServiceFacts } from '@/lib/place-payload';
+import { VERTICAL_DISPLAY } from '@/lib/primaryVertical';
 import {
   fetchPlaceForPRLBySlug,
   assembleSceneSenseFromMaterialized,
 } from '@/lib/scenesense';
+import { getTimeFOLDPhrase } from '@/lib/timefold/consumer';
 
 const BUILD_ID =
   process.env.VERCEL_GIT_COMMIT_SHA ||
@@ -357,7 +359,7 @@ export async function GET(
           website: place.website,
           instagram: place.instagram,
           description: place.description,
-          category: place.category,
+          category: VERTICAL_DISPLAY[place.primary_vertical] ?? place.category,
           neighborhood: place.neighborhood,
           cuisineType: place.cuisineType,
           priceLevel: place.priceLevel,
@@ -386,6 +388,7 @@ export async function GET(
           intentProfile: place.intentProfile,
           intentProfileOverride: place.intentProfileOverride,
           reservationUrl: place.reservationUrl,
+          primaryVertical: place.primary_vertical,
           // Primary operator (PlaceActorRelationship)
           primaryOperator: (() => {
             const rel = place.entity_actor_relationships?.[0];
@@ -397,6 +400,11 @@ export async function GET(
           placeType: place.entityType,
           categorySlug: place.category_rel?.slug ?? (typeof place.category === "string" ? place.category : null),
           marketSchedule: place.marketSchedule ?? null,
+          // TimeFOLD v1 — rendered phrase or null (never exposes class/status directly)
+          timefoldPhrase: getTimeFOLDPhrase({
+            timefoldClass: place.timefoldClass ?? null,
+            timefoldStatus: place.timefoldStatus ?? null,
+          }),
           // Appearances (Where to find / Currently hosting)
           appearancesAsSubject: (place.entity_appearances_as_subject ?? []).map((a) => ({
             id: a.id,
