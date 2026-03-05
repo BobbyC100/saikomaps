@@ -148,14 +148,26 @@ export async function GET(
       );
     }
 
-    // Get photo URLs (up to 10 for merchant page: 1 hero + up to 9 gallery)
+    // Get photo URLs: sort by quality (largest area first), take top 6
     const photoUrls: string[] = [];
     if (place.googlePhotos && Array.isArray(place.googlePhotos)) {
-      for (let i = 0; i < Math.min(10, place.googlePhotos.length); i++) {
-        const ref = getPhotoRefFromStored(place.googlePhotos[i] as { photo_reference?: string; photoReference?: string; name?: string });
+      const photosWithArea = place.googlePhotos
+        .map((p) => {
+          const obj = p as { width?: number; height?: number; photo_reference?: string; photoReference?: string; name?: string };
+          const w = typeof obj.width === 'number' ? obj.width : 0;
+          const h = typeof obj.height === 'number' ? obj.height : 0;
+          return { raw: obj, area: w * h, hasSize: w > 0 && h > 0 };
+        })
+        .sort((a, b) => {
+          if (a.hasSize !== b.hasSize) return a.hasSize ? -1 : 1;
+          return b.area - a.area;
+        });
+
+      for (const { raw } of photosWithArea.slice(0, 6)) {
+        const ref = getPhotoRefFromStored(raw);
         if (ref) {
           try {
-            photoUrls.push(getGooglePhotoUrl(ref, i === 0 ? 800 : 400));
+            photoUrls.push(getGooglePhotoUrl(ref, 400));
           } catch {
             // skip
           }
@@ -201,6 +213,10 @@ export async function GET(
               identity_signals: true,
               place_personality: true,
               vibe_tags: true,
+              cuisine_posture: true,
+              service_model: true,
+              price_tier: true,
+              wine_program_intent: true,
             },
           })
         : Promise.resolve(null),
@@ -289,16 +305,14 @@ export async function GET(
     let enhancedPullQuoteSource = place.pullQuoteSource;
     let enhancedCuratorNote = curatorNote;
     
-    if (isDemoPlace && photoUrls.length < 2) {
-      // Add dummy gallery photos for demo
+    if (isDemoPlace) {
       enhancedPhotoUrls = [
-        photoUrls[0] || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&h=600&fit=crop',
+        'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&h=600&fit=crop',
         'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&h=400&fit=crop',
         'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&h=400&fit=crop',
         'https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?w=400&h=400&fit=crop',
         'https://images.unsplash.com/photo-1428515613728-6b4607e44363?w=400&h=400&fit=crop',
         'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=400&h=400&fit=crop',
-        'https://images.unsplash.com/photo-1424847651672-bf20a4b0982b?w=400&h=400&fit=crop',
       ];
     }
     
@@ -351,6 +365,25 @@ export async function GET(
     }
     // ============================================================================
 
+    // Offering signals: extract drink/service booleans from googleAttrs for frontend
+    const offeringSignals: {
+      servesBeer: boolean | null;
+      servesWine: boolean | null;
+      servesVegetarianFood: boolean | null;
+      cuisinePosture: string | null;
+      serviceModel: string | null;
+      priceTier: string | null;
+      wineProgramIntent: string | null;
+    } = {
+      servesBeer: typeof googleAttrs?.serves_beer === 'boolean' ? googleAttrs.serves_beer : null,
+      servesWine: typeof googleAttrs?.serves_wine === 'boolean' ? googleAttrs.serves_wine : null,
+      servesVegetarianFood: typeof googleAttrs?.serves_vegetarian_food === 'boolean' ? googleAttrs.serves_vegetarian_food : null,
+      cuisinePosture: (goldenRecord as Record<string, unknown> | null)?.cuisine_posture as string ?? null,
+      serviceModel: (goldenRecord as Record<string, unknown> | null)?.service_model as string ?? null,
+      priceTier: (goldenRecord as Record<string, unknown> | null)?.price_tier as string ?? null,
+      wineProgramIntent: (goldenRecord as Record<string, unknown> | null)?.wine_program_intent as string ?? null,
+    };
+
     return NextResponse.json(
       {
         success: true,
@@ -396,6 +429,7 @@ export async function GET(
           intentProfileOverride: place.intentProfileOverride,
           reservationUrl: place.reservationUrl,
           primaryVertical: place.primary_vertical,
+          offeringSignals,
           // Primary operator (PlaceActorRelationship)
           primaryOperator: null,
           // Markets fields

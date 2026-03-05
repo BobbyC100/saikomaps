@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { GlobalHeader } from '@/components/layouts/GlobalHeader';
@@ -62,6 +62,15 @@ interface LocationData {
   pullQuoteUrl?: string | null;
   pullQuoteType?: string | null;
   reservationUrl?: string | null;
+  offeringSignals?: {
+    servesBeer: boolean | null;
+    servesWine: boolean | null;
+    servesVegetarianFood: boolean | null;
+    cuisinePosture: string | null;
+    serviceModel: string | null;
+    priceTier: string | null;
+    wineProgramIntent: string | null;
+  } | null;
   slug?: string;
   primaryOperator?: { actorId: string; name: string; slug: string; website?: string } | null;
   placeType?: 'venue' | 'activity' | 'public';
@@ -155,6 +164,78 @@ function buildLedgerEntries(location: LocationData, appearsOnCount: number): { s
   return groups;
 }
 
+const OFFERING_CAP = 4;
+
+const PRICE_PHRASES: Record<string, string> = {
+  '$': 'Budget-friendly pricing',
+  '$$': 'Moderate price range',
+  '$$$': 'Higher-end pricing',
+  '$$$$': 'Fine-dining price point',
+};
+
+const SERVICE_MODEL_PHRASES: Record<string, string> = {
+  'tasting-menu': 'Tasting menu format',
+  'a-la-carte': 'À la carte ordering',
+  'small-plates': 'Small plates and sharing format',
+  'family-style': 'Family-style service',
+  'counter': 'Counter service',
+};
+
+const WINE_INTENT_PHRASES: Record<string, string> = {
+  'natural': 'Producer-driven natural wine list',
+  'classic': 'Traditional wine program with regional depth',
+  'eclectic': 'Eclectic, wide-ranging wine list',
+  'minimal': 'Compact, curated wine selection',
+};
+
+const CUISINE_POSTURE_PHRASES: Record<string, string> = {
+  'produce-driven': 'Seasonal, produce-driven kitchen',
+  'protein-centric': 'Protein-focused menu',
+  'carb-forward': 'Carb-forward comfort cooking',
+  'seafood-focused': 'Seafood-centered menu',
+  'balanced': 'Balanced, broadly composed menu',
+};
+
+function buildOfferingLines(location: LocationData): { label: string; sentence: string }[] {
+  const lines: { label: string; sentence: string }[] = [];
+  const os = location.offeringSignals;
+
+  // Food line: enriched cuisine_posture > cuisineType fallback
+  if (os?.cuisinePosture && CUISINE_POSTURE_PHRASES[os.cuisinePosture]) {
+    lines.push({ label: 'Food', sentence: CUISINE_POSTURE_PHRASES[os.cuisinePosture] });
+  } else if (location.cuisineType) {
+    lines.push({ label: 'Food', sentence: `${location.cuisineType} kitchen` });
+  }
+
+  // Wine/Drink line: enriched wine_program_intent > Google drink signals fallback
+  if (os?.wineProgramIntent && os.wineProgramIntent !== 'none' && WINE_INTENT_PHRASES[os.wineProgramIntent]) {
+    lines.push({ label: 'Wine', sentence: WINE_INTENT_PHRASES[os.wineProgramIntent] });
+  } else if (os?.servesWine === true && os?.servesBeer === true) {
+    lines.push({ label: 'Drinks', sentence: 'Beer and wine available' });
+  } else if (os?.servesWine === true) {
+    lines.push({ label: 'Wine', sentence: 'Wine list available' });
+  } else if (os?.servesBeer === true) {
+    lines.push({ label: 'Drinks', sentence: 'Beer available' });
+  }
+
+  // Service line: enriched service_model > skip if generic
+  if (os?.serviceModel && SERVICE_MODEL_PHRASES[os.serviceModel]) {
+    lines.push({ label: 'Service', sentence: SERVICE_MODEL_PHRASES[os.serviceModel] });
+  }
+
+  // Price line: enriched price_tier > entity priceLevel fallback
+  if (os?.priceTier && PRICE_PHRASES[os.priceTier]) {
+    lines.push({ label: 'Price', sentence: PRICE_PHRASES[os.priceTier] });
+  } else if (location.priceLevel != null && location.priceLevel >= 1 && location.priceLevel <= 4) {
+    const tier = '$'.repeat(location.priceLevel);
+    if (PRICE_PHRASES[tier]) {
+      lines.push({ label: 'Price', sentence: PRICE_PHRASES[tier] });
+    }
+  }
+
+  return lines.slice(0, OFFERING_CAP);
+}
+
 export default function PlacePage() {
   const params = useParams();
   const slug = params?.slug as string;
@@ -163,6 +244,16 @@ export default function PlacePage() {
   const [error, setError] = useState<'not-found' | 'server-error' | null>(null);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
+  const [failedPhotos, setFailedPhotos] = useState<Set<string>>(new Set());
+
+  const handlePhotoError = useCallback((url: string) => {
+    setFailedPhotos((prev) => new Set(prev).add(url));
+  }, []);
+
+  const openGallery = useCallback((index: number) => {
+    setLightboxIndex(index);
+    setLightboxOpen(true);
+  }, []);
 
   useEffect(() => {
     if (!slug) return;
@@ -279,7 +370,9 @@ export default function PlacePage() {
   }
 
   const { location, guide, appearsOn } = data;
-  const photoUrls = location.photoUrls ?? (location.photoUrl ? [location.photoUrl] : []);
+  const rawPhotoUrls = location.photoUrls ?? (location.photoUrl ? [location.photoUrl] : []);
+  const validPhotos = rawPhotoUrls.filter((url) => url && !failedPhotos.has(url));
+
   const { isOpen, statusText, today, openNowExplicit } = parseHours(location.hours);
   const signalsList = location.vibeTags ?? [];
 
@@ -314,11 +407,6 @@ export default function PlacePage() {
   const recognitions = (location.recognitions ?? []).slice(0, RECOGNITIONS_CAP);
   const ledgerGroups = buildLedgerEntries(location, appearsOn.length);
 
-  const openGallery = (index: number) => {
-    setLightboxIndex(index);
-    setLightboxOpen(true);
-  };
-
   const statusLabel = openNowExplicit && isOpen !== null ? (isOpen ? 'Open' : 'Closed') : null;
   const hasActions = mapRefUrl || location.reservationUrl || location.website || location.instagram;
 
@@ -347,19 +435,6 @@ export default function PlacePage() {
                     {energyPhrase}
                   </p>
                 )}
-                {location.description && (
-                  <div id="identity-description" className="section-with-reference">
-                    <p>{location.description}</p>
-                    <a href="#ledger-description" className="section-reference" aria-label="Source">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.7">
-                        <circle cx="12" cy="12" r="9" />
-                        <path d="M3 12h18" />
-                        <path d="M12 3a15 15 0 0 1 0 18" />
-                        <path d="M12 3a15 15 0 0 0 0 18" />
-                      </svg>
-                    </a>
-                  </div>
-                )}
                 {hasActions && (
                   <div id="facts-band">
                     {mapRefUrl && (
@@ -376,6 +451,62 @@ export default function PlacePage() {
                     )}
                   </div>
                 )}
+                {location.description && (
+                  <div id="identity-description" className="section-with-reference">
+                    <p>{location.description}</p>
+                    <a href="#ledger-description" className="section-reference" aria-label="Source">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.7">
+                        <circle cx="12" cy="12" r="9" />
+                        <path d="M3 12h18" />
+                        <path d="M12 3a15 15 0 0 1 0 18" />
+                        <path d="M12 3a15 15 0 0 0 0 18" />
+                      </svg>
+                    </a>
+                  </div>
+                )}
+                {/* Place Character: Fields interpretation layer */}
+                {(() => {
+                  const rows: { label: string; value: string }[] = [
+                    { label: 'Scene', value: location.scenesense?.scene?.[0] },
+                    { label: 'Energy', value: location.scenesense?.vibe?.[0] },
+                    { label: 'Ambiance', value: location.scenesense?.ambiance?.[0] },
+                    { label: 'Atmosphere', value: location.scenesense?.atmosphere?.[0] },
+                  ].filter((r): r is { label: string; value: string } => !!r.value?.trim());
+
+                  if (rows.length === 0) return null;
+
+                  return (
+                    <section id="place-character">
+                      <h2>Place Character</h2>
+                      <div id="place-character-rows">
+                        {rows.map((row) => (
+                          <div key={row.label} className="character-row">
+                            <span className="character-label">{row.label}</span>
+                            <p className="character-sentence">{row.value}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </section>
+                  );
+                })()}
+                {/* Offering Signals: Food + Wine deterministic lines */}
+                {(() => {
+                  const offeringRows = buildOfferingLines(location);
+                  if (offeringRows.length === 0) return null;
+                  return (
+                    <section id="offering-signals">
+                      <h2>Offering</h2>
+                      <div id="offering-signals-rows">
+                        {offeringRows.map((row) => (
+                          <div key={row.label} className="offering-row">
+                            <span className="offering-label">{row.label}</span>
+                            <p className="offering-sentence">{row.sentence}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </section>
+                  );
+                })()}
               </div>
 
               <aside id="rail-column">
@@ -452,13 +583,13 @@ export default function PlacePage() {
             </div>
 
             {/* Photos Section */}
-            {photoUrls.length > 0 && (
+            {validPhotos.length > 0 && (
               <section id="photos-section">
                 <h2>Photos</h2>
                 <div id="photos-grid">
-                  {photoUrls.map((url, i) => (
-                    <div key={i} className="photo-tile" role="button" tabIndex={0} onClick={() => openGallery(i)} onKeyDown={(e) => e.key === 'Enter' && openGallery(i)}>
-                      <img src={url} alt="" />
+                  {validPhotos.map((url, i) => (
+                    <div key={url} className="photo-tile" role="button" tabIndex={0} onClick={() => openGallery(i)} onKeyDown={(e) => e.key === 'Enter' && openGallery(i)}>
+                      <img src={url} alt="" onError={() => handlePhotoError(url)} />
                     </div>
                   ))}
                 </div>
@@ -551,8 +682,8 @@ export default function PlacePage() {
         </div>
       </main>
 
-      {lightboxOpen && photoUrls.length > 0 && (
-        <GalleryLightbox photos={photoUrls} initialIndex={lightboxIndex} onClose={() => setLightboxOpen(false)} />
+      {lightboxOpen && validPhotos.length > 0 && (
+        <GalleryLightbox photos={validPhotos} initialIndex={lightboxIndex} onClose={() => setLightboxOpen(false)} />
       )}
 
       <GlobalFooter variant="minimal" />

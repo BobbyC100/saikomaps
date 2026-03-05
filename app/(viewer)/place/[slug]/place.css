@@ -96,7 +96,7 @@
   grid-column: 9 / span 4;
 }
 
-/* Identity stack: H1 → Subline → Signals → Description → Facts Band */
+/* Identity stack: H1 → Subline → Signals → Facts Band → Description → Place Character */
 #place-title {
   margin: 0 0 0.25em;
   font-size: var(--pp-font-title);
@@ -121,7 +121,7 @@
 }
 
 #identity-description {
-  margin: 0;
+  margin-top: 1.25em;
   font-size: calc(var(--pp-font-body) + 1px);
   line-height: var(--pp-lh-body);
   color: var(--pp-color-text);
@@ -320,10 +320,98 @@
 }
 
 /* ---------------------------------------------------------------------------
-   7. Photos Section (3-col, 4/3 aspect, no hero)
+   6b. Place Character (Fields interpretation layer)
+   --------------------------------------------------------------------------- */
+#place-character {
+  margin-top: 1.25em;
+}
+
+#place-character h2 {
+  font-size: var(--pp-l1-size);
+  font-weight: var(--pp-l1-weight);
+  text-transform: uppercase;
+  letter-spacing: var(--pp-l1-spacing);
+  color: var(--pp-color-text);
+  opacity: var(--pp-l1-opacity);
+  margin: 0 0 1.25em;
+}
+
+#place-character-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1em;
+}
+
+.character-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15em;
+}
+
+.character-label {
+  font-size: var(--pp-font-micro);
+  font-weight: 500;
+  color: var(--pp-color-text);
+  opacity: 0.5;
+  letter-spacing: 0.02em;
+}
+
+.character-sentence {
+  margin: 0;
+  font-size: calc(var(--pp-font-body) + 1px);
+  line-height: var(--pp-lh-body);
+  color: var(--pp-color-text);
+}
+
+/* ---------------------------------------------------------------------------
+   6c. Offering Signals (Food + Wine deterministic lines)
+   --------------------------------------------------------------------------- */
+#offering-signals {
+  margin-top: 1.25em;
+}
+
+#offering-signals h2 {
+  font-size: var(--pp-l1-size);
+  font-weight: var(--pp-l1-weight);
+  text-transform: uppercase;
+  letter-spacing: var(--pp-l1-spacing);
+  color: var(--pp-color-text);
+  opacity: var(--pp-l1-opacity);
+  margin: 0 0 1.25em;
+}
+
+#offering-signals-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1em;
+}
+
+.offering-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15em;
+}
+
+.offering-label {
+  font-size: var(--pp-font-micro);
+  font-weight: 500;
+  color: var(--pp-color-text);
+  opacity: 0.5;
+  letter-spacing: 0.02em;
+}
+
+.offering-sentence {
+  margin: 0;
+  font-size: calc(var(--pp-font-body) + 1px);
+  line-height: var(--pp-lh-body);
+  color: var(--pp-color-text);
+}
+
+/* ---------------------------------------------------------------------------
+   7. Photos Section (2×3 grid, compact, clickable)
    --------------------------------------------------------------------------- */
 #photos-section {
-  grid-column: 1 / -1;
+  grid-column: 1 / span 8;
   margin-top: var(--pp-section-gap);
   padding-top: var(--pp-section-pad);
   border-top: var(--pp-rule-weight-light) solid var(--pp-color-rule);
@@ -336,19 +424,25 @@
   letter-spacing: 0.05em;
   color: var(--pp-color-text);
   opacity: 0.7;
-  margin: 0 0 1em;
+  margin: 0 0 0.75em;
 }
 
 #photos-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: var(--pp-grid-gap);
+  gap: 10px;
 }
 
 #photos-grid .photo-tile {
   aspect-ratio: 4 / 3;
   overflow: hidden;
-  background: rgba(0, 0, 0, 0.06);
+  background: rgba(0, 0, 0, 0.04);
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+#photos-grid .photo-tile:hover {
+  opacity: 0.88;
 }
 
 #photos-grid .photo-tile img {
@@ -511,7 +605,9 @@
   #editorial-stack,
   #photos-section,
   #recognitions-section,
-  #reference-ledger {
+  #reference-ledger,
+  #appearances-as-subject,
+  #appearances-as-host {
     grid-column: 1 / -1;
   }
 
@@ -528,6 +624,7 @@
   }
 
   #photos-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
   }
 }

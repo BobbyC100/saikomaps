@@ -276,6 +276,11 @@ model entities {
   overall_confidence   Float?   @default(0.5) @map("overall_confidence")
   confidence_updated_at DateTime? @map("confidence_updated_at")
 
+  // Description enrichment metadata
+  description_source     String?  @map("description_source")     // editorial | website | google_editorial | synthesis
+  description_confidence Float?   @map("description_confidence") // 0.0–1.0
+  description_reviewed   Boolean  @default(false) @map("description_reviewed")
+
   // Website enrichment (SAIKO spec v1.1)
   last_enriched_at   DateTime? @map("last_enriched_at")
   enrichment_stage  String?   @map("enrichment_stage") // e.g. ENRICHED_WEBSITE
