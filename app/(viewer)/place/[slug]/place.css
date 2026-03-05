@@ -1,7 +1,64 @@
-/* Saiko Place Page — Canonical Spec v1 */
+/* ═══════════════════════════════════════════════════════════════════════════
+   Saiko Place Page — Canonical Spec v1 (Tokenized)
+
+   All tunable values live in the #place-page custom-property block below.
+   Change a token value → one-line edit, zero selector work.
+   See docs/ui/place-page/patch-log.md for the patch log.
+   ═══════════════════════════════════════════════════════════════════════════ */
 
 /* ---------------------------------------------------------------------------
-   0. Document Frame (global posture)
+   0. Design Tokens
+   --------------------------------------------------------------------------- */
+#place-page {
+  /* Colors */
+  --pp-color-text: #36454F;
+  --pp-color-link: #8B7355;
+  --pp-color-accent: #C3B091;
+  --pp-color-rule: rgba(0, 0, 0, 0.08);
+  --pp-color-quote-border: rgba(195, 176, 145, 0.3);
+
+  /* Type Scale */
+  --pp-font-title: clamp(2rem, 4.5vw, 2.6rem);
+  --pp-font-body: 15px;
+  --pp-font-small: 13px;
+  --pp-font-micro: 12px;
+  --pp-font-nano: 11px;
+  --pp-font-pico: 10px;
+  --pp-font-quote: 14px;
+  --pp-font-serif: 'Libre Baskerville', Georgia, serif;
+
+  /* Line Heights */
+  --pp-lh-body: 1.65;
+  --pp-lh-list: 1.6;
+  --pp-lh-tight: 1.2;
+
+  /* Layout */
+  --pp-rule-weight: 3px;
+  --pp-rule-weight-light: 1px;
+  --pp-section-gap: 2em;
+  --pp-section-pad: 1.5em;
+  --pp-hero-gap: 36px;
+  --pp-grid-gap: 24px;
+  --pp-sidebar-gap: 32px;
+  --pp-sidebar-pad: 24px;
+  --pp-canvas-max: 1280px;
+  --pp-canvas-pad-x: 32px;
+  --pp-canvas-pad-x-mob: 20px;
+  --pp-content-ratio: 7fr;
+  --pp-sidebar-ratio: 5fr;
+
+  /* Section Headers (L1 / L2) */
+  --pp-l1-size: 13px;
+  --pp-l1-weight: 600;
+  --pp-l1-spacing: 0.08em;
+  --pp-l1-opacity: 0.65;
+  --pp-l2-size: 14px;
+  --pp-l2-weight: 500;
+  --pp-l2-opacity: 0.9;
+}
+
+/* ---------------------------------------------------------------------------
+   1. Document Frame (global posture)
    --------------------------------------------------------------------------- */
 #document-frame {
   padding-top: max(96px, env(safe-area-inset-top));
@@ -9,25 +66,26 @@
 }
 
 /* ---------------------------------------------------------------------------
-   1. Page Canvas + Grid
+   2. Page Canvas + Grid
    --------------------------------------------------------------------------- */
 #page-canvas {
-  max-width: 1280px;
+  max-width: var(--pp-canvas-max);
   margin: 0 auto;
-  padding: 0 32px 72px;
+  padding: 0 var(--pp-canvas-pad-x) 72px;
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: 24px;
+  gap: var(--pp-grid-gap);
 }
 
 /* ---------------------------------------------------------------------------
-   2. Top Section: Identity (left) + Rail (right)
+   3. Top Section: Identity (left) + Rail (right)
    --------------------------------------------------------------------------- */
 #top-section {
   grid-column: 1 / -1;
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: 24px;
+  gap: var(--pp-grid-gap);
+  margin-top: var(--pp-hero-gap);
 }
 
 #identity-column {
@@ -38,55 +96,55 @@
   grid-column: 9 / span 4;
 }
 
-/* Identity stack order: H1 → Subline → Signals → Description → Facts Band */
-#identity-column h1 {
+/* Identity stack: H1 → Subline → Signals → Description → Facts Band */
+#place-title {
   margin: 0 0 0.25em;
-  font-size: clamp(1.75rem, 4vw, 2.25rem);
+  font-size: var(--pp-font-title);
   font-weight: 600;
-  color: #36454F;
-  line-height: 1.2;
+  color: var(--pp-color-text);
+  line-height: var(--pp-lh-tight);
 }
 
 #identity-subline {
   margin: 0 0 0.5em;
-  font-size: 14px;
-  color: #36454F;
+  font-size: var(--pp-l2-size);
+  color: var(--pp-color-text);
   opacity: 0.8;
 }
 
 #identity-signals {
   margin: 0 0 0.75em;
-  font-size: 13px;
-  color: #36454F;
+  font-size: var(--pp-font-small);
+  color: var(--pp-color-text);
   opacity: 0.85;
   line-height: 1.4;
 }
 
 #identity-description {
-  margin: 0 0 0;
-  font-size: 15px;
-  line-height: 1.65;
-  color: #36454F;
+  margin: 0;
+  font-size: var(--pp-font-body);
+  line-height: var(--pp-lh-body);
+  color: var(--pp-color-text);
 }
 
-/* Facts Band: between two rules, min-height 44px, horizontal left-aligned */
+/* Facts Band */
 #facts-band {
   min-height: 44px;
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: 0 1.5em;
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  border-top: var(--pp-rule-weight-light) solid var(--pp-color-rule);
+  border-bottom: var(--pp-rule-weight-light) solid var(--pp-color-rule);
   margin-top: 1.25em;
   padding: 10px 0;
-  font-size: 13px;
-  color: #36454F;
+  font-size: var(--pp-font-small);
+  color: var(--pp-color-text);
   opacity: 0.85;
 }
 
 #facts-band a {
-  color: #8B7355;
+  color: var(--pp-color-link);
   text-decoration: none;
 }
 
@@ -95,15 +153,14 @@
 }
 
 /* ---------------------------------------------------------------------------
-   3. Right Rail (v1): margin notes, crown lane, muted, fragmented
+   4. Right Rail: margin notes, crown lane, muted, fragmented
    --------------------------------------------------------------------------- */
 #rail-column {
-  border-left: 1px solid rgba(0, 0, 0, 0.08);
+  border-left: var(--pp-rule-weight-light) solid var(--pp-color-rule);
   padding-left: 16px;
   position: relative;
 }
 
-/* Crown lane: rail content starts lower than H1 */
 #rail-column::before {
   content: '';
   display: block;
@@ -111,8 +168,8 @@
 }
 
 .rail-block {
-  font-size: 12px;
-  color: #36454F;
+  font-size: var(--pp-font-micro);
+  color: var(--pp-color-text);
   opacity: 0.75;
   margin-bottom: 1em;
 }
@@ -127,14 +184,13 @@
 }
 
 /* ---------------------------------------------------------------------------
-   4. Section containers with provenance diamond (bottom-right)
+   5. Section containers with provenance diamond (bottom-right)
    --------------------------------------------------------------------------- */
 .section-with-provenance {
   position: relative;
   padding-bottom: 28px;
 }
 
-/* Provenance diamond: glyph ~12px, hit target 24px, opacity .5 default / .8 hover, 8px inset bottom-right */
 .provenance-diamond {
   position: absolute;
   bottom: 8px;
@@ -148,9 +204,9 @@
   background: transparent;
   cursor: pointer;
   text-decoration: none;
-  color: #36454F;
+  color: var(--pp-color-text);
   opacity: 0.5;
-  font-size: 12px;
+  font-size: var(--pp-font-micro);
   line-height: 1;
   transition: opacity 0.15s;
 }
@@ -164,17 +220,17 @@
 }
 
 /* ---------------------------------------------------------------------------
-   5. Editorial Stack (below top section)
+   6. Editorial Stack (below top section)
    --------------------------------------------------------------------------- */
 #editorial-stack {
   grid-column: 1 / span 8;
-  margin-top: 2em;
+  margin-top: var(--pp-section-gap);
 }
 
 #editorial-stack hr {
   border: none;
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
-  margin: 1.5em 0;
+  border-top: var(--pp-rule-weight-light) solid var(--pp-color-rule);
+  margin: var(--pp-section-pad) 0;
 }
 
 .editorial-block {
@@ -182,27 +238,27 @@
 }
 
 .editorial-block h2 {
-  font-size: 12px;
-  font-weight: 600;
+  font-size: var(--pp-font-micro);
+  font-weight: var(--pp-l1-weight);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #36454F;
+  color: var(--pp-color-text);
   opacity: 0.7;
   margin: 0 0 0.5em;
 }
 
 #curator-note p {
-  font-family: 'Libre Baskerville', Georgia, serif;
-  font-size: 15px;
+  font-family: var(--pp-font-serif);
+  font-size: var(--pp-font-body);
   font-style: italic;
-  color: #36454F;
-  line-height: 1.6;
+  color: var(--pp-color-text);
+  line-height: var(--pp-lh-list);
   margin: 0;
 }
 
 #curator-note .curator-byline {
-  font-size: 12px;
-  color: #36454F;
+  font-size: var(--pp-font-micro);
+  color: var(--pp-color-text);
   opacity: 0.5;
   margin-top: 8px;
   margin-bottom: 0;
@@ -214,9 +270,9 @@
   list-style: none;
   margin: 0;
   padding: 0;
-  font-size: 13px;
-  color: #36454F;
-  line-height: 1.6;
+  font-size: var(--pp-font-small);
+  color: var(--pp-color-text);
+  line-height: var(--pp-lh-list);
 }
 
 #tips-list li {
@@ -229,27 +285,27 @@
   content: '•';
   position: absolute;
   left: 0;
-  color: #C3B091;
+  color: var(--pp-color-accent);
 }
 
 #pull-quote {
   margin: 0;
-  border-left: 3px solid rgba(195, 176, 145, 0.3);
+  border-left: var(--pp-rule-weight) solid var(--pp-color-quote-border);
   padding-left: 16px;
 }
 
 #pull-quote p {
-  font-family: 'Libre Baskerville', Georgia, serif;
-  font-size: 14px;
-  line-height: 1.6;
-  color: #36454F;
+  font-family: var(--pp-font-serif);
+  font-size: var(--pp-font-quote);
+  line-height: var(--pp-lh-list);
+  color: var(--pp-color-text);
   opacity: 0.85;
   margin: 0;
 }
 
 #pull-quote cite {
-  font-size: 12px;
-  color: #36454F;
+  font-size: var(--pp-font-micro);
+  color: var(--pp-color-text);
   opacity: 0.6;
   font-style: normal;
   display: block;
@@ -257,21 +313,21 @@
 }
 
 /* ---------------------------------------------------------------------------
-   6. Photos Section (3-col, 4/3 aspect, no hero)
+   7. Photos Section (3-col, 4/3 aspect, no hero)
    --------------------------------------------------------------------------- */
 #photos-section {
   grid-column: 1 / -1;
-  margin-top: 2em;
-  padding-top: 1.5em;
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  margin-top: var(--pp-section-gap);
+  padding-top: var(--pp-section-pad);
+  border-top: var(--pp-rule-weight-light) solid var(--pp-color-rule);
 }
 
 #photos-section h2 {
-  font-size: 12px;
-  font-weight: 600;
+  font-size: var(--pp-font-micro);
+  font-weight: var(--pp-l1-weight);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #36454F;
+  color: var(--pp-color-text);
   opacity: 0.7;
   margin: 0 0 1em;
 }
@@ -279,7 +335,7 @@
 #photos-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
+  gap: var(--pp-grid-gap);
 }
 
 #photos-grid .photo-tile {
@@ -296,21 +352,21 @@
 }
 
 /* ---------------------------------------------------------------------------
-   7. Recognitions (capped display, hide if 0)
+   8. Recognitions (capped display, hide if 0)
    --------------------------------------------------------------------------- */
 #recognitions-section {
   grid-column: 1 / -1;
-  margin-top: 2em;
-  padding-top: 1.5em;
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  margin-top: var(--pp-section-gap);
+  padding-top: var(--pp-section-pad);
+  border-top: var(--pp-rule-weight-light) solid var(--pp-color-rule);
 }
 
 #recognitions-section h2 {
-  font-size: 12px;
-  font-weight: 600;
+  font-size: var(--pp-font-micro);
+  font-weight: var(--pp-l1-weight);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #36454F;
+  color: var(--pp-color-text);
   opacity: 0.7;
   margin: 0 0 0.75em;
 }
@@ -319,8 +375,8 @@
   list-style: none;
   margin: 0;
   padding: 0;
-  font-size: 13px;
-  color: #36454F;
+  font-size: var(--pp-font-small);
+  color: var(--pp-color-text);
   opacity: 0.9;
 }
 
@@ -329,21 +385,21 @@
 }
 
 /* ---------------------------------------------------------------------------
-   8. Reference Ledger (bottom, calm typography)
+   9. Reference Ledger (bottom, calm typography)
    --------------------------------------------------------------------------- */
 #reference-ledger {
   grid-column: 1 / -1;
   margin-top: 3em;
-  padding-top: 2em;
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  padding-top: var(--pp-section-gap);
+  border-top: var(--pp-rule-weight-light) solid var(--pp-color-rule);
 }
 
 #reference-ledger h2 {
-  font-size: 12px;
-  font-weight: 600;
+  font-size: var(--pp-font-micro);
+  font-weight: var(--pp-l1-weight);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #36454F;
+  color: var(--pp-color-text);
   opacity: 0.7;
   margin: 0 0 1em;
 }
@@ -357,11 +413,11 @@
 }
 
 .ledger-group h3 {
-  font-size: 11px;
-  font-weight: 600;
+  font-size: var(--pp-font-nano);
+  font-weight: var(--pp-l1-weight);
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: #36454F;
+  letter-spacing: var(--pp-l1-spacing);
+  color: var(--pp-color-text);
   opacity: 0.6;
   margin: 0 0 0.5em;
 }
@@ -370,8 +426,8 @@
   list-style: none;
   margin: 0;
   padding: 0;
-  font-size: 12px;
-  color: #36454F;
+  font-size: var(--pp-font-micro);
+  color: var(--pp-color-text);
   opacity: 0.85;
   line-height: 1.5;
 }
@@ -387,11 +443,11 @@
 
 #reference-ledger .methodology-link {
   margin-top: 1.5em;
-  font-size: 12px;
+  font-size: var(--pp-font-micro);
 }
 
 #reference-ledger .methodology-link a {
-  color: #8B7355;
+  color: var(--pp-color-link);
   text-decoration: none;
 }
 
@@ -400,7 +456,7 @@
 }
 
 /* ---------------------------------------------------------------------------
-   9. Unsupported tablet (768–1024px)
+  10. Unsupported tablet (768–1024px)
    --------------------------------------------------------------------------- */
 #unsupported-tablet {
   display: none;
@@ -413,16 +469,16 @@
 
   #unsupported-tablet {
     display: block;
-    max-width: 1280px;
+    max-width: var(--pp-canvas-max);
     margin: 0 auto;
-    padding: 2em 32px;
+    padding: 2em var(--pp-canvas-pad-x);
     text-align: center;
   }
 
   #unsupported-tablet p {
     margin: 0;
-    color: #36454F;
-    font-size: 15px;
+    color: var(--pp-color-text);
+    font-size: var(--pp-font-body);
     opacity: 0.85;
     max-width: 360px;
     margin-left: auto;
@@ -431,12 +487,12 @@
 }
 
 /* ---------------------------------------------------------------------------
-  10. Minimal mobile fallback (stack vertically)
-  --------------------------------------------------------------------------- */
+  11. Minimal mobile fallback (stack vertically)
+   --------------------------------------------------------------------------- */
 @media (max-width: 767px) {
   #page-canvas {
-    padding-left: 20px;
-    padding-right: 20px;
+    padding-left: var(--pp-canvas-pad-x-mob);
+    padding-right: var(--pp-canvas-pad-x-mob);
   }
 
   #top-section {
@@ -455,7 +511,7 @@
   #rail-column {
     border-left: none;
     padding-left: 0;
-    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    border-top: var(--pp-rule-weight-light) solid var(--pp-color-rule);
     padding-top: 1em;
     margin-top: 1em;
   }
