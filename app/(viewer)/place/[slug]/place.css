@@ -155,6 +155,12 @@
 
 #facts-band a:hover {
   text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.action-arrow {
+  margin-left: 4px;
+  opacity: 0.6;
 }
 
 /* ---------------------------------------------------------------------------

@@ -365,7 +365,7 @@ export default function PlacePage() {
                     {(statusText ?? today) && <span>{statusText ?? today}</span>}
                     {location.address && <span>{location.address}</span>}
                     {location.website && (
-                      <a href={location.website} target="_blank" rel="noopener noreferrer">Website</a>
+                      <a href={location.website} target="_blank" rel="noopener noreferrer">Website <span className="action-arrow">↗</span></a>
                     )}
                     {location.primaryOperator && (
                       <Link href={`/actor/${location.primaryOperator.slug}`}>
@@ -373,7 +373,7 @@ export default function PlacePage() {
                       </Link>
                     )}
                     {mapRefUrl && (
-                      <a href={mapRefUrl} target="_blank" rel="noopener noreferrer">Map ↗</a>
+                      <a href={mapRefUrl} target="_blank" rel="noopener noreferrer">Map <span className="action-arrow">↗</span></a>
                     )}
                   </div>
                 )}
