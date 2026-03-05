@@ -288,7 +288,7 @@ export default function PlacePage() {
 
   // Signal → Language: energy phrase from vibeTags
   const VIBE_PHRASES: Record<string, string> = {
-    'Lively': 'lively room',
+    'Lively': 'lively',
     'Cozy': 'cozy room',
     'Intimate': 'intimate room',
     'Chill': 'laid-back feel',
