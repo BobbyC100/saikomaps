@@ -125,3 +125,13 @@ Globe links to `#ledger-*` anchors in the Reference Ledger.
 
 **Content:**
 - Seco demo curator note updated with fuller editorial paragraph
+
+---
+
+### PP-003: Right rail refinement (planned)
+
+**Date:** TBD
+**Scope:** JSX + CSS
+**Risk:** Medium
+
+Next cycle target: right rail refinement (address block + Offerings & Signals + Heads Up density + segmentation).
