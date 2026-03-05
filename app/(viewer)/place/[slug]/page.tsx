@@ -308,10 +308,7 @@ export default function PlacePage() {
     ? (isOpen ? 'Open now' : 'Closed now')
     : null;
 
-  const signalsSentenceParts = [openStateLabel, energyPhrase].filter(Boolean);
-  const signalsSentence = signalsSentenceParts.length > 0
-    ? signalsSentenceParts.join(' — ')
-    : null;
+  const hasSignalsSentence = !!(openStateLabel || energyPhrase);
   const mapRefUrl = buildMapRefUrl(location.googlePlaceId, location.latitude, location.longitude, location.address);
   const recognitions = (location.recognitions ?? []).slice(0, RECOGNITIONS_CAP);
   const ledgerGroups = buildLedgerEntries(location, appearsOn.length);
@@ -342,8 +339,12 @@ export default function PlacePage() {
                 {identitySubline && (
                   <p id="identity-subline">{identitySubline}</p>
                 )}
-                {signalsSentence && (
-                  <p id="identity-signals">{signalsSentence}</p>
+                {hasSignalsSentence && (
+                  <p id="identity-signals">
+                    {openStateLabel && <em>{openStateLabel}</em>}
+                    {openStateLabel && energyPhrase && ' — '}
+                    {energyPhrase}
+                  </p>
                 )}
                 {location.description && (
                   <div id="identity-description" className="section-with-reference">

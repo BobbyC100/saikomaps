@@ -128,24 +128,14 @@ Globe links to `#ledger-*` anchors in the Reference Ledger.
 
 ---
 
-### PP-003: Right rail refinement (planned)
-
-**Date:** TBD
-**Scope:** JSX + CSS
-**Risk:** Medium
-
-Next cycle target: right rail refinement (address block + Offerings & Signals + Heads Up density + segmentation).
-
----
-
-### PP-004: Identity block language experiment
+### PP-003: Identity Block Language Layer (V1)
 
 **Date:** 2026-03-05
 **Scope:** JSX only
 **Risk:** Low (presentation-layer, no data/API/layout changes)
 
 Replaced taxonomy metadata in the identity block with editorial sentences
-derived from existing signals ("Signal → Language" experiment).
+derived from existing signals (Signal → Language).
 
 **Before:**
 ```
@@ -162,6 +152,7 @@ Open now — lively room, strong date-night energy
 **Signal mapping:**
 - `neighborhood` + `category` (lowercased) → subline sentence
 - `openState` + `vibeTags` → signals sentence via `VIBE_PHRASES` lookup
+- Dynamic state (`Open now` / `Closed now`) wrapped in `<em>`
 
 **Vibe phrases (v1):**
 - Lively → "lively room"
@@ -170,4 +161,14 @@ Open now — lively room, strong date-night energy
 - Late Night → "late-night energy"
 - (+ 6 more mapped tags)
 
-Rail block still shows raw tags for reference.
+Tags remain visible in the rail block for reference.
+
+---
+
+### PP-004: Right rail refinement (planned)
+
+**Date:** TBD
+**Scope:** JSX + CSS
+**Risk:** Medium
+
+Next cycle target: right rail refinement (address block + Offerings & Signals + Heads Up density + segmentation).
