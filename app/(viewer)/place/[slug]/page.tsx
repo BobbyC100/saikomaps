@@ -281,7 +281,37 @@ export default function PlacePage() {
   const photoUrls = location.photoUrls ?? (location.photoUrl ? [location.photoUrl] : []);
   const { isOpen, statusText, today, openNowExplicit } = parseHours(location.hours);
   const signalsList = location.vibeTags ?? [];
-  const sublineParts = [location.category, location.neighborhood].filter(Boolean) as string[];
+
+  // Signal → Language: identity subline
+  const verticalLower = location.category?.toLowerCase() ?? null;
+  const identitySubline = [location.neighborhood, verticalLower].filter(Boolean).join(' ');
+
+  // Signal → Language: energy phrase from vibeTags
+  const VIBE_PHRASES: Record<string, string> = {
+    'Lively': 'lively room',
+    'Cozy': 'cozy room',
+    'Intimate': 'intimate room',
+    'Chill': 'laid-back feel',
+    'Energetic': 'high-energy room',
+    'Romantic': 'romantic atmosphere',
+    'Date Night': 'strong date-night energy',
+    'Late Night': 'late-night energy',
+    'Casual': 'casual energy',
+    'Upscale': 'refined atmosphere',
+  };
+  const energyFragments = signalsList
+    .map((tag) => VIBE_PHRASES[tag])
+    .filter(Boolean);
+  const energyPhrase = energyFragments.length > 0 ? energyFragments.join(', ') : null;
+
+  const openStateLabel = openNowExplicit && isOpen !== null
+    ? (isOpen ? 'Open now' : 'Closed now')
+    : null;
+
+  const signalsSentenceParts = [openStateLabel, energyPhrase].filter(Boolean);
+  const signalsSentence = signalsSentenceParts.length > 0
+    ? signalsSentenceParts.join(' — ')
+    : null;
   const mapRefUrl = buildMapRefUrl(location.googlePlaceId, location.latitude, location.longitude, location.address);
   const recognitions = (location.recognitions ?? []).slice(0, RECOGNITIONS_CAP);
   const ledgerGroups = buildLedgerEntries(location, appearsOn.length);
@@ -309,11 +339,11 @@ export default function PlacePage() {
             <section id="top-section">
               <div id="identity-column">
                 <h1 id="place-title">{location.name}</h1>
-                {sublineParts.length > 0 && (
-                  <p id="identity-subline">{sublineParts.join(' · ')}</p>
+                {identitySubline && (
+                  <p id="identity-subline">{identitySubline}</p>
                 )}
-                {signalsList.length > 0 && (
-                  <p id="identity-signals">{signalsList.join(' · ')}</p>
+                {signalsSentence && (
+                  <p id="identity-signals">{signalsSentence}</p>
                 )}
                 {location.description && (
                   <div id="identity-description" className="section-with-reference">
