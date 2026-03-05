@@ -184,39 +184,35 @@
 }
 
 /* ---------------------------------------------------------------------------
-   5. Section containers with provenance diamond (bottom-right)
+   5. Section containers with reference globe (bottom-right)
    --------------------------------------------------------------------------- */
-.section-with-provenance {
+.section-with-reference {
   position: relative;
-  padding-bottom: 28px;
+  padding-bottom: 24px;
 }
 
-.provenance-diamond {
+.section-reference {
   position: absolute;
-  bottom: 8px;
-  right: 8px;
-  width: 24px;
-  height: 24px;
+  bottom: 6px;
+  right: 6px;
+  width: 12px;
+  height: 12px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(0, 0, 0, 0.25);
-  background: transparent;
-  cursor: pointer;
-  text-decoration: none;
   color: var(--pp-color-text);
-  opacity: 0.5;
-  font-size: var(--pp-font-micro);
-  line-height: 1;
+  opacity: 0.38;
   transition: opacity 0.15s;
+  text-decoration: none;
 }
 
-.provenance-diamond:hover {
-  opacity: 0.8;
+.section-reference:hover {
+  opacity: 0.7;
 }
 
-.provenance-diamond::after {
-  content: '◆';
+.section-reference svg {
+  width: 12px;
+  height: 12px;
 }
 
 /* ---------------------------------------------------------------------------

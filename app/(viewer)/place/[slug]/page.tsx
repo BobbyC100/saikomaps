@@ -316,9 +316,16 @@ export default function PlacePage() {
                   <p id="identity-signals">{signalsList.join(' · ')}</p>
                 )}
                 {location.description && (
-                  <div id="identity-description" className="section-with-provenance">
+                  <div id="identity-description" className="section-with-reference">
                     <p>{location.description}</p>
-                    <a href="#ledger-description" className="provenance-diamond" aria-label="Sources for this section" />
+                    <a href="#ledger-description" className="section-reference" aria-label="Source">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.7">
+                        <circle cx="12" cy="12" r="9" />
+                        <path d="M3 12h18" />
+                        <path d="M12 3a15 15 0 0 1 0 18" />
+                        <path d="M12 3a15 15 0 0 0 0 18" />
+                      </svg>
+                    </a>
                   </div>
                 )}
                 {hasFacts && (
@@ -361,34 +368,55 @@ export default function PlacePage() {
             <div id="editorial-stack">
               {location.curatorNote && (
                 <>
-                  <article id="curator-note" className="editorial-block section-with-provenance">
+                  <article id="curator-note" className="editorial-block section-with-reference">
                     <p>{location.curatorNote}</p>
                     {location.curatorCreatorName && <p className="curator-byline">{location.curatorCreatorName}</p>}
-                    <a href="#ledger-curator" className="provenance-diamond" aria-label="Sources for this section" />
+                    <a href="#ledger-curator" className="section-reference" aria-label="Source">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.7">
+                        <circle cx="12" cy="12" r="9" />
+                        <path d="M3 12h18" />
+                        <path d="M12 3a15 15 0 0 1 0 18" />
+                        <path d="M12 3a15 15 0 0 0 0 18" />
+                      </svg>
+                    </a>
                   </article>
                   <hr />
                 </>
               )}
               {location.tips && location.tips.length > 0 && (
                 <>
-                  <section id="tips" className="editorial-block section-with-provenance">
+                  <section id="tips" className="editorial-block section-with-reference">
                     <ul id="tips-list">
                       {location.tips.map((tip, i) => (
                         <li key={i}>{tip}</li>
                       ))}
                     </ul>
-                    <a href="#ledger-tips" className="provenance-diamond" aria-label="Sources for this section" />
+                    <a href="#ledger-tips" className="section-reference" aria-label="Source">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.7">
+                        <circle cx="12" cy="12" r="9" />
+                        <path d="M3 12h18" />
+                        <path d="M12 3a15 15 0 0 1 0 18" />
+                        <path d="M12 3a15 15 0 0 0 0 18" />
+                      </svg>
+                    </a>
                   </section>
                   <hr />
                 </>
               )}
               {location.pullQuote && (
-                <blockquote id="pull-quote" className="editorial-block section-with-provenance">
+                <blockquote id="pull-quote" className="editorial-block section-with-reference">
                   <p>&ldquo;{location.pullQuote}&rdquo;</p>
                   <cite>
                     {[location.pullQuoteSource, location.pullQuoteAuthor].filter(Boolean).join(' — ')}
                   </cite>
-                  <a href="#ledger-quote" className="provenance-diamond" aria-label="Sources for this section" />
+                  <a href="#ledger-quote" className="section-reference" aria-label="Source">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.7">
+                      <circle cx="12" cy="12" r="9" />
+                      <path d="M3 12h18" />
+                      <path d="M12 3a15 15 0 0 1 0 18" />
+                      <path d="M12 3a15 15 0 0 0 0 18" />
+                    </svg>
+                  </a>
                 </blockquote>
               )}
             </div>
@@ -409,7 +437,7 @@ export default function PlacePage() {
 
             {/* Where to find this (subject appearances) */}
             {location.appearancesAsSubject && location.appearancesAsSubject.length > 0 && (
-              <section id="appearances-as-subject" className="section-with-provenance">
+              <section id="appearances-as-subject" className="section-with-reference">
                 <h2>Where to find this</h2>
                 <ul id="appearances-as-subject-list" className="space-y-2">
                   {location.appearancesAsSubject.map((a) => (
@@ -430,7 +458,7 @@ export default function PlacePage() {
 
             {/* Currently hosting / Appearances here */}
             {location.appearancesAsHost && location.appearancesAsHost.length > 0 && (
-              <section id="appearances-as-host" className="section-with-provenance">
+              <section id="appearances-as-host" className="section-with-reference">
                 <h2>Currently hosting</h2>
                 <ul id="appearances-as-host-list" className="space-y-2">
                   {location.appearancesAsHost.map((a) => (
@@ -451,14 +479,21 @@ export default function PlacePage() {
 
             {/* Recognitions (capped, hide if 0) */}
             {recognitions.length > 0 && (
-              <section id="recognitions-section" className="section-with-provenance">
+              <section id="recognitions-section" className="section-with-reference">
                 <h2>Recognitions</h2>
                 <ul id="recognitions-list">
                   {recognitions.map((rec, i) => (
                     <li key={i}>{rec.name}{rec.source ? ` — ${rec.source}` : ''}{rec.year ? ` (${rec.year})` : ''}</li>
                   ))}
                 </ul>
-                <a href="#ledger-recognitions" className="provenance-diamond" aria-label="Sources for this section" />
+                <a href="#ledger-recognitions" className="section-reference" aria-label="Source">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.7">
+                    <circle cx="12" cy="12" r="9" />
+                    <path d="M3 12h18" />
+                    <path d="M12 3a15 15 0 0 1 0 18" />
+                    <path d="M12 3a15 15 0 0 0 0 18" />
+                  </svg>
+                </a>
               </section>
             )}
 

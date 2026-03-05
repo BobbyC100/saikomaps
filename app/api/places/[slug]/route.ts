@@ -347,7 +347,7 @@ export async function GET(
     }
     
     if (isDemoPlace && !enhancedCuratorNote) {
-      enhancedCuratorNote = "The best natural wine list on the eastside. Unpretentious and always interesting.";
+      enhancedCuratorNote = "Seco is one of the Eastside's most reliable natural wine destinations — the kind of place where the room fills with neighborhood regulars and creative types as the night goes on. The list leans adventurous but approachable, with bottles that reward curiosity rather than intimidate. It's unpretentious, energetic, and one of the better spots in the neighborhood to settle in for a glass that turns into three.";
     }
     // ============================================================================
 
