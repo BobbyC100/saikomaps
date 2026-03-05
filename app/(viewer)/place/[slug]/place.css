@@ -122,7 +122,7 @@
 
 #identity-description {
   margin: 0;
-  font-size: var(--pp-font-body);
+  font-size: calc(var(--pp-font-body) + 1px);
   line-height: var(--pp-lh-body);
   color: var(--pp-color-text);
 }
