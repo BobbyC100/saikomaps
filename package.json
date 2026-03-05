@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "test": "vitest run",
+    "check:place-page": "node scripts/check-place-page-tokens.mjs",
+    "test": "npm run check:place-page && vitest run",
     "test:watch": "vitest",
     "dev": "node ./scripts/dev.js",
     "dev:direct": "npx next dev -p 3000",
