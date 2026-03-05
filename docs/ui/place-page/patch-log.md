@@ -99,3 +99,29 @@ Dedicated spacing token between hero and top grid, decoupled from `--pp-section-
 **Tokens changed:**
 - `--pp-hero-gap`: (new) `36px`
 - `#top-section margin-top`: `var(--pp-section-gap)` → `var(--pp-hero-gap)`
+
+---
+
+### PP-002: Replace provenance diamonds with globe reference icons
+
+**Date:** 2026-03-04
+**Scope:** JSX + CSS
+**Risk:** Medium
+
+Removed square provenance-diamond buttons (24px bordered squares with ◆ glyph).
+Replaced with a 12px stroke-only globe SVG in the lower-right of each referenced section.
+
+Globe links to `#ledger-*` anchors in the Reference Ledger.
+
+**Design:**
+- Size: 12×12px
+- Stroke-width: 0.7px
+- Idle opacity: 0.38
+- Hover opacity: 0.7
+
+**Classes renamed:**
+- `.section-with-provenance` → `.section-with-reference`
+- `.provenance-diamond` → `.section-reference`
+
+**Content:**
+- Seco demo curator note updated with fuller editorial paragraph
