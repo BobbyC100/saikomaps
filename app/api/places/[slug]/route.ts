@@ -9,6 +9,7 @@ import { db } from '@/lib/db';
 import { getGooglePhotoUrl, getPhotoRefFromStored } from '@/lib/google-places';
 import { getActiveOverlays } from '@/lib/overlays/getActiveOverlays';
 import { buildPlaceServiceFacts } from '@/lib/place-payload';
+import { VERTICAL_DISPLAY } from '@/lib/primaryVertical';
 import {
   fetchPlaceForPRLBySlug,
   assembleSceneSenseFromMaterialized,
@@ -62,9 +63,49 @@ export async function GET(
 
     const place = await db.entities.findUnique({
       where: { slug },
-      include: {
+      select: {
+        id: true,
+        slug: true,
+        name: true,
+        address: true,
+        latitude: true,
+        longitude: true,
+        phone: true,
+        website: true,
+        instagram: true,
+        description: true,
+        category: true,
+        primary_vertical: true,
+        neighborhood: true,
+        cuisineType: true,
+        priceLevel: true,
+        googlePhotos: true,
+        hours: true,
+        googlePlaceId: true,
+        editorialSources: true,
+        vibeTags: true,
+        tips: true,
+        tagline: true,
+        pullQuote: true,
+        pullQuoteSource: true,
+        pullQuoteAuthor: true,
+        pullQuoteUrl: true,
+        pullQuoteType: true,
+        transitAccessible: true,
+        thematicTags: true,
+        contextualConnection: true,
+        curatorAttribution: true,
+        intentProfile: true,
+        intentProfileOverride: true,
+        reservationUrl: true,
+        entityType: true,
+        marketSchedule: true,
+        businessStatus: true,
+        googlePlacesAttributes: true,
+        // Relations
         map_places: {
-          include: {
+          select: {
+            descriptor: true,
             lists: {
               select: {
                 id: true,
@@ -325,7 +366,7 @@ export async function GET(
           website: place.website,
           instagram: place.instagram,
           description: place.description,
-          category: place.category,
+          category: VERTICAL_DISPLAY[place.primary_vertical] ?? place.category,
           neighborhood: place.neighborhood,
           cuisineType: place.cuisineType,
           priceLevel: place.priceLevel,
@@ -354,6 +395,7 @@ export async function GET(
           intentProfile: place.intentProfile,
           intentProfileOverride: place.intentProfileOverride,
           reservationUrl: place.reservationUrl,
+          primaryVertical: place.primary_vertical,
           // Primary operator (PlaceActorRelationship)
           primaryOperator: null,
           // Markets fields
