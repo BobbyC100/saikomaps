@@ -127,6 +127,11 @@
   color: var(--pp-color-text);
 }
 
+#identity-description::first-letter {
+  font-size: 1.08em;
+  font-weight: 500;
+}
+
 /* Facts Band */
 #facts-band {
   min-height: 44px;
