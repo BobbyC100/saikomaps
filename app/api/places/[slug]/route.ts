@@ -193,7 +193,7 @@ export async function GET(
     const mapIds = publishedMapPlaces.map(mp => mp.lists!.id);
 
     // Run overlay fetch, place counts, and golden_record (for service facts) in parallel
-    const [activeOverlays, placeCounts, goldenRecord] = await Promise.all([
+    const [activeOverlays, placeCounts, goldenRecord, coverageSources] = await Promise.all([
       getActiveOverlays({ placeId: place.id, now: new Date() }).catch((err) => {
         console.error(`[Newsletter Overlay] Failed to fetch overlays for place ${place.slug}:`, err);
         return [] as Awaited<ReturnType<typeof getActiveOverlays>>;
@@ -220,6 +220,11 @@ export async function GET(
             },
           })
         : Promise.resolve(null),
+      db.coverage_sources.findMany({
+        where: { entityId: place.id },
+        select: { source_name: true, url: true, excerpt: true, published_at: true },
+        orderBy: { created_at: 'asc' },
+      }).catch(() => [] as { source_name: string; url: string; excerpt: string | null; published_at: Date | null }[]),
     ]);
 
     // VALADATA: canonical service facts (takeout, delivery, dine_in, reservable, curbside_pickup)
@@ -277,49 +282,6 @@ export async function GET(
       curatorMapPlace?.lists?.users?.email?.split('@')[0] ||
       null;
 
-    // ============================================================================
-    // DEMO DATA INJECTION (for testing layouts)
-    // Remove this section when real data is available
-    // ============================================================================
-    const isDemoPlace = slug === 'seco';
-    
-    // DEMO: Add cover images for seco's Also On maps
-    if (isDemoPlace && appearsOn.length > 0) {
-      const dummyImages = [
-        'https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=400&h=300&fit=crop', // Restaurant interior
-        'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=300&fit=crop', // Restaurant bar
-        'https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?w=400&h=300&fit=crop', // Food plating
-      ];
-      
-      appearsOn.forEach((map, index) => {
-        if (!map.coverImageUrl) {
-          map.coverImageUrl = dummyImages[index % dummyImages.length];
-        }
-      });
-    }
-    
-    let enhancedPhotoUrls = photoUrls;
-    let enhancedVibeTags = place.vibeTags || [];
-    let enhancedTips = place.tips || [];
-    let enhancedPullQuote = place.pullQuote;
-    let enhancedPullQuoteSource = place.pullQuoteSource;
-    let enhancedCuratorNote = curatorNote;
-    
-    if (isDemoPlace) {
-      enhancedPhotoUrls = [
-        'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&h=600&fit=crop',
-        'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&h=400&fit=crop',
-        'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&h=400&fit=crop',
-        'https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?w=400&h=400&fit=crop',
-        'https://images.unsplash.com/photo-1428515613728-6b4607e44363?w=400&h=400&fit=crop',
-        'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=400&h=400&fit=crop',
-      ];
-    }
-    
-    if (isDemoPlace && enhancedVibeTags.length === 0) {
-      enhancedVibeTags = ['Date Night', 'Lively', 'Cozy'];
-    }
-
     // SceneSense: PRL + assemble via materializer (single source of truth)
     const placeForPRL = await fetchPlaceForPRLBySlug(slug);
     const identitySignals = goldenRecord?.identity_signals as {
@@ -330,7 +292,7 @@ export async function GET(
     const scenesenseResult = placeForPRL
       ? assembleSceneSenseFromMaterialized({
           placeForPRL,
-          vibeTags: isDemoPlace && enhancedVibeTags.length > 0 ? enhancedVibeTags : place.vibeTags,
+          vibeTags: place.vibeTags,
           neighborhood: place.neighborhood,
           category: place.category ?? place.category_rel?.slug ?? null,
           identitySignals: identitySignals
@@ -345,25 +307,6 @@ export async function GET(
             : null,
         })
       : { prl: 1 as const, mode: 'LITE' as const, scenesense: null, prlResult: null as never };
-    
-    if (isDemoPlace && enhancedTips.length === 0) {
-      enhancedTips = [
-        'Book 2-3 weeks ahead for prime times',
-        'Bar seats available walk-in at 5pm',
-        'Ask for wine pairings',
-        'Rooftop opens at sunset'
-      ];
-    }
-    
-    if (isDemoPlace && !enhancedPullQuote) {
-      enhancedPullQuote = "The room has a bubbly energy as it fills up with creative directors who part-time in Lisbon and people who own at least one crystal, but don't expect the same excitement from the snacky menu.";
-      enhancedPullQuoteSource = "The Infatuation";
-    }
-    
-    if (isDemoPlace && !enhancedCuratorNote) {
-      enhancedCuratorNote = "Seco is one of the Eastside's most reliable natural wine destinations — the kind of place where the room fills with neighborhood regulars and creative types as the night goes on. The list leans adventurous but approachable, with bottles that reward curiosity rather than intimidate. It's unpretentious, energetic, and one of the better spots in the neighborhood to settle in for a glass that turns into three.";
-    }
-    // ============================================================================
 
     // Offering signals: extract drink/service booleans from googleAttrs for frontend
     const offeringSignals: {
@@ -403,20 +346,20 @@ export async function GET(
           neighborhood: place.neighborhood,
           cuisineType: place.cuisineType,
           priceLevel: place.priceLevel,
-          photoUrl: enhancedPhotoUrls[0] ?? null,
-          photoUrls: enhancedPhotoUrls,
+          photoUrl: photoUrls[0] ?? null,
+          photoUrls,
           hours,
           googlePlaceId: place.googlePlaceId,
-          curatorNote: enhancedCuratorNote,
+          curatorNote,
           curatorCreatorName,
           sources: place.editorialSources || [],
-          vibeTags: enhancedVibeTags,
+          vibeTags: place.vibeTags ?? [],
           prl: scenesenseResult.prl,
           scenesense: scenesenseResult.scenesense,
-          tips: enhancedTips,
+          tips: place.tips ?? [],
           tagline: place.tagline,
-          pullQuote: enhancedPullQuote,
-          pullQuoteSource: enhancedPullQuoteSource,
+          pullQuote: place.pullQuote,
+          pullQuoteSource: place.pullQuoteSource,
           pullQuoteAuthor: place.pullQuoteAuthor,
           pullQuoteUrl: place.pullQuoteUrl,
           pullQuoteType: place.pullQuoteType,
@@ -436,6 +379,12 @@ export async function GET(
           placeType: place.entityType,
           categorySlug: place.category_rel?.slug ?? (typeof place.category === "string" ? place.category : null),
           marketSchedule: place.marketSchedule ?? null,
+          coverageSources: coverageSources.map((cs) => ({
+            sourceName: cs.source_name,
+            url: cs.url,
+            excerpt: cs.excerpt ?? null,
+            publishedAt: cs.published_at ? cs.published_at.toISOString() : null,
+          })),
           // Appearances (Where to find / Currently hosting)
           appearancesAsSubject: [],
           appearancesAsHost: [],
