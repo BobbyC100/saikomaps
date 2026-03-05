@@ -61,6 +61,7 @@ interface LocationData {
   pullQuoteAuthor?: string | null;
   pullQuoteUrl?: string | null;
   pullQuoteType?: string | null;
+  reservationUrl?: string | null;
   slug?: string;
   primaryOperator?: { actorId: string; name: string; slug: string; website?: string } | null;
   placeType?: 'venue' | 'activity' | 'public';
@@ -319,7 +320,7 @@ export default function PlacePage() {
   };
 
   const statusLabel = openNowExplicit && isOpen !== null ? (isOpen ? 'Open' : 'Closed') : null;
-  const hasFacts = statusLabel || statusText || today || location.address || location.website || !!location.primaryOperator;
+  const hasActions = mapRefUrl || location.reservationUrl || location.website || location.instagram;
 
   return (
     <div style={{ background: '#F5F0E1', minHeight: '100vh' }}>
@@ -359,21 +360,19 @@ export default function PlacePage() {
                     </a>
                   </div>
                 )}
-                {hasFacts && (
+                {hasActions && (
                   <div id="facts-band">
-                    {statusLabel && <span>{statusLabel}</span>}
-                    {(statusText ?? today) && <span>{statusText ?? today}</span>}
-                    {location.address && <span>{location.address}</span>}
+                    {mapRefUrl && (
+                      <a href={mapRefUrl} target="_blank" rel="noopener noreferrer">Directions <span className="action-arrow">↗</span></a>
+                    )}
+                    {location.reservationUrl && (
+                      <a href={location.reservationUrl} target="_blank" rel="noopener noreferrer">Reserve <span className="action-arrow">↗</span></a>
+                    )}
                     {location.website && (
                       <a href={location.website} target="_blank" rel="noopener noreferrer">Website <span className="action-arrow">↗</span></a>
                     )}
-                    {location.primaryOperator && (
-                      <Link href={`/actor/${location.primaryOperator.slug}`}>
-                        Part of the {location.primaryOperator.name} family
-                      </Link>
-                    )}
-                    {mapRefUrl && (
-                      <a href={mapRefUrl} target="_blank" rel="noopener noreferrer">Map <span className="action-arrow">↗</span></a>
+                    {!location.website && location.instagram && (
+                      <a href={`https://instagram.com/${location.instagram.replace(/^@/, '')}`} target="_blank" rel="noopener noreferrer">Instagram <span className="action-arrow">↗</span></a>
                     )}
                   </div>
                 )}
