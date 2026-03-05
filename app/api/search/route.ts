@@ -1,12 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { PrismaClient } from '@prisma/client'
 import { getGooglePhotoUrl } from '@/lib/google-places'
-import {
-  sortVibeTagsByPriority,
-  CARD_TAG_LIMIT,
-} from '@/lib/config/vibe-tags'
 
 const prisma = new PrismaClient()
+
+// Vibe intent: map search concepts → identity_signals.vibe_words equivalents
+const VIBE_INTENT_TERMS = new Set([
+  'date night', 'date-night', 'romantic',
+  'cozy', 'chill', 'intimate', 'quiet',
+  'lively', 'buzzy', 'energetic', 'electric',
+  'late night', 'late-night',
+  'after work', 'after-work',
+  'low-key', 'lowkey', 'casual',
+  'group', 'solo',
+]);
 
 // Helper: Extract first photo URL
 function getFirstPhotoUrl(googlePhotos: any): string | undefined {
@@ -15,12 +22,10 @@ function getFirstPhotoUrl(googlePhotos: any): string | undefined {
   if (!firstPhoto) return undefined;
   
   try {
-    // Handle string format (photo reference)
     if (typeof firstPhoto === 'string' && firstPhoto.trim()) {
       return getGooglePhotoUrl(firstPhoto, 400);
     }
     
-    // Handle object format
     if (typeof firstPhoto === 'object') {
       const ref = firstPhoto.name || firstPhoto.photoReference || firstPhoto.photo_reference;
       if (ref && typeof ref === 'string') {
@@ -48,13 +53,9 @@ function getOpenStatus(hours: any): { isOpen?: boolean; closesAt?: string; opens
   if (!hours || typeof hours !== 'object') return {};
   
   try {
-    // If hours has openNow field
     if ('openNow' in hours || 'open_now' in hours) {
       return { isOpen: hours.openNow || hours.open_now };
     }
-    
-    // If hours is weekday_text array, we can't easily determine current status without timezone logic
-    // Return undefined for now (graceful degradation)
     return {};
   } catch (e) {
     return {};
@@ -65,12 +66,11 @@ function getOpenStatus(hours: any): { isOpen?: boolean; closesAt?: string; opens
 function extractSignals(place: any): Array<{ type: string; label: string }> {
   const signals: Array<{ type: string; label: string }> = [];
   
-  // Check sources for publication names
   if (place.editorialSources && Array.isArray(place.editorialSources)) {
     const seenTypes = new Set<string>();
     
     for (const source of place.editorialSources) {
-      if (signals.length >= 2) break; // Max 2 signals
+      if (signals.length >= 2) break;
       
       const pub = source.publication?.toLowerCase() || '';
       
@@ -90,7 +90,6 @@ function extractSignals(place: any): Array<{ type: string; label: string }> {
     }
   }
   
-  // Check for chef recommendations
   if (place.chefRecs && Array.isArray(place.chefRecs) && place.chefRecs.length > 0 && signals.length < 2) {
     signals.push({ type: 'chefrec', label: 'Chef Rec' });
   }
@@ -112,9 +111,10 @@ export async function GET(request: NextRequest) {
   }
 
   const queryLower = query.toLowerCase().trim()
+  const isVibeQuery = VIBE_INTENT_TERMS.has(queryLower);
 
   try {
-    // Search places with enriched data for bento grid
+    // Search places — vibe-only queries skip name/category matching to avoid noise
     const places = await prisma.entities.findMany({
       where: {
         OR: [
@@ -122,7 +122,6 @@ export async function GET(request: NextRequest) {
           { neighborhood: { contains: queryLower, mode: 'insensitive' } },
           { category: { contains: queryLower, mode: 'insensitive' } },
           { cuisineType: { contains: queryLower, mode: 'insensitive' } },
-          { vibeTags: { hasSome: [queryLower] } },
         ],
         status: 'OPEN',
       },
@@ -134,39 +133,32 @@ export async function GET(request: NextRequest) {
         category: true,
         cuisineType: true,
         priceLevel: true,
-        vibeTags: true,
         latitude: true,
         longitude: true,
-        googlePlaceId: true, // Need this to join with golden_records
-        
-        // Photos
+        googlePlaceId: true,
         googlePhotos: true,
-        
-        // Status & hours
         hours: true,
-        
-        // Editorial content
         pullQuote: true,
         pullQuoteSource: true,
-        pullQuoteAuthor: true,
         editorialSources: true,
         chefRecs: true,
       },
-      take: 50, // Get more for ranking
+      take: 50,
     })
     
-    // Fetch identity signals + menu/winelist status for places that have google_place_id
+    // Fetch identity signals + menu/winelist status + vibe_words from golden_records
     const googlePlaceIds = places
       .map(p => p.googlePlaceId)
       .filter((id): id is string => id !== null);
     
-    const identitySignals = await prisma.golden_records.findMany({
+    const goldenRecords = await prisma.golden_records.findMany({
       where: {
         google_place_id: { in: googlePlaceIds },
       },
       select: {
         google_place_id: true,
         place_personality: true,
+        identity_signals: true,
         menu_signals: {
           select: {
             status: true,
@@ -182,18 +174,22 @@ export async function GET(request: NextRequest) {
       },
     });
     
-    // Build map of google_place_id -> identity data
+    // Build map of google_place_id → identity data
     const identityMap = new Map<string, {
       personality: string | null;
+      vibeWords: string[];
       menuSignalsStatus: string | null;
       winelistSignalsStatus: string | null;
       menuPayload: any;
       winelistPayload: any;
     }>();
-    identitySignals.forEach(record => {
+    goldenRecords.forEach(record => {
       if (record.google_place_id) {
+        const sig = record.identity_signals as Record<string, unknown> | null;
+        const vibeWords = Array.isArray(sig?.vibe_words) ? (sig!.vibe_words as string[]) : [];
         identityMap.set(record.google_place_id, {
           personality: record.place_personality,
+          vibeWords,
           menuSignalsStatus: record.menu_signals?.status || null,
           winelistSignalsStatus: record.winelist_signals?.status || null,
           menuPayload: record.menu_signals?.payload || null,
@@ -211,7 +207,7 @@ export async function GET(request: NextRequest) {
       
       if (isNaN(lat2Num) || isNaN(lng2Num)) return undefined;
       
-      const R = 3959; // Earth's radius in miles
+      const R = 3959;
       const dLat = ((lat2Num - lat1) * Math.PI) / 180;
       const dLng = ((lng2Num - lng1) * Math.PI) / 180;
       const a =
@@ -228,6 +224,8 @@ export async function GET(request: NextRequest) {
     const rankedPlaces = places
       .map((place) => {
         const nameLower = place.name.toLowerCase()
+        const identity = place.googlePlaceId ? identityMap.get(place.googlePlaceId) : null;
+        const vibeWords = identity?.vibeWords ?? [];
         let score = 0
 
         // Exact name match
@@ -246,25 +244,24 @@ export async function GET(request: NextRequest) {
           place.cuisineType?.toLowerCase().includes(queryLower)
         )
           score = 500
-        // Tag match
-        else if (place.vibeTags?.some((tag) => tag.toLowerCase().includes(queryLower))) score = 400
 
-        return { ...place, score }
+        // Boost for vibe/scene match in identity_signals.vibe_words
+        if (isVibeQuery && vibeWords.some((w) => w.toLowerCase().includes(queryLower) || queryLower.includes(w.toLowerCase()))) {
+          score = Math.max(score, 400);
+        }
+
+        return { ...place, score, identity }
       })
+      .filter((place) => place.score > 0)
       .sort((a, b) => b.score - a.score)
-      .slice(0, 12) // Get top 12 for bento grid
-      .map(({ score, id, googlePlaceId, ...place }) => {
-        // Transform to PlaceCardData format
+      .slice(0, 12)
+      .map(({ score, id, googlePlaceId, identity, ...place }) => {
         const photoUrl = getFirstPhotoUrl(place.googlePhotos);
         const status = getOpenStatus(place.hours);
         const signals = extractSignals(place);
         const price = mapPriceLevel(place.priceLevel);
         const distanceMiles = calculateDistance(userLat, userLng, place.latitude, place.longitude);
         
-        // Get identity data from map (Badge Ship v1)
-        const identity = googlePlaceId ? identityMap.get(googlePlaceId) : null;
-        
-        // Check if payloads have meaningful identity data
         const menuIdentityPresent = !!(identity?.menuPayload && 
           (identity.menuPayload.signature_items?.length > 0 || 
            identity.menuPayload.cuisine_indicators?.length > 0));
@@ -284,13 +281,8 @@ export async function GET(request: NextRequest) {
           signals,
           coverageQuote: place.pullQuote,
           coverageSource: place.pullQuoteSource,
-          vibeTags: place.vibeTags?.length
-            ? sortVibeTagsByPriority(place.vibeTags).slice(0, CARD_TAG_LIMIT)
-            : [],
           distanceMiles: distanceMiles !== undefined ? parseFloat(distanceMiles.toFixed(1)) : undefined,
           placePersonality: identity?.personality as any,
-          
-          // Badge Ship v1: Signal status
           menuSignalsStatus: identity?.menuSignalsStatus as any,
           winelistSignalsStatus: identity?.winelistSignalsStatus as any,
           menuIdentityPresent,
@@ -307,18 +299,15 @@ export async function GET(request: NextRequest) {
       }
     })
 
-    // Filter neighborhoods that match the query
     const matchingNeighborhoods = Array.from(neighborhoodCounts.entries())
       .filter(([name]) => name.toLowerCase().includes(queryLower))
       .sort((a, b) => {
         const aLower = a[0].toLowerCase()
         const bLower = b[0].toLowerCase()
 
-        // Exact match first
         if (aLower === queryLower) return -1
         if (bLower === queryLower) return 1
 
-        // Then by count
         return b[1] - a[1]
       })
       .slice(0, 3)

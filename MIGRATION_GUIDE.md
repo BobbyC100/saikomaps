@@ -64,7 +64,7 @@ export async function getPlaceBySlug(slug: string, source: PlaceSource = 'legacy
       priceLevel: golden.price_level,
       neighborhood: golden.neighborhood,
       category: golden.category,
-      vibeTags: golden.vibe_tags,
+      // vibeTags removed from entities — vibe signals stay in golden_records.vibe_tags / identity_signals.vibe_words
       pullQuote: golden.pull_quote,
       pullQuoteSource: golden.pull_quote_source,
       pullQuoteUrl: golden.pull_quote_url,

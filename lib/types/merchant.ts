@@ -91,7 +91,6 @@ export interface MerchantData {
   
   // Tier 1: Visual Identity
   photos?: Photo[]; // Excludes hero for collage
-  vibeTags?: string[];
   
   // Tier 2: Editorial + Context
   curatorNote?: CuratorNote;

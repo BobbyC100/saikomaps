@@ -210,7 +210,7 @@ return (
             pullQuoteSource={location.pullQuoteSource}
             pullQuoteAuthor={location.pullQuoteAuthor}
             sources={location.sources}
-            vibeTag={location.vibeTags?.[0]}
+            {/* vibeTag removed — vibeTags deprecated; use identity_signals.vibe_words via SceneSense */}
           />
         )}
 
@@ -251,9 +251,7 @@ return (
         />
 
         {/* Row 5: Vibe (6) */}
-        {location.vibeTags && location.vibeTags.length > 0 && (
-          <VibeCard vibeTags={location.vibeTags} />
-        )}
+        {/* VibeCard removed — vibeTags deprecated; vibe_words served via SceneSense */}
 
         {/* Row 6: Also On (6) */}
         {appearsOnDeduped.length > 0 && (
@@ -341,7 +339,7 @@ From `/app/api/places/[slug]/route.ts`:
 - latitude, longitude
 - hours, priceLevel
 - photoUrls, category, neighborhood, cuisineType
-- tagline, curatorNote, vibeTags, tips
+- tagline, curatorNote, tips
 - pullQuote, pullQuoteSource, pullQuoteAuthor
 - sources (editorial)
 - appearsOn (maps)

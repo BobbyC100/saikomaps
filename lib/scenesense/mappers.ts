@@ -31,7 +31,6 @@ export function mapPlaceToPlaceForPRL(place: {
   googlePhotos?: unknown;
   hours?: unknown;
   description?: string | null;
-  vibeTags?: string[] | null;
   pullQuote?: string | null;
   category?: string | null;
   tagline?: string | null;
@@ -63,7 +62,6 @@ export function mapPlaceToPlaceForPRL(place: {
   const hasCuratorNote = (place.curatorNote?.trim().length ?? 0) >= 40;
   const hasEnergyOrTags =
     typeof place.energyScore === 'number' || Boolean(place.hasTagSignals);
-  const hasVibeTags = (place.vibeTags?.length ?? 0) > 0;
   const hasPullQuote = !!(place.pullQuote?.trim());
   const hasTagline = !!(place.tagline?.trim());
 

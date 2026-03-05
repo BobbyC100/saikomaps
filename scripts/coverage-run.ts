@@ -155,7 +155,6 @@ function computeMissingGroups(place: {
   googlePhotos: unknown;
   description: string | null;
   pullQuote: string | null;
-  vibeTags: string[];
   has_energy?: boolean;
   has_pts?: boolean;
   curatorNote?: string | null;
@@ -182,10 +181,8 @@ function computeMissingGroups(place: {
     nonTrivialText(place.pullQuote);
   if (!hasDesc) missing.push('NEED_DESCRIPTION');
 
-  const hasTagSignals =
-    place.has_energy === true ||
-    place.has_pts === true ||
-    (place.vibeTags?.length ?? 0) > 0;
+  // vibe_tags removed from entities; tag signal truth is energy_scores + place_tag_scores
+  const hasTagSignals = place.has_energy === true || place.has_pts === true;
   if (!hasTagSignals) {
     missing.push('NEED_TAG_SIGNALS');
   }
@@ -203,7 +200,6 @@ function computePrlBucket(place: {
   googlePhotos: unknown;
   description: string | null;
   pullQuote: string | null;
-  vibeTags: string[];
   has_energy?: boolean;
   has_pts?: boolean;
   place_photo_eval?: { tier: string }[];
@@ -218,10 +214,8 @@ function computePrlBucket(place: {
     nonTrivialText(place.description) ||
     nonTrivialText(place.curatorNote) ||
     nonTrivialText(place.pullQuote);
-  const hasTags =
-    place.has_energy === true ||
-    place.has_pts === true ||
-    (place.vibeTags?.length ?? 0) > 0;
+  // vibe_tags removed from entities; tag signal truth is energy_scores + place_tag_scores
+  const hasTags = place.has_energy === true || place.has_pts === true;
   const hasHero = (place.place_photo_eval ?? []).some((e) => e.tier === 'HERO');
 
   // PRL 1: missing launch essentials (photos, attrs, tag signals)
@@ -300,7 +294,6 @@ export async function runCoverageAudit(options?: {
     pullQuote: string | null;
     googlePhotos: unknown;
     googlePlacesAttributes: unknown;
-    vibeTags: string[];
     place_photo_eval: { tier: string }[];
     map_places: { descriptor: string | null }[];
   };
@@ -319,7 +312,6 @@ export async function runCoverageAudit(options?: {
       pullQuote: true,
       googlePhotos: true,
       googlePlacesAttributes: true,
-      vibeTags: true,
       place_photo_eval: { select: { tier: true } },
       map_places: {
         where: { lists: { status: 'PUBLISHED' } },
@@ -332,7 +324,7 @@ export async function runCoverageAudit(options?: {
 
   // Tag signals: source of truth via SQL EXISTS (not Prisma _count)
   const placeIds = places.map((p) => p.id);
-  let tagSignalsByPlaceId = new Map<string, { has_energy: boolean; has_pts: boolean }>();
+  const tagSignalsByPlaceId = new Map<string, { has_energy: boolean; has_pts: boolean }>();
   if (placeIds.length > 0) {
     const rows = await db.$queryRaw<
       { id: string; has_energy: boolean; has_pts: boolean }[]
@@ -374,7 +366,7 @@ export async function runCoverageAudit(options?: {
     report.counts.by_prl[key] = (report.counts.by_prl[key] ?? 0) + 1;
   }
 
-  let statusByDedupeKey = new Map<
+  const statusByDedupeKey = new Map<
     string,
     {
       last_success_at: Date | null;

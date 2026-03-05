@@ -1,8 +1,7 @@
 /**
- * Example: Enrich place with vibe tags and tips
+ * Example: Enrich place with tips (and optionally tagline/pull_quote)
  * 
- * This script demonstrates how to add vibeTags and tips to places
- * for the merchant page bento grid layout.
+ * Demonstrates how to add tips to places for the merchant page bento grid layout.
  * 
  * Usage:
  *   ts-node scripts/enrich-place-with-bento-data.ts
@@ -24,60 +23,25 @@ async function enrichPlace(placeSlug: string) {
     return;
   }
 
-  // Example vibe tags (3-5 words that capture the atmosphere)
-  const vibeTags = generateVibeTags(place);
-
   // Example tips (practical visitor advice)
   const tips = generateTips(place);
 
   await prisma.place.update({
     where: { slug: placeSlug },
     data: {
-      vibeTags,
       tips,
     },
   });
 
   console.log(`✅ Updated ${place.name}`);
-  console.log(`   Vibe Tags: ${vibeTags.join(' · ')}`);
   console.log(`   Tips: ${tips.length} items`);
-}
-
-/**
- * Generate vibe tags based on place data
- * These should be short, evocative descriptors
- */
-function generateVibeTags(place: any): string[] {
-  const tags: string[] = [];
-
-  // Example logic - you can make this smarter with AI
-  if (place.category === 'Coffee') {
-    tags.push('Minimalist', 'Third wave', 'Laptop-friendly');
-  } else if (place.category === 'Eat') {
-    if (place.priceLevel && place.priceLevel >= 3) {
-      tags.push('Upscale', 'Date night', 'Reservations recommended');
-    } else {
-      tags.push('Casual', 'Family-friendly', 'Walk-in');
-    }
-  } else if (place.category === 'Drinks') {
-    tags.push('Low-lit', 'Cocktail-focused', 'After work');
-  }
-
-  // Add neighborhood-specific vibes
-  if (place.neighborhood === 'Silver Lake') {
-    tags.push('Local crowd');
-  } else if (place.neighborhood === 'Venice') {
-    tags.push('Beach vibes');
-  }
-
-  return tags.slice(0, 4); // Max 4 tags
 }
 
 /**
  * Generate helpful tips based on place data
  * These should be actionable visitor advice
  */
-function generateTips(place: any): string[] {
+function generateTips(place: { priceLevel?: number | null; category?: string | null; hours?: unknown }): string[] {
   const tips: string[] = [];
 
   // Example logic - you can make this smarter with AI or manual curation
@@ -91,7 +55,7 @@ function generateTips(place: any): string[] {
   } else if (place.category === 'Eat') {
     tips.push('Reservations recommended on weekends');
     if (place.priceLevel && place.priceLevel >= 3) {
-      tips.push('Ask for the chef's tasting menu');
+      tips.push("Ask for the chef's tasting menu");
     }
   }
 
@@ -108,11 +72,11 @@ function generateTips(place: any): string[] {
  * Batch enrich multiple places
  */
 async function batchEnrich() {
-  // Example: Enrich all places in a specific category
+  // Example: Enrich all places in a specific category that lack tips
   const places = await prisma.place.findMany({
     where: {
       category: 'Coffee',
-      vibeTags: { isEmpty: true }, // Only places without vibe tags
+      tips: { isEmpty: true },
     },
     take: 10,
   });
@@ -136,11 +100,9 @@ async function manualEnrich() {
       name: 'Biarritz Coffee Club',
       category: 'Coffee',
       neighborhood: 'Silver Lake',
-      vibeTags: ['Low-key', 'Surf crowd', 'Standing room'],
       tips: ['Go early for a seat', 'Cash only', 'Try the flat white'],
     },
     update: {
-      vibeTags: ['Low-key', 'Surf crowd', 'Standing room'],
       tips: ['Go early for a seat', 'Cash only', 'Try the flat white'],
     },
   });
@@ -155,11 +117,9 @@ async function manualEnrich() {
       name: 'The Breakers Palm Beach',
       category: 'Eat',
       priceLevel: 3,
-      vibeTags: ['Old-money Florida', 'Ocean views', 'Sunday brunch'],
       tips: ['Book the Circle Room', 'Dress code enforced', 'Valet parking available'],
     },
     update: {
-      vibeTags: ['Old-money Florida', 'Ocean views', 'Sunday brunch'],
       tips: ['Book the Circle Room', 'Dress code enforced', 'Valet parking available'],
     },
   });
@@ -174,11 +134,9 @@ async function manualEnrich() {
       name: 'Bar Leather Apron',
       category: 'Drinks',
       priceLevel: 4,
-      vibeTags: ['Speakeasy', 'Craft cocktails', 'No sign on door'],
       tips: ['Reservations recommended', 'Try the old fashioned', 'Arrive early to avoid wait'],
     },
     update: {
-      vibeTags: ['Speakeasy', 'Craft cocktails', 'No sign on door'],
       tips: ['Reservations recommended', 'Try the old fashioned', 'Arrive early to avoid wait'],
     },
   });

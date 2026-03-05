@@ -97,7 +97,7 @@ function describeRequests(groups: string[]): string {
   if (groups.includes('NEED_DESCRIPTION'))
     parts.push('description/curator/pullQuote');
   if (groups.includes('NEED_TAG_SIGNALS'))
-    parts.push('tag signals (energy/vibeTags)');
+    parts.push('tag signals (energy_scores/place_tag_scores)');
   return parts.join('; ') || 'none';
 }
 

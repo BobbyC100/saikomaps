@@ -21,7 +21,6 @@ export function PlaceCard2x1({ place }: PlaceCard2x1Props) {
     opensAt,
     signals = [],
     coverageQuote,
-    vibeTags = [],
     distanceMiles,
     placePersonality,
   } = place;

@@ -86,7 +86,6 @@ async function syncGoldenToPlaces() {
       hours_json: true,
       description: true,
       google_place_id: true,
-      vibe_tags: true,
       lat: true,
       lng: true,
       entity_links: {
@@ -237,7 +236,6 @@ async function syncGoldenToPlaces() {
         hours: golden.hours_json as Prisma.JsonValue,
         description: golden.description,
         googlePlaceId: resolvedGpid,
-        vibeTags: golden.vibe_tags,
         confidence: (Object.keys(confidence).length ? confidence : {}) as Prisma.InputJsonValue,
         overall_confidence: overall_confidence >= 0 ? overall_confidence : 0.5,
         confidence_updated_at: now,

@@ -88,6 +88,7 @@
     "recompute:golden-merge": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/recompute-golden-merge-quality.ts",
     "backfill:confidence": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/backfill-confidence.ts",
     "seed:prod:places": "tsx scripts/seed-prod-places.ts",
+    "seed:coverage": "tsx scripts/seed-coverage-sources.ts",
     "backfill:energy-tag": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/backfill-energy-tag-engine.ts",
     "compute:energy": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/compute-energy.ts",
     "compute:energy:neon:la": "./scripts/db-neon.sh node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/compute-energy.ts --la-only",

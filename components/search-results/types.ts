@@ -46,7 +46,6 @@ export interface PlaceCardData {
   signals?: Signal[];
   coverageQuote?: string;
   coverageSource?: string;
-  vibeTags?: string[];
   
   // Identity Signals
   placePersonality?: PlacePersonality;

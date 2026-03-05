@@ -114,14 +114,14 @@ async function findTestPages() {
     const galleryRich = await prisma.place.findMany({
       where: {
         photoUrls: { not: null },
-        vibeTags: { not: null },
+        tagline: { not: null },
       },
       select: {
         id: true,
         name: true,
         slug: true,
         photoUrls: true,
-        vibeTags: true,
+        tagline: true,
         neighborhood: true,
       },
       take: 2,
@@ -129,12 +129,11 @@ async function findTestPages() {
     
     for (const place of galleryRich) {
       const photoCount = Array.isArray(place.photoUrls) ? place.photoUrls.length : 0;
-      const vibeCount = Array.isArray(place.vibeTags) ? place.vibeTags.length : 0;
-      if (photoCount > 1 && vibeCount > 0) {
+      if (photoCount > 1 && place.tagline) {
         console.log(`✓ ${place.name}`);
         console.log(`  URL: https://saikomaps.com/place/${place.slug}`);
         console.log(`  Gallery: ${photoCount} photos`);
-        console.log(`  Vibe tags: ${vibeCount}`);
+        console.log(`  Tagline: ${place.tagline.substring(0, 60)}`);
         console.log(`  Expected: Natural grid flow (no gap fill)\n`);
       }
     }

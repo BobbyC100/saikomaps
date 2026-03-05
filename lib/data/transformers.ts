@@ -203,9 +203,6 @@ export function transformDatabaseToMerchant(place: any): MerchantData {
     reservationUrl: undefined, // Not in Place model
     websiteUrl: place.website,
     
-    // Vibe tags
-    vibeTags: place.neighborhood ? [place.neighborhood] : undefined,
-    
     // Editorial
     curatorNote: undefined, // Not in Place model
     coverageSources,

@@ -134,8 +134,7 @@ https://linktr.ee/stircrazy → linktr.ee/stircrazy
 - Component: `components/merchant/VibeCard.tsx` ✅
 - Integration: `app/(viewer)/place/[slug]/page.tsx` line 476-478 ✅
 - Grid span: 6 columns (full width) ✅
-- Null handling: Returns null if no vibeTags data ✅
-- Conditional render: Only shows if `vibeTags.length > 0` ✅
+- **Deprecated:** VibeCard and vibeTags removed from entities. Vibe signals now in `identity_signals.vibe_words` via SceneSense.
 
 **Files verified:**
 - `components/merchant/VibeCard.tsx` — Component correct

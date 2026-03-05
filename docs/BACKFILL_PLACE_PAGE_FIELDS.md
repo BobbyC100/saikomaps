@@ -44,6 +44,6 @@ npm run backfill:place-page-fields:neon -- --apply --force
 
 ## Extraction Rules (deterministic, no LLM)
 
-- **thematicTags**: place_personality + vibeTags + significant words from curator descriptor + first source excerpt
+- **thematicTags**: place_personality + significant words from curator descriptor + first source excerpt
 - **contextualConnection**: `{neighborhood} {vertical} — {personality}. {tagline or description}`
 - **curatorAttribution**: list owner name/email from first map_place with descriptor

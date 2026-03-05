@@ -63,7 +63,6 @@ async function main() {
       hours_json: true,
       description: true,
       google_place_id: true,
-      vibe_tags: true,
       confidence: true,
       promotion_status: true,
     },
@@ -116,7 +115,6 @@ async function main() {
       hours: g.hours_json as Prisma.JsonValue,
       description: g.description,
       googlePlaceId: g.google_place_id,
-      vibeTags: g.vibe_tags ?? [],
       updatedAt: new Date(),
     }
 

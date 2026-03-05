@@ -1,34 +1,73 @@
-# Saiko Voice Layer
+# SAI-DOC-VOICE-001 — Saiko Voice Layer
 
-## 1. Purpose
+**Document ID:** SAI-DOC-VOICE-001
+**Title:** Saiko Voice Layer
+**System:** TRACES
+**Layer:** Product Interpretation / Rendering
+**Status:** Active
+**Owner:** Saiko
+**Purpose:** Translate structured signals into editorial natural language.
 
-The Saiko voice layer translates structured signals into natural-language sentences displayed in the place page identity block. Instead of exposing raw taxonomy metadata to the user, the interface converts classification fields and live signals into concise editorial language.
+---
 
-**Example output (Seco):**
+## 1. Overview
+
+The Saiko Voice Layer converts structured data signals from Fields into short editorial sentences used in the TRACES interface.
+
+It allows the interface to read like a field guide, not a database.
+
+Instead of exposing taxonomy fields directly to users, the system renders concise phrases that describe the place's identity and current energy.
+
+**Example output:**
 
 ```
 Culver City restaurant
 Open now — lively room, strong date-night energy
 ```
 
-The goal: the page reads like an informed field guide, not a database record.
+The system performs signal → language translation, not data generation.
 
 ---
 
-## 2. Inputs (Signals)
+## 2. System Boundary
 
-The voice layer draws from four fields already present in the API response:
+The Voice Layer belongs to the TRACES product layer, not the Fields data layer.
 
-| Signal | Source field | Example value |
+**Architecture:**
+
+```
+Fields (structured signals)
+      ↓
+TRACES Voice Layer
+      ↓
+UI Sentences
+```
+
+Fields stores the raw signals.
+TRACES renders those signals into editorial language.
+
+---
+
+## 3. Inputs (Signals)
+
+The Voice Layer consumes signals already returned by the API.
+
+| Signal | Field | Example |
 |---|---|---|
-| Category | `primary_vertical` (via `VERTICAL_DISPLAY` mapping, lowercased) | `"restaurant"` |
-| Neighborhood | `neighborhood` | `"Culver City"` |
-| Open state | Derived from `hours` via `parseHours()` | `"Open now"` / `"Closed now"` |
-| Energy / vibe | `vibeTags` | `["Lively", "Date Night", "Cozy"]` |
+| Category | `primary_vertical` | `restaurant` |
+| Neighborhood | `neighborhood` | `Culver City` |
+| Open State | derived from `hours` | `Open now` |
+| Energy Signals | `identity_signals.vibe_words` (via SceneSense) | `["lively", "date-night"]` |
 
-### Lookup table: `VIBE_PHRASES`
+These signals remain unchanged from their stored values.
 
-Maps raw vibe tags to natural-language fragments:
+---
+
+## 4. Phrase Mapping
+
+Raw tags are converted into editorial fragments through a lookup table.
+
+**VIBE_PHRASES**
 
 | Tag | Phrase |
 |---|---|
@@ -43,141 +82,129 @@ Maps raw vibe tags to natural-language fragments:
 | Casual | casual energy |
 | Upscale | refined atmosphere |
 
-Tags not present in the lookup table are silently ignored — the voice layer never invents signals.
+Unrecognized tags are ignored. The system never invents signals.
 
 ---
 
-## 3. Transformation Layer
+## 5. Rendering Logic
 
-The identity block produces two lines below the place title:
+The identity block contains two lines.
 
-### Line 1 — Place identity
+### Line 1 — Identity
 
 ```
-{neighborhood} {primary_vertical (lowercased)}
+{neighborhood} {category}
 ```
 
 Example: `Culver City restaurant`
 
-Built by joining `neighborhood` and `category.toLowerCase()`, filtering out nulls. If both are missing, the line is omitted.
+**Rules**
+- Lowercase category
+- Join with space
+- Omit line if both values are missing
 
-### Line 2 — Signals sentence
+### Line 2 — Signals Sentence
 
 ```
-{open_state} — {energyPhrase}
+{open_state} — {energy_phrase}
 ```
 
 Example: `Open now — lively room, strong date-night energy`
 
-- **Open state** is derived from `parseHours()`. Rendered in `<em>` to typographically distinguish the live/dynamic signal from static descriptors.
-- **Energy phrase** is built by mapping each `vibeTag` through `VIBE_PHRASES`, then joining matched fragments with commas.
-- If only one part exists (open state only, or energy only), the dash separator is omitted.
-- If neither part exists, the entire line is omitted.
+**Construction**
+- `open_state` derived from hours parsing (`openNowExplicit` must be true)
+- `energy_phrase` assembled from `vibe_words` (via SceneSense interpretation of `identity_signals`), fragments joined by commas
+- Separator rules:
+
+| open_state | energy_phrase | Result |
+|---|---|---|
+| present | present | `Open now — lively room` |
+| absent | present | `lively room` |
+| present | absent | `Open now` |
+| absent | absent | line omitted |
 
 ---
 
-## 4. Guardrails
+## 6. Guardrails
 
-- **Tags are the source of truth.** The voice layer interprets existing signals; it does not generate or infer new ones.
-- **No invention.** Unrecognized vibe tags are skipped, not approximated.
-- **Sentence length stays short.** The identity block is a glance-read zone — one line of context, one line of energy.
-- **Dynamic signals are visually distinct.** `Open now` / `Closed now` are wrapped in `<em>` to separate live state from static descriptors.
-- **Raw tags remain visible.** The right rail still displays the original `vibeTags` list so structured data and voice output can be compared side by side.
-
----
-
-## 5. Current Implementation
-
-All voice layer logic currently lives inline in the place page component:
-
-```
-app/(viewer)/place/[slug]/page.tsx
-```
-
-Specifically:
-- `VIBE_PHRASES` lookup table (lines ~290–301)
-- `identitySubline` construction (line ~287)
-- `energyPhrase` assembly (lines ~302–305)
-- `openStateLabel` derivation (lines ~307–309)
-- JSX rendering with `<em>` wrap (identity block in the return)
-
-No separate module exists yet. The logic is intentionally co-located with the presentation for the experimentation phase.
+| Constraint | Rule |
+|---|---|
+| No signal invention | Only signals already present may be rendered |
+| Deterministic output | Same signals always produce the same sentence |
+| Short sentences | Identity block must remain glance-readable |
+| Dynamic signals distinct | Open/Closed indicators use `<em>` styling |
+| Raw signals accessible | Original structured tags remain visible in the UI rail |
 
 ---
 
-## 6. Future Direction
+## 7. Implementation
 
-If the voice layer proves effective, the transformation logic should move into a dedicated module:
+Voice logic lives in a dedicated module:
 
 ```
 lib/voice/saiko.ts
 ```
 
-Potential expansions:
-- **Time-aware phrasing** — "Open tonight", "Opens at 5pm", "Closed Mondays"
-- **Scene language** — derived from energy scores and SceneSense signals
-- **Neighborhood context** — "Quiet corner of Silver Lake", "Heart of downtown"
-- **Vertical-specific voice** — different sentence structures for coffee shops vs. hotels vs. nature spots
-- **Voice tuning** — adjustable tone/formality per vertical or editorial context
-
-The voice layer could eventually become a core Saiko primitive: **Signal → Language** — where structured data powers the experience, but the interface speaks in natural language.
-
----
-
-## 7. Architectural Boundary (Fields vs TRACES)
-
-The Saiko voice layer is **not** part of the Fields data layer.
-
-Fields stores structured signals and authored content only:
-
-- `primary_vertical`
-- `neighborhood`
-- `vibeTags`
-- `hours`
-- Provenance metadata
-- Confidence values
-
-These values are stored in the database and served by the API without modification.
-
-The voice layer exists only in the **TRACES product layer**. Its responsibility is to convert structured signals into human-readable observations at render time.
-
-```
-Fields (signals)  →  TRACES voice renderer  →  UI sentences
-```
-
-### Renderer properties
-
-- **Pure function** — signals in, text out
-- **Stateless** — no side effects, no database writes
-- **Deterministic** — same inputs always produce same outputs
-- **Cacheable** — output can be cached without being stored as data
-
-### Proposed interface (future extraction)
+**Primary export:**
 
 ```typescript
-renderIdentityBlock(signals) → {
+renderIdentityBlock(signals: VoiceSignals): {
   subline: string | null;
   sentence: string | null;
 }
 ```
 
-Supporting helpers:
+**Helper functions:**
 
-- `renderLocation(signals)` — neighborhood + vertical
-- `renderOpenState(hours)` — open/closed phrasing
-- `renderVibe(vibeTags)` — energy phrase assembly
+```typescript
+renderLocation(signals: VoiceSignals): string | null
+renderOpenState(hours: unknown): string | null
+renderEnergy(vibeWords: string[]): string | null   // consumes SceneSense output
+```
 
-### Why rendering stays out of Fields
+**Input type:**
 
-- **Different products need different rendering.** TRACES web, mobile, API clients, and voice assistants all want different phrasing from the same signals.
-- **Rendering evolves faster than data.** Changing tone or phrasing should be a template update, not a data migration.
-- **Fields must remain presentation-agnostic.** Third-party consumers should receive raw signals and render them however they want.
+```typescript
+interface VoiceSignals {
+  neighborhood: string | null | undefined;
+  category: string | null | undefined;
+  hours: unknown;
+  // vibe_words sourced from identity_signals via SceneSense interpretation
+  vibeWords: string[] | null | undefined;
+}
+```
 
-### The editorial content exception
+---
 
-Authored text (descriptions, curator notes) **does** belong in Fields — it is data with provenance, not a derived view. The voice layer generates text from signals; it does not store it.
+## 8. Architectural Principles
+
+| Principle | Meaning |
+|---|---|
+| Pure | signals → language, no side effects |
+| Stateless | no database writes |
+| Deterministic | same input always produces same output |
+| Cacheable | rendered text can be cached but never stored as canonical data |
+
+---
+
+## 9. Layer Responsibilities
 
 | Layer | Stores | Does not store |
 |---|---|---|
 | Fields | Structured signals, authored content, provenance | Rendered text, presentation logic |
-| TRACES | Rendering templates, phrase maps, cached output | Raw signal data |
+| TRACES | Phrase maps, render logic, cached output | Raw signal data |
+
+Fields never stores rendered text.
+TRACES never stores signal data.
+
+---
+
+## 10. Future Capabilities
+
+| Expansion | Description |
+|---|---|
+| Time-aware phrasing | "Open tonight", "Opens at 5pm", "Closed Mondays" |
+| SceneSense integration | Voice layer consumes SceneSense output; `identity_signals.vibe_words` drives energy phrase assembly |
+| Neighborhood context | "Heart of Silver Lake", "Quiet corner of Culver City" |
+| Vertical-specific voice | Coffee shops, hotels, parks, restaurants |
+| Voice tuning | Editorial tone variations per context |

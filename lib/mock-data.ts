@@ -30,7 +30,6 @@ export const scenarioA_FullyCurated: MerchantData = {
     { id: 'photo-2', url: '/images/la-taqueria-2.jpg' },
     { id: 'photo-3', url: '/images/la-taqueria-3.jpg' },
   ],
-  vibeTags: ['Mission District', 'Cash Only', 'No-Frills'],
   curatorNote: {
     text: "The carne asada is dry-grilled, not stewed. That's the difference. Order the dorado style if you want the tortilla pressed crispy on the plancha.",
     author: 'Saiko',

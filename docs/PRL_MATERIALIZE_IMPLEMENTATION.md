@@ -55,7 +55,7 @@ Powers: `HAS_ANY_PHOTO`, `HAS_PHOTO_QUALITY_THRESHOLD`.
 
 | Field | Rule |
 |-------|------|
-| `hasTagSignals` | True if `place_tag_scores` has rows for place **or** legacy `vibeTags.length > 0` (v1 bridge) |
+| `hasTagSignals` | True if `place_tag_scores` has rows for place **or** `energy_scores` has rows for place |
 | `energyScore` | Latest `energy_scores.energy_score` for place, else null |
 | `hasFormality` / `hasIdentitySignals` / `hasTemporalSignals` | false (v1) |
 
@@ -133,12 +133,12 @@ Returns in `data.location`:
 ./scripts/db-neon.sh node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/cron-prl-evaluator.ts
 ```
 
-**Expected:** PRL distribution changes from all-1 when data supports it; `blockedFromPRL3` reflects real blockers (e.g. `HAS_ENERGY_OR_TAG_SIGNALS` drops when vibeTags/place_tag_scores exist).
+**Expected:** PRL distribution changes from all-1 when data supports it; `blockedFromPRL3` reflects real blockers (e.g. `HAS_ENERGY_OR_TAG_SIGNALS` drops when `energy_scores`/`place_tag_scores` rows exist).
 
 ### B) Single place (prod)
 
 ```bash
-curl -s https://saikomaps.vercel.app/api/places/seco | jq '.data.location | { slug, prl, scenesense, vibeTags }'
+curl -s https://saikomaps.vercel.app/api/places/seco | jq '.data.location | { slug, prl, scenesense }'
 ```
 
 **Expected:** `prl` and `scenesense` consistent with PRL gating; `scenesense` null when PRL < 3.
@@ -158,7 +158,7 @@ curl -s "https://saikomaps.vercel.app/api/admin/prl-census?limit=200&laOnly=1" |
 ## Acceptance Criteria
 
 1. Cron evaluator shows >1 PRL bucket when data supports it, or reveals real blockers (not missing joins).
-2. Places with vibeTags + photos in DB see PRL rise appropriately (PRL-2 or PRL-3 depending on hours/business_status/photo_eval).
+2. Places with `energy_scores`/`place_tag_scores` + photos in DB see PRL rise appropriately (PRL-2 or PRL-3 depending on hours/business_status/photo_eval).
 3. `/api/places/:slug` returns `prl` and `scenesense` consistent with PRL gating rules.
 
 ---
@@ -173,5 +173,5 @@ Without waiting on photo-eval/energy joins: add `prlOverride = 3` for `seco` via
 
 - Do NOT add new migrations in this task.
 - If a table is missing in Prisma, do not reference it; implement joins only for existing models.
-- Keep the `vibeTags → hasTagSignals` bridge explicitly labeled `// v1 bridge` for future removal.
+- `entities.vibe_tags` has been removed; `hasTagSignals` is now sourced exclusively from `energy_scores` and `place_tag_scores`.
 - Keep materializer read-only and deterministic (no side effects).

@@ -30,7 +30,7 @@
 | Field | Coverage | Impact |
 |-------|----------|--------|
 | `pullQuote` | 0% | Coverage card uses `sources` array instead ✅ |
-| `vibeTags` | 0% | Vibe card doesn't render |
+| ~~`vibeTags`~~ | **Deprecated** | Column removed from entities; vibe signals now in `identity_signals.vibe_words` |
 | `priceLevel` | 0% | No price symbols ($$$) |
 | `restaurantGroup` | ~2% | "Part of" row rarely shows |
 | `reservationUrl` | ~10% | Reservations note rarely shows |
@@ -51,7 +51,7 @@
   "priceLevel": null,                                      ← ❌
   "pullQuote": null,                                       ← ❌
   "sources": [3 editorial articles],                       ← ✅ (Infatuation, Time Out, Resy)
-  "vibeTags": [],                                          ← ❌
+  // vibeTags: removed — vibe signals now in identity_signals.vibe_words
   "curatorNote": "The best natural wine list...",          ← ✅ (from mapPlaces)
 }
 ```
@@ -68,7 +68,7 @@
   "priceLevel": null,                                      ← ❌
   "pullQuote": null,                                       ← ❌
   "sources": [],                                           ← ❌
-  "vibeTags": [],                                          ← ❌
+  // vibeTags: removed — vibe signals now in identity_signals.vibe_words
   "curatorNote": null,                                     ← ❌
 }
 ```
@@ -85,7 +85,7 @@
   "priceLevel": null,                                      ← ❌
   "pullQuote": null,                                       ← ❌
   "sources": [1 editorial article],                        ← ✅ (LA Times)
-  "vibeTags": [],                                          ← ❌
+  // vibeTags: removed — vibe signals now in identity_signals.vibe_words
   "curatorNote": null,                                     ← ❌
 }
 ```
@@ -110,7 +110,7 @@
 | Component | Needs | Status | Impact |
 |-----------|-------|--------|--------|
 | **Details** | website, restaurantGroup, service | ⚠️ | Card often empty |
-| **Vibe** | vibeTags[] | ❌ | Never renders |
+| ~~**Vibe**~~ | ~~vibeTags[]~~ | **Deprecated** | Column removed; use `identity_signals.vibe_words` |
 | **Meta line** | priceLevel | ❌ | No $$$ symbols |
 
 ---
@@ -151,7 +151,7 @@ if (website && !website.includes('instagram.com')) {
 ---
 
 ### Issue 3: No Vibe Tags
-**Problem:** `vibeTags` array is empty for all places
+**Resolved (deprecated):** `vibeTags` column has been removed from entities. Vibe signals now live in `identity_signals.vibe_words` via `golden_records`.
 
 **Impact:** Vibe card never renders
 

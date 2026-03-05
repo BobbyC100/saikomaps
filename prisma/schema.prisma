@@ -236,7 +236,6 @@ model entities {
   taglinePattern         String?            @map("tagline_pattern")
   taglineSignals         Json?              @map("tagline_signals")
   tips                   String[]           @default([])
-  vibeTags               String[]           @default([]) @map("vibe_tags")
   transitAccessible      Boolean?           @map("transit_accessible")
   thematicTags           String[]           @default([]) @map("thematic_tags")
   contextualConnection   String?            @map("contextual_connection")
@@ -289,6 +288,7 @@ model entities {
 
   merchant_enrichment_runs merchant_enrichment_runs[]
   merchant_signals         merchant_signals?
+  coverage_sources         coverage_sources[]
 
   @@map("entities")
   @@index([category])
@@ -338,6 +338,23 @@ model merchant_signals {
   last_updated_at        DateTime @default(now()) @updatedAt @map("last_updated_at")
 
   entities entities @relation(fields: [entityId], references: [id], onDelete: Cascade)
+}
+
+/// Coverage sources — editorial links per entity (v1: store + render, no crawl)
+model coverage_sources {
+  id           String    @id @default(uuid())
+  entityId     String    @map("entity_id")
+  source_name  String
+  url          String
+  excerpt      String?
+  published_at DateTime? @map("published_at")
+  created_at   DateTime  @default(now()) @map("created_at")
+
+  entities entities @relation(fields: [entityId], references: [id], onDelete: Cascade)
+
+  @@unique([entityId, url])
+  @@index([entityId])
+  @@map("coverage_sources")
 }
 
 /// Place appearances — subject (pop-up/mobile) appears at host place OR raw location (sidewalk)

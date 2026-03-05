@@ -75,7 +75,7 @@ tagline            String?          // Selected tagline
 taglineCandidates  String[]         // 4 candidate taglines
 taglinePattern     String?          // Pattern used
 taglineGenerated   DateTime?        // Generation timestamp
-vibeTags           String[]         // Atmosphere descriptors
+// vibeTags removed from entities — deprecated; vibe signals in golden_records.identity_signals.vibe_words
 tips               String[]         // Visitor tips
 pullQuote          String?          // Editorial quote
 ```

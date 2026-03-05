@@ -2,6 +2,9 @@
  * SceneSense assembly — bridge place data → Voice Engine → Lint → output
  * Used at place API / cache generation boundary
  * Accepts materialized PlaceForPRL (preferred) or legacy PlaceForAssembly.
+ *
+ * Canonical "vibe words" source: identity_signals.vibe_words (string[])
+ * vibeTags is no longer accepted or used as a fallback.
  */
 
 import { computePRL } from './prl';
@@ -20,7 +23,6 @@ interface PlaceForAssembly {
   googlePhotos?: unknown;
   hours?: unknown;
   description?: string | null;
-  vibeTags?: string[] | null;
   pullQuote?: string | null;
   category?: string | null;
   tagline?: string | null;
@@ -55,7 +57,6 @@ export interface SceneSenseAssemblyResult {
 /** Assemble with materialized PlaceForPRL (from fetchPlaceForPRLBySlug) + Voice Engine inputs */
 export function assembleSceneSenseFromMaterialized(args: {
   placeForPRL: PlaceForPRL & { prlOverride?: number | null };
-  vibeTags?: string[] | null;
   neighborhood?: string | null;
   category?: string | null;
   identitySignals?: {
@@ -85,15 +86,14 @@ export function assembleSceneSenseFromMaterialized(args: {
 
   const mode: Mode = prl >= 4 ? 'FULL' : 'LITE';
   const canonical = mapToCanonicalSceneSense({
-    vibe_words: args.identitySignals?.vibe_words ?? args.vibeTags ?? [],
+    vibe_words: args.identitySignals?.vibe_words ?? [],
     place_personality: args.identitySignals?.place_personality ?? null,
     signature_dishes: args.identitySignals?.signature_dishes ?? [],
     neighborhood: args.neighborhood ?? null,
     category: args.category ?? null,
   });
 
-  const hasVibeWords =
-    (args.identitySignals?.vibe_words ?? args.vibeTags ?? []).length > 0;
+  const hasVibeWords = (args.identitySignals?.vibe_words ?? []).length > 0;
   const hasDishes =
     (args.identitySignals?.signature_dishes?.length ?? 0) > 0;
   const confidence = {
@@ -151,7 +151,7 @@ export function assembleSceneSense(place: PlaceForAssembly): SceneSenseAssemblyR
   const mode: Mode = prl >= 4 ? 'FULL' : 'LITE';
 
   const canonical = mapToCanonicalSceneSense({
-    vibe_words: place.identitySignals?.vibe_words ?? place.vibeTags ?? [],
+    vibe_words: place.identitySignals?.vibe_words ?? [],
     place_personality: place.identitySignals?.place_personality ?? null,
     signature_dishes: place.identitySignals?.signature_dishes ?? [],
     neighborhood: place.neighborhood ?? null,
@@ -160,7 +160,7 @@ export function assembleSceneSense(place: PlaceForAssembly): SceneSenseAssemblyR
   });
 
   const baseConf = 0.6;
-  const hasVibeWords = (place.identitySignals?.vibe_words ?? place.vibeTags ?? []).length > 0;
+  const hasVibeWords = (place.identitySignals?.vibe_words ?? []).length > 0;
   const hasDishes = (place.identitySignals?.signature_dishes?.length ?? 0) > 0;
 
   const confidence = {

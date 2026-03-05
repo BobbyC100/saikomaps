@@ -37,7 +37,7 @@
   - But stored as JSON blob, not structured fields
 
 **❌ Empty/Unpopulated Fields**
-- `vibeTags` - Empty array `[]`
+- ~~`vibeTags`~~ - **Deprecated** (column removed; use `identity_signals.vibe_words` via SceneSense)
 - `instagram` - NULL (except Seco, which we just fixed)
 - `priceLevel` - NULL (except Pizzeria Mozza)
 - `restaurantGroupId` - NULL
@@ -52,7 +52,7 @@
 
 ## Data Matrix
 
-| Place | Google Data | Photos | Sources | pullQuote | Instagram | vibeTags | Curator Note |
+| Place | Google Data | Photos | Sources | pullQuote | Instagram | ~~vibeTags~~ | Curator Note |
 |-------|-------------|--------|---------|-----------|-----------|----------|--------------|
 | Seco | ✅ | 10 | 4 (rich) | ❌ | ✅ | ❌ | ✅ (in mapPlaces) |
 | Stir Crazy | ✅ | 10 | 3 (rich) | ❌ | ❌ | ❌ | ❌ |
@@ -119,7 +119,7 @@ This is a **120-character editorial note** added when the place was added to tha
 - `pullQuoteSource` ❌ NULL
 
 **Vibe Tags**
-- `vibeTags` - Empty array `[]`
+- ~~`vibeTags`~~ - **Deprecated** (column removed; use `identity_signals.vibe_words` via SceneSense)
 
 **Ad Unit System**
 - `adUnitType` ❌ NULL
@@ -206,7 +206,7 @@ Someone picks best quotes and adds them to `pullQuote` field.
 
 2. **Vibe Tags**
    - Parse reviews for atmosphere descriptors
-   - Generate `vibeTags` array
+   - ~~Generate `vibeTags` array~~ — **Deprecated**; vibe signals now in `identity_signals.vibe_words`
 
 3. **Restaurant Groups**
    - Identify which places belong to groups (e.g., Mozza group)

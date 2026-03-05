@@ -23,7 +23,6 @@ export function HorizontalBentoCard({ place }: HorizontalBentoCardProps) {
     signals = [],
     coverageQuote,
     coverageSource,
-    vibeTags = [],
     distanceMiles,
   } = place;
   
@@ -195,34 +194,6 @@ export function HorizontalBentoCard({ place }: HorizontalBentoCardProps) {
               </div>
             )}
           </>
-        )}
-
-        {/* Vibe Tags */}
-        {vibeTags.length > 0 && (
-          <div
-            style={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: 6,
-            }}
-          >
-            {vibeTags.slice(0, 3).map((tag, idx) => (
-              <span
-                key={idx}
-                style={{
-                  padding: '4px 8px',
-                  borderRadius: 6,
-                  background: 'rgba(195, 176, 145, 0.18)',
-                  fontSize: 8,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.5px',
-                  color: '#8B7355',
-                }}
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
         )}
 
         {/* Footer: Status | Distance */}

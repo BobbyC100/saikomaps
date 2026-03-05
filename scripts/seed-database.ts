@@ -25,7 +25,7 @@ function mapToPlaceData(data: MerchantData, scenarioSlug: string) {
       : null,
     latitude: data.coordinates?.lat,
     longitude: data.coordinates?.lng,
-    neighborhood: data.vibeTags?.[0], // Use first vibe tag as neighborhood
+    neighborhood: null,
     
     // Contact
     phone: data.phone,

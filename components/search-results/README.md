@@ -66,7 +66,7 @@ The card works with minimal data. Only `slug`, `name`, `category`, and `neighbor
     ],
     coverageQuote: 'The flour tortillas are made to order...',
     coverageSource: 'Eater LA',
-    vibeTags: ['Cash only', 'No frills', 'Counter service'],
+    // vibeTags removed — deprecated; vibe signals now in identity_signals.vibe_words via SceneSense
     distanceMiles: 0.4,
   }}
 />

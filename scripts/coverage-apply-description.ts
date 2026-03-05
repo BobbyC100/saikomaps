@@ -2,9 +2,9 @@
  * Coverage Apply Description — Fills NEED_DESCRIPTION for queued places.
  *
  * Source hierarchy (highest to lowest priority):
- *   1. merchant          — Merchant website meta/about description
- *   2. saiko_editorial   — Existing Saiko editorial description
- *   3. editorial_source  — Third-party editorial (Google editorial_summary, Resy, etc.)
+ *   1. merchant          — Stored merchant text (IG bio, about_text_sample) or website crawl
+ *   2. saiko_editorial   — Existing Saiko editorial description (write-guard only)
+ *   3. editorial_source  — coverage_sources excerpts, Google editorial_summary, or page fetch
  *   4. synthesis         — Structured synthesis from place signals via Claude (≤ 60 words)
  *
  * A description is only overwritten when the incoming source outranks the existing one.
@@ -124,8 +124,147 @@ interface DescriptionResult {
   confidence: number;
 }
 
+// ---------------------------------------------------------------------------
+// Merchant text cleaner — deterministic "prep kitchen" for IG bio / raw About
+// ---------------------------------------------------------------------------
+
+function stripEmojis(s: string): string {
+  return s
+    .replace(/\p{Extended_Pictographic}/gu, '')
+    .replace(/[\u{FE00}-\u{FE0F}\u{200D}\u{20E3}\u{E0020}-\u{E007F}]/gu, '');
+}
+
+function isOperationalLine(line: string): boolean {
+  // Walk-ins / walk ins (anywhere in the line alongside "welcome")
+  if (/walk[- ]?ins?\b/i.test(line) && /welcome/i.test(line)) return true;
+  if (/^walk[- ]?ins?\b/i.test(line)) return true;
+
+  // Contains am/pm time pattern → hours line
+  if (/\b\d{1,2}\s*(?::\d{2})?\s*(?:am|pm)\b/i.test(line)) return true;
+
+  // Meal-service schedule lines ("Lunch service from…", "Dinner 5–11")
+  if (/\b(?:lunch|dinner|breakfast|brunch)\s+service\b/i.test(line)) return true;
+
+  // Two or more day-name tokens → schedule
+  const days = line.match(
+    /\b(?:mon|tue(?:s)?|wed|thu(?:r|rs)?|fri|sat|sun|monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/gi,
+  );
+  if (days && days.length >= 2) return true;
+
+  // Single day-name line with little else (e.g. "SAT and SUN")
+  if (days && days.length >= 1) {
+    const stripped = line
+      .replace(
+        /\b(?:mon|tue(?:s)?|wed|thu(?:r|rs)?|fri|sat|sun|monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/gi,
+        '',
+      )
+      .replace(/[^a-zA-Z]/g, '');
+    if (stripped.length < 5) return true;
+  }
+
+  // Address: street number + up to 4 words + road-type suffix
+  if (
+    /\b\d+\s+(?:[\w.]+\s+){0,4}(?:blvd|boulevard|ave|avenue|st|street|road|rd|drive|dr|lane|ln|way|place|pl|court|ct)\b/i.test(
+      line,
+    )
+  ) return true;
+
+  // Standalone phone numbers
+  if (/^\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/.test(line.trim())) return true;
+
+  return false;
+}
+
 /**
- * Tier 2: Extract description from merchant website (meta_description or about text).
+ * Deterministic cleaner for raw merchant text (IG bio, website about).
+ * Processes line-by-line: strips emojis, removes operational lines (hours,
+ * addresses, walk-ins), URLs, and @handles. Returns null if nothing usable.
+ */
+export function cleanMerchantAboutText(raw: string): string | null {
+  const lines = raw.split(/[\n\r]+/);
+  const kept: string[] = [];
+
+  for (let line of lines) {
+    line = stripEmojis(line);
+
+    // Remove URLs and @handles
+    line = line.replace(/https?:\/\/\S+/gi, '');
+    line = line.replace(/(?:^|\s)www\.\S+/gi, '');
+    line = line.replace(/@[\w.]+/g, '');
+
+    // Normalize bullets and inner whitespace
+    line = line.replace(/[•·▪︎●○◦‣⁃|—–]/g, ' ');
+    line = line.replace(/\s+/g, ' ').trim();
+
+    if (!line) continue;
+    if (isOperationalLine(line)) continue;
+
+    kept.push(line);
+  }
+
+  let text = kept.join(' ');
+  text = text.replace(/\s+/g, ' ').trim();
+
+  // Strip leading/trailing punctuation debris
+  text = text.replace(/^[\s,|.;:\-—–]+|[\s,|;:\-—–]+$/g, '').trim();
+
+  // Minimum-usability gate
+  if (text.length < 40 || !/[a-zA-Z]/.test(text)) return null;
+
+  // v1.1: Truncate to ≤ 220 chars without cutting mid-word
+  if (text.length > 220) {
+    const cut = text.slice(0, 220);
+    const lastSpace = cut.lastIndexOf(' ');
+    text = (lastSpace > 100 ? cut.slice(0, lastSpace) : cut) + '…';
+  }
+
+  return text;
+}
+
+/**
+ * Tier 1a: Check stored merchant text from merchant_enrichment_runs.
+ * Looks for about_text_sample or raw_bio with source_type = 'instagram_bio' (or similar).
+ * Runs raw text through cleanMerchantAboutText; falls through if cleaning returns null.
+ */
+async function tryStoredMerchantText(placeId: string): Promise<string | null> {
+  const runs = await db.merchant_enrichment_runs.findMany({
+    where: { entityId: placeId },
+    orderBy: { created_at: 'desc' },
+    take: 5,
+    select: { extraction_json: true },
+  });
+
+  for (const run of runs) {
+    const json = run.extraction_json as Record<string, unknown> | null;
+    if (!json) continue;
+
+    const about = (json.about_text_sample as string)?.trim();
+    if (about && about.length >= 20 && about.length <= 300) {
+      console.log(`    raw merchant text (${about.length} chars): "${about.slice(0, 120)}…"`);
+      const cleaned = cleanMerchantAboutText(about);
+      if (cleaned) {
+        console.log(`    cleaned (${cleaned.length} chars): "${cleaned.slice(0, 120)}…"`);
+        return cleaned;
+      }
+      console.log('    cleaned → null (text was operational or too short)');
+    }
+
+    const bio = (json.raw_bio as string)?.trim();
+    if (bio && bio.length >= 20 && bio.length <= 300) {
+      console.log(`    raw merchant bio (${bio.length} chars): "${bio.slice(0, 120)}…"`);
+      const cleaned = cleanMerchantAboutText(bio);
+      if (cleaned) {
+        console.log(`    cleaned (${cleaned.length} chars): "${cleaned.slice(0, 120)}…"`);
+        return cleaned;
+      }
+      console.log('    cleaned → null (text was operational or too short)');
+    }
+  }
+  return null;
+}
+
+/**
+ * Tier 1b: Extract description from merchant website (meta_description or about text).
  * Skips social media URLs.
  */
 async function tryWebsiteDescription(
@@ -147,7 +286,26 @@ async function tryWebsiteDescription(
 }
 
 /**
- * Tier 3: Google Place Details editorial_summary.
+ * Tier 3a: Check coverage_sources for excerpts.
+ */
+async function tryCoverageSourceExcerpt(placeId: string): Promise<string | null> {
+  const sources = await db.coverage_sources.findMany({
+    where: { entityId: placeId },
+    select: { excerpt: true, source_name: true },
+    orderBy: { created_at: 'asc' },
+  });
+
+  for (const src of sources) {
+    const excerpt = src.excerpt?.trim();
+    if (excerpt && excerpt.length >= 30) {
+      return excerpt.length > 300 ? excerpt.slice(0, 300) : excerpt;
+    }
+  }
+  return null;
+}
+
+/**
+ * Tier 3b: Google Place Details editorial_summary.
  */
 function tryGoogleEditorial(details: PlaceDetails | null): string | null {
   const desc = details?.editorialSummary?.trim();
@@ -222,24 +380,46 @@ async function synthesizeDescription(
 }
 
 /**
- * Resolve description using the source hierarchy.
- * Tries sources in priority order: merchant → editorial_source → synthesis.
- * Returns the first successful result or null.
+ * Resolve description using the full 4-tier source hierarchy.
+ * Tries each tier in priority order; returns the first successful result.
+ *
+ *   1. merchant          — stored merchant text (IG bio, about), then website crawl
+ *   2. saiko_editorial   — (write-guard only; existing editorial descriptions are preserved)
+ *   3. editorial_source  — coverage_sources excerpts, then Google editorialSummary
+ *   4. synthesis         — Claude structured synthesis from Google attributes
  */
 async function resolveDescription(
   entity: { id: string; name: string; website: string | null; neighborhood: string | null },
   googlePlaceId: string | null,
 ): Promise<DescriptionResult | null> {
-  // Tier 1: Merchant website
-  console.log('  [1/3] Checking merchant website...');
+  // Tier 1: Merchant — stored text first, then website crawl
+  console.log('  [1/4] Checking merchant stored text...');
+  const storedMerchant = await tryStoredMerchantText(entity.id);
+  if (storedMerchant) {
+    console.log(`  ✓ Found stored merchant text (${storedMerchant.length} chars)`);
+    return { text: storedMerchant, source: 'merchant', confidence: 0.75 };
+  }
+
+  console.log('  [1/4] Checking merchant website...');
   const websiteDesc = await tryWebsiteDescription(entity.id, entity.website);
   if (websiteDesc) {
-    console.log(`  ✓ Found merchant description (${websiteDesc.length} chars)`);
+    console.log(`  ✓ Found merchant website description (${websiteDesc.length} chars)`);
     return { text: websiteDesc, source: 'merchant', confidence: 0.8 };
   }
   console.log('  — No usable merchant description.');
 
-  // Tier 2: Third-party editorial (Google editorial summary, etc.)
+  // Tier 2: saiko_editorial — handled by sourceOutranks() guard in caller;
+  // if the entity already has description_source = 'saiko_editorial', the caller
+  // will skip overwriting with a lower-ranked source.
+
+  // Tier 3: Editorial source — coverage_sources excerpts, then Google editorialSummary
+  console.log('  [3/4] Checking coverage sources for excerpts...');
+  const coverageExcerpt = await tryCoverageSourceExcerpt(entity.id);
+  if (coverageExcerpt) {
+    console.log(`  ✓ Found coverage source excerpt (${coverageExcerpt.length} chars)`);
+    return { text: coverageExcerpt, source: 'editorial_source', confidence: 0.85 };
+  }
+
   let details: PlaceDetails | null = null;
   let attrs: GooglePlacesAttributes | null = null;
   const gpid = googlePlaceId?.trim();
@@ -247,15 +427,15 @@ async function resolveDescription(
     !!process.env.GOOGLE_PLACES_API_KEY && process.env.GOOGLE_PLACES_ENABLED === 'true';
 
   if (gpid && googleEnabled) {
-    console.log('  [2/3] Checking editorial sources...');
+    console.log('  [3/4] Checking Google editorial summary...');
     try {
       details = await getPlaceDetails(gpid);
       const googleDesc = tryGoogleEditorial(details);
       if (googleDesc) {
-        console.log(`  ✓ Found editorial source description (${googleDesc.length} chars)`);
+        console.log(`  ✓ Found Google editorial description (${googleDesc.length} chars)`);
         return { text: googleDesc, source: 'editorial_source', confidence: 0.9 };
       }
-      console.log('  — No editorial source description.');
+      console.log('  — No Google editorial description.');
     } catch (e) {
       console.warn(`  ⚠ Google Place Details fetch failed: ${e instanceof Error ? e.message : e}`);
     }
@@ -266,13 +446,13 @@ async function resolveDescription(
       // Non-fatal — synthesis can work with details alone
     }
   } else if (gpid) {
-    console.log('  [2/3] Skipped — GOOGLE_PLACES_API_KEY or GOOGLE_PLACES_ENABLED not set.');
+    console.log('  [3/4] Skipped Google — GOOGLE_PLACES_API_KEY or GOOGLE_PLACES_ENABLED not set.');
   } else {
-    console.log('  [2/3] Skipped — no google_place_id.');
+    console.log('  [3/4] Skipped Google — no google_place_id.');
   }
 
-  // Tier 3: Structured synthesis
-  console.log('  [3/3] Generating synthesis from place signals...');
+  // Tier 4: Structured synthesis (last resort)
+  console.log('  [4/4] Generating synthesis from place signals...');
   const synthesis = await synthesizeDescription(entity.name, entity.neighborhood, details, attrs);
   if (synthesis) {
     console.log(`  ✓ Generated synthesis (${synthesis.length} chars)`);
@@ -383,8 +563,18 @@ async function enrichSingleSlug(slugValue: string, dryRun: boolean): Promise<voi
     return;
   }
 
-  // Source hierarchy guard: only overwrite if incoming source outranks existing
-  if (entity.description?.trim() && !sourceOutranks(result.source, entity.description_source)) {
+  // Source hierarchy guard: only overwrite if incoming source outranks existing.
+  // Exception: if existing merchant text doesn't survive cleaning, treat it as vacant.
+  let effectiveExistingSource = entity.description_source;
+  if (entity.description_source === 'merchant' && entity.description?.trim()) {
+    const survivesClean = cleanMerchantAboutText(entity.description);
+    if (!survivesClean) {
+      console.log('  ℹ Existing merchant description is all-operational; treating as vacant.');
+      effectiveExistingSource = null;
+    }
+  }
+
+  if (entity.description?.trim() && !sourceOutranks(result.source, effectiveExistingSource)) {
     console.log(`\n  ⏭ Skipping: existing source "${entity.description_source}" is equal or higher priority than incoming "${result.source}".`);
     return;
   }

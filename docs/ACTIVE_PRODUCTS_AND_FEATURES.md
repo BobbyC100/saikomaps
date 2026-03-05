@@ -24,22 +24,23 @@ Users create custom maps/lists, add places via Google Place ID or search, set or
 Public maps at `/map/[slug]` use the Field Notes template: cover/header map with hydrology styling, scrollable place cards, and expanded full-screen map with marker clustering. Smart bounds use IQR-based outlier detection so the viewport fits the main cluster; desktop is split view (map + cards), mobile toggles list/map.
 
 **Sample data:**
-- **Public map API:** `GET /api/maps/public/silver-lake-natural-wine` → `{ success: true, data: { id, title, slug, description, mapPlaces: [{ orderIndex, descriptor, places: { id, slug, name, address, latitude, longitude, tagline, vibeTags, ... }, place_personality, price_tier }], creatorName, isOwner } }`.
+- **Public map API:** `GET /api/maps/public/silver-lake-natural-wine` → `{ success: true, data: { id, title, slug, description, mapPlaces: [{ orderIndex, descriptor, places: { id, slug, name, address, latitude, longitude, tagline, ... }, place_personality, price_tier }], creatorName, isOwner } }`.
 - **Example slugs:** `/map/silver-lake-natural-wine`, `/map/venice-coffee-shops`, `/map/dtla-lunch-spots`.
 
 ### 3. Place (merchant) pages
-Standalone place pages at `/place/[slug]` show hero photo, AI tagline, vibe tags, tips, pull quotes, hours, contact, and “Also on” coverage. Data degrades gracefully when fields are missing; the API is `/api/places/[slug]`.
+Standalone place pages at `/place/[slug]` show hero photo, AI tagline, tips, pull quotes, hours, contact, and “Also on” coverage. Data degrades gracefully when fields are missing; the API is `/api/places/[slug]`.
 
 **Sample data:**
-- **Place API response (excerpt):** `GET /api/places/covell` → `data.location`: `{ id, slug: "covell", name, address, latitude, longitude, phone, website, instagram, description, category, neighborhood, cuisineType, priceLevel, photoUrl, photoUrls, hours, googlePlaceId, curatorNote, vibeTags: ["Standing room", "Surf crowd"], tips: ["Go early for a seat", "Cash only"], tagline: "Low-key wine bar with natural selections", pullQuote, pullQuoteSource, pullQuoteAuthor, prl: 3, scenesense: { ... }, appearsOn: [{ id, title, slug, creatorName }], guide: { id, title, slug, creatorName } }`.
+- **Place API response (excerpt):** `GET /api/places/covell` → `data.location`: `{ id, slug: "covell", name, address, latitude, longitude, phone, website, instagram, description, category, neighborhood, cuisineType, priceLevel, photoUrl, photoUrls, hours, googlePlaceId, curatorNote, vibeWords: ["standing-room", "surf-crowd"],  # derived from identity_signals.vibe_words
+ tips: ["Go early for a seat", "Cash only"], tagline: "Low-key wine bar with natural selections", pullQuote, pullQuoteSource, pullQuoteAuthor, prl: 3, scenesense: { ... }, appearsOn: [{ id, title, slug, creatorName }], guide: { id, title, slug, creatorName } }`.
 - **Example slugs:** `covell`, `seco`, `budonoki`, `tabula-rasa-bar`, `psychic-wines`.
 
 ### 4. Voice Engine (AI content generation)
-Claude-powered generation of taglines, vibe tags, tips, and pull quotes for places. Scripts and pipelines backfill and refresh this content; it feeds place cards and merchant pages.
+Claude-powered generation of taglines, tips, and pull quotes for places. Scripts and pipelines backfill and refresh this content; it feeds place cards and merchant pages.
 
 **Sample data:**
 - **Tagline:** `"Low-key wine bar with natural selections"`.
-- **Vibe tags:** `["Standing room", "Surf crowd"]`.
+- **Vibe words:** `["standing-room", "surf-crowd"]` (from `identity_signals.vibe_words` via SceneSense).
 - **Tips:** `["Go early for a seat", "Cash only"]`.
 - **Pull quote:** `"The room has a bubbly energy as it fills up with creative directors who part-time in Lisbon..."` with `pullQuoteSource: "The Infatuation"`, `pullQuoteAuthor`.
 
@@ -91,7 +92,7 @@ Upload CSV/JSON at `/import`; preview, process, and add places to lists via `/ap
 Search API (`/api/search`) returns places (and optionally maps) with personality/signals; used by typeahead and add-to-map flows. Places search (`/api/places/search`) supports query and lat/lng/radius.
 
 **Sample data:**
-- **Search:** `GET /api/search?q=natural+wine` → `{ neighborhoods: [], places: [{ slug, name, neighborhood, category, cuisineType, priceLevel, vibeTags, latitude, longitude, googlePlaceId, googlePhotos, hours, pullQuote, pullQuoteSource, editorialSources, chefRecs, ... }] }` (up to 50, then sorted/sliced for cards).
+- **Search:** `GET /api/search?q=natural+wine` → `{ neighborhoods: [], places: [{ slug, name, neighborhood, category, cuisineType, priceLevel, latitude, longitude, googlePlaceId, googlePhotos, hours, pullQuote, pullQuoteSource, editorialSources, chefRecs, ... }] }` (up to 50, then sorted/sliced for cards).
 - **Editorial signals in results:** `eater38`, `latimes101`, `michelin`, `infatuation`, `chefrec` (from `editorialSources` / `chefRecs`).
 
 ### 12. Activity spots (skate / surf)
@@ -134,6 +135,6 @@ Share cards (e.g. 9:16 stories, 1:1 feed) and OG image generation for maps so sh
 
 - **Canonical place model:** `Place` (and golden-record style data where used) is the source of truth; `MapPlace` links places to lists with curator-specific fields.
 - **Key APIs:** `GET /api/maps/public/[slug]` (public map), `GET /api/places/[slug]` (place + PRL/SceneSense), `POST /api/maps`, `POST /api/import/add-to-list`, `GET /api/search`.
-- **Enrichment flow:** Google backfill → Voice Engine (taglines, tags, tips, quotes) → coverage scripts and photo-eval → PRL materialization → API and cron census.
+- **Enrichment flow:** Google backfill → Voice Engine (taglines, tips, quotes) → coverage scripts and photo-eval → PRL materialization → API and cron census.
 - **Templates:** Field Notes is the active premium template (editorial, hydrology map style); Postcard, Neon, Zine are documented for future use.
-- **Sample calls:** `curl -s "https://saikomaps.vercel.app/api/places/covell" | jq '.data.location | { slug, name, tagline, vibeTags, prl, scenesense }'`; `curl -s "https://saikomaps.vercel.app/api/maps/public/silver-lake-natural-wine" | jq '.data | { title, slug, mapPlaces: (.mapPlaces | length) }'`.
+- **Sample calls:** `curl -s "https://saikomaps.vercel.app/api/places/covell" | jq '.data.location | { slug, name, tagline, prl, scenesense }'`; `curl -s "https://saikomaps.vercel.app/api/maps/public/silver-lake-natural-wine" | jq '.data | { title, slug, mapPlaces: (.mapPlaces | length) }'`.

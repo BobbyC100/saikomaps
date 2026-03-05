@@ -23,7 +23,6 @@ interface SeedPlace {
   cuisineType?: string;
   priceLevel?: number;
   description?: string;
-  vibeTags?: string[];
   googlePlaceId?: string;
 }
 
@@ -44,7 +43,6 @@ const SEED_PLACES: SeedPlace[] = [
     priceLevel: 2,
     instagram: 'secolosangeles',
     description: 'Modern Latin American restaurant with natural wine focus.',
-    vibeTags: ['Date Night', 'Lively', 'Cozy'],
   },
   {
     slug: 'budonoki',
@@ -69,7 +67,6 @@ const SEED_PLACES: SeedPlace[] = [
     cuisineType: 'Mexican',
     priceLevel: 1,
     description: 'Tijuana-style tacos with handmade tortillas.',
-    vibeTags: ['Casual', 'Quick Bites'],
   },
   {
     slug: 'redbird-downtown-los-angeles',
@@ -82,7 +79,6 @@ const SEED_PLACES: SeedPlace[] = [
     cuisineType: 'California',
     priceLevel: 3,
     description: 'California cuisine in a converted parish hall.',
-    vibeTags: ['Date Night', 'Special Occasion', 'Patio'],
   },
   {
     slug: 'republique',
@@ -95,7 +91,6 @@ const SEED_PLACES: SeedPlace[] = [
     cuisineType: 'French',
     priceLevel: 3,
     description: 'French bistro and bakery in a historic building.',
-    vibeTags: ['Brunch', 'Bakery', 'Date Night'],
   },
 ];
 
@@ -120,7 +115,6 @@ async function seedPlace(place: SeedPlace) {
         cuisineType: place.cuisineType || null,
         priceLevel: place.priceLevel || null,
         description: place.description || null,
-        vibeTags: place.vibeTags || [],
         googlePlaceId: place.googlePlaceId || null,
         hours: null,
         googlePhotos: null,
@@ -158,7 +152,6 @@ async function seedPlace(place: SeedPlace) {
         cuisineType: place.cuisineType || null,
         priceLevel: place.priceLevel || null,
         description: place.description || null,
-        vibeTags: place.vibeTags || [],
         updatedAt: new Date(),
       },
     });

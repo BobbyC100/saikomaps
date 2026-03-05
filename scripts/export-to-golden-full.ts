@@ -55,7 +55,6 @@ async function exportPlacesToGoldenRecords() {
           neighborhood: place.neighborhood,
           address_street: place.address,
           description: place.description,
-          vibe_tags: place.vibe_tags,
           price_level: place.price_level,
           updated_at: new Date(),
         }

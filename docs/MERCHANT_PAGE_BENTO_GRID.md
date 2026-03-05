@@ -405,7 +405,7 @@ interface LocationData {
   description: string | null;        // Best For
   curatorNote: string | null;        // Curator's Note
   curatorCreatorName: string | null;
-  vibeTags: string[] | null;         // Vibe tags
+  vibeWords: string[] | null;        // Vibe words (from identity_signals.vibe_words via SceneSense)
   tips: string[] | null;             // Tips list
   tagline: string | null;            // Tagline (appears under name)
   
@@ -463,16 +463,16 @@ await prisma.place.update({
 });
 ```
 
-### Adding Vibe Tags
+### Vibe Words (via SceneSense)
+
+> **Note:** `vibeTags` on `entities` has been removed. Vibe signals now live in
+> `golden_records.identity_signals.vibe_words` and are surfaced via SceneSense.
+> Do not write vibe labels directly to entities.
 
 ```typescript
-// In your API or data pipeline
-await prisma.place.update({
-  where: { id: placeId },
-  data: {
-    vibeTags: ['Low-key', 'Surf crowd', 'Standing room']
-  }
-});
+// vibe_words are derived from identity_signals — read them, don't write them
+// derived from identity_signals.vibe_words
+const vibeWords = scenesense?.vibe_words ?? [];
 ```
 
 ### Adding Tips

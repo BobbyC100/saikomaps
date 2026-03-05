@@ -34,7 +34,7 @@ The **Merchant Page Bento Grid Layout** has been fully implemented with enhanced
 
 **New Fields Added to `Place` Model:**
 ```prisma
-vibeTags  String[] @map("vibe_tags") @default([])  // ["Low-key", "Surf crowd", "Standing room"]
+// vibeTags removed from entities — deprecated; vibe signals now in golden_records.identity_signals.vibe_words
 tips      String[] @default([])                     // ["Go early for a seat", "Cash only"]
 ```
 
@@ -52,7 +52,7 @@ Now returns:
   "data": {
     "location": {
       ...
-      "vibeTags": ["Low-key", "Surf crowd", "Standing room"],
+      // "vibeTags" removed — derived from identity_signals.vibe_words
       "tips": ["Go early for a seat", "Cash only", "Try the flat white"]
     }
   }
@@ -198,7 +198,7 @@ Helpful tips are practical, specific, and actionable:
 
 ### Data Testing
 
-- [ ] API returns `vibeTags` array
+- [x] ~~API returns `vibeTags` array~~ — **Deprecated**; field removed from entities and API
 - [ ] API returns `tips` array
 - [ ] Empty arrays don't break layout
 - [ ] Null values handled gracefully

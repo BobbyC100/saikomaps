@@ -109,7 +109,6 @@ type PlaceWithSources = {
   primary_vertical: string;
   tagline: string | null;
   description: string | null;
-  vibeTags: string[];
   thematicTags: string[];
   contextualConnection: string | null;
   curatorAttribution: string | null;
@@ -137,13 +136,10 @@ function deriveThematicTags(p: PlaceWithSources, placePersonality: string | null
   const personalityTag = personalityToTag(placePersonality);
   if (personalityTag) raw.push(personalityTag);
 
-  // 2. vibeTags (already thematic)
-  for (const v of p.vibeTags || []) raw.push(v);
-
-  // 3. curator descriptor words
+  // 2. curator descriptor words
   for (const w of extractTagsFromText(curatorDescriptor ?? '', 3)) raw.push(w);
 
-  // 4. first source excerpt words
+  // 3. first source excerpt words
   const excerpt = getFirstExcerpt(p.editorialSources);
   for (const w of extractTagsFromText(excerpt ?? '', 3)) raw.push(w);
 
@@ -302,7 +298,6 @@ async function main(): Promise<void> {
       primary_vertical: true,
       tagline: true,
       description: true,
-      vibeTags: true,
       thematicTags: true,
       contextualConnection: true,
       curatorAttribution: true,

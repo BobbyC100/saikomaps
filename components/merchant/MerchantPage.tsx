@@ -10,7 +10,6 @@ import { HeroHeader } from './HeroHeader';
 import { PrimaryActionSet } from './PrimaryActionSet';
 import { InstagramConfidenceRow } from './InstagramConfidenceRow';
 import { PhotoCollage } from './PhotoCollage';
-import { VibeTagsRow } from './VibeTagsRow';
 import { TrustBlock } from './TrustBlock';
 import { HoursCard } from './HoursCard';
 import { AddressCard } from './AddressCard';
@@ -25,19 +24,18 @@ interface MerchantPageProps {
 
 /**
  * LOCKED TIER ORDER (DO NOT REORDER):
- * 
+ *
  * 1. HeroHeader
  * 2. PrimaryActionSet
  * 3. InstagramConfidenceRow (conditional)
  * 4. PhotoCollage (conditional)
- * 5. VibeTagsRow (conditional)
- * 6. TrustBlock (conditional)
- * 7. HoursCard (ALWAYS)
- * 8. AddressCard (conditional)
- * 9. MapTile (conditional)
- * 10. AttributesCard (conditional)
- * 11. AlsoOnLists (conditional)
- * 12. HouseCard (conditional, Tier 5)
+ * 5. TrustBlock (conditional)
+ * 6. HoursCard (ALWAYS)
+ * 7. AddressCard (conditional)
+ * 8. MapTile (conditional)
+ * 9. AttributesCard (conditional)
+ * 10. AlsoOnLists (conditional)
+ * 11. HouseCard (conditional, Tier 5)
  */
 export function MerchantPage({ merchant }: MerchantPageProps) {
   return (
@@ -72,10 +70,6 @@ export function MerchantPage({ merchant }: MerchantPageProps) {
           photos={merchant.photos}
           heroPhotoId={merchant.heroPhoto.id}
         />
-      )}
-
-      {merchant.vibeTags && merchant.vibeTags.length > 0 && (
-        <VibeTagsRow tags={merchant.vibeTags} />
       )}
 
       {/* Tier 2: Editorial + Context */}

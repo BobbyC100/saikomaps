@@ -18,7 +18,6 @@ async function analyzeEnrichmentStatus() {
       tagline: true,
       taglineGenerated: true,
       taglinePattern: true,
-      vibeTags: true,
       tips: true,
       pullQuote: true,
       mapPlaces: {
@@ -37,7 +36,6 @@ async function analyzeEnrichmentStatus() {
   let hasNeighborhood = 0;
   let hasCuisineType = 0;
   let hasTagline = 0;
-  let hasVibeTags = 0;
   let hasTips = 0;
   let hasPullQuote = 0;
   let fullyEnriched = 0;
@@ -58,7 +56,6 @@ async function analyzeEnrichmentStatus() {
     const hasNH = !!place.neighborhood;
     const hasCT = !!place.cuisineType;
     const hasTL = !!place.tagline;
-    const hasVT = place.vibeTags.length > 0;
     const hasTI = place.tips.length > 0;
     const hasPQ = !!place.pullQuote;
 
@@ -68,12 +65,11 @@ async function analyzeEnrichmentStatus() {
     if (hasNH) hasNeighborhood++;
     if (hasCT) hasCuisineType++;
     if (hasTL) hasTagline++;
-    if (hasVT) hasVibeTags++;
     if (hasTI) hasTips++;
     if (hasPQ) hasPullQuote++;
 
     // Categorize
-    const voiceEnriched = hasTL || hasVT || hasTI || hasPQ;
+    const voiceEnriched = hasTL || hasTI || hasPQ;
     const googleEnriched = hasGPID && hasGPhotos;
 
     if (googleEnriched && voiceEnriched) {
@@ -101,7 +97,6 @@ async function analyzeEnrichmentStatus() {
   console.log('');
   console.log('🎤 Voice Engine Enrichment:');
   console.log(`Tagline:                         ${hasTagline} (${Math.round(hasTagline * 100 / places.length)}%)`);
-  console.log(`Vibe Tags:                       ${hasVibeTags} (${Math.round(hasVibeTags * 100 / places.length)}%)`);
   console.log(`Tips:                            ${hasTips} (${Math.round(hasTips * 100 / places.length)}%)`);
   console.log(`Pull Quote:                      ${hasPullQuote} (${Math.round(hasPullQuote * 100 / places.length)}%)`);
   console.log('');
@@ -121,7 +116,7 @@ async function analyzeEnrichmentStatus() {
   console.log('\n🎤 Places with Voice Engine Research:\n');
 
   const voiceEnrichedPlaces = places.filter(p => 
-    p.tagline || p.vibeTags.length > 0 || p.tips.length > 0 || p.pullQuote
+    p.tagline || p.tips.length > 0 || p.pullQuote
   ).sort((a, b) => (b.taglineGenerated?.getTime() || 0) - (a.taglineGenerated?.getTime() || 0));
 
   if (voiceEnrichedPlaces.length > 0) {
@@ -130,7 +125,6 @@ async function analyzeEnrichmentStatus() {
     voiceEnrichedPlaces.slice(0, 20).forEach((place) => {
       const enrichments = [];
       if (place.tagline) enrichments.push(`tagline: "${place.tagline.substring(0, 40)}..."`);
-      if (place.vibeTags.length > 0) enrichments.push(`vibeTags: ${place.vibeTags.length}`);
       if (place.tips.length > 0) enrichments.push(`tips: ${place.tips.length}`);
       if (place.pullQuote) enrichments.push('pull quote');
       
@@ -159,7 +153,7 @@ async function analyzeEnrichmentStatus() {
   );
 
   const needsVoiceEngine = places.filter(p => 
-    !p.tagline && p.vibeTags.length === 0 && p.tips.length === 0
+    !p.tagline && p.tips.length === 0 && !p.pullQuote
   ).filter(p => p.mapPlaces.length > 0); // Only places used in maps
 
   console.log(`📸 Need Google Places enrichment:  ${needsGoogle.length} places`);

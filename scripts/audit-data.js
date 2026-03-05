@@ -11,7 +11,7 @@
  *   node scripts/audit-data.js --complete      # Show places with complete data
  * 
  * Available fields:
- *   instagram, phone, website, pullQuote, curatorNote, vibeTags, 
+ *   instagram, phone, website, pullQuote, curatorNote,
  *   sources, restaurantGroup, priceLevel
  */
 
@@ -56,12 +56,6 @@ const FIELDS = {
       if (place.mapPlaces?.some(mp => mp.descriptor)) return '✓ Has note';
       return '—';
     },
-  },
-  vibeTags: {
-    name: 'Vibe Tags',
-    check: (place) => !place.vibeTags || place.vibeTags.length === 0,
-    importance: 'low',
-    display: (place) => place.vibeTags?.length ? `${place.vibeTags.length} tags` : '—',
   },
   sources: {
     name: 'Editorial Sources',
@@ -158,7 +152,6 @@ async function showSummary() {
       phone: true,
       website: true,
       pullQuote: true,
-      vibeTags: true,
       sources: true,
       priceLevel: true,
       restaurantGroupId: true,
@@ -230,7 +223,6 @@ async function showComplete() {
       phone: true,
       website: true,
       pullQuote: true,
-      vibeTags: true,
       sources: true,
       priceLevel: true,
       mapPlaces: { select: { descriptor: true } },

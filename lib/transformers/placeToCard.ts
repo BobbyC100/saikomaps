@@ -6,10 +6,6 @@
  */
 
 import { PlaceCardData, Signal, SignalType, SignalStatus } from '@/components/search-results/types';
-import {
-  sortVibeTagsByPriority,
-  CARD_TAG_LIMIT,
-} from '@/lib/config/vibe-tags';
 
 // Prisma Place type (partial - only fields we need for cards)
 interface PrismaPlace {
@@ -23,7 +19,6 @@ interface PrismaPlace {
   googlePhotos: any; // JSON field
   hours: any; // JSON field
   sources: any; // JSON field (editorial sources)
-  vibeTags: string[];
   latitude: any;
   longitude: any;
   placePersonality?: string | null;
@@ -255,10 +250,6 @@ export function transformPlaceToCardData(
     signals: extractSignals(place.sources),
     coverageQuote,
     coverageSource,
-    vibeTags:
-      place.vibeTags && place.vibeTags.length > 0
-        ? sortVibeTagsByPriority(place.vibeTags).slice(0, CARD_TAG_LIMIT)
-        : undefined,
     distanceMiles,
     placePersonality: place.placePersonality as any,
     

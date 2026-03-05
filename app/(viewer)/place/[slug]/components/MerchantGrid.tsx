@@ -29,7 +29,6 @@ export interface MerchantGridLocation {
   tagline?: string | null;
   description?: string | null;
   photoUrls?: string[] | null;
-  vibeTags?: string[] | null;
   prl?: number;
   scenesense?: {
     vibe: string[];
@@ -80,12 +79,9 @@ export function MerchantGrid({ location, onOpenGallery }: MerchantGridProps) {
   const { isOpen } = parseHours(location.hours);
 
   const hasSceneSense = (location.prl ?? 0) >= 3 && location.scenesense != null;
-  const hasLegacyVibes =
-    !hasSceneSense && (location.vibeTags?.length ?? 0) > 0;
   const hasExperience =
     (location.photoUrls?.length ?? 0) >= 1 ||
     hasSceneSense ||
-    hasLegacyVibes ||
     !!location.curatorNote?.trim() ||
     !!location.pullQuote?.trim();
 
@@ -123,7 +119,6 @@ export function MerchantGrid({ location, onOpenGallery }: MerchantGridProps) {
       >
         <ExperienceCell
           photoUrls={location.photoUrls}
-          vibeTags={hasLegacyVibes ? location.vibeTags : null}
           scenesense={hasSceneSense ? location.scenesense! : null}
           curatorNote={location.curatorNote}
           pullQuote={location.pullQuote}

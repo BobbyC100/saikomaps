@@ -143,17 +143,13 @@ async function fetchPlaceIdToGolden(
 // ---------------------------------------------------------------------------
 // Idempotency: check if place already has tag signals
 // ---------------------------------------------------------------------------
+// vibe_tags removed from entities; tag signal truth is energy_scores + place_tag_scores only
 async function hasTagSignals(placeId: string): Promise<boolean> {
-  const [energyCount, tagCount, place] = await Promise.all([
+  const [energyCount, tagCount] = await Promise.all([
     db.energy_scores.count({ where: { entityId: placeId, version: ENERGY_VERSION } }),
     db.place_tag_scores.count({ where: { entityId: placeId, version: TAG_VERSION } }),
-    db.entities.findUnique({
-      where: { id: placeId },
-      select: { vibeTags: true },
-    }),
   ]);
-  const hasVibeTags = (place?.vibeTags?.length ?? 0) > 0;
-  return energyCount > 0 || tagCount > 0 || hasVibeTags;
+  return energyCount > 0 || tagCount > 0;
 }
 
 // ---------------------------------------------------------------------------

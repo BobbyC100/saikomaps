@@ -3,12 +3,7 @@
 import { useState } from 'react';
 import { GalleryCard } from '@/components/merchant/GalleryCard';
 import { GalleryLightbox } from '@/components/merchant/GalleryLightbox';
-import { VibeCard } from '@/components/merchant/VibeCard';
 import { SceneSenseCard } from '@/components/merchant/SceneSenseCard';
-import {
-  sortVibeTagsByPriority,
-  PLACE_PAGE_TAG_LIMIT,
-} from '@/lib/config/vibe-tags';
 
 interface SceneSenseOutput {
   vibe: string[];
@@ -19,7 +14,6 @@ interface SceneSenseOutput {
 
 interface ExperienceCellProps {
   photoUrls?: string[] | null;
-  vibeTags?: string[] | null;
   scenesense?: SceneSenseOutput | null;
   curatorNote?: string | null;
   pullQuote?: string | null;
@@ -31,7 +25,6 @@ const CURATOR_MAX = 250;
 
 export function ExperienceCell({
   photoUrls,
-  vibeTags,
   scenesense,
   curatorNote,
   pullQuote,
@@ -48,21 +41,16 @@ export function ExperienceCell({
   });
 
   const galleryPhotos = (photoUrls?.length ?? 0) > 0 ? photoUrls! : [];
-  const displayVibeTags =
-    vibeTags && vibeTags.length > 0
-      ? sortVibeTagsByPriority(vibeTags).slice(0, PLACE_PAGE_TAG_LIMIT)
-      : [];
   const hasSceneSense = scenesense != null && (
     scenesense.vibe.length > 0 ||
     scenesense.atmosphere.length > 0 ||
     scenesense.ambiance.length > 0 ||
     scenesense.scene.length > 0
   );
-  const hasLegacyVibes = !hasSceneSense && displayVibeTags.length > 0;
   const hasCurator = !!curatorNote?.trim();
   const hasPullQuote = !!pullQuote?.trim();
 
-  if (!galleryPhotos.length && !hasSceneSense && !hasLegacyVibes && !hasCurator && !hasPullQuote) {
+  if (!galleryPhotos.length && !hasSceneSense && !hasCurator && !hasPullQuote) {
     return null;
   }
 
@@ -94,7 +82,6 @@ export function ExperienceCell({
       )}
 
       {hasSceneSense && <SceneSenseCard scenesense={scenesense!} span={6} />}
-      {hasLegacyVibes && <VibeCard vibeTags={displayVibeTags} span={6} />}
 
       {hasCurator && (
         <div>

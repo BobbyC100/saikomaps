@@ -83,7 +83,6 @@ export async function GET(
         hours: true,
         googlePlaceId: true,
         editorialSources: true,
-        vibeTags: true,
         tips: true,
         tagline: true,
         pullQuote: true,
@@ -212,7 +211,6 @@ export async function GET(
               google_places_attributes: true,
               identity_signals: true,
               place_personality: true,
-              vibe_tags: true,
               cuisine_posture: true,
               service_model: true,
               price_tier: true,
@@ -292,16 +290,13 @@ export async function GET(
     const scenesenseResult = placeForPRL
       ? assembleSceneSenseFromMaterialized({
           placeForPRL,
-          vibeTags: place.vibeTags,
           neighborhood: place.neighborhood,
           category: place.category ?? place.category_rel?.slug ?? null,
           identitySignals: identitySignals
             ? {
                 place_personality:
                   goldenRecord?.place_personality ?? identitySignals.place_personality ?? null,
-                vibe_words:
-                  identitySignals.vibe_words ??
-                  (Array.isArray(goldenRecord?.vibe_tags) ? goldenRecord.vibe_tags : []),
+                vibe_words: identitySignals.vibe_words ?? [],
                 signature_dishes: identitySignals.signature_dishes ?? [],
               }
             : null,
@@ -353,7 +348,7 @@ export async function GET(
           curatorNote,
           curatorCreatorName,
           sources: place.editorialSources || [],
-          vibeTags: place.vibeTags ?? [],
+          vibeWords: identitySignals?.vibe_words ?? [],
           prl: scenesenseResult.prl,
           scenesense: scenesenseResult.scenesense,
           tips: place.tips ?? [],

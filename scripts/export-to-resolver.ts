@@ -60,7 +60,6 @@ interface PlaceExport {
   pull_quote: string | null;
   pull_quote_source: string | null;
   pull_quote_url: string | null;
-  vibe_tags: string[];
   address: string | null;
 }
 
@@ -94,7 +93,6 @@ async function main() {
       pull_quote: true,
       pull_quote_source: true,
       pull_quote_url: true,
-      vibe_tags: true,
       address: true,
     },
     orderBy: { name: 'asc' },
@@ -193,7 +191,6 @@ async function exportPlace(place: PlaceExport) {
     pull_quote: place.pull_quote,
     pull_quote_source: place.pull_quote_source,
     pull_quote_url: place.pull_quote_url,
-    vibe_tags: place.vibe_tags,
     address_street: place.address,
     slug: place.slug,
   };

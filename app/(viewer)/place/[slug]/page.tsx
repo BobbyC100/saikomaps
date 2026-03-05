@@ -7,6 +7,7 @@ import { GlobalHeader } from '@/components/layouts/GlobalHeader';
 import { GlobalFooter } from '@/components/layouts/GlobalFooter';
 import { GalleryLightbox } from '@/components/merchant/GalleryLightbox';
 import { parseHours } from './lib/parseHours';
+import { renderLocation } from '@/lib/voice/saiko';
 import './place.css';
 
 interface EditorialSource {
@@ -42,7 +43,7 @@ interface LocationData {
   curatorNote?: string | null;
   curatorCreatorName?: string | null;
   sources?: EditorialSource[];
-  vibeTags?: string[] | null;
+  vibeWords?: string[] | null;
   prl?: number;
   scenesense?: {
     vibe: string[];
@@ -76,6 +77,7 @@ interface LocationData {
   placeType?: 'venue' | 'activity' | 'public';
   categorySlug?: string | null;
   marketSchedule?: unknown;
+  coverageSources?: { sourceName: string; url: string; excerpt?: string | null; publishedAt?: string | null }[];
   recognitions?: { name: string; source?: string; year?: string }[] | null;
   appearancesAsSubject?: {
     id: string;
@@ -146,6 +148,17 @@ function buildLedgerEntries(location: LocationData, appearsOnCount: number): { s
   if (location.pullQuote) {
     const src = [location.pullQuoteSource, location.pullQuoteAuthor].filter(Boolean).join(' — ') || 'Editorial';
     groups.push({ section: 'quote', entries: [{ source: src, role: 'Quote' }] });
+  }
+  const coverage = location.coverageSources ?? [];
+  if (coverage.length > 0) {
+    groups.push({
+      section: 'coverage',
+      entries: coverage.slice(0, LEDGER_CAP_PER_GROUP).map((cs) => ({
+        source: cs.sourceName,
+        role: 'Coverage',
+        date: cs.publishedAt ? new Date(cs.publishedAt).getFullYear().toString() : undefined,
+      })),
+    });
   }
   const recs = location.recognitions ?? [];
   if (recs.length > 0) {
@@ -373,41 +386,20 @@ export default function PlacePage() {
   const rawPhotoUrls = location.photoUrls ?? (location.photoUrl ? [location.photoUrl] : []);
   const validPhotos = rawPhotoUrls.filter((url) => url && !failedPhotos.has(url));
 
-  const { isOpen, statusText, today, openNowExplicit } = parseHours(location.hours);
-  const signalsList = location.vibeTags ?? [];
-
-  // Signal → Language: identity subline
-  const verticalLower = location.category?.toLowerCase() ?? null;
-  const identitySubline = [location.neighborhood, verticalLower].filter(Boolean).join(' ');
-
-  // Signal → Language: energy phrase from vibeTags
-  const VIBE_PHRASES: Record<string, string> = {
-    'Lively': 'lively',
-    'Cozy': 'cozy room',
-    'Intimate': 'intimate room',
-    'Chill': 'laid-back feel',
-    'Energetic': 'high-energy room',
-    'Romantic': 'romantic atmosphere',
-    'Date Night': 'strong date-night energy',
-    'Late Night': 'late-night energy',
-    'Casual': 'casual energy',
-    'Upscale': 'refined atmosphere',
-  };
-  const energyFragments = signalsList
-    .map((tag) => VIBE_PHRASES[tag])
-    .filter(Boolean);
-  const energyPhrase = energyFragments.length > 0 ? energyFragments.join(', ') : null;
+  const { isOpen, openNowExplicit } = parseHours(location.hours);
 
   const openStateLabel = openNowExplicit && isOpen !== null
     ? (isOpen ? 'Open now' : 'Closed now')
     : null;
 
+  const identitySubline = renderLocation({ neighborhood: location.neighborhood, category: location.category });
+  // Energy phrase: first sentence from scenesense.vibe (already assembled by the API)
+  const energyPhrase = location.scenesense?.vibe?.[0] ?? null;
   const hasSignalsSentence = !!(openStateLabel || energyPhrase);
   const mapRefUrl = buildMapRefUrl(location.googlePlaceId, location.latitude, location.longitude, location.address);
   const recognitions = (location.recognitions ?? []).slice(0, RECOGNITIONS_CAP);
   const ledgerGroups = buildLedgerEntries(location, appearsOn.length);
 
-  const statusLabel = openNowExplicit && isOpen !== null ? (isOpen ? 'Open' : 'Closed') : null;
   const hasActions = mapRefUrl || location.reservationUrl || location.website || location.instagram;
 
   return (
@@ -510,12 +502,6 @@ export default function PlacePage() {
               </div>
 
               <aside id="rail-column">
-                {signalsList.length > 0 && (
-                  <div className="rail-block">
-                    <strong>Signals</strong>
-                    <p style={{ margin: '4px 0 0' }}>{signalsList.join(' · ')}</p>
-                  </div>
-                )}
                 {appearsOn.length > 0 && (
                   <div className="rail-block">
                     <strong>Record</strong>
@@ -579,6 +565,32 @@ export default function PlacePage() {
                     </svg>
                   </a>
                 </blockquote>
+              )}
+              {location.coverageSources && location.coverageSources.length > 0 && (
+                <>
+                  {location.pullQuote && <hr />}
+                  <section id="coverage" className="editorial-block section-with-reference">
+                    <h2>Coverage</h2>
+                    <ul id="coverage-list">
+                      {location.coverageSources.map((cs) => (
+                        <li key={cs.url}>
+                          <a href={cs.url} target="_blank" rel="noopener noreferrer">
+                            {cs.sourceName} <span className="action-arrow">↗</span>
+                          </a>
+                          {cs.excerpt && <p className="coverage-excerpt">{cs.excerpt}</p>}
+                        </li>
+                      ))}
+                    </ul>
+                    <a href="#ledger-coverage" className="section-reference" aria-label="Source">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.7">
+                        <circle cx="12" cy="12" r="9" />
+                        <path d="M3 12h18" />
+                        <path d="M12 3a15 15 0 0 1 0 18" />
+                        <path d="M12 3a15 15 0 0 0 0 18" />
+                      </svg>
+                    </a>
+                  </section>
+                </>
               )}
             </div>
 

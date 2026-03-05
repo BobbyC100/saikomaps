@@ -4,7 +4,8 @@
  * Read-only. Deterministic.
  *
  * Resilient: if optional tables (place_photo_eval, energy_scores, place_tag_scores)
- * do not exist, falls back to minimal query using only core tables + vibeTags bridge.
+ * do not exist, falls back to minimal query using only core tables.
+ * Tag signals now derived from golden_records.identity_signals.vibe_words.
  */
 
 import { db } from '@/lib/db';
@@ -34,7 +35,6 @@ const MINIMAL_PLACE_SELECT = {
   editorialSources: true,
   pullQuote: true,
   pullQuoteSource: true,
-  vibeTags: true,
   googlePhotos: true,
   googlePlacesAttributes: true,
   prlOverride: true,
@@ -76,7 +76,6 @@ async function fetchPlaceForPRLBySlugFull(
       pullQuoteSource: true,
       tagline: true,
       tips: true,
-      vibeTags: true,
       googlePhotos: true,
       status: true,
       prlOverride: true,
@@ -132,8 +131,6 @@ async function fetchPlaceForPRLBySlugFull(
       : null;
 
   const hasTagScores = place._count.place_tag_scores > 0;
-  const hasLegacyVibeTags = (place.vibeTags?.length ?? 0) > 0;
-  const hasTagSignals = hasTagScores || hasLegacyVibeTags; // v1 bridge
 
   const editorialArr = place.editorialSources as unknown[] | null;
   const hasEditorialSources = (editorialArr?.length ?? 0) > 0;
@@ -143,18 +140,23 @@ async function fetchPlaceForPRLBySlugFull(
     hasEditorialSources || hasPullQuote || hasPullQuoteSource;
 
   let fieldsMembershipCount = 0;
+  let hasVibeWords = false;
   const gpid = place.googlePlaceId;
   if (gpid) {
     const gr = await db.golden_records.findFirst({
       where: { google_place_id: gpid },
-      select: { canonical_id: true },
+      select: { canonical_id: true, identity_signals: true },
     });
     if (gr) {
+      const identSig = gr.identity_signals as Record<string, unknown> | null;
+      hasVibeWords = Array.isArray(identSig?.vibe_words) && (identSig!.vibe_words as string[]).length > 0;
       fieldsMembershipCount = await db.fieldsMembership.count({
         where: { entityId: gr.canonical_id, removedAt: null },
       });
     }
   }
+
+  const hasTagSignals = hasTagScores || hasVibeWords;
 
   const businessStatus =
     (place.googlePlacesAttributes as Record<string, string> | null)
@@ -181,7 +183,7 @@ async function fetchPlaceForPRLBySlugFull(
     energyScore,
     hasTagSignals,
     hasFormality: false,
-    hasIdentitySignals: false,
+    hasIdentitySignals: hasVibeWords,
     hasTemporalSignals: false,
     fieldsMembershipCount,
     appearsOnCount: mapPlacesPublished,
@@ -192,7 +194,7 @@ async function fetchPlaceForPRLBySlugFull(
   return result;
 }
 
-/** Minimal fetch when optional tables (place_photo_eval, etc.) are missing. Uses vibeTags bridge. */
+/** Minimal fetch when optional tables (place_photo_eval, etc.) are missing. */
 async function fetchPlaceForPRLBySlugMinimal(
   slug: string
 ): Promise<(PlaceForPRL & { prlOverride: number | null }) | null> {
@@ -218,14 +220,17 @@ async function fetchPlaceForPRLBySlugMinimal(
   } catch {
     /* skip */
   }
+  let hasVibeWordsMinimal = false;
   const gpid = place.googlePlaceId;
   if (gpid) {
     try {
       const gr = await db.golden_records.findFirst({
         where: { google_place_id: gpid },
-        select: { canonical_id: true },
+        select: { canonical_id: true, identity_signals: true },
       });
       if (gr) {
+        const identSig = gr.identity_signals as Record<string, unknown> | null;
+        hasVibeWordsMinimal = Array.isArray(identSig?.vibe_words) && (identSig!.vibe_words as string[]).length > 0;
         fieldsMembershipCount = await db.fieldsMembership.count({
           where: { entityId: gr.canonical_id, removedAt: null },
         });
@@ -239,7 +244,6 @@ async function fetchPlaceForPRLBySlugMinimal(
     place.category ?? (place.category_rel?.slug as string | null) ?? null;
   const googlePhotosArr = place.googlePhotos as unknown[] | null;
   const googlePhotosCount = Array.isArray(googlePhotosArr) ? googlePhotosArr.length : 0;
-  const hasLegacyVibeTags = (place.vibeTags?.length ?? 0) > 0;
   const editorialArr = place.editorialSources as unknown[] | null;
   const hasEditorialSources = (editorialArr?.length ?? 0) > 0;
   const hasPullQuote = !!(place.pullQuote?.trim());
@@ -266,9 +270,9 @@ async function fetchPlaceForPRLBySlugMinimal(
     description: place.description,
     curatorNote,
     energyScore: null,
-    hasTagSignals: hasLegacyVibeTags, // v1 bridge: vibeTags only when optional tables missing
+    hasTagSignals: hasVibeWordsMinimal,
     hasFormality: false,
-    hasIdentitySignals: false,
+    hasIdentitySignals: hasVibeWordsMinimal,
     hasTemporalSignals: false,
     fieldsMembershipCount,
     appearsOnCount: mapPlacesPublished,
@@ -344,7 +348,6 @@ async function fetchPlaceForPRLBatchFull(args?: {
       pullQuoteSource: true,
       tagline: true,
       tips: true,
-      vibeTags: true,
       googlePhotos: true,
       googlePlacesAttributes: true,
       prlOverride: true,
@@ -382,7 +385,7 @@ async function fetchPlaceForPRLBatchFull(args?: {
     gpids.length > 0
       ? db.golden_records.findMany({
           where: { google_place_id: { in: gpids } },
-          select: { google_place_id: true, canonical_id: true },
+          select: { google_place_id: true, canonical_id: true, identity_signals: true },
         })
       : Promise.resolve([]),
   ]);
@@ -390,8 +393,22 @@ async function fetchPlaceForPRLBatchFull(args?: {
   const mapCountByPlace = new Map(
     mapCounts.map((m) => [m.entityId, m._count.id])
   );
-  const canonicalIdByGpid = new Map(
-    goldenRecs.map((g) => [g.google_place_id, g.canonical_id])
+  const     canonicalIdByGpid = new Map(
+      goldenRecs.map((g) => [g.google_place_id, g.canonical_id])
+    );
+    vibeWordsByGpidMinimal = new Map(
+      goldenRecs.map((g) => {
+        const sig = g.identity_signals as Record<string, unknown> | null;
+        const hasWords = Array.isArray(sig?.vibe_words) && (sig!.vibe_words as string[]).length > 0;
+        return [g.google_place_id, hasWords];
+      })
+    );
+  const vibeWordsByGpid = new Map(
+    goldenRecs.map((g) => {
+      const sig = g.identity_signals as Record<string, unknown> | null;
+      const hasWords = Array.isArray(sig?.vibe_words) && (sig!.vibe_words as string[]).length > 0;
+      return [g.google_place_id, hasWords];
+    })
   );
 
   const curatorNotes = await Promise.all(
@@ -433,8 +450,8 @@ async function fetchPlaceForPRLBatchFull(args?: {
         : null;
 
     const hasTagScores = place._count.place_tag_scores > 0;
-    const hasLegacyVibeTags = (place.vibeTags?.length ?? 0) > 0;
-    const hasTagSignals = hasTagScores || hasLegacyVibeTags; // v1 bridge
+    const hasVibeWordsBatch = vibeWordsByGpid.get(place.googlePlaceId ?? '') ?? false;
+    const hasTagSignals = hasTagScores || hasVibeWordsBatch;
 
     const editorialArr = place.editorialSources as unknown[] | null;
     const hasEditorialSources = (editorialArr?.length ?? 0) > 0;
@@ -469,7 +486,7 @@ async function fetchPlaceForPRLBatchFull(args?: {
       energyScore,
       hasTagSignals,
       hasFormality: false,
-      hasIdentitySignals: false,
+      hasIdentitySignals: hasVibeWordsBatch,
       hasTemporalSignals: false,
       fieldsMembershipCount:
         fieldsCountByCid.get(
@@ -483,7 +500,7 @@ async function fetchPlaceForPRLBatchFull(args?: {
   });
 }
 
-/** Minimal batch when optional tables are missing. Uses vibeTags bridge only. */
+/** Minimal batch when optional tables are missing. */
 async function fetchPlaceForPRLBatchMinimal(args?: {
   limit?: number;
   laOnly?: boolean;
@@ -506,6 +523,7 @@ async function fetchPlaceForPRLBatchMinimal(args?: {
 
   let mapCountByPlace = new Map<string, number>();
   let canonicalIdByGpid = new Map<string, string>();
+  let vibeWordsByGpidMinimal = new Map<string, boolean>();
   let fieldsCountByCid = new Map<string, number>();
   const curatorNoteByPlace = new Map<string, string | null>();
 
@@ -519,7 +537,7 @@ async function fetchPlaceForPRLBatchMinimal(args?: {
       gpids.length > 0
         ? db.golden_records.findMany({
             where: { google_place_id: { in: gpids } },
-            select: { google_place_id: true, canonical_id: true },
+            select: { google_place_id: true, canonical_id: true, identity_signals: true },
           })
         : Promise.resolve([]),
     ]);
@@ -563,7 +581,7 @@ async function fetchPlaceForPRLBatchMinimal(args?: {
     const googlePhotosCount = Array.isArray(googlePhotosArr)
       ? googlePhotosArr.length
       : 0;
-    const hasLegacyVibeTags = (place.vibeTags?.length ?? 0) > 0;
+    const hasVibeWordsBatchMinimal = vibeWordsByGpidMinimal.get(place.googlePlaceId ?? '') ?? false;
     const editorialArr = place.editorialSources as unknown[] | null;
     const hasEditorialSources = (editorialArr?.length ?? 0) > 0;
     const hasPullQuote = !!(place.pullQuote?.trim());
@@ -593,9 +611,9 @@ async function fetchPlaceForPRLBatchMinimal(args?: {
       description: place.description,
       curatorNote: curatorNoteByPlace.get(place.id) ?? null,
       energyScore: null,
-      hasTagSignals: hasLegacyVibeTags, // v1 bridge
+      hasTagSignals: hasVibeWordsBatchMinimal,
       hasFormality: false,
-      hasIdentitySignals: false,
+      hasIdentitySignals: hasVibeWordsBatchMinimal,
       hasTemporalSignals: false,
       fieldsMembershipCount:
         fieldsCountByCid.get(

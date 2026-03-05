@@ -39,7 +39,6 @@ async function main() {
     
     if (!p.tagline) missing.push('tagline')
     if (!p.pullQuote) missing.push('pullQuote')
-    if (!p.vibeTags || p.vibeTags.length === 0) missing.push('vibeTags')
     if (!p.tips || p.tips.length === 0) missing.push('tips')
     if (!p.chefRecs) missing.push('chefRecs')
     if (!p.restaurantGroupId) missing.push('restaurantGroup')
@@ -57,10 +56,6 @@ async function main() {
     
     if (p.pullQuote) {
       console.log(`   ✅ Pull Quote from ${p.pullQuoteSource}`)
-    }
-    
-    if (p.vibeTags && p.vibeTags.length > 0) {
-      console.log(`   ✅ Vibe Tags: ${p.vibeTags.join(', ')}`)
     }
     
     if (p.tips && p.tips.length > 0) {
@@ -84,7 +79,6 @@ async function main() {
     total: list.mapPlaces.length,
     withTagline: 0,
     withPullQuote: 0,
-    withVibeTags: 0,
     withTips: 0,
     withChefRecs: 0,
     withGroup: 0
@@ -94,7 +88,6 @@ async function main() {
     const p = mp.place
     if (p.tagline) stats.withTagline++
     if (p.pullQuote) stats.withPullQuote++
-    if (p.vibeTags && p.vibeTags.length > 0) stats.withVibeTags++
     if (p.tips && p.tips.length > 0) stats.withTips++
     if (p.chefRecs && (p.chefRecs as any[]).length > 0) stats.withChefRecs++
     if (p.restaurantGroupId) stats.withGroup++
@@ -103,7 +96,6 @@ async function main() {
   console.log('\n📊 COVERAGE SUMMARY\n')
   console.log(`Taglines:       ${stats.withTagline}/${stats.total} (${Math.round(stats.withTagline/stats.total*100)}%)`)
   console.log(`Pull Quotes:    ${stats.withPullQuote}/${stats.total} (${Math.round(stats.withPullQuote/stats.total*100)}%)`)
-  console.log(`Vibe Tags:      ${stats.withVibeTags}/${stats.total} (${Math.round(stats.withVibeTags/stats.total*100)}%)`)
   console.log(`Tips:           ${stats.withTips}/${stats.total} (${Math.round(stats.withTips/stats.total*100)}%)`)
   console.log(`Chef Recs:      ${stats.withChefRecs}/${stats.total} (${Math.round(stats.withChefRecs/stats.total*100)}%)`)
   console.log(`Groups:         ${stats.withGroup}/${stats.total} (${Math.round(stats.withGroup/stats.total*100)}%)`)
