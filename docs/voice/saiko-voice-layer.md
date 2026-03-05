@@ -121,3 +121,63 @@ Potential expansions:
 - **Voice tuning** — adjustable tone/formality per vertical or editorial context
 
 The voice layer could eventually become a core Saiko primitive: **Signal → Language** — where structured data powers the experience, but the interface speaks in natural language.
+
+---
+
+## 7. Architectural Boundary (Fields vs TRACES)
+
+The Saiko voice layer is **not** part of the Fields data layer.
+
+Fields stores structured signals and authored content only:
+
+- `primary_vertical`
+- `neighborhood`
+- `vibeTags`
+- `hours`
+- Provenance metadata
+- Confidence values
+
+These values are stored in the database and served by the API without modification.
+
+The voice layer exists only in the **TRACES product layer**. Its responsibility is to convert structured signals into human-readable observations at render time.
+
+```
+Fields (signals)  →  TRACES voice renderer  →  UI sentences
+```
+
+### Renderer properties
+
+- **Pure function** — signals in, text out
+- **Stateless** — no side effects, no database writes
+- **Deterministic** — same inputs always produce same outputs
+- **Cacheable** — output can be cached without being stored as data
+
+### Proposed interface (future extraction)
+
+```typescript
+renderIdentityBlock(signals) → {
+  subline: string | null;
+  sentence: string | null;
+}
+```
+
+Supporting helpers:
+
+- `renderLocation(signals)` — neighborhood + vertical
+- `renderOpenState(hours)` — open/closed phrasing
+- `renderVibe(vibeTags)` — energy phrase assembly
+
+### Why rendering stays out of Fields
+
+- **Different products need different rendering.** TRACES web, mobile, API clients, and voice assistants all want different phrasing from the same signals.
+- **Rendering evolves faster than data.** Changing tone or phrasing should be a template update, not a data migration.
+- **Fields must remain presentation-agnostic.** Third-party consumers should receive raw signals and render them however they want.
+
+### The editorial content exception
+
+Authored text (descriptions, curator notes) **does** belong in Fields — it is data with provenance, not a derived view. The voice layer generates text from signals; it does not store it.
+
+| Layer | Stores | Does not store |
+|---|---|---|
+| Fields | Structured signals, authored content, provenance | Rendered text, presentation logic |
+| TRACES | Rendering templates, phrase maps, cached output | Raw signal data |
