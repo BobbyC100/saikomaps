@@ -21,6 +21,7 @@
 
 import Anthropic from '@anthropic-ai/sdk';
 import { PrismaClient } from '@prisma/client';
+import { writeDerivedSignal } from '../lib/fields-v2/write-claim';
 
 // ============================================================================
 // TYPES
@@ -43,7 +44,7 @@ interface CoreSignals {
 interface ExtendedSignals {
   signature_dishes: string[];
   key_producers: string[];
-  vibe_words: string[];
+  language_signals: string[];
   origin_story_type: 'chef-journey' | 'family-legacy' | 'neighborhood-love' | 'concept-first' | 'partnership' | null;
 }
 
@@ -132,7 +133,7 @@ Return a JSON object with these fields:
   "place_personality": "neighborhood-joint" | "destination" | "chef-driven" | "scene" | "hidden-gem" | "institution" | null,
   "signature_dishes": [],
   "key_producers": [],
-  "vibe_words": [],
+  "language_signals": [],
   "origin_story_type": "chef-journey" | "family-legacy" | "neighborhood-love" | "concept-first" | "partnership" | null,
   "confidence": 0.0
 }
@@ -186,7 +187,7 @@ Rules:
 - null is better than guessing
 - signature_dishes: Max 5, identity-defining items only
 - key_producers: Max 5, wine/spirits producers that signal taste
-- vibe_words: Their words, not yours — adjectives they use about themselves
+- language_signals: Their words, not yours — adjectives they use about themselves
 - confidence: 0.0-1.0, your confidence in the overall extraction quality
 
 Return ONLY the JSON object, no explanation.`;
@@ -287,7 +288,7 @@ function parseExtractionResult(text: string): ExtractionResult | null {
     // Ensure arrays are arrays
     parsed.signature_dishes = Array.isArray(parsed.signature_dishes) ? parsed.signature_dishes : [];
     parsed.key_producers = Array.isArray(parsed.key_producers) ? parsed.key_producers : [];
-    parsed.vibe_words = Array.isArray(parsed.vibe_words) ? parsed.vibe_words : [];
+    parsed.language_signals = Array.isArray(parsed.language_signals) ? parsed.language_signals : [];
     
     return parsed as ExtractionResult;
   } catch (error) {
@@ -347,8 +348,8 @@ async function extractSignals(
       if (result.signature_dishes.length > 0) {
         console.log(`    Signatures: ${result.signature_dishes.join(', ')}`);
       }
-      if (result.vibe_words.length > 0) {
-        console.log(`    Vibe words: ${result.vibe_words.join(', ')}`);
+      if (result.language_signals.length > 0) {
+        console.log(`    Language signals: ${result.language_signals.join(', ')}`);
       }
     }
     
@@ -370,7 +371,7 @@ async function writeSignals(
   const identitySignals = {
     signature_dishes: result.signature_dishes,
     key_producers: result.key_producers,
-    vibe_words: result.vibe_words,
+    language_signals: result.language_signals,
     origin_story_type: result.origin_story_type,
     input_quality: inputQuality,
     extraction_confidence: result.confidence,
@@ -391,6 +392,38 @@ async function writeSignals(
       updated_at: new Date(),
     },
   });
+
+  // Fields v2: write derived_signals in parallel with golden_records (additive, non-fatal)
+  // Lookup entity_id from google_place_id via canonical_entity_state
+  const canonicalState = await prisma.canonical_entity_state.findFirst({
+    where: { google_place_id: { not: null } },
+    select: { entity_id: true },
+  }).catch(() => null);
+
+  if (canonicalState) {
+    const signalVersion = `extract-identity-v${1}`;
+    const signalWrites = [
+      { key: 'cuisine_posture', value: result.cuisine_posture },
+      { key: 'service_model', value: result.service_model },
+      { key: 'price_tier', value: result.price_tier },
+      { key: 'wine_program_intent', value: result.wine_program_intent },
+      { key: 'place_personality', value: result.place_personality },
+      { key: 'identity_signals', value: identitySignals },
+    ] as const;
+
+    for (const { key, value } of signalWrites) {
+      if (value != null) {
+        await writeDerivedSignal(prisma, {
+          entityId: canonicalState.entity_id,
+          signalKey: key,
+          signalValue: value,
+          signalVersion,
+        }).catch((err) => {
+          console.warn(`[Fields v2] derived_signal write failed for ${key}:`, err);
+        });
+      }
+    }
+  }
 }
 
 // ============================================================================

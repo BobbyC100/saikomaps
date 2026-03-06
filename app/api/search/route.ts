@@ -4,8 +4,8 @@ import { getGooglePhotoUrl } from '@/lib/google-places'
 
 const prisma = new PrismaClient()
 
-// Vibe intent: map search concepts → identity_signals.vibe_words equivalents
-const VIBE_INTENT_TERMS = new Set([
+// Energy intent: map search concepts → identity_signals.language_signals equivalents
+const ENERGY_INTENT_TERMS = new Set([
   'date night', 'date-night', 'romantic',
   'cozy', 'chill', 'intimate', 'quiet',
   'lively', 'buzzy', 'energetic', 'electric',
@@ -111,10 +111,10 @@ export async function GET(request: NextRequest) {
   }
 
   const queryLower = query.toLowerCase().trim()
-  const isVibeQuery = VIBE_INTENT_TERMS.has(queryLower);
+  const isEnergyQuery = ENERGY_INTENT_TERMS.has(queryLower);
 
   try {
-    // Search places — vibe-only queries skip name/category matching to avoid noise
+    // Search places — energy-only queries skip name/category matching to avoid noise
     const places = await prisma.entities.findMany({
       where: {
         OR: [
@@ -146,7 +146,7 @@ export async function GET(request: NextRequest) {
       take: 50,
     })
     
-    // Fetch identity signals + menu/winelist status + vibe_words from golden_records
+    // Fetch identity signals + menu/winelist status + language_signals from golden_records
     const googlePlaceIds = places
       .map(p => p.googlePlaceId)
       .filter((id): id is string => id !== null);
@@ -177,7 +177,7 @@ export async function GET(request: NextRequest) {
     // Build map of google_place_id → identity data
     const identityMap = new Map<string, {
       personality: string | null;
-      vibeWords: string[];
+      languageSignals: string[];
       menuSignalsStatus: string | null;
       winelistSignalsStatus: string | null;
       menuPayload: any;
@@ -186,10 +186,10 @@ export async function GET(request: NextRequest) {
     goldenRecords.forEach(record => {
       if (record.google_place_id) {
         const sig = record.identity_signals as Record<string, unknown> | null;
-        const vibeWords = Array.isArray(sig?.vibe_words) ? (sig!.vibe_words as string[]) : [];
+        const languageSignals = Array.isArray(sig?.language_signals) ? (sig!.language_signals as string[]) : [];
         identityMap.set(record.google_place_id, {
           personality: record.place_personality,
-          vibeWords,
+          languageSignals,
           menuSignalsStatus: record.menu_signals?.status || null,
           winelistSignalsStatus: record.winelist_signals?.status || null,
           menuPayload: record.menu_signals?.payload || null,
@@ -225,7 +225,7 @@ export async function GET(request: NextRequest) {
       .map((place) => {
         const nameLower = place.name.toLowerCase()
         const identity = place.googlePlaceId ? identityMap.get(place.googlePlaceId) : null;
-        const vibeWords = identity?.vibeWords ?? [];
+        const languageSignals = identity?.languageSignals ?? [];
         let score = 0
 
         // Exact name match
@@ -245,8 +245,8 @@ export async function GET(request: NextRequest) {
         )
           score = 500
 
-        // Boost for vibe/scene match in identity_signals.vibe_words
-        if (isVibeQuery && vibeWords.some((w) => w.toLowerCase().includes(queryLower) || queryLower.includes(w.toLowerCase()))) {
+        // Boost for energy/scene match in identity_signals.language_signals
+        if (isEnergyQuery && languageSignals.some((w) => w.toLowerCase().includes(queryLower) || queryLower.includes(w.toLowerCase()))) {
           score = Math.max(score, 400);
         }
 

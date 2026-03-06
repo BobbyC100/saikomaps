@@ -7,7 +7,9 @@ import { GlobalHeader } from '@/components/layouts/GlobalHeader';
 import { GlobalFooter } from '@/components/layouts/GlobalFooter';
 import { GalleryLightbox } from '@/components/merchant/GalleryLightbox';
 import { parseHours } from './lib/parseHours';
+import { getOpenStateLabelV2 } from '@/lib/utils/get-open-state-label';
 import { renderLocation } from '@/lib/voice/saiko';
+import { getProfileIdentityLine } from '@/lib/contracts/place-page.identity';
 import './place.css';
 
 interface EditorialSource {
@@ -43,10 +45,8 @@ interface LocationData {
   curatorNote?: string | null;
   curatorCreatorName?: string | null;
   sources?: EditorialSource[];
-  vibeWords?: string[] | null;
   prl?: number;
   scenesense?: {
-    vibe: string[];
     atmosphere: string[];
     ambiance: string[];
     scene: string[];
@@ -63,16 +63,22 @@ interface LocationData {
   pullQuoteUrl?: string | null;
   pullQuoteType?: string | null;
   reservationUrl?: string | null;
+  menuUrl?: string | null;
+  winelistUrl?: string | null;
   offeringSignals?: {
     servesBeer: boolean | null;
     servesWine: boolean | null;
     servesVegetarianFood: boolean | null;
+    servesLunch: boolean | null;
+    servesDinner: boolean | null;
+    servesCocktails: boolean | null;
     cuisinePosture: string | null;
     serviceModel: string | null;
     priceTier: string | null;
     wineProgramIntent: string | null;
   } | null;
   slug?: string;
+  primaryVertical?: string | null;
   primaryOperator?: { actorId: string; name: string; slug: string; website?: string } | null;
   placeType?: 'venue' | 'activity' | 'public';
   categorySlug?: string | null;
@@ -386,21 +392,26 @@ export default function PlacePage() {
   const rawPhotoUrls = location.photoUrls ?? (location.photoUrl ? [location.photoUrl] : []);
   const validPhotos = rawPhotoUrls.filter((url) => url && !failedPhotos.has(url));
 
-  const { isOpen, openNowExplicit } = parseHours(location.hours);
+  const parsedHours = parseHours(location.hours);
+  const { label: openStateLabel } = getOpenStateLabelV2(parsedHours, new Date(), { showTime: true });
 
-  const openStateLabel = openNowExplicit && isOpen !== null
-    ? (isOpen ? 'Open now' : 'Closed now')
-    : null;
-
-  const identitySubline = renderLocation({ neighborhood: location.neighborhood, category: location.category });
-  // Energy phrase: first sentence from scenesense.vibe (already assembled by the API)
-  const energyPhrase = location.scenesense?.vibe?.[0] ?? null;
+  // Profile Identity Line v1: "Echo Park, Italian, Natural Wine"
+  // Falls back to legacy renderLocation if no segments can be derived.
+  const identitySubline =
+    getProfileIdentityLine({
+      neighborhood: location.neighborhood ?? null,
+      cuisineType: location.cuisineType ?? null,
+      offeringSignals: location.offeringSignals ?? null,
+    }) ?? renderLocation({ neighborhood: location.neighborhood, category: location.category });
+  // Energy phrase: first item from scenesense.atmosphere (SceneSense output)
+  const energyPhrase = location.scenesense?.atmosphere?.[0] ?? null;
   const hasSignalsSentence = !!(openStateLabel || energyPhrase);
   const mapRefUrl = buildMapRefUrl(location.googlePlaceId, location.latitude, location.longitude, location.address);
   const recognitions = (location.recognitions ?? []).slice(0, RECOGNITIONS_CAP);
   const ledgerGroups = buildLedgerEntries(location, appearsOn.length);
 
-  const hasActions = mapRefUrl || location.reservationUrl || location.website || location.instagram;
+  const phoneUrl = location.phone ? `tel:${location.phone.replace(/\D/g, '')}` : null;
+  const hasActions = mapRefUrl || location.reservationUrl || location.phone || location.website || location.instagram || location.menuUrl || location.winelistUrl;
 
   return (
     <div style={{ background: '#F5F0E1', minHeight: '100vh' }}>
@@ -435,11 +446,20 @@ export default function PlacePage() {
                     {location.reservationUrl && (
                       <a href={location.reservationUrl} target="_blank" rel="noopener noreferrer">Reserve <span className="action-arrow">↗</span></a>
                     )}
+                    {phoneUrl && (
+                      <a href={phoneUrl}>Call <span className="action-arrow">↗</span></a>
+                    )}
                     {location.website && (
                       <a href={location.website} target="_blank" rel="noopener noreferrer">Website <span className="action-arrow">↗</span></a>
                     )}
                     {!location.website && location.instagram && (
                       <a href={`https://instagram.com/${location.instagram.replace(/^@/, '')}`} target="_blank" rel="noopener noreferrer">Instagram <span className="action-arrow">↗</span></a>
+                    )}
+                    {location.menuUrl && (
+                      <a href={location.menuUrl} target="_blank" rel="noopener noreferrer">Menu <span className="action-arrow">↗</span></a>
+                    )}
+                    {location.winelistUrl && (
+                      <a href={location.winelistUrl} target="_blank" rel="noopener noreferrer">Wine list <span className="action-arrow">↗</span></a>
                     )}
                   </div>
                 )}
@@ -459,10 +479,9 @@ export default function PlacePage() {
                 {/* Place Character: Fields interpretation layer */}
                 {(() => {
                   const rows: { label: string; value: string }[] = [
-                    { label: 'Scene', value: location.scenesense?.scene?.[0] },
-                    { label: 'Energy', value: location.scenesense?.vibe?.[0] },
-                    { label: 'Ambiance', value: location.scenesense?.ambiance?.[0] },
                     { label: 'Atmosphere', value: location.scenesense?.atmosphere?.[0] },
+                    { label: 'Ambiance', value: location.scenesense?.ambiance?.[0] },
+                    { label: 'Scene', value: location.scenesense?.scene?.[0] },
                   ].filter((r): r is { label: string; value: string } => !!r.value?.trim());
 
                   if (rows.length === 0) return null;

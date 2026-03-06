@@ -303,9 +303,9 @@
 }
 
 /* ================================================================
-   VIBE BLOCK — Tags with dot separators
+   SCENESENSE BLOCK — Tags with dot separators
    ================================================================ */
-.vibeBlock {
+.scenesenseBlock {
   display: flex;
   flex-direction: column;
   gap: 8px;

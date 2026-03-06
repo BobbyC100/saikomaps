@@ -7,7 +7,7 @@
 
 export interface BentoBlock {
   id: string;
-  type: 'action-cards' | 'gallery' | 'curator-note' | 'excerpt' | 'vibe' | 'hours' | 'map' | 'call' | 'tips' | 'coverage' | 'best-for' | 'also-on' | 'quiet';
+  type: 'action-cards' | 'gallery' | 'curator-note' | 'excerpt' | 'scenesense' | 'hours' | 'map' | 'call' | 'tips' | 'coverage' | 'best-for' | 'also-on' | 'quiet';
   span: 2 | 3 | 4 | 6;
   priority: number; // Lower = higher priority (renders first)
   required?: boolean; // If true, will always show even if data is sparse
@@ -18,7 +18,7 @@ export interface LayoutOptions {
   hasGallery: boolean;
   hasCuratorNote: boolean;
   hasExcerpt: boolean;
-  hasVibeTags: boolean;
+  hasSceneSense: boolean;
   hasHours: boolean;
   hasMap: boolean;
   hasCall: boolean;
@@ -44,10 +44,10 @@ export function calculateBentoLayout(options: LayoutOptions): BentoBlock[] {
     blocks.push({ id: 'gallery', type: 'gallery', span: 6, priority: 2 });
   }
 
-  // Tier 2: Curator's Note + Excerpt/Vibe (side by side layout)
-  // Logic: If curator note exists with excerpt or vibe, split 3-3. Otherwise full width.
+  // Tier 2: Curator's Note + Excerpt/SceneSense (side by side layout)
+  // Logic: If curator note exists with excerpt or scenesense, split 3-3. Otherwise full width.
   if (options.hasCuratorNote) {
-    const hasRightContent = options.hasExcerpt || options.hasVibeTags;
+    const hasRightContent = options.hasExcerpt || options.hasSceneSense;
     blocks.push({
       id: 'curator-note',
       type: 'curator-note',
@@ -61,16 +61,16 @@ export function calculateBentoLayout(options: LayoutOptions): BentoBlock[] {
     blocks.push({
       id: 'excerpt',
       type: 'excerpt',
-      span: hasLeftContent ? 3 : (options.hasVibeTags ? 3 : 6),
+      span: hasLeftContent ? 3 : (options.hasSceneSense ? 3 : 6),
       priority: 4,
     });
   }
 
-  if (options.hasVibeTags && !options.hasExcerpt) {
+  if (options.hasSceneSense && !options.hasExcerpt) {
     const hasLeftContent = options.hasCuratorNote;
     blocks.push({
-      id: 'vibe',
-      type: 'vibe',
+      id: 'scenesense',
+      type: 'scenesense',
       span: hasLeftContent ? 3 : 6,
       priority: 5,
     });

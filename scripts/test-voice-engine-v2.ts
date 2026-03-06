@@ -32,7 +32,7 @@ const TEST_CASES: TestCase[] = [
       place_personality: 'institution',
       signature_dishes: ['#19 pastrami sandwich'],
       key_producers: [],
-      vibe_words: ['classic', 'no-frills'],
+      language_signals: ['classic', 'no-frills'],
       origin_story_type: 'family-legacy',
       extraction_confidence: 0.85,
       confidence_tier: 'publish',
@@ -59,7 +59,7 @@ const TEST_CASES: TestCase[] = [
       place_personality: 'chef-driven',
       signature_dishes: ['cacio e pepe', 'oxtail ragu'],
       key_producers: [],
-      vibe_words: ['intimate', 'unhurried', 'neighborhood'],
+      language_signals: ['intimate', 'unhurried', 'neighborhood'],
       origin_story_type: 'chef-journey',
       extraction_confidence: 0.78,
       confidence_tier: 'publish',
@@ -75,7 +75,7 @@ const TEST_CASES: TestCase[] = [
     },
   },
   
-  // Test 3: Neighborhood spot with vibe words
+  // Test 3: Neighborhood spot with language signals
   {
     name: 'Canyon Coffee',
     signals: {
@@ -86,7 +86,7 @@ const TEST_CASES: TestCase[] = [
       place_personality: 'neighborhood-spot',
       signature_dishes: [],
       key_producers: [],
-      vibe_words: ['laid-back', 'natural light', 'unhurried'],
+      language_signals: ['laid-back', 'natural light', 'unhurried'],
       origin_story_type: 'neighborhood-love',
       extraction_confidence: 0.72,
       confidence_tier: 'publish',
@@ -113,7 +113,7 @@ const TEST_CASES: TestCase[] = [
       place_personality: 'hidden-gem',
       signature_dishes: [],
       key_producers: [],
-      vibe_words: ['casual', 'neighborhood'],
+      language_signals: ['casual', 'neighborhood'],
       origin_story_type: null,
       extraction_confidence: 0.55,
       confidence_tier: 'review',
@@ -159,8 +159,8 @@ async function testVoiceEngineV2() {
     if (testCase.signals.signature_dishes.length > 0) {
       console.log(`  Signature Dishes: ${testCase.signals.signature_dishes.join(', ')}`);
     }
-    if (testCase.signals.vibe_words.length > 0) {
-      console.log(`  Vibe Words: ${testCase.signals.vibe_words.join(', ')}`);
+    if (testCase.signals.language_signals.length > 0) {
+      console.log(`  Language Signals: ${testCase.signals.language_signals.join(', ')}`);
     }
     
     console.log(`  Confidence: ${testCase.signals.extraction_confidence.toFixed(2)} (${testCase.signals.confidence_tier})`);
@@ -175,7 +175,7 @@ async function testVoiceEngineV2() {
       console.log(`   "${result.tagline}"`);
       console.log('');
       console.log('📝 All Candidates:');
-      const patterns = ['food', 'neighborhood', 'vibe', 'authority'];
+      const patterns = ['food', 'neighborhood', 'energy', 'authority'];
       result.taglineCandidates.forEach((candidate, idx) => {
         const marker = candidate === result.tagline ? '✅' : '  ';
         console.log(`   ${marker} [${patterns[idx]}] "${candidate}"`);

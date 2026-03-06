@@ -791,7 +791,7 @@ export default function PublicMapPage({ params }: { params: Promise<{ slug: stri
         slug={mapData.slug}
         description={mapData.description ?? mapData.subtitle}
         category={mapData.subtitle ?? 'Places'}
-        vibe={mapData.introText ?? undefined}
+        energy={mapData.introText ?? undefined}
         theme="light"
         authorName={mapData.creatorName ?? 'Unknown'}
         authorAvatar={undefined}

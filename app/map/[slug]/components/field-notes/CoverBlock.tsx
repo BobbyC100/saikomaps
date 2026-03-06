@@ -10,7 +10,7 @@ export interface CoverBlockProps {
   authorName: string;
   authorAvatar?: string | null;
   neighborhoods?: string[]; // Array of neighborhoods to display stacked
-  vibeVitals?: string; // e.g. "Low-key, wine-forward"
+  energyVitals?: string; // e.g. "Low-key, wine-forward"
   coverPins: PlacePoint[];
   onCoverMapClick?: () => void;
 }
@@ -32,7 +32,7 @@ export function CoverBlock({
   authorName,
   authorAvatar,
   neighborhoods = [],
-  vibeVitals,
+  energyVitals,
   coverPins,
   onCoverMapClick,
 }: CoverBlockProps) {
@@ -142,7 +142,7 @@ export function CoverBlock({
                 </div>
               </div>
             )}
-            {vibeVitals && (
+            {energyVitals && (
               <div className="text-right">
                 <div
                   className="text-[8px] uppercase tracking-[0.15em] mb-0.5"
@@ -157,7 +157,7 @@ export function CoverBlock({
                     color: dark ? 'var(--fn-parchment)' : 'var(--fn-charcoal)',
                   }}
                 >
-                  {vibeVitals}
+                  {energyVitals}
                 </span>
               </div>
             )}

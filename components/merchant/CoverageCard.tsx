@@ -32,7 +32,7 @@ interface CoverageCardProps {
   pullQuoteAuthor?: string | null;
   pullQuoteUrl?: string | null;
   sources?: EditorialSource[];
-  vibeTag?: string | null;
+  energyTag?: string | null;
   span?: number; // Grid column span (from resolver)
 }
 
@@ -42,7 +42,7 @@ export function CoverageCard({
   pullQuoteAuthor,
   pullQuoteUrl,
   sources = [],
-  vibeTag,
+  energyTag,
   span,
 }: CoverageCardProps) {
   // Priority 1: Use explicit pullQuote if available
@@ -111,8 +111,8 @@ export function CoverageCard({
         </a>
       )}
       
-      {/* Optional vibe tag */}
-      {vibeTag && <div className={styles.vibeTag}>{vibeTag}</div>}
+      {/* Optional energy tag */}
+      {energyTag && <div className={styles.energyTag}>{energyTag}</div>}
     </div>
   );
 }

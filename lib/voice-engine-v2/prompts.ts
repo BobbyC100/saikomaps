@@ -26,7 +26,7 @@ You'll receive structured identity signals about this place. Use them:
 - place_personality tells you WHAT KIND of place this is
 - cuisine_posture tells you what ANCHORS the cooking
 - signature_dishes are the MOVES — the things to order
-- vibe_words are THEIR words — how they describe themselves
+- language_signals are THEIR words — how they describe themselves
 - origin_story_type hints at the NARRATIVE
 
 VOCABULARY SYSTEM — draw from these pools:
@@ -47,7 +47,7 @@ PATTERN 1 — FOOD FORWARD: Lead with what you eat or drink. Use cuisine_posture
 
 PATTERN 2 — NEIGHBORHOOD ANCHOR: Lead with where it is. Use neighborhood, street, and place_personality. Let geography do the work.
 
-PATTERN 3 — VIBE CHECK: Lead with how it feels. Use vibe_words and service_model. Short sensory statements. What it feels like to be there.
+PATTERN 3 — ENERGY CHECK: Lead with how it feels. Use language_signals and service_model. Short sensory statements. What it feels like to be there.
 
 PATTERN 4 — LOCAL AUTHORITY: Maximum confidence, minimum words. The shortest tagline. A declaration that doesn't need to justify itself.
 
@@ -81,9 +81,9 @@ export function buildTaglineGeneratorUserPromptV2(
     ? signals.signature_dishes.join(', ')
     : 'none';
   
-  // Format vibe words
-  const vibeStr = signals.vibe_words.length > 0
-    ? signals.vibe_words.join(', ')
+  // Format language signals
+  const langStr = signals.language_signals.length > 0
+    ? signals.language_signals.join(', ')
     : 'none';
   
   // Format key producers
@@ -103,7 +103,7 @@ Wine Program: ${signals.wine_program_intent || 'none'}
 Origin Story: ${signals.origin_story_type || 'unknown'}
 
 Signature Dishes: ${dishesStr}
-Vibe Words: ${vibeStr}
+Language Signals: ${langStr}
 Key Producers: ${producersStr}
 
 SUPPLEMENTAL:
@@ -128,16 +128,16 @@ Return ONLY the index (0, 1, 2, or 3). No commentary.`;
 export function buildTaglineSelectorUserPromptV2(
   context: PlaceContext,
   candidates: [string, string, string, string],
-  patternWeights: { food: number; neighborhood: number; vibe: number; authority: number }
+  patternWeights: { food: number; neighborhood: number; energy: number; authority: number }
 ): string {
-  const patterns = ['food', 'neighborhood', 'vibe', 'authority'];
+  const patterns = ['food', 'neighborhood', 'energy', 'authority'];
   
   return `Restaurant: ${context.name} (${context.neighborhood || 'unknown'})
 
 Pattern Weights (higher = preferred):
 - Food Forward: ${patternWeights.food}
 - Neighborhood Anchor: ${patternWeights.neighborhood}
-- Vibe Check: ${patternWeights.vibe}
+- Energy Check: ${patternWeights.energy}
 - Local Authority: ${patternWeights.authority}
 
 Options:

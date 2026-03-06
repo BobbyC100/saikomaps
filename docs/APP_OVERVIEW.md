@@ -159,7 +159,7 @@ User → List (Maps) → MapPlace → Place
 
 **Place (Canonical):**
 - Google Places data (address, photos, hours, types)
-- AI-generated content (tagline, vibe tags, tips, pull quotes)
+- AI-generated content (tagline, SceneSense output, tips, pull quotes)
 - Enrichment timestamps
 
 **MapPlace (Junction):**
@@ -187,7 +187,7 @@ User → List (Maps) → MapPlace → Place
 3. Set order and curator descriptors per place
 4. System creates MapPlace entries linking to canonical Place
 5. Backfill Google Places data (photos, hours, address)
-6. Generate AI content (taglines, vibe tags, tips)
+6. Generate AI content (taglines, SceneSense output, tips)
 7. Preview in Field Notes template
 8. Publish → status: PUBLISHED
 ```
@@ -213,7 +213,7 @@ User → List (Maps) → MapPlace → Place
    - Set placesDataCachedAt timestamp
 3. Voice Engine script (`npm run enrich:voice`):
    - Generate tagline with pattern detection
-   - Create vibe tags from signals
+   - Route language signals through SceneSense
    - Generate tips
    - Find/create pull quotes
 4. Place now "enriched" and ready for beautiful display

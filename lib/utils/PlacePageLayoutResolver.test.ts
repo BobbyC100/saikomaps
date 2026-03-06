@@ -46,7 +46,7 @@ const fullData: PlaceData = {
     regions: ["Sicily", "Piedmont", "Friuli"],
     priceRange: "$45-85"
   },
-  vibe: ["Date Night", "Lively"],
+  scenesense: ["Date Night", "Lively"],
   alsoOn: [
     { id: '1', title: 'Downtown Date Night', slug: 'downtown-date-night', creatorName: '@bobby', placeCount: 18 },
     { id: '2', title: 'Arts District Essentials', slug: 'arts-district', creatorName: '@sarah', placeCount: 24 },
@@ -61,7 +61,7 @@ console.log('Row 1: Hours(3) + Details(3)');
 console.log('Row 2: Coverage(6)');
 console.log('Row 3: Gallery(3) + Curator(3)');
 console.log('Row 4: Tips(2) + Menu(3) + Quiet(1)');
-console.log('Row 5: Vibe(2) + Wine(3) + Quiet(1)');
+console.log('Row 5: SceneSense(2) + Wine(3) + Quiet(1)');
 console.log('Row 6: AlsoOn(6)');
 console.log('Total Quiet: 2');
 
@@ -94,7 +94,7 @@ const noMenuData: PlaceData = {
   wine: {
     focus: "Natural wines"
   },
-  vibe: ["Date Night", "Lively", "Cozy", "Romantic", "Trendy"],
+  scenesense: ["Date Night", "Lively", "Cozy", "Romantic", "Trendy"],
   alsoOn: [
     { id: '1', title: 'Best Restaurants', slug: 'best', creatorName: '@chef', placeCount: 25 }
   ]
@@ -106,7 +106,7 @@ console.log('\nExpected:');
 console.log('Row 1: Hours(3) + Details(3)');
 console.log('Row 2: Coverage(4) + Curator(2)');
 console.log('Row 3: Gallery(3) + Tips(3)');
-console.log('Row 4: Vibe(3) + Wine(3)');
+console.log('Row 4: SceneSense(3) + Wine(3)');
 console.log('Row 5: AlsoOn(6)');
 console.log('Total Quiet: 0');
 
@@ -130,7 +130,7 @@ const minimalData: PlaceData = {
   tips: ["Book ahead", "Bar seats"],
   menu: null,
   wine: null,
-  vibe: ["Date Night", "Lively"],
+  scenesense: ["Date Night", "Lively"],
   alsoOn: [
     { id: '1', title: 'Local Favorites', slug: 'local', creatorName: '@local', placeCount: 12 },
     { id: '2', title: 'Hidden Gems', slug: 'hidden', creatorName: '@explorer', placeCount: 8 },
@@ -143,7 +143,7 @@ console.log(debugLayout(minimalLayout));
 console.log('\nExpected:');
 console.log('Row 1: Hours(3) + Details(3)');
 console.log('Row 2: Coverage(6) — promoted');
-console.log('Row 3: Tips(2) + Vibe(2) + Quiet(2)');
+console.log('Row 3: Tips(2) + SceneSense(2) + Quiet(2)');
 console.log('Row 4: AlsoOn(6)');
 console.log('Total Quiet: 2');
 
@@ -164,7 +164,7 @@ const sparseData: PlaceData = {
   tips: null,
   menu: null,
   wine: null,
-  vibe: null,
+  scenesense: null,
   alsoOn: null
 };
 
@@ -175,14 +175,14 @@ console.log('Row 1: Hours(3) + Details(3)');
 console.log('Total Quiet: 0');
 
 // ============================================================================
-// SCENARIO 5: VIBE HEAVY (MANY TAGS)
+// SCENARIO 5: SCENESENSE HEAVY (MANY TAGS)
 // ============================================================================
 
 console.log('\n' + '='.repeat(60));
-console.log('SCENARIO 5: VIBE HEAVY (MANY TAGS)');
+console.log('SCENARIO 5: SCENESENSE HEAVY (MANY TAGS)');
 console.log('='.repeat(60));
 
-const vibeHeavyData: PlaceData = {
+const scenesenseHeavyData: PlaceData = {
   hours: { /* mock hours data */ },
   details: { /* mock details */ },
   coverage: {
@@ -194,19 +194,19 @@ const vibeHeavyData: PlaceData = {
   tips: ["Arrive early", "Try the special"],
   menu: null,
   wine: null,
-  vibe: ["Date Night", "Lively", "Cozy", "Romantic", "Trendy", "Hip", "Instagram-worthy", "Music"],
+  scenesense: ["Date Night", "Lively", "Cozy", "Romantic", "Trendy", "Hip", "Instagram-worthy", "Music"],
   alsoOn: [
     { id: '1', title: 'Trending Now', slug: 'trending', creatorName: '@curator', placeCount: 30 }
   ]
 };
 
-const vibeHeavyLayout = resolvePlacePageLayout(vibeHeavyData);
-console.log(debugLayout(vibeHeavyLayout));
+const scenesenseHeavyLayout = resolvePlacePageLayout(scenesenseHeavyData);
+console.log(debugLayout(scenesenseHeavyLayout));
 console.log('\nExpected:');
 console.log('Row 1: Hours(3) + Details(3)');
 console.log('Row 2: Coverage(6) — promoted');
 console.log('Row 3: Tips(6) — promoted');
-console.log('Row 4: Vibe(6) — wide (7+ tags)');
+console.log('Row 4: SceneSense(6) — wide (7+ tags)');
 console.log('Row 5: AlsoOn(6)');
 console.log('Total Quiet: 0');
 
@@ -223,7 +223,7 @@ const allLayouts = [
   { name: 'No Menu', layout: noMenuLayout },
   { name: 'Minimal', layout: minimalLayout },
   { name: 'Sparse', layout: sparseLayout },
-  { name: 'Vibe Heavy', layout: vibeHeavyLayout }
+  { name: 'SceneSense Heavy', layout: scenesenseHeavyLayout }
 ];
 
 allLayouts.forEach(({ name, layout }) => {

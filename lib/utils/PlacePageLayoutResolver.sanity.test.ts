@@ -35,7 +35,7 @@ const badLayout1: RowConfig[] = [
     rowNumber: 2,
     cards: [
       { type: 'coverage', span: 4, data: {} },
-      { type: 'vibe', span: 1, data: ['Date Night'] }, // ❌ ILLEGAL: span-1 non-quiet
+      { type: 'scenesense', span: 1, data: ['Date Night'] }, // ❌ ILLEGAL: span-1 non-quiet
       { type: 'quiet', span: 1 }
     ]
   }
@@ -43,7 +43,7 @@ const badLayout1: RowConfig[] = [
 
 const isBad1Caught = !validateLayout(badLayout1);
 console.log(debugLayout(badLayout1));
-console.log(`\n✓ Validator catches span-1 vibe: ${isBad1Caught ? 'YES ✓' : 'NO ✗'}`);
+console.log(`\n✓ Validator catches span-1 scenesense: ${isBad1Caught ? 'YES ✓' : 'NO ✗'}`);
 
 if (!isBad1Caught) {
   console.error('❌ SANITY CHECK FAILED: Validator should catch span-1 non-quiet');

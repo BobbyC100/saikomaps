@@ -67,7 +67,7 @@ pullQuoteUrl: string | null;
 pullQuoteType: string | null;
 
 // EXISTING (clarified in docs)
-vibeTags: string[] | null;
+// vibeTags removed from entities — deprecated; use identity_signals.vibe_words via SceneSense
 tips: string[] | null;
 ```
 

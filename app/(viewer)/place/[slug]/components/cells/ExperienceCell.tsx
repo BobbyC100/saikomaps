@@ -6,7 +6,6 @@ import { GalleryLightbox } from '@/components/merchant/GalleryLightbox';
 import { SceneSenseCard } from '@/components/merchant/SceneSenseCard';
 
 interface SceneSenseOutput {
-  vibe: string[];
   atmosphere: string[];
   ambiance: string[];
   scene: string[];
@@ -42,7 +41,6 @@ export function ExperienceCell({
 
   const galleryPhotos = (photoUrls?.length ?? 0) > 0 ? photoUrls! : [];
   const hasSceneSense = scenesense != null && (
-    scenesense.vibe.length > 0 ||
     scenesense.atmosphere.length > 0 ||
     scenesense.ambiance.length > 0 ||
     scenesense.scene.length > 0

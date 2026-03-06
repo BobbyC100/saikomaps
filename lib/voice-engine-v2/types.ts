@@ -18,7 +18,8 @@ export interface IdentitySignals {
   // Extended signals (from identity_signals JSON field)
   signature_dishes: string[];
   key_producers: string[];
-  vibe_words: string[];
+  /** Raw phrases from identity_signals.language_signals — SceneSense routes these to the correct lens. */
+  language_signals: string[];
   origin_story_type: 'chef-journey' | 'family-legacy' | 'neighborhood-love' | 'concept-first' | 'partnership' | null;
   
   // Confidence metadata
@@ -67,7 +68,7 @@ export interface TaglineGenerationResultV2 {
 // PHRASE PATTERNS
 // ============================================
 
-export type PhrasePattern = 'food' | 'neighborhood' | 'vibe' | 'authority';
+export type PhrasePattern = 'food' | 'neighborhood' | 'energy' | 'authority';
 
 // ============================================
 // PATTERN SELECTION LOGIC
@@ -76,7 +77,7 @@ export type PhrasePattern = 'food' | 'neighborhood' | 'vibe' | 'authority';
 export interface PatternWeights {
   food: number;
   neighborhood: number;
-  vibe: number;
+  energy: number;
   authority: number;
 }
 
@@ -87,10 +88,10 @@ export interface PatternWeights {
 export function getPatternWeights(signals: IdentitySignals): PatternWeights {
   const personality = signals.place_personality;
   const hasDishes = signals.signature_dishes.length > 0 && signals.confidence_tier === 'publish';
-  const hasVibe = signals.vibe_words.length > 0;
+  const hasLanguageSignals = signals.language_signals.length > 0;
   
   // Default equal weights
-  const weights: PatternWeights = { food: 1, neighborhood: 1, vibe: 1, authority: 1 };
+  const weights: PatternWeights = { food: 1, neighborhood: 1, energy: 1, authority: 1 };
   
   // Boost patterns based on personality
   if (personality === 'institution') {
@@ -98,11 +99,11 @@ export function getPatternWeights(signals: IdentitySignals): PatternWeights {
     weights.neighborhood = 2;
   } else if (personality === 'neighborhood-spot') {
     weights.neighborhood = 3;
-    weights.vibe = 2;
+    weights.energy = 2;
   } else if (personality === 'chef-driven') {
     weights.food = 3;
   } else if (personality === 'scene') {
-    weights.vibe = 3;
+    weights.energy = 3;
   } else if (personality === 'hidden-gem') {
     weights.authority = 3;
   } else if (personality === 'destination') {
@@ -115,9 +116,9 @@ export function getPatternWeights(signals: IdentitySignals): PatternWeights {
     weights.food += 2;
   }
   
-  // Boost vibe pattern if we have vibe words
-  if (hasVibe) {
-    weights.vibe += 1;
+  // Boost energy pattern if we have language signals
+  if (hasLanguageSignals) {
+    weights.energy += 1;
   }
   
   return weights;

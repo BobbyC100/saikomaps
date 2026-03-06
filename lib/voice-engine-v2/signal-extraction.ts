@@ -33,7 +33,7 @@ export function extractSignalsFromGoldenRecord(record: any): {
     // Extended signals from JSON
     signature_dishes: identitySignalsJson.signature_dishes || [],
     key_producers: identitySignalsJson.key_producers || [],
-    vibe_words: identitySignalsJson.vibe_words || [],
+    language_signals: identitySignalsJson.language_signals || [],
     origin_story_type: identitySignalsJson.origin_story_type || null,
     
     // Confidence metadata
@@ -147,11 +147,11 @@ function derivePopularityTier(record: any): 'institution' | 'known' | 'discovery
  * Check if record has sufficient signals for tagline generation
  */
 export function hasMinimumSignals(signals: IdentitySignals): boolean {
-  // Must have at least one of: place_personality, cuisine_posture, or vibe_words
+  // Must have at least one of: place_personality, cuisine_posture, or language_signals
   return (
     signals.place_personality !== null ||
     signals.cuisine_posture !== null ||
-    signals.vibe_words.length > 0
+    signals.language_signals.length > 0
   );
 }
 
@@ -171,9 +171,9 @@ export function assessSignalQuality(signals: IdentitySignals): {
   ].filter(s => s !== null).length;
   
   const hasSignatureDishes = signals.signature_dishes.length > 0 && signals.confidence_tier === 'publish';
-  const hasVibeWords = signals.vibe_words.length > 0;
+  const hasLanguageSignals = signals.language_signals.length > 0;
   
-  if (coreSignals >= 3 && (hasSignatureDishes || hasVibeWords)) {
+  if (coreSignals >= 3 && (hasSignatureDishes || hasLanguageSignals)) {
     return { quality: 'excellent', reason: 'Rich signal set with specific details' };
   }
   
@@ -181,7 +181,7 @@ export function assessSignalQuality(signals: IdentitySignals): {
     return { quality: 'good', reason: 'Sufficient signals for pattern generation' };
   }
   
-  if (coreSignals >= 1 || hasVibeWords) {
+  if (coreSignals >= 1 || hasLanguageSignals) {
     return { quality: 'minimal', reason: 'Limited signals, will use fallback patterns' };
   }
   

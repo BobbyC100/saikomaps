@@ -32,19 +32,19 @@ export type PriceLevel = 'INEXPENSIVE' | 'MODERATE' | 'EXPENSIVE' | 'VERY_EXPENS
 
 export interface DerivedAttributes {
   popularityTier: PopularityTier;
-  vibe: Vibe;
+  energy: EnergyProfile;
   timeOfDay: TimeOfDay;
 }
 
 export type PopularityTier = 'institution' | 'known' | 'discovery';
-export type Vibe = 'hang' | 'occasion' | 'quick' | 'neighborhood';
+export type EnergyProfile = 'hang' | 'occasion' | 'quick' | 'neighborhood';
 export type TimeOfDay = 'morning' | 'midday' | 'evening' | 'anytime';
 
 // ============================================
 // PHRASE PATTERNS
 // ============================================
 
-export type PhrasePattern = 'food' | 'neighborhood' | 'vibe' | 'authority';
+export type PhrasePattern = 'food' | 'neighborhood' | 'energy' | 'authority';
 
 // ============================================
 // TAGLINE GENERATION

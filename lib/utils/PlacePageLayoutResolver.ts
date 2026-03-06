@@ -26,7 +26,7 @@ export type CardType =
   | 'tips'
   | 'menu'
   | 'wine'
-  | 'vibe'
+  | 'scenesense'
   | 'alsoOn'
   | 'quiet';
 
@@ -63,7 +63,7 @@ export interface PlaceData {
   tips?: string[] | null;
   menu?: MenuItem[] | null;
   wine?: WineProgram | null;
-  vibe?: string[] | null; // Tags
+  scenesense?: string[] | null; // SceneSense atmosphere labels
   
   // Tier D - Discovery
   alsoOn?: AlsoOnMap[] | null;
@@ -118,7 +118,7 @@ const ALLOWED_SPANS_BY_TYPE: Record<CardType, number[]> = {
   tips: [3, 2],
   menu: [3, 2],
   wine: [3, 2],
-  vibe: [3, 2],
+  scenesense: [3, 2],
   alsoOn: [3], // Will be split into 3+3 layout
   quiet: [1, 2, 3],
 } as const;
@@ -127,8 +127,8 @@ const THRESHOLDS = {
   COVERAGE_SHORT: 120, // chars
   CURATOR_SHORT: 80,   // chars
   TIPS_MAX_BULLETS: 4,
-  VIBE_COMPACT: 3,     // tags
-  VIBE_STANDARD: 6,    // tags
+  SS_COMPACT: 3,     // tags
+  SS_STANDARD: 6,    // tags
 } as const;
 
 // ============================================================================
@@ -148,11 +148,11 @@ function getCuratorVariant(note: string): { variant: 'standard' | 'compact'; spa
     : { variant: 'compact', span: 2 };
 }
 
-function getVibeVariant(tagCount: number): { variant: 'compact' | 'standard' | 'wide'; span: number } {
-  if (tagCount <= THRESHOLDS.VIBE_COMPACT) {
+function getSsVariant(tagCount: number): { variant: 'compact' | 'standard' | 'wide'; span: number } {
+  if (tagCount <= THRESHOLDS.SS_COMPACT) {
     return { variant: 'compact', span: 2 };
   }
-  // MAX SPAN = 3 for vibe (never 6)
+  // MAX SPAN = 3 for scenesense (never 6)
   return { variant: 'standard', span: 3 };
 }
 
@@ -312,14 +312,14 @@ function resolveRow2(data: PlaceData): RowConfig | null {
     };
   }
   
-  // Strategy 6: Coverage(3) + Vibe(3)
-  if (data.vibe && data.vibe.length > 0) {
-    const vibeVariant = getVibeVariant(data.vibe.length);
+  // Strategy 6: Coverage(3) + SceneSense(3)
+  if (data.scenesense && data.scenesense.length > 0) {
+    const ssVariant = getSsVariant(data.scenesense.length);
     return {
       rowNumber: 2,
       cards: [
         { type: 'coverage', span: 3, variant: 'compact', data: data.coverage },
-        { type: 'vibe', span: 3, variant: vibeVariant.variant, data: data.vibe }
+        { type: 'scenesense', span: 3, variant: ssVariant.variant, data: data.scenesense }
       ]
     };
   }
@@ -384,7 +384,7 @@ function resolveRow2(data: PlaceData): RowConfig | null {
  * Never use span 6. Patterns:
  * - Gallery(3) + Curator(3)
  * - Gallery(3) + Tips(3)
- * - Gallery(3) + Vibe(3)
+ * - Gallery(3) + SceneSense(3)
  * - Gallery(3) + Quiet(3) or Quiet(2)+Quiet(1)
  * - Curator(3) + Tips(3)
  * - Curator(3) + Quiet(3)
@@ -419,14 +419,14 @@ function resolveRow3(
     };
   }
   
-  // Pattern 3: Gallery(3) + Vibe(3)
-  if (hasGallery && data.vibe && data.vibe.length > 0) {
-    const vibeVariant = getVibeVariant(data.vibe.length);
+  // Pattern 3: Gallery(3) + SceneSense(3)
+  if (hasGallery && data.scenesense && data.scenesense.length > 0) {
+    const ssVariant = getSsVariant(data.scenesense.length);
     return {
       rowNumber: 3,
       cards: [
         { type: 'gallery', span: 3, data: data.gallery },
-        { type: 'vibe', span: 3, variant: vibeVariant.variant, data: data.vibe }
+        { type: 'scenesense', span: 3, variant: ssVariant.variant, data: data.scenesense }
       ]
     };
   }
@@ -479,16 +479,16 @@ function resolveRow3(
     }
   }
   
-  // Pattern 7: Curator(3) + Vibe(3)
-  if (hasCurator && data.vibe && data.vibe.length > 0) {
+  // Pattern 7: Curator(3) + SceneSense(3)
+  if (hasCurator && data.scenesense && data.scenesense.length > 0) {
     const curatorVariant = getCuratorVariant(data.curator!.note);
     if (curatorVariant.span === 3) {
-      const vibeVariant = getVibeVariant(data.vibe.length);
+      const ssVariant = getSsVariant(data.scenesense.length);
       return {
         rowNumber: 3,
         cards: [
           { type: 'curator', span: 3, variant: 'standard', data: data.curator },
-          { type: 'vibe', span: 3, variant: vibeVariant.variant, data: data.vibe }
+          { type: 'scenesense', span: 3, variant: ssVariant.variant, data: data.scenesense }
         ]
       };
     }
@@ -513,16 +513,16 @@ function resolveRow3(
   if (hasCurator) {
     const curatorVariant = getCuratorVariant(data.curator!.note);
     if (curatorVariant.span === 2) {
-      // Curator(2) + Tips(2) + Vibe(2)
-      if (data.tips && data.tips.length > 0 && data.vibe && data.vibe.length > 0) {
-        const vibeVariant = getVibeVariant(data.vibe.length);
-        if (vibeVariant.span === 2) {
+      // Curator(2) + Tips(2) + SceneSense(2)
+      if (data.tips && data.tips.length > 0 && data.scenesense && data.scenesense.length > 0) {
+        const ssVariant = getSsVariant(data.scenesense.length);
+        if (ssVariant.span === 2) {
           return {
             rowNumber: 3,
             cards: [
               { type: 'curator', span: 2, variant: 'compact', data: data.curator },
               { type: 'tips', span: 2, variant: 'fixed', data: data.tips },
-              { type: 'vibe', span: 2, variant: 'compact', data: data.vibe }
+              { type: 'scenesense', span: 2, variant: 'compact', data: data.scenesense }
             ]
           };
         }
@@ -534,22 +534,22 @@ function resolveRow3(
 }
 
 /**
- * Row 4: Utility (Tips + Menu + Vibe)
+ * Row 4: Utility (Tips + Menu + SceneSense)
  * Never use span 6. Patterns:
  * - Tips(3) + Menu(3)
- * - Tips(3) + Vibe(3)
- * - Tips(2) + Menu(2) + Vibe(2)
- * - Menu(3) + Vibe(3)
+ * - Tips(3) + SceneSense(3)
+ * - Tips(2) + Menu(2) + SceneSense(2)
+ * - Menu(3) + SceneSense(3)
  */
 function resolveRow4(
   data: PlaceData,
   quietCount: number,
-  vibeAlreadyUsed: boolean,
+  scenesenseAlreadyUsed: boolean,
   tipsAlreadyUsed: boolean
 ): RowConfig | null {
   const hasTips = data.tips && data.tips.length > 0 && !tipsAlreadyUsed;
   const hasMenu = data.menu && data.menu.length > 0;
-  const hasVibe = data.vibe && data.vibe.length > 0 && !vibeAlreadyUsed;
+  const hasSceneSense = data.scenesense && data.scenesense.length > 0 && !scenesenseAlreadyUsed;
   
   // Pattern 1: Tips(3) + Menu(3)
   if (hasTips && hasMenu) {
@@ -562,14 +562,14 @@ function resolveRow4(
     };
   }
   
-  // Pattern 2: Tips(3) + Vibe(3)
-  if (hasTips && hasVibe) {
-    const vibeVariant = getVibeVariant(data.vibe!.length);
+  // Pattern 2: Tips(3) + SceneSense(3)
+  if (hasTips && hasSceneSense) {
+    const ssVariant = getSsVariant(data.scenesense!.length);
     return {
       rowNumber: 4,
       cards: [
         { type: 'tips', span: 3, variant: 'fixed', data: data.tips },
-        { type: 'vibe', span: 3, variant: vibeVariant.variant, data: data.vibe }
+        { type: 'scenesense', span: 3, variant: ssVariant.variant, data: data.scenesense }
       ]
     };
   }
@@ -585,14 +585,14 @@ function resolveRow4(
     };
   }
   
-  // Pattern 4: Menu(3) + Vibe(3)
-  if (hasMenu && hasVibe) {
-    const vibeVariant = getVibeVariant(data.vibe!.length);
+  // Pattern 4: Menu(3) + SceneSense(3)
+  if (hasMenu && hasSceneSense) {
+    const ssVariant = getSsVariant(data.scenesense!.length);
     return {
       rowNumber: 4,
       cards: [
         { type: 'menu', span: 3, data: data.menu },
-        { type: 'vibe', span: 3, variant: vibeVariant.variant, data: data.vibe }
+        { type: 'scenesense', span: 3, variant: ssVariant.variant, data: data.scenesense }
       ]
     };
   }
@@ -636,64 +636,64 @@ function resolveRow4(
 }
 
 /**
- * Row 5: Vibe (If Not Already Used)
+ * Row 5: SceneSense (If Not Already Used)
  * Never use span 6. Patterns:
- * - Vibe(3) + Wine(3)
- * - Vibe(3) + Menu(3)
- * - Vibe(3) + Quiet fills
- * - Vibe(2) + other 2-span cards
+ * - SceneSense(3) + Wine(3)
+ * - SceneSense(3) + Menu(3)
+ * - SceneSense(3) + Quiet fills
+ * - SceneSense(2) + other 2-span cards
  */
 function resolveRow5(
   data: PlaceData,
-  vibeAlreadyUsed: boolean,
+  scenesenseAlreadyUsed: boolean,
   wineAlreadyUsed: boolean,
   quietCount: number
 ): RowConfig | null {
-  if (!data.vibe || vibeAlreadyUsed) return null;
+  if (!data.scenesense || scenesenseAlreadyUsed) return null;
   
-  const vibeVariant = getVibeVariant(data.vibe.length);
+  const ssVariant = getSsVariant(data.scenesense.length);
   
-  // Pattern 1: Vibe(3) + Wine(3)
-  if (vibeVariant.span === 3 && data.wine && !wineAlreadyUsed) {
+  // Pattern 1: SceneSense(3) + Wine(3)
+  if (ssVariant.span === 3 && data.wine && !wineAlreadyUsed) {
     return {
       rowNumber: 5,
       cards: [
-        { type: 'vibe', span: 3, variant: vibeVariant.variant, data: data.vibe },
+        { type: 'scenesense', span: 3, variant: ssVariant.variant, data: data.scenesense },
         { type: 'wine', span: 3, data: data.wine }
       ]
     };
   }
   
-  // Pattern 2: Vibe(3) + Menu(3)
-  if (vibeVariant.span === 3 && data.menu && data.menu.length > 0) {
+  // Pattern 2: SceneSense(3) + Menu(3)
+  if (ssVariant.span === 3 && data.menu && data.menu.length > 0) {
     return {
       rowNumber: 5,
       cards: [
-        { type: 'vibe', span: 3, variant: vibeVariant.variant, data: data.vibe },
+        { type: 'scenesense', span: 3, variant: ssVariant.variant, data: data.scenesense },
         { type: 'menu', span: 3, data: data.menu }
       ]
     };
   }
   
-  // Pattern 3: Vibe(3) + Quiet fills
-  if (vibeVariant.span === 3 && quietCount + 2 <= CONSTRAINTS.MAX_QUIET_PER_PAGE) {
+  // Pattern 3: SceneSense(3) + Quiet fills
+  if (ssVariant.span === 3 && quietCount + 2 <= CONSTRAINTS.MAX_QUIET_PER_PAGE) {
     return {
       rowNumber: 5,
       cards: [
-        { type: 'vibe', span: 3, variant: vibeVariant.variant, data: data.vibe },
+        { type: 'scenesense', span: 3, variant: ssVariant.variant, data: data.scenesense },
         { type: 'quiet', span: 2 },
         { type: 'quiet', span: 1 }
       ]
     };
   }
   
-  // Pattern 4: Vibe(2) + Wine(2) + Menu(2)
-  if (vibeVariant.span === 2) {
+  // Pattern 4: SceneSense(2) + Wine(2) + Menu(2)
+  if (ssVariant.span === 2) {
     if (data.wine && !wineAlreadyUsed && data.menu && data.menu.length > 0) {
       return {
         rowNumber: 5,
         cards: [
-          { type: 'vibe', span: 2, variant: vibeVariant.variant, data: data.vibe },
+          { type: 'scenesense', span: 2, variant: ssVariant.variant, data: data.scenesense },
           { type: 'wine', span: 2, data: data.wine },
           { type: 'menu', span: 2, data: data.menu }
         ]
@@ -701,12 +701,12 @@ function resolveRow5(
     }
   }
   
-  // Pattern 5: Vibe(2) + Wine(2) + Quiet(2)
-  if (vibeVariant.span === 2 && data.wine && !wineAlreadyUsed && quietCount + 2 <= CONSTRAINTS.MAX_QUIET_PER_PAGE) {
+  // Pattern 5: SceneSense(2) + Wine(2) + Quiet(2)
+  if (ssVariant.span === 2 && data.wine && !wineAlreadyUsed && quietCount + 2 <= CONSTRAINTS.MAX_QUIET_PER_PAGE) {
     return {
       rowNumber: 5,
       cards: [
-        { type: 'vibe', span: 2, variant: vibeVariant.variant, data: data.vibe },
+        { type: 'scenesense', span: 2, variant: ssVariant.variant, data: data.scenesense },
         { type: 'wine', span: 2, data: data.wine },
         { type: 'quiet', span: 2 }
       ]
@@ -784,7 +784,7 @@ export function resolvePlacePageLayout(data: PlaceData): RowConfig[] {
   const rows: RowConfig[] = [];
   let quietCount = 0;
   let curatorUsed = false;
-  let vibeUsed = false;
+  let ssUsed = false;
   let wineUsed = false;
   let tipsUsed = false;
   
@@ -816,24 +816,24 @@ export function resolvePlacePageLayout(data: PlaceData): RowConfig[] {
   }
   
   // Row 4: Utility
-  const row4 = resolveRow4(data, quietCount, vibeUsed, tipsUsed);
+  const row4 = resolveRow4(data, quietCount, ssUsed, tipsUsed);
   if (row4) {
     rows.push(row4);
     quietCount += row4.cards.filter(c => c.type === 'quiet').length;
-    if (row4.cards.some(c => c.type === 'vibe')) {
-      vibeUsed = true;
+    if (row4.cards.some(c => c.type === 'scenesense')) {
+      ssUsed = true;
     }
     if (row4.cards.some(c => c.type === 'tips')) {
       tipsUsed = true;
     }
   }
   
-  // Row 5: Vibe
-  const row5 = resolveRow5(data, vibeUsed, wineUsed, quietCount);
+  // Row 5: SceneSense
+  const row5 = resolveRow5(data, ssUsed, wineUsed, quietCount);
   if (row5) {
     rows.push(row5);
     quietCount += row5.cards.filter(c => c.type === 'quiet').length;
-    vibeUsed = true;
+    ssUsed = true;
     if (row5.cards.some(c => c.type === 'wine')) {
       wineUsed = true;
     }

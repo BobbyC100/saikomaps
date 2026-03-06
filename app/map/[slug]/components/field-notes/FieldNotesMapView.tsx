@@ -90,7 +90,7 @@ export interface FieldNotesMapViewProps {
   slug: string;
   description?: string | null;
   category: string;
-  vibe?: string | null;
+  energy?: string | null;
   theme: 'light' | 'dark';
   authorName: string;
   authorAvatar?: string | null;
@@ -117,7 +117,7 @@ export function FieldNotesMapView({
   slug,
   description,
   category,
-  vibe,
+  energy,
   theme,
   authorName,
   authorAvatar,
@@ -226,7 +226,7 @@ export function FieldNotesMapView({
           authorName={authorName}
           authorAvatar={authorAvatar}
           neighborhoods={neighborhoods}
-          vibeVitals={vibe || undefined}
+          energyVitals={energy || undefined}
           coverPins={coverPins}
           onCoverMapClick={() => setView('map')}
         />

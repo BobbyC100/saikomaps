@@ -22,7 +22,7 @@ Instead of exposing taxonomy fields directly to users, the system renders concis
 
 ```
 Culver City restaurant
-Open now — lively room, strong date-night energy
+Open now — lively room
 ```
 
 The system performs signal → language translation, not data generation.
@@ -38,51 +38,54 @@ The Voice Layer belongs to the TRACES product layer, not the Fields data layer.
 ```
 Fields (structured signals)
       ↓
+SceneSense (Atmosphere / Ambiance / Scene)
+      ↓
 TRACES Voice Layer
       ↓
 UI Sentences
 ```
 
-Fields stores the raw signals.
+Fields stores the raw language signals.
+SceneSense interprets and routes them to the correct lens.
 TRACES renders those signals into editorial language.
 
 ---
 
 ## 3. Inputs (Signals)
 
-The Voice Layer consumes signals already returned by the API.
+The Voice Layer consumes signals already returned by the API — it never reads raw `identity_signals` directly.
 
 | Signal | Field | Example |
 |---|---|---|
 | Category | `primary_vertical` | `restaurant` |
 | Neighborhood | `neighborhood` | `Culver City` |
 | Open State | derived from `hours` | `Open now` |
-| Energy Signals | `identity_signals.vibe_words` (via SceneSense) | `["lively", "date-night"]` |
+| Energy Phrase | `scenesense.atmosphere[0]` | `Lively` |
 
-These signals remain unchanged from their stored values.
+The energy phrase comes from `scenesense.atmosphere` — the first item in the atmosphere surface, which may be an energy label (Lively, Chill, etc.) or a physical room label (Warm-lit, Quiet, etc.).
 
 ---
 
 ## 4. Phrase Mapping
 
-Raw tags are converted into editorial fragments through a lookup table.
+SceneSense atmosphere labels are converted into editorial fragments through a lookup table.
 
-**VIBE_PHRASES**
+**ATMOSPHERE_PHRASES**
 
-| Tag | Phrase |
+| SceneSense label | Phrase |
 |---|---|
 | Lively | lively room |
-| Cozy | cozy room |
-| Intimate | intimate room |
+| Buzzy | buzzy room |
 | Chill | laid-back feel |
-| Energetic | high-energy room |
-| Romantic | romantic atmosphere |
-| Date Night | strong date-night energy |
-| Late Night | late-night energy |
-| Casual | casual energy |
-| Upscale | refined atmosphere |
+| Low-key | low-key feel |
+| Calm | calm atmosphere |
+| Steady | steady energy |
+| Electric | electric energy |
+| Warm-lit | warm-lit room |
+| Conversational | conversational room |
+| Quiet | quiet room |
 
-Unrecognized tags are ignored. The system never invents signals.
+Labels not in the table are rendered lowercased. The system never invents signals.
 
 ---
 
@@ -109,11 +112,11 @@ Example: `Culver City restaurant`
 {open_state} — {energy_phrase}
 ```
 
-Example: `Open now — lively room, strong date-night energy`
+Example: `Open now — lively room`
 
 **Construction**
 - `open_state` derived from hours parsing (`openNowExplicit` must be true)
-- `energy_phrase` assembled from `vibe_words` (via SceneSense interpretation of `identity_signals`), fragments joined by commas
+- `energy_phrase` sourced from `scenesense.atmosphere[0]`, mapped through ATMOSPHERE_PHRASES
 - Separator rules:
 
 | open_state | energy_phrase | Result |
@@ -133,7 +136,7 @@ Example: `Open now — lively room, strong date-night energy`
 | Deterministic output | Same signals always produce the same sentence |
 | Short sentences | Identity block must remain glance-readable |
 | Dynamic signals distinct | Open/Closed indicators use `<em>` styling |
-| Raw signals accessible | Original structured tags remain visible in the UI rail |
+| No raw signal reads | Voice Layer never reads `identity_signals` directly |
 
 ---
 
@@ -158,8 +161,7 @@ renderIdentityBlock(signals: VoiceSignals): {
 
 ```typescript
 renderLocation(signals: VoiceSignals): string | null
-renderOpenState(hours: unknown): string | null
-renderEnergy(vibeWords: string[]): string | null   // consumes SceneSense output
+renderEnergy(atmosphere: string[]): string | null   // consumes scenesense.atmosphere
 ```
 
 **Input type:**
@@ -168,9 +170,8 @@ renderEnergy(vibeWords: string[]): string | null   // consumes SceneSense output
 interface VoiceSignals {
   neighborhood: string | null | undefined;
   category: string | null | undefined;
-  hours: unknown;
-  // vibe_words sourced from identity_signals via SceneSense interpretation
-  vibeWords: string[] | null | undefined;
+  // atmosphere sourced from scenesense.atmosphere (SceneSense output)
+  atmosphere?: string[] | null | undefined;
 }
 ```
 
@@ -192,9 +193,11 @@ interface VoiceSignals {
 | Layer | Stores | Does not store |
 |---|---|---|
 | Fields | Structured signals, authored content, provenance | Rendered text, presentation logic |
+| SceneSense | Interpretation logic, lens routing | Raw signal data, rendered text |
 | TRACES | Phrase maps, render logic, cached output | Raw signal data |
 
 Fields never stores rendered text.
+SceneSense never stores signals — it interprets them.
 TRACES never stores signal data.
 
 ---
@@ -204,7 +207,7 @@ TRACES never stores signal data.
 | Expansion | Description |
 |---|---|
 | Time-aware phrasing | "Open tonight", "Opens at 5pm", "Closed Mondays" |
-| SceneSense integration | Voice layer consumes SceneSense output; `identity_signals.vibe_words` drives energy phrase assembly |
+| Multi-lens rendering | Voice layer may pull from ambiance or scene for richer sentences |
 | Neighborhood context | "Heart of Silver Lake", "Quiet corner of Culver City" |
 | Vertical-specific voice | Coffee shops, hotels, parks, restaurants |
 | Voice tuning | Editorial tone variations per context |

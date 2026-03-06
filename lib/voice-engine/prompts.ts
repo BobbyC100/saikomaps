@@ -39,7 +39,7 @@ PATTERN 1 — FOOD FORWARD: Lead with what they serve. State it as fact. Add a d
 
 PATTERN 2 — NEIGHBORHOOD ANCHOR: Lead with where they are — street name, micro-location, or neighborhood. Connect with a confident statement that doesn't explain itself.
 
-PATTERN 3 — VIBE CHECK: Put the reader in the scene. Short sensory statements. What it feels like to be there, not why it's great.
+PATTERN 3 — ENERGY CHECK: Put the reader in the scene. Short sensory statements. What it feels like to be there, not why it's great.
 
 PATTERN 4 — LOCAL AUTHORITY: Maximum confidence, minimum words. The shortest tagline. A declaration that doesn't need to justify itself.
 

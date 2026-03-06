@@ -21,7 +21,7 @@ const HAIKU_MODEL = 'claude-3-5-haiku-20250205';
 const PATTERN_MAP: Record<number, PhrasePattern> = {
   0: 'food',
   1: 'neighborhood',
-  2: 'vibe',
+  2: 'energy',
   3: 'authority',
 };
 

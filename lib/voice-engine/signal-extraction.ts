@@ -8,7 +8,7 @@ import {
   DerivedAttributes,
   PriceLevel,
   PopularityTier,
-  Vibe,
+  EnergyProfile,
   TimeOfDay,
 } from './types';
 
@@ -162,20 +162,20 @@ export function deriveAttributes(signals: MerchantSignals): DerivedAttributes {
     popularityTier = 'discovery';
   }
   
-  // VIBE
-  let vibe: Vibe;
+  // ENERGY PROFILE
+  let energy: EnergyProfile;
   const hasDrinks = signals.servesBeer || signals.servesCocktails;
   const isExpensive = signals.priceLevel === 'EXPENSIVE' || signals.priceLevel === 'VERY_EXPENSIVE';
   const isTakeoutOnly = signals.serviceStyle.includes('takeout') && !signals.serviceStyle.includes('dine_in');
   
   if (signals.outdoorSeating && hasDrinks) {
-    vibe = 'hang';
+    energy = 'hang';
   } else if (isExpensive) {
-    vibe = 'occasion';
+    energy = 'occasion';
   } else if (isTakeoutOnly) {
-    vibe = 'quick';
+    energy = 'quick';
   } else {
-    vibe = 'neighborhood';
+    energy = 'neighborhood';
   }
   
   // TIME OF DAY
@@ -190,7 +190,7 @@ export function deriveAttributes(signals: MerchantSignals): DerivedAttributes {
   
   return {
     popularityTier,
-    vibe,
+    energy,
     timeOfDay,
   };
 }

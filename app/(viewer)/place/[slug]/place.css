@@ -17,6 +17,14 @@
   --pp-color-rule: rgba(0, 0, 0, 0.08);
   --pp-color-quote-border: rgba(195, 176, 145, 0.3);
 
+  /* Typography — Typeface Roles
+     Display / Editorial (title, longform)  → Instrument Serif (serif, imported in globals)
+     Interface / Data (subline, actions, labels, chips) → DM Sans (sans, imported in globals)
+     Prose serif (curator notes, pull quotes) → Libre Baskerville (already loaded via pp-font-serif)
+  */
+  --pp-font-display: 'Instrument Serif', Georgia, serif;
+  --pp-font-ui: 'DM Sans', sans-serif;
+
   /* Type Scale */
   --pp-font-title: clamp(2rem, 4.5vw, 2.6rem);
   --pp-font-body: 15px;
@@ -99,6 +107,7 @@
 /* Identity stack: H1 → Subline → Signals → Facts Band → Description → Place Character */
 #place-title {
   margin: 0 0 0.25em;
+  font-family: var(--pp-font-display); /* display/editorial — must not be removed; see typography tests */
   font-size: var(--pp-font-title);
   font-weight: 600;
   color: var(--pp-color-text);
@@ -107,13 +116,17 @@
 
 #identity-subline {
   margin: 0 0 0.5em;
+  font-family: var(--pp-font-ui); /* interface/data tier — uppercase label row */
   font-size: var(--pp-l2-size);
   color: var(--pp-color-text);
   opacity: 0.8;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 #identity-signals {
   margin: 0 0 0.75em;
+  font-family: var(--pp-font-ui);
   font-size: var(--pp-font-small);
   color: var(--pp-color-text);
   opacity: 0.85;
@@ -143,6 +156,7 @@
   border-bottom: var(--pp-rule-weight-light) solid var(--pp-color-rule);
   margin-top: 1.25em;
   padding: 10px 0;
+  font-family: var(--pp-font-ui);
   font-size: var(--pp-font-small);
   color: var(--pp-color-text);
   opacity: 0.85;

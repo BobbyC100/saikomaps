@@ -99,7 +99,7 @@ console.log('Scenario 3: Gallery + Menu (Natural Fill)');
 console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
 
 const scenario3: PlaceData = {
-  vibe: ['Cozy', 'Date Night'],
+  scenesense: ['Cozy', 'Date Night'],
   gallery: ['hero.jpg', 'ambiance.jpg', 'dish1.jpg'],
   menu: [
     { name: 'Cacio e Pepe', price: '$24', description: 'Classic Roman pasta' },
@@ -147,7 +147,7 @@ console.log('━━━━━━━━━━━━━━━━━━━━━━�
 const scenario4: PlaceData = {
   hours: { today: 'Open', isOpen: true, closesAt: '9 PM', opensAt: null, fullWeek: [], isIrregular: false },
   description: { curator_note: 'Neighborhood cafe', about_copy: null },
-  vibe: ['Casual', 'Local'],
+  scenesense: ['Casual', 'Local'],
   phone: '+1 (310) 555-0199',
   alsoOn: [
     { 

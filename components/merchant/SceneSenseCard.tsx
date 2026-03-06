@@ -1,7 +1,7 @@
 'use client';
 
 import type { SceneSenseOutput } from '@/lib/scenesense/types';
-import styles from './VibeCard.module.css';
+import styles from './SceneSenseCard.module.css';
 
 interface SceneSenseCardProps {
   scenesense: SceneSenseOutput;
@@ -9,7 +9,6 @@ interface SceneSenseCardProps {
 }
 
 const SURFACE_LABELS: Record<keyof SceneSenseOutput, string> = {
-  vibe: 'VIBE',
   atmosphere: 'ATMOSPHERE',
   ambiance: 'AMBIANCE',
   scene: 'SCENE',
@@ -31,11 +30,11 @@ function StatementList({ statements }: { statements: string[] }) {
 }
 
 /**
- * SceneSense card — displays vibe, atmosphere, ambiance, scene per PRL mode.
+ * SceneSense card — displays atmosphere, ambiance, scene per PRL mode.
  * Max 2/surface (Lite) or 4/surface (Full) enforced upstream.
  */
 export function SceneSenseCard({ scenesense, span = 6 }: SceneSenseCardProps) {
-  const sections = (['vibe', 'atmosphere', 'ambiance', 'scene'] as const)
+  const sections = (['atmosphere', 'ambiance', 'scene'] as const)
     .map((key) => ({
       key,
       label: SURFACE_LABELS[key],
@@ -47,7 +46,7 @@ export function SceneSenseCard({ scenesense, span = 6 }: SceneSenseCardProps) {
 
   return (
     <div
-      className={styles.vibeCard}
+      className={styles.scenesenseCard}
       style={{ gridColumn: `span ${span}` }}
     >
       {sections.map(({ key, label, statements }) => (

@@ -34,7 +34,7 @@ const validData: PlaceData = {
   tips: ["Tip 1", "Tip 2"],
   menu: null,
   wine: null,
-  vibe: ["Tag 1", "Tag 2"],
+  scenesense: ["Tag 1", "Tag 2"],
   alsoOn: [{ id: '1', title: 'Test Map', slug: 'test', creatorName: 'tester', placeCount: 10 }]
 };
 

@@ -160,7 +160,7 @@
 #### Pattern 2D: Vibe (3 or 6 col)
 ```
 ┌─────────────────────┐
-│ VIBE                │
+│ SCENESENSE          │
 │                     │
 │ Low-key · Surf      │
 │ crowd · Standing    │

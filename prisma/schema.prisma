@@ -290,6 +290,12 @@ model entities {
   merchant_signals         merchant_signals?
   coverage_sources         coverage_sources[]
 
+  // Fields v2 relations
+  canonical_state       canonical_entity_state?
+  entity_claims         observed_claims[]
+  derived_signals       derived_signals[]
+  interpretation_cache  interpretation_cache[]
+
   @@map("entities")
   @@index([category])
   @@index([categoryId])
@@ -333,6 +339,7 @@ model merchant_signals {
   ordering_provider      String?  @map("ordering_provider")
   ordering_url           String?  @map("ordering_url")
   menu_url               String?  @map("menu_url")
+  winelist_url           String?  @map("winelist_url")
   social_links           Json?    @map("social_links")
   extraction_confidence  Decimal?  @map("extraction_confidence") @db.Decimal(4, 2)
   last_updated_at        DateTime @default(now()) @updatedAt @map("last_updated_at")
@@ -692,8 +699,9 @@ model golden_records {
   website_updated_at   DateTime?
 
   // Hours
-  hours_json      Json?
-  hours_irregular Boolean @default(false)
+  hours_json           Json?
+  hours_irregular      Boolean @default(false)
+  instagram_hours_raw  String? // Raw hours text captured from Instagram profile/bio
 
   // Editorial enrichment
   description       String?
@@ -752,6 +760,11 @@ model golden_records {
   winelist_raw_text   String? // Extracted wine list content
   about_copy          String? // "Our Story" / "About Us" content
   about_source_url    String? // URL of about page
+  // Website About extraction staging (WO-FIELDS-WEBSITE-ABOUT-EXTRACTION-001)
+  // Separate from about_copy/description so extraction can land without touching human-authored fields.
+  website_about_url           String?   // Discovered about-page URL
+  website_about_raw           String?   // Extracted clean text (max 2 000 chars)
+  website_about_extracted_at  DateTime? // When the extraction was run
   scraped_at          DateTime? // Last successful scrape timestamp
   scrape_status       String? // 'success' | 'partial' | 'blocked' | 'timeout' | 'failed'
 
@@ -1474,4 +1487,307 @@ model place_job_log {
   @@index([job_type])
   @@index([created_at])
   @@map("place_job_log")
+}
+
+// ============================================================================
+// FIELDS V2 — CLEAN DATA LAYER
+// Three-layer model: Observed Claims → Canonical Entity State → Derived/Interpretation
+// ============================================================================
+
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+enum SourceType {
+  GOOGLE_PLACES
+  EDITORIAL
+  OPERATOR_WEBSITE
+  SOCIAL
+  NEWSLETTER
+  HUMAN_REVIEW
+  SYSTEM_IMPORT
+}
+
+enum AttributeClass {
+  CANONICAL
+  DERIVED
+  INTERPRETATION
+}
+
+enum DecayPolicy {
+  NONE
+  TIME_BASED
+  SOURCE_UPDATED
+}
+
+enum ExtractionMethod {
+  API
+  SCRAPE
+  AI_EXTRACT
+  HUMAN
+  IMPORT
+}
+
+/// How the claim was matched to an entity at intake time.
+enum ClaimResolutionMethod {
+  SLUG_EXACT
+  GOOGLE_PLACE_ID_EXACT
+  PLACEKEY_EXACT
+  FUZZY_MATCH
+  HUMAN_REVIEW
+  NEW_ENTITY
+}
+
+enum SanctionMethod {
+  AUTO_HIGH_CONFIDENCE
+  AUTO_SOLE_SOURCE
+  HUMAN_APPROVED
+  HUMAN_OVERRIDE
+}
+
+enum SanctionConflictStatus {
+  OPEN
+  RESOLVED_HUMAN
+  RESOLVED_AUTO
+}
+
+enum InterpretationType {
+  TAGLINE
+  PULL_QUOTE
+  SCENESENSE_PRL
+  VOICE_DESCRIPTOR
+}
+
+// ---------------------------------------------------------------------------
+// A. Source Registry
+// Trust-gated catalog of every data source the system can accept.
+// Replaces `sources`. All observed claims must have a valid source_id here.
+// ---------------------------------------------------------------------------
+
+model source_registry {
+  id                      String     @id // machine key: "google_places", "eater_la"
+  display_name            String
+  source_type             SourceType
+  trust_tier              Int        // 1 = highest, 5 = lowest
+  requires_human_approval Boolean    @default(false)
+  base_domain             String?
+  is_active               Boolean    @default(true)
+  created_at              DateTime   @default(now()) @map("created_at")
+
+  claims observed_claims[]
+
+  @@map("source_registry")
+  @@index([trust_tier])
+  @@index([is_active])
+}
+
+// ---------------------------------------------------------------------------
+// B. Attribute Registry
+// Classifies every attribute key the system tracks.
+// attribute_class drives which table stores the value.
+// ---------------------------------------------------------------------------
+
+model attribute_registry {
+  attribute_key      String         @id
+  display_name       String
+  attribute_class    AttributeClass
+  identity_critical  Boolean        @default(false)
+  sanction_threshold Decimal        @default(0.70) @db.Decimal(3, 2)
+  decay_policy       DecayPolicy    @default(NONE)
+
+  claims observed_claims[]
+
+  @@map("attribute_registry")
+}
+
+// ---------------------------------------------------------------------------
+// C. Observed Claims
+// Immutable source observations. One row per (entity, attribute, source, time).
+// Never updated — superseded via supersedes_claim_id chain.
+// ---------------------------------------------------------------------------
+
+model observed_claims {
+  claim_id              String               @id @default(uuid())
+  entity_id             String               @map("entity_id")
+  attribute_key         String               @map("attribute_key")
+  raw_value             Json                 @map("raw_value")
+  normalized_value      String?              @map("normalized_value")
+  source_id             String               @map("source_id")
+  source_url            String?              @map("source_url")
+  observed_at           DateTime             @map("observed_at")
+  extracted_at          DateTime             @default(now()) @map("extracted_at")
+  extraction_method     ExtractionMethod     @map("extraction_method")
+  confidence            Decimal?             @db.Decimal(4, 3) @map("confidence")
+  resolution_method     ClaimResolutionMethod @map("resolution_method")
+  resolution_confidence Decimal?             @db.Decimal(4, 3) @map("resolution_confidence")
+  supersedes_claim_id   String?              @map("supersedes_claim_id")
+  is_active             Boolean              @default(true) @map("is_active")
+
+  entity          entities          @relation(fields: [entity_id], references: [id], onDelete: Cascade)
+  source          source_registry   @relation(fields: [source_id], references: [id])
+  attribute       attribute_registry @relation(fields: [attribute_key], references: [attribute_key])
+  supersedes      observed_claims?  @relation("Supersession", fields: [supersedes_claim_id], references: [claim_id])
+  superseded_by   observed_claims[] @relation("Supersession")
+  sanctions       canonical_sanctions[]
+
+  @@map("observed_claims")
+  @@index([entity_id, attribute_key])
+  @@index([entity_id, is_active])
+  @@index([source_id])
+  @@index([extracted_at])
+}
+
+// ---------------------------------------------------------------------------
+// D. Canonical Entity State
+// The system's currently sanctioned belief about an entity.
+// One row per entity. All values must be backed by a canonical_sanctions row.
+// Replaces golden_records for the fields the product actually needs.
+// ---------------------------------------------------------------------------
+
+model canonical_entity_state {
+  entity_id String @id @map("entity_id")
+
+  // Identity-critical (sanction_threshold 0.95)
+  name            String
+  google_place_id String? @unique @map("google_place_id")
+  latitude        Decimal? @db.Decimal(10, 7)
+  longitude       Decimal? @db.Decimal(11, 7)
+
+  // Operational (sanction_threshold 0.80)
+  address         String?
+  neighborhood    String?
+  phone           String?
+  website         String?
+  instagram       String?
+  hours_json      Json?    @map("hours_json")
+  price_level     Int?     @map("price_level")
+  reservation_url String?  @map("reservation_url")
+  menu_url        String?  @map("menu_url")
+  winelist_url    String?  @map("winelist_url")
+
+  // Content (requires explicit sanction or human approval)
+  description  String?
+  cuisine_type String? @map("cuisine_type")
+  category     String?
+  tips         String[] @default([])
+
+  // Google Photos blob (observed from Google API, surfaced here for convenience)
+  google_photos           Json? @map("google_photos")
+  google_places_attributes Json? @map("google_places_attributes")
+
+  // Sanctioning metadata
+  last_sanctioned_at DateTime? @map("last_sanctioned_at")
+  sanctioned_by      String?   @map("sanctioned_by") // "SYSTEM" or user_id
+
+  entity    entities              @relation(fields: [entity_id], references: [id], onDelete: Cascade)
+  sanctions canonical_sanctions[]
+
+  @@map("canonical_entity_state")
+  @@index([google_place_id])
+  @@index([neighborhood])
+}
+
+// ---------------------------------------------------------------------------
+// F. Canonical Sanctions
+// Audit trail: which observed_claim currently backs which canonical field.
+// One "current" row per (entity_id, attribute_key).
+// Partial unique index enforced via raw SQL: CREATE UNIQUE INDEX ON
+// canonical_sanctions (entity_id, attribute_key) WHERE is_current = true;
+// ---------------------------------------------------------------------------
+
+model canonical_sanctions {
+  sanction_id     String         @id @default(uuid()) @map("sanction_id")
+  entity_id       String         @map("entity_id")
+  attribute_key   String         @map("attribute_key")
+  claim_id        String         @map("claim_id")
+  sanctioned_at   DateTime       @default(now()) @map("sanctioned_at")
+  sanctioned_by   String         @map("sanctioned_by") // "SYSTEM" or user_id
+  sanction_method SanctionMethod @map("sanction_method")
+  is_current      Boolean        @default(true) @map("is_current")
+
+  claim          observed_claims        @relation(fields: [claim_id], references: [claim_id])
+  entity_state   canonical_entity_state @relation(fields: [entity_id], references: [entity_id], onDelete: Cascade)
+
+  @@map("canonical_sanctions")
+  @@index([entity_id, attribute_key])
+  @@index([claim_id])
+  @@index([entity_id, attribute_key, is_current])
+}
+
+// ---------------------------------------------------------------------------
+// G. Sanction Conflicts
+// Created when sanctioning function cannot auto-resolve competing claims.
+// Human resolves by picking the winning claim_id.
+// ---------------------------------------------------------------------------
+
+model sanction_conflicts {
+  conflict_id       String                 @id @default(uuid()) @map("conflict_id")
+  entity_id         String                 @map("entity_id")
+  attribute_key     String                 @map("attribute_key")
+  claim_ids         String[]               @map("claim_ids")
+  conflict_reason   String                 @map("conflict_reason")
+  status            SanctionConflictStatus @default(OPEN)
+  resolved_claim_id String?                @map("resolved_claim_id")
+  resolved_by       String?                @map("resolved_by")
+  resolved_at       DateTime?              @map("resolved_at")
+  created_at        DateTime               @default(now()) @map("created_at")
+
+  @@map("sanction_conflicts")
+  @@index([entity_id, status])
+  @@index([attribute_key, status])
+  @@index([status])
+}
+
+// ---------------------------------------------------------------------------
+// H. Derived Signals
+// Computed outputs from claims and/or canonical state. Never canonical.
+// Versioned so recompute is safe. Replaces AI signal fields in golden_records.
+// energy_scores and place_tag_scores remain separate (already correct layer).
+// ---------------------------------------------------------------------------
+
+model derived_signals {
+  signal_id       String   @id @default(uuid()) @map("signal_id")
+  entity_id       String   @map("entity_id")
+  signal_key      String   @map("signal_key")
+  signal_value    Json     @map("signal_value")
+  signal_version  String   @map("signal_version")
+  input_claim_ids String[] @map("input_claim_ids")
+  computed_at     DateTime @default(now()) @map("computed_at")
+
+  entity entities @relation(fields: [entity_id], references: [id], onDelete: Cascade)
+
+  @@map("derived_signals")
+  @@unique([entity_id, signal_key, signal_version])
+  @@index([entity_id])
+  @@index([signal_key])
+}
+
+// ---------------------------------------------------------------------------
+// I. Interpretation Cache
+// Taglines, pull quotes, SceneSense outputs. Never canonical. Versioned + expirable.
+// content shape per type:
+//   TAGLINE: { text: string }
+//   PULL_QUOTE: { text: string, author: string|null, source_name: string|null, source_url: string|null }
+//   SCENESENSE_PRL: { prl: number, atmosphere: string[], ambiance: string[], scene: string[] }
+//   VOICE_DESCRIPTOR: { text: string }
+// ---------------------------------------------------------------------------
+
+model interpretation_cache {
+  cache_id         String             @id @default(uuid()) @map("cache_id")
+  entity_id        String             @map("entity_id")
+  output_type      InterpretationType @map("output_type")
+  content          Json               @map("content")
+  prompt_version   String             @map("prompt_version")
+  model_version    String?            @map("model_version")
+  generated_at     DateTime           @default(now()) @map("generated_at")
+  expires_at       DateTime?          @map("expires_at")
+  input_signal_ids String[]           @map("input_signal_ids")
+  is_current       Boolean            @default(true) @map("is_current")
+
+  entity entities @relation(fields: [entity_id], references: [id], onDelete: Cascade)
+
+  @@map("interpretation_cache")
+  @@unique([entity_id, output_type, prompt_version])
+  @@index([entity_id])
+  @@index([entity_id, output_type, is_current])
 }

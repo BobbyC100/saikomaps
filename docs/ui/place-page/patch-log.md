@@ -151,7 +151,7 @@ Open now — lively room, strong date-night energy
 
 **Signal mapping:**
 - `neighborhood` + `category` (lowercased) → subline sentence
-- `openState` + `vibeTags` → signals sentence via `VIBE_PHRASES` lookup
+- `openState` + ~~`vibeTags`~~ → signals sentence via `VIBE_PHRASES` lookup (**deprecated**: `vibeTags` replaced by `identity_signals.vibe_words` via SceneSense)
 - Dynamic state (`Open now` / `Closed now`) wrapped in `<em>`
 
 **Vibe phrases (v1):**

@@ -1,8 +1,13 @@
 /**
  * Write rules (SAIKO spec §9): append run, upsert signals, update places by confidence.
+ *
+ * Fields v2 integration: high-confidence signals are also written as observed_claims
+ * and sanctioned into canonical_entity_state. The legacy merchant_signals upsert is
+ * retained during the transition; it will be removed after slim-entities runs.
  */
 
 import { db } from "../db";
+import { writeClaimAndSanction } from "../fields-v2/write-claim";
 import type { EnrichmentPayload } from "./types";
 
 const CONFIDENCE_HIGH = 0.75;
@@ -62,6 +67,33 @@ export async function applyWriteRules(payload: EnrichmentPayload): Promise<void>
         extraction_confidence: confidence,
       },
     });
+  }
+
+  // Fields v2: write high-confidence operational signals as observed_claims
+  if (confidence >= CONFIDENCE_HIGH) {
+    const claimInputs: Array<{ key: string; value: string | null }> = [
+      { key: 'menu_url', value: signals.menu_url ?? null },
+      { key: 'reservation_url', value: signals.reservation_url ?? null },
+      { key: 'website', value: final_url ?? null },
+    ];
+
+    for (const { key, value } of claimInputs) {
+      if (value) {
+        await writeClaimAndSanction(db, {
+          entityId: place_id,
+          attributeKey: key,
+          rawValue: value,
+          sourceId: 'operator_website',
+          sourceUrl: source_url,
+          extractionMethod: 'SCRAPE',
+          resolutionMethod: 'SLUG_EXACT',
+          confidence,
+        }).catch((err) => {
+          // Non-fatal: Fields v2 write is additive during transition
+          console.warn(`[Fields v2] write-claim failed for ${key} on ${place_id}:`, err);
+        });
+      }
+    }
   }
 
   const place = await db.entities.findUnique({

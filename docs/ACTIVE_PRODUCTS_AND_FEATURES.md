@@ -31,8 +31,7 @@ Public maps at `/map/[slug]` use the Field Notes template: cover/header map with
 Standalone place pages at `/place/[slug]` show hero photo, AI tagline, tips, pull quotes, hours, contact, and “Also on” coverage. Data degrades gracefully when fields are missing; the API is `/api/places/[slug]`.
 
 **Sample data:**
-- **Place API response (excerpt):** `GET /api/places/covell` → `data.location`: `{ id, slug: "covell", name, address, latitude, longitude, phone, website, instagram, description, category, neighborhood, cuisineType, priceLevel, photoUrl, photoUrls, hours, googlePlaceId, curatorNote, vibeWords: ["standing-room", "surf-crowd"],  # derived from identity_signals.vibe_words
- tips: ["Go early for a seat", "Cash only"], tagline: "Low-key wine bar with natural selections", pullQuote, pullQuoteSource, pullQuoteAuthor, prl: 3, scenesense: { ... }, appearsOn: [{ id, title, slug, creatorName }], guide: { id, title, slug, creatorName } }`.
+- **Place API response (excerpt):** `GET /api/places/covell` → `data.location`: `{ id, slug: "covell", name, address, latitude, longitude, phone, website, instagram, description, category, neighborhood, cuisineType, priceLevel, photoUrl, photoUrls, hours, googlePlaceId, curatorNote, tips: ["Go early for a seat", "Cash only"], tagline: "Low-key wine bar with natural selections", pullQuote, pullQuoteSource, pullQuoteAuthor, prl: 3, scenesense: { atmosphere: [...], ambiance: [...], scene: [...] }, appearsOn: [{ id, title, slug, creatorName }], guide: { id, title, slug, creatorName } }`.
 - **Example slugs:** `covell`, `seco`, `budonoki`, `tabula-rasa-bar`, `psychic-wines`.
 
 ### 4. Voice Engine (AI content generation)
@@ -40,7 +39,7 @@ Claude-powered generation of taglines, tips, and pull quotes for places. Scripts
 
 **Sample data:**
 - **Tagline:** `"Low-key wine bar with natural selections"`.
-- **Vibe words:** `["standing-room", "surf-crowd"]` (from `identity_signals.vibe_words` via SceneSense).
+- **Language signals:** `["standing-room", "surf-crowd"]` (from `identity_signals.language_signals`, routed through SceneSense into atmosphere / ambiance / scene).
 - **Tips:** `["Go early for a seat", "Cash only"]`.
 - **Pull quote:** `"The room has a bubbly energy as it fills up with creative directors who part-time in Lisbon..."` with `pullQuoteSource: "The Infatuation"`, `pullQuoteAuthor`.
 

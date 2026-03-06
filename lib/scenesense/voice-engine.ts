@@ -10,7 +10,6 @@ export type VoiceCtx = {
   mode: Mode;
   confidence: {
     overall: number;
-    vibe: number;
     atmosphere: number;
     ambiance: number;
     scene: number;
@@ -18,20 +17,16 @@ export type VoiceCtx = {
 };
 
 export type VoiceOutput = {
-  vibe: string[];
   atmosphere: string[];
   ambiance: string[];
   scene: string[];
 };
 
 export type CanonicalSceneSense = {
-  vibe?: {
-    core?: Array<
-      'BUZZY' | 'CHILL' | 'LIVELY' | 'LOW_KEY' | 'CALM' | 'STEADY' | 'ELECTRIC'
-    >;
-    time_variants?: Partial<
-      Record<'early_evening' | 'late' | 'weekend' | 'weekday', string>
-    >;
+  atmosphere?: {
+    /** Energy character derived from identity_signals.language_signals. */
+    energy?: Array<'BUZZY' | 'CHILL' | 'LIVELY' | 'LOW_KEY' | 'CALM' | 'STEADY' | 'ELECTRIC'>;
+    energy_time_variants?: Partial<Record<'early_evening' | 'late' | 'weekend' | 'weekday', string>>;
     busy_windows?: Array<{
       label: string;
       confidence: number;
@@ -39,8 +34,6 @@ export type CanonicalSceneSense = {
       endHour?: number;
     }>;
     tempo?: Array<'LINGER_FRIENDLY' | 'QUICK_TURN'>;
-  };
-  atmosphere?: {
     noise?: 'LOUD' | 'CONVERSATIONAL' | 'QUIET';
     lighting?: 'DIM' | 'WARM' | 'BRIGHT';
     density?: 'TIGHT' | 'AIRY' | 'PACKED';
@@ -129,12 +122,12 @@ function safePush(out: string[], s?: string) {
 }
 
 function isHighConfidenceForNumericBusy(ctx: VoiceCtx): boolean {
-  return ctx.mode === 'FULL' && ctx.confidence.vibe >= 0.75;
+  return ctx.mode === 'FULL' && ctx.confidence.atmosphere >= 0.75;
 }
 
 function formatBusyStatement(
   ctx: VoiceCtx,
-  busy?: NonNullable<CanonicalSceneSense['vibe']>['busy_windows']
+  busy?: NonNullable<CanonicalSceneSense['atmosphere']>['busy_windows']
 ): string | null {
   if (!busy || busy.length === 0) return null;
 
@@ -161,7 +154,7 @@ function formatBusyStatement(
     return `Busiest: ${range}`;
   }
 
-  if (ctx.mode === 'LITE' || ctx.confidence.vibe < 0.75) {
+  if (ctx.mode === 'LITE' || ctx.confidence.atmosphere < 0.75) {
     if (top.label === 'EVENING') return 'Typically busiest in the evening';
     if (top.label === 'AFTER_WORK') return 'Often busiest after work';
     return 'Typically gets busiest in the evening';
@@ -175,65 +168,46 @@ export function generateSceneSenseCopy(
   ctx: VoiceCtx
 ): VoiceOutput {
   const out: VoiceOutput = {
-    vibe: [],
     atmosphere: [],
     ambiance: [],
     scene: [],
   };
 
-  // VIBE
-  if (ctx.confidence.vibe >= 0.45) {
-    const core = canonical.vibe?.core?.[0];
+  // ATMOSPHERE — energy character first, then physical room signals
+  if (ctx.confidence.atmosphere >= 0.45) {
+    const core = canonical.atmosphere?.energy?.[0];
     if (core === 'ELECTRIC' && ctx.mode !== 'FULL') {
       // electric is Full-only
     } else {
-      safePush(out.vibe, core ? ENERGY_MAP[core] : undefined);
+      safePush(out.atmosphere, core ? ENERGY_MAP[core] : undefined);
     }
 
-    if (ctx.mode === 'FULL' && ctx.confidence.vibe >= 0.65) {
-      const early = canonical.vibe?.time_variants?.early_evening;
-      const late = canonical.vibe?.time_variants?.late;
-      if (
-        early &&
-        late &&
-        ENERGY_MAP[early] &&
-        ENERGY_MAP[late] &&
-        early !== late
-      ) {
-        safePush(
-          out.vibe,
-          `${ENERGY_MAP[early]} early evening · ${ENERGY_MAP[late]} late`
-        );
+    if (ctx.mode === 'FULL' && ctx.confidence.atmosphere >= 0.65) {
+      const early = canonical.atmosphere?.energy_time_variants?.early_evening;
+      const late = canonical.atmosphere?.energy_time_variants?.late;
+      if (early && late && ENERGY_MAP[early] && ENERGY_MAP[late] && early !== late) {
+        safePush(out.atmosphere, `${ENERGY_MAP[early]} early evening · ${ENERGY_MAP[late]} late`);
       }
     }
 
-    const busy = formatBusyStatement(ctx, canonical.vibe?.busy_windows);
-    safePush(out.vibe, busy ?? undefined);
+    const busy = formatBusyStatement(ctx, canonical.atmosphere?.busy_windows);
+    safePush(out.atmosphere, busy ?? undefined);
 
-    const tempo = canonical.vibe?.tempo?.[0];
-    if (tempo === 'LINGER_FRIENDLY') safePush(out.vibe, 'Lingering-friendly');
-    if (tempo === 'QUICK_TURN') safePush(out.vibe, 'Quick-turn tables');
-  }
+    const tempo = canonical.atmosphere?.tempo?.[0];
+    if (tempo === 'LINGER_FRIENDLY') safePush(out.atmosphere, 'Lingering-friendly');
+    if (tempo === 'QUICK_TURN') safePush(out.atmosphere, 'Quick-turn tables');
 
-  // ATMOSPHERE
-  if (ctx.confidence.atmosphere >= 0.45) {
     safePush(
       out.atmosphere,
-      canonical.atmosphere?.lighting
-        ? ATM_LIGHT[canonical.atmosphere.lighting]
-        : undefined
+      canonical.atmosphere?.lighting ? ATM_LIGHT[canonical.atmosphere.lighting] : undefined
     );
     safePush(
       out.atmosphere,
-      canonical.atmosphere?.noise
-        ? ATM_NOISE[canonical.atmosphere.noise]
-        : undefined
+      canonical.atmosphere?.noise ? ATM_NOISE[canonical.atmosphere.noise] : undefined
     );
     safePush(
       out.atmosphere,
-      canonical.atmosphere?.density
-        ? ATM_DENSITY[canonical.atmosphere.density]
-        : undefined
+      canonical.atmosphere?.density ? ATM_DENSITY[canonical.atmosphere.density] : undefined
     );
     const seating = canonical.atmosphere?.seating?.[0];
     if (seating === 'BAR_FORWARD') safePush(out.atmosphere, 'Bar-forward');
@@ -285,7 +259,6 @@ export function generateSceneSenseCopy(
 
   const cap = (arr: string[], max: number) => arr.slice(0, max);
   const maxPerSurface = ctx.mode === 'LITE' ? 2 : 4;
-  out.vibe = cap(out.vibe, maxPerSurface);
   out.atmosphere = cap(out.atmosphere, maxPerSurface);
   out.ambiance = cap(out.ambiance, maxPerSurface);
   out.scene = cap(out.scene, maxPerSurface);

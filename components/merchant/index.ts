@@ -7,7 +7,6 @@ export { HeroHeader } from './HeroHeader';
 export { PrimaryActionSet } from './PrimaryActionSet';
 export { InstagramConfidenceRow } from './InstagramConfidenceRow';
 export { PhotoCollage } from './PhotoCollage';
-export { VibeTagsRow } from './VibeTagsRow';
 export { TrustBlock } from './TrustBlock';
 export { HoursCard } from './HoursCard';
 export { AddressCard } from './AddressCard';

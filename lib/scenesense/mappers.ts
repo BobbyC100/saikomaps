@@ -5,7 +5,11 @@
 import type { PlaceForPRL } from './prl';
 import type { CanonicalSceneSense } from './voice-engine';
 
-const VIBE_WORD_TO_CORE: Record<string, 'BUZZY' | 'CHILL' | 'LIVELY' | 'LOW_KEY' | 'CALM' | 'STEADY' | 'ELECTRIC'> = {
+/**
+ * Maps raw language signals to canonical energy tokens for the Atmosphere lens.
+ * Energy/sensory signals route here; role signals route to ambiance/scene.
+ */
+const LANGUAGE_SIGNAL_TO_ENERGY: Record<string, 'BUZZY' | 'CHILL' | 'LIVELY' | 'LOW_KEY' | 'CALM' | 'STEADY' | 'ELECTRIC'> = {
   buzzy: 'BUZZY',
   chill: 'CHILL',
   lively: 'LIVELY',
@@ -92,9 +96,10 @@ export function mapPlaceToPlaceForPRL(place: {
   };
 }
 
-/** Map legacy vibe_words / place_personality / etc. to CanonicalSceneSense */
+/** Map language_signals / place_personality / etc. to CanonicalSceneSense */
 export function mapToCanonicalSceneSense(input: {
-  vibe_words?: string[];
+  /** Raw phrases from golden_records.identity_signals.language_signals */
+  language_signals?: string[];
   place_personality?: string | null;
   signature_dishes?: string[];
   neighborhood?: string | null;
@@ -111,19 +116,19 @@ export function mapToCanonicalSceneSense(input: {
     context?: string[];
   } | null;
 }): CanonicalSceneSense {
-  const words = input.vibe_words ?? [];
-  const core: Array<'BUZZY' | 'CHILL' | 'LIVELY' | 'LOW_KEY' | 'CALM' | 'STEADY' | 'ELECTRIC'> = [];
-  for (const w of words) {
+  const signals = input.language_signals ?? [];
+  const energy: Array<'BUZZY' | 'CHILL' | 'LIVELY' | 'LOW_KEY' | 'CALM' | 'STEADY' | 'ELECTRIC'> = [];
+  for (const w of signals) {
     const key = w.toLowerCase().replace(/\s+/g, '-');
-    const mapped = VIBE_WORD_TO_CORE[key];
-    if (mapped && !core.includes(mapped)) core.push(mapped);
+    const mapped = LANGUAGE_SIGNAL_TO_ENERGY[key];
+    if (mapped && !energy.includes(mapped)) energy.push(mapped);
   }
   const p = input.place_personality?.toLowerCase();
-  if (p === 'scene' && !core.includes('LIVELY')) core.unshift('LIVELY');
-  if (p === 'neighborhood-spot' && !core.includes('LOW_KEY')) core.unshift('LOW_KEY');
-  if (p === 'hidden-gem' && !core.includes('CHILL')) core.unshift('CHILL');
-  if (p === 'institution' && core.length === 0) core.push('STEADY');
-  if (core.length === 0 && words.length > 0) core.push('CHILL');
+  if (p === 'scene' && !energy.includes('LIVELY')) energy.unshift('LIVELY');
+  if (p === 'neighborhood-spot' && !energy.includes('LOW_KEY')) energy.unshift('LOW_KEY');
+  if (p === 'hidden-gem' && !energy.includes('CHILL')) energy.unshift('CHILL');
+  if (p === 'institution' && energy.length === 0) energy.push('STEADY');
+  if (energy.length === 0 && signals.length > 0) energy.push('CHILL');
 
   const id = input.identitySignals;
   const formalityMap: Record<string, 'CASUAL' | 'CASUAL_REFINED' | 'REFINED'> = {
@@ -146,17 +151,15 @@ export function mapToCanonicalSceneSense(input: {
   };
 
   return {
-    vibe: { core: core.length > 0 ? core : undefined },
-    atmosphere: id
-      ? {
-          noise: (id.noise?.toUpperCase() as 'LOUD' | 'CONVERSATIONAL' | 'QUIET') || undefined,
-          lighting: (id.lighting?.toUpperCase() as 'DIM' | 'WARM' | 'BRIGHT') || undefined,
-          density: (id.density?.toUpperCase() as 'TIGHT' | 'AIRY' | 'PACKED') || undefined,
-          seating: id.seating?.map((s) =>
-            s === 'bar' ? 'BAR_FORWARD' : s === 'patio' ? 'PATIO_FRIENDLY' : 'COUNTER_FIRST'
-          ) as Array<'BAR_FORWARD' | 'PATIO_FRIENDLY' | 'COUNTER_FIRST'>,
-        }
-      : undefined,
+    atmosphere: {
+      energy: energy.length > 0 ? energy : undefined,
+      noise: id?.noise ? (id.noise.toUpperCase() as 'LOUD' | 'CONVERSATIONAL' | 'QUIET') : undefined,
+      lighting: id?.lighting ? (id.lighting.toUpperCase() as 'DIM' | 'WARM' | 'BRIGHT') : undefined,
+      density: id?.density ? (id.density.toUpperCase() as 'TIGHT' | 'AIRY' | 'PACKED') : undefined,
+      seating: id?.seating?.map((s) =>
+        s === 'bar' ? 'BAR_FORWARD' : s === 'patio' ? 'PATIO_FRIENDLY' : 'COUNTER_FIRST'
+      ) as Array<'BAR_FORWARD' | 'PATIO_FRIENDLY' | 'COUNTER_FIRST'> | undefined,
+    },
     ambiance: id
       ? {
           formality: id.formality ? formalityMap[id.formality] ?? 'CASUAL' : undefined,

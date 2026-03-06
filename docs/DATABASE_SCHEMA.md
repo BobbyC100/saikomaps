@@ -186,7 +186,7 @@
 **Voice Engine v1.1 - Taglines:**
 - `tagline` - Selected tagline
 - `taglineCandidates[]` - Alternative options generated
-- `taglinePattern` (food | neighborhood | vibe | authority)
+- `taglinePattern` (food | neighborhood | energy | authority)
 - `taglineGenerated` - Timestamp
 - `taglineSignals` (JSON) - Snapshot of merchant signals at generation
 
@@ -202,7 +202,7 @@
 - `pullQuoteType` (editorial | owner | self)
 
 **Bento Grid Enrichment:**
-- `vibeTags[]` - Atmosphere descriptors: ["Low-key", "Surf crowd", "Standing room"]
+- ~~`vibeTags[]`~~ - **Deprecated** (column removed from entities; language signals in `golden_records.identity_signals.language_signals`)
 - `tips[]` - Helpful visitor tips: ["Go early for a seat", "Cash only"]
 
 **Cache Management:**
@@ -418,7 +418,7 @@ Backfill script fetches Google Places API
   ↓
 Updates: photos, hours, phone, address, types, priceLevel
   ↓
-Voice Engine generates: tagline, vibeTags, tips, pullQuote
+Voice Engine generates: tagline, tips, pullQuote (language signals now in `identity_signals.language_signals` via SceneSense)
   ↓
 Place now "enriched" and ready for display
 ```

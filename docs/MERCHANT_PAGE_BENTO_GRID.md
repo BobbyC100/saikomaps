@@ -141,7 +141,7 @@ The grid is organized into semantic tiers:
 ```tsx
 <div className={`${styles.bentoBlock} ${styles.vibeBlock} ${styles.span3}`}>
   <div className={styles.blockLabel}>Vibe</div>
-  <div className={styles.vibeTags}>
+  <div className={styles.vibeWords}>
     <span>Low-key</span> · <span>Surf crowd</span> · <span>Standing room</span>
   </div>
 </div>

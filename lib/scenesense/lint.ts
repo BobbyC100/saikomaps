@@ -44,7 +44,6 @@ const BUSY_WORDS = /\b(busy|busiest|typically busiest|peak)\b/i;
 
 function cloneOutput(o: VoiceOutput): VoiceOutput {
   return {
-    vibe: [...(o.vibe ?? [])],
     atmosphere: [...(o.atmosphere ?? [])],
     ambiance: [...(o.ambiance ?? [])],
     scene: [...(o.scene ?? [])],
@@ -91,7 +90,6 @@ function commaCloudCheck(arr: string[], reasons: string[]): 'ok' | 'fail' {
 function dedupeExact(out: VoiceOutput, reasons: string[]) {
   const seen = new Set<string>();
   const order: Array<keyof VoiceOutput> = [
-    'vibe',
     'atmosphere',
     'ambiance',
     'scene',
@@ -110,11 +108,11 @@ function dedupeExact(out: VoiceOutput, reasons: string[]) {
 }
 
 function enforceBusyPlacement(out: VoiceOutput, reasons: string[]) {
-  (['atmosphere', 'ambiance', 'scene'] as Array<keyof VoiceOutput>).forEach(
+  (['ambiance', 'scene'] as Array<keyof VoiceOutput>).forEach(
     (k) => {
       out[k] = out[k].filter((s) => {
         if (BUSY_WORDS.test(s)) {
-          reasons.push('C2_BUSY_NON_VIBE');
+          reasons.push('C2_BUSY_NON_ATMOSPHERE');
           return false;
         }
         return true;
@@ -126,12 +124,12 @@ function enforceBusyPlacement(out: VoiceOutput, reasons: string[]) {
 function enforceNumericBusy(
   out: VoiceOutput,
   mode: Mode,
-  vibeConfidence: number,
+  atmosphereConfidence: number,
   reasons: string[]
 ) {
-  out.vibe = out.vibe.filter((s) => {
+  out.atmosphere = out.atmosphere.filter((s) => {
     if (!TIME_NUMERIC.test(s)) return true;
-    const ok = mode === 'FULL' && vibeConfidence >= 0.75;
+    const ok = mode === 'FULL' && atmosphereConfidence >= 0.75;
     if (!ok) {
       reasons.push('C1_NUMERIC_TIME_NOT_ALLOWED');
       return false;
@@ -139,11 +137,11 @@ function enforceNumericBusy(
     return true;
   });
 
-  (['atmosphere', 'ambiance', 'scene'] as Array<keyof VoiceOutput>).forEach(
+  (['ambiance', 'scene'] as Array<keyof VoiceOutput>).forEach(
     (k) => {
       out[k] = out[k].filter((s) => {
         if (TIME_NUMERIC.test(s)) {
-          reasons.push('C1_NUMERIC_TIME_NON_VIBE');
+          reasons.push('C1_NUMERIC_TIME_NON_ATMOSPHERE');
           return false;
         }
         return true;
@@ -156,7 +154,6 @@ export function lintSceneSenseOutput(args: {
   prl: number;
   mode: Mode;
   confidence: {
-    vibe: number;
     atmosphere: number;
     ambiance: number;
     scene: number;
@@ -177,7 +174,7 @@ export function lintSceneSenseOutput(args: {
       status,
       reasons,
       actions,
-      cleaned_output: { vibe: [], atmosphere: [], ambiance: [], scene: [] },
+      cleaned_output: { atmosphere: [], ambiance: [], scene: [] },
     };
   }
   if (args.prl === 3 && args.mode !== 'LITE') {
@@ -188,31 +185,27 @@ export function lintSceneSenseOutput(args: {
       status,
       reasons,
       actions,
-      cleaned_output: { vibe: [], atmosphere: [], ambiance: [], scene: [] },
+      cleaned_output: { atmosphere: [], ambiance: [], scene: [] },
     };
   }
 
   const conf = args.confidence;
-  if (conf.vibe < 0.45) cleaned.vibe = [];
   if (conf.atmosphere < 0.45) cleaned.atmosphere = [];
   if (conf.ambiance < 0.45) cleaned.ambiance = [];
   if (conf.scene < 0.45) cleaned.scene = [];
 
-  cleaned.vibe = dropEmpty(cleaned.vibe);
   cleaned.atmosphere = dropEmpty(cleaned.atmosphere);
   cleaned.ambiance = dropEmpty(cleaned.ambiance);
   cleaned.scene = dropEmpty(cleaned.scene);
 
-  cleaned.vibe = dropBanned(cleaned.vibe, reasons);
   cleaned.atmosphere = dropBanned(cleaned.atmosphere, reasons);
   cleaned.ambiance = dropBanned(cleaned.ambiance, reasons);
   cleaned.scene = dropBanned(cleaned.scene, reasons);
 
   enforceBusyPlacement(cleaned, reasons);
-  enforceNumericBusy(cleaned, args.mode, conf.vibe, reasons);
+  enforceNumericBusy(cleaned, args.mode, conf.atmosphere, reasons);
 
   const surfaces: Array<keyof VoiceOutput> = [
-    'vibe',
     'atmosphere',
     'ambiance',
     'scene',
@@ -233,7 +226,7 @@ export function lintSceneSenseOutput(args: {
 
   if (args.mode === 'LITE') {
     const forbiddenLite = /(buzziest|peak|settles after)/i;
-    cleaned.vibe = cleaned.vibe.filter((s) => {
+    cleaned.atmosphere = cleaned.atmosphere.filter((s) => {
       if (forbiddenLite.test(s) || TIME_NUMERIC.test(s)) {
         reasons.push('D2_LITE_TOO_STRONG');
         return false;

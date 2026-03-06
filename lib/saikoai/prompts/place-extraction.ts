@@ -28,11 +28,11 @@ curator_note
   GOOD: "Walk-up window on a quiet block in Los Feliz. They hand you a ceramic cup of single-origin drip and it's the best coffee you'll have all week." → Casual, specific, opinionated.
   Rule: If your first sentence contains "a [nationality]-[type] [business] that [verb]s", rewrite it. That's Wikipedia voice.
 
-vibe — 2-6 words. A label, not a sentence. Examples: "Reading room" / "Loud and bright"
+atmosphere — 2-6 words. A label, not a sentence. Examples: "Reading room" / "Loud and bright"
 
 seating — Brief description of seating options and layout.
 
-music — What does the room sound like? Genre, volume, vibe.
+music — What does the room sound like? Genre, volume, energy character.
 
 decor — What does the room look like? Materials, colors, notable details.
 
@@ -98,7 +98,7 @@ Use one of: "Check Instagram for [specific thing]"; "Visible on Google Maps list
 Examples: music → "Check Instagram stories/reels for ambient audio"; best_time → "Check Google Maps popular times graph"; price_signal → "Check Google Maps price level or recent menu photos"; similar_energy → "Editor judgment — suggest after visiting"; staff_energy → "Field visit required — not captured in reviews".
 If you return null for proposed_value but null for notes_for_editor, the output is invalid.
 
-MULTI-LOCATION: If sources describe materially different locations, produce one output per location. Set place.name to "Place — Neighborhood". Location-specific fields (seating, vibe, decor) must reflect the specific space.
+MULTI-LOCATION: If sources describe materially different locations, produce one output per location. Set place.name to "Place — Neighborhood". Location-specific fields (seating, atmosphere, decor) must reflect the specific space.
 ${FIELDS_SECTION}
 
 Output JSON only. No preamble, no markdown fences.`;

@@ -31,7 +31,6 @@ export interface MerchantGridLocation {
   photoUrls?: string[] | null;
   prl?: number;
   scenesense?: {
-    vibe: string[];
     atmosphere: string[];
     ambiance: string[];
     scene: string[];

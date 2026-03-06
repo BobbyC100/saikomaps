@@ -21,6 +21,7 @@
  */
 
 import { PrismaClient } from '@prisma/client';
+import { writeInterpretationCache } from '../lib/fields-v2/write-claim';
 import {
   fetchRecordsForTaglineGeneration,
   buildTaglineInputFromGoldenRecord,
@@ -49,7 +50,7 @@ interface Stats {
   byPattern: {
     food: number;
     neighborhood: number;
-    vibe: number;
+    energy: number;
     authority: number;
   };
   byQuality: {
@@ -140,7 +141,7 @@ async function main() {
     byPattern: {
       food: 0,
       neighborhood: 0,
-      vibe: 0,
+      energy: 0,
       authority: 0,
     },
     byQuality: {
@@ -208,6 +209,7 @@ async function main() {
         
         // Write to database
         if (!args.dryRun) {
+          // Legacy write (retained during Fields v2 transition)
           await prisma.golden_records.update({
             where: { canonical_id: record.canonical_id },
             data: {
@@ -219,9 +221,31 @@ async function main() {
               tagline_version: 2,
             },
           });
+
+          // Fields v2: write to interpretation_cache (additive, non-fatal)
+          const canonicalState = await prisma.canonical_entity_state.findFirst({
+            where: { google_place_id: record.google_place_id ?? undefined },
+            select: { entity_id: true },
+          }).catch(() => null);
+
+          if (canonicalState) {
+            await writeInterpretationCache(prisma, {
+              entityId: canonicalState.entity_id,
+              outputType: 'TAGLINE',
+              content: {
+                text: result.tagline,
+                candidates: result.taglineCandidates,
+                pattern: result.taglinePattern,
+              },
+              promptVersion: `voice-v2-${result.taglinePattern}`,
+              inputSignalIds: [],
+            }).catch((err) => {
+              console.warn(`  [Fields v2] interpretation_cache write failed:`, err);
+            });
+          }
           
           if (args.verbose) {
-            console.log(`  💾 Saved to database`);
+            console.log(`  💾 Saved to database (legacy + Fields v2)`);
           }
         }
         
@@ -255,7 +279,7 @@ async function main() {
   console.log('By Pattern:');
   console.log(`  Food Forward:       ${stats.byPattern.food}`);
   console.log(`  Neighborhood Anchor: ${stats.byPattern.neighborhood}`);
-  console.log(`  Vibe Check:         ${stats.byPattern.vibe}`);
+  console.log(`  Energy Check:       ${stats.byPattern.energy}`);
   console.log(`  Local Authority:    ${stats.byPattern.authority}`);
   console.log('');
   console.log('By Signal Quality:');

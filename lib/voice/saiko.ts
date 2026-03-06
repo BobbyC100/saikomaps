@@ -11,8 +11,8 @@
  * parseHours() and pass the resulting label in. parseHours is the
  * single source of truth for open-state interpretation.
  *
- * Canonical "vibe words" source: identity_signals.vibe_words (lowercase strings).
- * Deprecated: vibeTags (entities.vibe_tags) — no longer accepted.
+ * Energy phrase source: scenesense.atmosphere (SceneSense output).
+ * The Voice Layer never reads raw identity_signals directly.
  *
  * See: docs/voice/saiko-voice-layer.md (SAI-DOC-VOICE-001)
  */
@@ -20,8 +20,8 @@
 export interface VoiceSignals {
   neighborhood: string | null | undefined;
   category: string | null | undefined;
-  /** Canonical vibe words from identity_signals.vibe_words (lowercase). */
-  vibe_words: string[] | null | undefined;
+  /** SceneSense atmosphere output — first item drives the energy phrase. */
+  atmosphere?: string[] | null | undefined;
 }
 
 export interface IdentityBlock {
@@ -29,37 +29,39 @@ export interface IdentityBlock {
   sentence: string | null;
 }
 
-/** Maps canonical vibe_words (lowercase) to editorial English phrases. */
-const VIBE_PHRASES: Record<string, string> = {
+/**
+ * Maps SceneSense atmosphere labels to editorial English phrases.
+ * Energy labels (from voice-engine ENERGY_MAP) → room-feel phrases.
+ * Physical labels pass through lowercased when not in the table.
+ */
+const ATMOSPHERE_PHRASES: Record<string, string> = {
   lively: 'lively room',
-  cozy: 'cozy room',
-  intimate: 'intimate room',
-  chill: 'laid-back feel',
-  energetic: 'high-energy room',
-  romantic: 'romantic atmosphere',
-  'date-friendly': 'strong date-night energy',
-  'date night': 'strong date-night energy',
-  'late-night': 'late-night energy',
-  'late night': 'late-night energy',
-  casual: 'casual energy',
-  refined: 'refined atmosphere',
-  upscale: 'refined atmosphere',
   buzzy: 'buzzy room',
-  electric: 'electric energy',
+  chill: 'laid-back feel',
+  cozy: 'cozy room',
   'low-key': 'low-key feel',
-  lowkey: 'low-key feel',
-  'after-work': 'solid after-work spot',
   calm: 'calm atmosphere',
+  steady: 'steady energy',
+  electric: 'electric energy',
+  'warm-lit': 'warm-lit room',
+  conversational: 'conversational room',
+  quiet: 'quiet room',
+  'tight room': 'tight room',
+  airy: 'airy room',
 };
 
 /**
- * Maps vibe_words through the phrase table and joins matched fragments.
- * Unrecognized words are silently ignored — never invented.
+ * Converts SceneSense atmosphere output into the editorial energy phrase.
+ * Uses the first atmosphere item; maps through ATMOSPHERE_PHRASES or
+ * falls back to lowercasing the label directly.
+ * Unrecognized items are rendered lowercase — the system never invents.
  */
-export function renderEnergy(vibe_words: string[] | null | undefined): string | null {
-  if (!vibe_words || vibe_words.length === 0) return null;
-  const fragments = vibe_words.map((w) => VIBE_PHRASES[w.toLowerCase()] ?? VIBE_PHRASES[w]).filter(Boolean);
-  return fragments.length > 0 ? fragments.join(', ') : null;
+export function renderEnergy(atmosphere: string[] | null | undefined): string | null {
+  if (!atmosphere || atmosphere.length === 0) return null;
+  const label = atmosphere[0];
+  if (!label) return null;
+  const key = label.toLowerCase();
+  return ATMOSPHERE_PHRASES[key] ?? key;
 }
 
 /**
@@ -81,7 +83,7 @@ export function renderLocation(signals: Pick<VoiceSignals, 'neighborhood' | 'cat
  *
  * Returns:
  *   subline  — "{neighborhood} {category}"  e.g. "Culver City restaurant"
- *   sentence — "{open_state} — {energy}"    e.g. "Open now — lively room, strong date-night energy"
+ *   sentence — "{open_state} — {energy}"    e.g. "Open now — lively room"
  *
  * Either field is null when insufficient signals are present.
  */
@@ -90,7 +92,7 @@ export function renderIdentityBlock(
   openStateLabel: string | null = null
 ): IdentityBlock {
   const subline = renderLocation(signals);
-  const energy = renderEnergy(signals.vibe_words);
+  const energy = renderEnergy(signals.atmosphere);
 
   let sentence: string | null = null;
   if (openStateLabel && energy) {

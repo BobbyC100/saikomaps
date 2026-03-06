@@ -50,7 +50,7 @@ export async function selectBestTaglineV2(
     }
     
     const selectedIndex = parseSelectionResponse(textContent.text);
-    const patterns: PhrasePattern[] = ['food', 'neighborhood', 'vibe', 'authority'];
+    const patterns: PhrasePattern[] = ['food', 'neighborhood', 'energy', 'authority'];
     
     return {
       selectedTagline: candidates[selectedIndex],
@@ -85,7 +85,7 @@ function selectShortestCandidate(
     }
   }
   
-  const patterns: PhrasePattern[] = ['food', 'neighborhood', 'vibe', 'authority'];
+  const patterns: PhrasePattern[] = ['food', 'neighborhood', 'energy', 'authority'];
   
   console.warn(
     '[Voice Engine v2.0] Selection failed, using shortest candidate (index ' +

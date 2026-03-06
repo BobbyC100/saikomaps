@@ -19,7 +19,7 @@ export type CardType =
   | 'hours'
   | 'description'   // NEW: curator_note or about_copy
   | 'reservations'
-  | 'vibe'
+  | 'scenesense'
   | 'press'
   | 'gallery'
   | 'menu'
@@ -46,8 +46,8 @@ export interface PlaceData {
     url?: string | null;
   };
   
-  // Tier 2: Editorial / vibe / proof
-  vibe?: string[] | null;
+  // Tier 2: Editorial / scenesense / proof
+  scenesense?: string[] | null;
   press?: {
     quote?: string;
     source?: string;
@@ -105,7 +105,7 @@ const SPANS = {
   hours:        { c: 3, r: 1 }, // Allow r:2 if content needs it
   heroPhoto:    { c: 3, r: 1 }, // Or c:6 for full-width inside grid
   description:  { c: 3, r: 1 }, // Curator note / about (taller naturally)
-  vibe:         { c: 2, r: 1 },
+  scenesense:   { c: 2, r: 1 },
   menu:         { c: 2, r: 1 }, // r:2 if content long
   wine:         { c: 2, r: 1 },
   press:        { c: 3, r: 1 },
@@ -161,14 +161,14 @@ export function resolvePlacePageLayout(data: PlaceData): CardConfig[] {
   } : null);
   
   // ──────────────────────────────────────────────────────────────────────────
-  // Tier 2: Editorial / vibe / proof
+  // Tier 2: Editorial / scenesense / proof
   // ──────────────────────────────────────────────────────────────────────────
   
-  // Vibe
-  pushIf(data.vibe && data.vibe.length > 0 ? { 
-    type: 'vibe', 
-    span: SPANS.vibe,
-    data: data.vibe 
+  // SceneSense
+  pushIf(data.scenesense && data.scenesense.length > 0 ? { 
+    type: 'scenesense', 
+    span: SPANS.scenesense,
+    data: data.scenesense 
   } : null);
   
   // Press (pull quote / coverage)
@@ -288,7 +288,7 @@ function applyGalleryGapFill(tiles: CardConfig[]): CardConfig[] {
   const nextCardIndex = galleryIndex + 1;
   
   // If no cards after Gallery, or next card is AlsoOn (span-6), or next card is span-3+, we need fill
-  // span-2 cards (menu, wine, vibe, etc.) naturally fill the 2-col gap
+  // span-2 cards (menu, wine, scenesense, etc.) naturally fill the 2-col gap
   const nextCard = tiles[nextCardIndex];
   const needsFill = !nextCard || nextCard.type === 'alsoOn' || nextCard.span.c > 2;
   

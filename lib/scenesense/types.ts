@@ -10,11 +10,10 @@ export type PRL = 1 | 2 | 3 | 4;
 export type SceneSenseMode = 'lite' | 'full';
 
 /** Surfaces for SceneSense copy */
-export type SceneSenseSurface = 'vibe' | 'atmosphere' | 'ambiance' | 'scene';
+export type SceneSenseSurface = 'atmosphere' | 'ambiance' | 'scene';
 
 /** Per-surface statement arrays (alias for VoiceOutput) */
 export interface SceneSenseOutput {
-  vibe: string[];
   atmosphere: string[];
   ambiance: string[];
   scene: string[];
@@ -22,7 +21,6 @@ export interface SceneSenseOutput {
 
 /** Confidence per surface (0–1) */
 export interface SceneSenseConfidence {
-  vibe_confidence?: number;
   atmosphere_confidence?: number;
   ambiance_confidence?: number;
   scene_confidence?: number;
@@ -31,7 +29,8 @@ export interface SceneSenseConfidence {
 /** Input to Voice Engine: canonical labels/enums */
 export interface SceneSenseCanonicalInput {
   place_personality?: string | null;
-  vibe_words?: string[];
+  /** Raw phrases captured from sources — SceneSense routes these to the correct lens. */
+  language_signals?: string[];
   signature_dishes?: string[];
   neighborhood?: string | null;
   category?: string | null;

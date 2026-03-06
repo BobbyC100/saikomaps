@@ -29,7 +29,7 @@
   {location.tips && <TipsCard span={3} />}
   
   {/* Row 5: Vibe (6) */}
-  {location.vibeTags && <VibeCard />}
+  {/* VibeCard removed — vibeTags deprecated; vibe signals via identity_signals.vibe_words */}
   
   {/* Row 6: Also On (6) */}
   {appearsOnRenderable.length > 0 && <AlsoOnCard />}

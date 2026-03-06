@@ -5,7 +5,7 @@
  *
  * Resilient: if optional tables (place_photo_eval, energy_scores, place_tag_scores)
  * do not exist, falls back to minimal query using only core tables.
- * Tag signals now derived from golden_records.identity_signals.vibe_words.
+ * Tag signals now derived from golden_records.identity_signals.language_signals.
  */
 
 import { db } from '@/lib/db';
@@ -136,11 +136,15 @@ async function fetchPlaceForPRLBySlugFull(
   const hasEditorialSources = (editorialArr?.length ?? 0) > 0;
   const hasPullQuote = !!(place.pullQuote?.trim());
   const hasPullQuoteSource = !!(place.pullQuoteSource?.trim());
+  // Also check the coverage_sources relational table (the current editorial system)
+  const coverageSourcesCount = await db.coverage_sources.count({
+    where: { entityId: place.id },
+  });
   const hasCoverageSource =
-    hasEditorialSources || hasPullQuote || hasPullQuoteSource;
+    hasEditorialSources || hasPullQuote || hasPullQuoteSource || coverageSourcesCount > 0;
 
   let fieldsMembershipCount = 0;
-  let hasVibeWords = false;
+  let hasLanguageSignals = false;
   const gpid = place.googlePlaceId;
   if (gpid) {
     const gr = await db.golden_records.findFirst({
@@ -149,14 +153,14 @@ async function fetchPlaceForPRLBySlugFull(
     });
     if (gr) {
       const identSig = gr.identity_signals as Record<string, unknown> | null;
-      hasVibeWords = Array.isArray(identSig?.vibe_words) && (identSig!.vibe_words as string[]).length > 0;
+      hasLanguageSignals = Array.isArray(identSig?.language_signals) && (identSig!.language_signals as string[]).length > 0;
       fieldsMembershipCount = await db.fieldsMembership.count({
         where: { entityId: gr.canonical_id, removedAt: null },
       });
     }
   }
 
-  const hasTagSignals = hasTagScores || hasVibeWords;
+  const hasTagSignals = hasTagScores || hasLanguageSignals;
 
   const businessStatus =
     (place.googlePlacesAttributes as Record<string, string> | null)
@@ -183,7 +187,7 @@ async function fetchPlaceForPRLBySlugFull(
     energyScore,
     hasTagSignals,
     hasFormality: false,
-    hasIdentitySignals: hasVibeWords,
+    hasIdentitySignals: hasLanguageSignals,
     hasTemporalSignals: false,
     fieldsMembershipCount,
     appearsOnCount: mapPlacesPublished,
@@ -220,7 +224,7 @@ async function fetchPlaceForPRLBySlugMinimal(
   } catch {
     /* skip */
   }
-  let hasVibeWordsMinimal = false;
+  let hasLanguageSignalsMinimal = false;
   const gpid = place.googlePlaceId;
   if (gpid) {
     try {
@@ -230,7 +234,7 @@ async function fetchPlaceForPRLBySlugMinimal(
       });
       if (gr) {
         const identSig = gr.identity_signals as Record<string, unknown> | null;
-        hasVibeWordsMinimal = Array.isArray(identSig?.vibe_words) && (identSig!.vibe_words as string[]).length > 0;
+        hasLanguageSignalsMinimal = Array.isArray(identSig?.language_signals) && (identSig!.language_signals as string[]).length > 0;
         fieldsMembershipCount = await db.fieldsMembership.count({
           where: { entityId: gr.canonical_id, removedAt: null },
         });
@@ -248,7 +252,16 @@ async function fetchPlaceForPRLBySlugMinimal(
   const hasEditorialSources = (editorialArr?.length ?? 0) > 0;
   const hasPullQuote = !!(place.pullQuote?.trim());
   const hasPullQuoteSource = !!(place.pullQuoteSource?.trim());
-  const hasCoverageSource = hasEditorialSources || hasPullQuote || hasPullQuoteSource;
+  let coverageSourcesCountMinimal = 0;
+  try {
+    coverageSourcesCountMinimal = await db.coverage_sources.count({
+      where: { entityId: place.id },
+    });
+  } catch {
+    /* coverage_sources may not exist in minimal mode */
+  }
+  const hasCoverageSource =
+    hasEditorialSources || hasPullQuote || hasPullQuoteSource || coverageSourcesCountMinimal > 0;
   const businessStatus =
     (place.googlePlacesAttributes as Record<string, string> | null)?.business_status ??
     'OPERATIONAL';
@@ -270,9 +283,9 @@ async function fetchPlaceForPRLBySlugMinimal(
     description: place.description,
     curatorNote,
     energyScore: null,
-    hasTagSignals: hasVibeWordsMinimal,
+    hasTagSignals: hasLanguageSignalsMinimal,
     hasFormality: false,
-    hasIdentitySignals: hasVibeWordsMinimal,
+    hasIdentitySignals: hasLanguageSignalsMinimal,
     hasTemporalSignals: false,
     fieldsMembershipCount,
     appearsOnCount: mapPlacesPublished,
@@ -393,21 +406,14 @@ async function fetchPlaceForPRLBatchFull(args?: {
   const mapCountByPlace = new Map(
     mapCounts.map((m) => [m.entityId, m._count.id])
   );
-  const     canonicalIdByGpid = new Map(
-      goldenRecs.map((g) => [g.google_place_id, g.canonical_id])
-    );
-    vibeWordsByGpidMinimal = new Map(
-      goldenRecs.map((g) => {
-        const sig = g.identity_signals as Record<string, unknown> | null;
-        const hasWords = Array.isArray(sig?.vibe_words) && (sig!.vibe_words as string[]).length > 0;
-        return [g.google_place_id, hasWords];
-      })
-    );
-  const vibeWordsByGpid = new Map(
+  const canonicalIdByGpid = new Map(
+    goldenRecs.map((g) => [g.google_place_id, g.canonical_id])
+  );
+  const languageSignalsByGpid = new Map(
     goldenRecs.map((g) => {
       const sig = g.identity_signals as Record<string, unknown> | null;
-      const hasWords = Array.isArray(sig?.vibe_words) && (sig!.vibe_words as string[]).length > 0;
-      return [g.google_place_id, hasWords];
+      const hasSignals = Array.isArray(sig?.language_signals) && (sig!.language_signals as string[]).length > 0;
+      return [g.google_place_id, hasSignals];
     })
   );
 
@@ -450,8 +456,8 @@ async function fetchPlaceForPRLBatchFull(args?: {
         : null;
 
     const hasTagScores = place._count.place_tag_scores > 0;
-    const hasVibeWordsBatch = vibeWordsByGpid.get(place.googlePlaceId ?? '') ?? false;
-    const hasTagSignals = hasTagScores || hasVibeWordsBatch;
+    const hasLanguageSignalsBatch = languageSignalsByGpid.get(place.googlePlaceId ?? '') ?? false;
+    const hasTagSignals = hasTagScores || hasLanguageSignalsBatch;
 
     const editorialArr = place.editorialSources as unknown[] | null;
     const hasEditorialSources = (editorialArr?.length ?? 0) > 0;
@@ -486,7 +492,7 @@ async function fetchPlaceForPRLBatchFull(args?: {
       energyScore,
       hasTagSignals,
       hasFormality: false,
-      hasIdentitySignals: hasVibeWordsBatch,
+      hasIdentitySignals: hasLanguageSignalsBatch,
       hasTemporalSignals: false,
       fieldsMembershipCount:
         fieldsCountByCid.get(
@@ -523,7 +529,7 @@ async function fetchPlaceForPRLBatchMinimal(args?: {
 
   let mapCountByPlace = new Map<string, number>();
   let canonicalIdByGpid = new Map<string, string>();
-  let vibeWordsByGpidMinimal = new Map<string, boolean>();
+  let languageSignalsByGpidMinimal = new Map<string, boolean>();
   let fieldsCountByCid = new Map<string, number>();
   const curatorNoteByPlace = new Map<string, string | null>();
 
@@ -581,7 +587,7 @@ async function fetchPlaceForPRLBatchMinimal(args?: {
     const googlePhotosCount = Array.isArray(googlePhotosArr)
       ? googlePhotosArr.length
       : 0;
-    const hasVibeWordsBatchMinimal = vibeWordsByGpidMinimal.get(place.googlePlaceId ?? '') ?? false;
+    const hasLanguageSignalsBatchMinimal = languageSignalsByGpidMinimal.get(place.googlePlaceId ?? '') ?? false;
     const editorialArr = place.editorialSources as unknown[] | null;
     const hasEditorialSources = (editorialArr?.length ?? 0) > 0;
     const hasPullQuote = !!(place.pullQuote?.trim());
@@ -611,9 +617,9 @@ async function fetchPlaceForPRLBatchMinimal(args?: {
       description: place.description,
       curatorNote: curatorNoteByPlace.get(place.id) ?? null,
       energyScore: null,
-      hasTagSignals: hasVibeWordsBatchMinimal,
+      hasTagSignals: hasLanguageSignalsBatchMinimal,
       hasFormality: false,
-      hasIdentitySignals: hasVibeWordsBatchMinimal,
+      hasIdentitySignals: hasLanguageSignalsBatchMinimal,
       hasTemporalSignals: false,
       fieldsMembershipCount:
         fieldsCountByCid.get(

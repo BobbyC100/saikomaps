@@ -117,7 +117,7 @@ async function testVoiceEngine() {
       const { signals, derived } = extractSignalsAndAttributes(restaurant);
       
       console.log(`   Popularity Tier: ${derived.popularityTier}`);
-      console.log(`   Vibe: ${derived.vibe}`);
+      console.log(`   Energy: ${derived.energy}`);
       console.log(`   Time of Day: ${derived.timeOfDay}`);
       console.log();
       
@@ -129,7 +129,7 @@ async function testVoiceEngine() {
       console.log();
       console.log('   📝 All Candidates:');
       result.taglineCandidates.forEach((candidate, i) => {
-        const patterns = ['food', 'neighborhood', 'vibe', 'authority'];
+        const patterns = ['food', 'neighborhood', 'energy', 'authority'];
         const marker = i === result.taglineCandidates.indexOf(result.tagline) ? '✅' : '  ';
         console.log(`   ${marker} [${patterns[i]}] "${candidate}"`);
       });
