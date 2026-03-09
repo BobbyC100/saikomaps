@@ -1,0 +1,18 @@
+---
+description: Saiko migration and schema safety rules
+alwaysApply: false
+---
+
+When working on schema, migrations, Prisma models, or database-related scripts:
+
+- Do not run `prisma migrate dev`, `prisma migrate deploy`, or `prisma db push` unless Bobby explicitly asks.
+- Do not invent or guess missing migration history.
+- If migration history appears forked or inconsistent, stop and surface it before making changes.
+- Prefer analysis first for ambiguous migration or schema work.
+- Before risky schema or migration work, recommend checking:
+  - `npx prisma migrate status`
+  - `npx prisma validate`
+  - `npx prisma generate`
+- Schema changes must include a migration file.
+- Do not modify unrelated migrations while restoring or reviewing one migration.
+- If database reality and local migration history differ, report the exact conflict instead of trying to silently reconcile it.
