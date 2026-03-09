@@ -261,6 +261,7 @@ model entities {
   children               entities[]         @relation("PlaceHierarchy")
   viewer_bookmarks       viewer_bookmarks[]
   energy_scores          energy_scores[]
+  entityActorRelationships EntityActorRelationship[]
   place_tag_scores       place_tag_scores[]
   place_photo_eval       place_photo_eval[]
   place_coverage_status  place_coverage_status[]
@@ -289,12 +290,17 @@ model entities {
   merchant_enrichment_runs merchant_enrichment_runs[]
   merchant_signals         merchant_signals?
   coverage_sources         coverage_sources[]
+  surface_scans            merchant_surface_scans[]
+  merchant_surfaces        merchant_surfaces[]
+  menu_fetches             menu_fetches[]
 
   // Fields v2 relations
   canonical_state       canonical_entity_state?
   entity_claims         observed_claims[]
   derived_signals       derived_signals[]
   interpretation_cache  interpretation_cache[]
+  fieldsMemberships     FieldsMembership[]
+  traceSignalsCache     TraceSignalsCache?
 
   @@map("entities")
   @@index([category])
@@ -327,6 +333,152 @@ model merchant_enrichment_runs {
 
   @@index([entityId])
   @@index([fetched_at])
+}
+
+/// Menu fetch records — append-only, one row per fetch attempt per entity.
+/// raw_text is stored directly. Full HTML is stored in R2 and referenced via raw_html_pointer.
+/// Current-state is derived as the latest successful fetch (http_status < 400) per entity.
+model menu_fetches {
+  id                     String   @id @default(uuid())
+  entity_id              String   @map("entity_id")
+  source_url             String   @map("source_url")
+  final_url              String?  @map("final_url")
+  menu_format            String   @default("html") @map("menu_format")       // html | pdf | external
+  http_status            Int?     @map("http_status")
+  content_type           String?  @map("content_type")                       // actual HTTP content-type of fetched response
+  fetch_duration_ms      Int?     @map("fetch_duration_ms")
+  fetched_at             DateTime @default(now()) @map("fetched_at")
+  raw_text               String?  @map("raw_text")
+  content_hash           String?  @map("content_hash")                       // sha256(raw_text)
+  raw_html_pointer       String?  @map("raw_html_pointer")                   // r2://bucket/...  (HTML or PDF receipt)
+  text_extraction_method String?  @map("text_extraction_method")             // node-html-parser-v1 | pdftotext
+  pdf_type               String?  @map("pdf_type")                           // text_based | image_based | unknown
+  extraction_quality     String?  @map("extraction_quality")                 // good | sparse | empty
+  created_at             DateTime @default(now()) @map("created_at")
+
+  entity entities @relation(fields: [entity_id], references: [id], onDelete: Cascade)
+
+  @@index([entity_id])
+  @@index([fetched_at])
+  @@index([content_hash])
+  @@index([extraction_quality])
+  @@map("menu_fetches")
+}
+
+/// Merchant surfaces — immutable evidence layer.
+/// One row per capture event per surface URL. Never updated.
+/// Current state for a URL = latest row ordered by discovered_at.
+///
+/// fetch_status:      discovered | fetch_success | fetch_failed
+/// parse_status:      parse_pending | parse_success | parse_failed
+/// extraction_status: not_attempted | extracted | no_signals
+///
+/// surface_type:      homepage | about | menu | drinks | instagram | reservation | ordering | contact
+///
+/// Immutability is enforced by a DB trigger (see migration 20260308000000).
+/// Never call prisma.merchant_surfaces.update() — create new rows instead.
+model merchant_surfaces {
+  id                String    @id @default(uuid())
+  entity_id         String    @map("entity_id")
+
+  surface_type      String    @map("surface_type")
+  source_url        String    @map("source_url")
+
+  content_type      String?   @map("content_type")    // html | pdf | json | unknown
+
+  fetch_status      String    @map("fetch_status")     // discovered | fetch_success | fetch_failed
+  parse_status      String?   @map("parse_status")     // parse_pending | parse_success | parse_failed
+  extraction_status String    @default("not_attempted") @map("extraction_status") // not_attempted | extracted | no_signals
+
+  content_hash      String?   @map("content_hash")     // sha256(raw_text)
+  raw_text          String?   @map("raw_text")          // stripped text content
+  raw_html          String?   @map("raw_html")          // full HTML (large; future: R2 pointer)
+
+  fetched_at        DateTime? @map("fetched_at")        // null for fetch_status='discovered'
+  discovered_at     DateTime  @default(now()) @map("discovered_at")
+
+  metadata_json     Json?     @map("metadata_json")     // http_status, final_url, fetch_duration_ms, discovered_from_id, link_text
+
+  entity    entities                     @relation(fields: [entity_id], references: [id], onDelete: Cascade)
+  artifacts merchant_surface_artifacts[]
+
+  @@index([entity_id])
+  @@index([entity_id, surface_type])
+  @@index([surface_type, fetch_status])
+  @@index([fetch_status, parse_status])        // replay queries
+  @@index([surface_type, extraction_status])   // extraction targeting
+  @@index([content_hash])
+  @@index([discovered_at])
+  @@map("merchant_surfaces")
+}
+
+/// Parse artifacts derived from merchant surface HTML.
+/// One row per (surface, artifact_type, artifact_version).
+/// Immutable once written — deduplicated on (merchant_surface_id, artifact_type, artifact_version).
+/// Evidence rows in merchant_surfaces are never modified; artifacts are separate derived outputs.
+///
+/// artifact_type:    'parse_v1'
+/// artifact_version: '1'
+model merchant_surface_artifacts {
+  id                  String   @id @default(uuid())
+  merchant_surface_id String   @map("merchant_surface_id")
+  artifact_type       String   @map("artifact_type")
+  artifact_version    String   @map("artifact_version")
+  artifact_json       Json     @map("artifact_json")
+  created_at          DateTime @default(now()) @map("created_at")
+
+  merchant_surface merchant_surfaces @relation(fields: [merchant_surface_id], references: [id], onDelete: Cascade)
+
+  @@unique([merchant_surface_id, artifact_type, artifact_version])
+  @@index([merchant_surface_id])
+  @@index([artifact_type, artifact_version])
+  @@index([created_at])
+  @@map("merchant_surface_artifacts")
+}
+
+/// Surface scan snapshots — append-only, one row per scan run per entity.
+/// Current state is derived from the latest successful scan (http_status < 400).
+/// Do not update rows in place; always insert new scan snapshots.
+model merchant_surface_scans {
+  id         String   @id @default(cuid())
+  entity_id  String   @map("entity_id")
+  fetched_at DateTime @default(now()) @map("fetched_at")
+  source_url String   @map("source_url")
+  final_url  String?  @map("final_url")
+  http_status Int?    @map("http_status")
+
+  website_platform         String?  @map("website_platform")
+
+  menu_present             Boolean  @default(false) @map("menu_present")
+  menu_format              String?  @map("menu_format")   // html | pdf | external | none
+  menu_url                 String?  @map("menu_url")
+  menu_read_state          String?  @map("menu_read_state") // readable | unreadable_pdf | inaccessible | none
+
+  reservation_platform     String?  @map("reservation_platform") // resy | opentable | tock | sevenrooms | none
+  reservation_url          String?  @map("reservation_url")
+
+  ordering_platform        String?  @map("ordering_platform") // toast | chownow | square | doordash | none
+  ordering_url             String?  @map("ordering_url")
+
+  instagram_present        Boolean  @default(false) @map("instagram_present")
+  instagram_url            String?  @map("instagram_url")
+
+  newsletter_present       Boolean  @default(false) @map("newsletter_present")
+  newsletter_platform      String?  @map("newsletter_platform") // mailchimp | klaviyo | substack | convertkit | unknown
+
+  gift_cards_present       Boolean  @default(false) @map("gift_cards_present")
+  careers_present          Boolean  @default(false) @map("careers_present")
+  private_dining_present   Boolean  @default(false) @map("private_dining_present")
+
+  sibling_entities_present Boolean  @default(false) @map("sibling_entities_present")
+  sibling_entity_urls      Json?    @map("sibling_entity_urls")   // String[]
+  sibling_entity_labels    Json?    @map("sibling_entity_labels") // String[]
+
+  entity entities @relation(fields: [entity_id], references: [id], onDelete: Cascade)
+
+  @@index([entity_id])
+  @@index([fetched_at])
+  @@map("merchant_surface_scans")
 }
 
 /// Merchant signals — current best per entity (upsert)
@@ -622,10 +774,11 @@ model raw_records {
   is_processed Boolean   @default(false)
 
   // Relations
-  entity_links_from entity_links[]
-  resolution_links   resolution_links[]
-  review_queue_a     review_queue[] @relation("ReviewQueueRecordA")
-  review_queue_b     review_queue[] @relation("ReviewQueueRecordB")
+  entity_links_from        entity_links[]
+  resolution_links         resolution_links[]
+  review_queue_a           review_queue[] @relation("ReviewQueueRecordA")
+  review_queue_b           review_queue[] @relation("ReviewQueueRecordB")
+  identity_enrichment_runs identity_enrichment_runs[]
 
   @@unique([source_name, external_id])
   @@index([h3_index_r9])
@@ -705,7 +858,7 @@ model golden_records {
 
   // Editorial enrichment
   description       String?
-  vibe_tags         String[]
+  // vibe_tags removed — was deprecated; vibe signals stored in identity_signals.vibe_words via derived_signals
   signature_dishes  String[]
   pro_tips          String[]
   pull_quote        String?
@@ -810,9 +963,6 @@ model golden_records {
   provenance        provenance[]
   menu_signals      menu_signals?
   winelist_signals  winelist_signals?
-  entityActorRelationships EntityActorRelationship[]
-  fieldsMemberships FieldsMembership[]
-  traceSignalsCache TraceSignalsCache?
 
   @@index([neighborhood])
   @@index([category])
@@ -850,7 +1000,7 @@ model review_queue {
   raw_id_b     String?
 
   // Conflict details
-  conflict_type      String // 'low_confidence_match', 'attribute_mismatch', 'potential_duplicate', 'new_entity'
+  conflict_type      String // 'low_confidence_match', 'attribute_mismatch', 'potential_duplicate', 'new_entity', 'new_entity_review'
   match_confidence   Decimal? @db.Decimal(4, 3)
   conflicting_fields Json?
 
@@ -860,6 +1010,13 @@ model review_queue {
   resolution       String? // 'merged', 'kept_separate', 'new_canonical', 'dismissed'
   resolution_notes String?
 
+  // Pre-review machine enrichment state (new_entity_review only)
+  // null on all low_confidence_match rows — gate only engages for new_entity_review
+  identity_enrichment_status  String?  @map("identity_enrichment_status") // 'pending_enrichment' | 'enriching' | 'sufficient' | 'needs_review' | 'unresolved'
+  identity_anchor_count       Int?     @map("identity_anchor_count")
+  latest_identity_confidence  Decimal? @map("latest_identity_confidence") @db.Decimal(4, 3)
+  latest_identity_run_id      String?  @map("latest_identity_run_id") // soft ref → identity_enrichment_runs.id
+
   // Audit
   created_at  DateTime  @default(now())
   assigned_to String?
@@ -867,14 +1024,48 @@ model review_queue {
   resolved_at DateTime?
 
   // Relations
-  golden_record golden_records?    @relation(fields: [canonical_id], references: [canonical_id])
-  raw_record_a  raw_records        @relation("ReviewQueueRecordA", fields: [raw_id_a], references: [raw_id])
-  raw_record_b  raw_records?       @relation("ReviewQueueRecordB", fields: [raw_id_b], references: [raw_id])
-  audit_logs    review_audit_log[]
+  golden_record      golden_records?          @relation(fields: [canonical_id], references: [canonical_id])
+  raw_record_a       raw_records              @relation("ReviewQueueRecordA", fields: [raw_id_a], references: [raw_id])
+  raw_record_b       raw_records?             @relation("ReviewQueueRecordB", fields: [raw_id_b], references: [raw_id])
+  audit_logs         review_audit_log[]
+  enrichment_runs    identity_enrichment_runs[]
 
   @@index([status])
   @@index([priority, status])
   @@index([canonical_id])
+  @@index([identity_enrichment_status])
+}
+
+/// Identity enrichment runs — append-only lookup attempt history for new_entity_review cases.
+/// One row per source per run. Never updated in place.
+model identity_enrichment_runs {
+  id                  String   @id @default(uuid())
+  raw_id              String   @map("raw_id")
+  review_queue_id     String?  @map("review_queue_id")
+
+  // What was searched
+  source_name         String   @map("source_name")   // 'google_candidate_search' | 'gpid_detection' | 'website_discovery' | 'instagram_discovery' | 'corroboration'
+  searched_name       String?  @map("searched_name")
+  searched_city       String?  @map("searched_city")
+
+  // What was found
+  result_json         Json     @map("result_json")    // raw candidates / signals from this step
+
+  // Computed outcome of this step
+  identity_confidence Decimal? @map("identity_confidence") @db.Decimal(4, 3)
+  anchor_count        Int      @default(0) @map("anchor_count")
+  decision_status     String   @map("decision_status") // 'sufficient' | 'needs_review' | 'unresolved'
+
+  created_at          DateTime @default(now()) @map("created_at")
+
+  review_queue        review_queue? @relation(fields: [review_queue_id], references: [queue_id])
+  raw_record          raw_records   @relation(fields: [raw_id], references: [raw_id])
+
+  @@index([raw_id])
+  @@index([review_queue_id])
+  @@index([decision_status])
+  @@index([created_at])
+  @@map("identity_enrichment_runs")
 }
 
 /// Audit trail for review decisions
@@ -1307,7 +1498,7 @@ model EntityActorRelationship {
   createdAt  DateTime  @default(now()) @map("created_at")
   updatedAt  DateTime  @updatedAt @map("updated_at")
 
-  entity golden_records @relation(fields: [entityId], references: [canonical_id], onDelete: Cascade)
+  entity entities @relation(fields: [entityId], references: [id], onDelete: Cascade)
   actor  Actor          @relation(fields: [actorId], references: [id], onDelete: Cascade)
 
   @@index([entityId])
@@ -1354,7 +1545,7 @@ model FieldsMembership {
   createdAt  DateTime  @default(now()) @map("created_at")
   updatedAt  DateTime  @updatedAt @map("updated_at")
 
-  entity golden_records @relation(fields: [entityId], references: [canonical_id], onDelete: Cascade)
+  entity entities @relation(fields: [entityId], references: [id], onDelete: Cascade)
 
   @@index([entityId])
 }
@@ -1368,7 +1559,7 @@ model TraceSignalsCache {
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
 
-  entity golden_records @relation(fields: [entityId], references: [canonical_id], onDelete: Cascade)
+  entity entities @relation(fields: [entityId], references: [id], onDelete: Cascade)
 
   @@index([entityId])
 }
