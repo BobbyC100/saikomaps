@@ -2,13 +2,13 @@
 
 ## Organizational Structure
 
-Saiko is organized in three layers:
+Saiko operates in three layers:
 
-Saiko SPORT
-↓
-Saiko Fields
-↓
-Traces
+Saiko SPORT  
+↓  
+Saiko Fields  
+↓  
+Traces  
 
 Each layer has a distinct role.
 
@@ -20,9 +20,11 @@ Saiko SPORT is the umbrella organization.
 
 It owns the Saiko platform and any products built on top of it.
 
-SPORT exists at the company and brand level, not the system architecture level.
+SPORT exists at the company and brand level rather than the system architecture level.
 
-Agents generally do not modify SPORT-level concepts during engineering work.
+Engineering work generally occurs within the platform and product layers below.
+
+Agents should not modify SPORT-level concepts unless Bobby explicitly requests it.
 
 ---
 
@@ -41,9 +43,15 @@ Fields manages:
 - signal computation
 - canonical place relationships
 
-Fields is infrastructure, not a consumer application.
+Fields is infrastructure.
 
-Everything structural about the place graph lives here.
+Fields is **not**:
+
+- a consumer UI
+- a ranking or feed surface
+- a presentation layer
+
+Everything structural about the place graph lives inside Fields.
 
 ---
 
@@ -69,15 +77,15 @@ Traces presents the data.
 
 ## Entities (Canonical Identity Layer)
 
-The entities table represents the canonical identity of a real-world place.
+The `entities` table represents the canonical identity of a real-world place.
 
 Key principles:
 
 - one entity per real-world place
 - entities are the stable anchor for relationships
-- foreign keys in new systems should target entities.id
+- foreign keys in new systems should target `entities.id`
 
-Entities replaced earlier constructs such as places and golden_records.
+Entities replaced earlier constructs such as `places` and `golden_records`.
 
 ---
 
@@ -89,7 +97,7 @@ The key gating table is:
 
 FieldsMembership
 
-Entities with an active membership row (removedAt IS NULL) are considered part of the Saiko field.
+Entities with an active membership row (`removedAt IS NULL`) are considered part of the Saiko field.
 
 Only entities within this field participate in signal computation.
 
@@ -99,7 +107,7 @@ Only entities within this field participate in signal computation.
 
 The Trace layer computes signals about entities using system data.
 
-Examples of signals may include:
+Examples of signals include:
 
 - continuity
 - turnover
@@ -207,7 +215,7 @@ Direct schema modification outside migrations is not permitted.
 
 Agents should prefer the smallest safe change necessary to achieve a task.
 
-Architectural changes require explicit approval.
+Architectural changes require explicit approval from Bobby.
 
 ---
 
@@ -215,9 +223,14 @@ Architectural changes require explicit approval.
 
 ## Bobby
 
-Human operator and final authority.
+Human operator and final decision authority.
 
-Defines product direction, architecture decisions, and work order scope.
+Responsibilities:
+
+- defining product direction
+- approving architecture decisions
+- determining engineering scope
+- resolving conflicts between agents
 
 ---
 
@@ -225,14 +238,44 @@ Defines product direction, architecture decisions, and work order scope.
 
 Product and architecture partner.
 
-Responsibilities:
+Primary responsibilities:
 
 - system design
 - architecture review
-- drafting work orders
-- product reasoning
+- drafting engineering work orders
+- identifying architectural inconsistencies
+- reasoning about product direction
 
-Clement does not directly modify the repository.
+Clement does **not** directly modify the repository.
+
+Implementation is performed by Cursor.
+
+### Product Development Mindset
+
+Clement should approach system design and product reasoning with a product-engineering mindset similar to teams at companies like Google, Meta, and Amazon.
+
+Guiding principles:
+
+User Impact First  
+Engineering work should ultimately map back to user value in the Traces product.
+
+Small Iterations Over Big Rewrites  
+Prefer incremental improvements and staged rollouts over large speculative redesigns.
+
+Clear System Boundaries  
+Maintain strict separation between:
+
+- platform infrastructure (Saiko Fields)
+- consumer product behavior (Traces)
+
+Evidence-Oriented Thinking  
+Favor decisions grounded in system behavior, data flow, or measurable outcomes rather than intuition alone.
+
+Operational Simplicity  
+Prefer systems that are easy to reason about, observable, and maintainable.
+
+Constructive Skepticism  
+Clement should challenge assumptions and provide a second opinion when architecture or product reasoning appears unclear.
 
 ---
 
@@ -247,15 +290,17 @@ Responsibilities:
 - running scripts
 - modifying repository files
 
-Cortez operates under .cursor/rules.
+Cortez operates under the rules defined in:
+
+.cursor/rules/
 
 ---
 
 # Source of Truth
 
-The project uses multiple sources of truth.
+The project relies on multiple sources of truth.
 
-GitHub
+## GitHub
 
 The authoritative source for:
 
@@ -263,15 +308,30 @@ The authoritative source for:
 - schema
 - migrations
 - cursor rules
+- platform implementation
 
-Operational Documentation
+---
+
+## Operational Documentation
+
+Operational documentation lives in:
 
 ai-operations/
 
-Contains:
+This includes:
 
 - system context
 - workflow protocols
 - agent coordination documents
 
-Agents should reference these documents instead of reconstructing assumptions about system behavior.
+---
+
+## Drift Prevention Policy
+
+Architectural decisions and system constraints are also governed by the **Drift Prevention Policy**.
+
+When documentation, assumptions, or repository behavior conflict:
+
+Agents should surface the inconsistency rather than attempting to resolve it automatically.
+
+Maintaining architectural coherence is more important than making silent corrections.
