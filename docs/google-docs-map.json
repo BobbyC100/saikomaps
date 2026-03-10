@@ -1,0 +1,231 @@
+{
+  "last_synced": "2026-03-10T20:34:54.490Z",
+  "root_folder_id": "1Dod-GaQff4n5TqRXuDroDxwct3Z-5R2T",
+  "folders": {
+    "SAIKO": "1a0JpEZjbLFKlIh4SxS_CFBnsvy-6plaH",
+    "TRACES": "13O7XOCjEZT4Lsqcf-nEyRpq5sFm3xwii",
+    "KNOWLEDGE-SYSTEM": "1ukDhRPS9Lc0zzZHX00GN_UfcxGIXp0vt"
+  },
+  "docs": {
+    "ARCH-AI-OPERATING-LAYER": {
+      "google_doc_id": "1MhJKSnowIjr7_pB-C_Z6NhC-FBKwjE6FVSb2l0tP8r8",
+      "google_doc_url": "https://docs.google.com/document/d/1MhJKSnowIjr7_pB-C_Z6NhC-FBKwjE6FVSb2l0tP8r8/",
+      "last_synced": "2026-03-10T20:32:09.192Z"
+    },
+    "ARCH-README": {
+      "google_doc_id": "1zWcM8JdWeKxQv1M2vJ0yEu0Pa6actlr6Jv2Qk1Ez1Oo",
+      "google_doc_url": "https://docs.google.com/document/d/1zWcM8JdWeKxQv1M2vJ0yEu0Pa6actlr6Jv2Qk1Ez1Oo/",
+      "last_synced": "2026-03-10T20:32:12.492Z"
+    },
+    "ARCH-SYSTEM-CONTRACT": {
+      "google_doc_id": "1k0gj9zxBiGM_BnNejUEv6sgPbqntGUaOKtb73DdCaLA",
+      "google_doc_url": "https://docs.google.com/document/d/1k0gj9zxBiGM_BnNejUEv6sgPbqntGUaOKtb73DdCaLA/",
+      "last_synced": "2026-03-10T20:32:16.151Z"
+    },
+    "DEC-001": {
+      "google_doc_id": "1B8WNYXZXWqsnjT40nOGGkdTxnBHtNNR-4Ujg17_U78A",
+      "google_doc_url": "https://docs.google.com/document/d/1B8WNYXZXWqsnjT40nOGGkdTxnBHtNNR-4Ujg17_U78A/",
+      "last_synced": "2026-03-10T20:32:19.678Z"
+    },
+    "FEAT-MARKETS-SPEC-V1-2": {
+      "google_doc_id": "1_K9mdIrpQ3uJ-RAgvmrYsO9Mx0d9_U_hA3drksa6z9U",
+      "google_doc_url": "https://docs.google.com/document/d/1_K9mdIrpQ3uJ-RAgvmrYsO9Mx0d9_U_hA3drksa6z9U/",
+      "last_synced": "2026-03-10T20:32:23.740Z"
+    },
+    "OPS-STALE-DEPLOYMENTS": {
+      "google_doc_id": "1aJWSMSFPaXAqdoIVXrscbw2JruFOsRrJsfevgGXksAA",
+      "google_doc_url": "https://docs.google.com/document/d/1aJWSMSFPaXAqdoIVXrscbw2JruFOsRrJsfevgGXksAA/",
+      "last_synced": "2026-03-10T20:32:27.218Z"
+    },
+    "OS-OFFERING-SIGNALS-V1": {
+      "google_doc_id": "15zkiWo6o_saxgPmV1u9ueUtO5IbckN8nuWWFOi3SG9c",
+      "google_doc_url": "https://docs.google.com/document/d/15zkiWo6o_saxgPmV1u9ueUtO5IbckN8nuWWFOi3SG9c/",
+      "last_synced": "2026-03-10T20:32:30.726Z"
+    },
+    "SAIKO-APP-OVERVIEW": {
+      "google_doc_id": "1oqQ484zm8zhpIUKOeshn48ppfJbzpb2B6Yc1Ug8-Ygg",
+      "google_doc_url": "https://docs.google.com/document/d/1oqQ484zm8zhpIUKOeshn48ppfJbzpb2B6Yc1Ug8-Ygg/",
+      "last_synced": "2026-03-10T20:32:34.478Z"
+    },
+    "SAIKO-DATA-PIPELINE-QUICK-START": {
+      "google_doc_id": "1Zg-ZO_oHVkkrEOPXE57cdBq0mojOqzQnKv-5i9oD7HY",
+      "google_doc_url": "https://docs.google.com/document/d/1Zg-ZO_oHVkkrEOPXE57cdBq0mojOqzQnKv-5i9oD7HY/",
+      "last_synced": "2026-03-10T20:32:38.057Z"
+    },
+    "SAIKO-DATA-SYNC-RUNBOOK": {
+      "google_doc_id": "1X-Q6Z8jWjDzqWjSf_bYBe3OkiOqnEzDsCv55ClblzYE",
+      "google_doc_url": "https://docs.google.com/document/d/1X-Q6Z8jWjDzqWjSf_bYBe3OkiOqnEzDsCv55ClblzYE/",
+      "last_synced": "2026-03-10T20:32:41.886Z"
+    },
+    "SAIKO-DATABASE-SCHEMA": {
+      "google_doc_id": "1EieTYHHo4l9gtqtEMNj5Os0CqQtL8KVRaTcwf0vpcqw",
+      "google_doc_url": "https://docs.google.com/document/d/1EieTYHHo4l9gtqtEMNj5Os0CqQtL8KVRaTcwf0vpcqw/",
+      "last_synced": "2026-03-10T20:32:45.658Z"
+    },
+    "SAIKO-DATABASE-SETUP": {
+      "google_doc_id": "1ARuZm8BCWUay2yGF1sMIZW0uYwWIWf5JT2GjshAySeI",
+      "google_doc_url": "https://docs.google.com/document/d/1ARuZm8BCWUay2yGF1sMIZW0uYwWIWf5JT2GjshAySeI/",
+      "last_synced": "2026-03-10T20:32:49.326Z"
+    },
+    "SAIKO-ENERGY-SCORE-SPEC": {
+      "google_doc_id": "1CdleQPI-IGw4WD-rsojPIixzhc5Auxh-KLmExg3n-ck",
+      "google_doc_url": "https://docs.google.com/document/d/1CdleQPI-IGw4WD-rsojPIixzhc5Auxh-KLmExg3n-ck/",
+      "last_synced": "2026-03-10T20:32:53.131Z"
+    },
+    "SAIKO-ENV-TEMPLATE": {
+      "google_doc_id": "1HSl8AfyC4Qh_uQef7q1SmbSItlZvAokcrkZEtYDWQ5U",
+      "google_doc_url": "https://docs.google.com/document/d/1HSl8AfyC4Qh_uQef7q1SmbSItlZvAokcrkZEtYDWQ5U/",
+      "last_synced": "2026-03-10T20:32:58.122Z"
+    },
+    "SAIKO-FIELDS-V2-CUTOVER-SPEC": {
+      "google_doc_id": "1-L6WW5xMtt5VxQf8puANERIfTnuGiS7piPxR9lCBDq8",
+      "google_doc_url": "https://docs.google.com/document/d/1-L6WW5xMtt5VxQf8puANERIfTnuGiS7piPxR9lCBDq8/",
+      "last_synced": "2026-03-10T20:33:01.954Z"
+    },
+    "SAIKO-FIELDS-V2-TARGET-ARCHITECTURE": {
+      "google_doc_id": "1U76YKbJcLx0W8e3uPJkNfehemv-WME2ti0zYe7pxQX4",
+      "google_doc_url": "https://docs.google.com/document/d/1U76YKbJcLx0W8e3uPJkNfehemv-WME2ti0zYe7pxQX4/",
+      "last_synced": "2026-03-10T20:33:05.863Z"
+    },
+    "SAIKO-FORMALITY-SCORE-SPEC": {
+      "google_doc_id": "1gdywIIOlf-z63dSmym6rtPe49OksvxUqBYM520gxd4M",
+      "google_doc_url": "https://docs.google.com/document/d/1gdywIIOlf-z63dSmym6rtPe49OksvxUqBYM520gxd4M/",
+      "last_synced": "2026-03-10T20:33:10.115Z"
+    },
+    "SAIKO-GOOGLE-PLACES-SETUP": {
+      "google_doc_id": "1MTc6JSc0fot6TAv2H-e0onlOxz9RQHb5ZVdMpe_FBLY",
+      "google_doc_url": "https://docs.google.com/document/d/1MTc6JSc0fot6TAv2H-e0onlOxz9RQHb5ZVdMpe_FBLY/",
+      "last_synced": "2026-03-10T20:33:14.535Z"
+    },
+    "SAIKO-LOCAL-DEV": {
+      "google_doc_id": "10q-2oSp71DHDxdrjE39HVktlEX5bfNL7PeJTJf6ZFcs",
+      "google_doc_url": "https://docs.google.com/document/d/10q-2oSp71DHDxdrjE39HVktlEX5bfNL7PeJTJf6ZFcs/",
+      "last_synced": "2026-03-10T20:33:17.969Z"
+    },
+    "SAIKO-MERCHANT-DATA-HIERARCHY": {
+      "google_doc_id": "1pToIctROD9yIIF84T24wmok8Y4l2mNHoOhvV9fcuZu0",
+      "google_doc_url": "https://docs.google.com/document/d/1pToIctROD9yIIF84T24wmok8Y4l2mNHoOhvV9fcuZu0/",
+      "last_synced": "2026-03-10T20:33:23.579Z"
+    },
+    "SAIKO-MIGRATION-GUIDE": {
+      "google_doc_id": "19SSQO9pZUOb8gH_iDCSX6ORWR9hoqq4XpLR8Tn8QAhI",
+      "google_doc_url": "https://docs.google.com/document/d/19SSQO9pZUOb8gH_iDCSX6ORWR9hoqq4XpLR8Tn8QAhI/",
+      "last_synced": "2026-03-10T20:33:28.560Z"
+    },
+    "SAIKO-MIGRATION-HISTORY-RECONCILIATION": {
+      "google_doc_id": "1o_S5g2vMpEWkDaGFhLUlHGfy9ulekJv6VsHQAyh6JsM",
+      "google_doc_url": "https://docs.google.com/document/d/1o_S5g2vMpEWkDaGFhLUlHGfy9ulekJv6VsHQAyh6JsM/",
+      "last_synced": "2026-03-10T20:33:32.351Z"
+    },
+    "SAIKO-PIPELINE-COMMANDS": {
+      "google_doc_id": "1_Gj7HFQ8VBZwNUIPQm-k3e2wuAH5wOOS_5yJiVZd03s",
+      "google_doc_url": "https://docs.google.com/document/d/1_Gj7HFQ8VBZwNUIPQm-k3e2wuAH5wOOS_5yJiVZd03s/",
+      "last_synced": "2026-03-10T20:33:36.276Z"
+    },
+    "SAIKO-PLATFORM-DATA-LAYER": {
+      "google_doc_id": "1uX0XSURyXLqetrYyLMe_jcQVH7qYsNlejKYeJCpv_rs",
+      "google_doc_url": "https://docs.google.com/document/d/1uX0XSURyXLqetrYyLMe_jcQVH7qYsNlejKYeJCpv_rs/",
+      "last_synced": "2026-03-10T20:33:40.320Z"
+    },
+    "SAIKO-PROD-MIGRATION-OPERATOR-RUNBOOK": {
+      "google_doc_id": "1ja5K9MA8YUA1VOHHTS2QKXmwdXprVLpHwY_Bfer37qk",
+      "google_doc_url": "https://docs.google.com/document/d/1ja5K9MA8YUA1VOHHTS2QKXmwdXprVLpHwY_Bfer37qk/",
+      "last_synced": "2026-03-10T20:33:44.185Z"
+    },
+    "SAIKO-PROD-PLACE-FIX-RUNBOOK": {
+      "google_doc_id": "10SB3hBndKSl-qThFqmE8_2rYrIU7iZgAN3N28RfFyRw",
+      "google_doc_url": "https://docs.google.com/document/d/10SB3hBndKSl-qThFqmE8_2rYrIU7iZgAN3N28RfFyRw/",
+      "last_synced": "2026-03-10T20:33:47.575Z"
+    },
+    "SAIKO-PROVENANCE-QUICK-REF": {
+      "google_doc_id": "1Q2LNCYn77uAWg8ZVAyhNBiHnvEHnpyIMbs1YNvWZf3I",
+      "google_doc_url": "https://docs.google.com/document/d/1Q2LNCYn77uAWg8ZVAyhNBiHnvEHnpyIMbs1YNvWZf3I/",
+      "last_synced": "2026-03-10T20:33:51.455Z"
+    },
+    "SAIKO-PROVENANCE-SYSTEM": {
+      "google_doc_id": "1f0pXB8pzddUcUHnvTkagqNA-pJxEWzaBobdD-4rT0Wo",
+      "google_doc_url": "https://docs.google.com/document/d/1f0pXB8pzddUcUHnvTkagqNA-pJxEWzaBobdD-4rT0Wo/",
+      "last_synced": "2026-03-10T20:33:55.096Z"
+    },
+    "SAIKO-README": {
+      "google_doc_id": "1AbcGEE2RsbWP17fXmHkqXeadZNNkzB6S016FEMCpgo8",
+      "google_doc_url": "https://docs.google.com/document/d/1AbcGEE2RsbWP17fXmHkqXeadZNNkzB6S016FEMCpgo8/",
+      "last_synced": "2026-03-10T20:33:58.698Z"
+    },
+    "SAIKO-RESOLVER-AND-PLACES-DATA-FLOW": {
+      "google_doc_id": "1CJJwLdkoHtHwyxZrH2XSHFBVTfyfrl52ou6mizDcuXY",
+      "google_doc_url": "https://docs.google.com/document/d/1CJJwLdkoHtHwyxZrH2XSHFBVTfyfrl52ou6mizDcuXY/",
+      "last_synced": "2026-03-10T20:34:02.778Z"
+    },
+    "SAIKO-SAIKOAI-EXTRACTION-PROMPT-V2-1": {
+      "google_doc_id": "1UInb_ZpgcRcUJgRHj757bz3zQoA7wOLtwmzCUAmJZH8",
+      "google_doc_url": "https://docs.google.com/document/d/1UInb_ZpgcRcUJgRHj757bz3zQoA7wOLtwmzCUAmJZH8/",
+      "last_synced": "2026-03-10T20:34:06.461Z"
+    },
+    "SAIKO-SITEMAP": {
+      "google_doc_id": "1kAs-2XpmRUe1veVTcddKgZpPLrQpB9AyBNcJUQYdjmc",
+      "google_doc_url": "https://docs.google.com/document/d/1kAs-2XpmRUe1veVTcddKgZpPLrQpB9AyBNcJUQYdjmc/",
+      "last_synced": "2026-03-10T20:34:09.893Z"
+    },
+    "SKAI/DECISION-INDEX-SPEC-V1": {
+      "google_doc_id": "1VzjuNsDF82vvxtiw33GKoSqpmPwI760mbmHsEH56pXc",
+      "google_doc_url": "https://docs.google.com/document/d/1VzjuNsDF82vvxtiw33GKoSqpmPwI760mbmHsEH56pXc/",
+      "last_synced": "2026-03-10T20:34:13.507Z"
+    },
+    "SKAI/RESEARCH-AI-KNOWLEDGE-ARCHITECTURE-V1": {
+      "google_doc_id": "1ljx1j3c6IWNUVVO1k6fW7tKyRw1g1ANg87ece9B6MAE",
+      "google_doc_url": "https://docs.google.com/document/d/1ljx1j3c6IWNUVVO1k6fW7tKyRw1g1ANg87ece9B6MAE/",
+      "last_synced": "2026-03-10T20:34:16.970Z"
+    },
+    "SS-DISPLAY-CONTRACT-V1": {
+      "google_doc_id": "1Aa7V2ZzDZYaklAWOolNgu-u1fNJcuzrj6enxQRuiA1M",
+      "google_doc_url": "https://docs.google.com/document/d/1Aa7V2ZzDZYaklAWOolNgu-u1fNJcuzrj6enxQRuiA1M/",
+      "last_synced": "2026-03-10T20:34:20.621Z"
+    },
+    "SYS-BOOT-CONTEXT-INVENTORY": {
+      "google_doc_id": "1oM0ezGBQprYCxd-4017tzjQZPxba7DZlXaGezg1H10o",
+      "google_doc_url": "https://docs.google.com/document/d/1oM0ezGBQprYCxd-4017tzjQZPxba7DZlXaGezg1H10o/",
+      "last_synced": "2026-03-10T20:34:24.008Z"
+    },
+    "SYS-DOCUMENT-REGISTRY-AUDIT": {
+      "google_doc_id": "1BXWDQ-JfjP0ERiClHNBBoI9ZjGXUB8l-9cLNZBQRFtY",
+      "google_doc_url": "https://docs.google.com/document/d/1BXWDQ-JfjP0ERiClHNBBoI9ZjGXUB8l-9cLNZBQRFtY/",
+      "last_synced": "2026-03-10T20:34:27.494Z"
+    },
+    "SYS-DRAFT-TRIGGER-V1": {
+      "google_doc_id": "1gdL4VI-TaEMHiF1y0CJygrhIpSvRZNpq0iqB7EtYqM4",
+      "google_doc_url": "https://docs.google.com/document/d/1gdL4VI-TaEMHiF1y0CJygrhIpSvRZNpq0iqB7EtYqM4/",
+      "last_synced": "2026-03-10T20:34:30.971Z"
+    },
+    "SYS-KNOWLEDGE-CONTROL-WORKSTREAM-2026-03-10": {
+      "google_doc_id": "1oHREeZZUpW-StDV_XwosNaguogR6KkYkgpOKYqi6498",
+      "google_doc_url": "https://docs.google.com/document/d/1oHREeZZUpW-StDV_XwosNaguogR6KkYkgpOKYqi6498/",
+      "last_synced": "2026-03-10T20:34:34.478Z"
+    },
+    "SYS-PROJECT-RESTART-TEMPLATE": {
+      "google_doc_id": "1DOt24oFfDfVkeVnelPWqAVuBye-oYKDwGtdGLICzltc",
+      "google_doc_url": "https://docs.google.com/document/d/1DOt24oFfDfVkeVnelPWqAVuBye-oYKDwGtdGLICzltc/",
+      "last_synced": "2026-03-10T20:34:38.205Z"
+    },
+    "SYS-PROMOTION-FLOW-V1": {
+      "google_doc_id": "1WgjhNPNN_h1p3XxarOioArKCzGK1NzHiRO6ZEUoQKvg",
+      "google_doc_url": "https://docs.google.com/document/d/1WgjhNPNN_h1p3XxarOioArKCzGK1NzHiRO6ZEUoQKvg/",
+      "last_synced": "2026-03-10T20:34:41.984Z"
+    },
+    "SYS-TRACES-BEVERAGE-RESTART-2026-03-10": {
+      "google_doc_id": "1T5MAYSjI3EavINEuaN-B72nUV71-d9kLvEGrGH4J2ZY",
+      "google_doc_url": "https://docs.google.com/document/d/1T5MAYSjI3EavINEuaN-B72nUV71-d9kLvEGrGH4J2ZY/",
+      "last_synced": "2026-03-10T20:34:45.572Z"
+    },
+    "UI-PLACE-PAGE-PATCH-LOG": {
+      "google_doc_id": "1l9IEWyc4hiCmUtVdcDrEbvfwNlW8GeVijeR5IopwKig",
+      "google_doc_url": "https://docs.google.com/document/d/1l9IEWyc4hiCmUtVdcDrEbvfwNlW8GeVijeR5IopwKig/",
+      "last_synced": "2026-03-10T20:34:49.236Z"
+    },
+    "VOICE-SAIKO-VOICE-LAYER": {
+      "google_doc_id": "1fLFRMmmXJ7Sb5JN9w-pwMnjyAfVk3XNT_uABmyP-j7k",
+      "google_doc_url": "https://docs.google.com/document/d/1fLFRMmmXJ7Sb5JN9w-pwMnjyAfVk3XNT_uABmyP-j7k/",
+      "last_synced": "2026-03-10T20:34:54.490Z"
+    }
+  }
+}
