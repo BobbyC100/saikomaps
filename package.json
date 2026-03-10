@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "boot": "tsx scripts/boot.ts",
+    "docs:apply-patch": "tsx scripts/apply-doc-patch.ts",
+    "docs:promote": "tsx scripts/docs-promote.ts",
     "check:place-page": "node scripts/check-place-page-tokens.mjs",
     "session:start": "npx tsx scripts/session-start.ts",
     "session:end": "npx tsx scripts/session-end.ts",
