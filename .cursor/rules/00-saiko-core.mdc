@@ -16,6 +16,7 @@ Core rules:
 - If repo reality conflicts with docs, report the conflict instead of guessing.
 - If a task requires modifying a file outside the immediate scope, stop and confirm before proceeding.
 - If uncertain, stop and ask rather than improvising.
+- Prefer analysis before modification when repository state is uncertain.
 
 You may:
 - edit code

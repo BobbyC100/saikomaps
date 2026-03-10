@@ -1,0 +1,62 @@
+{
+  "run_id": "apply_desc_1773009012365",
+  "created_at": "2026-03-08T22:30:12.365Z",
+  "dry_run": false,
+  "params": {
+    "limit": 20,
+    "la_only": true,
+    "ttl_days": 90
+  },
+  "counts": {
+    "candidates_filtered": 78,
+    "processed": 20,
+    "written": 0,
+    "skipped_existing": 0,
+    "skipped_no_google_desc": 12,
+    "failed": 8
+  },
+  "failed_slugs": [
+    "1642",
+    "anajak-thai-restaurant-4-iconic-sherman-oaks-massively-acclaimed",
+    "augustine-wine-bar-wine-bar-5-wine-bar-sherman-oaks",
+    "bar-covell-wine-bar-5-wine-bar-los-feliz",
+    "cara-hotel-hotel-hotel-boutique-laid-back-modern-boutique-los-feliz-near-griffit",
+    "chi-spacca-restaurant-1-nancy-silverton-meat-focused",
+    "clark-street-bakery-westlake",
+    "cookbook-market-echo-park-echo-park"
+  ],
+  "errors": [
+    {
+      "slug": "1642",
+      "error": "\nInvalid `db.entities.update()` invocation in\n/Users/bobbyciccaglione/code/saiko-maps/scripts/coverage-apply-description.ts:711:27\n\n  708 }\n  709 \n  710 if (!dryRun) {\n→ 711   await db.entities.update(\nError converting field \"enrichment_stage\" of expected non-nullable type \"String\", found incompatible value of \"MERCHANT_ENRICHED\"."
+    },
+    {
+      "slug": "anajak-thai-restaurant-4-iconic-sherman-oaks-massively-acclaimed",
+      "error": "\nInvalid `db.entities.update()` invocation in\n/Users/bobbyciccaglione/code/saiko-maps/scripts/coverage-apply-description.ts:711:27\n\n  708 }\n  709 \n  710 if (!dryRun) {\n→ 711   await db.entities.update(\nError converting field \"enrichment_stage\" of expected non-nullable type \"String\", found incompatible value of \"MERCHANT_ENRICHED\"."
+    },
+    {
+      "slug": "augustine-wine-bar-wine-bar-5-wine-bar-sherman-oaks",
+      "error": "\nInvalid `db.entities.update()` invocation in\n/Users/bobbyciccaglione/code/saiko-maps/scripts/coverage-apply-description.ts:711:27\n\n  708 }\n  709 \n  710 if (!dryRun) {\n→ 711   await db.entities.update(\nError converting field \"enrichment_stage\" of expected non-nullable type \"String\", found incompatible value of \"MERCHANT_ENRICHED\"."
+    },
+    {
+      "slug": "bar-covell-wine-bar-5-wine-bar-los-feliz",
+      "error": "\nInvalid `db.entities.update()` invocation in\n/Users/bobbyciccaglione/code/saiko-maps/scripts/coverage-apply-description.ts:711:27\n\n  708 }\n  709 \n  710 if (!dryRun) {\n→ 711   await db.entities.update(\nError converting field \"enrichment_stage\" of expected non-nullable type \"String\", found incompatible value of \"MERCHANT_ENRICHED\"."
+    },
+    {
+      "slug": "cara-hotel-hotel-hotel-boutique-laid-back-modern-boutique-los-feliz-near-griffit",
+      "error": "\nInvalid `db.entities.update()` invocation in\n/Users/bobbyciccaglione/code/saiko-maps/scripts/coverage-apply-description.ts:711:27\n\n  708 }\n  709 \n  710 if (!dryRun) {\n→ 711   await db.entities.update(\nError converting field \"enrichment_stage\" of expected non-nullable type \"String\", found incompatible value of \"MERCHANT_ENRICHED\"."
+    },
+    {
+      "slug": "chi-spacca-restaurant-1-nancy-silverton-meat-focused",
+      "error": "\nInvalid `db.entities.update()` invocation in\n/Users/bobbyciccaglione/code/saiko-maps/scripts/coverage-apply-description.ts:711:27\n\n  708 }\n  709 \n  710 if (!dryRun) {\n→ 711   await db.entities.update(\nError converting field \"enrichment_stage\" of expected non-nullable type \"String\", found incompatible value of \"MERCHANT_ENRICHED\"."
+    },
+    {
+      "slug": "clark-street-bakery-westlake",
+      "error": "\nInvalid `db.entities.update()` invocation in\n/Users/bobbyciccaglione/code/saiko-maps/scripts/coverage-apply-description.ts:711:27\n\n  708 }\n  709 \n  710 if (!dryRun) {\n→ 711   await db.entities.update(\nError converting field \"enrichment_stage\" of expected non-nullable type \"String\", found incompatible value of \"MERCHANT_ENRICHED\"."
+    },
+    {
+      "slug": "cookbook-market-echo-park-echo-park",
+      "error": "\nInvalid `db.entities.update()` invocation in\n/Users/bobbyciccaglione/code/saiko-maps/scripts/coverage-apply-description.ts:711:27\n\n  708 }\n  709 \n  710 if (!dryRun) {\n→ 711   await db.entities.update(\nError converting field \"enrichment_stage\" of expected non-nullable type \"String\", found incompatible value of \"MERCHANT_ENRICHED\"."
+    }
+  ]
+}

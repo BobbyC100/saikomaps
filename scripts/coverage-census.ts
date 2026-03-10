@@ -40,7 +40,7 @@ async function main() {
     db.golden_records.count({ where: { google_place_id: { not: null } } }),
     db.$queryRaw<[{ count: bigint }]>`
       SELECT COUNT(DISTINCT p.id)::bigint as count
-      FROM places p
+      FROM entities p
       INNER JOIN golden_records g ON g.google_place_id = p.google_place_id
       WHERE p.google_place_id IS NOT NULL
     `,

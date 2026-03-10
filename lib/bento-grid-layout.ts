@@ -26,6 +26,7 @@ export interface LayoutOptions {
   hasCoverage: boolean;
   hasBestFor: boolean;
   hasAlsoOn: boolean;
+  hasVibeTags?: boolean;
 }
 
 /**

@@ -110,6 +110,11 @@ async function ensureUniqueGoldenSlug(baseSlug: string): Promise<string> {
 }
 
 async function main() {
+  if (process.env.LEGACY_WRITES_FROZEN) {
+    console.error('FREEZE: LEGACY_WRITES_FROZEN is set — legacy write paths are disabled for Fields v2 cutover. Exiting.');
+    process.exit(1);
+  }
+
   const { batchId } = parseArgs()
   const prisma = db
 

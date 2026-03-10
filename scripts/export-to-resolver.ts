@@ -64,6 +64,11 @@ interface PlaceExport {
 }
 
 async function main() {
+  if (process.env.LEGACY_WRITES_FROZEN && !isDryRun) {
+    console.error('FREEZE: LEGACY_WRITES_FROZEN is set — legacy write paths are disabled for Fields v2 cutover. Use --dry-run to inspect without writing. Exiting.');
+    process.exit(1);
+  }
+
   console.log('🚀 Exporting existing places to entity resolution system\n');
   
   if (isDryRun) {

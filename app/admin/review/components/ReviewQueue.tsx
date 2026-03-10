@@ -7,6 +7,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { ComparisonCard } from './ComparisonCard';
+import { IdentityEnrichmentPanel } from './IdentityEnrichmentPanel';
 import { ActionBar } from './ActionBar';
 import { QueueHeader } from './QueueHeader';
 import type { HydratedReviewItem } from '@/lib/review-queue';
@@ -185,13 +186,20 @@ export function ReviewQueue() {
       
       <div className="flex-1 flex items-center justify-center p-8 overflow-auto">
         <div className="w-full max-w-4xl">
-          <ComparisonCard
-            key={currentItem.queue_id}
-            recordA={currentItem.recordA}
-            recordB={currentItem.recordB!}
-            matchConfidence={currentItem.match_confidence || 0}
-            conflictingFields={currentItem.conflicting_fields || {}}
-          />
+          {currentItem.conflict_type === 'new_entity_review' ? (
+            <IdentityEnrichmentPanel
+              key={currentItem.queue_id}
+              item={currentItem}
+            />
+          ) : (
+            <ComparisonCard
+              key={currentItem.queue_id}
+              recordA={currentItem.recordA}
+              recordB={currentItem.recordB!}
+              matchConfidence={currentItem.match_confidence || 0}
+              conflictingFields={currentItem.conflicting_fields || {}}
+            />
+          )}
         </div>
       </div>
       

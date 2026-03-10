@@ -80,9 +80,13 @@ EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 DO $$ BEGIN
   ALTER TABLE "EntityActorRelationship" ADD CONSTRAINT "EntityActorRelationship_actor_id_fkey" FOREIGN KEY ("actor_id") REFERENCES "Actor"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+-- FieldsMembership now FKs to entities.id (not golden_records.canonical_id).
+-- entities.id === golden_records.canonical_id (same UUIDs), so no data migration needed.
 DO $$ BEGIN
-  ALTER TABLE "FieldsMembership" ADD CONSTRAINT "FieldsMembership_entity_id_fkey" FOREIGN KEY ("entity_id") REFERENCES "golden_records"("canonical_id") ON DELETE CASCADE ON UPDATE CASCADE;
+  ALTER TABLE "FieldsMembership" ADD CONSTRAINT "FieldsMembership_entity_id_fkey" FOREIGN KEY ("entity_id") REFERENCES "entities"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+-- TraceSignalsCache now FKs to entities.id (not golden_records.canonical_id).
+-- entities.id === golden_records.canonical_id (same UUIDs), so no data migration needed.
 DO $$ BEGIN
-  ALTER TABLE "TraceSignalsCache" ADD CONSTRAINT "TraceSignalsCache_entity_id_fkey" FOREIGN KEY ("entity_id") REFERENCES "golden_records"("canonical_id") ON DELETE CASCADE ON UPDATE CASCADE;
+  ALTER TABLE "TraceSignalsCache" ADD CONSTRAINT "TraceSignalsCache_entity_id_fkey" FOREIGN KEY ("entity_id") REFERENCES "entities"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;

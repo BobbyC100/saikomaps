@@ -158,7 +158,6 @@ async function upsertCoverageStatus(params: {
 
   const now = new Date();
   const data = {
-    place_id: params.placeId,
     dedupe_key: params.dedupeKey,
     last_attempt_at: now,
     last_attempt_status: params.status,
@@ -167,6 +166,7 @@ async function upsertCoverageStatus(params: {
     last_error_message: params.errorMessage ?? null,
     source: 'GOOGLE_PLACES' as const,
     ...(params.status === 'SUCCESS' && { last_success_at: now }),
+    entities: { connect: { id: params.placeId } },
   };
 
   if (existing) {
@@ -384,10 +384,26 @@ async function main() {
         if (i < 5) console.log(`  ✓ ${slug} (no new data to write)`);
       } else if (!dryRun) {
         updates.placesDataCachedAt = new Date();
-        await db.entities.update({
-          where: { id: place_id },
-          data: updates,
-        });
+        const sets = [];
+        const values = [];
+        let i = 1;
+
+        for (const [key, value] of Object.entries(updates)) {
+          const col =
+            key === 'placesDataCachedAt' ? 'places_data_cached_at' :
+            key === 'businessStatus' ? 'business_status' :
+            key === 'hoursJson' ? 'hours_json' :
+            key;
+          sets.push(`${col} = $${i++}`);
+          values.push(value);
+        }
+
+        values.push(place_id);
+
+        await db.$executeRawUnsafe(
+          `update public.entities set ${sets.join(', ')} where id = $${i}`,
+          ...values
+        );
         await upsertCoverageStatus({
           placeId: place_id,
           dedupeKey: dedupe_key,

@@ -1,0 +1,35 @@
+name,city,entity_type,program_focus,subprogram_focus,source,priority,notes
+Mirate,Los Angeles,Restaurant/Bar,non_alcoholic_program,zero_proof_cocktails,Resy/Infatuation coverage,P1,Serious NA cocktail program
+Thunderbolt,Los Angeles,Cocktail Bar,non_alcoholic_program,zero_proof_cocktails,Resy/Infatuation coverage,P1,Highly regarded bar with NA menu
+Bar Benjamin,Los Angeles,Cocktail Bar,non_alcoholic_program,zero_proof_cocktails,Resy coverage,P1,Sober beverage director and strong NA menu
+Felix Trattoria,Los Angeles,Restaurant,non_alcoholic_program,zero_proof_cocktails,Resy coverage,P1,Senza alcol menu section
+Lucia,Los Angeles,Restaurant/Bar,non_alcoholic_program,zero_proof_cocktails,Resy coverage,P2,Produce-driven NA drinks
+Hermon's,Los Angeles,Restaurant/Bar,non_alcoholic_program,zero_proof_cocktails,Resy coverage,P2,Natural / low intervention NA drinks
+Apotheke,Los Angeles,Cocktail Bar,non_alcoholic_program,zero_proof_cocktails,Resy coverage,P2,Medicinal-herb cocktail style with NA options
+Melrose Umbrella Co.,Los Angeles,Cocktail Bar,non_alcoholic_program,na_beer_wine_presence,Infatuation coverage,P2,Mocktails plus NA beers
+Free Spirited,Alhambra,Sober Bar,non_alcoholic_program,zero_proof_cocktails,Secret LA / ZeroProof coverage,P1,Dedicated alcohol-free bar
+,,,,,,,
+Steep After Dark,Los Angeles,Tea Lounge,coffee_tea_program,tea_house_structure,Vogue tea guide,P1,Tea lounge and tea culture venue
+Chado Tea Room,Los Angeles/Pasadena,Tea House,coffee_tea_program,specialty_tea_presence,Vogue / Eater tea coverage,P1,Large curated tea list
+Buena Vida Tea Bar & Garden,Los Angeles,Tea House,coffee_tea_program,tea_house_structure,Vogue coverage,P2,Garden tea venue
+Rose & Blanc Tea Room,Los Angeles,Tea Room,coffee_tea_program,afternoon_tea_service,Eater tea guide,P2,Formal tea service
+Tea Rose Garden,Pasadena,Tea Room,coffee_tea_program,afternoon_tea_service,Eater tea guide,P2,Traditional afternoon tea
+Rose Garden Tea Room (Huntington),San Marino,Tea Service Venue,coffee_tea_program,afternoon_tea_service,Huntington official site,P1,Historic tea service
+The Langham Huntington Tea Room,Pasadena,Hotel Tea Service,coffee_tea_program,afternoon_tea_service,Timeout / Eater,P1,Classic British afternoon tea
+The Peninsula Beverly Hills Afternoon Tea,Beverly Hills,Hotel Tea Service,coffee_tea_program,afternoon_tea_service,Timeout coverage,P2,High-end tea service
+The London West Hollywood Tea Service,West Hollywood,Hotel Tea Service,coffee_tea_program,afternoon_tea_service,Timeout coverage,P3,Hotel tea service
+,,,,,,,
+Chi Cha San Chen,San Gabriel,Boba Shop,coffee_tea_program,bubble_tea_program,Eater boba guide,P1,High-end Taiwanese tea shop
+Bopomofo,San Gabriel,Boba Shop,coffee_tea_program,bubble_tea_program,Eater boba guide,P1,Creative drinks and specialty tea
+Hey Hey Tea,Echo Park,Boba Shop,coffee_tea_program,bubble_tea_program,Eater boba guide,P2,Craft tea focus
+Labobatory,San Gabriel,Boba Shop,coffee_tea_program,bubble_tea_program,Eater boba guide,P2,Experimental flavors
+Pearl’s Finest Teas,Los Angeles,Boba/Tea Shop,coffee_tea_program,bubble_tea_program,Eater boba guide,P2,Tea-forward drinks
+Alfred Tea Room,Los Angeles,Tea Shop,coffee_tea_program,specialty_tea_presence,LA tea coverage,P2,Tea-focused cafe
+Kung Fu Tea,Koreatown,Boba Chain,coffee_tea_program,bubble_tea_chain,Eater coverage,P3,Major Taiwanese franchise
+Gong Cha,Koreatown,Boba Chain,coffee_tea_program,bubble_tea_chain,Eater coverage,P3,Global bubble tea chain
+Lollicup Coffee & Tea,San Gabriel,Boba Chain,coffee_tea_program,bubble_tea_chain,Eater coverage,P3,Early US boba chain
+Tapioca Express,San Gabriel,Boba Chain,coffee_tea_program,bubble_tea_chain,Eater coverage,P3,Legacy Taiwanese chain
+Boba Guys,Los Angeles,Boba Shop,coffee_tea_program,bubble_tea_program,Eater coverage,P1,Third-wave style boba shop
+OneZo Boba,Los Angeles,Boba Shop,coffee_tea_program,bubble_tea_program,Eater coverage,P2,Handmade pearls
+Wushiland Boba,San Gabriel,Boba Shop,coffee_tea_program,bubble_tea_program,Eater coverage,P2,Taiwanese milk tea chain
+Jalsa Yemeni Coffee,Los Angeles,Cafe,coffee_tea_program,arabic_coffee_program,User research,P1,Yemeni coffee culture venue

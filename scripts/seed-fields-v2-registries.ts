@@ -120,6 +120,24 @@ const SOURCES = [
     requires_human_approval: false,
     base_domain: null,
   },
+  // Saiko Seed — the preserved Phase 0 seed export; treated as a trusted system import
+  {
+    id: 'saiko_seed',
+    display_name: 'Saiko Seed (Phase 0 export)',
+    source_type: 'SYSTEM_IMPORT' as const,
+    trust_tier: 2,
+    requires_human_approval: false,
+    base_domain: null,
+  },
+  // Saiko Human — human-reviewed decisions (highest trust, human semantics preserved)
+  {
+    id: 'saiko_human',
+    display_name: 'Saiko Human Review',
+    source_type: 'HUMAN_REVIEW' as const,
+    trust_tier: 1,
+    requires_human_approval: false,
+    base_domain: null,
+  },
 ] as const;
 
 // ---------------------------------------------------------------------------
@@ -128,6 +146,8 @@ const SOURCES = [
 
 const ATTRIBUTES = [
   // --- CANONICAL: identity-critical (threshold 0.95, no decay) ---
+  // slug: routing key — identity_critical, no decay, never floats on entities as a "temporary" field
+  { attribute_key: 'slug', display_name: 'Slug (URL Key)', attribute_class: 'CANONICAL', identity_critical: true, sanction_threshold: 0.95, decay_policy: 'NONE' },
   { attribute_key: 'name', display_name: 'Name', attribute_class: 'CANONICAL', identity_critical: true, sanction_threshold: 0.95, decay_policy: 'NONE' },
   { attribute_key: 'google_place_id', display_name: 'Google Place ID', attribute_class: 'CANONICAL', identity_critical: true, sanction_threshold: 0.95, decay_policy: 'NONE' },
   { attribute_key: 'latitude', display_name: 'Latitude', attribute_class: 'CANONICAL', identity_critical: true, sanction_threshold: 0.95, decay_policy: 'NONE' },

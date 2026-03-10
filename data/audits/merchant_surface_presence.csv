@@ -1,0 +1,56 @@
+name,website,website_platform,menu_present,menu_format,reservation_platform,ordering_platform,instagram_present,newsletter_present,careers_present,events_private_dining_present,sibling_entities_present,gift_cards_present,image_density,fetch_status
+Bavel,https://baveldtla.com/,wordpress,true,html,opentable,toast,true,true,true,true,false,true,medium,200
+Donna's,https://www.donnasla.com/,squarespace,true,html,resy,toast,true,true,false,true,false,true,low,200
+Restaurant Ki,https://restaurantki.com/,unknown,true,html,tock,none,false,false,false,false,false,false,low,200
+Chi Spacca,http://www.chispacca.com/,bentobox,true,html,resy,toast,true,true,true,true,false,true,high,200
+Mori Nozomi,https://www.morinozomi.com/,wix,true,external,tock,none,false,true,false,true,true,false,low,200
+Santa Canela,http://www.santacanela.com/,squarespace,true,html,none,none,true,true,false,true,false,false,high,200
+Alba Los Angeles,https://www.cucinaalba.com/,bentobox,true,html,resy,toast,true,true,true,true,false,true,low,200
+Lasa,http://www.lasita-la.com/,squarespace,true,html,none,toast,true,true,false,true,false,true,high,200
+Anajak Thai,http://www.anajakthai.com/,wordpress,true,html,opentable,square,true,false,false,true,false,true,low,200
+Sunset Tower Hotel,http://www.sunsettowerhotel.com/,squarespace,true,html,opentable,none,true,true,true,true,true,true,high,200
+Downtown L.A. Proper Hotel,https://www.properhotel.com/downtown-la/?utm_source=local-listings&utm_medium=organic&utm_campaign=local-listings,wordpress,true,html,opentable,none,true,true,true,true,true,true,high,200
+Santa Monica Proper,https://www.properhotel.com/santa-monica/?utm_source=local-listings&utm_medium=organic&utm_campaign=local-listings,wordpress,true,html,opentable,none,true,true,true,true,true,true,high,200
+Tomat,http://www.tomat.la/,wix,true,html,resy,square,true,true,true,true,true,true,low,200
+Gjelina,http://www.gjelina.com/,bentobox,true,html,resy,toast,true,true,true,true,true,true,medium,200
+Somni,http://www.somnirestaurant.com/,unknown,true,html,resy,none,true,true,true,true,false,false,high,200
+Great White,http://greatwhitevenice.com/,squarespace,true,html,resy,none,true,true,false,true,false,false,high,200
+Bridgetown Roti,http://www.bridgetownroti.com/,bentobox,true,html,resy,square,true,true,false,true,false,true,medium,200
+Night + Market Weho,http://www.nightmarketsong.com/,squarespace,true,html,resy,none,true,true,false,true,false,true,low,200
+Alta Adams,http://altaadams.com/,wordpress,true,html,resy,none,true,true,false,true,true,true,medium,200
+Gucci Osteria da Massimo Bottura,https://www.gucciosteria.com/en/beverlyhills/?y_source=1_MTU0MDI1NDItNzE1LWxvY2F0aW9uLndlYnNpdGU%3D,wordpress,true,html,resy,none,false,false,false,true,false,true,medium,200
+Baby Bistro,https://babybistrola.com/,unknown,true,external,resy,toast,true,false,false,true,false,true,low,200
+Canyon Coffee,https://canyoncoffee.co/,shopify,true,html,none,none,true,true,false,true,false,false,high,200
+Silver Lake Pool & Inn,https://www.palisociety.com/hotels/silverlake,wordpress,true,html,none,none,true,true,true,true,false,false,high,200
+Leo's Tacos Truck,http://www.leostacostruck.com/,webflow,true,html,none,none,true,false,false,false,false,false,high,200
+Oc & Lau Restaurant,https://oclaurestaurant.com/,wordpress,true,html,none,none,false,true,false,true,false,false,medium,200
+n/naka,https://n-naka.com/,wordpress,true,html,tock,none,true,false,false,true,false,false,medium,200
+Cara Hotel,http://carahotel.com/,squarespace,true,pdf,resy,none,true,true,true,true,false,false,low,200
+Burritos La Palma,http://burritoslapalma.com/,squarespace,true,html,none,none,true,true,false,true,false,false,medium,200
+Kuya Lord,https://kuyalord.com/,wordpress,true,html,none,square,true,false,true,true,false,true,medium,200
+Camélia,https://cameliadtla.com/,wordpress,true,html,opentable,toast,true,true,false,true,true,true,low,200
+Cookbook Market - Echo Park,http://www.cookbookla.com/,squarespace,true,pdf,none,toast,true,true,true,true,false,true,medium,200
+Holbox,http://www.holboxla.com/,unknown,true,html,tock,toast,true,true,false,true,false,true,low,200
+Eightfold Coffee,https://eightfoldcoffee.square.site/,unknown,true,html,none,square,false,true,false,false,false,true,low,200
+Budonoki,https://www.budonoki.la/,squarespace,true,pdf,resy,toast,true,true,false,true,false,true,high,200
+Republique,http://www.republiquela.com/,wordpress,true,external,opentable,toast,true,true,true,true,false,true,high,200
+Tacos 1986,http://www.tacos1986.com/,shopify,true,html,none,toast,true,true,true,true,false,true,high,200
+Ocean Eyebrow Threading,http://www.oceaneyebrowthreading.com/,unknown,true,html,none,none,false,false,true,false,false,false,low,200
+Lowboy,http://www.lowboybar.com/,squarespace,true,html,none,toast,true,true,false,true,false,true,high,200
+Stories,http://www.storiesla.com/,unknown,false,none,none,none,false,false,false,false,false,false,low,200
+North Italia,https://www.northitalia.com/locations/cerritos-ca/,wordpress,true,pdf,none,none,true,true,true,true,false,true,low,200
+Ramona Room,https://www.theramonaroom.com,squarespace,true,pdf,none,none,true,true,false,true,false,false,medium,200
+The Douglas,http://www.thedouglasla.com/,squarespace,true,html,none,none,true,true,false,true,false,false,low,200
+Betsy,https://betsyaltadena.com/,unknown,false,none,resy,toast,true,false,false,false,false,false,low,200
+Dada Market,https://www.dadamarket.com/,squarespace,true,html,none,none,true,true,false,true,false,true,medium,200
+Psychic Wines,http://www.psychicwinesla.com/,unknown,false,none,none,square,false,true,false,false,false,true,low,200
+Sushi n Matcha Sho,https://sushishomelrose.com/,unknown,true,html,none,none,false,false,false,true,false,false,low,200
+Quarter Sheets,http://www.quartersheetspizza.com/,squarespace,true,html,none,square,true,true,false,true,false,true,low,200
+Honey Hi,http://honeyhi.co/,squarespace,true,html,none,toast,true,true,false,true,false,true,low,200
+Los Angeles Pétanque Club,http://www.losangelespetanque.org/,wix,true,external,none,none,true,true,false,true,true,false,medium,200
+Ruby's Diner,https://www.rubys.com/locations/city-of-commerce-citadel/,wordpress,true,html,none,none,true,true,true,true,false,true,medium,200
+Tu Madre,https://www.tumadre.com/,unknown,false,none,none,none,false,false,false,false,false,false,low,403
+Little Fish Echo Park,https://littlefishechopark.com/,squarespace,true,html,resy,doordash,true,true,false,true,false,true,medium,200
+Laveta,https://gourme.top/businesses/laveta,unknown,false,none,none,none,false,false,false,false,false,false,low,404
+DADA ECHO PARK,https://www.dadaechopark.com/,unknown,true,html,resy,none,false,false,false,true,false,false,low,200
+Granada,https://granada-la.com/,squarespace,false,none,none,none,true,true,false,true,false,false,low,200

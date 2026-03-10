@@ -1,0 +1,52 @@
+{
+  "run_id": "apply_desc_1773009081171",
+  "created_at": "2026-03-08T22:31:21.171Z",
+  "dry_run": false,
+  "params": {
+    "limit": 20,
+    "la_only": true,
+    "ttl_days": 90
+  },
+  "counts": {
+    "candidates_filtered": 70,
+    "processed": 20,
+    "written": 0,
+    "skipped_existing": 0,
+    "skipped_no_google_desc": 14,
+    "failed": 6
+  },
+  "failed_slugs": [
+    "eightfold-coffee",
+    "el-prado",
+    "freehand-los-angeles-hotel-hotel-neighborhood-dtla-youthful-artsy-vibe-rooftop-b",
+    "gjelina-restaurant-1-venice-institution-eater-all-time-38",
+    "grá",
+    "hayato-restaurant-2-michelin-2-michelin-stars-japanese"
+  ],
+  "errors": [
+    {
+      "slug": "eightfold-coffee",
+      "error": "\nInvalid `db.entities.update()` invocation in\n/Users/bobbyciccaglione/code/saiko-maps/scripts/coverage-apply-description.ts:711:27\n\n  708 }\n  709 \n  710 if (!dryRun) {\n→ 711   await db.entities.update(\nError converting field \"enrichment_stage\" of expected non-nullable type \"String\", found incompatible value of \"MERCHANT_ENRICHED\"."
+    },
+    {
+      "slug": "el-prado",
+      "error": "\nInvalid `db.entities.update()` invocation in\n/Users/bobbyciccaglione/code/saiko-maps/scripts/coverage-apply-description.ts:711:27\n\n  708 }\n  709 \n  710 if (!dryRun) {\n→ 711   await db.entities.update(\nError converting field \"enrichment_stage\" of expected non-nullable type \"String\", found incompatible value of \"GOOGLE_COVERAGE_COMPLETE\"."
+    },
+    {
+      "slug": "freehand-los-angeles-hotel-hotel-neighborhood-dtla-youthful-artsy-vibe-rooftop-b",
+      "error": "\nInvalid `db.entities.update()` invocation in\n/Users/bobbyciccaglione/code/saiko-maps/scripts/coverage-apply-description.ts:711:27\n\n  708 }\n  709 \n  710 if (!dryRun) {\n→ 711   await db.entities.update(\nError converting field \"enrichment_stage\" of expected non-nullable type \"String\", found incompatible value of \"FAILED\"."
+    },
+    {
+      "slug": "gjelina-restaurant-1-venice-institution-eater-all-time-38",
+      "error": "\nInvalid `db.entities.update()` invocation in\n/Users/bobbyciccaglione/code/saiko-maps/scripts/coverage-apply-description.ts:711:27\n\n  708 }\n  709 \n  710 if (!dryRun) {\n→ 711   await db.entities.update(\nError converting field \"enrichment_stage\" of expected non-nullable type \"String\", found incompatible value of \"MERCHANT_ENRICHED\"."
+    },
+    {
+      "slug": "grá",
+      "error": "\nInvalid `db.entities.update()` invocation in\n/Users/bobbyciccaglione/code/saiko-maps/scripts/coverage-apply-description.ts:711:27\n\n  708 }\n  709 \n  710 if (!dryRun) {\n→ 711   await db.entities.update(\nError converting field \"enrichment_stage\" of expected non-nullable type \"String\", found incompatible value of \"MERCHANT_ENRICHED\"."
+    },
+    {
+      "slug": "hayato-restaurant-2-michelin-2-michelin-stars-japanese",
+      "error": "\nInvalid `db.entities.update()` invocation in\n/Users/bobbyciccaglione/code/saiko-maps/scripts/coverage-apply-description.ts:711:27\n\n  708 }\n  709 \n  710 if (!dryRun) {\n→ 711   await db.entities.update(\nError converting field \"enrichment_stage\" of expected non-nullable type \"String\", found incompatible value of \"FAILED\"."
+    }
+  ]
+}

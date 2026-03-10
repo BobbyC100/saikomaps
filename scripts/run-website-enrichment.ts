@@ -6,9 +6,11 @@
  *   npm run enrich:website [-- --limit=N] [--refresh] [--dry-run]
  *   npm run enrich:website [-- --mode=categoryOnly --limit=N] [--dry-run]
  *   npm run enrich:website [-- --mode=categoryOnly --ignoreCategoryThrottle]  # bypass 30d throttle (emergency re-try)
+ *   npm run enrich:website [-- --slug=<slug>]  # target single entity by slug, bypasses category/enriched filters
  *
  * Selection (default): website + empty category + last_enriched_at null
  * --refresh: website + last_enriched_at older than 180 days
+ * --slug=<slug>: bypass all filters, process exactly this one entity regardless of enrichment state
  * --mode=categoryOnly: website + empty category, exclude STAY, throttle by category_enrich_attempted_at (30 days)
  * --ignoreCategoryThrottle: (categoryOnly only) bypass throttle; keep allowlist, conf≥0.65, STAY exclusion
  */
@@ -20,6 +22,7 @@ import {
   applyWriteRulesCategoryOnly,
 } from "../lib/website-enrichment";
 import { logPlaceJob } from "../lib/place-job-log";
+import type { Prisma } from "@prisma/client";
 
 const REFRESH_STALENESS_DAYS = 180;
 const CATEGORY_ONLY_THROTTLE_DAYS = 30;
@@ -30,6 +33,12 @@ async function main() {
     parseInt(args.find((a) => a.startsWith("--limit="))?.split("=")[1] ?? "0", 10) || 50;
   const refresh = args.includes("--refresh");
   const dryRun = args.includes("--dry-run");
+  const slugArg = args.find((a) => a.startsWith("--slug="))?.split("=")[1];
+
+  if (process.env.LEGACY_WRITES_FROZEN && !dryRun) {
+    console.error('FREEZE: LEGACY_WRITES_FROZEN is set — legacy write paths are disabled for Fields v2 cutover. Use --dry-run to inspect without writing. Exiting.');
+    process.exit(1);
+  }
   const categoryOnly =
     args.find((a) => a.startsWith("--mode="))?.split("=")[1] === "categoryOnly";
   const ignoreCategoryThrottle =
@@ -40,7 +49,11 @@ async function main() {
     Date.now() - CATEGORY_ONLY_THROTTLE_DAYS * 24 * 60 * 60 * 1000
   );
 
-  const where = categoryOnly
+  // --slug bypasses all category/enrichment-state filters: explicitly naming an
+  // entity asserts intent regardless of its current enrichment state.
+  const where: Prisma.entitiesWhereInput = slugArg
+    ? { slug: slugArg, website: { not: null } }
+    : categoryOnly
     ? {
         AND: [
           { website: { not: null } },
@@ -104,15 +117,6 @@ async function main() {
         website,
       });
       const pagesFetched = payload.raw?.about_text_sample ? 2 : 1;
-      if (!dryRun) {
-        await logPlaceJob({
-          entityId: place.id,
-          entityType: "place",
-          jobType: "SCAN",
-          pagesFetched,
-          aiCalls: 0,
-        });
-      }
       console.log(
         `  ${place.name} | ${payload.http_status} | conf=${payload.confidence.toFixed(2)} | cat=${payload.signals.inferred_category ?? "—"}`
       );
@@ -122,6 +126,18 @@ async function main() {
         if (result.didWriteCategory) didWrite++;
       } else if (!dryRun) {
         await applyWriteRules(payload);
+      }
+      if (!dryRun) {
+        await logPlaceJob({
+          entityId: place.id,
+          entityType: "place",
+          jobType: "SCAN",
+          pagesFetched,
+          aiCalls: 0,
+        }).catch((err: unknown) => {
+          // Non-fatal: place_job_log may not exist in all environments.
+          console.warn(`  [job-log] skipped — ${(err as Error).message}`);
+        });
       }
     } catch (e) {
       console.error(`  ${place.name} FULL ERROR:`);

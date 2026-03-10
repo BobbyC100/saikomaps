@@ -20,7 +20,7 @@
  */
 
 import Anthropic from '@anthropic-ai/sdk';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Prisma } from '@prisma/client';
 import { writeDerivedSignal } from '../lib/fields-v2/write-claim';
 
 // ============================================================================
@@ -100,7 +100,25 @@ const CONFIG = {
   requestDelayMs: 500,  // Rate limiting between API calls
   batchSize: 10,
   batchDelayMs: 2000,
+  // Minimum character length for a content field to count as usable.
+  // Below this threshold the AI consistently returns null fields with
+  // hold-tier confidence — not worth the API call and not worth writing.
+  minContentChars: 50,
 };
+
+// Geographic scope: Greater Los Angeles area bounding box.
+// Covers City/County of Los Angeles, Santa Monica, Burbank, Pasadena,
+// Long Beach, and surrounding cities.  Excludes international research
+// entities (France, Spain, Denmark, Hawaii, etc.) that are in the entities
+// table but are not part of the current Saiko Maps product scope.
+// Entities with null canonical coordinates are also excluded — they require
+// geocoding before signals can be extracted with confidence.
+const LA_BBOX = {
+  latMin: 33.6,
+  latMax: 34.5,
+  lonMin: -118.9,
+  lonMax: -117.6,
+} as const;
 
 // ============================================================================
 // EXTRACTION PROMPT
@@ -367,8 +385,17 @@ async function writeSignals(
   dryRun: boolean
 ): Promise<void> {
   if (dryRun) return;
-  
+
+  // Comprehensive blob: flat fields embedded alongside extended signals so downstream
+  // consumers (Voice Engine, SceneSense) can read everything from a single derived_signal row.
   const identitySignals = {
+    // Flat signal fields (embedded for single-query reads)
+    cuisine_posture: result.cuisine_posture,
+    service_model: result.service_model,
+    price_tier: result.price_tier,
+    wine_program_intent: result.wine_program_intent,
+    place_personality: result.place_personality,
+    // Extended JSON signals
     signature_dishes: result.signature_dishes,
     key_producers: result.key_producers,
     language_signals: result.language_signals,
@@ -378,7 +405,10 @@ async function writeSignals(
     confidence_tier: getConfidenceTier(result.confidence),
   };
   
-  await prisma.golden_records.update({
+  // Bridge: write back to golden_records if a row exists for this entity.
+  // updateMany silently skips when no row matches — safe for entities that
+  // were never in the legacy pipeline.
+  await prisma.golden_records.updateMany({
     where: { canonical_id: canonicalId },
     data: {
       cuisine_posture: result.cuisine_posture,
@@ -393,35 +423,32 @@ async function writeSignals(
     },
   });
 
-  // Fields v2: write derived_signals in parallel with golden_records (additive, non-fatal)
-  // Lookup entity_id from google_place_id via canonical_entity_state
-  const canonicalState = await prisma.canonical_entity_state.findFirst({
-    where: { google_place_id: { not: null } },
-    select: { entity_id: true },
-  }).catch(() => null);
+  // Fields v2: write derived_signals.
+  // canonical_id === entity_id (same UUID), so use it directly — no lookup needed.
+  const entityId = canonicalId;
+  const signalVersion = 'extract-identity-v1';
 
-  if (canonicalState) {
-    const signalVersion = `extract-identity-v${1}`;
-    const signalWrites = [
-      { key: 'cuisine_posture', value: result.cuisine_posture },
-      { key: 'service_model', value: result.service_model },
-      { key: 'price_tier', value: result.price_tier },
-      { key: 'wine_program_intent', value: result.wine_program_intent },
-      { key: 'place_personality', value: result.place_personality },
-      { key: 'identity_signals', value: identitySignals },
-    ] as const;
+  // One comprehensive identity_signals row for single-query reads by Voice/SceneSense,
+  // plus individual rows for each flat field for targeted filtering/querying.
+  const signalWrites: { key: string; value: unknown }[] = [
+    { key: 'identity_signals', value: identitySignals },
+    { key: 'cuisine_posture', value: result.cuisine_posture },
+    { key: 'service_model', value: result.service_model },
+    { key: 'price_tier', value: result.price_tier },
+    { key: 'wine_program_intent', value: result.wine_program_intent },
+    { key: 'place_personality', value: result.place_personality },
+  ];
 
-    for (const { key, value } of signalWrites) {
-      if (value != null) {
-        await writeDerivedSignal(prisma, {
-          entityId: canonicalState.entity_id,
-          signalKey: key,
-          signalValue: value,
-          signalVersion,
-        }).catch((err) => {
-          console.warn(`[Fields v2] derived_signal write failed for ${key}:`, err);
-        });
-      }
+  for (const { key, value } of signalWrites) {
+    if (value != null) {
+      await writeDerivedSignal(prisma, {
+        entityId,
+        signalKey: key,
+        signalValue: value,
+        signalVersion,
+      }).catch((err) => {
+        console.warn(`[Fields v2] derived_signal write failed for ${key}:`, err);
+      });
     }
   }
 }
@@ -442,40 +469,95 @@ async function main() {
   if (args.verbose) console.log('🔸 Verbose mode enabled');
   console.log('');
 
-  // Build query
-  const whereClause: any = {
-    county: 'Los Angeles',
-    // Must have at least some scraped content
-    OR: [
-      { menu_raw_text: { not: null } },
-      { about_copy: { not: null } },
-    ],
-  };
+  // ── v2 Selection: drive from canonical_entity_state ──────────────────────────
+  // Eligibility source : entities that have a canonical_entity_state row AND
+  //                      whose canonical lat/lon falls within the LA_BBOX.
+  //                      This enforces the current product scope (Los Angeles
+  //                      market) and excludes international reference entities
+  //                      that are in the entities table but are not Saiko Maps
+  //                      product entities.
+  // "Already processed": derived_signals WHERE signal_key = 'identity_signals'.
+  // Content source     : entities.description (v2-native) and/or golden_records
+  //                      bridge for menu_raw_text / winelist_raw_text / about_copy.
 
-  // Filter to specific place if requested
-  if (args.placeName) {
-    whereClause.name = { contains: args.placeName, mode: 'insensitive' };
-  }
+  // 1. All entities in canonical scope within the LA product bounding box.
+  //    When --place is specified the bbox is bypassed: naming a place explicitly
+  //    asserts scope intent, and the entity may not have coordinates yet
+  //    (e.g. freshly created entities pending a Google Places geocode pass).
+  const entityWhere: Prisma.entitiesWhereInput = args.placeName
+    ? {
+        name: { contains: args.placeName, mode: 'insensitive' },
+        canonical_state: { isNot: null },
+      }
+    : {
+        canonical_state: {
+          is: {
+            latitude:  { gte: LA_BBOX.latMin, lte: LA_BBOX.latMax },
+            longitude: { gte: LA_BBOX.lonMin, lte: LA_BBOX.lonMax },
+          },
+        },
+      };
 
-  // Skip already-processed unless reprocessing
-  if (!args.reprocess) {
-    whereClause.signals_generated_at = null;
-  }
-
-  const records = await prisma.golden_records.findMany({
-    where: whereClause,
-    select: {
-      canonical_id: true,
-      name: true,
-      menu_raw_text: true,
-      winelist_raw_text: true,
-      about_copy: true,
-    },
+  const candidates = await prisma.entities.findMany({
+    where: entityWhere,
+    select: { id: true, name: true, googlePlaceId: true, description: true },
     orderBy: { name: 'asc' },
-    take: args.limit ?? undefined,
   });
 
-  console.log(`📍 Found ${records.length} places to process\n`);
+  // 2. Exclude entities that already have identity_signals in derived_signals.
+  let processedIds = new Set<string>();
+  if (!args.reprocess) {
+    const done = await prisma.derived_signals.findMany({
+      where: { signal_key: 'identity_signals' },
+      select: { entity_id: true },
+    });
+    processedIds = new Set(done.map(d => d.entity_id));
+  }
+
+  const unprocessed = candidates.filter(e => !processedIds.has(e.id));
+
+  // 3. Batch-fetch scraped text from golden_records via google_place_id (bridge).
+  //    menu_raw_text / winelist_raw_text / about_copy live here when the legacy
+  //    scraping pipeline has run for a given entity.
+  const gpids = unprocessed
+    .map(e => e.googlePlaceId)
+    .filter((g): g is string => g != null);
+
+  const goldenRows = gpids.length
+    ? await prisma.golden_records.findMany({
+        where: { google_place_id: { in: gpids } },
+        select: {
+          google_place_id: true,
+          menu_raw_text: true,
+          winelist_raw_text: true,
+          about_copy: true,
+        },
+      })
+    : [];
+  const goldenByGpid = new Map(goldenRows.map(g => [g.google_place_id, g]));
+
+  // 4. Build records — require at least one content field above the minimum
+  //    useful length. Content shorter than minContentChars is "minimal" quality:
+  //    the AI returns mostly-null fields with hold-tier confidence, wastes an
+  //    API call, and produces an empty derived_signal that blocks future runs.
+  //    Priority: golden_records fields first; fall back to entities.description
+  //    as about_copy substitute when no golden_records row exists.
+  const { minContentChars } = CONFIG;
+  const allRecords: GoldenRecordInput[] = unprocessed.flatMap(e => {
+    const gr = e.googlePlaceId ? goldenByGpid.get(e.googlePlaceId) : undefined;
+    const menu_raw_text     = gr?.menu_raw_text     ?? null;
+    const winelist_raw_text = gr?.winelist_raw_text ?? null;
+    const about_copy        = gr?.about_copy ?? e.description ?? null;
+    const hasUsableMenu  = (menu_raw_text?.length  ?? 0) >= minContentChars;
+    const hasUsableAbout = (about_copy?.length     ?? 0) >= minContentChars;
+    if (!hasUsableMenu && !hasUsableAbout) return [];
+    return [{ canonical_id: e.id, name: e.name, menu_raw_text, winelist_raw_text, about_copy }];
+  });
+
+  const records = args.limit ? allRecords.slice(0, args.limit) : allRecords;
+
+  console.log(`📍 Found ${records.length} places to process`);
+  console.log(`   (${candidates.length} in canonical scope · ${unprocessed.length} unprocessed · ${allRecords.length} with extractable content)\n`);
 
   if (records.length === 0) {
     console.log('No records to process. Exiting.');
@@ -486,6 +568,7 @@ async function main() {
   const stats = {
     processed: 0,
     extracted: 0,
+    held: 0,      // result produced but below confidence threshold — write skipped
     skipped: 0,
     failed: 0,
     byConfidenceTier: {
@@ -513,9 +596,18 @@ async function main() {
     stats.byInputQuality[inputQuality.overallQuality]++;
     
     if (result) {
-      await writeSignals(record.canonical_id, result, inputQuality, args.dryRun);
-      stats.extracted++;
-      stats.byConfidenceTier[getConfidenceTier(result.confidence)]++;
+      const tier = getConfidenceTier(result.confidence);
+      stats.byConfidenceTier[tier]++;
+      if (tier === 'hold') {
+        // Do not write hold-tier results to derived_signals: the blob would be
+        // mostly null, marking the entity as "done" and blocking future runs
+        // once real scraped content arrives.  Let the entity be retried.
+        console.log(`    Held (confidence ${result.confidence.toFixed(2)}) — write skipped, will retry when content improves`);
+        stats.held++;
+      } else {
+        await writeSignals(record.canonical_id, result, inputQuality, args.dryRun);
+        stats.extracted++;
+      }
     } else if (inputQuality.overallQuality === 'none') {
       stats.skipped++;
     } else {
@@ -538,10 +630,11 @@ async function main() {
   console.log('\n==========================================');
   console.log('📊 EXTRACTION SUMMARY');
   console.log('==========================================');
-  console.log(`Total processed:  ${stats.processed}`);
-  console.log(`Extracted:        ${stats.extracted}`);
+  console.log(`Total processed:   ${stats.processed}`);
+  console.log(`Extracted:         ${stats.extracted}`);
+  console.log(`Held (low conf):   ${stats.held}  ← not written, will retry`);
   console.log(`Skipped (no data): ${stats.skipped}`);
-  console.log(`Failed:           ${stats.failed}`);
+  console.log(`Failed:            ${stats.failed}`);
   console.log('');
   console.log('By Confidence Tier:');
   console.log(`  Publish (≥0.7):  ${stats.byConfidenceTier.publish}`);

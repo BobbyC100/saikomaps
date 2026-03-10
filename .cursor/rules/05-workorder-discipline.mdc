@@ -1,0 +1,25 @@
+---
+description: Saiko work order (SKAI-WO) discipline — naming, tagging, and scope rules
+alwaysApply: true
+---
+
+## Work Order Convention
+
+Work orders use the prefix `SKAI-WO` followed by a domain segment and a sequential identifier.
+
+Examples:
+- `SKAI-WO-CORE-PLACE-RENAME-TO-ENTITY`
+- `SKAI-WO-FIELDS-INGESTION-FOUNDATION-001`
+- `SKAI-WO-FIELDS-SURFACE-FETCH-001`
+
+## Baseline Docs
+
+Significant work orders have a baseline doc in `docs/` named `SKAI-WO-{ID}-BASELINE.md`. Do not start implementation without reading the relevant baseline doc if one exists.
+
+## Rules
+
+- Before starting a new WO, check if one already exists for the same scope.
+- Do not expand WO scope without explicit confirmation from Bobby.
+- Do not mark phases complete speculatively or without meeting their verification criteria.
+- If you find code tagged with a WO ID that conflicts with the current task scope, surface the conflict before proceeding.
+- Out-of-scope items identified during a WO belong in a new WO, not the current one.

@@ -62,13 +62,12 @@ async function main() {
       console.log(`❌ ${place.name} → no website`);
       continue;
     }
-    await db.entities.update({
-      where: { id: place.id },
-      data: {
-        website,
-        placesDataCachedAt: new Date(),
-      },
-    });
+    await db.$executeRawUnsafe(
+      'update public.entities set website = $1, places_data_cached_at = $2 where id = $3',
+      website,
+      new Date(),
+      place.id
+    );
     updated++;
     console.log(`✅ ${place.name} → ${website}`);
   }

@@ -1,0 +1,37 @@
+{
+  "run_id": "apply_desc_1773009322560",
+  "created_at": "2026-03-08T22:35:22.560Z",
+  "dry_run": false,
+  "params": {
+    "limit": 20,
+    "la_only": true,
+    "ttl_days": 90
+  },
+  "counts": {
+    "candidates_filtered": 64,
+    "processed": 20,
+    "written": 0,
+    "skipped_existing": 0,
+    "skipped_no_google_desc": 17,
+    "failed": 3
+  },
+  "failed_slugs": [
+    "holbox-restaurant-1-mercado-la-paloma-#1-on-la-times-101-2025",
+    "honey-hi",
+    "lasa-restaurant-4-iconic-filipino-chinatown"
+  ],
+  "errors": [
+    {
+      "slug": "holbox-restaurant-1-mercado-la-paloma-#1-on-la-times-101-2025",
+      "error": "\nInvalid `db.entities.update()` invocation in\n/Users/bobbyciccaglione/code/saiko-maps/scripts/coverage-apply-description.ts:711:27\n\n  708 }\n  709 \n  710 if (!dryRun) {\n→ 711   await db.entities.update(\nError converting field \"enrichment_stage\" of expected non-nullable type \"String\", found incompatible value of \"MERCHANT_ENRICHED\"."
+    },
+    {
+      "slug": "honey-hi",
+      "error": "\nInvalid `db.entities.update()` invocation in\n/Users/bobbyciccaglione/code/saiko-maps/scripts/coverage-apply-description.ts:711:27\n\n  708 }\n  709 \n  710 if (!dryRun) {\n→ 711   await db.entities.update(\nError converting field \"enrichment_stage\" of expected non-nullable type \"String\", found incompatible value of \"MERCHANT_ENRICHED\"."
+    },
+    {
+      "slug": "lasa-restaurant-4-iconic-filipino-chinatown",
+      "error": "\nInvalid `db.entities.update()` invocation in\n/Users/bobbyciccaglione/code/saiko-maps/scripts/coverage-apply-description.ts:711:27\n\n  708 }\n  709 \n  710 if (!dryRun) {\n→ 711   await db.entities.update(\nError converting field \"enrichment_stage\" of expected non-nullable type \"String\", found incompatible value of \"MERCHANT_ENRICHED\"."
+    }
+  ]
+}

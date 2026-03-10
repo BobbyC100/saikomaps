@@ -38,6 +38,11 @@ function readLines(filePath: string): string[] {
 async function main() {
   const { batchId, source, filePath, dryRun } = parseArgs()
 
+  if (process.env.LEGACY_WRITES_FROZEN && !dryRun) {
+    console.error('FREEZE: LEGACY_WRITES_FROZEN is set — legacy write paths are disabled for Fields v2 cutover. Use --dry-run to inspect without writing. Exiting.');
+    process.exit(1);
+  }
+
   if (!fs.existsSync(filePath)) {
     console.error('File not found:', filePath)
     process.exit(1)

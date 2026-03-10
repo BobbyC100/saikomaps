@@ -1,0 +1,125 @@
+{
+  "run_id": "apply_1773008339435",
+  "created_at": "2026-03-08T22:18:59.435Z",
+  "dry_run": false,
+  "params": {
+    "limit": 20,
+    "photos_per_place": 10,
+    "la_only": true
+  },
+  "counts": {
+    "candidates_filtered": 53,
+    "processed": 20,
+    "succeeded": 0,
+    "failed": 20,
+    "by_group": {
+      "NEED_GOOGLE_PHOTOS": 0,
+      "NEED_HOURS": 18,
+      "NEED_GOOGLE_ATTRS": 0
+    }
+  },
+  "failed_slugs": [
+    "1642",
+    "8540-s-sepulveda-blvd-westchester",
+    "alba-los-angeles-restaurant-3-hot2025-italian-open-air-west-hollywood",
+    "alejandra-s-quesadilla-cart-de-oaxaca",
+    "alta-adams-restaurant-4-iconic-keith-corbin-south-la",
+    "anajak-thai-restaurant-4-iconic-sherman-oaks-massively-acclaimed",
+    "augustine-wine-bar-wine-bar-5-wine-bar-sherman-oaks",
+    "baby-bistro-restaurant-3-hot2025-restaurant-of-the-year-contender-echo-park",
+    "bar-covell-wine-bar-5-wine-bar-los-feliz",
+    "bavel-restaurant-1-arts-district-middle-eastern-same-owners-as-bestia",
+    "betsy-restaurant-3-hot2025-altadena-hearth-cooking-tyler-wells-comeback",
+    "budonoki",
+    "camélia-restaurant-3-hot2025-french-japanese-bon-appétit-2025",
+    "canyon-coffee",
+    "cara-hotel-hotel-hotel-boutique-laid-back-modern-boutique-los-feliz-near-griffit",
+    "chi-spacca-restaurant-1-nancy-silverton-meat-focused",
+    "clark-street-bakery-westlake",
+    "cookbook-market-echo-park-echo-park",
+    "coucou-french-classes-la",
+    "creekside-village"
+  ],
+  "errors": [
+    {
+      "slug": "1642",
+      "error": "\nInvalid `db.entities.update()` invocation in\n/Users/bobbyciccaglione/code/saiko-maps/scripts/coverage-apply.ts:387:27\n\n  384   if (i < 5) console.log(`  ✓ ${slug} (no new data to write)`);\n  385 } else if (!dryRun) {\n  386   updates.placesDataCachedAt = new Date();\n→ 387   await db.entities.update(\nError converting field \"enrichment_stage\" of expected non-nullable type \"String\", found incompatible value of \"MERCHANT_ENRICHED\"."
+    },
+    {
+      "slug": "8540-s-sepulveda-blvd-westchester",
+      "error": "\nInvalid `db.place_coverage_status.create()` invocation in\n/Users/bobbyciccaglione/code/saiko-maps/scripts/coverage-apply.ts:178:36\n\n  175     data,\n  176   });\n  177 } else {\n→ 178   await db.place_coverage_status.create({\n          data: {\n            place_id: \"cb7e6aef-4ed2-4c90-aa11-c92f5c5fef24\",\n            dedupe_key: \"ChIJ3Vl5CM2wwoARH3ZCjzo_lOI\",\n            last_attempt_at: new Date(\"2026-03-08T22:19:04.180Z\"),\n            last_attempt_status: \"SUCCESS\",\n            last_missing_groups: [\n              \"NEED_HOURS\",\n              \"NEED_GOOGLE_PHOTOS\"\n            ],\n            last_error_code: null,\n            last_error_message: null,\n            source: \"GOOGLE_PLACES\",\n            last_success_at: new Date(\"2026-03-08T22:19:04.180Z\"),\n        +   entities: {\n        +     create: entitiesCreateWithoutPlace_coverage_statusInput | entitiesUncheckedCreateWithoutPlace_coverage_statusInput,\n        +     connectOrCreate: entitiesCreateOrConnectWithoutPlace_coverage_statusInput,\n        +     connect: entitiesWhereUniqueInput\n        +   }\n          }\n        })\n\nArgument `entities` is missing."
+    },
+    {
+      "slug": "alba-los-angeles-restaurant-3-hot2025-italian-open-air-west-hollywood",
+      "error": "\nInvalid `db.entities.update()` invocation in\n/Users/bobbyciccaglione/code/saiko-maps/scripts/coverage-apply.ts:387:27\n\n  384   if (i < 5) console.log(`  ✓ ${slug} (no new data to write)`);\n  385 } else if (!dryRun) {\n  386   updates.placesDataCachedAt = new Date();\n→ 387   await db.entities.update(\nError converting field \"enrichment_stage\" of expected non-nullable type \"String\", found incompatible value of \"MERCHANT_ENRICHED\"."
+    },
+    {
+      "slug": "alejandra-s-quesadilla-cart-de-oaxaca",
+      "error": "\nInvalid `db.entities.update()` invocation in\n/Users/bobbyciccaglione/code/saiko-maps/scripts/coverage-apply.ts:387:27\n\n  384   if (i < 5) console.log(`  ✓ ${slug} (no new data to write)`);\n  385 } else if (!dryRun) {\n  386   updates.placesDataCachedAt = new Date();\n→ 387   await db.entities.update(\nError converting field \"enrichment_stage\" of expected non-nullable type \"String\", found incompatible value of \"GOOGLE_COVERAGE_COMPLETE\"."
+    },
+    {
+      "slug": "alta-adams-restaurant-4-iconic-keith-corbin-south-la",
+      "error": "\nInvalid `db.entities.update()` invocation in\n/Users/bobbyciccaglione/code/saiko-maps/scripts/coverage-apply.ts:387:27\n\n  384   if (i < 5) console.log(`  ✓ ${slug} (no new data to write)`);\n  385 } else if (!dryRun) {\n  386   updates.placesDataCachedAt = new Date();\n→ 387   await db.entities.update(\nError converting field \"enrichment_stage\" of expected non-nullable type \"String\", found incompatible value of \"MERCHANT_ENRICHED\"."
+    },
+    {
+      "slug": "anajak-thai-restaurant-4-iconic-sherman-oaks-massively-acclaimed",
+      "error": "\nInvalid `db.entities.update()` invocation in\n/Users/bobbyciccaglione/code/saiko-maps/scripts/coverage-apply.ts:387:27\n\n  384   if (i < 5) console.log(`  ✓ ${slug} (no new data to write)`);\n  385 } else if (!dryRun) {\n  386   updates.placesDataCachedAt = new Date();\n→ 387   await db.entities.update(\nError converting field \"enrichment_stage\" of expected non-nullable type \"String\", found incompatible value of \"MERCHANT_ENRICHED\"."
+    },
+    {
+      "slug": "augustine-wine-bar-wine-bar-5-wine-bar-sherman-oaks",
+      "error": "\nInvalid `db.entities.update()` invocation in\n/Users/bobbyciccaglione/code/saiko-maps/scripts/coverage-apply.ts:387:27\n\n  384   if (i < 5) console.log(`  ✓ ${slug} (no new data to write)`);\n  385 } else if (!dryRun) {\n  386   updates.placesDataCachedAt = new Date();\n→ 387   await db.entities.update(\nError converting field \"enrichment_stage\" of expected non-nullable type \"String\", found incompatible value of \"MERCHANT_ENRICHED\"."
+    },
+    {
+      "slug": "baby-bistro-restaurant-3-hot2025-restaurant-of-the-year-contender-echo-park",
+      "error": "\nInvalid `db.entities.update()` invocation in\n/Users/bobbyciccaglione/code/saiko-maps/scripts/coverage-apply.ts:387:27\n\n  384   if (i < 5) console.log(`  ✓ ${slug} (no new data to write)`);\n  385 } else if (!dryRun) {\n  386   updates.placesDataCachedAt = new Date();\n→ 387   await db.entities.update(\nError converting field \"enrichment_stage\" of expected non-nullable type \"String\", found incompatible value of \"MERCHANT_ENRICHED\"."
+    },
+    {
+      "slug": "bar-covell-wine-bar-5-wine-bar-los-feliz",
+      "error": "\nInvalid `db.entities.update()` invocation in\n/Users/bobbyciccaglione/code/saiko-maps/scripts/coverage-apply.ts:387:27\n\n  384   if (i < 5) console.log(`  ✓ ${slug} (no new data to write)`);\n  385 } else if (!dryRun) {\n  386   updates.placesDataCachedAt = new Date();\n→ 387   await db.entities.update(\nError converting field \"enrichment_stage\" of expected non-nullable type \"String\", found incompatible value of \"MERCHANT_ENRICHED\"."
+    },
+    {
+      "slug": "bavel-restaurant-1-arts-district-middle-eastern-same-owners-as-bestia",
+      "error": "\nInvalid `db.entities.update()` invocation in\n/Users/bobbyciccaglione/code/saiko-maps/scripts/coverage-apply.ts:387:27\n\n  384   if (i < 5) console.log(`  ✓ ${slug} (no new data to write)`);\n  385 } else if (!dryRun) {\n  386   updates.placesDataCachedAt = new Date();\n→ 387   await db.entities.update(\nError converting field \"enrichment_stage\" of expected non-nullable type \"String\", found incompatible value of \"MERCHANT_ENRICHED\"."
+    },
+    {
+      "slug": "betsy-restaurant-3-hot2025-altadena-hearth-cooking-tyler-wells-comeback",
+      "error": "\nInvalid `db.entities.update()` invocation in\n/Users/bobbyciccaglione/code/saiko-maps/scripts/coverage-apply.ts:387:27\n\n  384   if (i < 5) console.log(`  ✓ ${slug} (no new data to write)`);\n  385 } else if (!dryRun) {\n  386   updates.placesDataCachedAt = new Date();\n→ 387   await db.entities.update(\nError converting field \"enrichment_stage\" of expected non-nullable type \"String\", found incompatible value of \"MERCHANT_ENRICHED\"."
+    },
+    {
+      "slug": "budonoki",
+      "error": "\nInvalid `db.entities.update()` invocation in\n/Users/bobbyciccaglione/code/saiko-maps/scripts/coverage-apply.ts:387:27\n\n  384   if (i < 5) console.log(`  ✓ ${slug} (no new data to write)`);\n  385 } else if (!dryRun) {\n  386   updates.placesDataCachedAt = new Date();\n→ 387   await db.entities.update(\nError converting field \"enrichment_stage\" of expected non-nullable type \"String\", found incompatible value of \"MERCHANT_ENRICHED\"."
+    },
+    {
+      "slug": "camélia-restaurant-3-hot2025-french-japanese-bon-appétit-2025",
+      "error": "\nInvalid `db.entities.update()` invocation in\n/Users/bobbyciccaglione/code/saiko-maps/scripts/coverage-apply.ts:387:27\n\n  384   if (i < 5) console.log(`  ✓ ${slug} (no new data to write)`);\n  385 } else if (!dryRun) {\n  386   updates.placesDataCachedAt = new Date();\n→ 387   await db.entities.update(\nError converting field \"enrichment_stage\" of expected non-nullable type \"String\", found incompatible value of \"MERCHANT_ENRICHED\"."
+    },
+    {
+      "slug": "canyon-coffee",
+      "error": "\nInvalid `db.entities.update()` invocation in\n/Users/bobbyciccaglione/code/saiko-maps/scripts/coverage-apply.ts:387:27\n\n  384   if (i < 5) console.log(`  ✓ ${slug} (no new data to write)`);\n  385 } else if (!dryRun) {\n  386   updates.placesDataCachedAt = new Date();\n→ 387   await db.entities.update(\nError converting field \"enrichment_stage\" of expected non-nullable type \"String\", found incompatible value of \"MERCHANT_ENRICHED\"."
+    },
+    {
+      "slug": "cara-hotel-hotel-hotel-boutique-laid-back-modern-boutique-los-feliz-near-griffit",
+      "error": "\nInvalid `db.entities.update()` invocation in\n/Users/bobbyciccaglione/code/saiko-maps/scripts/coverage-apply.ts:387:27\n\n  384   if (i < 5) console.log(`  ✓ ${slug} (no new data to write)`);\n  385 } else if (!dryRun) {\n  386   updates.placesDataCachedAt = new Date();\n→ 387   await db.entities.update(\nError converting field \"enrichment_stage\" of expected non-nullable type \"String\", found incompatible value of \"MERCHANT_ENRICHED\"."
+    },
+    {
+      "slug": "chi-spacca-restaurant-1-nancy-silverton-meat-focused",
+      "error": "\nInvalid `db.entities.update()` invocation in\n/Users/bobbyciccaglione/code/saiko-maps/scripts/coverage-apply.ts:387:27\n\n  384   if (i < 5) console.log(`  ✓ ${slug} (no new data to write)`);\n  385 } else if (!dryRun) {\n  386   updates.placesDataCachedAt = new Date();\n→ 387   await db.entities.update(\nError converting field \"enrichment_stage\" of expected non-nullable type \"String\", found incompatible value of \"MERCHANT_ENRICHED\"."
+    },
+    {
+      "slug": "clark-street-bakery-westlake",
+      "error": "\nInvalid `db.entities.update()` invocation in\n/Users/bobbyciccaglione/code/saiko-maps/scripts/coverage-apply.ts:387:27\n\n  384   if (i < 5) console.log(`  ✓ ${slug} (no new data to write)`);\n  385 } else if (!dryRun) {\n  386   updates.placesDataCachedAt = new Date();\n→ 387   await db.entities.update(\nError converting field \"enrichment_stage\" of expected non-nullable type \"String\", found incompatible value of \"MERCHANT_ENRICHED\"."
+    },
+    {
+      "slug": "cookbook-market-echo-park-echo-park",
+      "error": "\nInvalid `db.entities.update()` invocation in\n/Users/bobbyciccaglione/code/saiko-maps/scripts/coverage-apply.ts:387:27\n\n  384   if (i < 5) console.log(`  ✓ ${slug} (no new data to write)`);\n  385 } else if (!dryRun) {\n  386   updates.placesDataCachedAt = new Date();\n→ 387   await db.entities.update(\nError converting field \"enrichment_stage\" of expected non-nullable type \"String\", found incompatible value of \"MERCHANT_ENRICHED\"."
+    },
+    {
+      "slug": "coucou-french-classes-la",
+      "error": "\nInvalid `db.entities.update()` invocation in\n/Users/bobbyciccaglione/code/saiko-maps/scripts/coverage-apply.ts:387:27\n\n  384   if (i < 5) console.log(`  ✓ ${slug} (no new data to write)`);\n  385 } else if (!dryRun) {\n  386   updates.placesDataCachedAt = new Date();\n→ 387   await db.entities.update(\nError converting field \"enrichment_stage\" of expected non-nullable type \"String\", found incompatible value of \"MERCHANT_ENRICHED\"."
+    },
+    {
+      "slug": "creekside-village",
+      "error": "\nInvalid `db.entities.update()` invocation in\n/Users/bobbyciccaglione/code/saiko-maps/scripts/coverage-apply.ts:387:27\n\n  384   if (i < 5) console.log(`  ✓ ${slug} (no new data to write)`);\n  385 } else if (!dryRun) {\n  386   updates.placesDataCachedAt = new Date();\n→ 387   await db.entities.update(\nError converting field \"enrichment_stage\" of expected non-nullable type \"String\", found incompatible value of \"GOOGLE_COVERAGE_COMPLETE\"."
+    }
+  ]
+}

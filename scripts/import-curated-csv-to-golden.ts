@@ -126,6 +126,12 @@ function buildProvenance(sourceName: string, batchId: string): Prisma.JsonValue 
 
 async function main() {
   const { file, batch, apply, source, verbose } = parseArgs()
+
+  if (process.env.LEGACY_WRITES_FROZEN && apply) {
+    console.error('FREEZE: LEGACY_WRITES_FROZEN is set — legacy write paths are disabled for Fields v2 cutover. Remove --apply flag or unset LEGACY_WRITES_FROZEN. Exiting.');
+    process.exit(1);
+  }
+
   const resolvedPath = path.resolve(process.cwd(), file)
   if (!fs.existsSync(resolvedPath)) {
     console.error('File not found:', resolvedPath)

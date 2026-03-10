@@ -143,9 +143,9 @@ async function main() {
       })
     : null;
 
-  // Fetch PRL materializer (for SceneSense)
-  const prlRow = await db.trace_signals_cache?.findUnique?.({
-    where: { golden_record_id: golden?.canonical_id ?? '' },
+  // Fetch TraceSignalsCache by entity.id (FK now points to entities.id, not golden_records)
+  const prlRow = await db.traceSignalsCache.findUnique({
+    where: { entityId: entity.id },
   }).catch(() => null) ?? null;
 
   // Compute effective hours (same fallback logic as route)

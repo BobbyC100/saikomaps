@@ -330,9 +330,9 @@ export async function runCoverageAudit(options?: {
       { id: string; has_energy: boolean; has_pts: boolean }[]
     >(Prisma.sql`
       SELECT p.id,
-        exists(SELECT 1 FROM energy_scores es WHERE es.place_id = p.id) AS has_energy,
-        exists(SELECT 1 FROM place_tag_scores pts WHERE pts.place_id = p.id) AS has_pts
-      FROM places p
+        exists(SELECT 1 FROM energy_scores es WHERE es.entity_id = p.id) AS has_energy,
+        exists(SELECT 1 FROM place_tag_scores pts WHERE pts.entity_id = p.id) AS has_pts
+      FROM entities p
       WHERE p.id IN (${Prisma.join(placeIds)})
     `);
     for (const r of rows) {

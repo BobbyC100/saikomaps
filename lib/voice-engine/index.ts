@@ -45,7 +45,6 @@ export type {
   AdUnitAssignment,
   PhrasePattern,
   PopularityTier,
-  Vibe,
   TimeOfDay,
   PriceLevel,
   VocabularyPools,

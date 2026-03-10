@@ -14,6 +14,10 @@ const CONFIDENCE_HIGH = 0.75;
 const CONFIDENCE_MEDIUM = 0.5;
 
 export async function applyWriteRules(payload: EnrichmentPayload): Promise<void> {
+  if (process.env.LEGACY_WRITES_FROZEN) {
+    throw new Error(`FREEZE[write-rules]: legacy merchant_signals write blocked for place_id=${payload.place_id} — LEGACY_WRITES_FROZEN is set`);
+  }
+
   const { place_id, source_url, final_url, http_status, signals, confidence, notes } = payload;
   const extractionJson = {
     place_id,
@@ -104,7 +108,6 @@ export async function applyWriteRules(payload: EnrichmentPayload): Promise<void>
   const status = http_status ?? 0;
   const isBlocked = status === 403;
   const isLowConf = confidence < CONFIDENCE_HIGH;
-  const enrichmentStage = isBlocked ? "BLOCKED" : isLowConf ? "LOW_CONF" : "OK";
   const needsReview = isBlocked || isLowConf;
 
   await db.entities.update({
@@ -112,13 +115,19 @@ export async function applyWriteRules(payload: EnrichmentPayload): Promise<void>
     data: {
       last_enriched_at: new Date(),
       needs_human_review: needsReview,
-      enrichment_stage: enrichmentStage,
+      // enrichment_stage omitted: the DB column is an EnrichmentStage enum but
+      // the Prisma schema maps it as String? — Prisma cannot round-trip the
+      // native enum value on the return read (P2032). Legacy field, not used
+      // in v2 read paths.
       ...(confidence >= CONFIDENCE_HIGH &&
         place &&
         (!place.category || place.category.trim() === "")
         ? { category: payload.signals.inferred_category ?? undefined }
         : {}),
     },
+    // Exclude enrichment_stage from the return projection — Prisma cannot
+    // deserialize the DB-native EnrichmentStage enum as a String.
+    select: { id: true },
   });
 }
 
@@ -149,6 +158,10 @@ export async function applyWriteRulesCategoryOnly(
   payload: EnrichmentPayload,
   options?: { dryRun?: boolean }
 ): Promise<ApplyWriteRulesCategoryOnlyResult> {
+  if (process.env.LEGACY_WRITES_FROZEN) {
+    throw new Error(`FREEZE[write-rules/category]: legacy merchant_signals write blocked for place_id=${payload.place_id} — LEGACY_WRITES_FROZEN is set`);
+  }
+
   const dryRun = options?.dryRun ?? false;
   const { place_id, source_url, final_url, http_status, signals, confidence } =
     payload;

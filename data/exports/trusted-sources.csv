@@ -1,0 +1,7 @@
+id,name,domain,trust_tier,created_at
+google_places,Google Places,{},0.85,2026-02-26 04:21:46.53
+michelin,Michelin,{},0.9,2026-02-26 04:21:46.53
+resy,Resy,{},0.85,2026-02-26 04:21:46.53
+instagram_verified,Instagram Verified,{},0.8,2026-02-26 04:21:46.53
+instagram_scraped,Instagram Scraped,{},0.6,2026-02-26 04:21:46.53
+manual_bobby,Manual (Bobby),{},0.85,2026-02-26 04:21:46.53

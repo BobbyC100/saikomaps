@@ -169,8 +169,9 @@ async function main() {
     } catch { console.log('winelist_signals table missing — skipped'); }
 
     try {
+      // TraceSignalsCache.entity_id now FKs to entities.id — use entity.id directly.
       const traceDel = await db.$executeRawUnsafe(
-        `DELETE FROM "TraceSignalsCache" WHERE entity_id = $1`, cid
+        `DELETE FROM "TraceSignalsCache" WHERE entity_id = $1`, entity.id
       );
       console.log(`Deleted ${traceDel} TraceSignalsCache row(s)`);
     } catch { console.log('TraceSignalsCache table missing — skipped'); }

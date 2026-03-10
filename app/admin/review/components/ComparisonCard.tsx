@@ -23,10 +23,15 @@ export function ComparisonCard({
   conflictingFields 
 }: ComparisonCardProps) {
   
+  const safeA = recordA ?? ({} as HydratedRecord);
+  const safeB = recordB ?? ({} as HydratedRecord);
+
   // Calculate distance between the two locations
   const distanceMeters = haversineDistance(
-    recordA.lat, recordA.lng,
-    recordB.lat, recordB.lng
+    Number((safeA as any)?.lat ?? 0),
+    Number((safeA as any)?.lng ?? 0),
+    Number((safeB as any)?.lat ?? 0),
+    Number((safeB as any)?.lng ?? 0)
   );
   
   // Define fields to compare
@@ -39,33 +44,33 @@ export function ComparisonCard({
   }> = [
     { 
       label: 'Name', 
-      valA: recordA.name, 
-      valB: recordB.name,
+      valA: safeA.name, 
+      valB: safeB.name,
       prioritySource: 'editorial',
       showDiff: true
     },
     { 
       label: 'Address', 
-      valA: recordA.address, 
-      valB: recordB.address,
+      valA: safeA.address, 
+      valB: safeB.address,
       prioritySource: 'google'
     },
     { 
       label: 'Neighborhood', 
-      valA: recordA.neighborhood, 
-      valB: recordB.neighborhood,
+      valA: safeA.neighborhood, 
+      valB: safeB.neighborhood,
       prioritySource: 'editorial'
     },
     { 
       label: 'Category', 
-      valA: recordA.category, 
-      valB: recordB.category,
+      valA: safeA.category, 
+      valB: safeB.category,
       prioritySource: 'editorial'
     },
     { 
       label: 'Phone', 
-      valA: recordA.phone, 
-      valB: recordB.phone,
+      valA: safeA.phone, 
+      valB: safeB.phone,
       prioritySource: 'google'
     },
   ];
@@ -77,12 +82,12 @@ export function ComparisonCard({
       <div className="grid grid-cols-2 border-b border-gray-200">
         <div className="px-6 py-3 bg-gray-50">
           <span className="text-[10px] uppercase tracking-widest text-gray-500 font-semibold">
-            {recordA.source_name.replace('_', ' ')}
+            {(safeA.source_name ?? 'unknown').replace('_', ' ')}
           </span>
         </div>
         <div className="px-6 py-3 bg-gray-50 border-l border-gray-200">
           <span className="text-[10px] uppercase tracking-widest text-gray-500 font-semibold">
-            {recordB.source_name.replace('_', ' ')}
+            {(safeB.source_name ?? 'unknown').replace('_', ' ')}
           </span>
         </div>
       </div>
@@ -96,8 +101,8 @@ export function ComparisonCard({
             valA={field.valA}
             valB={field.valB}
             prioritySource={field.prioritySource}
-            sourceA={recordA.source_name}
-            sourceB={recordB.source_name}
+            sourceA={safeA.source_name ?? 'unknown'}
+            sourceB={safeB.source_name ?? 'unknown'}
           />
         ))}
       </div>

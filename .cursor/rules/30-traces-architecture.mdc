@@ -1,0 +1,22 @@
+---
+description: Saiko trace layer invariants
+alwaysApply: false
+---
+
+When working on traces, trace signals, or trace-related tables:
+
+Trace is Saiko's **signal computation layer**, not a general relationship store.
+
+Core invariants:
+
+- Trace signals are computed from system data; they are not entered manually.
+- Only entities with an active `FieldsMembership` row (`removedAt IS NULL`) receive trace computation.
+- All trace-layer foreign keys must target `entities.id`.
+
+Safety rules:
+
+- Do not add or modify trace signals without an explicit scope that includes signal definition.
+- Do not write to `TraceSignalsCache` outside of the designated compute script.
+- `TraceSignalsCache` is not application-facing and should not appear in API routes without explicit instruction.
+
+If migration history or FK routing appears inconsistent, surface the issue instead of attempting to repair it automatically.

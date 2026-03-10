@@ -128,6 +128,11 @@ function mapPrimaryType(types: string[] | undefined): string | null {
 }
 
 async function enrichPlaces() {
+  if (process.env.LEGACY_WRITES_FROZEN && !isDryRun) {
+    console.error('FREEZE: LEGACY_WRITES_FROZEN is set — legacy write paths are disabled for Fields v2 cutover. Use --dry-run to inspect without writing. Exiting.');
+    process.exit(1);
+  }
+
   console.log('🔍 Google Places Data Enrichment\n');
   
   if (!process.env.GOOGLE_MAPS_API_KEY) {

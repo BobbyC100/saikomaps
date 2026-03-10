@@ -41,9 +41,6 @@ const SOURCE_PRIORITY: Record<string, string[]> = {
   // Description: Editorial > SaikoAI > Google
   description: ['google_places', 'foursquare', 'saiko_ai', 'editorial_eater', 'editorial_infatuation', 'saiko_seed'],
   
-  // Vibe tags: Editorial > SaikoAI (never Google)
-  vibe_tags: ['google_places', 'foursquare', 'saiko_ai', 'editorial_eater', 'editorial_infatuation', 'saiko_seed'],
-  
   // Category: Editorial > Google > Foursquare
   category: ['saiko_seed', 'foursquare', 'google_places', 'editorial_eater', 'editorial_infatuation'],
   
@@ -94,7 +91,6 @@ function extractFieldFromRawJson(rawJson: any, field: string): any {
     website: 'website',
     instagram_handle: 'instagram_handle',
     description: 'description',
-    vibe_tags: 'vibe_tags',
     category: 'category',
     price_level: 'price_level',
     business_status: 'business_status',
@@ -144,6 +140,10 @@ async function generateUniqueSlug(name: string, neighborhood?: string): Promise<
  * Applies survivorship rules to determine winning values
  */
 export async function updateGoldenRecord(canonicalId: string): Promise<void> {
+  if (process.env.LEGACY_WRITES_FROZEN) {
+    throw new Error(`FREEZE[survivorship]: legacy golden_records write blocked for canonical_id=${canonicalId} — LEGACY_WRITES_FROZEN is set`);
+  }
+
   // Get all linked raw records
   const links = await prisma.entity_links.findMany({
     where: {
@@ -272,10 +272,6 @@ export async function updateGoldenRecord(canonicalId: string): Promise<void> {
   const description = descriptionResult?.value;
   if (descriptionResult) sourceAttribution.description = descriptionResult.source;
   
-  const vibeTagsResult = getWinningValue('vibe_tags', bySource);
-  const vibeTags = vibeTagsResult?.value || [];
-  if (vibeTagsResult) sourceAttribution.vibe_tags = vibeTagsResult.source;
-  
   const priceLevelResult = getWinningValue('price_level', bySource);
   const priceLevel = priceLevelResult?.value;
   if (priceLevelResult) sourceAttribution.price_level = priceLevelResult.source;
@@ -353,7 +349,6 @@ export async function updateGoldenRecord(canonicalId: string): Promise<void> {
       website,
       instagram_handle: instagramHandle,
       description,
-      vibe_tags: vibeTags,
       price_level: priceLevel,
       business_status: businessStatus,
       hours_json: hoursJson ? (hoursJson as Prisma.InputJsonValue) : Prisma.JsonNull,
@@ -380,7 +375,6 @@ export async function updateGoldenRecord(canonicalId: string): Promise<void> {
       website,
       instagram_handle: instagramHandle,
       description,
-      vibe_tags: vibeTags,
       price_level: priceLevel,
       business_status: businessStatus,
       hours_json: hoursJson ? (hoursJson as Prisma.InputJsonValue) : Prisma.JsonNull,

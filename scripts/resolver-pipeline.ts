@@ -13,6 +13,7 @@
 import { PrismaClient, Prisma } from '@prisma/client';
 import { haversineDistance } from '../lib/haversine';
 import { createReviewQueueItem } from '../lib/review-queue';
+import { runIdentityEnrichment } from '../lib/identity-enrichment';
 
 // Simple string similarity without external deps
 function jaroWinklerSimilarity(s1: string, s2: string): number {
@@ -114,6 +115,11 @@ const REVIEW_THRESHOLD = 0.70;      // Between this and auto-link, send to revie
 // Below review threshold, treat as separate entities
 
 async function main() {
+  if (process.env.LEGACY_WRITES_FROZEN && !isDryRun) {
+    console.error('FREEZE: LEGACY_WRITES_FROZEN is set — legacy write paths are disabled for Fields v2 cutover. Use --dry-run to inspect without writing. Exiting.');
+    process.exit(1);
+  }
+
   console.log('🔍 Running resolver pipeline\n');
   
   if (isDryRun) {
@@ -250,7 +256,6 @@ async function placekeyPrepass() {
             lng: firstRecord.lng || new Prisma.Decimal(0),
             source_attribution: {} as Prisma.JsonValue,
             cuisines: [],
-            vibe_tags: [],
             signature_dishes: [],
             pro_tips: [],
           },
@@ -304,43 +309,32 @@ async function resolveUnprocessedRecords() {
     const candidates = await findCandidates(record);
     
     if (candidates.length === 0) {
-      // No candidates found - create new canonical entity
+      // No candidates found — run identity enrichment gate before surfacing to humans
       if (!isDryRun) {
-        const canonicalId = crypto.randomUUID();
-        
-        // Create golden_records first
-        await prisma.golden_records.create({
-          data: {
-            canonical_id: canonicalId,
-            slug: `unknown-${canonicalId.split('-')[0]}`,
-            name: record.raw_json.name || 'Unknown',
-            lat: record.lat || new Prisma.Decimal(0),
-            lng: record.lng || new Prisma.Decimal(0),
-            source_attribution: {} as Prisma.JsonValue,
-            cuisines: [],
-            vibe_tags: [],
-            signature_dishes: [],
-            pro_tips: [],
-          },
+        const queueId = await createReviewQueueItem({
+          rawIdA: record.raw_id,
+          rawIdB: null,
+          canonicalId: null,
+          conflictType: 'new_entity_review',
+          matchConfidence: 0,
+          priority: 5,
+          identityEnrichmentStatus: 'pending_enrichment',
         });
-        
-        // Then create entity link
-        await prisma.entity_links.create({
-          data: {
-            canonical_id: canonicalId,
-            raw_id: record.raw_id,
-            match_confidence: new Prisma.Decimal(1.0),
-            match_method: 'new_entity',
-            linked_by: 'system:resolver',
-          },
-        });
-        
+
+        const enrichmentResult = await runIdentityEnrichment(record, queueId);
+
+        // Conservative path: all enrichment outcomes route to human review.
+        // 'sufficient' means the machine found strong candidates — the human
+        // adjudicates and performs the actual create/link. No entity or
+        // entity_link is created here.
+        console.log(`→ Enrichment complete (${enrichmentResult}): ${record.name_normalized} → queued for human review`);
+
         await prisma.raw_records.update({
           where: { raw_id: record.raw_id },
           data: { is_processed: true },
         });
       }
-      keptSeparate++;
+      sentToReview++;
       continue;
     }
     
@@ -399,44 +393,34 @@ async function resolveUnprocessedRecords() {
       console.log(`? Review needed: ${record.name_normalized} (${(bestScore * 100).toFixed(1)}%)`);
       
     } else {
-      // Keep separate
+      // Low-confidence non-match — run identity enrichment gate before surfacing to humans
       if (!isDryRun) {
-        const canonicalId = crypto.randomUUID();
-        
-        // Create golden_records first
-        await prisma.golden_records.create({
-          data: {
-            canonical_id: canonicalId,
-            slug: `unknown-${canonicalId.split('-')[0]}`,
-            name: record.raw_json.name || 'Unknown',
-            lat: record.lat || new Prisma.Decimal(0),
-            lng: record.lng || new Prisma.Decimal(0),
-            source_attribution: {} as Prisma.JsonValue,
-            cuisines: [],
-            vibe_tags: [],
-            signature_dishes: [],
-            pro_tips: [],
-          },
+        const queueId = await createReviewQueueItem({
+          rawIdA: record.raw_id,
+          rawIdB: bestMatch.raw_id,
+          canonicalId: bestMatch.canonical_id,
+          conflictType: 'new_entity_review',
+          matchConfidence: bestScore,
+          priority: 5,
+          identityEnrichmentStatus: 'pending_enrichment',
         });
-        
-        // Then create entity link
-        await prisma.entity_links.create({
-          data: {
-            canonical_id: canonicalId,
-            raw_id: record.raw_id,
-            match_confidence: new Prisma.Decimal(1.0),
-            match_method: 'new_entity',
-            linked_by: 'system:resolver',
-          },
-        });
-        
+
+        const enrichmentResult = await runIdentityEnrichment(record, queueId);
+
+        // Conservative path: all enrichment outcomes route to human review.
+        // 'sufficient' means the machine found strong candidates — the human
+        // adjudicates and performs the actual create/link. No entity or
+        // entity_link is created here.
+        console.log(`→ Enrichment complete (${enrichmentResult}): ${record.name_normalized} → queued for human review`);
+
         await prisma.raw_records.update({
           where: { raw_id: record.raw_id },
           data: { is_processed: true },
         });
       }
-      
-      keptSeparate++;
+
+      sentToReview++;
+      console.log(`? Review needed: ${record.name_normalized} (low-confidence new entity)`);
     }
   }
   

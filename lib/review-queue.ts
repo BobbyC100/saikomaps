@@ -10,6 +10,18 @@ import { updateGoldenRecord } from './survivorship';
 
 const prisma = new PrismaClient();
 
+export interface EnrichmentRun {
+  id: string;
+  source_name: string;
+  searched_name: string | null;
+  searched_city: string | null;
+  result_json: any;
+  identity_confidence: number | null;
+  anchor_count: number;
+  decision_status: string;
+  created_at: Date;
+}
+
 export interface HydratedReviewItem {
   queue_id: string;
   canonical_id: string | null;
@@ -30,6 +42,11 @@ export interface HydratedReviewItem {
     source_count: number;
   };
   distanceMeters?: number;
+  // Identity enrichment state (new_entity_review only; null on all other types)
+  identity_enrichment_status: string | null;
+  identity_anchor_count: number | null;
+  latest_identity_confidence: number | null;
+  enrichment_runs: EnrichmentRun[];
 }
 
 export interface HydratedRecord {
@@ -73,7 +90,9 @@ function hydrateRawRecord(raw: any): HydratedRecord {
 }
 
 /**
- * Fetch review queue items with hydration
+ * Fetch review queue items with hydration.
+ * Items still in machine enrichment (identity_enrichment_status = 'pending_enrichment'
+ * or 'enriching') are suppressed — they are not ready for human review.
  */
 export async function getReviewQueueItems(params: {
   status?: string;
@@ -89,6 +108,11 @@ export async function getReviewQueueItems(params: {
   
   const where: any = { status };
   if (conflictType) where.conflict_type = conflictType;
+
+  // Suppress items still in machine enrichment — not ready for human adjudication
+  where.NOT = {
+    identity_enrichment_status: { in: ['pending_enrichment', 'enriching'] },
+  };
   
   const [items, total] = await Promise.all([
     prisma.review_queue.findMany({
@@ -100,6 +124,9 @@ export async function getReviewQueueItems(params: {
         raw_record_a: true,
         raw_record_b: true,
         golden_record: true,
+        enrichment_runs: {
+          orderBy: { created_at: 'asc' },
+        },
       },
     }),
     prisma.review_queue.count({ where }),
@@ -136,6 +163,24 @@ export async function getReviewQueueItems(params: {
       distanceMeters: recordB
         ? haversineDistance(recordA.lat, recordA.lng, recordB.lat, recordB.lng)
         : undefined,
+      identity_enrichment_status: (item as any).identity_enrichment_status ?? null,
+      identity_anchor_count: (item as any).identity_anchor_count ?? null,
+      latest_identity_confidence: (item as any).latest_identity_confidence
+        ? parseFloat((item as any).latest_identity_confidence.toString())
+        : null,
+      enrichment_runs: ((item as any).enrichment_runs ?? []).map((r: any) => ({
+        id: r.id,
+        source_name: r.source_name,
+        searched_name: r.searched_name,
+        searched_city: r.searched_city,
+        result_json: r.result_json,
+        identity_confidence: r.identity_confidence
+          ? parseFloat(r.identity_confidence.toString())
+          : null,
+        anchor_count: r.anchor_count,
+        decision_status: r.decision_status,
+        created_at: r.created_at,
+      })),
     };
   });
   
@@ -171,7 +216,11 @@ export async function resolveReviewQueueItem(params: {
   nextQueueId: string | null;
 }> {
   const { queueId, resolution, resolutionNotes, resolvedBy, canonicalId } = params;
-  
+
+  if (process.env.LEGACY_WRITES_FROZEN) {
+    throw new Error(`FREEZE[review-queue]: legacy entity_links/raw_records/golden_records write blocked for queueId=${queueId} — LEGACY_WRITES_FROZEN is set`);
+  }
+
   const queueItem = await prisma.review_queue.findUnique({
     where: { queue_id: queueId },
     include: { raw_record_a: true, raw_record_b: true },
@@ -304,16 +353,19 @@ export async function skipReviewQueueItem(params: {
 }
 
 /**
- * Create a review queue item
+ * Create a review queue item.
+ * For new_entity_review cases pass identityEnrichmentStatus: 'pending_enrichment'
+ * so the item is suppressed from human review until the enrichment gate finishes.
  */
 export async function createReviewQueueItem(params: {
   rawIdA: string;
-  rawIdB?: string;
-  canonicalId?: string;
-  conflictType: 'low_confidence_match' | 'attribute_mismatch' | 'potential_duplicate' | 'new_entity';
+  rawIdB?: string | null;
+  canonicalId?: string | null;
+  conflictType: 'low_confidence_match' | 'attribute_mismatch' | 'potential_duplicate' | 'new_entity' | 'new_entity_review';
   matchConfidence?: number;
   conflictingFields?: Record<string, [any, any]>;
   priority?: number;
+  identityEnrichmentStatus?: string | null;
 }): Promise<string> {
   const {
     rawIdA,
@@ -323,17 +375,19 @@ export async function createReviewQueueItem(params: {
     matchConfidence,
     conflictingFields,
     priority = 5,
+    identityEnrichmentStatus = null,
   } = params;
   
   const queueItem = await prisma.review_queue.create({
     data: {
-      canonical_id: canonicalId,
+      canonical_id: canonicalId ?? undefined,
       raw_id_a: rawIdA,
-      raw_id_b: rawIdB,
+      raw_id_b: rawIdB ?? undefined,
       conflict_type: conflictType,
       match_confidence: matchConfidence ? new Prisma.Decimal(matchConfidence) : null,
       conflicting_fields: conflictingFields ? (conflictingFields as Prisma.InputJsonValue) : Prisma.JsonNull,
       priority,
+      identity_enrichment_status: identityEnrichmentStatus,
     },
   });
   
