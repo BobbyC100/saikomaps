@@ -37,7 +37,8 @@ import { google } from 'googleapis';
 import { marked } from 'marked';
 import * as dotenv from 'dotenv';
 
-dotenv.config();
+dotenv.config();                         // .env
+dotenv.config({ path: '.env.local', override: false }); // .env.local (secrets)
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
