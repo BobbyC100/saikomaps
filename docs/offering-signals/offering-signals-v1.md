@@ -1,3 +1,16 @@
+---
+doc_id: OS-OFFERING-SIGNALS-V1
+doc_type: domain-spec
+status: active
+owner: Bobby Ciccaglione
+created: '2026-03-10'
+last_updated: '2026-03-10'
+project_id: TRACES
+systems:
+  - offering-signals
+  - traces
+summary: ''
+---
 # Offering Signals v1
 
 ## 1. Purpose

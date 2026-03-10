@@ -1,3 +1,15 @@
+---
+doc_id: SAIKO-DATABASE-SCHEMA
+doc_type: reference
+status: active
+owner: Bobby Ciccaglione
+created: '2026-03-10'
+last_updated: '2026-03-10'
+project_id: SAIKO
+systems:
+  - database
+summary: ''
+---
 # Saiko Maps - Database Schema
 
 ## Core Entity Relationships

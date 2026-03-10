@@ -1,3 +1,15 @@
+---
+doc_id: ARCH-SYSTEM-CONTRACT
+doc_type: architecture
+status: active
+owner: Bobby Ciccaglione
+created: '2026-03-10'
+last_updated: '2026-03-10'
+project_id: SAIKO
+systems:
+  - platform
+summary: ''
+---
 # SYSTEM CONTRACT
 SaikoFields / TRACES
 

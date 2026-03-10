@@ -1,3 +1,15 @@
+---
+doc_id: SAIKO-PROVENANCE-QUICK-REF
+doc_type: reference
+status: active
+owner: Bobby Ciccaglione
+created: '2026-03-10'
+last_updated: '2026-03-10'
+project_id: SAIKO
+systems:
+  - data-pipeline
+summary: ''
+---
 # Provenance System - Quick Reference
 
 ## ✅ SYSTEM IS ACTIVE

@@ -1,3 +1,15 @@
+---
+doc_id: SAIKO-PIPELINE-COMMANDS
+doc_type: reference
+status: active
+owner: Bobby Ciccaglione
+created: '2026-03-10'
+last_updated: '2026-03-10'
+project_id: SAIKO
+systems:
+  - data-pipeline
+summary: ''
+---
 # Saiko Maps — Pipeline Commands
 
 Quick reference for monitoring and managing the scraping/extraction pipeline.

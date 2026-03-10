@@ -1,3 +1,13 @@
+---
+doc_id: OPS-STALE-DEPLOYMENTS
+doc_type: runbook
+status: active
+owner: Bobby Ciccaglione
+created: '2026-03-10'
+last_updated: '2026-03-10'
+project_id: SAIKO
+summary: ''
+---
 # Debugging Stale Deployments & Local Updates
 
 When `/place/[slug]` or the API doesn't reflect recent code changes, use this playbook.

@@ -1,7 +1,488 @@
 {
-  "generated": "2026-03-10T18:40:15.760Z",
-  "doc_count": 6,
+  "generated": "2026-03-10T18:52:41.890Z",
+  "doc_count": 44,
   "docs": [
+    {
+      "doc_id": "ARCH-AI-OPERATING-LAYER",
+      "doc_type": "architecture",
+      "status": "active",
+      "title": "AI OPERATING LAYER",
+      "path": "docs/architecture/ai_operating_layer.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-10",
+      "last_updated": "2026-03-10",
+      "project_id": "SAIKO",
+      "summary": "",
+      "systems": [
+        "platform"
+      ],
+      "related_docs": []
+    },
+    {
+      "doc_id": "ARCH-README",
+      "doc_type": "overview",
+      "status": "active",
+      "title": "(untitled)",
+      "path": "docs/architecture/README.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-10",
+      "last_updated": "2026-03-10",
+      "project_id": "SAIKO",
+      "summary": "",
+      "systems": [
+        "platform"
+      ],
+      "related_docs": []
+    },
+    {
+      "doc_id": "ARCH-SYSTEM-CONTRACT",
+      "doc_type": "architecture",
+      "status": "active",
+      "title": "SYSTEM CONTRACT",
+      "path": "docs/architecture/system_contract.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-10",
+      "last_updated": "2026-03-10",
+      "project_id": "SAIKO",
+      "summary": "",
+      "systems": [
+        "platform"
+      ],
+      "related_docs": []
+    },
+    {
+      "doc_id": "DEC-001",
+      "doc_type": "decision",
+      "status": "active",
+      "title": "Canonical Knowledge Architecture — Documents Stored in Repository",
+      "path": "docs/decisions/DEC-001.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-09",
+      "last_updated": "2026-03-10",
+      "project_id": "SAIKO",
+      "summary": "",
+      "systems": [],
+      "related_docs": []
+    },
+    {
+      "doc_id": "FEAT-MARKETS-SPEC-V1-2",
+      "doc_type": "spec",
+      "status": "active",
+      "title": "Markets Integration — SPEC v1.2",
+      "path": "docs/features/markets/SPEC_v1.2.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-10",
+      "last_updated": "2026-03-10",
+      "project_id": "SAIKO",
+      "summary": "",
+      "systems": [],
+      "related_docs": []
+    },
+    {
+      "doc_id": "OPS-STALE-DEPLOYMENTS",
+      "doc_type": "runbook",
+      "status": "active",
+      "title": "Debugging Stale Deployments & Local Updates",
+      "path": "docs/debugging/stale-deployments.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-10",
+      "last_updated": "2026-03-10",
+      "project_id": "SAIKO",
+      "summary": "",
+      "systems": [],
+      "related_docs": []
+    },
+    {
+      "doc_id": "OS-OFFERING-SIGNALS-V1",
+      "doc_type": "domain-spec",
+      "status": "active",
+      "title": "Offering Signals v1",
+      "path": "docs/offering-signals/offering-signals-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-10",
+      "last_updated": "2026-03-10",
+      "project_id": "TRACES",
+      "summary": "",
+      "systems": [
+        "offering-signals",
+        "traces"
+      ],
+      "related_docs": []
+    },
+    {
+      "doc_id": "SAIKO-APP-OVERVIEW",
+      "doc_type": "overview",
+      "status": "active",
+      "title": "Saiko Maps - Application Overview",
+      "path": "docs/APP_OVERVIEW.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-10",
+      "last_updated": "2026-03-10",
+      "project_id": "SAIKO",
+      "summary": "",
+      "systems": [],
+      "related_docs": []
+    },
+    {
+      "doc_id": "SAIKO-DATA-PIPELINE-QUICK-START",
+      "doc_type": "reference",
+      "status": "active",
+      "title": "Data Pipeline Quick Reference",
+      "path": "docs/DATA_PIPELINE_QUICK_START.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-10",
+      "last_updated": "2026-03-10",
+      "project_id": "SAIKO",
+      "summary": "",
+      "systems": [
+        "data-pipeline"
+      ],
+      "related_docs": []
+    },
+    {
+      "doc_id": "SAIKO-DATA-SYNC-RUNBOOK",
+      "doc_type": "runbook",
+      "status": "active",
+      "title": "Data Sync Runbook",
+      "path": "docs/DATA_SYNC_RUNBOOK.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-10",
+      "last_updated": "2026-03-10",
+      "project_id": "SAIKO",
+      "summary": "",
+      "systems": [],
+      "related_docs": []
+    },
+    {
+      "doc_id": "SAIKO-DATABASE-SCHEMA",
+      "doc_type": "reference",
+      "status": "active",
+      "title": "Saiko Maps - Database Schema",
+      "path": "docs/DATABASE_SCHEMA.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-10",
+      "last_updated": "2026-03-10",
+      "project_id": "SAIKO",
+      "summary": "",
+      "systems": [
+        "database"
+      ],
+      "related_docs": []
+    },
+    {
+      "doc_id": "SAIKO-DATABASE-SETUP",
+      "doc_type": "reference",
+      "status": "active",
+      "title": "Database Setup for Saiko Maps",
+      "path": "docs/DATABASE_SETUP.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-10",
+      "last_updated": "2026-03-10",
+      "project_id": "SAIKO",
+      "summary": "",
+      "systems": [
+        "database"
+      ],
+      "related_docs": []
+    },
+    {
+      "doc_id": "SAIKO-ENERGY-SCORE-SPEC",
+      "doc_type": "spec",
+      "status": "active",
+      "title": "Energy Score — Specification (Locked)",
+      "path": "docs/ENERGY_SCORE_SPEC.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-10",
+      "last_updated": "2026-03-10",
+      "project_id": "SAIKO",
+      "summary": "",
+      "systems": [],
+      "related_docs": []
+    },
+    {
+      "doc_id": "SAIKO-ENV-TEMPLATE",
+      "doc_type": "reference",
+      "status": "active",
+      "title": "Environment Variables Setup",
+      "path": "docs/ENV_TEMPLATE.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-10",
+      "last_updated": "2026-03-10",
+      "project_id": "SAIKO",
+      "summary": "",
+      "systems": [],
+      "related_docs": []
+    },
+    {
+      "doc_id": "SAIKO-FIELDS-V2-CUTOVER-SPEC",
+      "doc_type": "spec",
+      "status": "active",
+      "title": "Fields v2 — Cutover Spec",
+      "path": "docs/FIELDS_V2_CUTOVER_SPEC.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-10",
+      "last_updated": "2026-03-10",
+      "project_id": "SAIKO",
+      "summary": "",
+      "systems": [
+        "database"
+      ],
+      "related_docs": []
+    },
+    {
+      "doc_id": "SAIKO-FIELDS-V2-TARGET-ARCHITECTURE",
+      "doc_type": "architecture",
+      "status": "active",
+      "title": "Saiko Fields v2 — Target Architecture Spec",
+      "path": "docs/FIELDS_V2_TARGET_ARCHITECTURE.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-10",
+      "last_updated": "2026-03-10",
+      "project_id": "SAIKO",
+      "summary": "",
+      "systems": [
+        "database"
+      ],
+      "related_docs": []
+    },
+    {
+      "doc_id": "SAIKO-FORMALITY-SCORE-SPEC",
+      "doc_type": "spec",
+      "status": "active",
+      "title": "Formality Score — Specification (Locked)",
+      "path": "docs/FORMALITY_SCORE_SPEC.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-10",
+      "last_updated": "2026-03-10",
+      "project_id": "SAIKO",
+      "summary": "",
+      "systems": [],
+      "related_docs": []
+    },
+    {
+      "doc_id": "SAIKO-GOOGLE-PLACES-SETUP",
+      "doc_type": "reference",
+      "status": "active",
+      "title": "Google Places API — Unblock Legacy Text Search",
+      "path": "docs/GOOGLE_PLACES_SETUP.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-10",
+      "last_updated": "2026-03-10",
+      "project_id": "SAIKO",
+      "summary": "",
+      "systems": [],
+      "related_docs": []
+    },
+    {
+      "doc_id": "SAIKO-LOCAL-DEV",
+      "doc_type": "runbook",
+      "status": "active",
+      "title": "Local Development",
+      "path": "docs/LOCAL_DEV.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-10",
+      "last_updated": "2026-03-10",
+      "project_id": "SAIKO",
+      "summary": "",
+      "systems": [],
+      "related_docs": []
+    },
+    {
+      "doc_id": "SAIKO-MERCHANT-DATA-HIERARCHY",
+      "doc_type": "architecture",
+      "status": "active",
+      "title": "Saiko Merchant Data Hierarchy",
+      "path": "docs/saiko-merchant-data-hierarchy.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-10",
+      "last_updated": "2026-03-10",
+      "project_id": "SAIKO",
+      "summary": "",
+      "systems": [],
+      "related_docs": []
+    },
+    {
+      "doc_id": "SAIKO-MIGRATION-GUIDE",
+      "doc_type": "guide",
+      "status": "active",
+      "title": "Migration Guide: Places → Golden Records",
+      "path": "docs/MIGRATION_GUIDE.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-10",
+      "last_updated": "2026-03-10",
+      "project_id": "SAIKO",
+      "summary": "",
+      "systems": [
+        "database"
+      ],
+      "related_docs": []
+    },
+    {
+      "doc_id": "SAIKO-MIGRATION-HISTORY-RECONCILIATION",
+      "doc_type": "guide",
+      "status": "active",
+      "title": "Migration History Reconciliation Analysis",
+      "path": "docs/MIGRATION_HISTORY_RECONCILIATION.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-10",
+      "last_updated": "2026-03-10",
+      "project_id": "SAIKO",
+      "summary": "",
+      "systems": [
+        "database"
+      ],
+      "related_docs": []
+    },
+    {
+      "doc_id": "SAIKO-PIPELINE-COMMANDS",
+      "doc_type": "reference",
+      "status": "active",
+      "title": "Saiko Maps — Pipeline Commands",
+      "path": "docs/PIPELINE_COMMANDS.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-10",
+      "last_updated": "2026-03-10",
+      "project_id": "SAIKO",
+      "summary": "",
+      "systems": [
+        "data-pipeline"
+      ],
+      "related_docs": []
+    },
+    {
+      "doc_id": "SAIKO-PLATFORM-DATA-LAYER",
+      "doc_type": "architecture",
+      "status": "active",
+      "title": "PLATFORM_DATA_LAYER.md",
+      "path": "docs/PLATFORM_DATA_LAYER.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-10",
+      "last_updated": "2026-03-10",
+      "project_id": "SAIKO",
+      "summary": "",
+      "systems": [],
+      "related_docs": []
+    },
+    {
+      "doc_id": "SAIKO-PROD-MIGRATION-OPERATOR-RUNBOOK",
+      "doc_type": "runbook",
+      "status": "active",
+      "title": "Production Migration Operator Runbook",
+      "path": "docs/PROD_MIGRATION_OPERATOR_RUNBOOK.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-10",
+      "last_updated": "2026-03-10",
+      "project_id": "SAIKO",
+      "summary": "",
+      "systems": [
+        "database"
+      ],
+      "related_docs": []
+    },
+    {
+      "doc_id": "SAIKO-PROD-PLACE-FIX-RUNBOOK",
+      "doc_type": "runbook",
+      "status": "active",
+      "title": "Production Place Page Fix - Runbook",
+      "path": "docs/PROD_PLACE_FIX_RUNBOOK.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-10",
+      "last_updated": "2026-03-10",
+      "project_id": "SAIKO",
+      "summary": "",
+      "systems": [],
+      "related_docs": []
+    },
+    {
+      "doc_id": "SAIKO-PROVENANCE-QUICK-REF",
+      "doc_type": "reference",
+      "status": "active",
+      "title": "Provenance System - Quick Reference",
+      "path": "docs/PROVENANCE_QUICK_REF.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-10",
+      "last_updated": "2026-03-10",
+      "project_id": "SAIKO",
+      "summary": "",
+      "systems": [
+        "data-pipeline"
+      ],
+      "related_docs": []
+    },
+    {
+      "doc_id": "SAIKO-PROVENANCE-SYSTEM",
+      "doc_type": "architecture",
+      "status": "active",
+      "title": "Saiko Maps - Provenance System",
+      "path": "docs/PROVENANCE_SYSTEM.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-10",
+      "last_updated": "2026-03-10",
+      "project_id": "SAIKO",
+      "summary": "",
+      "systems": [
+        "data-pipeline"
+      ],
+      "related_docs": []
+    },
+    {
+      "doc_id": "SAIKO-README",
+      "doc_type": "overview",
+      "status": "active",
+      "title": "Saiko Maps",
+      "path": "docs/README.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-10",
+      "last_updated": "2026-03-10",
+      "project_id": "SAIKO",
+      "summary": "",
+      "systems": [],
+      "related_docs": []
+    },
+    {
+      "doc_id": "SAIKO-RESOLVER-AND-PLACES-DATA-FLOW",
+      "doc_type": "architecture",
+      "status": "active",
+      "title": "Resolver pipeline and golden_records → places data flow",
+      "path": "docs/RESOLVER_AND_PLACES_DATA_FLOW.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-10",
+      "last_updated": "2026-03-10",
+      "project_id": "SAIKO",
+      "summary": "",
+      "systems": [
+        "data-pipeline"
+      ],
+      "related_docs": []
+    },
+    {
+      "doc_id": "SAIKO-SAIKOAI-EXTRACTION-PROMPT-V2-1",
+      "doc_type": "document",
+      "status": "active",
+      "title": "SaikoAI Extraction Prompt — V2.1",
+      "path": "docs/saikoai-extraction-prompt-v2.1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-10",
+      "last_updated": "2026-03-10",
+      "project_id": "SAIKO",
+      "summary": "",
+      "systems": [],
+      "related_docs": []
+    },
+    {
+      "doc_id": "SAIKO-SITEMAP",
+      "doc_type": "reference",
+      "status": "active",
+      "title": "Saiko Maps - Sitemap",
+      "path": "docs/SITEMAP.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-10",
+      "last_updated": "2026-03-10",
+      "project_id": "SAIKO",
+      "summary": "",
+      "systems": [],
+      "related_docs": []
+    },
     {
       "doc_id": "SKAI/DECISION-INDEX-SPEC-V1",
       "doc_type": "architecture",
@@ -38,6 +519,23 @@
       "related_docs": [
         "docs/skai/decision-index-spec-v1.md"
       ]
+    },
+    {
+      "doc_id": "SS-DISPLAY-CONTRACT-V1",
+      "doc_type": "domain-spec",
+      "status": "active",
+      "title": "SKAI-DOC-SS-001 — SceneSense Display Contract v1",
+      "path": "docs/scenesense/display-contract-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-10",
+      "last_updated": "2026-03-10",
+      "project_id": "TRACES",
+      "summary": "",
+      "systems": [
+        "scenesense",
+        "traces"
+      ],
+      "related_docs": []
     },
     {
       "doc_id": "SYS-BOOT-CONTEXT-INVENTORY",
@@ -96,6 +594,38 @@
       ]
     },
     {
+      "doc_id": "SYS-KNOWLEDGE-CONTROL-WORKSTREAM-2026-03-10",
+      "doc_type": "system",
+      "status": "active",
+      "title": "Workstream Progress Snapshot",
+      "path": "docs/system/knowledge-control-workstream-2026-03-10.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-10",
+      "last_updated": "2026-03-10",
+      "project_id": "KNOWLEDGE-SYSTEM",
+      "summary": "",
+      "systems": [
+        "knowledge-system"
+      ],
+      "related_docs": []
+    },
+    {
+      "doc_id": "SYS-PROJECT-RESTART-TEMPLATE",
+      "doc_type": "reference",
+      "status": "active",
+      "title": "(untitled)",
+      "path": "docs/system/project-restart-template.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-10",
+      "last_updated": "2026-03-10",
+      "project_id": "KNOWLEDGE-SYSTEM",
+      "summary": "",
+      "systems": [
+        "knowledge-system"
+      ],
+      "related_docs": []
+    },
+    {
       "doc_id": "SYS-PROMOTION-FLOW-V1",
       "doc_type": "system",
       "status": "active",
@@ -114,6 +644,53 @@
         "docs/system/draft-trigger-v1.md",
         "docs/system/knowledge-control-workstream-2026-03-10.md"
       ]
+    },
+    {
+      "doc_id": "SYS-TRACES-BEVERAGE-RESTART-2026-03-10",
+      "doc_type": "system",
+      "status": "active",
+      "title": "(untitled)",
+      "path": "docs/system/traces-beverage-restart-2026-03-10.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-10",
+      "last_updated": "2026-03-10",
+      "project_id": "KNOWLEDGE-SYSTEM",
+      "summary": "",
+      "systems": [
+        "knowledge-system"
+      ],
+      "related_docs": []
+    },
+    {
+      "doc_id": "UI-PLACE-PAGE-PATCH-LOG",
+      "doc_type": "changelog",
+      "status": "active",
+      "title": "Place Page — UI Patch Log",
+      "path": "docs/ui/place-page/patch-log.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-10",
+      "last_updated": "2026-03-10",
+      "project_id": "SAIKO",
+      "summary": "",
+      "systems": [],
+      "related_docs": []
+    },
+    {
+      "doc_id": "VOICE-SAIKO-VOICE-LAYER",
+      "doc_type": "domain-spec",
+      "status": "active",
+      "title": "SAI-DOC-VOICE-001 — Saiko Voice Layer",
+      "path": "docs/voice/saiko-voice-layer.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-10",
+      "last_updated": "2026-03-10",
+      "project_id": "TRACES",
+      "summary": "",
+      "systems": [
+        "voice-engine",
+        "traces"
+      ],
+      "related_docs": []
     }
   ]
 }

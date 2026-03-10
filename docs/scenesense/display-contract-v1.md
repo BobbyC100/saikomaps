@@ -1,3 +1,16 @@
+---
+doc_id: SS-DISPLAY-CONTRACT-V1
+doc_type: domain-spec
+status: active
+owner: Bobby Ciccaglione
+created: '2026-03-10'
+last_updated: '2026-03-10'
+project_id: TRACES
+systems:
+  - scenesense
+  - traces
+summary: ''
+---
 # SKAI-DOC-SS-001 — SceneSense Display Contract v1
 
 **Document ID:** SKAI-DOC-SS-001

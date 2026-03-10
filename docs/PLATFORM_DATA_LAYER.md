@@ -1,3 +1,13 @@
+---
+doc_id: SAIKO-PLATFORM-DATA-LAYER
+doc_type: architecture
+status: active
+owner: Bobby Ciccaglione
+created: '2026-03-10'
+last_updated: '2026-03-10'
+project_id: SAIKO
+summary: ''
+---
 # PLATFORM_DATA_LAYER.md
 
 Saiko Data Layer — Operating Instruction v1

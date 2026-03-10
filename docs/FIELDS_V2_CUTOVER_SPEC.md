@@ -1,3 +1,15 @@
+---
+doc_id: SAIKO-FIELDS-V2-CUTOVER-SPEC
+doc_type: spec
+status: active
+owner: Bobby Ciccaglione
+created: '2026-03-10'
+last_updated: '2026-03-10'
+project_id: SAIKO
+systems:
+  - database
+summary: ''
+---
 # Fields v2 — Cutover Spec
 
 **Status:** Ready to execute Phase 0–2. Phases 3–5 gated on verification.

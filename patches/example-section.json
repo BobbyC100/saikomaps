@@ -1,0 +1,6 @@
+{
+  "patch_type": "section_replace",
+  "target_doc": "docs/ski/BASE-004.md",
+  "section": "## 7. Implementation Notes",
+  "content": "Updated implementation notes.\n"
+}

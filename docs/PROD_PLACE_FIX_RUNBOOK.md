@@ -1,3 +1,13 @@
+---
+doc_id: SAIKO-PROD-PLACE-FIX-RUNBOOK
+doc_type: runbook
+status: active
+owner: Bobby Ciccaglione
+created: '2026-03-10'
+last_updated: '2026-03-10'
+project_id: SAIKO
+summary: ''
+---
 # Production Place Page Fix - Runbook
 
 **Issue**: Place pages return 404 because production database has 0 places.

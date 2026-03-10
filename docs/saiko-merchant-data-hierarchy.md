@@ -1,3 +1,13 @@
+---
+doc_id: SAIKO-MERCHANT-DATA-HIERARCHY
+doc_type: architecture
+status: active
+owner: Bobby Ciccaglione
+created: '2026-03-10'
+last_updated: '2026-03-10'
+project_id: SAIKO
+summary: ''
+---
 # Saiko Merchant Data Hierarchy
 
 **Version:** 2.1  

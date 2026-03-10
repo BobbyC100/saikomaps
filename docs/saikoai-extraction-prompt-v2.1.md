@@ -1,3 +1,13 @@
+---
+doc_id: SAIKO-SAIKOAI-EXTRACTION-PROMPT-V2-1
+doc_type: document
+status: active
+owner: Bobby Ciccaglione
+created: '2026-03-10'
+last_updated: '2026-03-10'
+project_id: SAIKO
+summary: ''
+---
 # SaikoAI Extraction Prompt — V2.1
 
 Production-ready system prompt for the enrichment pipeline.

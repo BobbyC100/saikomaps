@@ -1,3 +1,15 @@
+---
+doc_id: SAIKO-DATABASE-SETUP
+doc_type: reference
+status: active
+owner: Bobby Ciccaglione
+created: '2026-03-10'
+last_updated: '2026-03-10'
+project_id: SAIKO
+systems:
+  - database
+summary: ''
+---
 # Database Setup for Saiko Maps
 
 ## Error: "User was denied access on the database"

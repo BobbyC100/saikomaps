@@ -1,3 +1,13 @@
+---
+doc_id: SAIKO-ENERGY-SCORE-SPEC
+doc_type: spec
+status: active
+owner: Bobby Ciccaglione
+created: '2026-03-10'
+last_updated: '2026-03-10'
+project_id: SAIKO
+summary: ''
+---
 # Energy Score — Specification (Locked)
 
 **System:** Saiko Maps — Place Profile System  

@@ -1,3 +1,13 @@
+---
+doc_id: SAIKO-GOOGLE-PLACES-SETUP
+doc_type: reference
+status: active
+owner: Bobby Ciccaglione
+created: '2026-03-10'
+last_updated: '2026-03-10'
+project_id: SAIKO
+summary: ''
+---
 # Google Places API — Unblock Legacy Text Search
 
 Use when `backfill-google-place-ids` returns `REQUEST_DENIED`.

@@ -1,3 +1,15 @@
+---
+doc_id: SAIKO-FIELDS-V2-TARGET-ARCHITECTURE
+doc_type: architecture
+status: active
+owner: Bobby Ciccaglione
+created: '2026-03-10'
+last_updated: '2026-03-10'
+project_id: SAIKO
+systems:
+  - database
+summary: ''
+---
 # Saiko Fields v2 — Target Architecture Spec
 
 **Status:** Reference / Enforced  

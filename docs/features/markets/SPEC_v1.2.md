@@ -1,3 +1,13 @@
+---
+doc_id: FEAT-MARKETS-SPEC-V1-2
+doc_type: spec
+status: active
+owner: Bobby Ciccaglione
+created: '2026-03-10'
+last_updated: '2026-03-10'
+project_id: SAIKO
+summary: ''
+---
 # Markets Integration — SPEC v1.2
 
 **Version:** 1.2  

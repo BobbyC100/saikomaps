@@ -1,3 +1,13 @@
+---
+doc_id: SAIKO-ENV-TEMPLATE
+doc_type: reference
+status: active
+owner: Bobby Ciccaglione
+created: '2026-03-10'
+last_updated: '2026-03-10'
+project_id: SAIKO
+summary: ''
+---
 # Environment Variables Setup
 
 Create a `.env` file in the root directory with the following variables:

@@ -1,3 +1,15 @@
+---
+doc_id: SAIKO-MIGRATION-HISTORY-RECONCILIATION
+doc_type: guide
+status: active
+owner: Bobby Ciccaglione
+created: '2026-03-10'
+last_updated: '2026-03-10'
+project_id: SAIKO
+systems:
+  - database
+summary: ''
+---
 # Migration History Reconciliation Analysis
 
 **Status:** Analysis Only — No Changes Applied  

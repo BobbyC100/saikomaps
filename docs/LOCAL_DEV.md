@@ -1,3 +1,13 @@
+---
+doc_id: SAIKO-LOCAL-DEV
+doc_type: runbook
+status: active
+owner: Bobby Ciccaglione
+created: '2026-03-10'
+last_updated: '2026-03-10'
+project_id: SAIKO
+summary: ''
+---
 # Local Development
 
 Saiko runs on Next.js + Prisma. Single data path, no branching.

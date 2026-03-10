@@ -1,3 +1,15 @@
+---
+doc_id: SAIKO-RESOLVER-AND-PLACES-DATA-FLOW
+doc_type: architecture
+status: active
+owner: Bobby Ciccaglione
+created: '2026-03-10'
+last_updated: '2026-03-10'
+project_id: SAIKO
+systems:
+  - data-pipeline
+summary: ''
+---
 # Resolver pipeline and golden_records → places data flow
 
 ## 1. Which tables does the resolver pipeline write to?

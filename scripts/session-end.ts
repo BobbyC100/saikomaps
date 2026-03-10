@@ -158,8 +158,12 @@ try {
   primaryPr = '';
 }
 
+// ── Auto-collect commit hash ──────────────────────────────────
+const commitHash = git('rev-parse --short HEAD');
+
 console.log(`Session ID   : ${sessionId}`);
 console.log(`Output file  : ai-operations/sessions/${sessionFilename}`);
+console.log(`Commit hash  : ${commitHash || '(none)'}`);
 console.log('');
 
 // Interactive prompts
@@ -169,20 +173,34 @@ function ask(question: string): Promise<string> {
   return new Promise(resolve => rl.question(question, resolve));
 }
 
+const SYSTEM_STATUS_VALUES = ['green', 'yellow', 'red'] as const;
+type SystemStatus = typeof SYSTEM_STATUS_VALUES[number];
+
+function parseStatus(raw: string): SystemStatus {
+  const v = raw.trim().toLowerCase();
+  if (v === 'yellow' || v === 'red') return v;
+  return 'green';
+}
+
 async function collectAndWrite(): Promise<void> {
-  const systemsRaw = await ask('systems_advanced (comma-separated IDs, blank for none): ');
-  const threadsRaw = await ask('open_threads (comma-separated, blank for none): ');
-  const nextMove = await ask('next_move (one line, blank to skip): ');
+  const nextObjective      = await ask('next_session_objective (one sentence): ');
+  const firstWO            = await ask('recommended_first_work_order (one line): ');
+  const projectsRaw        = await ask('projects_for_next_session (comma-separated, blank for none): ');
+  const openItemsRaw       = await ask('open_items (comma-separated, blank for none): ');
+  const verificationNotes  = await ask('verification_notes (short summary, blank to skip): ');
+  const systemStatusRaw    = await ask('system_status (green / yellow / red, blank = green): ');
 
   rl.close();
 
-  const systemsAdvanced = systemsRaw.trim()
-    ? systemsRaw.split(',').map(s => s.trim()).filter(Boolean)
+  const projectsForNextSession = projectsRaw.trim()
+    ? projectsRaw.split(',').map(s => s.trim()).filter(Boolean)
     : [];
 
-  const openThreads = threadsRaw.trim()
-    ? threadsRaw.split(',').map(s => s.trim()).filter(Boolean)
+  const openItems = openItemsRaw.trim()
+    ? openItemsRaw.split(',').map(s => s.trim()).filter(Boolean)
     : [];
+
+  const systemStatus = parseStatus(systemStatusRaw);
 
   const record = {
     session_id: sessionId,
@@ -190,10 +208,19 @@ async function collectAndWrite(): Promise<void> {
     session_number: sessionNumber,
     branch,
     primary_pr: primaryPr,
-    systems_advanced: systemsAdvanced,
+    commit_hash: commitHash,
+    // ── Explicit boot fields ──────────────────────────────────
+    next_session_objective: nextObjective.trim(),
+    recommended_first_work_order: firstWO.trim(),
+    projects_for_next_session: projectsForNextSession,
+    open_items: openItems,
+    verification_notes: verificationNotes.trim(),
+    system_status: systemStatus,
+    // ── Legacy fields (kept for backward compat) ──────────────
+    systems_advanced: projectsForNextSession,
     files_modified: filesModified,
-    open_threads: openThreads,
-    next_move: nextMove.trim(),
+    open_threads: openItems,
+    next_move: nextObjective.trim(),
     agents: ['cursor'],
   };
 

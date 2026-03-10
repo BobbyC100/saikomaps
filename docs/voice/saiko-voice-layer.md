@@ -1,3 +1,16 @@
+---
+doc_id: VOICE-SAIKO-VOICE-LAYER
+doc_type: domain-spec
+status: active
+owner: Bobby Ciccaglione
+created: '2026-03-10'
+last_updated: '2026-03-10'
+project_id: TRACES
+systems:
+  - voice-engine
+  - traces
+summary: ''
+---
 # SAI-DOC-VOICE-001 — Saiko Voice Layer
 
 **Document ID:** SAI-DOC-VOICE-001

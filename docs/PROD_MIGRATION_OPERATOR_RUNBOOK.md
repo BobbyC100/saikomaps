@@ -1,3 +1,15 @@
+---
+doc_id: SAIKO-PROD-MIGRATION-OPERATOR-RUNBOOK
+doc_type: runbook
+status: active
+owner: Bobby Ciccaglione
+created: '2026-03-10'
+last_updated: '2026-03-10'
+project_id: SAIKO
+systems:
+  - database
+summary: ''
+---
 # Production Migration Operator Runbook
 
 **Golden-First Rollout — Recovery + Deploy**
