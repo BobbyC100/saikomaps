@@ -8,6 +8,7 @@
  */
 
 import { db } from '../lib/db';
+import type { PrimaryVertical } from '@prisma/client';
 
 interface SeedPlace {
   slug: string;
@@ -15,6 +16,7 @@ interface SeedPlace {
   address: string;
   latitude: number;
   longitude: number;
+  primary_vertical: PrimaryVertical;
   phone?: string;
   website?: string;
   instagram?: string;
@@ -37,6 +39,7 @@ const SEED_PLACES: SeedPlace[] = [
     address: '2705 Sawtelle Blvd, Los Angeles, CA 90064',
     latitude: 34.035877,
     longitude: -118.449692,
+    primary_vertical: 'EAT',
     neighborhood: 'Sawtelle',
     category: 'Restaurant',
     cuisineType: 'Latin American',
@@ -50,6 +53,7 @@ const SEED_PLACES: SeedPlace[] = [
     address: '2506 Sawtelle Blvd, Los Angeles, CA 90064',
     latitude: 34.034123,
     longitude: -118.449512,
+    primary_vertical: 'EAT',
     neighborhood: 'Sawtelle',
     category: 'Restaurant',
     cuisineType: 'Ramen',
@@ -62,6 +66,7 @@ const SEED_PLACES: SeedPlace[] = [
     address: '3643 S Grand Ave, Los Angeles, CA 90007',
     latitude: 34.004321,
     longitude: -118.270987,
+    primary_vertical: 'EAT',
     neighborhood: 'Downtown',
     category: 'Restaurant',
     cuisineType: 'Mexican',
@@ -74,6 +79,7 @@ const SEED_PLACES: SeedPlace[] = [
     address: '114 E 2nd St, Los Angeles, CA 90012',
     latitude: 34.050876,
     longitude: -118.245123,
+    primary_vertical: 'EAT',
     neighborhood: 'Downtown',
     category: 'Restaurant',
     cuisineType: 'California',
@@ -86,6 +92,7 @@ const SEED_PLACES: SeedPlace[] = [
     address: '624 S La Brea Ave, Los Angeles, CA 90036',
     latitude: 34.063412,
     longitude: -118.344567,
+    primary_vertical: 'EAT',
     neighborhood: 'Mid-City',
     category: 'Restaurant',
     cuisineType: 'French',
@@ -107,6 +114,7 @@ async function seedPlace(place: SeedPlace) {
         address: place.address,
         latitude: place.latitude,
         longitude: place.longitude,
+        primary_vertical: place.primary_vertical,
         phone: place.phone || null,
         website: place.website || null,
         instagram: place.instagram || null,
@@ -133,7 +141,7 @@ async function seedPlace(place: SeedPlace) {
         intentProfile: null,
         intentProfileOverride: false,
         reservationUrl: null,
-        placeType: 'venue',
+        entityType: 'venue',
         categoryId: null,
         marketSchedule: null,
         createdAt: new Date(),
@@ -144,6 +152,7 @@ async function seedPlace(place: SeedPlace) {
         address: place.address,
         latitude: place.latitude,
         longitude: place.longitude,
+        primary_vertical: place.primary_vertical,
         phone: place.phone || null,
         website: place.website || null,
         instagram: place.instagram || null,
