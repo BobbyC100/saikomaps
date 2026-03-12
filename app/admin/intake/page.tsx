@@ -11,6 +11,7 @@
  */
 
 import { useState, useRef, useCallback, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -90,6 +91,7 @@ const ENRICH_LABEL: Record<EnrichState, string> = {
 };
 
 function ResultsTable({ results }: { results: IntakeResult[] }) {
+  const router = useRouter();
   const [enrichStates, setEnrichStates] = useState<Record<string, EnrichState>>({});
   const pollRefs = useRef<Record<string, ReturnType<typeof setInterval>>>({});
   // overrides: input name → new result, for rows force-created from ambiguous state
@@ -109,6 +111,8 @@ function ResultsTable({ results }: { results: IntakeResult[] }) {
           setEnrichStates((s) => ({ ...s, [slug]: 'done' }));
           clearInterval(pollRefs.current[slug]);
           delete pollRefs.current[slug];
+          // Navigate to the place page after a brief moment to show ✓ Enriched
+          setTimeout(() => router.push(`/place/${slug}`), 1200);
         }
       } catch {
         // network hiccup — keep polling
