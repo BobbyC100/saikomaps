@@ -13,7 +13,7 @@
 
 export type PlacePageSceneSense = {
   atmosphere: string[];
-  ambiance: string[];
+  energy: string[];
   scene: string[];
 };
 
@@ -54,6 +54,21 @@ export type PlacePageAppearanceAsHost = {
   subjectPlace: { id: string; name: string; slug: string } | null;
   scheduleText: string;
   status: string;
+};
+
+export type PlacePageProgramEntry = {
+  maturity: 'none' | 'incidental' | 'considered' | 'dedicated' | 'unknown';
+  signals: string[];
+};
+
+export type PlacePageOfferingPrograms = {
+  food_program: PlacePageProgramEntry;
+  wine_program: PlacePageProgramEntry;
+  beer_program: PlacePageProgramEntry;
+  cocktail_program: PlacePageProgramEntry;
+  non_alcoholic_program: PlacePageProgramEntry;
+  coffee_tea_program: PlacePageProgramEntry;
+  service_program: PlacePageProgramEntry;
 };
 
 export type PlacePageAppearsOnItem = {
@@ -98,6 +113,7 @@ export type PlacePageLocation = {
 
   // Editorial
   description: string | null;
+  descriptionSource: string | null;
   tagline: string | null;
   pullQuote: string | null;
   pullQuoteAuthor: string | null;
@@ -117,6 +133,11 @@ export type PlacePageLocation = {
 
   // Offering
   offeringSignals: PlacePageOfferingSignals | null;
+  offeringPrograms: PlacePageOfferingPrograms | null;
+
+  // Identity Signals (enrichment)
+  placePersonality: string | null;
+  signatureDishes: string[];
 
   // Coverage
   coverageSources: PlacePageCoverageSource[];
@@ -166,6 +187,7 @@ export const PLACE_PAGE_LOCATION_KEYS: ReadonlyArray<keyof PlacePageLocation> = 
   'winelistUrl',
   // Editorial
   'description',
+  'descriptionSource',
   'tagline',
   'pullQuote',
   'pullQuoteAuthor',
@@ -182,6 +204,10 @@ export const PLACE_PAGE_LOCATION_KEYS: ReadonlyArray<keyof PlacePageLocation> = 
   'scenesense',
   // Offering
   'offeringSignals',
+  'offeringPrograms',
+  // Identity Signals (enrichment)
+  'placePersonality',
+  'signatureDishes',
   // Coverage
   'coverageSources',
   // Appearances
@@ -233,6 +259,9 @@ export function assertPlacePageData(x: unknown): asserts x is PlacePageData {
   }
   if (!Array.isArray(loc.photoUrls)) {
     throw new Error('PlacePageData.location.photoUrls must be an array');
+  }
+  if (!Array.isArray(loc.signatureDishes)) {
+    throw new Error('PlacePageData.location.signatureDishes must be an array');
   }
   if (!Array.isArray(loc.coverageSources)) {
     throw new Error('PlacePageData.location.coverageSources must be an array');

@@ -1,6 +1,7 @@
 /**
  * SceneSense Voice Engine — Deterministic copy generation
- * Spec: Bobby pseudocode — CanonicalSceneSense + VoiceCtx
+ * Three lenses: Atmosphere (physical environment) / Energy (activity level) / Scene (social patterns)
+ * Spec: SS-FW-001 – SS-FW-004, SS-DISPLAY-CONTRACT-V2
  */
 
 export type Mode = 'LITE' | 'FULL';
@@ -11,44 +12,41 @@ export type VoiceCtx = {
   confidence: {
     overall: number;
     atmosphere: number;
-    ambiance: number;
+    energy: number;
     scene: number;
   };
 };
 
 export type VoiceOutput = {
   atmosphere: string[];
-  ambiance: string[];
+  energy: string[];
   scene: string[];
 };
 
 export type CanonicalSceneSense = {
   atmosphere?: {
-    /** Energy character derived from identity_signals.language_signals. */
-    energy?: Array<'BUZZY' | 'CHILL' | 'LIVELY' | 'LOW_KEY' | 'CALM' | 'STEADY' | 'ELECTRIC'>;
-    energy_time_variants?: Partial<Record<'early_evening' | 'late' | 'weekend' | 'weekday', string>>;
-    busy_windows?: Array<{
-      label: string;
-      confidence: number;
-      startHour?: number;
-      endHour?: number;
-    }>;
     tempo?: Array<'LINGER_FRIENDLY' | 'QUICK_TURN'>;
     noise?: 'LOUD' | 'CONVERSATIONAL' | 'QUIET';
     lighting?: 'DIM' | 'WARM' | 'BRIGHT';
     density?: 'TIGHT' | 'AIRY' | 'PACKED';
     seating?: Array<'BAR_FORWARD' | 'PATIO_FRIENDLY' | 'COUNTER_FIRST'>;
   };
-  ambiance?: {
-    formality?: 'CASUAL' | 'CASUAL_REFINED' | 'REFINED';
-    service?: 'FULL_SERVICE' | 'COUNTER_SERVICE' | 'BAR_SERVICE';
-    comfort?: Array<'RELAXED' | 'POLISHED' | 'UNPRETENTIOUS'>;
+  energy?: {
+    /** Energy character derived from identity_signals.language_signals. */
+    tokens?: Array<'BUZZY' | 'CHILL' | 'LIVELY' | 'LOW_KEY' | 'CALM' | 'STEADY' | 'ELECTRIC'>;
+    time_variants?: Partial<Record<'early_evening' | 'late' | 'weekend' | 'weekday', string>>;
+    busy_windows?: Array<{
+      label: string;
+      confidence: number;
+      startHour?: number;
+      endHour?: number;
+    }>;
   };
   scene?: {
-    roles?: Array<
-      'DATE_FRIENDLY' | 'AFTER_WORK' | 'GROUP_FRIENDLY' | 'SOLO_FRIENDLY'
-    >;
+    roles?: Array<'DATE_FRIENDLY' | 'AFTER_WORK' | 'GROUP_FRIENDLY' | 'SOLO_FRIENDLY'>;
     context?: Array<'NEIGHBORHOOD_STAPLE' | 'DESTINATION_LEANING'>;
+    formality?: 'CASUAL' | 'CASUAL_REFINED' | 'REFINED';
+    register?: Array<'RELAXED' | 'POLISHED' | 'UNPRETENTIOUS'>;
   };
 };
 
@@ -89,17 +87,12 @@ const ATM_DENSITY: Record<string, string> = {
   AIRY: 'Airy',
   PACKED: 'Packed',
 };
-const AMB_FORMALITY: Record<string, string> = {
+const SCENE_FORMALITY: Record<string, string> = {
   CASUAL: 'Casual',
   CASUAL_REFINED: 'Casual-refined',
   REFINED: 'Refined',
 };
-const AMB_SERVICE: Record<string, string> = {
-  FULL_SERVICE: 'Full service',
-  COUNTER_SERVICE: 'Counter service',
-  BAR_SERVICE: 'Bar service',
-};
-const AMB_COMFORT: Record<string, string> = {
+const SCENE_REGISTER: Record<string, string> = {
   RELAXED: 'Relaxed',
   POLISHED: 'Polished',
   UNPRETENTIOUS: 'Unpretentious',
@@ -122,12 +115,12 @@ function safePush(out: string[], s?: string) {
 }
 
 function isHighConfidenceForNumericBusy(ctx: VoiceCtx): boolean {
-  return ctx.mode === 'FULL' && ctx.confidence.atmosphere >= 0.75;
+  return ctx.mode === 'FULL' && ctx.confidence.energy >= 0.75;
 }
 
 function formatBusyStatement(
   ctx: VoiceCtx,
-  busy?: NonNullable<CanonicalSceneSense['atmosphere']>['busy_windows']
+  busy?: NonNullable<CanonicalSceneSense['energy']>['busy_windows']
 ): string | null {
   if (!busy || busy.length === 0) return null;
 
@@ -154,7 +147,7 @@ function formatBusyStatement(
     return `Busiest: ${range}`;
   }
 
-  if (ctx.mode === 'LITE' || ctx.confidence.atmosphere < 0.75) {
+  if (ctx.mode === 'LITE' || ctx.confidence.energy < 0.75) {
     if (top.label === 'EVENING') return 'Typically busiest in the evening';
     if (top.label === 'AFTER_WORK') return 'Often busiest after work';
     return 'Typically gets busiest in the evening';
@@ -169,30 +162,12 @@ export function generateSceneSenseCopy(
 ): VoiceOutput {
   const out: VoiceOutput = {
     atmosphere: [],
-    ambiance: [],
+    energy: [],
     scene: [],
   };
 
-  // ATMOSPHERE — energy character first, then physical room signals
+  // ATMOSPHERE — physical and sensory environment only
   if (ctx.confidence.atmosphere >= 0.45) {
-    const core = canonical.atmosphere?.energy?.[0];
-    if (core === 'ELECTRIC' && ctx.mode !== 'FULL') {
-      // electric is Full-only
-    } else {
-      safePush(out.atmosphere, core ? ENERGY_MAP[core] : undefined);
-    }
-
-    if (ctx.mode === 'FULL' && ctx.confidence.atmosphere >= 0.65) {
-      const early = canonical.atmosphere?.energy_time_variants?.early_evening;
-      const late = canonical.atmosphere?.energy_time_variants?.late;
-      if (early && late && ENERGY_MAP[early] && ENERGY_MAP[late] && early !== late) {
-        safePush(out.atmosphere, `${ENERGY_MAP[early]} early evening · ${ENERGY_MAP[late]} late`);
-      }
-    }
-
-    const busy = formatBusyStatement(ctx, canonical.atmosphere?.busy_windows);
-    safePush(out.atmosphere, busy ?? undefined);
-
     const tempo = canonical.atmosphere?.tempo?.[0];
     if (tempo === 'LINGER_FRIENDLY') safePush(out.atmosphere, 'Lingering-friendly');
     if (tempo === 'QUICK_TURN') safePush(out.atmosphere, 'Quick-turn tables');
@@ -214,44 +189,40 @@ export function generateSceneSenseCopy(
     if (seating === 'PATIO_FRIENDLY') safePush(out.atmosphere, 'Patio-friendly');
   }
 
-  // AMBIANCE
-  if (ctx.confidence.ambiance >= 0.45) {
-    safePush(
-      out.ambiance,
-      canonical.ambiance?.formality
-        ? AMB_FORMALITY[canonical.ambiance.formality]
-        : undefined
-    );
-
-    if (ctx.mode === 'FULL' && ctx.confidence.ambiance >= 0.65) {
-      const form = canonical.ambiance?.formality
-        ? AMB_FORMALITY[canonical.ambiance.formality]
-        : null;
-      const svc = canonical.ambiance?.service
-        ? AMB_SERVICE[canonical.ambiance.service]
-        : null;
-      if (form && svc)
-        safePush(out.ambiance, `${form} · ${svc.toLowerCase()}`);
+  // ENERGY — activity level and temporal rhythm
+  if (ctx.confidence.energy >= 0.45) {
+    const core = canonical.energy?.tokens?.[0];
+    if (core === 'ELECTRIC' && ctx.mode !== 'FULL') {
+      // ELECTRIC is Full-only
     } else {
-      safePush(
-        out.ambiance,
-        canonical.ambiance?.service
-          ? AMB_SERVICE[canonical.ambiance.service]
-          : undefined
-      );
+      safePush(out.energy, core ? ENERGY_MAP[core] : undefined);
     }
 
-    const comfort = canonical.ambiance?.comfort?.[0];
-    if (comfort) safePush(out.ambiance, AMB_COMFORT[comfort]);
+    if (ctx.mode === 'FULL' && ctx.confidence.energy >= 0.65) {
+      const early = canonical.energy?.time_variants?.early_evening;
+      const late = canonical.energy?.time_variants?.late;
+      if (early && late && ENERGY_MAP[early] && ENERGY_MAP[late] && early !== late) {
+        safePush(out.energy, `${ENERGY_MAP[early]} early evening · ${ENERGY_MAP[late]} late`);
+      }
+    }
+
+    const busy = formatBusyStatement(ctx, canonical.energy?.busy_windows);
+    safePush(out.energy, busy ?? undefined);
   }
 
-  // SCENE
+  // SCENE — social patterns, formality, social register
   if (ctx.confidence.scene >= 0.45) {
     const role = canonical.scene?.roles?.[0];
     if (role) safePush(out.scene, SCENE_ROLE[role]);
 
     const context = canonical.scene?.context?.[0];
     if (context) safePush(out.scene, SCENE_CONTEXT[context]);
+
+    const formality = canonical.scene?.formality;
+    if (formality) safePush(out.scene, SCENE_FORMALITY[formality]);
+
+    const register = canonical.scene?.register?.[0];
+    if (register) safePush(out.scene, SCENE_REGISTER[register]);
 
     if (ctx.mode === 'LITE' && out.scene.length < 2)
       safePush(out.scene, 'Easy repeat spot');
@@ -260,7 +231,7 @@ export function generateSceneSenseCopy(
   const cap = (arr: string[], max: number) => arr.slice(0, max);
   const maxPerSurface = ctx.mode === 'LITE' ? 2 : 4;
   out.atmosphere = cap(out.atmosphere, maxPerSurface);
-  out.ambiance = cap(out.ambiance, maxPerSurface);
+  out.energy = cap(out.energy, maxPerSurface);
   out.scene = cap(out.scene, maxPerSurface);
 
   return out;

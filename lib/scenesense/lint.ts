@@ -45,7 +45,7 @@ const BUSY_WORDS = /\b(busy|busiest|typically busiest|peak)\b/i;
 function cloneOutput(o: VoiceOutput): VoiceOutput {
   return {
     atmosphere: [...(o.atmosphere ?? [])],
-    ambiance: [...(o.ambiance ?? [])],
+    energy: [...(o.energy ?? [])],
     scene: [...(o.scene ?? [])],
   };
 }
@@ -91,7 +91,7 @@ function dedupeExact(out: VoiceOutput, reasons: string[]) {
   const seen = new Set<string>();
   const order: Array<keyof VoiceOutput> = [
     'atmosphere',
-    'ambiance',
+    'energy',
     'scene',
   ];
   for (const k of order) {
@@ -108,7 +108,7 @@ function dedupeExact(out: VoiceOutput, reasons: string[]) {
 }
 
 function enforceBusyPlacement(out: VoiceOutput, reasons: string[]) {
-  (['ambiance', 'scene'] as Array<keyof VoiceOutput>).forEach(
+  (['energy', 'scene'] as Array<keyof VoiceOutput>).forEach(
     (k) => {
       out[k] = out[k].filter((s) => {
         if (BUSY_WORDS.test(s)) {
@@ -124,12 +124,12 @@ function enforceBusyPlacement(out: VoiceOutput, reasons: string[]) {
 function enforceNumericBusy(
   out: VoiceOutput,
   mode: Mode,
-  atmosphereConfidence: number,
+  energyConfidence: number,
   reasons: string[]
 ) {
-  out.atmosphere = out.atmosphere.filter((s) => {
+  out.energy = out.energy.filter((s) => {
     if (!TIME_NUMERIC.test(s)) return true;
-    const ok = mode === 'FULL' && atmosphereConfidence >= 0.75;
+    const ok = mode === 'FULL' && energyConfidence >= 0.75;
     if (!ok) {
       reasons.push('C1_NUMERIC_TIME_NOT_ALLOWED');
       return false;
@@ -137,11 +137,11 @@ function enforceNumericBusy(
     return true;
   });
 
-  (['ambiance', 'scene'] as Array<keyof VoiceOutput>).forEach(
+  (['atmosphere', 'scene'] as Array<keyof VoiceOutput>).forEach(
     (k) => {
       out[k] = out[k].filter((s) => {
         if (TIME_NUMERIC.test(s)) {
-          reasons.push('C1_NUMERIC_TIME_NON_ATMOSPHERE');
+          reasons.push('C1_NUMERIC_TIME_NON_ENERGY');
           return false;
         }
         return true;
@@ -155,7 +155,7 @@ export function lintSceneSenseOutput(args: {
   mode: Mode;
   confidence: {
     atmosphere: number;
-    ambiance: number;
+    energy: number;
     scene: number;
   };
   output: VoiceOutput;
@@ -174,7 +174,7 @@ export function lintSceneSenseOutput(args: {
       status,
       reasons,
       actions,
-      cleaned_output: { atmosphere: [], ambiance: [], scene: [] },
+      cleaned_output: { atmosphere: [], energy: [], scene: [] },
     };
   }
   if (args.prl === 3 && args.mode !== 'LITE') {
@@ -185,29 +185,29 @@ export function lintSceneSenseOutput(args: {
       status,
       reasons,
       actions,
-      cleaned_output: { atmosphere: [], ambiance: [], scene: [] },
+      cleaned_output: { atmosphere: [], energy: [], scene: [] },
     };
   }
 
   const conf = args.confidence;
   if (conf.atmosphere < 0.45) cleaned.atmosphere = [];
-  if (conf.ambiance < 0.45) cleaned.ambiance = [];
+  if (conf.energy < 0.45) cleaned.energy = [];
   if (conf.scene < 0.45) cleaned.scene = [];
 
   cleaned.atmosphere = dropEmpty(cleaned.atmosphere);
-  cleaned.ambiance = dropEmpty(cleaned.ambiance);
+  cleaned.energy = dropEmpty(cleaned.energy);
   cleaned.scene = dropEmpty(cleaned.scene);
 
   cleaned.atmosphere = dropBanned(cleaned.atmosphere, reasons);
-  cleaned.ambiance = dropBanned(cleaned.ambiance, reasons);
+  cleaned.energy = dropBanned(cleaned.energy, reasons);
   cleaned.scene = dropBanned(cleaned.scene, reasons);
 
   enforceBusyPlacement(cleaned, reasons);
-  enforceNumericBusy(cleaned, args.mode, conf.atmosphere, reasons);
+  enforceNumericBusy(cleaned, args.mode, conf.energy, reasons);
 
   const surfaces: Array<keyof VoiceOutput> = [
     'atmosphere',
-    'ambiance',
+    'energy',
     'scene',
   ];
   for (const k of surfaces) {
@@ -226,7 +226,7 @@ export function lintSceneSenseOutput(args: {
 
   if (args.mode === 'LITE') {
     const forbiddenLite = /(buzziest|peak|settles after)/i;
-    cleaned.atmosphere = cleaned.atmosphere.filter((s) => {
+    cleaned.energy = cleaned.energy.filter((s) => {
       if (forbiddenLite.test(s) || TIME_NUMERIC.test(s)) {
         reasons.push('D2_LITE_TOO_STRONG');
         return false;

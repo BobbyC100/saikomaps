@@ -46,6 +46,7 @@ function makeLocation(overrides: Partial<PlacePageLocation> = {}): PlacePageLoca
     winelistUrl: null,
     // Editorial
     description: 'A great place to eat.',
+    descriptionSource: null,
     tagline: 'The best pasta in Silver Lake.',
     pullQuote: null,
     pullQuoteAuthor: null,
@@ -62,6 +63,10 @@ function makeLocation(overrides: Partial<PlacePageLocation> = {}): PlacePageLoca
     scenesense: null,
     // Offering
     offeringSignals: null,
+    offeringPrograms: null,
+    // Identity Signals (enrichment)
+    placePersonality: null,
+    signatureDishes: [],
     // Coverage
     coverageSources: [],
     // Appearances
@@ -126,7 +131,7 @@ describe('assertPlacePageData — valid data', () => {
   it('accepts scenesense with all surfaces populated', () => {
     const loc = makeLocation({
       prl: 3,
-      scenesense: { atmosphere: ['Lively'], ambiance: ['Casual'], scene: ['Date-friendly'] },
+      scenesense: { atmosphere: ['Dim'], energy: ['Lively'], scene: ['Neighborhood crowd'] },
     });
     expect(() => assertPlacePageData(makeData({ location: loc }))).not.toThrow();
   });

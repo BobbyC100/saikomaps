@@ -7,7 +7,7 @@ import { SceneSenseCard } from '@/components/merchant/SceneSenseCard';
 
 interface SceneSenseOutput {
   atmosphere: string[];
-  ambiance: string[];
+  energy: string[];
   scene: string[];
 }
 
@@ -42,7 +42,7 @@ export function ExperienceCell({
   const galleryPhotos = (photoUrls?.length ?? 0) > 0 ? photoUrls! : [];
   const hasSceneSense = scenesense != null && (
     scenesense.atmosphere.length > 0 ||
-    scenesense.ambiance.length > 0 ||
+    scenesense.energy.length > 0 ||
     scenesense.scene.length > 0
   );
   const hasCurator = !!curatorNote?.trim();

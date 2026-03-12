@@ -1,7 +1,7 @@
 ---
 doc_id: SS-DISPLAY-CONTRACT-V1
 doc_type: domain-spec
-status: active
+status: superseded
 owner: Bobby Ciccaglione
 created: '2026-03-10'
 last_updated: '2026-03-10'

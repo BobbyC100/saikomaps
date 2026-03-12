@@ -1,0 +1,7 @@
+{
+  "patch_type": "frontmatter_update",
+  "target_doc": "docs/scenesense/display-contract-v1.md",
+  "changes": {
+    "status": "superseded"
+  }
+}

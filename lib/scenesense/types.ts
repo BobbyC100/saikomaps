@@ -10,19 +10,19 @@ export type PRL = 1 | 2 | 3 | 4;
 export type SceneSenseMode = 'lite' | 'full';
 
 /** Surfaces for SceneSense copy */
-export type SceneSenseSurface = 'atmosphere' | 'ambiance' | 'scene';
+export type SceneSenseSurface = 'atmosphere' | 'energy' | 'scene';
 
 /** Per-surface statement arrays (alias for VoiceOutput) */
 export interface SceneSenseOutput {
   atmosphere: string[];
-  ambiance: string[];
+  energy: string[];
   scene: string[];
 }
 
 /** Confidence per surface (0–1) */
 export interface SceneSenseConfidence {
   atmosphere_confidence?: number;
-  ambiance_confidence?: number;
+  energy_confidence?: number;
   scene_confidence?: number;
 }
 

@@ -4,7 +4,7 @@
  * Accepts materialized PlaceForPRL (preferred) or legacy PlaceForAssembly.
  *
  * Language signals source: identity_signals.language_signals (string[])
- * Raw phrases are routed by SceneSense to the correct lens (Atmosphere / Ambiance / Scene).
+ * Raw phrases are routed by SceneSense to the correct lens (Atmosphere / Energy / Scene).
  */
 
 import { computePRL } from './prl';
@@ -98,8 +98,8 @@ export function assembleSceneSenseFromMaterialized(args: {
     (args.identitySignals?.signature_dishes?.length ?? 0) > 0;
   const confidence = {
     overall: 0.6,
-    atmosphere: hasLanguageSignals ? 0.8 : 0.6,
-    ambiance: 0.6,
+    atmosphere: 0.6,
+    energy: hasLanguageSignals ? 0.8 : 0.6,
     scene: hasDishes ? 0.7 : 0.5,
   };
 
@@ -164,8 +164,8 @@ export function assembleSceneSense(place: PlaceForAssembly): SceneSenseAssemblyR
 
   const confidence = {
     overall: baseConf,
-    atmosphere: hasLanguageSignals ? 0.8 : baseConf,
-    ambiance: baseConf,
+    atmosphere: baseConf,
+    energy: hasLanguageSignals ? 0.8 : baseConf,
     scene: hasDishes ? 0.7 : 0.5,
   };
 

@@ -32,7 +32,7 @@ export interface MerchantGridLocation {
   prl?: number;
   scenesense?: {
     atmosphere: string[];
-    ambiance: string[];
+    energy: string[];
     scene: string[];
   } | null;
   curatorNote?: string | null;

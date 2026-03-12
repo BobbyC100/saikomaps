@@ -10,7 +10,7 @@ interface SceneSenseCardProps {
 
 const SURFACE_LABELS: Record<keyof SceneSenseOutput, string> = {
   atmosphere: 'ATMOSPHERE',
-  ambiance: 'AMBIANCE',
+  energy: 'ENERGY',
   scene: 'SCENE',
 };
 
@@ -30,11 +30,11 @@ function StatementList({ statements }: { statements: string[] }) {
 }
 
 /**
- * SceneSense card — displays atmosphere, ambiance, scene per PRL mode.
+ * SceneSense card — displays atmosphere, energy, scene per PRL mode.
  * Max 2/surface (Lite) or 4/surface (Full) enforced upstream.
  */
 export function SceneSenseCard({ scenesense, span = 6 }: SceneSenseCardProps) {
-  const sections = (['atmosphere', 'ambiance', 'scene'] as const)
+  const sections = (['atmosphere', 'energy', 'scene'] as const)
     .map((key) => ({
       key,
       label: SURFACE_LABELS[key],

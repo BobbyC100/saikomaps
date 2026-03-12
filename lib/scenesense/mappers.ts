@@ -6,8 +6,8 @@ import type { PlaceForPRL } from './prl';
 import type { CanonicalSceneSense } from './voice-engine';
 
 /**
- * Maps raw language signals to canonical energy tokens for the Atmosphere lens.
- * Energy/sensory signals route here; role signals route to ambiance/scene.
+ * Maps raw language signals to canonical energy tokens for the Energy lens.
+ * Energy/sensory signals route to energy; role signals route to scene.
  */
 const LANGUAGE_SIGNAL_TO_ENERGY: Record<string, 'BUZZY' | 'CHILL' | 'LIVELY' | 'LOW_KEY' | 'CALM' | 'STEADY' | 'ELECTRIC'> = {
   buzzy: 'BUZZY',
@@ -136,13 +136,6 @@ export function mapToCanonicalSceneSense(input: {
     'casual-refined': 'CASUAL_REFINED',
     refined: 'REFINED',
   };
-  const serviceMap: Record<string, 'FULL_SERVICE' | 'COUNTER_SERVICE' | 'BAR_SERVICE'> = {
-    'full-service': 'FULL_SERVICE',
-    'counter-service': 'COUNTER_SERVICE',
-    'bar-service': 'BAR_SERVICE',
-    'a-la-carte': 'FULL_SERVICE',
-    counter: 'COUNTER_SERVICE',
-  };
   const roleMap: Record<string, 'DATE_FRIENDLY' | 'AFTER_WORK' | 'GROUP_FRIENDLY' | 'SOLO_FRIENDLY'> = {
     'date-friendly': 'DATE_FRIENDLY',
     'after-work': 'AFTER_WORK',
@@ -152,7 +145,6 @@ export function mapToCanonicalSceneSense(input: {
 
   return {
     atmosphere: {
-      energy: energy.length > 0 ? energy : undefined,
       noise: id?.noise ? (id.noise.toUpperCase() as 'LOUD' | 'CONVERSATIONAL' | 'QUIET') : undefined,
       lighting: id?.lighting ? (id.lighting.toUpperCase() as 'DIM' | 'WARM' | 'BRIGHT') : undefined,
       density: id?.density ? (id.density.toUpperCase() as 'TIGHT' | 'AIRY' | 'PACKED') : undefined,
@@ -160,20 +152,18 @@ export function mapToCanonicalSceneSense(input: {
         s === 'bar' ? 'BAR_FORWARD' : s === 'patio' ? 'PATIO_FRIENDLY' : 'COUNTER_FIRST'
       ) as Array<'BAR_FORWARD' | 'PATIO_FRIENDLY' | 'COUNTER_FIRST'> | undefined,
     },
-    ambiance: id
-      ? {
-          formality: id.formality ? formalityMap[id.formality] ?? 'CASUAL' : undefined,
-          service: id.service_model ? serviceMap[id.service_model] ?? undefined : undefined,
-          comfort: ['RELAXED'],
-        }
-      : undefined,
+    energy: {
+      tokens: energy.length > 0 ? energy : undefined,
+    },
     scene:
-      input.signature_dishes?.length || input.neighborhood || id?.roles?.length || id?.context?.length
+      input.signature_dishes?.length || input.neighborhood || id?.roles?.length || id?.context?.length || id?.formality
         ? {
             roles: id?.roles?.map((r) => roleMap[r] ?? 'GROUP_FRIENDLY'),
             context: input.neighborhood
               ? ['NEIGHBORHOOD_STAPLE']
               : id?.context?.map((c) => (c === 'destination' ? 'DESTINATION_LEANING' : 'NEIGHBORHOOD_STAPLE')),
+            formality: id?.formality ? formalityMap[id.formality] : undefined,
+            register: id ? ['RELAXED'] : undefined,
           }
         : undefined,
   };

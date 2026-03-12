@@ -1,6 +1,6 @@
 {
-  "generated": "2026-03-12T15:25:28.554Z",
-  "doc_count": 43,
+  "generated": "2026-03-12T15:52:14.392Z",
+  "doc_count": 44,
   "docs": [
     {
       "doc_id": "ARCH-AI-OPERATING-LAYER",
@@ -515,7 +515,7 @@
     {
       "doc_id": "SS-DISPLAY-CONTRACT-V1",
       "doc_type": "domain-spec",
-      "status": "active",
+      "status": "superseded",
       "title": "SKAI-DOC-SS-001 — SceneSense Display Contract v1",
       "path": "docs/scenesense/display-contract-v1.md",
       "owner": "Bobby Ciccaglione",
@@ -528,6 +528,30 @@
         "traces"
       ],
       "related_docs": []
+    },
+    {
+      "doc_id": "SS-DISPLAY-CONTRACT-V2",
+      "doc_type": "domain-spec",
+      "status": "active",
+      "title": "SceneSense Display Contract v2",
+      "path": "docs/scenesense/display-contract-v2.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-12",
+      "last_updated": "2026-03-12",
+      "project_id": "TRACES",
+      "summary": "Display contract for the revised SceneSense three-lens model (Atmosphere / Energy / Scene). Supersedes SS-DISPLAY-CONTRACT-V1.",
+      "systems": [
+        "scenesense",
+        "traces"
+      ],
+      "related_docs": [
+        "docs/scenesense/three-lenses-framework-v1.md",
+        "docs/scenesense/atmosphere-lens-v1.md",
+        "docs/scenesense/energy-lens-v1.md",
+        "docs/scenesense/scene-lens-v1.md",
+        "docs/scenesense/glossary-v1.md",
+        "docs/scenesense/display-contract-v1.md"
+      ]
     },
     {
       "doc_id": "SS-FW-001",
