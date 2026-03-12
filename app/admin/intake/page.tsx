@@ -295,7 +295,7 @@ function SingleForm({ onResults }: { onResults: (r: IntakeResult[], s: IntakeSum
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.name.trim()) return;
+    if (!form.name.trim() && !form.website.trim()) return;
     setLoading(true);
     setError(null);
     try {
@@ -303,7 +303,7 @@ function SingleForm({ onResults }: { onResults: (r: IntakeResult[], s: IntakeSum
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: form.name.trim(),
+          name: form.name.trim() || undefined,
           googlePlaceId: form.googlePlaceId.trim() || undefined,
           website: form.website.trim() || undefined,
           instagram: form.instagram.trim() || undefined,
@@ -345,7 +345,10 @@ function SingleForm({ onResults }: { onResults: (r: IntakeResult[], s: IntakeSum
 
   return (
     <form onSubmit={handleSubmit} className="space-y-3">
-      {field('name', 'Place Name', 'République', true)}
+      <p className="text-xs" style={{ color: C.muted }}>
+        Provide a name, a website URL, or both. Website alone will auto-resolve the name from the page title.
+      </p>
+      {field('name', 'Place Name', 'République')}
       <div className="grid grid-cols-2 gap-3">
         {field('googlePlaceId', 'Google Place ID', 'ChIJSRKFQeTHwoARQlQFbEnqvZo')}
         {field('neighborhood', 'Neighborhood', 'Mid-Wilshire')}
@@ -359,7 +362,7 @@ function SingleForm({ onResults }: { onResults: (r: IntakeResult[], s: IntakeSum
       )}
       <button
         type="submit"
-        disabled={loading || !form.name.trim()}
+        disabled={loading || (!form.name.trim() && !form.website.trim())}
         style={{ backgroundColor: C.accent, color: '#fff' }}
         className="px-5 py-2 rounded text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 transition-opacity"
       >

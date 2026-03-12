@@ -1,20 +1,26 @@
 /**
  * Admin Intake API
- * POST /api/admin/intake — accept name / GPID / partial record, dedup against entities,
- * create CANDIDATE entities for new places.
+ * POST /api/admin/intake — accept name / GPID / website / partial record,
+ * dedup against entities, create CANDIDATE entities for new places.
  *
  * Accepts:
- *   JSON: { name, googlePlaceId?, website?, instagram?, neighborhood?, source? }
+ *   JSON: { name?, googlePlaceId?, website?, instagram?, neighborhood?, source? }
  *   Multipart: { file: CSV, source? }
+ *
+ * At least one of name or website must be provided. When only website is given,
+ * name is derived by fetching the page <title>.
  *
  * CSV columns: Name, Google Place ID, Website, Instagram Handle, Neighborhood
  *
  * Dedup order:
  *   1. GPID exact match → return existing
- *   2. Slug exact match
- *   3. Fuzzy name (Jaro-Winkler ≥ 0.90 on normalized names) → return match
- *   4. Partial match (0.70–0.90) → return ambiguous + candidates
- *   5. No match → create CANDIDATE entity
+ *   2. Website URL domain match → return existing
+ *   3. Slug exact match
+ *   4. If website was provided but not matched above → skip fuzzy → create
+ *      (website is a strong unique identifier; avoid false-ambiguous)
+ *   5. Fuzzy name (Jaro-Winkler ≥ 0.90 on normalized names) → return match
+ *   6. Partial match (0.70–0.90) → return ambiguous + candidates
+ *   7. No match → create CANDIDATE entity
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -27,13 +33,51 @@ const AUTO_MATCH_THRESHOLD = 0.90;
 const AMBIGUOUS_THRESHOLD = 0.70;
 
 interface IntakeInput {
-  name: string;
+  name?: string; // optional if website provided — derived from page <title> when absent
   googlePlaceId?: string;
   website?: string;
   instagram?: string;
   neighborhood?: string;
   source?: string;
   forceCreate?: boolean; // skip fuzzy dedup — use when admin confirms it's a new distinct place
+}
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+/** Extract the bare domain for website matching (strips www., protocol, path) */
+function websiteDomain(url: string): string {
+  try {
+    const normalized = url.startsWith('http') ? url : `https://${url}`;
+    return new URL(normalized).hostname.replace(/^www\./, '').toLowerCase();
+  } catch {
+    return url.toLowerCase().replace(/^(https?:\/\/)?(www\.)?/, '').split('/')[0];
+  }
+}
+
+/** Fetch page <title> to derive a place name when only a website is provided */
+async function fetchNameFromWebsite(url: string): Promise<string | null> {
+  try {
+    const normalized = url.startsWith('http') ? url : `https://${url}`;
+    const res = await fetch(normalized, {
+      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; SaikoMaps/1.0)' },
+      signal: AbortSignal.timeout(6000),
+    });
+    const html = await res.text();
+    const match = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+    if (match) {
+      // Strip common suffixes like " | Restaurant Name" or " - City Guide"
+      return match[1].trim().replace(/\s*[-|·–—|]\s*.+$/, '').trim() || null;
+    }
+  } catch {
+    // timeout or network error — fall through to domain fallback
+  }
+  // Fallback: humanise the domain
+  try {
+    const domain = websiteDomain(url);
+    return domain.split('.')[0].replace(/-/g, ' ');
+  } catch {
+    return null;
+  }
 }
 
 type IntakeOutcome = 'created' | 'matched' | 'ambiguous';
@@ -62,7 +106,19 @@ async function generateUniqueSlug(name: string, neighborhood?: string): Promise<
 }
 
 async function processOne(input: IntakeInput): Promise<IntakeResult> {
-  const { name, googlePlaceId, website, instagram, neighborhood, source, forceCreate } = input;
+  let { name, googlePlaceId, website, instagram, neighborhood, source, forceCreate } = input;
+
+  // Resolve name when only website was provided
+  if (!name?.trim() && website) {
+    const derived = await fetchNameFromWebsite(website);
+    name = derived || websiteDomain(website);
+  }
+  const resolvedName = name?.trim() || '';
+  if (!resolvedName) {
+    throw new Error('Could not determine a name — provide name or a reachable website URL');
+  }
+
+  const displayInput = resolvedName;
 
   // 1. GPID exact match
   if (googlePlaceId) {
@@ -71,36 +127,47 @@ async function processOne(input: IntakeInput): Promise<IntakeResult> {
       select: { id: true, slug: true, name: true, status: true },
     });
     if (byGpid) {
-      return {
-        input: name,
-        outcome: 'matched',
-        entity: { ...byGpid, status: byGpid.status as string },
-      };
+      return { input: displayInput, outcome: 'matched', entity: { ...byGpid, status: byGpid.status as string } };
     }
   }
 
-  // 2. Slug exact match
-  const candidateSlug = slugify(name, { lower: true, strict: true });
+  // 2. Website domain match — check if any entity already uses this website
+  const websiteMatched = website ? await (async () => {
+    const domain = websiteDomain(website);
+    // Search for entities whose stored website contains the same domain
+    const all = await db.entities.findMany({
+      where: { website: { not: null } },
+      select: { id: true, slug: true, name: true, status: true, website: true },
+    });
+    return all.find((e) => e.website && websiteDomain(e.website) === domain) ?? null;
+  })() : null;
+
+  if (websiteMatched) {
+    return {
+      input: displayInput,
+      outcome: 'matched',
+      entity: { id: websiteMatched.id, slug: websiteMatched.slug, name: websiteMatched.name, status: websiteMatched.status as string },
+    };
+  }
+
+  // 3. Slug exact match
+  const candidateSlug = slugify(resolvedName, { lower: true, strict: true });
   const bySlug = await db.entities.findUnique({
     where: { slug: candidateSlug },
     select: { id: true, slug: true, name: true, status: true },
   });
   if (bySlug) {
-    return {
-      input: name,
-      outcome: 'matched',
-      entity: { ...bySlug, status: bySlug.status as string },
-    };
+    return { input: displayInput, outcome: 'matched', entity: { ...bySlug, status: bySlug.status as string } };
   }
 
-  // 3 & 4. Fuzzy name scan — skipped when forceCreate=true (admin confirmed distinct)
-  if (forceCreate) {
-    const slug = await generateUniqueSlug(name, neighborhood);
+  // Helper: create a new CANDIDATE entity
+  const createCandidate = async () => {
+    const slug = await generateUniqueSlug(resolvedName, neighborhood);
     const entity = await db.entities.create({
       data: {
         id: randomUUID(),
         slug,
-        name,
+        name: resolvedName,
         googlePlaceId: googlePlaceId || undefined,
         website: website || undefined,
         instagram: instagram || undefined,
@@ -111,18 +178,22 @@ async function processOne(input: IntakeInput): Promise<IntakeResult> {
       },
       select: { id: true, slug: true, name: true, status: true },
     });
-    return {
-      input: name,
-      outcome: 'created',
-      entity: { ...entity, status: entity.status as string },
-    };
-  }
+    return { input: displayInput, outcome: 'created' as const, entity: { ...entity, status: entity.status as string } };
+  };
 
+  // 4. forceCreate — admin confirmed it's distinct, skip fuzzy
+  if (forceCreate) return createCandidate();
+
+  // 5. Website provided but not matched above — it's a unique signal; skip fuzzy
+  //    to avoid false-ambiguous on name alone
+  if (website) return createCandidate();
+
+  // 6 & 7. Fuzzy name scan (only when no website to anchor on)
   const allEntities = await db.entities.findMany({
     select: { id: true, slug: true, name: true, status: true },
   });
 
-  const normalizedInput = normalizeName(name);
+  const normalizedInput = normalizeName(resolvedName);
   let bestScore = 0;
   let bestMatch: (typeof allEntities)[0] | null = null;
   const nearMatches: Array<{ id: string; slug: string; name: string; score: number }> = [];
@@ -130,10 +201,7 @@ async function processOne(input: IntakeInput): Promise<IntakeResult> {
   for (const entity of allEntities) {
     const score = jaroWinklerSimilarity(normalizedInput, normalizeName(entity.name));
     if (score >= AUTO_MATCH_THRESHOLD) {
-      if (score > bestScore) {
-        bestScore = score;
-        bestMatch = entity;
-      }
+      if (score > bestScore) { bestScore = score; bestMatch = entity; }
     } else if (score >= AMBIGUOUS_THRESHOLD) {
       nearMatches.push({ id: entity.id, slug: entity.slug, name: entity.name, score });
     }
@@ -141,7 +209,7 @@ async function processOne(input: IntakeInput): Promise<IntakeResult> {
 
   if (bestMatch) {
     return {
-      input: name,
+      input: displayInput,
       outcome: 'matched',
       entity: { id: bestMatch.id, slug: bestMatch.slug, name: bestMatch.name, status: bestMatch.status as string },
     };
@@ -149,38 +217,13 @@ async function processOne(input: IntakeInput): Promise<IntakeResult> {
 
   if (nearMatches.length > 0) {
     return {
-      input: name,
+      input: displayInput,
       outcome: 'ambiguous',
-      candidates: nearMatches
-        .sort((a, b) => b.score - a.score)
-        .slice(0, 5)
-        .map(({ id, slug, name: n }) => ({ id, slug, name: n })),
+      candidates: nearMatches.sort((a, b) => b.score - a.score).slice(0, 5).map(({ id, slug, name: n }) => ({ id, slug, name: n })),
     };
   }
 
-  // 5. New entity — create as CANDIDATE
-  const slug = await generateUniqueSlug(name, neighborhood);
-  const entity = await db.entities.create({
-    data: {
-      id: randomUUID(),
-      slug,
-      name,
-      googlePlaceId: googlePlaceId || undefined,
-      website: website || undefined,
-      instagram: instagram || undefined,
-      neighborhood: neighborhood || undefined,
-      primary_vertical: 'EAT',
-      status: 'CANDIDATE',
-      editorialSources: source ? { sources: [source] } : undefined,
-    },
-    select: { id: true, slug: true, name: true, status: true },
-  });
-
-  return {
-    input: name,
-    outcome: 'created',
-    entity: { ...entity, status: entity.status as string },
-  };
+  return createCandidate();
 }
 
 function parseCSV(text: string): IntakeInput[] {
@@ -240,7 +283,8 @@ export async function POST(request: NextRequest) {
 
     const results: IntakeResult[] = [];
     for (const input of inputs) {
-      if (!input.name?.trim()) continue;
+      // Must have at least name or website
+      if (!input.name?.trim() && !input.website?.trim()) continue;
       const result = await processOne(input);
       results.push(result);
     }
