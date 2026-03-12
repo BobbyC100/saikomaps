@@ -226,42 +226,20 @@ function ResultsTable({ results }: { results: IntakeResult[] }) {
                   )}
                 </td>
                 <td className="px-4 py-2">
-                  {r.outcome === 'created' && slug && (() => {
-                    const hasGpid = !!r.entity?.googlePlaceId;
-                    const noGpidIdle = enrichState === 'idle' && !hasGpid;
-                    return (
-                      <span className="flex flex-col gap-1 items-start">
-                        <button
-                          onClick={() => enrichState === 'idle' || enrichState === 'error' ? handleEnrich(slug) : undefined}
-                          disabled={enrichState === 'queued' || enrichState === 'enriching' || enrichState === 'done'}
-                          title={noGpidIdle ? 'No Google Place ID — stage 1 will search by name, which may match the wrong place. Add a GPID for reliable enrichment.' : undefined}
-                          style={{
-                            backgroundColor: enrichState === 'done'    ? C.greenBg  :
-                                             noGpidIdle                ? C.amberBg  :
-                                             enrichState === 'idle'    ? C.accent   : C.bg,
-                            color:           enrichState === 'done'    ? C.green    :
-                                             noGpidIdle                ? C.amber    :
-                                             enrichState === 'idle'    ? '#fff'     : C.muted,
-                            border: `1px solid ${noGpidIdle ? C.amber : C.border}`,
-                          }}
-                          className="px-3 py-1 rounded text-xs font-semibold transition-colors disabled:cursor-not-allowed"
-                        >
-                          {noGpidIdle ? '⚠ Enrich (no GPID)' : ENRICH_LABEL[enrichState]}
-                        </button>
-                        {noGpidIdle && (
-                          <a
-                            href={`https://www.google.com/maps/search/${encodeURIComponent(r.input + ' Los Angeles')}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-xs hover:underline"
-                            style={{ color: C.muted }}
-                          >
-                            Find GPID on Maps ↗
-                          </a>
-                        )}
-                      </span>
-                    );
-                  })()}
+                  {r.outcome === 'created' && slug && (
+                    <button
+                      onClick={() => enrichState === 'idle' || enrichState === 'error' ? handleEnrich(slug) : undefined}
+                      disabled={enrichState === 'queued' || enrichState === 'enriching' || enrichState === 'done'}
+                      style={{
+                        backgroundColor: enrichState === 'done' ? C.greenBg : enrichState === 'idle' ? C.accent : C.bg,
+                        color:           enrichState === 'done' ? C.green   : enrichState === 'idle' ? '#fff'   : C.muted,
+                        border: `1px solid ${C.border}`,
+                      }}
+                      className="px-3 py-1 rounded text-xs font-semibold transition-colors disabled:cursor-not-allowed"
+                    >
+                      {ENRICH_LABEL[enrichState]}
+                    </button>
+                  )}
                   {r.outcome === 'ambiguous' && (
                     <span className="flex items-center gap-2">
                       <a
