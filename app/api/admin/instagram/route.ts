@@ -96,13 +96,6 @@ export async function GET(request: NextRequest) {
  * Update Instagram handle for a place or mark as "no Instagram"
  */
 export async function POST(request: NextRequest) {
-  if (process.env.LEGACY_WRITES_FROZEN) {
-    return NextResponse.json(
-      { error: 'legacy writes frozen', detail: 'Fields v2 cutover in progress — legacy write paths are disabled.' },
-      { status: 503 }
-    );
-  }
-
   try {
     const body = await request.json();
     const { canonical_id, instagram_handle, no_instagram } = body;

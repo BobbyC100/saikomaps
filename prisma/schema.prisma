@@ -701,6 +701,7 @@ enum PlaceStatus {
   OPEN
   CLOSED
   PERMANENTLY_CLOSED
+  CANDIDATE  // intake entity, not yet enriched or published
 }
 
 enum SpotSource {

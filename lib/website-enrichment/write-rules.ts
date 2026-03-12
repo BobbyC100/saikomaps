@@ -14,10 +14,6 @@ const CONFIDENCE_HIGH = 0.75;
 const CONFIDENCE_MEDIUM = 0.5;
 
 export async function applyWriteRules(payload: EnrichmentPayload): Promise<void> {
-  if (process.env.LEGACY_WRITES_FROZEN) {
-    throw new Error(`FREEZE[write-rules]: legacy merchant_signals write blocked for place_id=${payload.place_id} — LEGACY_WRITES_FROZEN is set`);
-  }
-
   const { place_id, source_url, final_url, http_status, signals, confidence, notes } = payload;
   const extractionJson = {
     place_id,
@@ -158,10 +154,6 @@ export async function applyWriteRulesCategoryOnly(
   payload: EnrichmentPayload,
   options?: { dryRun?: boolean }
 ): Promise<ApplyWriteRulesCategoryOnlyResult> {
-  if (process.env.LEGACY_WRITES_FROZEN) {
-    throw new Error(`FREEZE[write-rules/category]: legacy merchant_signals write blocked for place_id=${payload.place_id} — LEGACY_WRITES_FROZEN is set`);
-  }
-
   const dryRun = options?.dryRun ?? false;
   const { place_id, source_url, final_url, http_status, signals, confidence } =
     payload;

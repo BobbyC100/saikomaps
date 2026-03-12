@@ -140,10 +140,6 @@ async function generateUniqueSlug(name: string, neighborhood?: string): Promise<
  * Applies survivorship rules to determine winning values
  */
 export async function updateGoldenRecord(canonicalId: string): Promise<void> {
-  if (process.env.LEGACY_WRITES_FROZEN) {
-    throw new Error(`FREEZE[survivorship]: legacy golden_records write blocked for canonical_id=${canonicalId} — LEGACY_WRITES_FROZEN is set`);
-  }
-
   // Get all linked raw records
   const links = await prisma.entity_links.findMany({
     where: {

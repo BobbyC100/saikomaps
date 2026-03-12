@@ -11,13 +11,6 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  if (process.env.LEGACY_WRITES_FROZEN) {
-    return NextResponse.json(
-      { error: 'legacy writes frozen', detail: 'Fields v2 cutover in progress — legacy write paths are disabled.' },
-      { status: 503 }
-    );
-  }
-
   try {
     const { id } = await params;
     const body = await request.json();

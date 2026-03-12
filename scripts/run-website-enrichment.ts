@@ -35,10 +35,6 @@ async function main() {
   const dryRun = args.includes("--dry-run");
   const slugArg = args.find((a) => a.startsWith("--slug="))?.split("=")[1];
 
-  if (process.env.LEGACY_WRITES_FROZEN && !dryRun) {
-    console.error('FREEZE: LEGACY_WRITES_FROZEN is set — legacy write paths are disabled for Fields v2 cutover. Use --dry-run to inspect without writing. Exiting.');
-    process.exit(1);
-  }
   const categoryOnly =
     args.find((a) => a.startsWith("--mode="))?.split("=")[1] === "categoryOnly";
   const ignoreCategoryThrottle =

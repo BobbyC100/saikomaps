@@ -217,10 +217,6 @@ export async function resolveReviewQueueItem(params: {
 }> {
   const { queueId, resolution, resolutionNotes, resolvedBy, canonicalId } = params;
 
-  if (process.env.LEGACY_WRITES_FROZEN) {
-    throw new Error(`FREEZE[review-queue]: legacy entity_links/raw_records/golden_records write blocked for queueId=${queueId} — LEGACY_WRITES_FROZEN is set`);
-  }
-
   const queueItem = await prisma.review_queue.findUnique({
     where: { queue_id: queueId },
     include: { raw_record_a: true, raw_record_b: true },
