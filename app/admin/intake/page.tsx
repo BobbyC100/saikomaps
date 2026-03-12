@@ -10,7 +10,7 @@
  * After creation, "Enrich" button triggers ERA pipeline in background.
  */
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -41,7 +41,7 @@ interface IntakeSummary {
   ambiguous: number;
 }
 
-type EnrichState = 'idle' | 'queued' | 'error';
+type EnrichState = 'idle' | 'queued' | 'enriching' | 'done' | 'error';
 
 // ─── Palette ──────────────────────────────────────────────────────────────────
 
@@ -81,18 +81,86 @@ function OutcomeBadge({ outcome }: { outcome: IntakeResult['outcome'] }) {
 
 // ─── Results table ────────────────────────────────────────────────────────────
 
+const ENRICH_LABEL: Record<EnrichState, string> = {
+  idle:      'Enrich →',
+  queued:    'Starting…',
+  enriching: 'Enriching…',
+  done:      '✓ Enriched',
+  error:     'Error — retry',
+};
+
 function ResultsTable({ results }: { results: IntakeResult[] }) {
   const [enrichStates, setEnrichStates] = useState<Record<string, EnrichState>>({});
+  const pollRefs = useRef<Record<string, ReturnType<typeof setInterval>>>({});
+  // overrides: input name → new result, for rows force-created from ambiguous state
+  const [overrides, setOverrides] = useState<Record<string, IntakeResult>>({});
+  const [forceCreateLoading, setForceCreateLoading] = useState<Record<string, boolean>>({});
+
+  // Start polling DB for enrichment_stage after triggering
+  const startPolling = useCallback((slug: string) => {
+    if (pollRefs.current[slug]) return; // already polling
+    setEnrichStates((s) => ({ ...s, [slug]: 'enriching' }));
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/admin/enrich/${slug}`);
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.done) {
+          setEnrichStates((s) => ({ ...s, [slug]: 'done' }));
+          clearInterval(pollRefs.current[slug]);
+          delete pollRefs.current[slug];
+        }
+      } catch {
+        // network hiccup — keep polling
+      }
+    }, 4000); // poll every 4 s
+    pollRefs.current[slug] = interval;
+
+    // Safety cap: stop polling after 10 min regardless
+    setTimeout(() => {
+      if (pollRefs.current[slug]) {
+        clearInterval(pollRefs.current[slug]);
+        delete pollRefs.current[slug];
+        setEnrichStates((s) => s[slug] === 'enriching' ? { ...s, [slug]: 'error' } : s);
+      }
+    }, 10 * 60 * 1000);
+  }, []);
+
+  // Clean up intervals on unmount
+  useEffect(() => {
+    const refs = pollRefs.current;
+    return () => { Object.values(refs).forEach(clearInterval); };
+  }, []);
+
+  const handleForceCreate = useCallback(async (name: string) => {
+    setForceCreateLoading((s) => ({ ...s, [name]: true }));
+    try {
+      const res = await fetch('/api/admin/intake', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, forceCreate: true }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Create failed');
+      const created: IntakeResult = data.results?.[0];
+      if (created) setOverrides((s) => ({ ...s, [name]: created }));
+    } catch {
+      // leave in ambiguous state on failure — user can retry
+    } finally {
+      setForceCreateLoading((s) => ({ ...s, [name]: false }));
+    }
+  }, []);
 
   const handleEnrich = useCallback(async (slug: string) => {
     setEnrichStates((s) => ({ ...s, [slug]: 'queued' }));
     try {
       const res = await fetch(`/api/admin/enrich/${slug}`, { method: 'POST' });
       if (!res.ok) throw new Error(await res.text());
+      startPolling(slug);
     } catch {
       setEnrichStates((s) => ({ ...s, [slug]: 'error' }));
     }
-  }, []);
+  }, [startPolling]);
 
   return (
     <div className="mt-6 overflow-x-auto rounded-lg border" style={{ borderColor: C.border }}>
@@ -106,9 +174,12 @@ function ResultsTable({ results }: { results: IntakeResult[] }) {
           </tr>
         </thead>
         <tbody>
-          {results.map((r, i) => {
+          {results.map((rawRow, i) => {
+            const r = overrides[rawRow.input] ?? rawRow;
             const slug = r.entity?.slug;
             const enrichState = slug ? enrichStates[slug] ?? 'idle' : 'idle';
+            const isForceLoading = forceCreateLoading[r.input];
+            const googleSearchUrl = `https://www.google.com/search?q=${encodeURIComponent(r.input + ' Los Angeles')}`;
             return (
               <tr
                 key={i}
@@ -152,19 +223,41 @@ function ResultsTable({ results }: { results: IntakeResult[] }) {
                 <td className="px-4 py-2">
                   {r.outcome === 'created' && slug && (
                     <button
-                      onClick={() => handleEnrich(slug)}
-                      disabled={enrichState !== 'idle'}
+                      onClick={() => enrichState === 'idle' || enrichState === 'error' ? handleEnrich(slug) : undefined}
+                      disabled={enrichState === 'queued' || enrichState === 'enriching' || enrichState === 'done'}
                       style={{
-                        backgroundColor: enrichState === 'idle' ? C.accent : C.bg,
-                        color: enrichState === 'idle' ? '#fff' : C.muted,
+                        backgroundColor: enrichState === 'done'  ? C.greenBg  :
+                                         enrichState === 'idle'  ? C.accent   : C.bg,
+                        color:           enrichState === 'done'  ? C.green    :
+                                         enrichState === 'idle'  ? '#fff'     : C.muted,
                         border: `1px solid ${C.border}`,
                       }}
                       className="px-3 py-1 rounded text-xs font-semibold transition-colors disabled:cursor-not-allowed"
                     >
-                      {enrichState === 'idle'   && 'Enrich →'}
-                      {enrichState === 'queued' && 'Enriching…'}
-                      {enrichState === 'error'  && 'Error — retry'}
+                      {ENRICH_LABEL[enrichState]}
                     </button>
+                  )}
+                  {r.outcome === 'ambiguous' && (
+                    <span className="flex items-center gap-2">
+                      <a
+                        href={googleSearchUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title="Search Google to verify"
+                        style={{ color: C.muted }}
+                        className="text-xs hover:underline"
+                      >
+                        🔍 Verify
+                      </a>
+                      <button
+                        onClick={() => handleForceCreate(r.input)}
+                        disabled={isForceLoading}
+                        style={{ backgroundColor: C.bg, color: C.text, border: `1px solid ${C.border}` }}
+                        className="px-3 py-1 rounded text-xs font-semibold hover:opacity-80 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {isForceLoading ? 'Creating…' : 'Create Anyway'}
+                      </button>
+                    </span>
                   )}
                 </td>
               </tr>

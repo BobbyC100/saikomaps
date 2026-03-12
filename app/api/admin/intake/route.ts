@@ -33,6 +33,7 @@ interface IntakeInput {
   instagram?: string;
   neighborhood?: string;
   source?: string;
+  forceCreate?: boolean; // skip fuzzy dedup — use when admin confirms it's a new distinct place
 }
 
 type IntakeOutcome = 'created' | 'matched' | 'ambiguous';
@@ -61,7 +62,7 @@ async function generateUniqueSlug(name: string, neighborhood?: string): Promise<
 }
 
 async function processOne(input: IntakeInput): Promise<IntakeResult> {
-  const { name, googlePlaceId, website, instagram, neighborhood, source } = input;
+  const { name, googlePlaceId, website, instagram, neighborhood, source, forceCreate } = input;
 
   // 1. GPID exact match
   if (googlePlaceId) {
@@ -92,7 +93,31 @@ async function processOne(input: IntakeInput): Promise<IntakeResult> {
     };
   }
 
-  // 3 & 4. Fuzzy name scan (load all names — acceptable at current LA-area scale)
+  // 3 & 4. Fuzzy name scan — skipped when forceCreate=true (admin confirmed distinct)
+  if (forceCreate) {
+    const slug = await generateUniqueSlug(name, neighborhood);
+    const entity = await db.entities.create({
+      data: {
+        id: randomUUID(),
+        slug,
+        name,
+        googlePlaceId: googlePlaceId || undefined,
+        website: website || undefined,
+        instagram: instagram || undefined,
+        neighborhood: neighborhood || undefined,
+        primary_vertical: 'EAT',
+        status: 'CANDIDATE',
+        editorialSources: source ? { sources: [source] } : undefined,
+      },
+      select: { id: true, slug: true, name: true, status: true },
+    });
+    return {
+      input: name,
+      outcome: 'created',
+      entity: { ...entity, status: entity.status as string },
+    };
+  }
+
   const allEntities = await db.entities.findMany({
     select: { id: true, slug: true, name: true, status: true },
   });

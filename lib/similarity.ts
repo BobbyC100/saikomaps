@@ -64,7 +64,7 @@ export function normalizeName(name: string | null | undefined): string {
   
   // Common substitutions
   const substitutions: [RegExp, string][] = [
-    [/\b(the|a|an)\b/g, ''],
+    [/\b(the|a|an|el|la|los|las|le|les|de|del|di|il)\b/g, ''],
     [/[\'"`]/g, ''],
     [/\s+/g, ' '],
     [/\b(restaurant|cafe|bar|grill|kitchen|eatery|bistro|brasserie)\b/g, ''],
