@@ -85,7 +85,7 @@ type IntakeOutcome = 'created' | 'matched' | 'ambiguous';
 interface IntakeResult {
   input: string;
   outcome: IntakeOutcome;
-  entity?: { id: string; slug: string; name: string; status: string };
+  entity?: { id: string; slug: string; name: string; status: string; googlePlaceId?: string | null };
   candidates?: Array<{ id: string; slug: string; name: string }>;
 }
 
@@ -124,7 +124,7 @@ async function processOne(input: IntakeInput): Promise<IntakeResult> {
   if (googlePlaceId) {
     const byGpid = await db.entities.findUnique({
       where: { googlePlaceId },
-      select: { id: true, slug: true, name: true, status: true },
+      select: { id: true, slug: true, name: true, status: true, googlePlaceId: true },
     });
     if (byGpid) {
       return { input: displayInput, outcome: 'matched', entity: { ...byGpid, status: byGpid.status as string } };
@@ -134,10 +134,9 @@ async function processOne(input: IntakeInput): Promise<IntakeResult> {
   // 2. Website domain match — check if any entity already uses this website
   const websiteMatched = website ? await (async () => {
     const domain = websiteDomain(website);
-    // Search for entities whose stored website contains the same domain
     const all = await db.entities.findMany({
       where: { website: { not: null } },
-      select: { id: true, slug: true, name: true, status: true, website: true },
+      select: { id: true, slug: true, name: true, status: true, googlePlaceId: true, website: true },
     });
     return all.find((e) => e.website && websiteDomain(e.website) === domain) ?? null;
   })() : null;
@@ -146,7 +145,7 @@ async function processOne(input: IntakeInput): Promise<IntakeResult> {
     return {
       input: displayInput,
       outcome: 'matched',
-      entity: { id: websiteMatched.id, slug: websiteMatched.slug, name: websiteMatched.name, status: websiteMatched.status as string },
+      entity: { id: websiteMatched.id, slug: websiteMatched.slug, name: websiteMatched.name, status: websiteMatched.status as string, googlePlaceId: websiteMatched.googlePlaceId },
     };
   }
 
@@ -154,7 +153,7 @@ async function processOne(input: IntakeInput): Promise<IntakeResult> {
   const candidateSlug = slugify(resolvedName, { lower: true, strict: true });
   const bySlug = await db.entities.findUnique({
     where: { slug: candidateSlug },
-    select: { id: true, slug: true, name: true, status: true },
+    select: { id: true, slug: true, name: true, status: true, googlePlaceId: true },
   });
   if (bySlug) {
     return { input: displayInput, outcome: 'matched', entity: { ...bySlug, status: bySlug.status as string } };
@@ -176,7 +175,7 @@ async function processOne(input: IntakeInput): Promise<IntakeResult> {
         status: 'CANDIDATE',
         editorialSources: source ? { sources: [source] } : undefined,
       },
-      select: { id: true, slug: true, name: true, status: true },
+      select: { id: true, slug: true, name: true, status: true, googlePlaceId: true },
     });
     return { input: displayInput, outcome: 'created' as const, entity: { ...entity, status: entity.status as string } };
   };
@@ -190,7 +189,7 @@ async function processOne(input: IntakeInput): Promise<IntakeResult> {
 
   // 6 & 7. Fuzzy name scan (only when no website to anchor on)
   const allEntities = await db.entities.findMany({
-    select: { id: true, slug: true, name: true, status: true },
+    select: { id: true, slug: true, name: true, status: true, googlePlaceId: true },
   });
 
   const normalizedInput = normalizeName(resolvedName);
@@ -211,7 +210,7 @@ async function processOne(input: IntakeInput): Promise<IntakeResult> {
     return {
       input: displayInput,
       outcome: 'matched',
-      entity: { id: bestMatch.id, slug: bestMatch.slug, name: bestMatch.name, status: bestMatch.status as string },
+      entity: { id: bestMatch.id, slug: bestMatch.slug, name: bestMatch.name, status: bestMatch.status as string, googlePlaceId: bestMatch.googlePlaceId },
     };
   }
 

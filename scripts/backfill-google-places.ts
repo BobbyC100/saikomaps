@@ -22,6 +22,12 @@ import {
   getNeighborhoodFromCoords,
 } from "@/lib/google-places";
 import { getSaikoCategory, parseCuisineType } from "@/lib/categoryMapping";
+import { jaroWinklerSimilarity, normalizeName } from "@/lib/similarity";
+
+// Minimum name-similarity between entity name and Google Places result name.
+// Only enforced when we searched by name (no pre-existing GPID) to avoid
+// clobbering an entity with a completely wrong place.
+const GPID_SEARCH_MIN_SIMILARITY = 0.60;
 
 const prisma = new PrismaClient();
 const RATE_LIMIT_MS = 150;
@@ -92,7 +98,7 @@ async function main() {
     where = { placesDataCachedAt: null };
   }
 
-  const places = await prisma.place.findMany({
+  const places = await prisma.entities.findMany({
     where,
     orderBy: { createdAt: "asc" },
     ...(Number.isFinite(limit) && limit > 0 && { take: limit }),
@@ -124,10 +130,12 @@ async function main() {
       }
 
       // Strategy 2: Text search by name + address or name + neighborhood + city
+      let searchedByName = false;
       if (!placeDetails && (place.name || place.address)) {
         const searchQuery = place.address
           ? `${place.name}, ${place.address}`
           : `${place.name}${place.neighborhood ? ` ${place.neighborhood}` : ""}, Los Angeles`;
+        searchedByName = !place.address; // true when we had no address anchor
         try {
           const results = await searchPlace(searchQuery, {
             maxResults: 1,
@@ -147,6 +155,25 @@ async function main() {
         console.log(`  ❌ ${label}: could not resolve via Google Places`);
         await sleep(RATE_LIMIT_MS);
         continue;
+      }
+
+      // Guard: when we searched by name only (no address/GPID anchor), verify the
+      // Google result actually matches the entity name. A low-similarity result means
+      // the text search returned something unrelated (e.g. "Picnic" → "Grand Park").
+      if (searchedByName && place.name && placeDetails.name) {
+        const similarity = jaroWinklerSimilarity(
+          normalizeName(place.name),
+          normalizeName(placeDetails.name)
+        );
+        if (similarity < GPID_SEARCH_MIN_SIMILARITY) {
+          failed++;
+          console.log(
+            `  ❌ ${label}: Google result "${placeDetails.name}" name-similarity too low (${similarity.toFixed(2)} < ${GPID_SEARCH_MIN_SIMILARITY}) — skipping to avoid clobbering wrong place. Provide a GPID to proceed.`
+          );
+          await sleep(RATE_LIMIT_MS);
+          continue;
+        }
+        console.log(`  ✓ name match: "${placeDetails.name}" (similarity ${similarity.toFixed(2)})`);
       }
 
       const lat =
@@ -194,7 +221,7 @@ async function main() {
       };
 
       if (!dryRun) {
-        await prisma.place.update({
+        await prisma.entities.update({
           where: { id: place.id },
           data: updateData,
         });
