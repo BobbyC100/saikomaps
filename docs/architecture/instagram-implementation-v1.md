@@ -1,0 +1,254 @@
+---
+doc_id: ARCHITECTURE-INSTAGRAM-IMPLEMENTATION-V1
+doc_type: architecture
+status: active
+owner: Bobby Ciccaglione
+created: '2026-03-13'
+last_updated: '2026-03-13'
+project_id: SAIKO
+summary: >-
+  Instagram integration implementation plan and system impact — new tables, sync
+  rules, temporal signal architecture, interpretation layer impact, photo
+  strategy, attachment model
+---
+# Instagram Integration — Implementation & Impact Doc
+
+**Version:** 0.1
+**Draft Date:** 2026-03-13
+**Author:** Bobby / Claude
+**Status:** Pre-engineering handoff — pending data review
+
+## 1. Purpose & Architectural Intent
+
+This document defines the implementation plan and system impact assessment for adding Instagram as a data source to the Saiko platform. It is intended as a handoff to engineering and as a seed document for the knowledge base.
+
+Instagram is not just another data source. It is categorically different from every source we have ingested to date. Website content is foundational but static — updated infrequently, written for marketing purposes, not for communication. Google Business Profile is slow and aggregated. Editorial coverage is episodic and externally authored. Instagram is the merchant speaking directly, regularly, in their own voice, about what is happening right now.
+
+Our places are alive. Instagram is what makes that true.
+
+The architectural intent of this integration is to treat Instagram as a first-class input to the interpretation layer — not a bolt-on, not a supplemental source, but a primary merchant-authored voice that feeds signal extraction, confidence scoring, photo candidates, and contextual display. Every decision in this document should be made in service of that intent.
+
+A secondary intent is to establish a pattern for ingesting broad, recurring datasets. Instagram is the first dataset of this type. The architecture we build here should be extensible — when the next dataset of this kind arrives, it should slot in cleanly without requiring every downstream feature to be individually updated.
+
+## 2. Opportunities
+
+Instagram unlocks capabilities that no other source in the current stack can provide. These are worth stating explicitly so the engineering team understands the editorial and product intent behind the technical work.
+
+**Real merchant voice.** Instagram is the most direct line we have to how a place talks about itself. Website copy is written for conversion. Instagram is written for communication. That distinction matters for signal quality.
+
+**Temporal pulse.** Instagram is the only source that tells us what is happening this week, today, hours ago. No other source in the stack has this property. This is a genuine and significant differentiation.
+
+**Operational intelligence.** Closures, private events, hours changes, special menus, guest chefs — merchants post this information on Instagram before it appears anywhere else. In many cases it never appears anywhere else. We can have this information hours after it is posted.
+
+**Visual intent.** Merchant-posted photos are editorially intentional. The merchant chose those images. They framed the shot. They decided it represented them. This is categorically different from user-submitted Google photos.
+
+**Confidence lift.** Instagram signals can corroborate signals we were already extracting from other sources. A natural wine bar that mentions producers in their captions, describes their pours, posts about winemaker dinners — that is high-quality corroborating evidence for signals we may have only had weak confidence in before.
+
+**Caption signal density.** Wine bars, natural wine focused restaurants, chef-driven spots — these entities often use captions to describe sourcing, producers, regions, dishes, philosophy. That is rich structured data hiding in plain text. It is some of the highest-quality signal we can extract relative to the cost of getting it.
+
+**Contextual display.** Instagram is the data foundation for showing users information that is true right now, not just true in general. This is one of the most meaningful product differentiators we can build. Users learn that Saiko knows things other platforms do not. That builds trust compounding over time.
+
+## 3. Affected Systems
+
+The following systems are affected by the Instagram integration. This is not an exhaustive engineering audit — it is a map of known impact areas. Engineering should treat this as a starting point for discovery, not a complete specification.
+
+**Data layer:** Three new tables, merchant_surface attachment, place_coverage_status freshness fields, interpretation_cache new input source, confidence scoring model.
+
+**Ingest layer:** New fetch job for account and media, insights ingest job, caption extraction job, temporal and operational signal extraction job, future visual analysis job.
+
+**Interpretation layer:** SceneSense and language_signals pipeline, ABOUT synthesis path, confidence scoring model, signal TTL and expiry concept which does not yet exist.
+
+**API layer:** `/api/places/[slug]` route which will need to pull from new data sources, data contract in `place-page.ts` which will need homes for Instagram fields.
+
+**Rendering layer:** Links rail for Instagram URL, Photos section for merchant IG candidates, ABOUT section where IG bio and captions enter the source hierarchy, SceneSense indirectly via language_signals.
+
+**Voice layer:** ABOUT synthesis path needs to know Instagram exists and how to weight it. Caption register awareness — Instagram language is shorter and more casual than website copy and should not bleed into rendered output tone. Merchant voice fidelity — Instagram is the highest-trust merchant voice signal we have. Temporal voice signals — time-bound language in captions must be recognized and not absorbed into evergreen identity copy.
+
+**Operational:** Fetch cost and rate limit management, storage growth planning, re-parse capability via raw payload preservation.
+
+## 4. New Tables
+
+Three new tables. A fourth for temporal signals is defined in section 6.
+
+### instagram_accounts
+
+One record per connected Instagram account. Links to merchant_surface.
+
+**Fields:** internal id, merchant surface link, instagram_user_id, username, account_type, media_count, canonical_instagram_url, last_fetched_at, last_successful_fetch_at, source_status, raw_payload.
+
+**Derived fields:** latest_post_at, posting_cadence_30d, posting_cadence_90d, is_active_recently.
+
+**Sync rule:** Overwrite mutable fields on each fetch, keep latest raw_payload.
+
+### instagram_media
+
+One record per post. Upsert by instagram_media_id.
+
+**Fields:** internal id, instagram_media_id (unique), instagram_user_id, media_type, media_url, thumbnail_url, permalink, caption, timestamp, fetched_at, raw_payload.
+
+**Derived fields:** caption_present, caption_length, posted_day_of_week, posted_hour_local, is_recent_post, signal_extracted_at, is_display_candidate, visual_analysis_run.
+
+- `signal_extracted_at` tracks which posts have been run through caption extraction and when, supporting re-extraction if the model improves.
+- `is_display_candidate` is a boolean flag for the photo scoring layer.
+- `visual_analysis_run` is a boolean that future-proofs the schema for image analysis without requiring it now.
+
+**Sync rule:** Upsert by instagram_media_id, preserve original timestamp, refresh mutable fields if changed.
+
+### instagram_insight_snapshots
+
+Append only. Never overwrite old values.
+
+**Fields:** internal id, subject_type (account or media), subject_id, metric_name, metric_value, observed_at, window_label, raw_payload.
+
+**Metrics:** impressions, reach, engagement.
+
+**Sync rule:** Append only on every fetch. Historical snapshots are the record.
+
+## 5. Sync & Ingest Rules
+
+Each table has a distinct sync behavior. These are not interchangeable.
+
+**Accounts overwrite.** Each fetch overwrites mutable fields. Accounts do not change frequently enough to require history. Keep latest raw_payload.
+
+**Media upsert.** Upsert by instagram_media_id. Never duplicate a post. Preserve original timestamp — that is immutable, it is when they posted. Refresh mutable fields if changed since caption edits happen.
+
+**Insights append only.** Every fetch creates a new snapshot row. This is how trending and cadence analysis gets built over time.
+
+**Fetch cadence** is an open question to be resolved after data review. Options include daily for active accounts, every 48-72 hours for lower cadence accounts, or dynamic cadence driven by is_active_recently. Whatever cadence is chosen, the ingest job must be designed around Instagram API rate limits from day one, not retrofitted. Scheduling needs to account for rate limit headroom across the full merchant set.
+
+**Raw payloads** are preserved on all three tables specifically so signals can be re-extracted later without re-fetching. This is a deliberate cost decision. We paid for the fetch. We should be able to use it more than once.
+
+## 6. Temporal Signal Architecture
+
+This is the most novel section in the document. Nothing in the current system thinks about time the way Instagram requires. This section defines a new signal class that did not previously exist in the platform.
+
+Every other source produces evergreen signals. A website that says "wood-fired, seasonal, natural wine focused" is probably saying the same thing next year. Instagram produces both evergreen signals and perishable ones. The architecture must tell them apart.
+
+**Evergreen signals** are extracted from captions and treated as stable identity information. Examples: "we source from small producers," "wood-fired open fire cooking," "natural wine focused." These flow into language_signals and through the existing SceneSense pipeline. No expiry.
+
+**Temporal and operational signals** are time-bound. They are only true for a specific window. Examples: "closed this Sunday for a private event," "guest chef dinner Friday only," "truffle menu through end of March," "we will be at the farmers market Saturday." These require different handling entirely.
+
+Temporal signals need what evergreen signals do not:
+- A `valid_from` and `valid_until` or TTL field
+- Separation from evergreen signal storage so they do not flow into SceneSense or ABOUT
+- Their own extraction job that specifically looks for date and event language
+- A display path that does not yet exist but must be designed for
+
+**The trust implication** is the most operationally critical point in this document. If Saiko displays hours or open status that contradicts what a merchant posted on Instagram hours ago, that is a trust problem. Temporal signals from Instagram should be treated as higher recency authority than any other source on operational matters.
+
+**Capture now, display later.** The display UI for temporal signals does not exist yet. That is acceptable. The capture infrastructure must exist from day one. Six months of event and closure data thrown away because the UI was not ready is not acceptable.
+
+This architecture is the technical foundation for contextual display as a product capability. Contextual display — surfacing information that is true right now, not just true in general — is one of the most meaningful differentiators Saiko can build. Instagram is what makes it possible.
+
+### instagram_temporal_signals
+
+**Fields:** internal id, instagram_media_id (source post), signal_type (closure / event / hours_change / special_menu / other), signal_text (extracted language), valid_from, valid_until, confidence, extracted_at, is_expired.
+
+A scheduled job will need to run expiry sweeps to set is_expired as signals age out.
+
+**Open question:** How do temporal signals interact with `entities.hours`? If a post says "closed Sunday" but hours say open, who wins and does anything in the UI surface the conflict? This is a product decision to be made when contextual display is scoped.
+
+## 7. Interpretation Layer Impact
+
+Every interpretation feature in the current stack was built against a fixed input set. Instagram expands that input set in ways that are largely positive but require awareness before wiring.
+
+Generally speaking Instagram provides another rich dataset for interpretation features to draw on. SceneSense gains more language_signals input. ABOUT synthesis gains more merchant text to work from. Confidence scoring gains a new corroborating source. These are additive improvements.
+
+The concern worth flagging is that features may have been built with hardcoded assumptions about where signals come from. A feature that knows to look at specific fields from specific sources will not automatically know Instagram exists. Before wiring Instagram signals into any interpretation feature, engineering should audit how that feature currently sources its inputs and whether source assumptions are hardcoded.
+
+**Flag for engineering review:** Before Instagram signals can be fully utilized by interpretation features, identify which features have hardcoded source assumptions that need to be made more flexible. This is not a blocker but it is a known risk area. Features most likely to be affected based on current knowledge:
+- ABOUT synthesis path
+- SceneSense and language_signals ingestion
+- Confidence scoring model
+- Identity line assembly
+
+The longer-term architectural direction this points toward is a **source arbitration layer** — a unified signal pool with source, recency, and confidence attached, from which features draw without needing to know the specific origin. Instagram is the forcing function that makes this worth designing toward. Engineering should be aware of this direction even if the refactor is deferred.
+
+## 8. Photo Strategy
+
+Instagram photos should be ingested using the same pipeline philosophy as Google photos. The goal is a unified pool of quality-vetted photo candidates with source metadata attached. The rendering layer — TRACES — decides what gets displayed. The data layer surfaces the best candidates it can.
+
+**The data layer is responsible for:**
+- Ingesting the media
+- Assessing quality signals (resolution, aspect ratio)
+- Flagging display candidates via `is_display_candidate` on instagram_media
+- Preserving source and recency metadata so TRACES can factor them into display decisions
+
+**The data layer is not responsible for:**
+- Deciding which photos get shown
+- Ranking merchant Instagram above Google in the UI
+- Any display logic
+
+**Flag for engineering:** Instagram photo ingestion should mirror the existing Google photo pipeline wherever possible. Do not build a separate system. Extend what exists. TRACES consumes from a unified candidate pool with source metadata, not from source-specific photo tables. Review how the Google photo pipeline currently works before building the Instagram photo ingest path.
+
+## 9. Attachment Model
+
+Instagram attaches to `merchant_surface` first, not directly to `entities`. This is the structural decision that everything else depends on.
+
+The chain is: `entities` → `merchant_surface` → `instagram_accounts` → `instagram_media` and `instagram_insight_snapshots`.
+
+This keeps Instagram as a source record — a signal contributor — not a core identity record. `merchant_surface` is the right abstraction layer because it is where all merchant-authored sources live. Instagram is one of them. A place can exist in `entities` without an Instagram account. Instagram is additive, not load-bearing.
+
+**Hard dependency:** `merchant_surface` must exist and be wired to entities before Instagram attachment works. If that table is not yet built, this is the first thing to resolve. Everything downstream — signal extraction, photo candidates, ABOUT sourcing, confidence scoring — depends on this link being clean.
+
+**Unmatched accounts:** The ingest job needs a fallback state for Instagram accounts that cannot be confidently matched to an entity. Proposed: `source_status` set to `unmatched`. Unresolved accounts should not be dropped — they should be queued for review. Identity resolution for unmatched accounts is an open question.
+
+## 10. Future Considerations
+
+These are capabilities the architecture should not close the door on. Engineering should be aware they are coming.
+
+**Visual signal extraction.** Running image analysis on display candidate photos. Dish recognition, ambiance signals, lighting, spatial density. Feeds SceneSense and confidence scoring. Schema is already designed to support this via `visual_analysis_run` flag on instagram_media. Cost model needs to be defined before building — run only on display candidates, not the full media archive. Do not build now.
+
+**Contextual display.** The product expression of temporal signals. Surfacing time-bound information directly on the place page — closures, events, special menus, hours changes. `instagram_temporal_signals` is designed for this. Display UI does not exist yet but capture infrastructure will from day one.
+
+**Signal expiry and TTL.** As temporal signals accumulate a scheduled expiry sweep job will be needed to set `is_expired` and keep the active signal pool clean.
+
+**Source arbitration layer.** As the source set grows, individual features should not need to know where signals come from. A unified signal pool with source, recency, and confidence attached would make the interpretation layer source-agnostic. Instagram is the forcing function. Design toward this even if the refactor is deferred.
+
+**Event detection and display.** Instagram posts about events are captured as temporal signals but not yet parsed for structured event data. A future extraction job could identify event type, date, and time and surface it as a dedicated display element.
+
+**Merchant direct upload.** Instagram is a proxy for merchant-curated photos. Eventually merchants may upload directly. The photo pipeline should be designed so direct uploads slot into the same candidate pool without architectural changes.
+
+**Instagram as identity signal.** For entities where Instagram is the primary or only merchant-authored presence, there may be a future case for Instagram signals contributing to identity line assembly. Not now.
+
+## 11. Open Questions
+
+### Answered by data review tomorrow
+
+- What does the actual Instagram data look like across our merchant set?
+- What percentage of merchants have active accounts vs dormant vs none?
+- What is the average caption length and quality?
+- How many posts per week across the corpus?
+- What percentage of captions have extractable signals vs noise?
+
+### Engineering discoveries
+
+- Is `merchant_surface` built and wired to entities?
+- Which interpretation features have hardcoded source assumptions that need refactoring before Instagram signals can flow in cleanly?
+- How does the existing Google photo pipeline work and how cleanly can Instagram photos be added to it?
+- What is the current confidence scoring model and where does source weighting live?
+
+### Product decisions
+
+- What is the fetch cadence for active vs inactive accounts?
+- What is the TTL for temporal signals?
+- When does contextual display activate — what is the minimum signal confidence to surface a closure or event on the place page?
+- Does the References section need to acknowledge Instagram as a source?
+- How do we handle cases where Instagram signals contradict existing entity data — who wins?
+
+### Cost decisions
+
+- What is the fetch cost across the full merchant set at various cadences?
+- What does visual analysis cost per image and what is the break-even on display candidates only?
+- What is the storage growth rate at current merchant set size and at projected scale?
+
+### Identity resolution
+
+- What happens to Instagram accounts that cannot be matched to an entity?
+- Is there a review queue for unmatched accounts or do they sit in `source_status = unmatched` indefinitely?
+
+## Revision History
+
+| Version | Date | Changes | Author |
+|---------|------|---------|--------|
+| 0.1 | 2026-03-13 | Initial implementation doc from planning session | Bobby / Claude |
