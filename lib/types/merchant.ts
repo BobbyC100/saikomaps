@@ -86,6 +86,7 @@ export interface MerchantData {
   // Tier 0: Actions
   phone?: string;
   instagramHandle?: string;
+  tiktokHandle?: string;
   reservationUrl?: string;
   websiteUrl?: string;
   

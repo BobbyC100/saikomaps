@@ -22,10 +22,11 @@ export async function POST(request: NextRequest) {
     // ── Batch mode: spawn background script ──────────────────────────────
     if (body.batch === true) {
       const projectRoot = path.resolve(process.cwd());
-      const args = ['tsx', 'scripts/backfill-neighborhood.ts'];
+      const tsxBin = path.join(projectRoot, 'node_modules', '.bin', 'tsx');
+      const args = ['-r', './scripts/load-env.js', tsxBin, 'scripts/backfill-neighborhood.ts'];
       if (body.limit) args.push('--limit', String(body.limit));
 
-      const child = spawn('npx', args, {
+      const child = spawn('node', args, {
         cwd: projectRoot,
         detached: true,
         stdio: 'ignore',

@@ -18,6 +18,8 @@
  *   contact  / missing_website        — no website in CES (medium)
  *   contact  / missing_phone          — no phone in CES (low)
  *   social   / missing_instagram      — no instagram, not confirmed NONE (low)
+ *   social   / missing_tiktok         — no tiktok, not confirmed NONE (low)
+ *   identity / google_says_closed     — Google businessStatus is CLOSED_TEMPORARILY or CLOSED_PERMANENTLY (high)
  */
 
 import { PrismaClient } from '@prisma/client';
@@ -53,13 +55,16 @@ export interface ScanEntity {
   phone: string | null;
   website: string | null;
   instagram: string | null;
+  tiktok: string | null;
   enrichment_stage: string | null;
   last_enriched_at: Date | null;
   // CES fields (may be null if no CES row)
   ces_website: string | null;
   ces_phone: string | null;
   ces_instagram: string | null;
+  ces_tiktok: string | null;
   ces_neighborhood: string | null;
+  businessStatus: string | null;
 }
 
 export interface ScanResult {
@@ -92,8 +97,48 @@ export const ISSUE_RULES: IssueRule[] = [
     blocking_publish: true,
     recommended_tool: 'gpid_resolution',
     detect: (e) => {
-      if (!e.googlePlaceId) return { detected: true };
-      return null;
+      // Identity is "sufficient" if we have enough weighted anchors,
+      // not just GPID. A taco cart with an IG handle + neighborhood is valid.
+      if (e.googlePlaceId) return null; // GPID alone = resolved
+
+      // Weighted anchors (mirrors lib/identity-enrichment.ts ANCHOR_WEIGHTS)
+      let score = 0;
+      if (e.website || e.ces_website) score += 3;
+      if (e.instagram || e.ces_instagram) score += 2;
+      if (e.tiktok || e.ces_tiktok) score += 2;
+      if (e.phone || e.ces_phone) score += 1;
+      if (e.neighborhood || e.ces_neighborhood) score += 1;
+      if (e.latitude && e.longitude) score += 2;
+
+      // Threshold: need at least 4 points of identity signals to be "sufficient"
+      // e.g., Instagram (2) + coords (2) = 4 ✓
+      // e.g., Website (3) + neighborhood (1) = 4 ✓
+      // e.g., Just a name = 0 ✗
+      if (score >= 4) return null;
+
+      return { detected: true, detail: { identity_score: score, has_gpid: false } };
+    },
+  },
+  {
+    issue_type: 'missing_gpid',
+    problem_class: 'identity',
+    severity: 'medium',
+    blocking_publish: false,
+    recommended_tool: 'gpid_resolution',
+    detect: (e) => {
+      // Non-blocking: entity has sufficient identity but no GPID.
+      // Useful to track but doesn't prevent publication.
+      if (e.googlePlaceId) return null;
+      // Only flag if identity IS sufficient (otherwise unresolved_identity covers it)
+      let score = 0;
+      if (e.website || e.ces_website) score += 3;
+      if (e.instagram || e.ces_instagram) score += 2;
+      if (e.tiktok || e.ces_tiktok) score += 2;
+      if (e.phone || e.ces_phone) score += 1;
+      if (e.neighborhood || e.ces_neighborhood) score += 1;
+      if (e.latitude && e.longitude) score += 2;
+      if (score < 4) return null; // covered by unresolved_identity
+      return { detected: true };
     },
   },
   {
@@ -185,6 +230,39 @@ export const ISSUE_RULES: IssueRule[] = [
       return null;
     },
   },
+  {
+    issue_type: 'missing_tiktok',
+    problem_class: 'social',
+    severity: 'low',
+    blocking_publish: false,
+    recommended_tool: 'tiktok_discover',
+    detect: (e) => {
+      const tiktok = e.ces_tiktok ?? e.tiktok;
+      // 'NONE' = confirmed no TikTok — not an issue
+      if (!tiktok) return { detected: true };
+      if (tiktok === 'NONE') return null;
+      return null;
+    },
+  },
+  {
+    issue_type: 'google_says_closed',
+    problem_class: 'identity',
+    severity: 'high',
+    blocking_publish: false,
+    recommended_tool: null,
+    detect: (e) => {
+      if (!e.businessStatus) return null;
+      const bs = e.businessStatus.toUpperCase();
+      if (bs === 'CLOSED_TEMPORARILY') {
+        // Only flag if entity status is still OPEN
+        if (e.status === 'OPEN') return { detected: true, detail: { googleStatus: 'CLOSED_TEMPORARILY' } };
+      }
+      if (bs === 'CLOSED_PERMANENTLY') {
+        if (e.status !== 'PERMANENTLY_CLOSED') return { detected: true, detail: { googleStatus: 'CLOSED_PERMANENTLY' } };
+      }
+      return null;
+    },
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -237,6 +315,8 @@ export async function scanEntities(
       phone: true,
       website: true,
       instagram: true,
+      tiktok: true,
+      businessStatus: true,
       enrichment_stage: true,
       last_enriched_at: true,
       canonical_state: {
@@ -244,6 +324,7 @@ export async function scanEntities(
           website: true,
           phone: true,
           instagram: true,
+          tiktok: true,
           neighborhood: true,
         },
       },
@@ -273,11 +354,14 @@ export async function scanEntities(
       phone: raw.phone,
       website: raw.website,
       instagram: raw.instagram,
+      tiktok: raw.tiktok,
       enrichment_stage: raw.enrichment_stage,
       last_enriched_at: raw.last_enriched_at,
+      businessStatus: raw.businessStatus ?? null,
       ces_website: raw.canonical_state?.website ?? null,
       ces_phone: raw.canonical_state?.phone ?? null,
       ces_instagram: raw.canonical_state?.instagram ?? null,
+      ces_tiktok: raw.canonical_state?.tiktok ?? null,
       ces_neighborhood: raw.canonical_state?.neighborhood ?? null,
     };
 

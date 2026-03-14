@@ -4,7 +4,7 @@ doc_type: architecture
 status: active
 owner: Bobby Ciccaglione
 created: 2026-03-13
-last_updated: 2026-03-13
+last_updated: 2026-03-14
 project_id: SAIKO
 systems:
   - coverage-operations
@@ -388,3 +388,71 @@ Existing specialized queues remain intact and feed issue generation.
 `entity_issues` provides the unified task abstraction needed for a triage-based operational surface.
 
 Resolution tools must exist before the issue layer — an issue without a resolution action is just a complaint.
+
+---
+
+## Implementation Status (as of 2026-03-14)
+
+### What's been built
+
+**Phase 0 — Resolution Tools: COMPLETE**
+
+All four "needs to be built" tools are now operational:
+
+| Tool | Route | Status |
+|------|-------|--------|
+| Neighborhood derivation | `/api/admin/tools/derive-neighborhood` | Live — reverse geocodes from lat/lng |
+| Targeted stage re-run | `/api/admin/tools/enrich-stage` | Live — runs individual ERA stages via `spawn` |
+| Instagram discovery | `/api/admin/tools/discover-social` (mode: instagram) | Live — Claude-powered search by name+city |
+| TikTok discovery | `/api/admin/tools/discover-social` (mode: tiktok) | Live — same pattern as Instagram |
+| Website discovery | `/api/admin/tools/discover-social` (mode: website) | Live — same pattern |
+| GPID resolution | `/api/admin/tools/seed-gpid-queue` | Live — searches Google Places API for candidates |
+
+**Phase 1 — Issue Layer: COMPLETE**
+
+- `entity_issues` table exists and is populated by the issue scanner (`lib/coverage/issue-scanner.ts`)
+- Scanner detects: `unresolved_identity`, `missing_coords`, `missing_neighborhood`, `missing_phone`, `missing_website`, `missing_instagram`, `missing_tiktok`
+- Issues have severity (CRITICAL/HIGH/MEDIUM/LOW), blocking_publish flag, problem_class grouping
+- Re-scan is triggered manually from the UI or via API
+
+**Phase 2 — Coverage Operations UI: COMPLETE (v1)**
+
+Triage board at `/admin/coverage-ops`:
+- Groups issues by problem_class (Identity, Location, Contact, Social)
+- Severity pills (CRIT/HIGH/MED/LOW) with color coding
+- Per-issue inline actions: Run Stage 1, Discover IG/TikTok/Web, Find GPID, Derive Neighborhood
+- Bulk actions: Run Stage 1 (N), Run Stage 6 (N), Backfill IG (N), Find All GPIDs (N)
+- Inline editing: paste website URL, IG handle, TikTok handle, GPID directly
+- "None" button for confirmed-no-value (taco carts without websites, etc.)
+- "Skip" button for won't-fix items
+- Google search link per entity row
+- Duplicate detection modal with side-by-side comparison and merge
+- Re-scan Issues button to refresh after actions complete
+
+Coverage Dashboard at `/admin/coverage`:
+- Summary metrics: total entities, publishable count, missing field counts
+- Smart counts that distinguish automation-fixable from human-required
+
+**Phase 3 — System Simplification: NOT STARTED**
+
+Existing specialized queues remain intact. GPID resolution queue is referenced but mostly bypassed — `seed-gpid-queue` writes directly and auto-matches high-confidence results.
+
+### Key architectural decisions made during implementation
+
+1. **GPID is not required for entity identity.** Weighted anchor scoring (`lib/identity-enrichment.ts`) determines identity completeness. GPID carries weight 10 but entities with name + address + coords can reach publication threshold without it. This supports taco carts and mobile vendors that don't have Google Places listings.
+
+2. **Issue types map to fields, not workflows.** The original doc recommended workflow-oriented types (`social_unverified`, `contact_unverified`). Implementation uses field-level types (`missing_instagram`, `missing_phone`) because they map cleanly to inline editing and specific resolution tools. The `problem_class` grouping provides the workflow-level organization.
+
+3. **Inline resolution over queue navigation.** Instead of linking out to specialized queues (GPID Queue, Review Queue), most actions execute directly from Coverage Ops. The GPID Queue page still exists for complex multi-candidate review, but simple cases resolve inline.
+
+4. **TikTok as first-class social field.** Added alongside Instagram with identical treatment across 16 files. Driven by the observation that TikTok is the primary social platform for street food vendors and food reviewers.
+
+5. **Entity merge with evidence preservation.** When duplicates are merged, surfaces from the deleted entity are recreated (delete + insert) on the kept entity to respect the `merchant_surfaces` immutability trigger. Gap-fill copies non-null fields from the deleted entity to fill nulls on the kept entity.
+
+### Open items
+
+- **Operating status** (temp_closed / perm_closed): Schema column needed on entities. Google Places API returns `businessStatus` which can auto-detect closures. Manual override needed from Coverage Ops UI.
+- **Media coverage links**: Human-added editorial mentions, reviews, article URLs. Needs a storage model (likely `entity_appearances` or similar) and an "Add coverage" action in Coverage Ops.
+- **Editorial thinness detection**: Issue scanner should flag entities with zero or few editorial sources. Depends on media coverage storage.
+- **Auto-rescan after actions**: Bulk actions should trigger a re-scan automatically instead of requiring manual button click.
+- **Progress indicators**: Background actions (Stage 1, etc.) show "Queued" but no progress feedback. Need polling or SSE for real-time status.

@@ -1,5 +1,5 @@
 {
-  "last_synced": "2026-03-13T07:13:28.959Z",
+  "last_synced": "2026-03-14T19:08:03.806Z",
   "root_folder_id": "1Dod-GaQff4n5TqRXuDroDxwct3Z-5R2T",
   "folders": {
     "SAIKO": "1a0JpEZjbLFKlIh4SxS_CFBnsvy-6plaH",
@@ -390,6 +390,54 @@
       "google_doc_url": "https://docs.google.com/document/d/12li-K-gI3Tn-BJ3TYR9zSs6tNGenL8VLeQ8MrFC5omc/",
       "last_synced": "2026-03-13T07:13:28.955Z",
       "content_hash": "27176ea7db6ddb9e"
+    },
+    "ARCH-IDENTITY-SCORING-V1": {
+      "google_doc_id": "15py9edoi0OAwS0zcHdwgfkM-YYRBrnmJavxG2SkifTE",
+      "google_doc_url": "https://docs.google.com/document/d/15py9edoi0OAwS0zcHdwgfkM-YYRBrnmJavxG2SkifTE/",
+      "last_synced": "2026-03-14T15:56:21.154Z",
+      "content_hash": "5e42d691a8fa2d53"
+    },
+    "ARCH-SOCIAL-FIELDS-V1": {
+      "google_doc_id": "1hFBE5VFGMrLMGq00lT0WLrVnJR3CkjHsGTaLPAowcOQ",
+      "google_doc_url": "https://docs.google.com/document/d/1hFBE5VFGMrLMGq00lT0WLrVnJR3CkjHsGTaLPAowcOQ/",
+      "last_synced": "2026-03-14T15:56:23.896Z",
+      "content_hash": "4909496fe15c578a"
+    },
+    "ARCHITECTURE-INSTAGRAM-IMPLEMENTATION-V1": {
+      "google_doc_id": "1UvFbLx3dXZwVWCjPBytx_4RbB2a7UDTV9o7V_HqKDWE",
+      "google_doc_url": "https://docs.google.com/document/d/1UvFbLx3dXZwVWCjPBytx_4RbB2a7UDTV9o7V_HqKDWE/",
+      "last_synced": "2026-03-14T15:56:26.478Z",
+      "content_hash": "ae1f04c7938d4749"
+    },
+    "ARCHITECTURE-INSTAGRAM-INGESTION-V1": {
+      "google_doc_id": "1Mhim7FmT3DtzZwdUaGzZ_l0BamLgwZH_CG5kmjgVQxI",
+      "google_doc_url": "https://docs.google.com/document/d/1Mhim7FmT3DtzZwdUaGzZ_l0BamLgwZH_CG5kmjgVQxI/",
+      "last_synced": "2026-03-14T15:56:29.211Z",
+      "content_hash": "5b6ee696496ac4a8"
+    },
+    "COVOPS-APPROACH-V1": {
+      "google_doc_id": "1pVo0ibWAWrYrUPPcqqdQUE8X8moksx_nHLKcZ5RLsYw",
+      "google_doc_url": "https://docs.google.com/document/d/1pVo0ibWAWrYrUPPcqqdQUE8X8moksx_nHLKcZ5RLsYw/",
+      "last_synced": "2026-03-14T15:56:31.873Z",
+      "content_hash": "6111f55896c4434a"
+    },
+    "PIPE-INSTAGRAM-WORKSTREAM-V1": {
+      "google_doc_id": "1YE3NBaH0i8vT5bsbfOk5ln_h9r8YTSI41eOmCmsPSu4",
+      "google_doc_url": "https://docs.google.com/document/d/1YE3NBaH0i8vT5bsbfOk5ln_h9r8YTSI41eOmCmsPSu4/",
+      "last_synced": "2026-03-14T15:56:34.828Z",
+      "content_hash": "7c3b7253503afb25"
+    },
+    "OS-BEVERAGE-PROGRAM-VOCAB-V1": {
+      "google_doc_id": "1LjUnKwuh00WsosoDyDu8wRcKXJ_rQMDhWnf3E50M-Ag",
+      "google_doc_url": "https://docs.google.com/document/d/1LjUnKwuh00WsosoDyDu8wRcKXJ_rQMDhWnf3E50M-Ag/",
+      "last_synced": "2026-03-14T19:00:40.501Z",
+      "content_hash": "fc243224ed32797b"
+    },
+    "ARCH-COVERAGE-TIERS-V1": {
+      "google_doc_id": "1kUZhVu37dgAGf3RwgL939h-FZ79Um9kbbhWv_loB_4Q",
+      "google_doc_url": "https://docs.google.com/document/d/1kUZhVu37dgAGf3RwgL939h-FZ79Um9kbbhWv_loB_4Q/",
+      "last_synced": "2026-03-14T19:03:22.902Z",
+      "content_hash": "991fa0529bdfb35e"
     }
   }
 }

@@ -56,6 +56,7 @@ export function MerchantPage({ merchant }: MerchantPageProps) {
           latitude: merchant.coordinates?.lat,
           longitude: merchant.coordinates?.lng,
           instagram: merchant.instagramHandle,
+          tiktok: merchant.tiktokHandle,
         }}
       />
 

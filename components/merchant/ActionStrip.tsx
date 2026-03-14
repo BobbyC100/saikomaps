@@ -8,9 +8,10 @@ interface ActionStripProps {
   longitude: number | null;
   phone: string | null;
   instagram: string | null;
+  tiktok: string | null;
 }
 
-export function ActionStrip({ latitude, longitude, phone, instagram }: ActionStripProps) {
+export function ActionStrip({ latitude, longitude, phone, instagram, tiktok }: ActionStripProps) {
   // Build directions URL
   const directionsUrl =
     latitude && longitude
@@ -24,6 +25,12 @@ export function ActionStrip({ latitude, longitude, phone, instagram }: ActionStr
   const instagramHandle = instagram?.replace(/^@/, '') || null;
   const instagramUrl = instagramHandle
     ? `https://instagram.com/${instagramHandle}`
+    : null;
+
+  // Clean TikTok handle
+  const tiktokHandle = tiktok?.replace(/^@/, '') || null;
+  const tiktokUrl = tiktokHandle
+    ? `https://www.tiktok.com/@${tiktokHandle}`
     : null;
 
   return (
@@ -59,6 +66,19 @@ export function ActionStrip({ latitude, longitude, phone, instagram }: ActionStr
         >
           <Instagram className={styles.icon} size={16} />
           <span className={styles.label}>Insta</span>
+        </a>
+      )}
+
+      {/* TikTok */}
+      {tiktokUrl && (
+        <a
+          href={tiktokUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={styles.action}
+        >
+          <span className={styles.icon} style={{ fontSize: 16, lineHeight: 1 }}>T</span>
+          <span className={styles.label}>TikTok</span>
         </a>
       )}
     </div>

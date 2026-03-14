@@ -71,15 +71,20 @@ export async function POST(
       });
     }
 
-    // Spawn enrichment pipeline in the background (fire-and-forget)
+    // Spawn enrichment pipeline in the background with logging
     const projectRoot = path.resolve(process.cwd());
+    const fs = await import('fs');
+    const logFile = path.join(projectRoot, 'data', 'logs', `enrich-${slug}-${Date.now()}.log`);
+    const logFd = fs.openSync(logFile, 'a');
+
+    const tsxBin = path.join(projectRoot, 'node_modules', '.bin', 'tsx');
     const child = spawn(
-      'npx',
-      ['tsx', 'scripts/enrich-place.ts', `--slug=${slug}`],
+      'node',
+      ['-r', './scripts/load-env.js', tsxBin, 'scripts/enrich-place.ts', `--slug=${slug}`],
       {
         cwd: projectRoot,
         detached: true,
-        stdio: 'ignore',
+        stdio: ['ignore', logFd, logFd],
         env: { ...process.env },
       }
     );

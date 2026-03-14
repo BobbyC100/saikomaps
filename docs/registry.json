@@ -1,30 +1,7 @@
 {
-  "generated": "2026-03-13T07:51:31.833Z",
-  "doc_count": 61,
+  "generated": "2026-03-14T19:03:18.423Z",
+  "doc_count": 66,
   "docs": [
-    {
-      "doc_id": "COVOPS-APPROACH-V1",
-      "doc_type": "architecture",
-      "status": "active",
-      "title": "Coverage Operations — Architectural Position",
-      "path": "docs/architecture/coverage-ops-approach-v1.md",
-      "owner": "Bobby Ciccaglione",
-      "created": "2026-03-13",
-      "last_updated": "2026-03-13",
-      "project_id": "SAIKO",
-      "summary": "Architectural position for Coverage Operations — introduces entity_issues as a unified operational layer over existing queue fragments, with tool readiness assessment and phased implementation plan.",
-      "systems": [
-        "coverage-operations",
-        "fields-data-layer",
-        "data-pipeline"
-      ],
-      "related_docs": [
-        "docs/architecture/fields-era-overview-v1.md",
-        "docs/system/coverage-dashboard-design-v1.md",
-        "docs/ENRICHMENT-OPERATIONS-INVENTORY.md",
-        "docs/FIELDS_V2_TARGET_ARCHITECTURE.md"
-      ]
-    },
     {
       "doc_id": "ARCH-AI-OPERATING-LAYER",
       "doc_type": "architecture",
@@ -40,6 +17,77 @@
         "platform"
       ],
       "related_docs": []
+    },
+    {
+      "doc_id": "ARCH-COVERAGE-TIERS-V1",
+      "doc_type": "architecture",
+      "status": "active",
+      "title": "Coverage Tiers — Entity Enrichment Model",
+      "path": "docs/architecture/coverage-tiers-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-14",
+      "last_updated": "2026-03-14",
+      "project_id": "SAIKO",
+      "summary": "Defines the coverage tier model for entity enrichment. Six tiers from raw identity through experiential interpretation, with enrichment strategy (merchant surfaces first, editorial sources second, human third), entity-type signal requirements, and scanner integration points.",
+      "systems": [
+        "coverage-operations",
+        "offering-signals",
+        "fields-data-layer",
+        "data-pipeline"
+      ],
+      "related_docs": [
+        "docs/architecture/coverage-ops-approach-v1.md",
+        "docs/offering-signals/offering-signals-v1.md",
+        "docs/offering-signals/beverage-program-vocab-v1.md",
+        "docs/architecture/identity-scoring-v1.md",
+        "docs/architecture/social-fields-spec-v1.md",
+        "docs/scenesense/three-lenses-framework-v1.md",
+        "docs/scenesense/display-contract-v2.md",
+        "docs/saikoai-extraction-prompt-v2.1.md",
+        "docs/ENRICHMENT-OPERATIONS-INVENTORY.md"
+      ]
+    },
+    {
+      "doc_id": "ARCH-IDENTITY-SCORING-V1",
+      "doc_type": "architecture",
+      "status": "active",
+      "title": "Identity Scoring — Weighted Anchor Model",
+      "path": "docs/architecture/identity-scoring-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-14",
+      "last_updated": "2026-03-14",
+      "project_id": "SAIKO",
+      "summary": "Weighted anchor scoring model for entity identity confidence. GPID is not required — entities reach publication threshold through any combination of anchors that demonstrates sufficient identity certainty.",
+      "systems": [
+        "identity-enrichment",
+        "coverage-operations"
+      ],
+      "related_docs": [
+        "docs/architecture/coverage-ops-approach-v1.md",
+        "docs/architecture/fields-era-overview-v1.md"
+      ]
+    },
+    {
+      "doc_id": "ARCH-SOCIAL-FIELDS-V1",
+      "doc_type": "architecture",
+      "status": "active",
+      "title": "Social Fields — Entity-Level Specification",
+      "path": "docs/architecture/social-fields-spec-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-14",
+      "last_updated": "2026-03-14",
+      "project_id": "SAIKO",
+      "summary": "Specification for social media handle fields on entities (Instagram, TikTok). Covers storage format, discovery, validation, identity weight, and the sentinel value convention for confirmed-none.",
+      "systems": [
+        "entities",
+        "coverage-operations",
+        "identity-enrichment"
+      ],
+      "related_docs": [
+        "docs/architecture/identity-scoring-v1.md",
+        "docs/architecture/coverage-ops-approach-v1.md",
+        "docs/architecture/instagram-ingestion-field-spec-v1.md"
+      ]
     },
     {
       "doc_id": "ARCH-SYSTEM-CONTRACT",
@@ -81,9 +129,53 @@
       "created": "2026-03-13",
       "last_updated": "2026-03-13",
       "project_id": "SAIKO",
-      "summary": "Instagram integration implementation plan and system impact — new tables, sync rules, temporal signal architecture, interpretation layer impact, photo strategy, attachment model",
+      "summary": "Instagram integration implementation plan and system impact — tables, sync rules, temporal signals, interpretation layer, photo strategy, attachment model. V0.2 adds current state assessment, implementation phases, and data review results.",
+      "systems": [
+        "instagram-api",
+        "enrichment-pipeline",
+        "merchant-surfaces"
+      ],
+      "related_docs": [
+        "docs/architecture/instagram-api-integration-v1.md",
+        "docs/architecture/instagram-ingestion-field-spec-v1.md"
+      ]
+    },
+    {
+      "doc_id": "ARCHITECTURE-INSTAGRAM-INGESTION-V1",
+      "doc_type": "architecture",
+      "status": "draft",
+      "title": "Instagram Ingestion — Field Spec v1",
+      "path": "docs/architecture/instagram-ingestion-field-spec-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-13",
+      "last_updated": "2026-03-13",
+      "project_id": "SAIKO",
+      "summary": "Instagram ingestion schema — 3 tables, field definitions, sync rules. Engineering handoff for migration + Prisma models.",
       "systems": [],
       "related_docs": []
+    },
+    {
+      "doc_id": "COVOPS-APPROACH-V1",
+      "doc_type": "architecture",
+      "status": "active",
+      "title": "Coverage Operations — Architectural Position",
+      "path": "docs/architecture/coverage-ops-approach-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "Thu Mar 12 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "last_updated": "Fri Mar 13 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "project_id": "SAIKO",
+      "summary": "Architectural position for Coverage Operations — introduces entity_issues as a unified operational layer over existing queue fragments, with tool readiness assessment and phased implementation plan.",
+      "systems": [
+        "coverage-operations",
+        "fields-data-layer",
+        "data-pipeline"
+      ],
+      "related_docs": [
+        "docs/architecture/fields-era-overview-v1.md",
+        "docs/system/coverage-dashboard-design-v1.md",
+        "docs/ENRICHMENT-OPERATIONS-INVENTORY.md",
+        "docs/FIELDS_V2_TARGET_ARCHITECTURE.md"
+      ]
     },
     {
       "doc_id": "DEC-002",
@@ -241,6 +333,26 @@
       "related_docs": []
     },
     {
+      "doc_id": "OS-BEVERAGE-PROGRAM-VOCAB-V1",
+      "doc_type": "specification",
+      "status": "active",
+      "title": "Beverage Program + Signal Vocabulary (v1)",
+      "path": "docs/offering-signals/beverage-program-vocab-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-14",
+      "last_updated": "2026-03-14",
+      "project_id": "SAIKO",
+      "summary": "Canonical beverage program model and signal vocabulary for derived offering enrichment. Defines 5 program containers, maturity scale, and locked signal sets for wine, beer, cocktail, non-alcoholic, and coffee/tea programs.",
+      "systems": [
+        "offering-signals",
+        "fields-data-layer"
+      ],
+      "related_docs": [
+        "docs/offering-signals/offering-signals-v1.md",
+        "docs/scenesense/three-lenses-framework-v1.md"
+      ]
+    },
+    {
       "doc_id": "OS-OFFERING-SIGNALS-V1",
       "doc_type": "domain-spec",
       "status": "active",
@@ -256,29 +368,6 @@
         "traces"
       ],
       "related_docs": []
-    },
-    {
-      "doc_id": "PIPE-INSTAGRAM-WORKSTREAM-V1",
-      "doc_type": "spec",
-      "status": "active",
-      "title": "Instagram Integration — Workstream & Execution Plan",
-      "path": "docs/pipelines/instagram-integration-workstream-v1.md",
-      "owner": "Bobby Ciccaglione",
-      "created": "2026-03-13",
-      "last_updated": "2026-03-13",
-      "project_id": "SAIKO",
-      "summary": "Phased execution plan for Instagram integration — 6 phases from data quality through contextual display. Codebase readiness assessment, effort estimates, timing, and per-phase task checklists.",
-      "systems": [
-        "instagram-api",
-        "enrichment-pipeline",
-        "merchant-surfaces",
-        "scenesense"
-      ],
-      "related_docs": [
-        "docs/architecture/instagram-implementation-v1.md",
-        "docs/architecture/instagram-api-integration-v1.md",
-        "docs/architecture/instagram-ingestion-field-spec-v1.md"
-      ]
     },
     {
       "doc_id": "PIPE-CAPTURE-PROFILES-V1",
@@ -298,6 +387,29 @@
       "related_docs": [
         "docs/FIELDS_V2_TARGET_ARCHITECTURE.md",
         "docs/architecture/entity-pipeline-overview-v1.md"
+      ]
+    },
+    {
+      "doc_id": "PIPE-INSTAGRAM-WORKSTREAM-V1",
+      "doc_type": "spec",
+      "status": "active",
+      "title": "Instagram Integration — Workstream & Execution Plan",
+      "path": "docs/pipelines/instagram-integration-workstream-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-13",
+      "last_updated": "2026-03-13",
+      "project_id": "SAIKO",
+      "summary": "Phased execution plan for Instagram integration — 6 phases from data quality through contextual display. Includes codebase readiness assessment, effort estimates, timing recommendations, and per-phase task checklists.",
+      "systems": [
+        "instagram-api",
+        "enrichment-pipeline",
+        "merchant-surfaces",
+        "scenesense"
+      ],
+      "related_docs": [
+        "docs/architecture/instagram-implementation-v1.md",
+        "docs/architecture/instagram-api-integration-v1.md",
+        "docs/architecture/instagram-ingestion-field-spec-v1.md"
       ]
     },
     {

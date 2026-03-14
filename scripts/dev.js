@@ -133,7 +133,7 @@ async function runProbes() {
 // Run probes then start Next dev server (banner + probes run once at startup)
 const nextBin = path.join(__dirname, '..', 'node_modules', '.bin', 'next');
 
-const DEV_PORT = 3000;
+const DEV_PORT = parseInt(process.env.PORT || '3000', 10);
 const BIND_CHECK_POLL_MS = 500;
 const BIND_CHECK_DEADLINE_MS = 3000;
 

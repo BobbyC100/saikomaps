@@ -229,6 +229,7 @@ async function applyToCanonicalState(
     phone: 'phone',
     website: 'website',
     instagram: 'instagram',
+    tiktok: 'tiktok',
     hours: 'hours_json',
     price_level: 'price_level',
     reservation_url: 'reservation_url',

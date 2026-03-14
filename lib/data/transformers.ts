@@ -200,6 +200,7 @@ export function transformDatabaseToMerchant(place: any): MerchantData {
     // Contact
     phone: normalizeText(place.phone),
     instagramHandle: normalizeInstagramHandle(place.instagram),
+    tiktokHandle: normalizeInstagramHandle((place as any).tiktok),
     reservationUrl: undefined, // Not in Place model
     websiteUrl: place.website,
     

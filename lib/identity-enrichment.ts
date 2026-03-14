@@ -38,6 +38,7 @@ interface AnchorSet {
   gpid: string | null;
   website: string | null;
   instagram: string | null;
+  tiktok: string | null;
   verifiedAddress: string | null;
   phone: string | null;
   category: string | null;
@@ -148,6 +149,7 @@ const ANCHOR_WEIGHTS: Record<string, number> = {
   gpid: 4,
   website: 3,
   instagram: 2,
+  tiktok: 2,
   verifiedAddress: 2,
   reservationProvider: 1,
   mediaMention: 1,

@@ -2,14 +2,16 @@ type Props = {
   schedule?: any | null;
   website?: string | null;
   instagram?: string | null;
+  tiktok?: string | null;
   span?: number;
 };
 
-export default function MarketFactsCard({ 
-  schedule, 
-  website, 
+export default function MarketFactsCard({
+  schedule,
+  website,
   instagram,
-  span = 2 
+  tiktok,
+  span = 2
 }: Props) {
   return (
     <section
@@ -55,13 +57,26 @@ export default function MarketFactsCard({
         {instagram ? (
           <>
             {website ? <span style={{ margin: '0 6px', color: '#999' }}>·</span> : null}
-            <a 
+            <a
               href={`https://instagram.com/${instagram.replace('@', '')}`}
-              target="_blank" 
+              target="_blank"
               rel="noopener noreferrer"
               style={{ color: '#0066CC', textDecoration: 'none' }}
             >
               Instagram
+            </a>
+          </>
+        ) : null}
+        {tiktok ? (
+          <>
+            {(website || instagram) ? <span style={{ margin: '0 6px', color: '#999' }}>·</span> : null}
+            <a
+              href={`https://www.tiktok.com/@${tiktok.replace('@', '')}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: '#0066CC', textDecoration: 'none' }}
+            >
+              TikTok
             </a>
           </>
         ) : null}

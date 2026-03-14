@@ -19,6 +19,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { scanEntities, ISSUE_RULES } from '@/lib/coverage/issue-scanner';
+import { scanForDuplicates } from '@/lib/coverage/duplicate-scanner';
 
 export async function POST(request: NextRequest) {
   try {
@@ -34,10 +35,11 @@ export async function POST(request: NextRequest) {
 
     // ── Scan: generate/update entity_issues ──
     if (action === 'scan') {
-      const { slug, entityId, dryRun } = body as {
+      const { slug, entityId, dryRun, includeDuplicates } = body as {
         slug?: string;
         entityId?: string;
         dryRun?: boolean;
+        includeDuplicates?: boolean;
       };
 
       const result = await scanEntities(db, {
@@ -47,10 +49,17 @@ export async function POST(request: NextRequest) {
         verbose: false,
       });
 
+      // Run duplicate scanner on full scans (no slug/entityId filter)
+      let duplicates = null;
+      if (!slug && !entityId && includeDuplicates !== false) {
+        duplicates = await scanForDuplicates(db, { dryRun: dryRun ?? false });
+      }
+
       return NextResponse.json({
         action: 'scan',
         dryRun: dryRun ?? false,
         ...result,
+        ...(duplicates ? { duplicates } : {}),
       });
     }
 

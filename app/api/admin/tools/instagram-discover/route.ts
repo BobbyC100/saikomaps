@@ -30,14 +30,15 @@ export async function POST(request: NextRequest) {
     }
 
     const projectRoot = path.resolve(process.cwd());
+    const tsxBin = path.join(projectRoot, 'node_modules', '.bin', 'tsx');
 
     // ── Backfill: extract handles from merchant_surfaces → entities.instagram ──
     if (action === 'backfill') {
-      const args = ['tsx', 'scripts/backfill-instagram-handles.ts'];
+      const args = ['-r', './scripts/load-env.js', tsxBin, 'scripts/backfill-instagram-handles.ts'];
       if (body.force) args.push('--force');
       if (body.dryRun) args.push('--dry-run');
 
-      const child = spawn('npx', args, {
+      const child = spawn('node', args, {
         cwd: projectRoot,
         detached: true,
         stdio: 'ignore',
@@ -53,7 +54,7 @@ export async function POST(request: NextRequest) {
 
     // ── Ingest: fetch Instagram media via Graph API ──
     if (action === 'ingest') {
-      const args = ['tsx', 'scripts/ingest-instagram.ts'];
+      const args = ['-r', './scripts/load-env.js', tsxBin, 'scripts/ingest-instagram.ts'];
 
       if (body.batch) {
         args.push('--batch');
@@ -86,7 +87,7 @@ export async function POST(request: NextRequest) {
 
       if (body.dryRun) args.push('--dry-run');
 
-      const child = spawn('npx', args, {
+      const child = spawn('node', args, {
         cwd: projectRoot,
         detached: true,
         stdio: 'ignore',

@@ -109,6 +109,7 @@ interface LocationCardProps {
     address?: string | null;
     category?: string | null;
     instagram?: string | null;
+    tiktok?: string | null;
     hours?: Record<string, string> | null;
     imageUrl?: string | null;
     photoGallery?: { mainUrl: string | null; thumbUrls: string[]; totalCount: number };
@@ -179,6 +180,7 @@ export function LocationCard({ location, isOwner, onEdit, onDelete, cardRef }: L
   };
 
   const instagramHandle = normalizeInstagram(location.instagram);
+  const tiktokHandle = location.tiktok?.replace(/^@/, '') || null;
   const categoryLabel = getCategoryLabel(location.category);
 
   return (
@@ -279,6 +281,19 @@ export function LocationCard({ location, isOwner, onEdit, onDelete, cardRef }: L
             >
               <Instagram size={14} />
               @{instagramHandle}
+            </a>
+          )}
+          {tiktokHandle && (
+            <a
+              href={`https://www.tiktok.com/@${tiktokHandle}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-2 inline-flex items-center gap-1.5 text-[13px] hover:opacity-80"
+              style={{ color: '#8A8580' }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <span style={{ fontSize: 14, lineHeight: 1 }}>T</span>
+              @{tiktokHandle}
             </a>
           )}
         </div>

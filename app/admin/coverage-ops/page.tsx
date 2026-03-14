@@ -39,6 +39,34 @@ interface SummaryData {
   by_type: { issue_type: string; severity: string; count: number }[];
 }
 
+interface CompareEntity {
+  id: string;
+  name: string;
+  slug: string;
+  googlePlaceId: string | null;
+  website: string | null;
+  phone: string | null;
+  instagram: string | null;
+  tiktok: string | null;
+  neighborhood: string | null;
+  address: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  createdAt: string;
+  updatedAt: string;
+  _counts: {
+    merchant_surfaces: number;
+    merchant_surface_artifacts: number;
+    coverage_issues: number;
+  };
+}
+
+interface MergeState {
+  issueId: string;
+  entityA: CompareEntity;
+  entityB: CompareEntity;
+}
+
 /* ------------------------------------------------------------------ */
 /*  Constants                                                          */
 /* ------------------------------------------------------------------ */
@@ -74,20 +102,30 @@ const LANE_META: Record<string, { icon: string; label: string; order: number }> 
 };
 
 const ISSUE_TYPE_LABELS: Record<string, string> = {
-  unresolved_identity: 'Unresolved Identity (no GPID)',
+  unresolved_identity: 'Unresolved Identity (insufficient signals)',
   enrichment_incomplete: 'Never Enriched',
   missing_coords: 'Missing Coordinates',
   missing_neighborhood: 'Missing Neighborhood',
   missing_website: 'Missing Website',
   missing_phone: 'Missing Phone',
   missing_instagram: 'Missing Instagram',
+  missing_tiktok: 'Missing TikTok',
+  missing_gpid: 'Missing GPID (not blocking)',
+  google_says_closed: 'Google Says Closed',
+  potential_duplicate: 'Potential Duplicate',
 };
 
-const SUPPRESS_REASONS = [
-  { value: 'confirmed_none', label: 'Confirmed none' },
-  { value: 'not_applicable', label: 'Not applicable' },
-  { value: 'wont_fix', label: "Won't fix" },
-];
+/** Maps issue types to the entity field that can be manually entered */
+const INLINE_EDITABLE: Record<string, { field: string; placeholder: string }> = {
+  unresolved_identity: { field: 'google_place_id', placeholder: 'ChIJ...' },
+  missing_gpid: { field: 'google_place_id', placeholder: 'ChIJ...' },
+  missing_website: { field: 'website', placeholder: 'https://...' },
+  missing_phone: { field: 'phone', placeholder: '(213) 555-1234' },
+  missing_instagram: { field: 'instagram', placeholder: '@handle' },
+  missing_tiktok: { field: 'tiktok', placeholder: '@handle' },
+};
+
+const SUPPRESS_REASON = 'skipped';
 
 /* ------------------------------------------------------------------ */
 /*  Tool action wiring                                                 */
@@ -99,14 +137,30 @@ interface ToolConfig {
   isLink?: boolean;
   href?: string;
   invoke?: (issue: IssueRow) => Promise<Response>;
+  /** If true, bulk action calls invoke() once (not per-issue) and marks all as done */
+  batchOnce?: boolean;
 }
 
 const TOOL_ACTIONS: Record<string, ToolConfig> = {
   unresolved_identity: {
-    label: 'GPID Queue \u2192',
-    queuedLabel: '',
-    isLink: true,
-    href: '/admin/gpid-queue',
+    label: 'Find GPID',
+    queuedLabel: 'Queued',
+    invoke: (issue) =>
+      fetch('/api/admin/tools/seed-gpid-queue', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ entityId: issue.entity_id }),
+      }),
+  },
+  missing_gpid: {
+    label: 'Find GPID',
+    queuedLabel: 'Queued',
+    invoke: (issue) =>
+      fetch('/api/admin/tools/seed-gpid-queue', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ entityId: issue.entity_id }),
+      }),
   },
   enrichment_incomplete: {
     label: 'Enrich',
@@ -135,13 +189,13 @@ const TOOL_ACTIONS: Record<string, ToolConfig> = {
       }),
   },
   missing_website: {
-    label: 'Run Stage 6',
+    label: 'Discover Web',
     queuedLabel: 'Queued',
     invoke: (issue) =>
-      fetch('/api/admin/tools/enrich-stage', {
+      fetch('/api/admin/tools/discover-social', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ slug: issue.entity_slug, stage: 6 }),
+        body: JSON.stringify({ mode: 'website', slug: issue.entity_slug }),
       }),
   },
   missing_phone: {
@@ -155,14 +209,42 @@ const TOOL_ACTIONS: Record<string, ToolConfig> = {
       }),
   },
   missing_instagram: {
-    label: 'Backfill IG',
+    label: 'Discover IG',
     queuedLabel: 'Queued',
     invoke: (issue) =>
-      fetch('/api/admin/tools/instagram-discover', {
+      fetch('/api/admin/tools/discover-social', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'ingest', slug: issue.entity_slug }),
+        body: JSON.stringify({ mode: 'instagram', slug: issue.entity_slug }),
       }),
+  },
+  missing_tiktok: {
+    label: 'Discover TikTok',
+    queuedLabel: 'Queued',
+    invoke: (issue) =>
+      fetch('/api/admin/tools/discover-social', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: 'tiktok', slug: issue.entity_slug }),
+      }),
+  },
+  google_says_closed: {
+    label: 'Mark Closed',
+    queuedLabel: 'Done',
+    invoke: async (issue) => {
+      const googleStatus = (issue.detail as any)?.googleStatus;
+      const newStatus = googleStatus === 'CLOSED_PERMANENTLY' ? 'PERMANENTLY_CLOSED' : 'CLOSED';
+      return fetch(`/api/admin/entities/${issue.entity_id}/patch`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ field: 'status', value: newStatus }),
+      });
+    },
+  },
+  potential_duplicate: {
+    label: 'Review / Merge',
+    queuedLabel: 'Done',
+    // invoke is not used — handled by special case in handleAction
   },
 };
 
@@ -189,6 +271,13 @@ export default function CoverageOpsPage() {
 
   // Action button states per issue id
   const [actionStates, setActionStates] = useState<Record<string, 'idle' | 'running' | 'done' | 'error'>>({});
+
+  // Bulk action state
+  const [bulkRunning, setBulkRunning] = useState<string | null>(null);
+
+  // Merge modal state
+  const [mergeState, setMergeState] = useState<MergeState | null>(null);
+  const [merging, setMerging] = useState(false);
 
   // ── Data fetching ──
 
@@ -263,6 +352,15 @@ export default function CoverageOpsPage() {
   };
 
   const handleAction = async (issue: IssueRow) => {
+    // Special case: potential_duplicate opens merge modal
+    if (issue.issue_type === 'potential_duplicate') {
+      const dupDetail = issue.detail as { duplicate_of_id?: string } | null;
+      if (dupDetail?.duplicate_of_id) {
+        openMergeModal(issue, dupDetail.duplicate_of_id);
+      }
+      return;
+    }
+
     const tool = TOOL_ACTIONS[issue.issue_type];
     if (!tool?.invoke) return;
 
@@ -270,11 +368,26 @@ export default function CoverageOpsPage() {
     try {
       const res = await tool.invoke(issue);
       if (res.ok) {
+        const data = await res.json().catch(() => null);
+        const isCompleted = data?.status === 'completed';
+        const wasSaved = isCompleted && Object.values(data.results ?? {}).some((r: any) => r.saved);
+
         setActionStates((prev) => ({ ...prev, [issue.id]: 'done' }));
-        setToast({
-          message: `${tool.queuedLabel === 'Done' ? 'Completed' : 'Queued'}: ${ISSUE_TYPE_LABELS[issue.issue_type] ?? issue.issue_type} for ${issue.entity_name}`,
-          type: 'success',
-        });
+
+        if (wasSaved) {
+          // Data was written inline — auto-resolve this issue
+          await handleResolve(issue.id);
+          const discovered = Object.values(data.results).map((r: any) => r.discovered).filter(Boolean).join(', ');
+          setToast({ message: `Found ${discovered} for ${issue.entity_name}`, type: 'success' });
+        } else if (isCompleted && !wasSaved) {
+          const reasoning = Object.values(data.results ?? {}).map((r: any) => r.reasoning).filter(Boolean).join('; ');
+          setToast({ message: `${issue.entity_name}: ${reasoning || 'Not found'}`, type: 'error' });
+        } else {
+          setToast({
+            message: `${tool.queuedLabel === 'Done' ? 'Completed' : 'Queued'}: ${ISSUE_TYPE_LABELS[issue.issue_type] ?? issue.issue_type} for ${issue.entity_name}`,
+            type: 'success',
+          });
+        }
       } else {
         setActionStates((prev) => ({ ...prev, [issue.id]: 'error' }));
         setToast({ message: `Failed for ${issue.entity_name}`, type: 'error' });
@@ -283,6 +396,105 @@ export default function CoverageOpsPage() {
       setActionStates((prev) => ({ ...prev, [issue.id]: 'error' }));
       setToast({ message: `Failed for ${issue.entity_name}`, type: 'error' });
     }
+  };
+
+  const handleInlineSave = async (issue: IssueRow, field: string, value: string) => {
+    try {
+      const res = await fetch(`/api/admin/entities/${issue.entity_id}/patch`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ field, value }),
+      });
+      if (res.ok) {
+        // Auto-resolve this issue since we just provided the data
+        await handleResolve(issue.id);
+        setToast({ message: `Saved ${field} for ${issue.entity_name}`, type: 'success' });
+      } else {
+        const data = await res.json().catch(() => null);
+        const errorMsg = data?.error ?? `Failed to save ${field}`;
+        setToast({ message: errorMsg, type: 'error' });
+
+        // On 409 conflict for google_place_id, open merge flow
+        if (res.status === 409 && field === 'google_place_id' && data?.conflictEntityId) {
+          openMergeModal(issue, data.conflictEntityId);
+        }
+      }
+    } catch {
+      setToast({ message: `Failed to save ${field}`, type: 'error' });
+    }
+  };
+
+  const openMergeModal = async (issue: IssueRow, conflictEntityId: string) => {
+    try {
+      const res = await fetch(
+        `/api/admin/entities/compare?a=${issue.entity_id}&b=${conflictEntityId}`,
+      );
+      if (!res.ok) {
+        setToast({ message: 'Failed to load comparison data', type: 'error' });
+        return;
+      }
+      const data = await res.json();
+      setMergeState({
+        issueId: issue.id,
+        entityA: data.a,
+        entityB: data.b,
+      });
+    } catch {
+      setToast({ message: 'Failed to load comparison data', type: 'error' });
+    }
+  };
+
+  const handleMerge = async (keepId: string, deleteId: string) => {
+    setMerging(true);
+    try {
+      const res = await fetch('/api/admin/entities/merge', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ keepId, deleteId }),
+      });
+      const data = await res.json().catch(() => null);
+      if (res.ok) {
+        setToast({
+          message: `Merged: kept "${data?.keptName}", deleted "${data?.deletedName}"`,
+          type: 'success',
+        });
+        setMergeState(null);
+        // Refresh data to reflect merge
+        await fetchData();
+      } else {
+        setToast({ message: data?.error ?? 'Merge failed', type: 'error' });
+      }
+    } catch {
+      setToast({ message: 'Merge failed', type: 'error' });
+    }
+    setMerging(false);
+  };
+
+  const handleNotDuplicate = async () => {
+    if (!mergeState) return;
+    setMerging(true);
+    try {
+      const res = await fetch('/api/admin/tools/scan-issues', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'suppress',
+          issueId: mergeState.issueId,
+          reason: 'not_duplicate',
+        }),
+      });
+      if (res.ok) {
+        setToast({ message: 'Marked as not a duplicate', type: 'success' });
+        setMergeState(null);
+        await fetchData();
+      } else {
+        const data = await res.json().catch(() => null);
+        setToast({ message: data?.error ?? 'Failed to dismiss', type: 'error' });
+      }
+    } catch {
+      setToast({ message: 'Failed to dismiss', type: 'error' });
+    }
+    setMerging(false);
   };
 
   const handleSuppress = async (issueId: string, reason: string) => {
@@ -327,6 +539,66 @@ export default function CoverageOpsPage() {
     }
   };
 
+  const handleBulkAction = async (issueTypes: string[], bulkLabel: string) => {
+    const typeSet = new Set(issueTypes);
+    const matching = filteredIssues.filter(
+      (i) => typeSet.has(i.issue_type) && TOOL_ACTIONS[i.issue_type]?.invoke && (!actionStates[i.id] || actionStates[i.id] === 'idle'),
+    );
+    if (matching.length === 0) return;
+
+    setBulkRunning(bulkLabel);
+    let succeeded = 0;
+    let failed = 0;
+
+    // Check if any of these issue types use batchOnce — if so, invoke once and mark all done
+    const firstTool = TOOL_ACTIONS[matching[0].issue_type];
+    if (firstTool?.batchOnce) {
+      for (const issue of matching) {
+        setActionStates((prev) => ({ ...prev, [issue.id]: 'running' }));
+      }
+      try {
+        const res = await firstTool.invoke!(matching[0]);
+        const newState = res.ok ? 'done' : 'error';
+        for (const issue of matching) {
+          setActionStates((prev) => ({ ...prev, [issue.id]: newState as 'done' | 'error' }));
+        }
+        succeeded = res.ok ? matching.length : 0;
+        failed = res.ok ? 0 : matching.length;
+      } catch {
+        for (const issue of matching) {
+          setActionStates((prev) => ({ ...prev, [issue.id]: 'error' }));
+        }
+        failed = matching.length;
+      }
+    } else {
+      // Run sequentially to avoid overwhelming the server
+      for (const issue of matching) {
+        const tool = TOOL_ACTIONS[issue.issue_type];
+        if (!tool?.invoke) continue;
+        setActionStates((prev) => ({ ...prev, [issue.id]: 'running' }));
+        try {
+          const res = await tool.invoke(issue);
+          if (res.ok) {
+            setActionStates((prev) => ({ ...prev, [issue.id]: 'done' }));
+            succeeded++;
+          } else {
+            setActionStates((prev) => ({ ...prev, [issue.id]: 'error' }));
+            failed++;
+          }
+        } catch {
+          setActionStates((prev) => ({ ...prev, [issue.id]: 'error' }));
+          failed++;
+        }
+      }
+    }
+
+    setBulkRunning(null);
+    setToast({
+      message: `Bulk ${bulkLabel}: ${succeeded} queued${failed ? `, ${failed} failed` : ''}`,
+      type: failed > 0 ? 'error' : 'success',
+    });
+  };
+
   const toggleLane = (cls: string) => {
     setCollapsedLanes((prev) => {
       const next = new Set(prev);
@@ -344,6 +616,29 @@ export default function CoverageOpsPage() {
     if (blockingOnly && !i.blocking_publish) return false;
     return true;
   });
+
+  // Compute which bulk actions are available, grouped by tool label
+  // (e.g. missing_coords + missing_phone both use "Run Stage 1" → one button)
+  const bulkActions = (() => {
+    const byLabel: Record<string, { issueTypes: string[]; count: number }> = {};
+    for (const issue of filteredIssues) {
+      const tool = TOOL_ACTIONS[issue.issue_type];
+      if (!tool?.invoke) continue;
+      const key = tool.label;
+      if (!byLabel[key]) byLabel[key] = { issueTypes: [], count: 0 };
+      if (!byLabel[key].issueTypes.includes(issue.issue_type)) {
+        byLabel[key].issueTypes.push(issue.issue_type);
+      }
+      byLabel[key].count++;
+    }
+    return Object.entries(byLabel)
+      .filter(([, v]) => v.count > 1)
+      .map(([label, v]) => ({
+        issueTypes: v.issueTypes,
+        label,
+        count: v.count,
+      }));
+  })();
 
   // Group by problem_class
   const lanes = Object.entries(LANE_META)
@@ -453,6 +748,26 @@ export default function CoverageOpsPage() {
 
           <div className="flex-1" />
 
+          {/* Bulk Action Buttons */}
+          {bulkActions.length > 0 && (
+            <div className="flex items-center gap-2">
+              <span className="text-xs" style={{ color: C.muted }}>Bulk:</span>
+              {bulkActions.map((ba) => (
+                <button
+                  key={ba.label}
+                  onClick={() => handleBulkAction(ba.issueTypes, ba.label)}
+                  disabled={bulkRunning !== null}
+                  className="px-3 py-1.5 rounded text-xs font-semibold disabled:opacity-50 transition-colors"
+                  style={{ backgroundColor: C.accent, color: '#fff' }}
+                >
+                  {bulkRunning === ba.label
+                    ? `Running...`
+                    : `${ba.label} (${ba.count})`}
+                </button>
+              ))}
+            </div>
+          )}
+
           <button
             onClick={handleRescan}
             disabled={scanning}
@@ -506,6 +821,7 @@ export default function CoverageOpsPage() {
                     onAction={() => handleAction(issue)}
                     onSuppress={(reason) => handleSuppress(issue.id, reason)}
                     onResolve={() => handleResolve(issue.id)}
+                    onInlineSave={(field, value) => handleInlineSave(issue, field, value)}
                   />
                 ))}
               </div>
@@ -583,6 +899,18 @@ export default function CoverageOpsPage() {
         )}
       </div>
 
+      {/* Merge Modal */}
+      {mergeState && (
+        <MergeModal
+          entityA={mergeState.entityA}
+          entityB={mergeState.entityB}
+          merging={merging}
+          onMerge={handleMerge}
+          onNotDuplicate={handleNotDuplicate}
+          onClose={() => setMergeState(null)}
+        />
+      )}
+
       {/* Toast */}
       {toast && (
         <div
@@ -646,20 +974,68 @@ function IssueRowComponent({
   onAction,
   onSuppress,
   onResolve,
+  onInlineSave,
 }: {
   issue: IssueRow;
   actionState: 'idle' | 'running' | 'done' | 'error';
   onAction: () => void;
   onSuppress: (reason: string) => void;
   onResolve: () => void;
+  onInlineSave: (field: string, value: string) => void;
 }) {
-  const [suppressOpen, setSuppressOpen] = useState(false);
+  const [inlineValue, setInlineValue] = useState('');
+  const [inlineSaving, setInlineSaving] = useState(false);
+  const [showExtra, setShowExtra] = useState(false);
+  const [coverageUrl, setCoverageUrl] = useState('');
+  const [coverageSaving, setCoverageSaving] = useState(false);
+  const [coverageMsg, setCoverageMsg] = useState('');
   const tool = TOOL_ACTIONS[issue.issue_type];
+  const editable = INLINE_EDITABLE[issue.issue_type];
+
+  const handleInlineSubmit = () => {
+    if (!editable || !inlineValue.trim()) return;
+    setInlineSaving(true);
+    onInlineSave(editable.field, inlineValue.trim());
+  };
+
+  const handleAddCoverage = async () => {
+    if (!coverageUrl.trim()) return;
+    setCoverageSaving(true);
+    setCoverageMsg('');
+    try {
+      const res = await fetch(`/api/admin/entities/${issue.entity_id}/coverage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: coverageUrl.trim() }),
+      });
+      if (res.ok) {
+        setCoverageMsg('Added');
+        setCoverageUrl('');
+      } else {
+        const data = await res.json();
+        setCoverageMsg(data.error ?? 'Failed');
+      }
+    } catch {
+      setCoverageMsg('Error');
+    }
+    setCoverageSaving(false);
+  };
 
   return (
+    <div>
     <div
       className="flex items-center gap-3 px-5 py-2.5 hover:bg-[#F5F0E1]/40 transition-colors"
     >
+      {/* Expand toggle */}
+      <button
+        onClick={() => setShowExtra(!showExtra)}
+        className="text-xs shrink-0 w-4 text-center opacity-40 hover:opacity-100"
+        style={{ color: C.muted }}
+        title="Add extra info (coverage links, etc.)"
+      >
+        {showExtra ? '−' : '+'}
+      </button>
+
       {/* Severity */}
       <SeverityPill severity={issue.severity} />
 
@@ -674,6 +1050,16 @@ function IssueRowComponent({
           >
             {issue.entity_name}
           </Link>
+          <a
+            href={`https://www.google.com/search?q=${encodeURIComponent(issue.entity_name + ' Los Angeles')}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs shrink-0 opacity-40 hover:opacity-100 transition-opacity"
+            style={{ color: C.muted }}
+            title={`Google "${issue.entity_name} Los Angeles"`}
+          >
+            search
+          </a>
           {issue.blocking_publish && (
             <span
               className="text-[10px] px-1.5 py-0.5 rounded font-medium shrink-0"
@@ -685,8 +1071,71 @@ function IssueRowComponent({
         </div>
         <div className="text-xs truncate" style={{ color: C.muted }}>
           {ISSUE_TYPE_LABELS[issue.issue_type] ?? issue.issue_type}
+          {issue.issue_type === 'google_says_closed' && issue.detail && (
+            <span className="ml-1 font-semibold" style={{ color: C.red }}>
+              ({(issue.detail as any).googleStatus === 'CLOSED_PERMANENTLY' ? 'Permanently' : 'Temporarily'})
+            </span>
+          )}
+          {issue.issue_type === 'potential_duplicate' && issue.detail && (
+            <span className="ml-1" style={{ color: C.amber }}>
+              — possible duplicate of {(issue.detail as any).duplicate_of_name}
+              {(issue.detail as any).match_reasons && (
+                <span className="ml-1 opacity-70">
+                  [{((issue.detail as any).match_reasons as string[]).join(', ')}]
+                </span>
+              )}
+            </span>
+          )}
         </div>
       </div>
+
+      {/* Inline Edit Field */}
+      {editable && (
+        <div className="flex items-center gap-1 shrink-0">
+          <input
+            type="text"
+            value={inlineValue}
+            onChange={(e) => setInlineValue(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleInlineSubmit()}
+            placeholder={editable.placeholder}
+            disabled={inlineSaving}
+            className="text-xs border rounded px-2 py-1 w-40"
+            style={{ borderColor: C.border, color: C.text, backgroundColor: '#fff' }}
+          />
+          <button
+            onClick={handleInlineSubmit}
+            disabled={!inlineValue.trim() || inlineSaving}
+            className="px-2 py-1 rounded text-xs font-semibold disabled:opacity-30"
+            style={{ backgroundColor: C.greenBg, color: C.green }}
+          >
+            {inlineSaving ? '...' : 'Save'}
+          </button>
+          <button
+            onClick={() => {
+              setInlineSaving(true);
+              onInlineSave(editable.field, 'NONE');
+            }}
+            disabled={inlineSaving}
+            className="px-2 py-1 rounded text-xs font-medium disabled:opacity-30"
+            style={{ backgroundColor: C.bg, color: C.muted, border: `1px solid ${C.border}` }}
+            title={`Confirm this entity has no ${editable.field}`}
+          >
+            None
+          </button>
+        </div>
+      )}
+
+      {/* "Still Open" override for google_says_closed */}
+      {issue.issue_type === 'google_says_closed' && (
+        <button
+          onClick={() => onSuppress('confirmed_open')}
+          className="px-2 py-1 rounded text-xs font-medium shrink-0"
+          style={{ backgroundColor: C.greenBg, color: C.green, border: `1px solid ${C.border}` }}
+          title="Override: this place is actually still open"
+        >
+          Still Open
+        </button>
+      )}
 
       {/* Action Button */}
       <div className="flex items-center gap-2 shrink-0">
@@ -698,7 +1147,7 @@ function IssueRowComponent({
           >
             {tool.label}
           </Link>
-        ) : tool?.invoke ? (
+        ) : (tool?.invoke || issue.issue_type === 'potential_duplicate') ? (
           <button
             onClick={onAction}
             disabled={actionState === 'running' || actionState === 'done'}
@@ -728,53 +1177,219 @@ function IssueRowComponent({
           </button>
         ) : null}
 
-        {/* Resolve */}
+        {/* Suppress */}
         <button
-          onClick={onResolve}
+          onClick={() => onSuppress(SUPPRESS_REASON)}
           className="text-xs hover:underline"
           style={{ color: C.muted }}
-          title="Mark as resolved"
+          title="Hide this issue (not worth fixing right now)"
         >
-          Resolve
+          Skip
         </button>
+      </div>
+    </div>
 
-        {/* Suppress */}
-        <div className="relative">
+    {/* Expandable extra info section */}
+    {showExtra && (
+      <div
+        className="px-5 py-2 ml-7 mb-1 rounded"
+        style={{ backgroundColor: '#FAFAF5', border: `1px solid ${C.border}` }}
+      >
+        <div className="text-xs font-semibold mb-1.5" style={{ color: C.text }}>
+          Add coverage link
+        </div>
+        <div className="flex items-center gap-2">
+          <input
+            type="text"
+            value={coverageUrl}
+            onChange={(e) => setCoverageUrl(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleAddCoverage()}
+            placeholder="https://eater.com/..."
+            disabled={coverageSaving}
+            className="text-xs border rounded px-2 py-1 flex-1"
+            style={{ borderColor: C.border, color: C.text, backgroundColor: '#fff' }}
+          />
           <button
-            onClick={() => setSuppressOpen(!suppressOpen)}
-            className="text-xs hover:underline"
-            style={{ color: C.muted }}
-            title="Suppress this issue"
+            onClick={handleAddCoverage}
+            disabled={!coverageUrl.trim() || coverageSaving}
+            className="px-2 py-1 rounded text-xs font-semibold disabled:opacity-30"
+            style={{ backgroundColor: C.accent, color: '#fff' }}
           >
-            Suppress
+            {coverageSaving ? '...' : 'Add'}
           </button>
-          {suppressOpen && (
-            <>
-              {/* Backdrop to close */}
-              <div
-                className="fixed inset-0 z-40"
-                onClick={() => setSuppressOpen(false)}
-              />
-              <div
-                className="absolute right-0 top-full mt-1 z-50 rounded-lg shadow-md border py-1 min-w-[140px]"
-                style={{ backgroundColor: C.cardBg, borderColor: C.border }}
-              >
-                {SUPPRESS_REASONS.map((r) => (
-                  <button
-                    key={r.value}
-                    onClick={() => {
-                      onSuppress(r.value);
-                      setSuppressOpen(false);
-                    }}
-                    className="block w-full text-left px-3 py-1.5 text-xs hover:bg-[#F5F0E1] transition-colors"
-                    style={{ color: C.text }}
-                  >
-                    {r.label}
-                  </button>
-                ))}
-              </div>
-            </>
+          {coverageMsg && (
+            <span className="text-xs" style={{ color: coverageMsg === 'Added' ? C.green : C.red }}>
+              {coverageMsg}
+            </span>
           )}
+        </div>
+      </div>
+    )}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Merge Modal                                                        */
+/* ------------------------------------------------------------------ */
+
+const COMPARE_FIELDS: { key: keyof CompareEntity; label: string }[] = [
+  { key: 'name', label: 'Name' },
+  { key: 'slug', label: 'Slug' },
+  { key: 'googlePlaceId', label: 'Google Place ID' },
+  { key: 'website', label: 'Website' },
+  { key: 'phone', label: 'Phone' },
+  { key: 'instagram', label: 'Instagram' },
+  { key: 'tiktok', label: 'TikTok' },
+  { key: 'neighborhood', label: 'Neighborhood' },
+  { key: 'address', label: 'Address' },
+  { key: 'latitude', label: 'Latitude' },
+  { key: 'longitude', label: 'Longitude' },
+  { key: 'createdAt', label: 'Created' },
+  { key: 'updatedAt', label: 'Updated' },
+];
+
+function MergeModal({
+  entityA,
+  entityB,
+  merging,
+  onMerge,
+  onNotDuplicate,
+  onClose,
+}: {
+  entityA: CompareEntity;
+  entityB: CompareEntity;
+  merging: boolean;
+  onMerge: (keepId: string, deleteId: string) => void;
+  onNotDuplicate: () => void;
+  onClose: () => void;
+}) {
+  const formatVal = (v: unknown) => {
+    if (v === null || v === undefined) return '--';
+    if (typeof v === 'string' && v.match(/^\d{4}-\d{2}-\d{2}/)) {
+      return new Date(v).toLocaleDateString();
+    }
+    return String(v);
+  };
+
+  const renderSide = (entity: CompareEntity, other: CompareEntity) => (
+    <div
+      className="flex-1 rounded-lg border p-4"
+      style={{ borderColor: C.border, backgroundColor: C.cardBg }}
+    >
+      <h3 className="text-base font-bold mb-1" style={{ color: C.text }}>
+        {entity.name}
+      </h3>
+      <p className="text-xs mb-3" style={{ color: C.muted }}>{entity.slug}</p>
+
+      {/* Counts */}
+      <div className="flex gap-3 mb-4">
+        {[
+          { label: 'Surfaces', val: entity._counts.merchant_surfaces },
+          { label: 'Artifacts', val: entity._counts.merchant_surface_artifacts },
+          { label: 'Issues', val: entity._counts.coverage_issues },
+        ].map((c) => (
+          <div
+            key={c.label}
+            className="text-center rounded px-2 py-1"
+            style={{ backgroundColor: C.bg }}
+          >
+            <div className="text-xs font-bold" style={{ color: C.text }}>{c.val}</div>
+            <div className="text-[10px]" style={{ color: C.muted }}>{c.label}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Fields */}
+      <div className="space-y-1.5">
+        {COMPARE_FIELDS.map(({ key, label }) => {
+          const val = entity[key];
+          const otherVal = other[key];
+          const hasValue = val !== null && val !== undefined;
+          const otherHas = otherVal !== null && otherVal !== undefined;
+          // Highlight if this side has a value the other doesn't
+          const isUnique = hasValue && !otherHas;
+          return (
+            <div key={key} className="flex items-baseline gap-2">
+              <span className="text-[10px] w-24 shrink-0 text-right" style={{ color: C.muted }}>
+                {label}
+              </span>
+              <span
+                className="text-xs truncate"
+                style={{
+                  color: hasValue ? C.text : '#C3B09188',
+                  fontWeight: isUnique ? 600 : 400,
+                  backgroundColor: isUnique ? C.greenBg : 'transparent',
+                  padding: isUnique ? '0 4px' : 0,
+                  borderRadius: 3,
+                }}
+              >
+                {formatVal(val)}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Keep button */}
+      <button
+        onClick={() => onMerge(entity.id, other.id)}
+        disabled={merging}
+        className="mt-4 w-full py-2 rounded text-sm font-semibold disabled:opacity-50 transition-colors"
+        style={{ backgroundColor: C.accent, color: '#fff' }}
+      >
+        {merging ? 'Merging...' : 'Keep this one'}
+      </button>
+    </div>
+  );
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      {/* Backdrop */}
+      <div
+        className="absolute inset-0 bg-black/40"
+        onClick={!merging ? onClose : undefined}
+      />
+
+      {/* Modal */}
+      <div
+        className="relative z-10 rounded-xl shadow-xl p-6 max-w-5xl w-[95vw] mx-4 max-h-[90vh] overflow-y-auto"
+        style={{ backgroundColor: C.bg }}
+      >
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-bold" style={{ color: C.text }}>
+            Duplicate Detected &mdash; Choose Which to Keep
+          </h2>
+          <button
+            onClick={onClose}
+            disabled={merging}
+            className="text-lg px-2 hover:opacity-70"
+            style={{ color: C.muted }}
+          >
+            &times;
+          </button>
+        </div>
+
+        <p className="text-xs mb-4" style={{ color: C.muted }}>
+          The other entity will be merged into the one you keep. All surfaces, artifacts,
+          and issues will be reassigned. Missing fields will be gap-filled from the deleted entity.
+        </p>
+
+        <div className="flex gap-4">
+          {renderSide(entityA, entityB)}
+          {renderSide(entityB, entityA)}
+        </div>
+
+        {/* Not a duplicate */}
+        <div className="mt-4 text-center">
+          <button
+            onClick={onNotDuplicate}
+            disabled={merging}
+            className="px-4 py-2 rounded text-sm font-medium disabled:opacity-50 transition-colors"
+            style={{ backgroundColor: C.bg, color: C.muted, border: `1px solid ${C.border}` }}
+          >
+            Not a duplicate — these are different places
+          </button>
         </div>
       </div>
     </div>

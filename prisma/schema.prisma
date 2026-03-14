@@ -109,6 +109,7 @@ model locations {
   phone              String?
   website            String?
   instagram          String?
+  tiktok             String?
   hours              Json?
   description        String?
   googleTypes        String[]  @default([]) @map("google_types")
@@ -210,6 +211,7 @@ model entities {
   phone                  String?
   website                String?
   instagram              String?
+  tiktok                 String?
   hours                  Json?
   description            String?
   googlePhotos           Json?              @map("google_photos")
@@ -1554,6 +1556,7 @@ model canonical_entity_state {
   phone           String?
   website         String?
   instagram       String?
+  tiktok          String?
   hours_json      Json?    @map("hours_json")
   price_level     Int?     @map("price_level")
   reservation_url String?  @map("reservation_url")

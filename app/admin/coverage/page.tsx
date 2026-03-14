@@ -53,6 +53,7 @@ interface MissingFieldsRow {
   missing_phone: number
   missing_website: number
   missing_instagram: number
+  missing_tiktok: number
   missing_hours: number
   total: number
 }
@@ -210,6 +211,7 @@ async function fetchData() {
         COUNT(CASE WHEN phone IS NULL THEN 1 END)::int AS missing_phone,
         COUNT(CASE WHEN website IS NULL THEN 1 END)::int AS missing_website,
         COUNT(CASE WHEN instagram IS NULL THEN 1 END)::int AS missing_instagram,
+        COUNT(CASE WHEN tiktok IS NULL THEN 1 END)::int AS missing_tiktok,
         COUNT(CASE WHEN hours_json IS NULL THEN 1 END)::int AS missing_hours,
         COUNT(*)::int AS total
       FROM canonical_entity_state
@@ -305,7 +307,10 @@ export default async function AdminCoveragePage() {
     : []
 
   const secondaryFields = mr
-    ? [{ field: 'Instagram', missing: n(mr.missing_instagram) }]
+    ? [
+        { field: 'Instagram', missing: n(mr.missing_instagram) },
+        { field: 'TikTok', missing: n(mr.missing_tiktok) },
+      ]
     : []
 
   const resolutionRate = resolution.active > 0

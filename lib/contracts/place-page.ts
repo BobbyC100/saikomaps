@@ -100,6 +100,7 @@ export type PlacePageLocation = {
   phone: string | null;
   website: string | null;
   instagram: string | null;
+  tiktok: string | null;
 
   // Facts
   hours: unknown | null;
@@ -176,6 +177,7 @@ export const PLACE_PAGE_LOCATION_KEYS: ReadonlyArray<keyof PlacePageLocation> = 
   'phone',
   'website',
   'instagram',
+  'tiktok',
   // Facts
   'hours',
   'priceLevel',

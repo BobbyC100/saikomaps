@@ -33,6 +33,7 @@ interface PrimaryActionSetProps {
     latitude?: number | null;
     longitude?: number | null;
     instagram?: string | null;
+    tiktok?: string | null;
     intentProfile?: string | null;
     intentProfileOverride?: boolean;
     slug?: string;
