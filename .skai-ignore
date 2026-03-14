@@ -1,0 +1,62 @@
+# .skai-ignore
+# Controls what the SKAI sync job excludes from the knowledge snapshot.
+# Syntax mirrors .gitignore — patterns are relative to repo root.
+# The sync job reads this file before copying anything. Matched paths are
+# never written to the knowledge store and are never queryable via SKAI.
+#
+# To add a file or directory: add its path or pattern below.
+# To make something queryable again: remove or comment out the line.
+# This file should be committed to the repo and treated as a governance doc.
+#
+# Last reviewed: 2026-03-14
+
+# ── Credentials and environment ──────────────────────────────────────────────
+.env
+.env.*
+**/.env
+**/.env.*
+.claude/
+
+# ── Dependencies and build artifacts ─────────────────────────────────────────
+node_modules/
+.next/
+public/
+patches/
+tmp/
+tsconfig.tsbuildinfo
+next-env.d.ts
+eslint.config.mjs
+postcss.config.mjs
+package-lock.json
+
+# ── Database artifacts ────────────────────────────────────────────────────────
+prisma/migrations/
+prisma/baseline.sql
+prisma/dev.db
+
+# ── Data directory ────────────────────────────────────────────────────────────
+data/
+
+# ── Scripts ───────────────────────────────────────────────────────────────────
+scripts/*
+# !scripts/coverage-run.ts
+# !scripts/docs-registry.ts
+# !scripts/era-pipeline.ts
+
+# ── App and UI layer ─────────────────────────────────────────────────────────
+app/
+components/
+
+# ── Tests ─────────────────────────────────────────────────────────────────────
+tests/
+
+# ── lib/ — selective inclusion ────────────────────────────────────────────────
+lib/*
+!lib/signals/
+!lib/scenesense/
+!lib/fields-v2/
+!lib/voice-engine/
+!lib/voice-engine-v2/
+!lib/saikoai/
+!lib/energy-tag-engine/
+!lib/types/
