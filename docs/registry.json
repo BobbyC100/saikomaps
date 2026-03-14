@@ -1,7 +1,62 @@
 {
-  "generated": "2026-03-14T20:46:37.161Z",
-  "doc_count": 47,
+  "generated": "2026-03-14T21:00:01.675Z",
+  "doc_count": 55,
   "docs": [
+    {
+      "doc_id": "AI-OPS-GETTING-STARTED",
+      "doc_type": "guide",
+      "status": "active",
+      "title": "Entity Resolution System - Complete Implementation",
+      "path": "ai-operations/GETTING_STARTED.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-09",
+      "last_updated": "2026-03-09",
+      "project_id": "SAIKO",
+      "summary": "Getting started guide for the Entity Resolution System — MDM setup, review queue, CSV ingestion, and resolver pipeline quickstart.",
+      "systems": [
+        "entity-resolution",
+        "identity"
+      ],
+      "related_docs": [
+        "docs/MIGRATION_GUIDE.md",
+        "docs/architecture/identity-scoring-v1.md"
+      ]
+    },
+    {
+      "doc_id": "AI-OPS-REPO-STATE",
+      "doc_type": "reference",
+      "status": "active",
+      "title": "Repo State",
+      "path": "ai-operations/state/repo_state.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-09",
+      "last_updated": "2026-03-09",
+      "project_id": "SAIKO",
+      "summary": "Auto-generated repo state snapshot — branch, commit, and PR status for AI agent boot context.",
+      "systems": [
+        "ai-operations"
+      ],
+      "related_docs": []
+    },
+    {
+      "doc_id": "AI-OPS-SYSTEM-CONTRACT",
+      "doc_type": "architecture",
+      "status": "active",
+      "title": "Saiko System Context",
+      "path": "ai-operations/system_contract.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-09",
+      "last_updated": "2026-03-09",
+      "project_id": "SAIKO",
+      "summary": "Canonical system context — organizational layers (SPORT/Fields/Traces), agent roles, engineering principles, and source-of-truth definitions.",
+      "systems": [
+        "platform",
+        "ai-operations"
+      ],
+      "related_docs": [
+        "docs/architecture/system_contract.md"
+      ]
+    },
     {
       "doc_id": "ARCH-AI-OPERATING-LAYER",
       "doc_type": "architecture",
@@ -123,6 +178,44 @@
       "summary": "",
       "systems": [],
       "related_docs": []
+    },
+    {
+      "doc_id": "LIB-SIGNALS-RERUN-GUARD",
+      "doc_type": "policy",
+      "status": "active",
+      "title": "Menu & Winelist Signals — Rerun Guard + Data Integrity Policy (v1)",
+      "path": "lib/signals/RERUN_GUARD_AND_DATA_INTEGRITY.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-02-15",
+      "last_updated": "2026-02-15",
+      "project_id": "SAIKO",
+      "summary": "Data integrity policy for menu & winelist signal extraction — freshness rules, preflight quality gates, cost protection, and rerun safety invariants.",
+      "systems": [
+        "signals",
+        "data-pipeline"
+      ],
+      "related_docs": [
+        "lib/signals/VERIFICATION.md"
+      ]
+    },
+    {
+      "doc_id": "LIB-SIGNALS-VERIFICATION",
+      "doc_type": "checklist",
+      "status": "active",
+      "title": "Menu & Winelist Signal Extraction — Verification Checklist",
+      "path": "lib/signals/VERIFICATION.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-02-15",
+      "last_updated": "2026-02-15",
+      "project_id": "SAIKO",
+      "summary": "Verification checklist for menu & winelist signal extraction — fresh-skip correctness, staleness triggers, DB integrity, and API hygiene tests.",
+      "systems": [
+        "signals",
+        "data-pipeline"
+      ],
+      "related_docs": [
+        "lib/signals/RERUN_GUARD_AND_DATA_INTEGRITY.md"
+      ]
     },
     {
       "doc_id": "OPS-STALE-DEPLOYMENTS",
@@ -394,6 +487,47 @@
         "data-pipeline"
       ],
       "related_docs": []
+    },
+    {
+      "doc_id": "SAIKO-PLACE-IDENTITY-CODEBASE-AUDIT-2026-03-14",
+      "doc_type": "reference",
+      "status": "active",
+      "title": "Place Identity Codebase Audit",
+      "path": "docs/PLACE_IDENTITY_CODEBASE_AUDIT_2026-03-14.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-14",
+      "last_updated": "2026-03-14",
+      "project_id": "SAIKO",
+      "summary": "Implementation truth-check audit of the place identity system — schema, API routes, and scripts as they exist in the current codebase.",
+      "systems": [
+        "identity",
+        "entities",
+        "fields-v2"
+      ],
+      "related_docs": [
+        "docs/PLACE_IDENTITY_SYSTEM_FEATURE_OVERVIEW.md",
+        "docs/architecture/identity-scoring-v1.md"
+      ]
+    },
+    {
+      "doc_id": "SAIKO-PLACE-IDENTITY-SYSTEM-OVERVIEW",
+      "doc_type": "overview",
+      "status": "active",
+      "title": "Saiko — Place Identity System",
+      "path": "docs/PLACE_IDENTITY_SYSTEM_FEATURE_OVERVIEW.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-14",
+      "last_updated": "2026-03-14",
+      "project_id": "SAIKO",
+      "summary": "Conceptual overview of the Place Identity System — how Saiko resolves incoming signals from multiple sources into stable canonical entity records.",
+      "systems": [
+        "identity",
+        "entities"
+      ],
+      "related_docs": [
+        "docs/architecture/identity-scoring-v1.md",
+        "docs/PLACE_IDENTITY_CODEBASE_AUDIT_2026-03-14.md"
+      ]
     },
     {
       "doc_id": "SAIKO-PLATFORM-DATA-LAYER",
@@ -741,6 +875,30 @@
       "summary": "",
       "systems": [],
       "related_docs": []
+    },
+    {
+      "doc_id": "UI-SOCIAL-IDENTITY-DESIGN-V1",
+      "doc_type": "design",
+      "status": "draft",
+      "title": "Place Page — Social Identity & Signals Design",
+      "path": "docs/ui/place-page/social-identity-design-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-14",
+      "last_updated": "2026-03-14",
+      "project_id": "TRACES",
+      "summary": "Design specification for surfacing unified social signals (Instagram, TikTok, YouTube) on the place page — identity block integration, social proof surfaces, and editorial rendering via the Voice Layer.",
+      "systems": [
+        "place-page",
+        "social-signals",
+        "voice-engine"
+      ],
+      "related_docs": [
+        "docs/architecture/unified-social-signals-v1.md",
+        "docs/architecture/social-fields-spec-v1.md",
+        "docs/voice/saiko-voice-layer.md",
+        "docs/ui/place-page/patch-log.md",
+        "docs/scenesense/display-contract-v1.md"
+      ]
     },
     {
       "doc_id": "VOICE-SAIKO-VOICE-LAYER",
