@@ -4,7 +4,7 @@ doc_type: architecture
 status: active
 owner: Bobby Ciccaglione
 created: '2026-03-10'
-last_updated: '2026-03-10'
+last_updated: '2026-03-14'
 project_id: SAIKO
 summary: ''
 ---
@@ -27,6 +27,17 @@ Blocks earn their space. If a tier has no data, it collapses cleanly and silentl
 ---
 
 ## Tier Structure
+
+### Tier Namespace Clarification
+
+This document defines merchant profile **UI rendering tiers** (Tier 0-5) for `/place/[slug]` and related surfaces.
+
+These tiers are not the same as Coverage Operations tiers. Coverage architecture uses:
+- Tier 1 — Identity & Classification
+- Tier 2 — Visit Facts
+- Tier 3 — Experience / Interpretation
+
+See `docs/architecture/coverage-tiers-v1.md` for the coverage-tier model used by scanners and Coverage Ops.
 
 ### Tier 0 — Identity + Action
 

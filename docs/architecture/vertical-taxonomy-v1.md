@@ -4,7 +4,7 @@ doc_type: architecture
 status: active
 owner: Bobby Ciccaglione
 created: 2026-03-12
-last_updated: 2026-03-12
+last_updated: 2026-03-14
 project_id: SAIKO
 systems:
   - fields-data-layer
@@ -163,6 +163,26 @@ There are two parallel types in the codebase:
 - **`SaikoCategory`** — 11–12 lowercase string literals; used at read time and in display contracts
 
 They cover the same domain. When modifying the taxonomy, both must be updated together.
+
+---
+
+## 5.1 Classification Layers (Current Schema)
+
+Saiko currently uses four related classification fields, each with a different job:
+
+| Field | Layer role | Typical values | Operational use |
+|-------|------------|----------------|-----------------|
+| `entities.entityType` (`entity_type`) | Structural entity kind | `venue`, `activity`, `public` | Coarse entity shape and generic API behavior |
+| `entities.primary_vertical` | Primary domain classifier | `EAT`, `COFFEE`, `WINE`, `DRINKS`, `STAY`, ... | Routing, enrichment policy, scanner gating, reporting |
+| `entities.category` | Human-readable/category fallback | `restaurant`, `wine bar`, `hotel`, ... | Display fallback and legacy compatibility |
+| `entities.cuisineType` (`cuisine_type`) | Cuisine-specific subtype | `Mexican`, `Italian`, ... | Food identity/detail layer |
+
+Practical rule of thumb:
+- Use `entityType` when you need broad structural class.
+- Use `primary_vertical` for operational logic and applicability decisions.
+- Use `category` / `cuisine_type` for descriptive identity and presentation detail.
+
+This layered model is the reason Coverage Ops Tier 2 gating now uses `primary_vertical` rather than `entityType`.
 
 ---
 

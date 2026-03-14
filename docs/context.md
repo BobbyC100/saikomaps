@@ -1,8 +1,8 @@
 # Saiko — Context Snapshot
 
-> Generated: 2026-03-12T18:08:20.607Z
-> Source: docs/registry.json (2026-03-12T18:08:20.327Z)
-> Documents: 50 included / 51 total
+> Generated: 2026-03-14T20:10:52.730Z
+> Source: docs/registry.json (2026-03-14T20:10:52.501Z)
+> Documents: 66 included / 69 total
 > Filters: status=active
 
 ---
@@ -16,9 +16,11 @@ To regenerate: `npm run docs:context`
 - [FIELDS-ENTITY-AWARENESS-STAGE-V1](#fields-entity-awareness-stage-v1) — Awareness Stage — Workbench: Defines the Awareness stage — Saiko's pre-identity, pre-enrichment intake layer. Covers source abstraction, organization responsibilities, readiness signals, and the workbench model.
 - [FIELDS-ENTITY-PIPELINE-OVERVIEW-V1](#fields-entity-pipeline-overview-v1) — Entity Pipeline — Overview: High-level model of the stages through which an entity moves inside Saiko — from first contact (Awareness) through Identification to Enrichment. Mental model only; does not prescribe UI, schema, or workflow.
 - [PIPE-CAPTURE-PROFILES-V1](#pipe-capture-profiles-v1) — (untitled): Defines capture profiles for each source type — what to attempt when a source is touched, and what can be promoted to Facts-tier vs stored as raw material.
+- [FIELDS-ENRICHMENT-OPS-INVENTORY-V1](#fields-enrichment-ops-inventory-v1) — Enrichment Operations Inventory: Canonical inventory of all enrichment operations available on an entity record — automated (Google Places, neighborhood lookup), semi-automated (GPID, Instagram, Photos), and human-only (editorial fields). Coverage Dashboard and Entity Profile are designed from this inventory outward.
 **KNOWLEDGE-SYSTEM**
 - [SKAI/DECISION-INDEX-SPEC-V1](#skai-decision-index-spec-v1) — Decision Index v1
 - [SYS-BOOT-CONTEXT-INVENTORY](#sys-boot-context-inventory) — Boot Context Inventory
+- [SYS-COVERAGE-DASHBOARD-DESIGN-V1](#sys-coverage-dashboard-design-v1) — Coverage Dashboard — Design Principles: Design principles for the Coverage Dashboard — work surface, not report; smart counts; group by solution; automation first
 - [SYS-DRAFT-TRIGGER-V1](#sys-draft-trigger-v1) — Draft Trigger v1: Defines when reusable knowledge must become a controlled draft.
 - [SYS-PROMOTION-FLOW-V1](#sys-promotion-flow-v1) — Promotion Flow v1: Defines the controlled path from approved draft to canonical document.
 - [SKAI/RESEARCH-AI-KNOWLEDGE-ARCHITECTURE-V1](#skai-research-ai-knowledge-architecture-v1) — AI-Native Knowledge & Data Architecture Patterns (2023–2026)
@@ -27,8 +29,17 @@ To regenerate: `npm run docs:context`
 - [SKAI-DOC-TRACES-PLACE-PAGE-DESIGN-001](#skai-doc-traces-place-page-design-001) — Place Page Design v1: Canonical design spec for the Saiko place profile page — wireframe, data sources, content model, and rendering rules.
 **SAIKO**
 - [ARCH-AI-OPERATING-LAYER](#arch-ai-operating-layer) — AI OPERATING LAYER
+- [ARCH-COVERAGE-TIERS-V1](#arch-coverage-tiers-v1) — Coverage Tiers — Entity Enrichment Model: Defines the coverage tier model for entity enrichment. Six tiers from raw identity through experiential interpretation, with enrichment strategy (merchant surfaces first, editorial sources second, human third), entity-type signal requirements, and scanner integration points.
+- [ARCH-ENTITY-CLASSIFICATION-LAYERS-V1](#arch-entity-classification-layers-v1) — Entity Classification Layers: Plain-language explanation of entity classification layers in the current schema — entityType vs primary_vertical vs category vs cuisine_type — including operational authority and usage guidance.
+- [ARCH-IDENTITY-SCORING-V1](#arch-identity-scoring-v1) — Identity Scoring — Weighted Anchor Model: Weighted anchor scoring model for entity identity confidence. GPID is not required — entities reach publication threshold through any combination of anchors that demonstrates sufficient identity certainty.
+- [ARCH-SOCIAL-FIELDS-V1](#arch-social-fields-v1) — Social Fields — Entity-Level Specification: Specification for social media handle fields on entities (Instagram, TikTok). Covers storage format, discovery, validation, identity weight, and the sentinel value convention for confirmed-none.
 - [ARCH-SYSTEM-CONTRACT](#arch-system-contract) — SYSTEM CONTRACT
+- [ARCHITECTURE-INSTAGRAM-API-INTEGRATION-V1](#architecture-instagram-api-integration-v1) — Instagram API Integration — Current State: Instagram Graph API integration state — Meta app config, permissions, verified endpoints, architectural models for media ingestion
+- [ARCHITECTURE-INSTAGRAM-IMPLEMENTATION-V1](#architecture-instagram-implementation-v1) — Instagram Integration — Implementation & Impact Doc: Instagram integration implementation plan and system impact — tables, sync rules, temporal signals, interpretation layer, photo strategy, attachment model. V0.2 adds current state assessment, implementation phases, and data review results.
+- [COVOPS-APPROACH-V1](#covops-approach-v1) — Coverage Operations — Architectural Position: Architectural position for Coverage Operations — introduces entity_issues as a unified operational layer over existing queue fragments, with tool readiness assessment and phased implementation plan.
 - [FIELDS-ERA-OVERVIEW-V1](#fields-era-overview-v1) — Entity Record Awareness (ERA) — One-Pager: Defines Entity Record Awareness (ERA) — how Saiko becomes aware a place exists, separating awareness from canonical (Golden) status to prevent silent drift.
+- [FIELDS-VERTICAL-TAXONOMY-V1](#fields-vertical-taxonomy-v1) — Saiko Vertical Taxonomy: Defines Saiko's 12-vertical taxonomy — the primary domains of urban life used to classify every place in the system. Documents anthropological rationale, system role, technical anchors, and design implications.
+- [SAIKO-COVERAGE-DASHBOARD-DESIGN-V1](#saiko-coverage-dashboard-design-v1) — Coverage Dashboard — Design Principles: Design principles for the Coverage Dashboard — a work surface for resolving data gaps, organized by solution type (automated vs. semi-automated vs. human-only) rather than by missing field.
 - [SAIKO-DEFERRED-MIGRATION-GATES](#saiko-deferred-migration-gates) — Deferred Migration Gates: Gate conditions that must be satisfied before applying the two deferred Fields v2 migrations — slim entities and legacy table drop.
 - [SAIKO-ENTITIES-CONTRACT-RECONCILIATION](#saiko-entities-contract-reconciliation) — Entities Contract Reconciliation: Field-level audit and decision log for the entities table — what belongs, what migrates, and what is retired as part of the Fields v2 architecture.
 - [SAIKO-FIELDS-V2-TARGET-ARCHITECTURE](#saiko-fields-v2-target-architecture) — Saiko Fields v2 — Target Architecture Spec: Defines the four-layer Fields v2 architecture — entities routing shell, canonical_entity_state, interpretation_cache, and place_coverage_status — with anti-drift rules and current migration status.
@@ -37,9 +48,12 @@ To regenerate: `npm run docs:context`
 - [SAIKO-PROVENANCE-SYSTEM](#saiko-provenance-system) — Saiko Maps - Provenance System
 - [SAIKO-RESOLVER-AND-PLACES-DATA-FLOW](#saiko-resolver-and-places-data-flow) — Resolver pipeline and golden_records → places data flow
 - [FEAT-MARKETS-SPEC-V1-2](#feat-markets-spec-v1-2) — Markets Integration — SPEC v1.2
+- [PIPE-INSTAGRAM-WORKSTREAM-V1](#pipe-instagram-workstream-v1) — Instagram Integration — Workstream & Execution Plan: Phased execution plan for Instagram integration — 6 phases from data quality through contextual display. Includes codebase readiness assessment, effort estimates, timing recommendations, and per-phase task checklists.
 - [SAIKO-ENERGY-SCORE-SPEC](#saiko-energy-score-spec) — Energy Score — Specification (Locked)
+- [SAIKO-ENTITY-PROFILE-SPEC-V1](#saiko-entity-profile-spec-v1) — Entity Profile Page — Spec: Spec for /admin/entity/[id] — the canonical single-entity admin view showing all field states with inline resolution actions and a TimeFOLD editorial slot.
 - [SAIKO-FIELDS-V2-CUTOVER-SPEC](#saiko-fields-v2-cutover-spec) — Fields v2 — Cutover Spec
 - [SAIKO-FORMALITY-SCORE-SPEC](#saiko-formality-score-spec) — Formality Score — Specification (Locked)
+- [SYS-COVERAGE-OPS-ISSUE-CONTRACT-V1](#sys-coverage-ops-issue-contract-v1) — Coverage Ops Issue Contract (v1): Canonical issue contract for Coverage Ops v1 — issue types, severity, gating, and UI action mappings.
 - [SAIKO-DATA-PIPELINE-QUICK-START](#saiko-data-pipeline-quick-start) — Data Pipeline Quick Reference
 - [SAIKO-DATABASE-SCHEMA](#saiko-database-schema) — Saiko Maps - Database Schema
 - [SAIKO-DATABASE-SETUP](#saiko-database-setup) — Database Setup for Saiko Maps
@@ -55,9 +69,11 @@ To regenerate: `npm run docs:context`
 - [SAIKO-PROD-PLACE-FIX-RUNBOOK](#saiko-prod-place-fix-runbook) — Production Place Page Fix - Runbook
 - [SAIKO-MIGRATION-GUIDE](#saiko-migration-guide) — Migration Guide: Places → Golden Records
 - [SAIKO-MIGRATION-HISTORY-RECONCILIATION](#saiko-migration-history-reconciliation) — Migration History Reconciliation Analysis
+- [SAIKO-ADMIN-SPRING-CLEANING-2026-03](#saiko-admin-spring-cleaning-2026-03) — Admin Spring Cleaning Log — March 2026: Record of admin routes and features retired or fixed in March 2026 — Review Queue, Energy Engine, Appearances auth, GPID Queue URL. Captures rationale for each retirement.
 - [SAIKO-SAIKOAI-EXTRACTION-PROMPT-V2-1](#saiko-saikoai-extraction-prompt-v2-1) — SaikoAI Extraction Prompt — V2.1
 - [SAIKO-APP-OVERVIEW](#saiko-app-overview) — Saiko Maps - Application Overview
 - [SAIKO-README](#saiko-readme) — Saiko Maps
+- [OS-BEVERAGE-PROGRAM-VOCAB-V1](#os-beverage-program-vocab-v1) — Beverage Program + Signal Vocabulary (v1): Canonical beverage program model and signal vocabulary for derived offering enrichment. Defines 5 program containers, maturity scale, and locked signal sets for wine, beer, cocktail, non-alcoholic, and coffee/tea programs.
 **TRACES**
 - [OS-OFFERING-SIGNALS-V1](#os-offering-signals-v1) — Offering Signals v1
 - [SS-DISPLAY-CONTRACT-V2](#ss-display-contract-v2) — SceneSense Display Contract v2: Display contract for the revised SceneSense three-lens model (Atmosphere / Energy / Scene). Supersedes SS-DISPLAY-CONTRACT-V1.
@@ -431,6 +447,76 @@ Changes to source-specific checklists or promotion rules require:
 
 ---
 
+## FIELDS-ENRICHMENT-OPS-INVENTORY-V1
+
+| Field | Value |
+|-------|-------|
+| **Type** | reference |
+| **Status** | active |
+| **Project** | FIELDS |
+| **Path** | `docs/ENRICHMENT-OPERATIONS-INVENTORY.md` |
+| **Last Updated** | Thu Mar 12 2026 17:00:00 GMT-0700 (Pacific Daylight Time) |
+| **Summary** | Canonical inventory of all enrichment operations available on an entity record — automated (Google Places, neighborhood lookup), semi-automated (GPID, Instagram, Photos), and human-only (editorial fields). Coverage Dashboard and Entity Profile are designed from this inventory outward. |
+| **Systems** | fields-data-layer, data-pipeline, admin |
+
+# Enrichment Operations Inventory
+
+## Purpose
+This document defines the canonical set of operations the system can perform on an entity record. The Coverage Dashboard and Entity Profile page are designed from this inventory outward — not from missing fields inward.
+
+## Automated Operations (system does it, no human required)
+
+Google Places Enrichment
+- Requires: google_place_id
+- Fills: address, latitude, longitude, neighborhood, phone, hours, website
+- How to trigger: enrichment script via admin UI button or CLI
+- Notes: single run resolves majority of missing-field problems for records with GPID
+
+Neighborhood Reverse Lookup
+- Requires: latitude + longitude
+- Fills: neighborhood
+- Notes: subset of Google Places enrichment, can run independently if coords exist
+
+## Semi-Automated (system proposes, human confirms)
+
+GPID Matching
+- System finds Google Place candidate for an entity
+- Human approves or rejects the match
+- Tool: /admin/gpid-queue
+
+Instagram Handle Finder
+- AI-assisted lookup based on place name and location
+- Human confirms before saving
+- Tool: /admin/instagram
+
+Photo Fetch and Eval
+- System pulls available Google photos for the entity
+- Human tags and approves by tier (Default vs Editorial)
+- Tool: /admin/photo-eval
+
+## Human Only
+
+Editorial fields:
+- description
+- TimeFOLD Foreground signal (tagline)
+- Any subjective classification
+
+Manual field entry:
+- Any field the system cannot find (no GPID, no coords, no discoverable web presence)
+
+## Key principle
+Always run automated operations first. Human work is reserved for what the system genuinely cannot resolve. Before surfacing a problem to a human, check whether an automated operation could resolve it given the data already on the record.
+
+## Derivability rules (as of March 2026)
+- Has GPID → can auto-fill address, coords, neighborhood, phone, hours, website
+- Has coords but no neighborhood → can reverse lookup neighborhood
+- Has no GPID and no coords → needs human to resolve GPID first, then enrich
+- Missing Instagram → semi-automated finder, human confirms
+- Missing description → human only
+- Missing TimeFOLD signal → human only, after factual fields are complete
+
+---
+
 ## SKAI/DECISION-INDEX-SPEC-V1
 
 | Field | Value |
@@ -796,6 +882,63 @@ the highest-priority candidates for inclusion in the boot context packet:
 - `ai-operations/sessions/*.json` (historical, beyond the latest)
 - `data/` directory
 - `ai-operations/GETTING_STARTED.md`
+
+---
+
+## SYS-COVERAGE-DASHBOARD-DESIGN-V1
+
+| Field | Value |
+|-------|-------|
+| **Type** | system |
+| **Status** | active |
+| **Project** | KNOWLEDGE-SYSTEM |
+| **Path** | `docs/system/coverage-dashboard-design-v1.md` |
+| **Last Updated** | 2026-03-13 |
+| **Summary** | Design principles for the Coverage Dashboard — work surface, not report; smart counts; group by solution; automation first |
+
+# Coverage Dashboard — Design Principles
+
+## Purpose
+
+The Coverage Dashboard is a work surface, not a diagnostic report. Someone arrives here to fix problems and leave with fewer of them.
+
+## The Core Rule
+
+Every number shown must either confirm things are healthy or tell you what kind of action is needed. If a number doesn't imply an action, it doesn't belong on the page.
+
+## Dumb count vs. smart count
+
+- **Dumb:** "42 records missing opening hours"
+- **Smart:** "31 can be auto-filled via Stage 1 enrichment — 11 still need human review"
+
+The difference: a smart count tells you who does the work — the system or you.
+
+## Problem grouping principle
+
+Group problems by solution, not by field. The universe of solutions is constrained to the tools that exist. Design Coverage from the tools outward, not from the missing fields inward.
+
+## Automation first
+
+Automated operations run before any human review. Human work is reserved for what the system genuinely cannot resolve. The page should make it obvious which bucket each problem falls into.
+
+## Operations inventory (as of March 2026)
+
+### Automated
+- **Google Places enrichment** — given a GPID, fetches address, coords, neighborhood, phone, hours, website
+- **Neighborhood reverse lookup** — given coords, derives neighborhood
+
+### Semi-automated (system proposes, human confirms)
+- **GPID matching** — system finds candidate, human approves
+- **Instagram handle finder** — AI-assisted, human confirms
+- **Photo fetch and eval** — system pulls Google photos, human tags
+
+### Human only
+- **Editorial fields** — description, TimeFOLD signal
+- **Manual field entry** — anything system cannot find
+
+## Key insight (March 2026)
+
+If a record has a GPID, operating facts are often machine-recoverable. Missing hours, price level, or business status are frequently automation problems first, not human problems first. Always check what the system can fix before surfacing a problem to a human.
 
 ---
 
@@ -1929,6 +2072,642 @@ ACTIVE
 
 ---
 
+## ARCH-COVERAGE-TIERS-V1
+
+| Field | Value |
+|-------|-------|
+| **Type** | architecture |
+| **Status** | active |
+| **Project** | SAIKO |
+| **Path** | `docs/architecture/coverage-tiers-v1.md` |
+| **Last Updated** | 2026-03-14 |
+| **Summary** | Defines the coverage tier model for entity enrichment. Six tiers from raw identity through experiential interpretation, with enrichment strategy (merchant surfaces first, editorial sources second, human third), entity-type signal requirements, and scanner integration points. |
+| **Systems** | coverage-operations, offering-signals, fields-data-layer, data-pipeline |
+
+# Coverage Tiers — Entity Enrichment Model
+
+---
+
+## Purpose
+
+This document defines what "complete coverage" means for an entity in Saiko, how to measure it, and in what order to pursue it.
+
+Coverage is not binary. An entity progresses through tiers of enrichment depth. Each tier adds a layer of understanding — from "this place exists" to "here's what it feels like to be there."
+
+---
+
+## Enrichment Strategy
+
+The enrichment priority order is fixed:
+
+### 1. Merchant-owned surfaces first (the 80% source)
+
+If an entity has a website, we scan it for everything: hours, menu, reservation links, social handles, descriptions, team info, philosophy, beverage programs, service model. Same with Instagram and TikTok — we grab everything useful.
+
+This is the merchant speaking in their own words. It is the highest-fidelity, most authentic source of identity and offering signals.
+
+Merchant-owned surfaces include:
+- **Website** — homepage, about, menu, drinks, contact, press pages
+- **Instagram** — bio, captions, posting frequency, visual identity
+- **TikTok** — bio, content themes, audience engagement
+- **Google Places** — hours, phone, address, photos, attributes, business status
+
+If we've thoroughly defined our signal expectations at an entity-type level, merchant surfaces should yield 80% of what we need.
+
+### 2. Approved editorial sources second
+
+Auto-search approved publications for media coverage of the entity. This fills in what the merchant doesn't say about themselves: critical reception, awards, press mentions, pull quotes.
+
+Approved sources include:
+- Eater LA
+- LA Times Food
+- The Infatuation
+- Michelin Guide
+- Bon Appetit
+- Timeout
+
+Editorial coverage provides:
+- Pull quotes and critical voice
+- Awards and recognition signals
+- Cultural positioning
+- Trend and moment context
+
+### 3. Human fills the gaps
+
+The remaining 10-20% that can't be automated:
+- Confirming "none" for fields that don't apply (taco cart with no website)
+- Adding coverage links from niche or non-indexed sources
+- Resolving ambiguous duplicates
+- Correcting misattributed data
+- Adding curator notes and contextual connections
+
+---
+
+## The Six Tiers
+
+### Tier 1 — Identity & Location
+
+**What it answers:** "Can this entity exist on a map?"
+
+| Signal | Source | Required? |
+|--------|--------|-----------|
+| Name | Intake | Yes |
+| Category | Google Places / manual | Yes |
+| Coordinates (lat/lng) | Google Places / manual | Yes (blocking) |
+| Address | Google Places | Yes |
+| Neighborhood | Derived from coords | Yes |
+| Cuisine type | Website / editorial / Google Places | Yes (restaurants) |
+| Google Place ID | Google Places API | No (see identity scoring) |
+| Phone | Google Places / website | No |
+| Website | Discovery / manual | No |
+| Instagram | Discovery / website | No |
+| TikTok | Discovery / website | No |
+
+**Scanner issue types:** `unresolved_identity`, `missing_coords`, `missing_neighborhood`, `missing_phone`, `missing_website`, `missing_instagram`, `missing_tiktok`, `missing_classification`, `potential_duplicate`
+
+**Resolution tools:** Google Places lookup, social discovery, GPID resolver, neighborhood derivation
+
+**Key principle:** GPID is not required for identity. Weighted anchor scoring determines identity completeness. Taco carts and mobile vendors can reach publication threshold without a Google Places listing. See `docs/architecture/identity-scoring-v1.md`.
+
+**Status:** Fully implemented in Coverage Ops.
+
+---
+
+### Tier 2 — Visit Decision Facts
+
+**What it answers:** "Should I go, and what should I expect when I arrive?"
+
+| Signal | Source | Entity types |
+|--------|--------|-------------|
+| Hours | Google Places / website | All with fixed location |
+| Price level | Google Places / menu | Restaurants, bars, cafes |
+| Business status (open/closed) | Google Places / manual | All |
+| Reservation URL | Website scan | Restaurants with reservations |
+| Menu URL | Website scan | Restaurants, bars, cafes |
+
+**Scanner issue types (planned):** `missing_hours`, `missing_price_level`, `missing_menu_link`, `missing_reservations`, `operating_status_unknown`, `google_says_closed`
+
+**Resolution tools:** Stage 1 (Google Places backfill), website enrichment (Stage 6)
+
+**Key principle:** Classification (category/cuisine) belongs to Tier 1 identity. Tier 2 assumes identity is already coherent, then answers visitability and arrival expectations (status, hours, price, reservation/menu affordances).
+
+Operating status (temp/perm closed) should be auto-detected from Google Places `businessStatus` field AND manually overridable from Coverage Ops.
+
+**Status:** Partially implemented. `google_says_closed` exists in Coverage Ops today; Tier 2 v1 adds scanner/UI coverage for missing hours, price level, menu links, reservation links, and operating status unknown.
+
+---
+
+### Tier 3 — Surface Evidence
+
+**What it answers:** "Do we have raw source material to work with?"
+
+| Signal | Source | Purpose |
+|--------|--------|---------|
+| Homepage captured | Website crawl | Foundation for all website-derived signals |
+| Menu page captured | Website crawl | Food and beverage signal extraction |
+| About page captured | Website crawl | Identity, team, philosophy extraction |
+| Instagram profile captured | IG API | Merchant voice, temporal signals |
+| TikTok profile captured | TikTok discovery | Merchant voice, content themes |
+| Social links extracted | Website scan | Cross-reference social handles |
+| Reservation provider detected | Website scan | Resy, OpenTable, Tock, SevenRooms |
+| Ordering provider detected | Website scan | Toast, ChowNow, Square, DoorDash |
+
+Storage: `merchant_surfaces` (immutable evidence), `merchant_surface_artifacts` (parsed outputs), `merchant_signals` (best-effort synthesis)
+
+**Scanner issue types (planned):** `no_surfaces`, `surfaces_stale`, `surfaces_unparsed`
+
+**Resolution tools:** ERA Stage 2 (surface discovery), Stage 3 (surface fetch), Stage 4 (surface parse)
+
+**Key principle:** Surfaces are immutable evidence records. Never update — always append new rows. This preserves the audit trail and enables re-extraction when prompts improve.
+
+**Status:** ERA pipeline handles this for entities with websites. Scanner does not yet flag surface-level issues.
+
+---
+
+### Tier 4 — Offering Signals
+
+**What it answers:** "What does this place serve and how?"
+
+Three-layer model (see `docs/offering-signals/offering-signals-v1.md`):
+
+**Food Signals:**
+- `cuisine_posture` — broad culinary identity
+- `menu_format` — tasting menu, a la carte, counter
+- `cooking_method` — wood-fired, raw bar, live-fire
+- `dish_focus` — pasta, seafood, charcuterie
+- `ingredient_focus` — seasonal produce, dry-aged beef
+- `meal_focus` — dinner-only, all-day, brunch
+
+**Beverage Signals** (see `docs/offering-signals/beverage-program-vocab-v1.md`):
+- 5 program containers: `wine_program`, `beer_program`, `cocktail_program`, `non_alcoholic_program`, `coffee_tea_program`
+- Each with maturity scale: `none` / `incidental` / `considered` / `dedicated` / `unknown`
+- 25+ locked signal vocabulary items across all programs
+
+**Service Signals:**
+- `reservation_model` — required, recommended, not taken
+- `walk_in_policy` — counter walk-in, bar only
+- `seating_format` — counter, communal, table service
+- `sharing_style` — sharing-forward, individual plates
+- `pacing_style` — courses-driven, guest-controlled
+
+**Priority tiers within offering signals:**
+- **Tier 1 (Identity):** cuisine_posture, wine_program_intent, reservation_model — extracted first, required before lower tiers
+- **Tier 2 (Distinctive):** wine_region_focus, cooking_method, cocktail_program — differentiates within category
+- **Tier 3 (Detail):** ingredient_focus, pacing_style, sharing_style — rendered only in expanded contexts
+
+**Stop-Early Rule:** If one Tier 1 signal at confidence >= 0.7 and one or two Tier 2 signals at confidence >= 0.6, stop crawling additional sources.
+
+**Scanner issue types (planned):** `missing_offering_identity`, `thin_offering_signals`, `offering_signals_stale`
+
+**Status:** Signal vocabulary locked. Extraction prompt exists (`saikoai-extraction-prompt-v2.1.md`). Programs exist in place-page contract but not yet materialized in DB storage. Phase 3 of Fields v2.
+
+---
+
+### Tier 5 — Editorial Coverage
+
+**What it answers:** "What has been written about this place?"
+
+| Signal | Source | Purpose |
+|--------|--------|---------|
+| Coverage source links | Editorial search / manual | Press mentions, reviews, features |
+| Pull quote | Editorial extraction | Critical voice highlight |
+| Pull quote author/source | Editorial extraction | Attribution |
+| Description | Website / editorial / synthesis | Place narrative |
+| Awards / recognition | Editorial extraction | Credibility signals |
+
+Storage: `coverage_sources` (links), entity fields (pull quote, description)
+
+**Scanner issue types (planned):** `thin_editorial_coverage`, `no_pull_quote`, `missing_description`
+
+**Resolution tools (planned):** Editorial source auto-search against approved publications
+
+**Key principle:** Editorial coverage is the merchant story told by others. It complements the merchant's own voice (Tier 3-4) with external validation and critical perspective.
+
+**Status:** `coverage_sources` table exists. Manual entry possible. Auto-search against approved sources not yet built. Scanner does not yet flag editorial thinness.
+
+---
+
+### Tier 6 — Experiential Interpretation (SceneSense)
+
+**What it answers:** "What does it feel like to be there?"
+
+Three Universal Lenses (see `docs/scenesense/three-lenses-framework-v1.md`):
+
+**Atmosphere Lens** — physical/sensory environment:
+- Lighting, noise, spatial scale, seating density, comfort, indoor/outdoor
+
+**Energy Lens** — activity level & temporal rhythm:
+- Crowd intensity, movement, service tempo, busy windows, daypart shifts
+- Backed by `energy_scores` table with component breakdown
+
+**Scene Lens** — social patterns & behavioral expectations:
+- Group size, social roles, dining occasions, formality, social register
+
+**Place Relevance Level (PRL):**
+- 1-4 scale measuring cultural significance and relevance
+- Can be computed or manually overridden (`prlOverride`)
+
+**Behavioral Tag Scores:**
+- `cozy_score`, `date_night_score`, `late_night_score`, `after_work_score`, `scene_score`
+- Float 0-1, versioned, dependency-tracked
+
+Storage: `interpretation_cache` (SCENESENSE_PRL output type), `energy_scores`, `place_tag_scores`
+
+**Scanner issue types (planned):** `missing_scenesense`, `scenesense_stale`, `missing_prl`
+
+**Status:** Framework fully specified across 6 docs. Display contract v2 aligned to revised 3-lens model. Energy scores computed for enriched entities. Full SceneSense extraction pipeline not yet wired to Coverage Ops.
+
+---
+
+## Entity-Type Signal Requirements
+
+Not every entity type needs every signal. A taco cart doesn't need a wine program assessment. A hotel doesn't need cuisine_posture.
+
+### Restaurant (full-service)
+
+**Required:** Name, coords, neighborhood, hours, price level, cuisine type, reservation model
+**Expected:** Website, Instagram, menu URL, description, at least 1 editorial source, food program identity, beverage program assessment
+**Nice-to-have:** TikTok, pull quote, SceneSense, tag scores
+
+### Street food / Taco cart / Mobile vendor
+
+**Required:** Name, coords (or appearance locations), neighborhood
+**Expected:** Instagram OR TikTok, cuisine type, meal focus
+**Confirmed-none common:** Website, phone, reservation URL, wine program
+**Special:** `place_appearances` for location tracking, `marketSchedule` for schedule
+
+### Bar / Wine bar
+
+**Required:** Name, coords, neighborhood, hours
+**Expected:** Website, Instagram, beverage program assessment (especially wine/cocktail), reservation model
+**Nice-to-have:** TikTok, editorial coverage, SceneSense
+
+### Coffee shop / Cafe
+
+**Required:** Name, coords, neighborhood, hours
+**Expected:** Website, Instagram, coffee/tea program assessment
+**Nice-to-have:** Food program (if substantial), TikTok
+
+### Hotel
+
+**Required:** Name, coords, neighborhood, website, phone
+**Expected:** Instagram, reservation URL, description, price level
+**Different signals:** Room count, amenities, check-in/out, on-site dining (via entity relationships)
+
+### Activity / Venue (non-food)
+
+**Required:** Name, coords, neighborhood
+**Expected:** Website, Instagram, description, hours
+**Not applicable:** Most food/beverage signals
+
+---
+
+## Scanner Integration
+
+The issue scanner (`lib/coverage/issue-scanner.ts`) should evolve to check coverage depth per tier:
+
+### Current (Tier 1 only)
+- `unresolved_identity` — no GPID
+- `missing_coords` — no lat/lng (blocking)
+- `missing_neighborhood` — no neighborhood
+- `missing_phone` — no phone
+- `missing_website` — no website
+- `missing_instagram` — no Instagram
+- `missing_tiktok` — no TikTok
+- `potential_duplicate` — fuzzy name/GPID/social match
+
+### Next phase (Tier 2)
+- `missing_hours` — no hours data
+- `missing_price_level` — no price level (restaurants only)
+- `missing_menu_link` — no menu URL available for entities that should expose one
+- `missing_reservations` — no reservation URL for reservation-relevant entities
+- `operating_status_unknown` — no businessStatus data
+- `google_says_closed` — Google businessStatus indicates closure
+
+### Next phase (Tier 1 classification)
+- `missing_classification` — category/cuisine unresolved for entity type expectations
+
+### Future (Tiers 3-6)
+- `no_surfaces` — no merchant surfaces captured
+- `thin_offering_signals` — entity type expects offering signals but none present
+- `thin_editorial_coverage` — zero or few coverage sources
+- `missing_description` — no description from any source
+- `missing_scenesense` — no SceneSense interpretation cached
+- `missing_prl` — no PRL assigned
+
+### Entity-type-aware severity
+
+Issue severity should be influenced by entity type:
+- `missing_website` is MEDIUM for a restaurant but should be LOW (or suppressed) for a taco cart
+- `missing_instagram` is LOW for a hotel but MEDIUM for a street food vendor (IG is their primary channel)
+- `thin_offering_signals` is HIGH for a full-service restaurant but irrelevant for an activity venue
+
+---
+
+## Measuring Coverage Completeness
+
+Coverage completeness is a per-entity percentage based on entity type signal requirements.
+
+```
+completeness = signals_present / signals_expected_for_entity_type
+```
+
+This enables:
+- Coverage dashboard showing "72% of restaurants have Tier 1 complete"
+- Per-entity coverage score visible in admin
+- Bulk actions targeting entities below a threshold
+
+Completeness bands:
+- **Publishable** (Tier 1 complete) — entity can appear on maps
+- **Useful** (Tiers 1-2 complete) — user can make a visit decision
+- **Rich** (Tiers 1-4 complete) — full offering story in merchant's words
+- **Complete** (Tiers 1-6 complete) — experiential interpretation available
+
+---
+
+## Relationship to Existing Systems
+
+| System | Role in coverage |
+|--------|-----------------|
+| ERA Pipeline (`scripts/enrich-place.ts`) | Executes enrichment stages 1-7 per entity |
+| Issue Scanner (`lib/coverage/issue-scanner.ts`) | Detects coverage gaps, creates `entity_issues` |
+| Coverage Ops UI (`/admin/coverage-ops`) | Operator triage board for resolving issues |
+| Website Enrichment (`lib/website-enrichment/`) | Extracts signals from merchant websites |
+| SaikoAI Extraction Prompt | AI prompt for parsing surface text into signals |
+| Fields v2 (`observed_claims` → `canonical_entity_state`) | Sanctioned ground truth for extracted signals |
+| Interpretation Cache | Versioned AI-generated editorial outputs |
+| SceneSense Framework | Experiential interpretation model |
+
+---
+
+## What's Not Covered Here
+
+- **Rendering rules** — how signals become UI text (see `docs/voice/saiko-voice-layer.md`)
+- **SceneSense interpretation logic** — how raw signals become atmosphere/energy/scene descriptors (see SceneSense docs)
+- **Signal freshness decay** — time-weighted confidence penalties (planned for Offering Signals v2)
+- **Consumer-facing coverage indicators** — whether/how to show coverage depth to end users
+
+---
+
+## ARCH-ENTITY-CLASSIFICATION-LAYERS-V1
+
+| Field | Value |
+|-------|-------|
+| **Type** | architecture |
+| **Status** | active |
+| **Project** | SAIKO |
+| **Path** | `docs/architecture/entity-classification-layers-v1.md` |
+| **Last Updated** | 2026-03-14 |
+| **Summary** | Plain-language explanation of entity classification layers in the current schema — entityType vs primary_vertical vs category vs cuisine_type — including operational authority and usage guidance. |
+| **Systems** | fields-data-layer, coverage-operations, place-page |
+
+# Entity Classification Layers
+
+## Purpose
+
+This document explains how Saiko currently classifies entities across schema and product logic, and which field is authoritative for each decision type.
+
+---
+
+## The Four Classification Fields
+
+| Field | Meaning | Typical values |
+|------|---------|----------------|
+| `entities.entityType` (`entity_type`) | Coarse structural kind of entity | `venue`, `activity`, `public` |
+| `entities.primary_vertical` | Primary domain classifier | `EAT`, `COFFEE`, `WINE`, `DRINKS`, `STAY`, ... |
+| `entities.category` | Human-readable category label | `restaurant`, `wine bar`, `hotel`, ... |
+| `entities.cuisineType` (`cuisine_type`) | Cuisine-specific subtype | `Mexican`, `Italian`, `Thai`, ... |
+
+---
+
+## Why Both `entityType` and `primary_vertical` Exist
+
+They solve different problems:
+
+- `entityType` tells the system what broad class of entity it is dealing with.
+- `primary_vertical` tells the system what domain-specific operational logic should apply.
+
+In practice, `entityType` is too coarse for operational rules like "should this place have a menu URL?" or "should reservations be expected?".
+
+---
+
+## Which Field Is Authoritative For What
+
+### Structural decisions
+
+Use: `entityType`
+
+Examples:
+- coarse API behavior for venue/activity/public branching
+- generic admin search payloads that include entity kind
+
+### Operational applicability and scanner gating
+
+Use: `primary_vertical` (authoritative)
+
+Examples from current repo reality:
+- Tier 2 Coverage Ops scanner gates `missing_price_level`, `missing_menu_link`, and `missing_reservations` by `primary_vertical` in `lib/coverage/issue-scanner.ts`.
+- Website enrichment category-only mode excludes lodging-like entities using `primary_vertical != STAY` in `scripts/run-website-enrichment.ts`.
+
+### Display and descriptive identity
+
+Use: `category` and `cuisine_type`
+
+Examples:
+- place-page output renders display category fallback using `primary_vertical` display mapping with category fallback in `app/api/places/[slug]/route.ts`.
+- cuisine remains a descriptive identity signal, not the primary operational classifier.
+
+---
+
+## Operational Rule of Thumb
+
+When building scanner rules, coverage tiers, or automation applicability:
+
+1. use `primary_vertical` for domain gating
+2. use `entityType` only for coarse structural branching
+3. use `category`/`cuisine_type` for identity description and UI semantics
+
+---
+
+## Relationship to Coverage Tiers
+
+- Tier 1 (Identity & Classification) includes category/cuisine identity semantics.
+- Tier 2 (Visit Facts) uses `primary_vertical` to decide which visit facts should exist for which entities.
+- Tier 3 (Experience / Interpretation) sits above both and uses enriched signals.
+
+See `docs/architecture/coverage-tiers-v1.md` for the tier model.
+
+---
+
+## ARCH-IDENTITY-SCORING-V1
+
+| Field | Value |
+|-------|-------|
+| **Type** | architecture |
+| **Status** | active |
+| **Project** | SAIKO |
+| **Path** | `docs/architecture/identity-scoring-v1.md` |
+| **Last Updated** | 2026-03-14 |
+| **Summary** | Weighted anchor scoring model for entity identity confidence. GPID is not required — entities reach publication threshold through any combination of anchors that demonstrates sufficient identity certainty. |
+| **Systems** | identity-enrichment, coverage-operations |
+
+# Identity Scoring — Weighted Anchor Model
+
+## Core Principle
+
+**GPID (Google Place ID) is not required for entity identity.**
+
+Saiko is not a location-first database. Many entities we track — taco carts, pop-ups, mobile vendors, market stalls — don't have Google Places listings. Requiring GPID as a prerequisite for identity would permanently exclude these entities from publication.
+
+Instead, identity confidence is computed from a weighted set of **anchors** — independent data points that corroborate an entity's existence and uniqueness.
+
+## Anchor Weights
+
+| Anchor | Weight | Why |
+|--------|--------|-----|
+| `gpid` (Google Place ID) | 4 | Strongest single signal — Google verified the business exists at this location |
+| `website` | 3 | Official web presence — strong identity signal, especially for established businesses |
+| `instagram` | 2 | Social presence — confirms entity is active and provides visual verification |
+| `tiktok` | 2 | Social presence — especially relevant for street food, taco vendors, food reviewers |
+| `verifiedAddress` | 2 | Physical location confirmed — address string matches a known format |
+| `reservationProvider` | 1 | Corroborator — listed on Resy, OpenTable, etc. |
+| `mediaMention` | 1 | Corroborator — mentioned in editorial coverage |
+| `matchingCategory` | 1 | Corroborator — category aligns with intake data |
+| `matchingNeighborhood` | 1 | Corroborator — neighborhood aligns with intake data |
+| `matchingPhone` | 1 | Corroborator — phone number matches across sources |
+
+## Scoring
+
+Confidence is computed as `sum(triggered_weights) / MAX_WEIGHT` where `MAX_WEIGHT = 10`.
+
+This means a score of 1.0 is achievable without GPID:
+- website (3) + instagram (2) + tiktok (2) + verifiedAddress (2) + mediaMention (1) = 10
+
+And a taco cart with just Instagram + TikTok + a media mention scores 0.5 — enough to be tracked and potentially published.
+
+## Publication Threshold
+
+Entities are considered publishable when they have sufficient identity confidence **and** key fields populated. The identity score is one input to the coverage operations system, which also checks for:
+- Coordinates (required for map placement)
+- Name (required)
+- At least one contact/social anchor
+
+## Implementation
+
+- **Scoring function**: `lib/identity-enrichment.ts` → `computeConfidence()`
+- **Anchor extraction**: `lib/identity-enrichment.ts` → `AnchorSet` interface
+- **Name matching**: Jaro-Winkler similarity ≥ 0.85 for near-exact matches
+- **Coverage integration**: `lib/coverage/issue-scanner.ts` flags `unresolved_identity` only when GPID is missing — but this does NOT block publication if other anchors are sufficient
+
+## Design Rationale
+
+### Why not just use GPID?
+
+1. **Taco carts and mobile vendors** — the core use case for Saiko. Many operate without a Google listing. Requiring GPID means excluding the most interesting, hardest-to-find places.
+
+2. **New businesses** — Google Places listings lag behind real-world openings by weeks or months. A new restaurant with an Instagram, a website, and an Eater review is clearly a real entity.
+
+3. **Data independence** — over-reliance on a single external provider (Google) creates brittleness. Multiple independent anchors provide more robust identity than one strong signal.
+
+### Why weighted, not boolean?
+
+A binary "has GPID = verified" model can't express nuance. A place with GPID but no other signals might be a closed business with a stale listing. A place with Instagram + TikTok + two media mentions but no GPID is clearly real. The weighted model captures this.
+
+### Why these specific weights?
+
+- **GPID at 4**: Google has done verification work (business owner claimed the listing, or Street View confirmed it). High signal but not insurmountable.
+- **Website at 3**: An official website requires effort to create and maintain. Strong signal of an established business.
+- **Social at 2 each**: Active social presence confirms the entity exists and is operating. Two platforms are worth more than one (independence).
+- **Corroborators at 1 each**: These confirm but don't independently establish identity. A matching phone number is good, but phone numbers can be wrong or reused.
+
+---
+
+## ARCH-SOCIAL-FIELDS-V1
+
+| Field | Value |
+|-------|-------|
+| **Type** | architecture |
+| **Status** | active |
+| **Project** | SAIKO |
+| **Path** | `docs/architecture/social-fields-spec-v1.md` |
+| **Last Updated** | 2026-03-14 |
+| **Summary** | Specification for social media handle fields on entities (Instagram, TikTok). Covers storage format, discovery, validation, identity weight, and the sentinel value convention for confirmed-none. |
+| **Systems** | entities, coverage-operations, identity-enrichment |
+
+# Social Fields — Entity-Level Specification
+
+## Fields
+
+| Column | Table | Type | Example value | Identity weight |
+|--------|-------|------|---------------|-----------------|
+| `instagram` | entities | TEXT, nullable | `tacos1986` | 2 |
+| `tiktok` | entities | TEXT, nullable | `tacos1986official` | 2 |
+
+## Storage Convention
+
+- Store the **handle only** — no `@` prefix, no full URL
+- Example: `tacos1986` not `@tacos1986` not `https://instagram.com/tacos1986`
+- Sentinel value `NONE` means "confirmed this entity has no account on this platform"
+- `NULL` means "unknown / not yet checked"
+
+## Discovery Methods
+
+### Automated (via `/api/admin/tools/discover-social`)
+
+1. **Surface extraction** — if `merchant_surfaces` has an instagram/tiktok surface, extract handle from the URL
+2. **Claude-powered search** — searches `"{entity name} {city} instagram/tiktok"`, extracts handle from results, validates format
+3. **Website scraping** — `lib/website-enrichment/links.ts` extracts social links from entity websites (`instagram.com` → `instagram`, pattern extensible to TikTok)
+
+### Manual (via Coverage Ops UI)
+
+- Inline text field per issue row — paste handle directly
+- "None" button — sets sentinel `NONE` value
+- Google search link — opens `"{entity name} Los Angeles"` in new tab for manual lookup
+
+## Validation
+
+Handles must match: `/^[a-zA-Z0-9._]+$/`
+
+Rejected patterns:
+- Full URLs (extract handle instead)
+- Post/reel/story URLs (not profile URLs)
+- Literal strings `none`, `null`
+- Empty or whitespace-only
+
+## Integration Points
+
+Social fields are wired into:
+
+| System | File | What it does |
+|--------|------|-------------|
+| Issue scanner | `lib/coverage/issue-scanner.ts` | Flags `missing_instagram` / `missing_tiktok` (LOW severity) |
+| Coverage Ops UI | `app/admin/coverage-ops/page.tsx` | Inline editing, discovery buttons, bulk actions |
+| Identity scoring | `lib/identity-enrichment.ts` | Weight 2 each in anchor model |
+| Place page API | `app/api/places/[slug]/route.ts` | Returns handles in response |
+| Action strip | `components/merchant/ActionStrip.tsx` | Links to profile |
+| Location card | `components/LocationCard.tsx` | Shows handle with link |
+| Market facts | `components/merchant/MarketFactsCard.tsx` | Shows handle with link |
+| Fields v2 | `lib/fields-v2/write-claim.ts` | Claim-to-entity mapping |
+| Entity patch | `app/api/admin/entities/[id]/patch/route.ts` | Allows saving via API |
+
+## Why TikTok?
+
+TikTok is a first-class social field because:
+1. **Street food discovery** — taco carts, pop-ups, and mobile vendors use TikTok as their primary (sometimes only) online presence
+2. **Food reviewer platform** — reviewers post TikTok videos that drive significant discovery traffic
+3. **Identity signal** — for entities without GPID or website, TikTok + Instagram together provide weight 4 in identity scoring, approaching the value of GPID alone (weight 4)
+
+## Future: Additional Platforms
+
+The same pattern can extend to other platforms (YouTube, X/Twitter, Threads) by:
+1. Adding a nullable TEXT column to entities
+2. Adding to `ANCHOR_WEIGHTS` in identity-enrichment
+3. Adding `missing_{platform}` rule to issue scanner
+4. Adding inline editing in Coverage Ops
+5. Adding discovery mode to `discover-social` route
+
+---
+
 ## ARCH-SYSTEM-CONTRACT
 
 | Field | Value |
@@ -2209,6 +2988,943 @@ The current rendering system is implemented through TRACES.
 
 ---
 
+## ARCHITECTURE-INSTAGRAM-API-INTEGRATION-V1
+
+| Field | Value |
+|-------|-------|
+| **Type** | architecture |
+| **Status** | active |
+| **Project** | SAIKO |
+| **Path** | `docs/architecture/instagram-api-integration-v1.md` |
+| **Last Updated** | 2026-03-13 |
+| **Summary** | Instagram Graph API integration state — Meta app config, permissions, verified endpoints, architectural models for media ingestion |
+
+# Instagram API Integration — Current State
+
+## Objective
+
+Enable Saiko to access Instagram media via the official Instagram Graph API to support potential ingestion of media signals for places, merchants, and editorial surfaces.
+
+This work establishes the first authenticated API connection between the Saiko system and Instagram.
+
+## Current Status: Operational
+
+The following capabilities are now operational.
+
+### Meta Developer App
+
+- **App name:** TRACES THREE
+- **Platform:** Meta Developer Platform
+- **Purpose:** Provides authenticated access to the Instagram Graph API
+
+### Permissions Configured
+
+Core permission:
+- `instagram_business_basic`
+
+Supporting permissions (via "Manage messaging & content on Instagram" use case):
+- `instagram_manage_comments`
+- `instagram_business_manage_messages`
+
+### Account Connected
+
+- **Username:** rjcicc
+- **User ID:** 26071220029153617
+- Successfully authorized for the application
+
+### Access Token
+
+- Working OAuth access token generated and stored
+- **Location:** `.env.local` as `INSTAGRAM_ACCESS_TOKEN`
+- Server-side only, not exposed to browser
+
+### Verified Endpoints
+
+**Identity:** `GET https://graph.instagram.com/me` — returns id + username
+
+**Media:** `GET /me/media?fields=id,caption,media_type,media_url,permalink,timestamp` — returns media IDs, captions, image URLs, post timestamps, permalinks
+
+## What This Enables
+
+The system can programmatically retrieve:
+- Instagram media, captions, timestamps, permalinks, media types
+
+Potential integration points:
+- Place pages
+- Editorial surfaces
+- Ingestion pipelines
+- Media galleries
+
+## Important API Constraints
+
+The official Instagram API does **not** allow arbitrary scraping of other accounts. The API only returns data for:
+
+1. Instagram accounts that authenticate with our app
+2. Accounts we own or manage
+
+This means the API cannot automatically ingest media from restaurants or venues unless they authorize the application. This constraint has architectural implications for Saiko's ingestion pipeline.
+
+## Recommended Next Steps
+
+### 1. Token Security
+
+Rotate the access token (exposed during testing). Implement:
+- `.env.local` storage (done)
+- Server-side usage only (done)
+- Periodic refresh policy (pending)
+
+### 2. Server-Side Fetch Route
+
+Add a backend endpoint (e.g. `/api/instagram/media`) to retrieve Instagram media using the stored token, so internal services can query without exposing tokens.
+
+### 3. Media Ingestion Strategy
+
+Three potential architectural models:
+
+| Model | Description | Pros | Cons |
+|-------|------------|------|------|
+| **A — Merchant Authorization** | Restaurants authenticate their Instagram account | Fully compliant, reliable, scalable | Requires merchant participation |
+| **B — Editorial Media Curation** | Editors manually attach Instagram posts to places | High quality, compliant, simple | Manual process |
+| **C — Hybrid Signal Model** | Instagram as supplemental media source where available | Flexible, supports curated content | Inconsistent coverage |
+
+**Recommended first version:** Editorial Media Attachment — editors select posts, system stores permalink + media_url + caption + timestamp, media displays on place pages. No scraping required.
+
+### Longer-Term Opportunities
+
+If Instagram becomes strategically important:
+- Merchant account connection flow
+- Automated media ingestion
+- Instagram signal analysis (popularity/activity)
+- Social discovery layers
+
+## Key Takeaway
+
+Instagram API integration is operationally verified. The next step is architectural: how Instagram media should be incorporated into the Saiko data and ingestion model.
+
+---
+
+## ARCHITECTURE-INSTAGRAM-IMPLEMENTATION-V1
+
+| Field | Value |
+|-------|-------|
+| **Type** | architecture |
+| **Status** | active |
+| **Project** | SAIKO |
+| **Path** | `docs/architecture/instagram-implementation-v1.md` |
+| **Last Updated** | 2026-03-13 |
+| **Summary** | Instagram integration implementation plan and system impact — tables, sync rules, temporal signals, interpretation layer, photo strategy, attachment model. V0.2 adds current state assessment, implementation phases, and data review results. |
+| **Systems** | instagram-api, enrichment-pipeline, merchant-surfaces |
+
+# Instagram Integration — Implementation & Impact Doc
+
+**Version:** 0.2
+**Draft Date:** 2026-03-13
+**Author:** Bobby / Claude
+**Status:** Pre-engineering handoff — data review complete
+
+## 1. Purpose & Architectural Intent
+
+This document defines the implementation plan and system impact assessment for adding Instagram as a data source to the Saiko platform. It is intended as a handoff to engineering and as a seed document for the knowledge base.
+
+Instagram is not just another data source. It is categorically different from every source we have ingested to date. Website content is foundational but static — updated infrequently, written for marketing purposes, not for communication. Google Business Profile is slow and aggregated. Editorial coverage is episodic and externally authored. Instagram is the merchant speaking directly, regularly, in their own voice, about what is happening right now.
+
+Our places are alive. Instagram is what makes that true.
+
+The architectural intent of this integration is to treat Instagram as a first-class input to the interpretation layer — not a bolt-on, not a supplemental source, but a primary merchant-authored voice that feeds signal extraction, confidence scoring, photo candidates, and contextual display. Every decision in this document should be made in service of that intent.
+
+A secondary intent is to establish a pattern for ingesting broad, recurring datasets. Instagram is the first dataset of this type. The architecture we build here should be extensible — when the next dataset of this kind arrives, it should slot in cleanly without requiring every downstream feature to be individually updated.
+
+## 2. Opportunities
+
+Instagram unlocks capabilities that no other source in the current stack can provide. These are worth stating explicitly so the engineering team understands the editorial and product intent behind the technical work.
+
+**Real merchant voice.** Instagram is the most direct line we have to how a place talks about itself. Website copy is written for conversion. Instagram is written for communication. That distinction matters for signal quality.
+
+**Temporal pulse.** Instagram is the only source that tells us what is happening this week, today, hours ago. No other source in the stack has this property. This is a genuine and significant differentiation.
+
+**Operational intelligence.** Closures, private events, hours changes, special menus, guest chefs — merchants post this information on Instagram before it appears anywhere else. In many cases it never appears anywhere else. We can have this information hours after it is posted.
+
+**Visual intent.** Merchant-posted photos are editorially intentional. The merchant chose those images. They framed the shot. They decided it represented them. This is categorically different from user-submitted Google photos.
+
+**Confidence lift.** Instagram signals can corroborate signals we were already extracting from other sources. A natural wine bar that mentions producers in their captions, describes their pours, posts about winemaker dinners — that is high-quality corroborating evidence for signals we may have only had weak confidence in before.
+
+**Caption signal density.** Wine bars, natural wine focused restaurants, chef-driven spots — these entities often use captions to describe sourcing, producers, regions, dishes, philosophy. That is rich structured data hiding in plain text. It is some of the highest-quality signal we can extract relative to the cost of getting it.
+
+**Contextual display.** Instagram is the data foundation for showing users information that is true right now, not just true in general. This is one of the most meaningful product differentiators we can build. Users learn that Saiko knows things other platforms do not. That builds trust compounding over time.
+
+## 3. Current State & What's Already Done
+
+As of 2026-03-13, significant infrastructure already exists. This section distinguishes what is built from what remains.
+
+### Component Status
+
+| Component | Status | Notes |
+|---|---|---|
+| `instagram_accounts` table | ✅ Schema exists | Empty — no ingestion run yet |
+| `instagram_media` table | ✅ Schema exists | Empty — no ingestion run yet |
+| `instagram_insight_snapshots` table | ✅ Schema exists | Empty |
+| `instagram_temporal_signals` table | ❌ Not yet created | New — defined in Section 6 |
+| `ingest-instagram.ts` | ✅ Operational | Business Discovery + batch + /me modes |
+| API credentials | ✅ Configured | Never-expiring Page Access Token + IG User ID in `.env.local` |
+| `merchant_surfaces` IG records | ✅ 90 rows exist | ~70 entities with discovered IG URLs |
+| `entities.instagram` column | ⚠️ 7 populated | Quality issues; needs backfill from surfaces |
+| API route serves IG handle | ✅ Working | Returns `entities.instagram` to client |
+| Place page renders IG link | ✅ Working | StatusCell + primary CTAs |
+| Caption signal extraction | ❌ Not built | Phase 2 |
+| Temporal signal extraction | ❌ Not built | Phase 3 |
+| Photo candidate scoring | ❌ Not built | Phase 4 |
+| SceneSense IG wiring | ❌ Not built | Phase 5 |
+| Contextual display UI | ❌ Not built | Phase 6 |
+
+### Key Credentials
+
+- **Facebook Page "Saiko Fields"** Graph API ID: `1048011751721611`
+- **Instagram Business Account ID:** `17841401035810011`
+- **Meta App:** TRACES THREE (app ID `1325848402713479`, development mode)
+- **Token scopes:** `pages_show_list`, `instagram_basic`, `instagram_manage_insights`, `pages_read_engagement`
+- **Token type:** Never-expiring Page Access Token (derived from long-lived user token)
+
+### Handle Data Quality
+
+The `entities.instagram` column has 7 entries but quality is poor. Meanwhile, `merchant_surfaces` has 90 instagram URLs across ~70 entities discovered by the surface pipeline. There is an immediate opportunity to backfill `entities.instagram` from `merchant_surfaces` by extracting clean handles from surface URLs.
+
+Known handle issues:
+- `LA Tutors 123` has literal string `"null"` (not SQL NULL)
+- `Mochomitoss` has full URL `https://www.instagram.com/mochomitosss/` instead of clean handle
+- Several handles don't resolve via Business Discovery (account may not be Business/Professional type)
+
+### Batch Dry Run Results (2026-03-13)
+
+| Entity | Handle | Status | Posts | Followers |
+|---|---|---|---|---|
+| Brothers Cousins | @brotherscousinstacos | ✅ Found | 209 | 61,721 |
+| Tacos El Toro | @tacoseltoro_ | ✅ Found | 929 | 32,994 |
+| Tacos Pasadita | @tacospasadita_ | ✅ Found | 30 | 2,911 |
+| Balam Kitchen | @balammexicankitchen | ❌ Not found | — | — |
+| Seco | @secolosangeles | ❌ Not found | — | — |
+| Mochomitoss | @mochomitosss | ❌ Not found | — | — |
+| LA Tutors 123 | @null | ❌ Bad data | — | — |
+
+### Caption Data Observations
+
+From the three successful accounts, caption characteristics vary significantly:
+- **Brothers Cousins:** Bilingual (English/Spanish), operational content (location announcements, hours, closures), moderate caption length
+- **Tacos El Toro:** Primarily Spanish, personal/storytelling content mixed with operational info, high posting cadence (929 posts)
+- **Tacos Pasadita:** Primarily Spanish, location-focused, shorter captions with emoji-heavy formatting
+
+This is a small sample skewed toward taco trucks. The ~70 entities with `merchant_surfaces` instagram records include fine dining, wine bars, and chef-driven restaurants likely to have richer caption signal density for SceneSense extraction.
+
+### Platform Constraint
+
+The TRACES THREE app is in **development mode**. All API calls are limited to test users and business accounts that have granted access. Before batch ingest at scale, the app will need Meta App Review approval. This is not a blocker for the current entity set but will be for production scale.
+
+## 4. Affected Systems
+
+The following systems are affected by the Instagram integration. This is not an exhaustive engineering audit — it is a map of known impact areas. Engineering should treat this as a starting point for discovery, not a complete specification.
+
+**Data layer:** Three new tables, merchant_surface attachment, place_coverage_status freshness fields, interpretation_cache new input source, confidence scoring model.
+
+**Ingest layer:** New fetch job for account and media, insights ingest job, caption extraction job, temporal and operational signal extraction job, future visual analysis job.
+
+**Interpretation layer:** SceneSense and language_signals pipeline, ABOUT synthesis path, confidence scoring model, signal TTL and expiry concept which does not yet exist.
+
+**API layer:** `/api/places/[slug]` route which will need to pull from new data sources, data contract in `place-page.ts` which will need homes for Instagram fields.
+
+**Rendering layer:** Links rail for Instagram URL, Photos section for merchant IG candidates, ABOUT section where IG bio and captions enter the source hierarchy, SceneSense indirectly via language_signals.
+
+**Voice layer:** ABOUT synthesis path needs to know Instagram exists and how to weight it. Caption register awareness — Instagram language is shorter and more casual than website copy and should not bleed into rendered output tone. Merchant voice fidelity — Instagram is the highest-trust merchant voice signal we have. Temporal voice signals — time-bound language in captions must be recognized and not absorbed into evergreen identity copy.
+
+**Operational:** Fetch cost and rate limit management, storage growth planning, re-parse capability via raw payload preservation.
+
+## 5. Tables
+
+Three tables already exist in the Prisma schema (empty, never populated). A fourth for temporal signals is new and defined in Section 7.
+
+### instagram_accounts
+
+One record per connected Instagram account. Links to merchant_surface.
+
+**Fields:** internal id, merchant surface link, instagram_user_id, username, account_type, media_count, canonical_instagram_url, last_fetched_at, last_successful_fetch_at, source_status, raw_payload.
+
+**Derived fields:** latest_post_at, posting_cadence_30d, posting_cadence_90d, is_active_recently.
+
+**Sync rule:** Overwrite mutable fields on each fetch, keep latest raw_payload.
+
+### instagram_media
+
+One record per post. Upsert by instagram_media_id.
+
+**Fields:** internal id, instagram_media_id (unique), instagram_user_id, media_type, media_url, thumbnail_url, permalink, caption, timestamp, fetched_at, raw_payload.
+
+**Derived fields:** caption_present, caption_length, posted_day_of_week, posted_hour_local, is_recent_post, signal_extracted_at, is_display_candidate, visual_analysis_run.
+
+- `signal_extracted_at` tracks which posts have been run through caption extraction and when, supporting re-extraction if the model improves.
+- `is_display_candidate` is a boolean flag for the photo scoring layer.
+- `visual_analysis_run` is a boolean that future-proofs the schema for image analysis without requiring it now.
+
+**Sync rule:** Upsert by instagram_media_id, preserve original timestamp, refresh mutable fields if changed.
+
+### instagram_insight_snapshots
+
+Append only. Never overwrite old values.
+
+**Fields:** internal id, subject_type (account or media), subject_id, metric_name, metric_value, observed_at, window_label, raw_payload.
+
+**Metrics:** impressions, reach, engagement.
+
+**Sync rule:** Append only on every fetch. Historical snapshots are the record.
+
+## 6. Sync & Ingest Rules
+
+Each table has a distinct sync behavior. These are not interchangeable.
+
+**Accounts overwrite.** Each fetch overwrites mutable fields. Accounts do not change frequently enough to require history. Keep latest raw_payload.
+
+**Media upsert.** Upsert by instagram_media_id. Never duplicate a post. Preserve original timestamp — that is immutable, it is when they posted. Refresh mutable fields if changed since caption edits happen.
+
+**Insights append only.** Every fetch creates a new snapshot row. This is how trending and cadence analysis gets built over time.
+
+**Fetch cadence** is an open question to be resolved after data review. Options include daily for active accounts, every 48-72 hours for lower cadence accounts, or dynamic cadence driven by is_active_recently. Whatever cadence is chosen, the ingest job must be designed around Instagram API rate limits from day one, not retrofitted. Scheduling needs to account for rate limit headroom across the full merchant set.
+
+**Raw payloads** are preserved on all three tables specifically so signals can be re-extracted later without re-fetching. This is a deliberate cost decision. We paid for the fetch. We should be able to use it more than once.
+
+## 7. Temporal Signal Architecture
+
+This is the most novel section in the document. Nothing in the current system thinks about time the way Instagram requires. This section defines a new signal class that did not previously exist in the platform.
+
+Every other source produces evergreen signals. A website that says "wood-fired, seasonal, natural wine focused" is probably saying the same thing next year. Instagram produces both evergreen signals and perishable ones. The architecture must tell them apart.
+
+**Evergreen signals** are extracted from captions and treated as stable identity information. Examples: "we source from small producers," "wood-fired open fire cooking," "natural wine focused." These flow into language_signals and through the existing SceneSense pipeline. No expiry.
+
+**Temporal and operational signals** are time-bound. They are only true for a specific window. Examples: "closed this Sunday for a private event," "guest chef dinner Friday only," "truffle menu through end of March," "we will be at the farmers market Saturday." These require different handling entirely.
+
+Temporal signals need what evergreen signals do not:
+- A `valid_from` and `valid_until` or TTL field
+- Separation from evergreen signal storage so they do not flow into SceneSense or ABOUT
+- Their own extraction job that specifically looks for date and event language
+- A display path that does not yet exist but must be designed for
+
+**The trust implication** is the most operationally critical point in this document. If Saiko displays hours or open status that contradicts what a merchant posted on Instagram hours ago, that is a trust problem. Temporal signals from Instagram should be treated as higher recency authority than any other source on operational matters.
+
+**Capture now, display later.** The display UI for temporal signals does not exist yet. That is acceptable. The capture infrastructure must exist from day one. Six months of event and closure data thrown away because the UI was not ready is not acceptable.
+
+This architecture is the technical foundation for contextual display as a product capability. Contextual display — surfacing information that is true right now, not just true in general — is one of the most meaningful differentiators Saiko can build. Instagram is what makes it possible.
+
+### instagram_temporal_signals
+
+**Fields:** internal id, instagram_media_id (source post), signal_type (closure / event / hours_change / special_menu / other), signal_text (extracted language), valid_from, valid_until, confidence, extracted_at, is_expired.
+
+A scheduled job will need to run expiry sweeps to set is_expired as signals age out.
+
+**Open question:** How do temporal signals interact with `entities.hours`? If a post says "closed Sunday" but hours say open, who wins and does anything in the UI surface the conflict? This is a product decision to be made when contextual display is scoped.
+
+## 8. Interpretation Layer Impact
+
+Every interpretation feature in the current stack was built against a fixed input set. Instagram expands that input set in ways that are largely positive but require awareness before wiring.
+
+Generally speaking Instagram provides another rich dataset for interpretation features to draw on. SceneSense gains more language_signals input. ABOUT synthesis gains more merchant text to work from. Confidence scoring gains a new corroborating source. These are additive improvements.
+
+The concern worth flagging is that features may have been built with hardcoded assumptions about where signals come from. A feature that knows to look at specific fields from specific sources will not automatically know Instagram exists. Before wiring Instagram signals into any interpretation feature, engineering should audit how that feature currently sources its inputs and whether source assumptions are hardcoded.
+
+**Flag for engineering review:** Before Instagram signals can be fully utilized by interpretation features, identify which features have hardcoded source assumptions that need to be made more flexible. This is not a blocker but it is a known risk area. Features most likely to be affected based on current knowledge:
+- ABOUT synthesis path
+- SceneSense and language_signals ingestion
+- Confidence scoring model
+- Identity line assembly
+
+The longer-term architectural direction this points toward is a **source arbitration layer** — a unified signal pool with source, recency, and confidence attached, from which features draw without needing to know the specific origin. Instagram is the forcing function that makes this worth designing toward. Engineering should be aware of this direction even if the refactor is deferred.
+
+## 9. Photo Strategy
+
+Instagram photos should be ingested using the same pipeline philosophy as Google photos. The goal is a unified pool of quality-vetted photo candidates with source metadata attached. The rendering layer — TRACES — decides what gets displayed. The data layer surfaces the best candidates it can.
+
+**The data layer is responsible for:**
+- Ingesting the media
+- Assessing quality signals (resolution, aspect ratio)
+- Flagging display candidates via `is_display_candidate` on instagram_media
+- Preserving source and recency metadata so TRACES can factor them into display decisions
+
+**The data layer is not responsible for:**
+- Deciding which photos get shown
+- Ranking merchant Instagram above Google in the UI
+- Any display logic
+
+**Flag for engineering:** Instagram photo ingestion should mirror the existing Google photo pipeline wherever possible. Do not build a separate system. Extend what exists. TRACES consumes from a unified candidate pool with source metadata, not from source-specific photo tables. Review how the Google photo pipeline currently works before building the Instagram photo ingest path.
+
+## 10. Attachment Model
+
+Instagram attaches to `merchant_surface` first, not directly to `entities`. This is the structural decision that everything else depends on.
+
+The chain is: `entities` → `merchant_surface` → `instagram_accounts` → `instagram_media` and `instagram_insight_snapshots`.
+
+This keeps Instagram as a source record — a signal contributor — not a core identity record. `merchant_surface` is the right abstraction layer because it is where all merchant-authored sources live. Instagram is one of them. A place can exist in `entities` without an Instagram account. Instagram is additive, not load-bearing.
+
+**Hard dependency:** `merchant_surface` must exist and be wired to entities before Instagram attachment works. If that table is not yet built, this is the first thing to resolve. Everything downstream — signal extraction, photo candidates, ABOUT sourcing, confidence scoring — depends on this link being clean.
+
+**Unmatched accounts:** The ingest job needs a fallback state for Instagram accounts that cannot be confidently matched to an entity. Proposed: `source_status` set to `unmatched`. Unresolved accounts should not be dropped — they should be queued for review. Identity resolution for unmatched accounts is an open question.
+
+## 11. Future Considerations
+
+These are capabilities the architecture should not close the door on. Engineering should be aware they are coming.
+
+**Visual signal extraction.** Running image analysis on display candidate photos. Dish recognition, ambiance signals, lighting, spatial density. Feeds SceneSense and confidence scoring. Schema is already designed to support this via `visual_analysis_run` flag on instagram_media. Cost model needs to be defined before building — run only on display candidates, not the full media archive. Do not build now.
+
+**Contextual display.** The product expression of temporal signals. Surfacing time-bound information directly on the place page — closures, events, special menus, hours changes. `instagram_temporal_signals` is designed for this. Display UI does not exist yet but capture infrastructure will from day one.
+
+**Signal expiry and TTL.** As temporal signals accumulate a scheduled expiry sweep job will be needed to set `is_expired` and keep the active signal pool clean.
+
+**Source arbitration layer.** As the source set grows, individual features should not need to know where signals come from. A unified signal pool with source, recency, and confidence attached would make the interpretation layer source-agnostic. Instagram is the forcing function. Design toward this even if the refactor is deferred.
+
+**Event detection and display.** Instagram posts about events are captured as temporal signals but not yet parsed for structured event data. A future extraction job could identify event type, date, and time and surface it as a dedicated display element.
+
+**Merchant direct upload.** Instagram is a proxy for merchant-curated photos. Eventually merchants may upload directly. The photo pipeline should be designed so direct uploads slot into the same candidate pool without architectural changes.
+
+**Instagram as identity signal.** For entities where Instagram is the primary or only merchant-authored presence, there may be a future case for Instagram signals contributing to identity line assembly. Not now.
+
+## 12. Implementation Phases
+
+### Phase 0 — Plumbing (DONE)
+- ✅ `instagram_accounts`, `instagram_media`, `instagram_insight_snapshots` tables in schema
+- ✅ `ingest-instagram.ts` script operational (Business Discovery, batch, /me modes)
+- ✅ API credentials configured (never-expiring Page Access Token + IG User ID)
+- ✅ `merchant_surfaces` has 90 instagram surface records across ~70 entities
+- ✅ API route returns instagram handle; place page renders instagram link
+
+### Phase 1 — Data Quality & First Real Ingest
+- Backfill `entities.instagram` from `merchant_surfaces` (extract handles from ~90 URLs)
+- Validate handles against Business Discovery API, flag unresolvable
+- Fix known bad data (literal `"null"`, full URLs instead of handles)
+- Run first real `--batch` ingest (populate `instagram_accounts` + `instagram_media`)
+- Data review: caption length distribution, posting cadence, signal density across merchant types
+
+### Phase 2 — Caption Signal Extraction
+- Build caption extraction job (evergreen signals → `language_signals`)
+- Wire extracted signals into Stage 5 (identity signal extraction) as supplemental input
+- Define signal taxonomy: cuisine markers, producer mentions, philosophy language, dish names
+- Handle bilingual content (significant Spanish-language caption presence in current data)
+
+### Phase 3 — Temporal Signals
+- Create `instagram_temporal_signals` table (new — only table not yet in schema)
+- Build temporal extraction job (closures, events, hours changes, special menus)
+- Build expiry sweep job (`is_expired` flag management)
+- Capture-only — no display UI yet
+
+### Phase 4 — Photo Candidate Pipeline
+- Score `instagram_media` for display candidacy (`is_display_candidate`)
+- Integrate into unified photo candidate pool alongside Google photos
+- Source metadata preserved for TRACES rendering decisions
+
+### Phase 5 — Interpretation Layer Wiring
+- Audit hardcoded source assumptions in SceneSense, ABOUT synthesis, confidence scoring
+- Wire Instagram signals into confidence model as corroborating source
+- Caption register awareness for ABOUT synthesis (Instagram tone ≠ website tone)
+
+### Phase 6 — Contextual Display
+- Design temporal signal display UI
+- Define minimum confidence thresholds for surfacing closures/events
+- Product decision: Instagram vs. Google hours conflict resolution
+
+## 13. Open Questions
+
+### Data review (partially answered 2026-03-13)
+
+- ✅ **What does the actual Instagram data look like?** — See Section 3. Three accounts resolved: Brothers Cousins (209 posts, 61K followers), Tacos El Toro (929 posts, 33K followers), Tacos Pasadita (30 posts, 2.9K followers). Small sample skewed toward taco trucks. Broader data review needed after Phase 1 handle backfill.
+- ✅ **Is `merchant_surface` built and wired?** — Yes. 90 instagram surface records exist across ~70 entities. Surface types: homepage (115), about (89), instagram (90), contact (84), menu (74), reservation (10), drinks (4).
+- ⏳ What percentage of merchants have active accounts vs dormant vs none? (Needs Phase 1 backfill first)
+- ⏳ What is the average caption length and quality across the full set?
+- ⏳ How many posts per week across the corpus?
+- ⏳ What percentage of captions have extractable signals vs noise?
+
+### Engineering discoveries
+
+- ✅ **Is `merchant_surface` built and wired to entities?** — Yes. Resolved.
+- Which interpretation features have hardcoded source assumptions that need refactoring before Instagram signals can flow in cleanly?
+- How does the existing Google photo pipeline work and how cleanly can Instagram photos be added to it?
+- What is the current confidence scoring model and where does source weighting live?
+
+### Product decisions
+
+- What is the fetch cadence for active vs inactive accounts?
+- What is the TTL for temporal signals?
+- When does contextual display activate — what is the minimum signal confidence to surface a closure or event on the place page?
+- Does the References section need to acknowledge Instagram as a source?
+- How do we handle cases where Instagram signals contradict existing entity data — who wins?
+
+### Cost decisions
+
+- What is the fetch cost across the full merchant set at various cadences?
+- What does visual analysis cost per image and what is the break-even on display candidates only?
+- What is the storage growth rate at current merchant set size and at projected scale?
+
+### Identity resolution
+
+- What happens to Instagram accounts that cannot be matched to an entity?
+- Is there a review queue for unmatched accounts or do they sit in `source_status = unmatched` indefinitely?
+
+## Revision History
+
+| Version | Date | Changes | Author |
+|---------|------|---------|--------|
+| 0.1 | 2026-03-13 | Initial implementation doc from planning session | Bobby / Claude |
+| 0.2 | 2026-03-13 | Added current state (Section 3), implementation phases (Section 12), answered open questions from data review, renumbered sections | Bobby / Claude |
+
+---
+
+## COVOPS-APPROACH-V1
+
+| Field | Value |
+|-------|-------|
+| **Type** | architecture |
+| **Status** | active |
+| **Project** | SAIKO |
+| **Path** | `docs/architecture/coverage-ops-approach-v1.md` |
+| **Last Updated** | Fri Mar 13 2026 17:00:00 GMT-0700 (Pacific Daylight Time) |
+| **Summary** | Architectural position for Coverage Operations — introduces entity_issues as a unified operational layer over existing queue fragments, with tool readiness assessment and phased implementation plan. |
+| **Systems** | coverage-operations, fields-data-layer, data-pipeline |
+
+# Coverage Operations — Architectural Position
+
+---
+
+## Current State
+
+Saiko currently contains several specialized queue and conflict systems:
+
+- `review_queue`
+- `gpid_resolution_queue`
+- `sanction_conflicts`
+
+These tables serve specific pipeline workflows, primarily around identity resolution and canonical sanctioning.
+
+They are not designed to function as a unified operational system for entity repair.
+
+As a result, we currently have:
+
+- the ability to detect problems
+- the ability to run enrichment and resolution tools
+- several specialized review queues
+
+But we do not have a single operational surface that represents:
+
+> "This entity has this problem, and here is the next action required to resolve it."
+
+This is why Coverage Operations currently cannot exist as a true work queue.
+
+---
+
+## The Structural Gap
+
+The schema today contains **queue fragments, not a queue system**.
+
+| Table | Purpose |
+|-------|---------|
+| `review_queue` | Raw-record identity merge review |
+| `gpid_resolution_queue` | GPID matching review |
+| `sanction_conflicts` | Canonical claim conflict arbitration |
+
+These are pipeline-level objects, not operator-level tasks.
+
+Coverage Operations requires a new abstraction: **entity-level operational issues**.
+
+---
+
+## Queue Inventory — Why Each Is Insufficient Alone
+
+### review_queue
+
+Built around `raw_id_a`, `raw_id_b`, `canonical_id`. Workflow vocabulary is merge/review resolution.
+
+Serves: low-confidence matches, duplicate review, new canonical decisions, pre-canonical identity review.
+
+Not suitable for Coverage Operations because:
+- anchored to raw records, not entity-level operational problems
+- heavily identity-specific
+- workflow vocabulary is about merge/review resolution, not repair actions
+
+**Recommendation:** keep for what it is. Do not stretch into Coverage Operations.
+
+### gpid_resolution_queue
+
+Has `entityId`, resolver output, candidate GPID, human review status, reason codes.
+
+Closest in spirit, but too narrow. Cannot cover location repair, contact repair, social confirmation, editorial thinness.
+
+Currently has **0 rows** — exists structurally but is not yet the operational center of gravity.
+
+**Recommendation:** keep as a specialized engine / detail table. Let Coverage Operations reference it, not depend on it as the main abstraction.
+
+### sanction_conflicts
+
+Field conflict detection, sanctioning arbitration, claim-level resolution.
+
+Useful for identity conflicts, contact conflicts, classification disputes. But too narrow and too backend-facing for the operator workflow.
+
+**Recommendation:** may feed issues later, but should not be the primary UI object.
+
+---
+
+## The Proposed Addition
+
+Introduce a new operational table: **`entity_issues`**
+
+Each row represents one actionable problem associated with an entity.
+
+Examples:
+
+- Secco → missing website → needs human confirmation
+- Mariscos Jalisco → unresolved identity → run GPID resolver
+- Gjusta → thin editorial coverage → search articles
+
+This table becomes the single operational source for Coverage Operations.
+
+---
+
+## Architectural Relationship
+
+Existing systems remain unchanged. They become inputs to the issue generation layer.
+
+```
+entities
+canonical_entity_state
+review_queue
+gpid_resolution_queue
+sanction_conflicts
+editorial coverage signals
+        ↓
+  issue generator
+        ↓
+  entity_issues
+        ↓
+  Coverage Operations UI
+```
+
+The UI reads only from `entity_issues`.
+
+This prevents the UI from needing to interpret complex pipeline logic directly.
+
+---
+
+## Why This Layer Is Necessary
+
+Without an issue layer, Coverage Operations would need to infer problems dynamically from multiple sources:
+
+- entity fields
+- canonical state
+- queue statuses
+- enrichment stages
+- conflict records
+
+This creates brittle UI logic and tightly couples the interface to internal pipeline behavior.
+
+The issue layer isolates those concerns. It converts pipeline signals into operator-facing tasks.
+
+---
+
+## Important Design Principle
+
+For Coverage Ops v1, `entity_issues.issue_type` is intentionally **field-level** so each row maps to one deterministic action in the UI.
+
+Examples:
+```
+missing_hours
+missing_menu_link
+missing_price_level
+missing_instagram
+```
+
+Workflow grouping is handled by `problem_class` (identity, location, contact, social, editorial), not by changing the issue type contract.
+
+This keeps automation and operator actions straightforward while preserving a workflow-level view in lanes.
+
+---
+
+## Operational States
+
+Each issue has a state representing the next action required.
+
+```
+needs_automation → processing → needs_human → resolved
+                                           → suppressed
+```
+
+These states power the triage board in Coverage Operations.
+
+---
+
+## Example Issues
+
+```
+entity: Mariscos Jalisco
+problem_class: identity
+issue_type: unresolved_match
+state: needs_automation
+recommended_tool: google_places_lookup
+blocking_publish: true
+```
+
+```
+entity: Secco
+problem_class: contact
+issue_type: missing_website
+state: needs_human
+recommended_tool: confirm_none
+blocking_publish: false
+```
+
+---
+
+## Confirmed None Rule
+
+Optional attributes require a persistent confirmation state.
+
+```
+website_status = confirmed_none
+instagram_status = confirmed_none
+phone_status = confirmed_none
+```
+
+Once confirmed, the issue generator stops producing issues for that attribute. This prevents repeated alerts and keeps queues manageable.
+
+---
+
+## Operational Insight — Same Symptom, Different Workflows
+
+The current coverage dashboard surfaces symptoms, not problems.
+
+Example: 40 entities show unknown neighborhood.
+
+Analysis shows:
+- 25 already have GPID
+- 15 do not
+
+These represent two different workflows:
+
+**Case A — GPID exists:**
+```
+problem_class: location
+issue_type: missing_neighborhood
+tool: derive_neighborhood
+```
+
+**Case B — GPID missing:**
+```
+problem_class: identity
+issue_type: unresolved_match
+tool: google_places_lookup
+```
+
+A field-based dashboard cannot distinguish these cases cleanly. An issue system can.
+
+---
+
+## Editorial Coverage
+
+Editorial coverage does not currently require new storage primitives.
+
+Existing signals include:
+- `entities.editorialSources`
+- `coverage_sources`
+- `place_coverage_status`
+
+Editorial issues can initially be generated from: article count, source diversity, recency.
+
+```
+problem_class: editorial
+issue_type: thin_editorial_coverage
+recommended_tool: search_articles
+```
+
+---
+
+## Anti-Patterns
+
+### Don't build Coverage Operations directly on `entities`
+
+Deriving everything live from entities + canonical_entity_state + queues will get messy fast. You'll encode brittle conditional logic in the UI: "if this field is null and that queue has a row and that status is X… then show this action unless that other status is Y…"
+
+That feels okay for 2 weeks and then becomes annoying to maintain.
+
+### Don't overload `needs_human_review`
+
+`entities.needs_human_review` is too coarse. You now need to know: why, for what class, what next action, whether blocking, what was already attempted. A boolean can't carry that.
+
+### Don't use `enrichment_stage` as operational state
+
+`entities.enrichment_stage` is a loose string. Current values are mostly null and "7". That is not rich enough to drive Coverage Operations. It's okay as a pipeline artifact, but not as the triage model.
+
+---
+
+## Tool Readiness Assessment
+
+**entity_issues without resolution tools is a complaint box.** Before building the issue layer, we need enough resolution actions that an operator can actually invoke from the UI.
+
+### Tools that exist today
+
+| Tool | Problem class | Current form | What it resolves |
+|------|--------------|--------------|------------------|
+| GPID resolution | identity | `lib/gpid-resolve.ts` + `/api/admin/intake/resolve` | Unresolved identity — matches entity to Google Place |
+| Full enrichment pipeline | identity, contact, social | `scripts/enrich-place.ts` stages 1-7 + `/api/admin/enrich/[slug]` | End-to-end enrichment from GPID through tagline |
+| Instagram discovery | social | `scripts/find-instagram-handles.ts` + `scripts/backfill-instagram-handles.ts` | Finds Instagram handles from website/surface data |
+
+### Tools that need to be built
+
+| Tool | Problem class | Complexity | What it resolves | Why it's buildable now |
+|------|--------------|------------|------------------|----------------------|
+| **Neighborhood derivation** | location | Low | 25 entities with GPID + coords but no neighborhood | Reverse geocode from existing lat/lng — one function |
+| **Targeted stage re-run** | identity, contact, social | Medium | Re-run specific enrichment stage without full pipeline | `enrich-place.ts` already has `--from` and `--only` flags; needs API route |
+| **Instagram as operator action** | social | Low-Medium | One-click Instagram discovery per entity from UI | Scripts exist; need API route + single-entity trigger |
+| **Issue scanner/generator** | all | Medium | Automatically detect problems and create entity_issues rows | Query entities + canonical_entity_state for nulls, thin coverage, missing anchors |
+
+### Tools that need design first
+
+| Tool | Problem class | Open question |
+|------|--------------|---------------|
+| **Editorial source discovery** | editorial | What sources to search? What constitutes sufficient coverage? Product decision needed |
+| **Contact verification** | contact | Verify against what? Google Places data? Fresh scrape? Needs spec |
+
+### Tool readiness verdict
+
+Identity and location problem classes have sufficient tooling to go operational today. Contact and social are close (scripts exist, need API routes). Editorial needs product design before tooling.
+
+**Minimum viable tool set for Phase 1:** GPID resolution + neighborhood derivation + targeted stage re-run + issue scanner. This covers identity and location — the two highest-signal problem classes.
+
+---
+
+## Implementation Phases
+
+### Phase 0 — Resolution Tools
+
+Build the 3-4 resolution tools from the "needs to be built" list above. Each is a standalone API route an operator can invoke against an entity. Priority:
+
+1. Neighborhood derivation (lowest complexity, 25 immediate fixes)
+2. Targeted stage re-run API route (unlocks partial re-enrichment)
+3. Instagram operator action (wire existing scripts to API)
+
+### Phase 1 — Issue Layer
+
+Add `entity_issues`. Build the issue scanner/generator.
+
+Generate issues from:
+- entity state
+- canonical state
+- review queues
+- GPID queue
+- sanction conflicts
+- editorial signals
+
+Existing queues remain unchanged.
+
+### Phase 2 — Coverage Operations UI
+
+Coverage Operations becomes a triage board driven entirely by `entity_issues`.
+
+UI sections: publishable, needs automation, processing, needs human, suppressed.
+
+Problem lanes: identity, location, contact, social, editorial.
+
+### Phase 3 — System Simplification (Optional)
+
+After the operational model stabilizes, specialized queues may be simplified or merged.
+
+Possible outcomes:
+- GPID queue becomes internal to identity tooling
+- some review_queue logic migrates to issues
+- sanction conflicts become operator-facing issues
+
+These changes are not required initially.
+
+---
+
+## Final Position
+
+Coverage Operations is not a schema rewrite.
+
+It is an orchestration layer that normalizes operational problems across the system.
+
+Existing specialized queues remain intact and feed issue generation.
+
+`entity_issues` provides the unified task abstraction needed for a triage-based operational surface.
+
+Resolution tools must exist before the issue layer — an issue without a resolution action is just a complaint.
+
+---
+
+## Implementation Status (as of 2026-03-14)
+
+### What's been built
+
+**Phase 0 — Resolution Tools: COMPLETE**
+
+All four "needs to be built" tools are now operational:
+
+| Tool | Route | Status |
+|------|-------|--------|
+| Neighborhood derivation | `/api/admin/tools/derive-neighborhood` | Live — reverse geocodes from lat/lng |
+| Targeted stage re-run | `/api/admin/tools/enrich-stage` | Live — runs individual ERA stages via `spawn` |
+| Instagram discovery | `/api/admin/tools/discover-social` (mode: instagram) | Live — Claude-powered search by name+city |
+| TikTok discovery | `/api/admin/tools/discover-social` (mode: tiktok) | Live — same pattern as Instagram |
+| Website discovery | `/api/admin/tools/discover-social` (mode: website) | Live — same pattern |
+| GPID resolution | `/api/admin/tools/seed-gpid-queue` | Live — searches Google Places API for candidates |
+
+**Phase 1 — Issue Layer: COMPLETE**
+
+- `entity_issues` table exists and is populated by the issue scanner (`lib/coverage/issue-scanner.ts`)
+- Scanner detects:
+  - Tier 1 baseline: `unresolved_identity`, `missing_gpid`, `enrichment_incomplete`, `missing_coords`, `missing_neighborhood`, `missing_website`, `missing_phone`, `missing_instagram`, `missing_tiktok`, `potential_duplicate`
+  - Tier 2 visit facts: `missing_hours`, `missing_price_level`, `missing_menu_link`, `missing_reservations`, `operating_status_unknown`, `google_says_closed`
+- Issues have severity (CRITICAL/HIGH/MEDIUM/LOW), blocking_publish flag, problem_class grouping
+- Re-scan is triggered manually from the UI or via API
+
+**Phase 2 — Coverage Operations UI: COMPLETE (v1)**
+
+Triage board at `/admin/coverage-ops`:
+- Groups issues by problem_class (Identity, Location, Contact, Social)
+- Severity pills (CRIT/HIGH/MED/LOW) with color coding
+- Per-issue inline actions:
+  - `Find GPID` for identity gaps
+  - `Run Stage 1` for `missing_coords`, `missing_phone`, `missing_hours`, `missing_price_level`, `operating_status_unknown`
+  - `Run Stage 6` for `missing_menu_link`, `missing_reservations`
+  - `Discover IG/TikTok/Web` for social/website discovery
+  - `Derive` for neighborhood backfill
+  - `Mark Closed` / `Still Open` override for `google_says_closed`
+- Bulk actions: grouped by action label (for example `Run Stage 1 (N)` / `Run Stage 6 (N)`)
+- Inline editing: paste website URL, IG handle, TikTok handle, GPID directly
+- "None" button for confirmed-no-value (taco carts without websites, etc.)
+- "Skip" button for won't-fix items
+- Google search link per entity row
+- Duplicate detection modal with side-by-side comparison and merge
+- Re-scan Issues button to refresh after actions complete
+
+Coverage Dashboard at `/admin/coverage`:
+- Summary metrics: total entities, publishable count, missing field counts
+- Smart counts that distinguish automation-fixable from human-required
+
+**Phase 3 — System Simplification: NOT STARTED**
+
+Existing specialized queues remain intact. GPID resolution queue is referenced but mostly bypassed — `seed-gpid-queue` writes directly and auto-matches high-confidence results.
+
+### Key architectural decisions made during implementation
+
+1. **GPID is not required for entity identity.** Weighted anchor scoring (`lib/identity-enrichment.ts`) determines identity completeness. GPID carries weight 10 but entities with name + address + coords can reach publication threshold without it. This supports taco carts and mobile vendors that don't have Google Places listings.
+
+2. **Issue types map to fields, not workflows.** The original doc recommended workflow-oriented types (`social_unverified`, `contact_unverified`). Implementation uses field-level types (`missing_instagram`, `missing_phone`) because they map cleanly to inline editing and specific resolution tools. The `problem_class` grouping provides the workflow-level organization.
+
+3. **Inline resolution over queue navigation.** Instead of linking out to specialized queues (GPID Queue, Review Queue), most actions execute directly from Coverage Ops. The GPID Queue page still exists for complex multi-candidate review, but simple cases resolve inline.
+
+4. **TikTok as first-class social field.** Added alongside Instagram with identical treatment across 16 files. Driven by the observation that TikTok is the primary social platform for street food vendors and food reviewers.
+
+5. **Entity merge with evidence preservation.** When duplicates are merged, surfaces from the deleted entity are recreated (delete + insert) on the kept entity to respect the `merchant_surfaces` immutability trigger. Gap-fill copies non-null fields from the deleted entity to fill nulls on the kept entity.
+
+### Open items
+
+- **Operating status workflow polish**: Core schema support already exists (`entities.status`, `entities.businessStatus`) and closure actions are wired in Coverage Ops. Remaining work is scanner/UI refinement for `operating_status_unknown`, plus stronger operator states for temporary vs permanent closure review.
+- **Media coverage links**: Human-added editorial mentions, reviews, article URLs. Needs a storage model (likely `entity_appearances` or similar) and an "Add coverage" action in Coverage Ops.
+- **Editorial thinness detection**: Issue scanner should flag entities with zero or few editorial sources. Depends on media coverage storage.
+- **Auto-rescan after actions**: Bulk actions should trigger a re-scan automatically instead of requiring manual button click.
+- **Progress indicators**: Background actions (Stage 1, etc.) show "Queued" but no progress feedback. Need polling or SSE for real-time status.
+
+---
+
 ## FIELDS-ERA-OVERVIEW-V1
 
 | Field | Value |
@@ -2325,6 +4041,383 @@ ERA is not a weakness in the system. It is the safety layer that makes canonical
 - Separating them creates durability
 
 This document is the canonical reference for that separation.
+
+---
+
+## FIELDS-VERTICAL-TAXONOMY-V1
+
+| Field | Value |
+|-------|-------|
+| **Type** | architecture |
+| **Status** | active |
+| **Project** | SAIKO |
+| **Path** | `docs/architecture/vertical-taxonomy-v1.md` |
+| **Last Updated** | Fri Mar 13 2026 17:00:00 GMT-0700 (Pacific Daylight Time) |
+| **Summary** | Defines Saiko's 12-vertical taxonomy — the primary domains of urban life used to classify every place in the system. Documents anthropological rationale, system role, technical anchors, and design implications. |
+| **Systems** | fields-data-layer, entity-resolution |
+
+# Saiko Vertical Taxonomy
+
+**Anthropological Rationale and System Role**
+
+**System:** Fields Data Layer / Saiko Maps
+**Status:** Active
+**Applies to:** Fields, Traces, Saiko Maps
+
+---
+
+## 1. Purpose
+
+The Saiko Vertical Taxonomy defines the primary domains of everyday life in a city.
+
+It organizes places according to how they participate in human living — not according to traditional business categories.
+
+Most mapping platforms categorize places by industry classification:
+
+- Restaurant
+- Retail
+- Hotel
+- Entertainment
+
+Saiko instead categorizes places by **human activity domain**.
+
+This approach reflects the underlying philosophy of Saiko: mapping the places that contribute to how people live well in a city.
+
+A place appears on Saiko not because it exists, but because it meaningfully contributes to lived experience.
+
+---
+
+## 2. The 12 Vertical Domains
+
+Saiko uses twelve verticals to represent the primary domains of urban life.
+
+| Vertical | Display Label | Identity Noun |
+|----------|--------------|---------------|
+| `EAT` | Restaurant | restaurant |
+| `COFFEE` | Coffee | café |
+| `WINE` | Wine Bar | wine bar |
+| `DRINKS` | Bar | bar |
+| `BAKERY` | Bakery | bakery |
+| `STAY` | Hotel | hotel |
+| `SHOP` | Shop | shop |
+| `CULTURE` | Culture | gallery |
+| `WELLNESS` | Wellness | spa |
+| `PURVEYORS` | Purveyor | market |
+| `NATURE` | Nature | park |
+| `ACTIVITY` | Activity | venue |
+
+Each vertical represents a type of lived interaction with the city.
+
+Together they form a minimal but complete model of the places people repeatedly move through in everyday life.
+
+---
+
+## 3. Anthropological Perspective
+
+Anthropologists often study cities through activity systems rather than industries.
+
+These systems describe how people obtain resources, socialize, care for themselves, and experience culture.
+
+Viewed through this lens, the Saiko taxonomy maps the **infrastructure of daily life**.
+
+### Provisioning
+How people obtain food and everyday resources.
+- `EAT` · `BAKERY` · `PURVEYORS` · `COFFEE`
+
+### Social Gathering
+Where people gather and interact.
+- `WINE` · `DRINKS` · `COFFEE`
+
+### Dwelling and Travel
+Where people temporarily live.
+- `STAY`
+
+### Material Culture
+Where objects circulate and become part of daily life.
+- `SHOP`
+
+### Cultural Expression
+Spaces where art, performance, and meaning are produced.
+- `CULTURE`
+
+### Care of the Body
+Spaces dedicated to maintaining physical and mental wellbeing.
+- `WELLNESS`
+
+### Landscape Interaction
+Where people interact with the natural environment.
+- `NATURE`
+
+### Recreation and Movement
+Places where people participate in physical activity or sport.
+- `ACTIVITY`
+
+> Note: `COFFEE` spans both Provisioning and Social Gathering. This dual role is intentional — the café functions as both a resource (daily caffeine) and a place of habitual social presence. This ambiguity reflects reality rather than a classification error.
+
+This framework reflects the reality that cities are not simply collections of businesses — they are **systems of living environments**.
+
+---
+
+## 4. Why Twelve
+
+The taxonomy intentionally balances three constraints:
+
+- **Clarity** — each vertical is legible and non-overlapping in practice
+- **Coverage** — the full range of urban lived experience is represented
+- **Cognitive simplicity** — twelve is navigable without a lookup
+
+Too many categories produce noise. Too few erase meaningful distinctions.
+
+Twelve verticals provide enough resolution to represent the diversity of urban life while remaining intuitive for navigation and discovery.
+
+They also map well onto natural mental models people already use when exploring a city:
+
+- finding somewhere to eat
+- getting coffee
+- going out for drinks
+- visiting a gallery
+- going to the park
+
+---
+
+## 5. Technical Anchors
+
+The taxonomy is defined in three places in the codebase. These are the sources of truth.
+
+### `lib/primaryVertical.ts`
+- `PRIMARY_VERTICALS` — the canonical array of all 12 valid values (used for validation and dropdowns)
+- `VERTICAL_DISPLAY` — maps each vertical to its UI display label
+- `categoryToPrimaryVertical()` — maps legacy string categories to the enum
+- `resolvePrimaryVertical()` — resolves vertical from category + Google types, defaults to `EAT`
+
+### `prisma/schema.prisma` → `PrimaryVertical` enum
+The database-level enum. All entities store `primary_vertical` using this enum. `CANDIDATE` is the intake status for newly-created, pre-enrichment entities.
+
+### `lib/contracts/place-page.identity.ts`
+Defines the `SaikoCategory` type used at the API and display layer. Currently mirrors the 12 verticals (lowercased).
+
+### Note on Dual Types
+There are two parallel types in the codebase:
+
+- **`PrimaryVertical`** (`@prisma/client`) — 12 uppercase enum values; used at write time, storage, and validation
+- **`SaikoCategory`** — 11–12 lowercase string literals; used at read time and in display contracts
+
+They cover the same domain. When modifying the taxonomy, both must be updated together.
+
+---
+
+## 5.1 Classification Layers (Current Schema)
+
+Saiko currently uses four related classification fields, each with a different job:
+
+| Field | Layer role | Typical values | Operational use |
+|-------|------------|----------------|-----------------|
+| `entities.entityType` (`entity_type`) | Structural entity kind | `venue`, `activity`, `public` | Coarse entity shape and generic API behavior |
+| `entities.primary_vertical` | Primary domain classifier | `EAT`, `COFFEE`, `WINE`, `DRINKS`, `STAY`, ... | Routing, enrichment policy, scanner gating, reporting |
+| `entities.category` | Human-readable/category fallback | `restaurant`, `wine bar`, `hotel`, ... | Display fallback and legacy compatibility |
+| `entities.cuisineType` (`cuisine_type`) | Cuisine-specific subtype | `Mexican`, `Italian`, ... | Food identity/detail layer |
+
+Practical rule of thumb:
+- Use `entityType` when you need broad structural class.
+- Use `primary_vertical` for operational logic and applicability decisions.
+- Use `category` / `cuisine_type` for descriptive identity and presentation detail.
+
+This layered model is the reason Coverage Ops Tier 2 gating now uses `primary_vertical` rather than `entityType`.
+
+---
+
+## 6. Relationship to the Fields Data Layer
+
+In the Saiko architecture, the taxonomy lives primarily in **Fields**.
+
+Fields is the place data infrastructure layer.
+
+The vertical system serves several roles:
+
+### Identity Classification
+Each place has a `primary_vertical` that describes its core social function.
+
+```
+Gjelina        → EAT
+Intelligentsia  → COFFEE
+Silverlake Wine → WINE
+```
+
+### Query Organization
+Verticals provide a stable dimension for discovery queries.
+
+```
+coffee near me
+wine bars in echo park
+parks in los angeles
+```
+
+### Data Modeling
+Verticals sit at the top of the place type hierarchy, above more specific place types.
+
+```
+vertical: EAT      →  place_type: restaurant
+vertical: CULTURE  →  place_type: gallery
+```
+
+---
+
+## 7. Relationship to Traces
+
+**Traces** is the planned consumer layer that interprets Fields data into lived experiences.
+
+Within Traces, verticals help define experience surfaces:
+
+```
+EAT      → dining scenes
+COFFEE   → daily ritual spaces
+WINE     → slow evening social spaces
+NATURE   → outdoor exploration
+```
+
+Verticals therefore act as the structural bridge between raw place data and lived experiences.
+
+> **Fields** defines the place.
+> **Traces** interprets the place within the context of human life.
+
+---
+
+## 8. Relationship to Saiko Philosophy
+
+Saiko is not intended to be a comprehensive directory of businesses.
+
+Instead, it is a curated map of places that meaningfully contribute to how people live well in a city.
+
+**Inclusion itself implies recommendation.**
+
+The taxonomy therefore organizes places that Saiko stands behind, not the entire universe of locations.
+
+The result is a map that reflects lived culture rather than commercial inventory.
+
+---
+
+## 9. Design Implications
+
+The vertical system influences several parts of the product.
+
+### Navigation
+Verticals become natural discovery entry points.
+
+```
+Eat · Coffee · Wine · Culture · Nature
+```
+
+### Editorial Structure
+Verticals provide the foundation for lists, collections, and curated surfaces.
+
+```
+Best Coffee in LA
+Great Wine Bars
+Sunday Parks
+```
+
+### Data Signals
+Certain signals are more relevant to certain verticals.
+
+```
+EAT     → menu signals, dining occasion
+WINE    → wine list signals, pour style
+NATURE  → landscape signals, public access
+```
+
+---
+
+## 10. Future Evolution
+
+The vertical taxonomy is expected to remain **relatively stable**.
+
+Two additional layers may evolve over time:
+
+- **Place Type** — more specific classification within a vertical (e.g., `restaurant → bistro, tasting menu, counter`)
+- **Experience Signals** — vertical-specific attribute sets for discovery and matching
+
+Example future structure:
+
+```
+vertical:           CULTURE
+place_type:         museum
+experience_signals: contemporary, architecture, public
+```
+
+This layered approach allows the system to grow without modifying the core taxonomy.
+
+**What's already in place:**
+- `PrimaryVertical` enum is stable and validated at intake
+- `resolvePrimaryVertical()` handles legacy and unknown inputs with a safe `EAT` default
+- `VERTICAL_DISPLAY` drives UI rendering
+
+**What's not yet built for multi-vertical expansion:**
+- Vertical-aware ERA enrichment signals (Stage 5 AI extraction currently targets EAT)
+- Intake form vertical selector (currently hardcoded to `EAT`)
+- Vertical-specific Programs model (price tier, service model, etc.)
+
+---
+
+## 11. Guiding Principle
+
+The Saiko vertical taxonomy organizes places according to how people experience a city.
+
+It models urban life as a set of recurring domains:
+
+> eating · gathering · dwelling · moving · creating · resting
+
+The map therefore reflects the structure of everyday living rather than the structure of commerce.
+
+---
+
+## SAIKO-COVERAGE-DASHBOARD-DESIGN-V1
+
+| Field | Value |
+|-------|-------|
+| **Type** | architecture |
+| **Status** | active |
+| **Project** | SAIKO |
+| **Path** | `docs/COVERAGE-DASHBOARD-DESIGN-PRINCIPLES.md` |
+| **Last Updated** | Thu Mar 12 2026 17:00:00 GMT-0700 (Pacific Daylight Time) |
+| **Summary** | Design principles for the Coverage Dashboard — a work surface for resolving data gaps, organized by solution type (automated vs. semi-automated vs. human-only) rather than by missing field. |
+| **Systems** | admin, coverage-dashboard |
+
+# Coverage Dashboard — Design Principles
+
+## Purpose
+The Coverage Dashboard is a work surface, not a diagnostic report. Someone arrives here to fix problems and leave with fewer of them.
+
+## The Core Rule
+Every number shown must either confirm things are healthy or tell you what kind of action is needed. If a number doesn't imply an action, it doesn't belong on the page.
+
+## Dumb count vs. smart count
+Dumb: "42 records missing opening hours"
+Smart: "31 can be auto-filled via Stage 1 enrichment — 11 still need human review"
+
+The difference: a smart count tells you who does the work — the system or you.
+
+## Problem grouping principle
+Group problems by solution, not by field. The universe of solutions is constrained to the tools that exist. Design Coverage from the tools outward, not from the missing fields inward.
+
+## Automation first
+Automated operations run before any human review. Human work is reserved for what the system genuinely cannot resolve. The page should make it obvious which bucket each problem falls into.
+
+## Operations inventory (as of March 2026)
+Automated:
+- Google Places enrichment — given a GPID, fetches address, coords, neighborhood, phone, hours, website
+- Neighborhood reverse lookup — given coords, derives neighborhood
+
+Semi-automated (system proposes, human confirms):
+- GPID matching — system finds candidate, human approves
+- Instagram handle finder — AI-assisted, human confirms
+- Photo fetch and eval — system pulls Google photos, human tags
+
+Human only:
+- Editorial fields — description, TimeFOLD signal
+- Manual field entry — anything system cannot find
+
+## Key insight (March 2026)
+If a record has a GPID, operating facts are often machine-recoverable. Missing hours, price level, or business status are frequently automation problems first, not human problems first. Always check what the system can fix before surfacing a problem to a human.
 
 ---
 
@@ -2767,7 +4860,7 @@ The two deferred migrations (`20260306200000_slim_entities_fields_v2` and `20260
 | **Status** | active |
 | **Project** | SAIKO |
 | **Path** | `docs/saiko-merchant-data-hierarchy.md` |
-| **Last Updated** | 2026-03-10 |
+| **Last Updated** | 2026-03-14 |
 
 # Saiko Merchant Data Hierarchy
 
@@ -2788,6 +4881,17 @@ Blocks earn their space. If a tier has no data, it collapses cleanly and silentl
 ---
 
 ## Tier Structure
+
+### Tier Namespace Clarification
+
+This document defines merchant profile **UI rendering tiers** (Tier 0-5) for `/place/[slug]` and related surfaces.
+
+These tiers are not the same as Coverage Operations tiers. Coverage architecture uses:
+- Tier 1 — Identity & Classification
+- Tier 2 — Visit Facts
+- Tier 3 — Experience / Interpretation
+
+See `docs/architecture/coverage-tiers-v1.md` for the coverage-tier model used by scanners and Coverage Ops.
 
 ### Tier 0 — Identity + Action
 
@@ -3858,6 +5962,333 @@ This validates the platform taxonomy without expanding surface area.
 
 ---
 
+## PIPE-INSTAGRAM-WORKSTREAM-V1
+
+| Field | Value |
+|-------|-------|
+| **Type** | spec |
+| **Status** | active |
+| **Project** | SAIKO |
+| **Path** | `docs/pipelines/instagram-integration-workstream-v1.md` |
+| **Last Updated** | 2026-03-13 |
+| **Summary** | Phased execution plan for Instagram integration — 6 phases from data quality through contextual display. Includes codebase readiness assessment, effort estimates, timing recommendations, and per-phase task checklists. |
+| **Systems** | instagram-api, enrichment-pipeline, merchant-surfaces, scenesense |
+
+# Instagram Integration — Workstream & Execution Plan
+
+**Version:** 1.0
+**Date:** 2026-03-13
+**Author:** Bobby / Claude
+**Status:** Active — Phase 1 in progress
+
+---
+
+## Codebase Readiness Assessment
+
+Before the phases: what the codebase review found.
+
+### What's already built (Phase 0 — Done)
+
+| Component | Status |
+|---|---|
+| `instagram_accounts` table | ✅ In schema, indexed, linked to `entities` |
+| `instagram_media` table | ✅ In schema, indexed, linked to `instagram_accounts` |
+| `instagram_insight_snapshots` table | ✅ In schema, append-only structure |
+| `instagram_temporal_signals` table | ❌ New — only missing table |
+| `ingest-instagram.ts` | ✅ Production-ready — 3 modes (Business Discovery, batch, /me) |
+| API credentials | ✅ Never-expiring Page Access Token + IG_USER_ID in `.env.local` |
+| `merchant_surfaces` IG records | ✅ ~90 records across ~70 entities |
+| `entities.instagram` column | ⚠️ 7 populated, quality issues |
+| Instagram registered as source | ✅ `source_registry` — trust_tier 3, threshold 0.80 |
+| API route serves IG handle | ✅ Returns `entities.instagram` to client |
+| Place page renders IG link | ✅ StatusCell + primary CTAs |
+
+### Interpretation layer: no major refactoring required
+
+The Fields v2 / `derived_signals` architecture is source-agnostic. Key findings:
+
+- **Signal extraction** reads from `merchant_surface_artifacts.text_blocks` — source-independent. Feed it text, it extracts signals. No hardcoded assumptions.
+- **SceneSense** reads `derived_signals` with `signal_key='identity_signals'`. No source assumptions.
+- **Voice/tagline gen** consumes signal extraction output. No source assumptions.
+- **API route** already has `instagram` column. Source-independent.
+- **Review queue** completely source-agnostic.
+- **Surface parse** has Instagram in `SKIP_FETCH_TYPES` — needs Instagram-specific parse path (Phase 2).
+
+### Key gating constraint: Meta App Review
+
+The TRACES THREE app is in **development mode**. All API calls limited to test users and business accounts that granted access. Batch ingest of the full ~70-entity set requires Meta App Review approval. This is calendar-time-gated (2-6 weeks). **Start the submission process as soon as Phase 1 validates data quality.** Everything else is unblocked.
+
+---
+
+## Phase 1 — Data Quality & First Real Ingest
+
+**Status:** In progress
+**Estimated effort:** 2-3 days
+**Gate:** None — can start immediately
+
+### Tasks
+
+- [ ] Backfill `entities.instagram` from `merchant_surfaces`
+  - Query `merchant_surfaces` WHERE surface_type = 'instagram'
+  - Extract clean handles from source_url (e.g. `https://instagram.com/brotherscousinstacos/` → `brotherscousinstacos`)
+  - Script: `scripts/backfill-instagram-handles.ts`
+  - Dry-run first to review candidates; write only on confirmation
+- [ ] Fix known bad data
+  - Literal `"null"` string on LA Tutors 123 → SQL NULL
+  - Full URLs stored as handles → cleaned by backfill script
+  - Any other anomalies surfaced during review
+- [ ] Run first real `--batch` ingest
+  - Command: `npx tsx scripts/ingest-instagram.ts --batch`
+  - Dry-run first: `--dry-run --batch`
+  - Validates which handles resolve via Business Discovery
+  - Populates `instagram_accounts` + `instagram_media`
+- [ ] Data review after ingest
+  - Count: how many accounts resolved vs failed?
+  - Caption quality: what % have captions? Average length?
+  - Posting cadence: how many posts/week across corpus?
+  - Signal density: what % of captions have extractable content (vs pure emoji/hashtags)?
+  - Language: what % are primarily Spanish vs English vs bilingual?
+- [ ] Submit Meta App Review
+  - Document required permissions: `instagram_basic`, `instagram_manage_insights`, `pages_read_engagement`
+  - Begin submission process — 2-6 week calendar gate, start early
+
+### Success criteria
+
+- `entities.instagram` populated for all entities that have a `merchant_surfaces` instagram record
+- `instagram_accounts` + `instagram_media` populated for all resolvable handles
+- Data review completed with findings documented (append to Section 3 of `instagram-implementation-v1.md`)
+- Meta App Review submitted
+
+---
+
+## Phase 2 — Caption Signal Extraction
+
+**Status:** Pending Phase 1
+**Estimated effort:** 4-6 days
+**Gate:** Phase 1 data in tables; data review confirms signal density worth extracting
+
+### Context
+
+The signal extraction pipeline (`extract-identity-signals.ts`) is already source-agnostic — it reads from `merchant_surface_artifacts.text_blocks` and extracts signals regardless of origin. Instagram captions need a bridge: a path from `instagram_media.caption` into the same text-blocks format the pipeline expects.
+
+### Tasks
+
+- [ ] Build caption bridge: Instagram media → text blocks
+  - Script or job that reads `instagram_media` rows where `signal_extracted_at IS NULL`
+  - Packages captions as text blocks in the same format as `merchant_surface_artifacts`
+  - Option A: writes synthetic `merchant_surface_artifacts` rows (cleanest re-use of existing pipeline)
+  - Option B: feeds captions directly into signal extraction as an alternate input (simpler but less reusable)
+- [ ] Handle bilingual content
+  - ~30-40% of corpus is Spanish-primary or bilingual (taco trucks etc.)
+  - Signal extraction prompt may need bilingual awareness
+  - Test on Tacos El Toro (929 posts, primarily Spanish) as validation case
+- [ ] Define Instagram-specific signal taxonomy additions
+  - Existing taxonomy covers: cuisine_posture, language_signals, place_personality, etc.
+  - Instagram adds: producer_mentions, sourcing_language, dish_narrative, philosophy_language
+  - Review whether existing fields cover these or if new signal keys needed
+- [ ] Mark extracted posts: set `signal_extracted_at` on `instagram_media` rows
+  - Supports re-extraction if model improves
+- [ ] Wire into coverage dashboard
+  - Add caption extraction status as a coverage dimension (% of entities with extracted IG signals)
+
+### Success criteria
+
+- Caption signals flowing into `language_signals` / `derived_signals` for all entities with resolved IG handles
+- Re-extraction supported via `signal_extracted_at` timestamp
+- SceneSense receiving richer input for wine bars, chef-driven spots, natural wine focused restaurants
+
+---
+
+## Phase 3 — Temporal Signal Architecture
+
+**Status:** Pending Phase 1
+**Estimated effort:** 5-7 days
+**Gate:** Phase 1 data in tables; independent of Phase 2
+
+### Context
+
+Temporal signals are a new signal class that doesn't exist anywhere in the current system. Every other source produces evergreen signals. Instagram is the first source that produces perishable ones. This phase builds the capture infrastructure — display comes later.
+
+### Tasks
+
+- [ ] Create `instagram_temporal_signals` migration
+  - Fields: id, instagram_media_id, signal_type (closure/event/hours_change/special_menu/other), signal_text, valid_from, valid_until, confidence, extracted_at, is_expired
+  - Script: `prisma/migrations/[date]_add_instagram_temporal_signals/`
+- [ ] Build temporal extraction job
+  - Reads `instagram_media` captions
+  - Looks specifically for: date language, event language, closure language, hours change language
+  - AI extraction prompt focused on: "does this caption announce something time-bound?"
+  - Parses out: what is it, when, how confident
+  - Writes to `instagram_temporal_signals`
+- [ ] Build expiry sweep job
+  - Scheduled job: sets `is_expired = true` on signals where `valid_until < now()`
+  - Keeps active signal pool clean
+  - Can run daily via cron or as part of ingest job
+- [ ] Capture-only — no display UI yet
+  - Signals accumulate but are not surfaced to users
+  - This is correct: 6 months of data before display is better than displaying prematurely
+
+### Success criteria
+
+- `instagram_temporal_signals` table created and populated for merchants with operational posting patterns
+- Expiry sweep job running
+- At minimum: capture working for Brothers Cousins (operational content, bilingual), Tacos El Toro (high cadence)
+- Open question documented: how do temporal signals interact with `entities.hours` in conflict cases?
+
+---
+
+## Phase 4 — Photo Candidate Pipeline
+
+**Status:** Pending Phase 1
+**Estimated effort:** 3-4 days
+**Gate:** Phase 1 — `instagram_media` populated
+
+### Context
+
+Instagram merchant photos are editorially intentional — categorically different from user-submitted Google photos. They should enter the same unified photo candidate pool with source metadata attached, so TRACES can make display decisions with full context.
+
+### Tasks
+
+- [ ] Review existing Google photo pipeline
+  - How does `place_photo_eval` work?
+  - What fields does it use for tier/type classification?
+  - How does TRACES consume photo candidates today?
+- [ ] Build `is_display_candidate` scoring logic for `instagram_media`
+  - Quality signals: media_type = IMAGE or CAROUSEL_ALBUM (VIDEO typically lower priority)
+  - Recency signal: posted within last 6 months
+  - Caption quality signal: captions with substantive text → higher merchant intent
+  - Aspect ratio / resolution: if accessible from media_url metadata
+- [ ] Update `instagram_media` rows: set `is_display_candidate` flag
+- [ ] Integration path into unified candidate pool
+  - Determine how TRACES currently resolves candidates from `place_photo_eval`
+  - Add Instagram candidates to the same pool with source='instagram', recency timestamp
+  - Do not build a separate system; extend what exists
+
+### Success criteria
+
+- `is_display_candidate` populated on `instagram_media` with sensible scoring
+- Instagram photos available to TRACES alongside Google photos
+- Source metadata preserved: TRACES knows origin and recency of each candidate
+
+---
+
+## Phase 5 — Interpretation Layer Wiring
+
+**Status:** Pending Phase 2
+**Estimated effort:** 3-5 days
+**Gate:** Phase 2 caption signals flowing
+
+### Context
+
+The interpretation layer is largely source-agnostic already. This phase is about explicit wiring, not refactoring. Key things that need awareness of Instagram as a source:
+
+### Tasks
+
+- [ ] Confidence model: add Instagram as corroborating source
+  - When Instagram signals match existing signals, confidence should increase
+  - Instagram is tier-3 trust but high recency — calibrate accordingly
+- [ ] ABOUT synthesis: register caption tone awareness
+  - Instagram language is shorter, more casual, sometimes in first person
+  - Should feed ABOUT synthesis as supporting evidence but not set the register
+  - Safeguard: Instagram text should not bleed into rendered output tone
+- [ ] SceneSense: verify Instagram signals flowing through `language_signals`
+  - Validate that `derived_signals` rows from Instagram caption extraction are being read by SceneSense
+  - Run SceneSense on a wine bar entity before/after to confirm signal lift
+- [ ] Audit remaining hardcoded source assumptions
+  - Priority: identity line assembly — does it hardcode sources?
+  - Check: confidence scoring model source weighting
+- [ ] Register `instagram_api` in `source_registry` table (if not already done)
+  - Seed script entry exists; verify it was applied to prod DB
+
+### Success criteria
+
+- SceneSense results visibly improved for entities with high-quality Instagram captions
+- Confidence scores reflect Instagram corroboration
+- No tone bleed from Instagram captions into ABOUT text register
+- `instagram_api` confirmed in `source_registry`
+
+---
+
+## Phase 6 — Contextual Display
+
+**Status:** Deferred — pending Phases 3, 4, and product decisions
+**Estimated effort:** 5-8 days
+**Gate:** Phase 3 temporal signals; product decisions on confidence thresholds and conflict resolution
+
+### Context
+
+Contextual display is the product expression of the temporal signal architecture. It is one of the most meaningful differentiators Saiko can build. Users learn that Saiko knows things other platforms do not.
+
+### Product decisions required before building
+
+- What is the minimum confidence to surface a closure or event on the place page?
+- How do we handle Instagram signal vs. `entities.hours` conflicts — who wins?
+- What does the display component look like? Banner? Inline note? Separate section?
+- Does the place page need a "last updated" signal based on Instagram freshness?
+
+### Tasks (pending product decisions)
+
+- [ ] Design temporal signal display component
+- [ ] Define confidence threshold for display activation
+- [ ] Build conflict resolution logic: Instagram vs. hours
+- [ ] Wire `instagram_temporal_signals` into API route (`/api/places/[slug]`)
+- [ ] Update place page data contract (`lib/contracts/place-page.identity.ts`)
+- [ ] Implement display UI
+- [ ] Add Instagram freshness signal to place page (optional: "last posted 2 days ago")
+
+### Success criteria
+
+- Closures and special events visible on place page within hours of Instagram post
+- Conflict cases handled with defined precedence rule
+- No false positives from low-confidence temporal extractions
+
+---
+
+## Open Questions Tracker
+
+| Question | Phase | Status |
+|---|---|---|
+| What % of corpus has active vs dormant accounts? | 1 | ⏳ Phase 1 data review |
+| Average caption length and quality across full set? | 1 | ⏳ Phase 1 data review |
+| What % have extractable signals vs emoji/hashtag noise? | 1 | ⏳ Phase 1 data review |
+| How many posts/week across corpus? | 1 | ⏳ Phase 1 data review |
+| Instagram text blocks: synthetic artifacts vs direct injection? | 2 | 🔲 Engineering decision |
+| Bilingual signal extraction: prompt changes needed? | 2 | 🔲 Engineering decision |
+| `instagram_api` in `source_registry` — applied to prod? | 5 | 🔲 Verify |
+| How do temporal signals interact with `entities.hours`? | 6 | 🔲 Product decision |
+| Confidence threshold for surfacing closures/events? | 6 | 🔲 Product decision |
+| Fetch cadence: daily vs dynamic by is_active_recently? | 1 | 🔲 After data review |
+| Meta App Review: what permissions to request? | 1 | 🔲 Submit Phase 1 |
+
+---
+
+## Timing
+
+| Phase | Effort | Dependencies | Start |
+|---|---|---|---|
+| Phase 0 | Done | — | Done |
+| **Phase 1** | 2-3 days | None | **Now** |
+| Phase 2 | 4-6 days | Phase 1 data | After Phase 1 |
+| Phase 3 | 5-7 days | Phase 1 data | Can parallel Phase 2 |
+| Phase 4 | 3-4 days | Phase 1 media | Can parallel Phases 2-3 |
+| Phase 5 | 3-5 days | Phase 2 signals | After Phase 2 |
+| Phase 6 | 5-8 days | Phase 3 + product decisions | Deferred |
+| Meta App Review | 2-6 weeks (calendar) | Phase 1 validation | Submit during Phase 1 |
+
+**Total active engineering: ~22-33 days across Phases 1-5.**
+
+Phase 6 (contextual display) is independent and can be scoped separately once the capture infrastructure is in place.
+
+---
+
+## Revision History
+
+| Version | Date | Changes | Author |
+|---|---|---|---|
+| 1.0 | 2026-03-13 | Initial workstream doc — all 6 phases, readiness assessment, open questions, timing | Bobby / Claude |
+
+---
+
 ## SAIKO-ENERGY-SCORE-SPEC
 
 | Field | Value |
@@ -4073,6 +6504,78 @@ The sensory modifier draws from:
 - **QSR/Curion sensory research** — Color studies showing warm/bright colors raise arousal; cool/dark colors lower it
 
 The novel contribution: applying these validated frameworks to data-derived text signals rather than in-person measurement. We cannot measure decibel levels or scent intensity from data — but we can detect language proxies for sensory environments that the research confirms drive arousal.
+
+---
+
+## SAIKO-ENTITY-PROFILE-SPEC-V1
+
+| Field | Value |
+|-------|-------|
+| **Type** | spec |
+| **Status** | active |
+| **Project** | SAIKO |
+| **Path** | `docs/ENTITY-PROFILE-SPEC.md` |
+| **Last Updated** | Thu Mar 12 2026 17:00:00 GMT-0700 (Pacific Daylight Time) |
+| **Summary** | Spec for /admin/entity/[id] — the canonical single-entity admin view showing all field states with inline resolution actions and a TimeFOLD editorial slot. |
+| **Systems** | admin, entity-profile |
+
+# Entity Profile Page — Spec
+
+## Route
+/admin/entity/[id]
+
+## Purpose
+Canonical admin view for a single place record. One page that shows everything about an entity, the state of every field, and inline actions to resolve gaps.
+
+Surgical workflow: fix one specific place fully. Queue pages (Instagram, GPID, Photo Eval) are the bulk workflow for the same actions.
+
+## Two modes
+Resolution mode — fix missing or low-confidence fields inline
+Editorial mode — write the TimeFOLD Foreground signal once factual identity is solid
+
+## Layout
+
+Header strip (read-only, edit override button):
+- name, slug, neighborhood, category, status badge, google_place_id, created_at
+
+Field grid:
+Each field card has one of three states:
+- Populated — value + confidence score if available, green indicator
+- Low confidence — value + score + Review action, yellow indicator
+- Missing — empty state + inline resolution action, red indicator
+
+Fields and resolution actions:
+- google_place_id — trigger GPID lookup, approve match
+- address / latitude / longitude — pull from Google Places API
+- phone — pull from Google Places API
+- website — inline input + save
+- instagram — inline input + save
+- hours_json — pull from Google Places API
+- cuisine_type — inline select + save
+- category — inline select + save
+- description — inline textarea + save
+- photos — trigger Google Photos fetch, tag and approve
+- enrichment_tier — read-only badge from entity_enrichment_tiers view
+
+TimeFOLD slot (below field grid):
+- Label: Temporal Signal
+- If populated: display read-only with Edit button
+- If empty: single-line input, placeholder "e.g. Long-running neighborhood fixture."
+- Save button → PATCH entities.tagline
+- UI note: "One line. No dates. Write what this place means right now."
+
+## Entry points into this page
+- Coverage Dashboard Problem Records table — each row links here
+- Instagram Backfill — each place row has View Entity link
+- GPID Queue — each item links here
+- Photo Eval — each place links here
+
+## Constraints
+- Do not use entities.enrichment_stage
+- Do not use golden_records.data_completeness
+- Server component for initial data load
+- Client components for inline resolution actions
+- All writes through existing API patterns, no raw SQL from client
 
 ---
 
@@ -4530,6 +7033,106 @@ Formality should be mostly computable from Identity + reservability even with li
 2. Implement scoring functions (same pipeline pattern as Energy).
 3. Run full LA dataset + output distributions.
 4. Tune only weights/lexicons as needed; do not change dimensions or input set.
+
+---
+
+## SYS-COVERAGE-OPS-ISSUE-CONTRACT-V1
+
+| Field | Value |
+|-------|-------|
+| **Type** | system |
+| **Status** | active |
+| **Project** | SAIKO |
+| **Path** | `docs/system/coverage-ops-issue-contract-v1.md` |
+| **Last Updated** | 2026-03-14 |
+| **Summary** | Canonical issue contract for Coverage Ops v1 — issue types, severity, gating, and UI action mappings. |
+| **Systems** | coverage-operations, issue-scanner, admin |
+
+# Coverage Ops Issue Contract (v1)
+
+## Purpose
+
+This document is the single source of truth for Coverage Ops issue semantics in v1.
+
+It defines:
+- issue type names
+- severity and problem class
+- gating/applicability rules
+- action mappings used by Coverage Ops UI
+
+Issue types remain field-level in v1 for deterministic operator actions.
+
+---
+
+## Read Precedence
+
+Scanner checks canonical first, then entity fallback where applicable:
+
+1. `canonical_entity_state`
+2. `entities`
+
+This applies to visit-fact checks like hours, price level, and reservation links.
+
+---
+
+## Tier 2 Visit Facts Contract
+
+| issue_type | problem_class | severity | gating/applicability | detection summary | UI action |
+|-----------|---------------|----------|----------------------|-------------------|----------|
+| `missing_hours` | `location` | medium | all active entities | no `canonical_entity_state.hours_json` and no `entities.hours` fallback | Run Stage 1 |
+| `missing_price_level` | `location` | low | food/drink verticals (`EAT`, `COFFEE`, `WINE`, `DRINKS`, `BAKERY`) | no `canonical_entity_state.price_level` and no `entities.priceLevel` fallback | Run Stage 1 |
+| `missing_menu_link` | `location` | low | food/drink verticals (`EAT`, `COFFEE`, `WINE`, `DRINKS`, `BAKERY`) | no `canonical_entity_state.menu_url` | Run Stage 6 |
+| `missing_reservations` | `location` | low | reservation-likely verticals (`EAT`, `DRINKS`, `WINE`, `STAY`) | no `canonical_entity_state.reservation_url` and no `entities.reservationUrl` fallback | Run Stage 6 |
+| `operating_status_unknown` | `location` | medium | only when `entities.googlePlaceId` exists | `entities.businessStatus` missing/blank | Run Stage 1 |
+| `google_says_closed` | `identity` | high | entity has Google status | Google reports closure inconsistent with current entity status | Mark Closed / Still Open |
+
+---
+
+## Baseline Tier 1/Identity Issue Contract (Current)
+
+| issue_type | problem_class | severity | UI action |
+|-----------|---------------|----------|----------|
+| `unresolved_identity` | `identity` | critical | Find GPID / inline GPID entry |
+| `missing_gpid` | `identity` | medium | Find GPID |
+| `enrichment_incomplete` | `identity` | high | Enrich |
+| `missing_coords` | `location` | high | Run Stage 1 |
+| `missing_neighborhood` | `location` | medium | Derive |
+| `missing_website` | `contact` | medium | Discover Web / inline website |
+| `missing_phone` | `contact` | low | Run Stage 1 / inline phone |
+| `missing_instagram` | `social` | low | Discover IG / inline handle |
+| `missing_tiktok` | `social` | low | Discover TikTok / inline handle |
+| `potential_duplicate` | `identity` | medium | Review / Merge |
+
+`potential_duplicate` is generated via duplicate scan path and handled in Coverage Ops merge flow.
+
+---
+
+## Action Routing
+
+Current action routes used by Coverage Ops:
+
+- Stage 1/6 enrichment: `POST /api/admin/tools/enrich-stage`
+- Neighborhood derivation: `POST /api/admin/tools/derive-neighborhood`
+- Social/website discovery: `POST /api/admin/tools/discover-social`
+- GPID find: `POST /api/admin/tools/seed-gpid-queue`
+- Closure override/write: `PATCH /api/admin/entities/[id]/patch`
+- Resolve/suppress issue state: `POST /api/admin/tools/scan-issues`
+
+---
+
+## Provenance (v1)
+
+No schema changes are required for v1 provenance hints.
+
+If needed in issue detail payloads, derive lightweight fields from existing data:
+- `source_system`
+- `source_url`
+- `observed_at`
+- `confidence`
+
+Suggested source order:
+1. sanctioned claim path (`canonical_sanctions` -> `observed_claims`)
+2. evidence fallback (`merchant_surface_scans`, `menu_fetches`, `merchant_enrichment_runs`)
 
 ---
 
@@ -7307,6 +9910,60 @@ LOCAL ONLY                DB ONLY                     SHARED (both)
 
 ---
 
+## SAIKO-ADMIN-SPRING-CLEANING-2026-03
+
+| Field | Value |
+|-------|-------|
+| **Type** | document |
+| **Status** | active |
+| **Project** | SAIKO |
+| **Path** | `docs/ADMIN-SPRING-CLEANING-LOG.md` |
+| **Last Updated** | Thu Mar 12 2026 17:00:00 GMT-0700 (Pacific Daylight Time) |
+| **Summary** | Record of admin routes and features retired or fixed in March 2026 — Review Queue, Energy Engine, Appearances auth, GPID Queue URL. Captures rationale for each retirement. |
+| **Systems** | admin |
+
+# Admin Spring Cleaning Log — March 2026
+
+## Retired: Review Queue (/admin/review)
+
+What it did: Human adjudication of ML resolver output — "same place or different place" decisions for entity matches with confidence between 0.70 and 0.90.
+
+Why retired: The ML-based deduplication pipeline is no longer active. The 20 pending records were corrupted ingest artifacts from a deprecated editorial_era_intake path — not real deduplication candidates. The review queue was solving a problem that no longer exists in the current ingest path.
+
+Action taken:
+- Route archived
+- Nav item removed
+- Admin dashboard card removed
+- pending records cleared from review_queue table
+
+## Retired: Energy Engine (/admin/energy)
+
+What it did: Displayed energy/atmosphere scoring for places — a 0-100 classification system intended as a precursor to SceneSense vibe tagging.
+
+Why retired: The scoring system ran but produced no meaningful signal. 143 records all scored 0-9 out of 100, avg confidence 0.01. The system was superseded by place_tag_scores (Cozy tag) which has real coverage. No consumer surface ever consumed energy_scores.
+
+Action taken:
+- Route archived
+- Nav item removed
+- Admin dashboard card removed
+- energy_scores table retained but not active
+
+## Fixed: Appearances auth (/admin/appearances)
+
+Issue: Route was redirecting to /login instead of loading within authenticated admin session.
+Fix: Applied same auth guard used by other admin routes.
+
+## Fixed: GPID Queue URL
+
+Old route: /admin/identity/gpid-queue
+New route: /admin/gpid-queue
+Reason: Flattened to match nav label and pattern of other admin pages.
+
+## Admin nav after spring cleaning
+Dashboard / Intake / Coverage / Instagram / Photos / GPID Queue / Appearances
+
+---
+
 ## SAIKO-SAIKOAI-EXTRACTION-PROMPT-V2-1
 
 | Field | Value |
@@ -7713,7 +10370,7 @@ map.panTo(centroid)
 | **Status** | active |
 | **Project** | SAIKO |
 | **Path** | `docs/README.md` |
-| **Last Updated** | 2026-03-10 |
+| **Last Updated** | 2026-03-14 |
 
 # Saiko Maps
 
@@ -7788,6 +10445,8 @@ Individual place pages with a three-tier data hierarchy:
 - **Tier 3 — Reference + Discovery:** Styled map tile, coverage links, "Also On" cross-references
 
 *Data degrades gracefully — if a tier has no data, the space collapses. See Merchant Data Hierarchy for the full spec.*
+
+> Note: This page-level tier model is a UI/content hierarchy for merchant profile rendering. It is separate from the Coverage Architecture tier model documented in `docs/architecture/coverage-tiers-v1.md`.
 
 ### Share Cards
 
@@ -7916,6 +10575,337 @@ Without these, development allows requests with a warning; production fails clos
 ---
 
 **Saiko Maps · 2026**
+
+---
+
+## OS-BEVERAGE-PROGRAM-VOCAB-V1
+
+| Field | Value |
+|-------|-------|
+| **Type** | specification |
+| **Status** | active |
+| **Project** | SAIKO |
+| **Path** | `docs/offering-signals/beverage-program-vocab-v1.md` |
+| **Last Updated** | 2026-03-14 |
+| **Summary** | Canonical beverage program model and signal vocabulary for derived offering enrichment. Defines 5 program containers, maturity scale, and locked signal sets for wine, beer, cocktail, non-alcoholic, and coffee/tea programs. |
+| **Systems** | offering-signals, fields-data-layer |
+
+# Beverage Program + Signal Vocabulary (v1)
+
+**System:** Saiko Fields / TRACES
+**Status:** Working Lock
+
+**Purpose:** Define the canonical beverage program model and the initial signal vocabulary for derived offering enrichment.
+
+---
+
+## 1. Scope
+
+This document locks the **beverage-side program model** for Traces.
+
+It does **not** define UI copy.
+It does **not** define SceneSense interpretation.
+It does **not** replace the broader Fields signal taxonomy.
+
+It defines:
+
+- beverage program containers
+- beverage signal vocabulary
+- naming conventions
+- maturity usage
+- localization rule
+
+---
+
+## 2. Core Rule
+
+Programs are **stable derived containers**.
+Signals are **derived descriptors** that feed those programs.
+Facts / atomic observations remain in Fields.
+
+The stack is:
+
+```
+Atomic / observable facts
+  → derived beverage signals
+    → derived beverage programs
+      → interpretation / rendering
+```
+
+---
+
+## 3. Beverage Program Containers (Locked)
+
+These are the canonical beverage program containers inside the derived offering model.
+
+- `wine_program`
+- `beer_program`
+- `cocktail_program`
+- `non_alcoholic_program`
+- `coffee_tea_program`
+
+These containers are **global** and should remain stable across markets.
+They are peers under the broader beverage layer.
+
+---
+
+## 4. Program Maturity Scale (Locked)
+
+All beverage programs use the same maturity scale:
+
+- `none`
+- `incidental`
+- `considered`
+- `dedicated`
+- `unknown`
+
+Definitions:
+
+- `none` = clear evidence the program is absent
+- `incidental` = present, but not a meaningful part of the entity's identity
+- `considered` = intentional and relevant to the offering
+- `dedicated` = clearly a defining program
+- `unknown` = insufficient evidence
+
+This scale measures **intentionality / centrality**, not size alone.
+
+---
+
+## 5. Wine Program Signals (Locked v1)
+
+Canonical signals:
+
+- `extensive_wine_list`
+- `natural_wine_presence`
+- `aperitif_focus`
+
+Notes:
+
+- `aperitif_focus` belongs to `wine_program`, not `cocktail_program`
+- future market-local wine signals may be added without changing the program container
+- examples of future localized wine signals: `vin_au_verre_presence`, `champagne_focus`, `sake_presence` (if later split or mapped carefully)
+
+---
+
+## 6. Beer Program Signals (Locked v1)
+
+Canonical signals:
+
+- `beer_program`
+
+Notes:
+
+- beer is a first-class beverage program container
+- v1 remains shallow
+- future expansion may add signals such as:
+  - `craft_beer_presence`
+  - `draft_beer_focus`
+  - `brewery_affiliation`
+  - `na_beer_presence` (if not kept under non-alcoholic only)
+
+---
+
+## 7. Cocktail Program Signals (Locked v1)
+
+Canonical signals:
+
+- `cocktail_program`
+
+Notes:
+
+- `aperitif_focus` is not a cocktail signal
+- v1 cocktail treatment is intentionally shallow
+- future expansion may add:
+  - `classic_cocktail_focus`
+  - `house_cocktail_focus`
+  - `tiki_program`
+  - `martini_focus`
+
+---
+
+## 8. Non-Alcoholic Program Signals (Locked v1)
+
+Canonical signals:
+
+- `basic_na_beverages`
+- `agua_fresca_program`
+- `horchata_presence`
+- `house_soda_program`
+- `zero_proof_cocktails`
+- `na_spirits_presence`
+- `na_beer_wine_presence`
+- `functional_beverage_presence`
+- `fermented_beverage_presence`
+- `cultural_soda_presence`
+
+Definitions:
+
+- `basic_na_beverages` = default soft drinks / basic non-alcoholic beverages
+- `agua_fresca_program` = aguas frescas as an intentional beverage offering
+- `horchata_presence` = horchata explicitly present
+- `house_soda_program` = house-made soda / lemonade / similar
+- `zero_proof_cocktails` = structured spirit-free / non-alcoholic cocktail program
+- `na_spirits_presence` = NA spirits or direct analogue bottles used
+- `na_beer_wine_presence` = NA beer and/or NA wine offered
+- `functional_beverage_presence` = adaptogen / nootropic / wellness beverage offering
+- `fermented_beverage_presence` = kombucha / shrubs / vinegar drinks / similar
+- `cultural_soda_presence` = Mexican Coke, Jarritos, Topo Chico, or similar culturally specific soft drinks
+
+Notes:
+
+- NA drinks do not automatically imply an NA program
+- taco trucks and similar entities may have `cultural_soda_presence` or `horchata_presence` while remaining only `incidental` at the program level
+- dedicated sober bars are a different entity pattern and should not be confused with incidental NA coverage inside restaurants
+
+---
+
+## 9. Coffee / Tea Program Signals (Locked v1)
+
+Canonical signals:
+
+- `coffee_program`
+- `espresso_program`
+- `specialty_coffee_presence`
+- `tea_program`
+- `specialty_tea_presence`
+- `matcha_program`
+- `bubble_tea_program`
+- `bubble_tea_chain`
+- `tea_house_structure`
+- `afternoon_tea_service`
+- `arabic_coffee_program`
+
+Definitions:
+
+- `coffee_program` = coffee is present as a menu offering
+- `espresso_program` = espresso-based drinks are a meaningful part of the menu
+- `specialty_coffee_presence` = third-wave / single-origin / pour-over / roaster-driven coffee
+- `tea_program` = tea is present beyond minimal default service
+- `specialty_tea_presence` = curated tea list / loose-leaf / notable tea focus
+- `matcha_program` = matcha is a meaningful beverage signal
+- `bubble_tea_program` = bubble tea / boba is a defining beverage format
+- `bubble_tea_chain` = large-format standardized chain boba pattern
+- `tea_house_structure` = venue structurally organized around tea
+- `afternoon_tea_service` = formal tea service program
+- `arabic_coffee_program` = Yemeni / Arabic coffee tradition is a defining beverage signal
+
+Notes:
+
+- boba belongs inside `coffee_tea_program`, not its own program container
+- backend canonical term is `bubble_tea_program`
+- local UI language may render this as "Boba" in Los Angeles
+- tea remains inside `coffee_tea_program` for v1 and is not split into a separate top-level program
+
+---
+
+## 10. Naming Convention (Locked)
+
+Backend signal names should use **canonical descriptive language**, not local slang.
+
+Rules:
+
+1. use lowercase snake_case
+2. prefer descriptive beverage formats over brand language
+3. prefer globally portable naming in backend vocabulary
+4. allow local rendering in UI / voice
+5. avoid interpretation terms in signal names
+
+Examples:
+
+- use `bubble_tea_program`, not `boba_program`
+- use `arabic_coffee_program`, not `jalsa_style`
+- use `afternoon_tea_service`, not `high_tea_vibes`
+- use `natural_wine_presence`, not `cool_wine_list`
+
+---
+
+## 11. Localization Rule (Locked)
+
+Beverage programs are **global containers**.
+Signals may be **global or market-local**.
+
+Rule:
+
+```
+Global schema
+Local signal vocabulary
+Shared evidence / confidence model
+```
+
+Examples:
+
+Los Angeles may use:
+- `agua_fresca_program`
+- `bubble_tea_program`
+- `natural_wine_presence`
+
+Paris may later use:
+- `vin_au_verre_presence`
+- `apero_structure`
+
+Tokyo may later use:
+- `kissaten_style`
+- `sake_presence`
+
+These all map into the same global beverage program containers.
+Localization affects **signals**, not **program containers**.
+
+---
+
+## 12. Assembly Principle (Locked)
+
+Programs are derived summaries of beverage signals.
+
+Program output should include:
+- `maturity`
+- `signals`
+- `confidence`
+- `evidence`
+
+Program evidence must be scoped only to the signals that feed that program.
+No cross-program evidence bleed is allowed.
+
+---
+
+## 13. What Is Explicitly Out of Scope for v1
+
+Not part of this lock:
+
+- deep wine producer extraction
+- importer / distributor inference
+- cocktail style taxonomy
+- coffee origin taxonomy
+- tea lineage taxonomy
+- detailed service posture interpretation
+- consumer-facing label language
+- SceneSense usage rules
+
+These may come later, but are not required for Beverage Program Vocabulary v1.
+
+---
+
+## 14. Locked Summary
+
+Program containers locked:
+- `wine_program`
+- `beer_program`
+- `cocktail_program`
+- `non_alcoholic_program`
+- `coffee_tea_program`
+
+Signal sets locked for v1:
+
+**Wine:** `extensive_wine_list`, `natural_wine_presence`, `aperitif_focus`
+
+**Beer:** `beer_program`
+
+**Cocktail:** `cocktail_program`
+
+**Non-Alcoholic:** `basic_na_beverages`, `agua_fresca_program`, `horchata_presence`, `house_soda_program`, `zero_proof_cocktails`, `na_spirits_presence`, `na_beer_wine_presence`, `functional_beverage_presence`, `fermented_beverage_presence`, `cultural_soda_presence`
+
+**Coffee / Tea:** `coffee_program`, `espresso_program`, `specialty_coffee_presence`, `tea_program`, `specialty_tea_presence`, `matcha_program`, `bubble_tea_program`, `bubble_tea_chain`, `tea_house_structure`, `afternoon_tea_service`, `arabic_coffee_program`
+
+Maturity scale locked: `none`, `incidental`, `considered`, `dedicated`, `unknown`
 
 ---
 
@@ -9239,8 +12229,8 @@ TRACES never stores signal data.
 
 | Field | Value |
 |-------|-------|
-| Registry generated | 2026-03-12T18:08:20.327Z |
-| Context generated | 2026-03-12T18:08:20.609Z |
-| Docs included | 50 |
+| Registry generated | 2026-03-14T20:10:52.501Z |
+| Context generated | 2026-03-14T20:10:52.732Z |
+| Docs included | 66 |
 | Docs missing on disk | 0 |
 | Filters applied | status=active |

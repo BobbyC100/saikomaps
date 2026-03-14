@@ -22,8 +22,8 @@ Every number shown must either confirm things are healthy or tell you what kind 
 
 ## Dumb count vs. smart count
 
-- **Dumb:** "36 records missing neighborhood"
-- **Smart:** "33 can be auto-fixed via Google Places enrichment — 6 need a human"
+- **Dumb:** "42 records missing opening hours"
+- **Smart:** "31 can be auto-filled via Stage 1 enrichment — 11 still need human review"
 
 The difference: a smart count tells you who does the work — the system or you.
 
@@ -52,4 +52,4 @@ Automated operations run before any human review. Human work is reserved for wha
 
 ## Key insight (March 2026)
 
-If a record has a GPID, neighborhood can be derived automatically via Google Places. "Missing neighborhood" is not always a human problem. 33 of 49 missing-neighborhood records had GPIDs and could be auto-resolved. Always check what the system can fix before surfacing a problem to a human.
+If a record has a GPID, operating facts are often machine-recoverable. Missing hours, price level, or business status are frequently automation problems first, not human problems first. Always check what the system can fix before surfacing a problem to a human.

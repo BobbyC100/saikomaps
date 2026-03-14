@@ -1,6 +1,6 @@
 {
-  "generated": "2026-03-14T19:03:18.423Z",
-  "doc_count": 66,
+  "generated": "2026-03-14T20:10:52.501Z",
+  "doc_count": 69,
   "docs": [
     {
       "doc_id": "ARCH-AI-OPERATING-LAYER",
@@ -45,6 +45,28 @@
         "docs/scenesense/display-contract-v2.md",
         "docs/saikoai-extraction-prompt-v2.1.md",
         "docs/ENRICHMENT-OPERATIONS-INVENTORY.md"
+      ]
+    },
+    {
+      "doc_id": "ARCH-ENTITY-CLASSIFICATION-LAYERS-V1",
+      "doc_type": "architecture",
+      "status": "active",
+      "title": "Entity Classification Layers",
+      "path": "docs/architecture/entity-classification-layers-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-14",
+      "last_updated": "2026-03-14",
+      "project_id": "SAIKO",
+      "summary": "Plain-language explanation of entity classification layers in the current schema — entityType vs primary_vertical vs category vs cuisine_type — including operational authority and usage guidance.",
+      "systems": [
+        "fields-data-layer",
+        "coverage-operations",
+        "place-page"
+      ],
+      "related_docs": [
+        "docs/architecture/vertical-taxonomy-v1.md",
+        "docs/architecture/coverage-tiers-v1.md",
+        "docs/FIELDS_V2_TARGET_ARCHITECTURE.md"
       ]
     },
     {
@@ -104,6 +126,31 @@
         "platform"
       ],
       "related_docs": []
+    },
+    {
+      "doc_id": "ARCH-UNIFIED-SOCIAL-V1",
+      "doc_type": "architecture",
+      "status": "draft",
+      "title": "Unified Social Signals — Architecture Specification",
+      "path": "docs/architecture/unified-social-signals-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-14",
+      "last_updated": "2026-03-14",
+      "project_id": "SAIKO",
+      "summary": "Unified social signals schema replacing platform-specific tables with three platform-agnostic tables (social_accounts, social_content, social_metric_snapshots) supporting Instagram, TikTok, and YouTube through a single ingestion and signal extraction layer.",
+      "systems": [
+        "social-signals",
+        "enrichment-pipeline",
+        "fields-v2",
+        "coverage-operations"
+      ],
+      "related_docs": [
+        "docs/architecture/social-fields-spec-v1.md",
+        "docs/architecture/instagram-api-integration-v1.md",
+        "docs/architecture/instagram-implementation-v1.md",
+        "docs/architecture/identity-scoring-v1.md",
+        "docs/architecture/coverage-ops-approach-v1.md"
+      ]
     },
     {
       "doc_id": "ARCHITECTURE-INSTAGRAM-API-INTEGRATION-V1",
@@ -305,7 +352,7 @@
       "path": "docs/architecture/vertical-taxonomy-v1.md",
       "owner": "Bobby Ciccaglione",
       "created": "Wed Mar 11 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
-      "last_updated": "Wed Mar 11 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "last_updated": "Fri Mar 13 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
       "project_id": "SAIKO",
       "summary": "Defines Saiko's 12-vertical taxonomy — the primary domains of urban life used to classify every place in the system. Documents anthropological rationale, system role, technical anchors, and design implications.",
       "systems": [
@@ -703,7 +750,7 @@
       "path": "docs/saiko-merchant-data-hierarchy.md",
       "owner": "Bobby Ciccaglione",
       "created": "2026-03-10",
-      "last_updated": "2026-03-10",
+      "last_updated": "2026-03-14",
       "project_id": "SAIKO",
       "summary": "",
       "systems": [],
@@ -841,7 +888,7 @@
       "path": "docs/README.md",
       "owner": "Bobby Ciccaglione",
       "created": "2026-03-10",
-      "last_updated": "2026-03-10",
+      "last_updated": "2026-03-14",
       "project_id": "SAIKO",
       "summary": "",
       "systems": [],
@@ -1135,6 +1182,28 @@
       "summary": "Design principles for the Coverage Dashboard — work surface, not report; smart counts; group by solution; automation first",
       "systems": [],
       "related_docs": []
+    },
+    {
+      "doc_id": "SYS-COVERAGE-OPS-ISSUE-CONTRACT-V1",
+      "doc_type": "system",
+      "status": "active",
+      "title": "Coverage Ops Issue Contract (v1)",
+      "path": "docs/system/coverage-ops-issue-contract-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-14",
+      "last_updated": "2026-03-14",
+      "project_id": "SAIKO",
+      "summary": "Canonical issue contract for Coverage Ops v1 — issue types, severity, gating, and UI action mappings.",
+      "systems": [
+        "coverage-operations",
+        "issue-scanner",
+        "admin"
+      ],
+      "related_docs": [
+        "docs/architecture/coverage-ops-approach-v1.md",
+        "docs/architecture/coverage-tiers-v1.md",
+        "docs/architecture/entity-classification-layers-v1.md"
+      ]
     },
     {
       "doc_id": "SYS-DRAFT-TRIGGER-V1",

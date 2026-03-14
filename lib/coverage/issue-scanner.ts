@@ -15,6 +15,11 @@
  *   identity / enrichment_incomplete  — has GPID but never enriched (high, blocking)
  *   location / missing_coords         — has GPID but no lat/lng (high, blocking)
  *   location / missing_neighborhood   — has coords but no neighborhood (medium)
+ *   location / missing_hours          — no canonical/entity hours (medium)
+ *   location / missing_price_level    — no canonical/entity price level for food/drink entities (low)
+ *   location / missing_menu_link      — no canonical menu URL for food/drink entities (low)
+ *   location / missing_reservations   — no canonical/entity reservation URL for reservation-likely entities (low)
+ *   location / operating_status_unknown — has GPID but no Google businessStatus (medium)
  *   contact  / missing_website        — no website in CES (medium)
  *   contact  / missing_phone          — no phone in CES (low)
  *   social   / missing_instagram      — no instagram, not confirmed NONE (low)
@@ -48,12 +53,16 @@ export interface ScanEntity {
   slug: string;
   name: string;
   status: string;
+  primary_vertical: string | null;
   googlePlaceId: string | null;
   latitude: unknown;
   longitude: unknown;
   neighborhood: string | null;
   phone: string | null;
   website: string | null;
+  hours: unknown;
+  priceLevel: number | null;
+  reservationUrl: string | null;
   instagram: string | null;
   tiktok: string | null;
   enrichment_stage: string | null;
@@ -61,6 +70,10 @@ export interface ScanEntity {
   // CES fields (may be null if no CES row)
   ces_website: string | null;
   ces_phone: string | null;
+  ces_hours_json: unknown;
+  ces_price_level: number | null;
+  ces_reservation_url: string | null;
+  ces_menu_url: string | null;
   ces_instagram: string | null;
   ces_tiktok: string | null;
   ces_neighborhood: string | null;
@@ -188,6 +201,82 @@ export const ISSUE_RULES: IssueRule[] = [
     },
   },
   {
+    issue_type: 'missing_hours',
+    problem_class: 'location',
+    severity: 'medium',
+    blocking_publish: false,
+    recommended_tool: 'enrich_stage',
+    detect: (e) => {
+      const hasHours = (e.ces_hours_json ?? e.hours) !== null && (e.ces_hours_json ?? e.hours) !== undefined;
+      if (!hasHours) {
+        return { detected: true, detail: { recommended_stage: 1 } };
+      }
+      return null;
+    },
+  },
+  {
+    issue_type: 'missing_price_level',
+    problem_class: 'location',
+    severity: 'low',
+    blocking_publish: false,
+    recommended_tool: 'enrich_stage',
+    detect: (e) => {
+      const FOOD_DRINK_VERTICALS = new Set(['EAT', 'COFFEE', 'WINE', 'DRINKS', 'BAKERY']);
+      if (!e.primary_vertical || !FOOD_DRINK_VERTICALS.has(e.primary_vertical)) return null;
+      const hasPriceLevel = (e.ces_price_level ?? e.priceLevel) !== null && (e.ces_price_level ?? e.priceLevel) !== undefined;
+      if (!hasPriceLevel) {
+        return { detected: true, detail: { recommended_stage: 1 } };
+      }
+      return null;
+    },
+  },
+  {
+    issue_type: 'missing_menu_link',
+    problem_class: 'location',
+    severity: 'low',
+    blocking_publish: false,
+    recommended_tool: 'enrich_stage',
+    detect: (e) => {
+      const FOOD_DRINK_VERTICALS = new Set(['EAT', 'COFFEE', 'WINE', 'DRINKS', 'BAKERY']);
+      if (!e.primary_vertical || !FOOD_DRINK_VERTICALS.has(e.primary_vertical)) return null;
+      if (!e.ces_menu_url) {
+        return { detected: true, detail: { recommended_stage: 6 } };
+      }
+      return null;
+    },
+  },
+  {
+    issue_type: 'missing_reservations',
+    problem_class: 'location',
+    severity: 'low',
+    blocking_publish: false,
+    recommended_tool: 'enrich_stage',
+    detect: (e) => {
+      const RESERVATION_VERTICALS = new Set(['EAT', 'DRINKS', 'WINE', 'STAY']);
+      if (!e.primary_vertical || !RESERVATION_VERTICALS.has(e.primary_vertical)) return null;
+      const hasReservationUrl = (e.ces_reservation_url ?? e.reservationUrl) !== null && (e.ces_reservation_url ?? e.reservationUrl) !== undefined;
+      if (!hasReservationUrl) {
+        return { detected: true, detail: { recommended_stage: 6 } };
+      }
+      return null;
+    },
+  },
+  {
+    issue_type: 'operating_status_unknown',
+    problem_class: 'location',
+    severity: 'medium',
+    blocking_publish: false,
+    recommended_tool: 'enrich_stage',
+    detect: (e) => {
+      // Only emit when GPID exists; otherwise status lookup cannot be automated.
+      if (!e.googlePlaceId) return null;
+      if (!e.businessStatus || !e.businessStatus.trim()) {
+        return { detected: true, detail: { recommended_stage: 1 } };
+      }
+      return null;
+    },
+  },
+  {
     issue_type: 'missing_website',
     problem_class: 'contact',
     severity: 'medium',
@@ -308,12 +397,16 @@ export async function scanEntities(
       slug: true,
       name: true,
       status: true,
+      primary_vertical: true,
       googlePlaceId: true,
       latitude: true,
       longitude: true,
       neighborhood: true,
       phone: true,
       website: true,
+      hours: true,
+      priceLevel: true,
+      reservationUrl: true,
       instagram: true,
       tiktok: true,
       businessStatus: true,
@@ -323,6 +416,10 @@ export async function scanEntities(
         select: {
           website: true,
           phone: true,
+          hours_json: true,
+          price_level: true,
+          reservation_url: true,
+          menu_url: true,
           instagram: true,
           tiktok: true,
           neighborhood: true,
@@ -347,12 +444,16 @@ export async function scanEntities(
       slug: raw.slug,
       name: raw.name,
       status: raw.status,
+      primary_vertical: raw.primary_vertical ?? null,
       googlePlaceId: raw.googlePlaceId,
       latitude: raw.latitude,
       longitude: raw.longitude,
       neighborhood: raw.neighborhood,
       phone: raw.phone,
       website: raw.website,
+      hours: raw.hours,
+      priceLevel: raw.priceLevel ?? null,
+      reservationUrl: raw.reservationUrl ?? null,
       instagram: raw.instagram,
       tiktok: raw.tiktok,
       enrichment_stage: raw.enrichment_stage,
@@ -360,6 +461,10 @@ export async function scanEntities(
       businessStatus: raw.businessStatus ?? null,
       ces_website: raw.canonical_state?.website ?? null,
       ces_phone: raw.canonical_state?.phone ?? null,
+      ces_hours_json: raw.canonical_state?.hours_json ?? null,
+      ces_price_level: raw.canonical_state?.price_level ?? null,
+      ces_reservation_url: raw.canonical_state?.reservation_url ?? null,
+      ces_menu_url: raw.canonical_state?.menu_url ?? null,
       ces_instagram: raw.canonical_state?.instagram ?? null,
       ces_tiktok: raw.canonical_state?.tiktok ?? null,
       ces_neighborhood: raw.canonical_state?.neighborhood ?? null,

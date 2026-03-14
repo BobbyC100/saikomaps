@@ -158,25 +158,19 @@ The issue layer isolates those concerns. It converts pipeline signals into opera
 
 ## Important Design Principle
 
-`entity_issues` represent **operator problems, not database fields**.
+For Coverage Ops v1, `entity_issues.issue_type` is intentionally **field-level** so each row maps to one deterministic action in the UI.
 
-Bad issue types:
+Examples:
 ```
-missing_latitude
+missing_hours
+missing_menu_link
+missing_price_level
 missing_instagram
-missing_phone
 ```
 
-Better issue types:
-```
-unresolved_identity
-missing_location_context
-contact_unverified
-social_unverified
-thin_editorial_coverage
-```
+Workflow grouping is handled by `problem_class` (identity, location, contact, social, editorial), not by changing the issue type contract.
 
-Issue types should reflect repair workflows, not schema structure.
+This keeps automation and operator actions straightforward while preserving a workflow-level view in lanes.
 
 ---
 
@@ -411,7 +405,9 @@ All four "needs to be built" tools are now operational:
 **Phase 1 — Issue Layer: COMPLETE**
 
 - `entity_issues` table exists and is populated by the issue scanner (`lib/coverage/issue-scanner.ts`)
-- Scanner detects: `unresolved_identity`, `missing_coords`, `missing_neighborhood`, `missing_phone`, `missing_website`, `missing_instagram`, `missing_tiktok`
+- Scanner detects:
+  - Tier 1 baseline: `unresolved_identity`, `missing_gpid`, `enrichment_incomplete`, `missing_coords`, `missing_neighborhood`, `missing_website`, `missing_phone`, `missing_instagram`, `missing_tiktok`, `potential_duplicate`
+  - Tier 2 visit facts: `missing_hours`, `missing_price_level`, `missing_menu_link`, `missing_reservations`, `operating_status_unknown`, `google_says_closed`
 - Issues have severity (CRITICAL/HIGH/MEDIUM/LOW), blocking_publish flag, problem_class grouping
 - Re-scan is triggered manually from the UI or via API
 
@@ -420,8 +416,14 @@ All four "needs to be built" tools are now operational:
 Triage board at `/admin/coverage-ops`:
 - Groups issues by problem_class (Identity, Location, Contact, Social)
 - Severity pills (CRIT/HIGH/MED/LOW) with color coding
-- Per-issue inline actions: Run Stage 1, Discover IG/TikTok/Web, Find GPID, Derive Neighborhood
-- Bulk actions: Run Stage 1 (N), Run Stage 6 (N), Backfill IG (N), Find All GPIDs (N)
+- Per-issue inline actions:
+  - `Find GPID` for identity gaps
+  - `Run Stage 1` for `missing_coords`, `missing_phone`, `missing_hours`, `missing_price_level`, `operating_status_unknown`
+  - `Run Stage 6` for `missing_menu_link`, `missing_reservations`
+  - `Discover IG/TikTok/Web` for social/website discovery
+  - `Derive` for neighborhood backfill
+  - `Mark Closed` / `Still Open` override for `google_says_closed`
+- Bulk actions: grouped by action label (for example `Run Stage 1 (N)` / `Run Stage 6 (N)`)
 - Inline editing: paste website URL, IG handle, TikTok handle, GPID directly
 - "None" button for confirmed-no-value (taco carts without websites, etc.)
 - "Skip" button for won't-fix items
@@ -451,7 +453,7 @@ Existing specialized queues remain intact. GPID resolution queue is referenced b
 
 ### Open items
 
-- **Operating status** (temp_closed / perm_closed): Schema column needed on entities. Google Places API returns `businessStatus` which can auto-detect closures. Manual override needed from Coverage Ops UI.
+- **Operating status workflow polish**: Core schema support already exists (`entities.status`, `entities.businessStatus`) and closure actions are wired in Coverage Ops. Remaining work is scanner/UI refinement for `operating_status_unknown`, plus stronger operator states for temporary vs permanent closure review.
 - **Media coverage links**: Human-added editorial mentions, reviews, article URLs. Needs a storage model (likely `entity_appearances` or similar) and an "Add coverage" action in Coverage Ops.
 - **Editorial thinness detection**: Issue scanner should flag entities with zero or few editorial sources. Depends on media coverage storage.
 - **Auto-rescan after actions**: Bulk actions should trigger a re-scan automatically instead of requiring manual button click.

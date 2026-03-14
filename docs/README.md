@@ -4,7 +4,7 @@ doc_type: overview
 status: active
 owner: Bobby Ciccaglione
 created: '2026-03-10'
-last_updated: '2026-03-10'
+last_updated: '2026-03-14'
 project_id: SAIKO
 summary: ''
 ---
@@ -81,6 +81,8 @@ Individual place pages with a three-tier data hierarchy:
 - **Tier 3 — Reference + Discovery:** Styled map tile, coverage links, "Also On" cross-references
 
 *Data degrades gracefully — if a tier has no data, the space collapses. See Merchant Data Hierarchy for the full spec.*
+
+> Note: This page-level tier model is a UI/content hierarchy for merchant profile rendering. It is separate from the Coverage Architecture tier model documented in `docs/architecture/coverage-tiers-v1.md`.
 
 ### Share Cards
 

@@ -96,16 +96,18 @@ The remaining 10-20% that can't be automated:
 | Signal | Source | Required? |
 |--------|--------|-----------|
 | Name | Intake | Yes |
+| Category | Google Places / manual | Yes |
 | Coordinates (lat/lng) | Google Places / manual | Yes (blocking) |
 | Address | Google Places | Yes |
 | Neighborhood | Derived from coords | Yes |
+| Cuisine type | Website / editorial / Google Places | Yes (restaurants) |
 | Google Place ID | Google Places API | No (see identity scoring) |
 | Phone | Google Places / website | No |
 | Website | Discovery / manual | No |
 | Instagram | Discovery / website | No |
 | TikTok | Discovery / website | No |
 
-**Scanner issue types:** `unresolved_identity`, `missing_coords`, `missing_neighborhood`, `missing_phone`, `missing_website`, `missing_instagram`, `missing_tiktok`, `potential_duplicate`
+**Scanner issue types:** `unresolved_identity`, `missing_coords`, `missing_neighborhood`, `missing_phone`, `missing_website`, `missing_instagram`, `missing_tiktok`, `missing_classification`, `potential_duplicate`
 
 **Resolution tools:** Google Places lookup, social discovery, GPID resolver, neighborhood derivation
 
@@ -115,27 +117,27 @@ The remaining 10-20% that can't be automated:
 
 ---
 
-### Tier 2 — Operational Facts
+### Tier 2 — Visit Decision Facts
 
-**What it answers:** "Can a user decide to visit?"
+**What it answers:** "Should I go, and what should I expect when I arrive?"
 
 | Signal | Source | Entity types |
 |--------|--------|-------------|
 | Hours | Google Places / website | All with fixed location |
 | Price level | Google Places / menu | Restaurants, bars, cafes |
-| Cuisine type | Website / editorial | Restaurants |
-| Category | Google Places / manual | All |
 | Business status (open/closed) | Google Places / manual | All |
 | Reservation URL | Website scan | Restaurants with reservations |
 | Menu URL | Website scan | Restaurants, bars, cafes |
 
-**Scanner issue types (planned):** `missing_hours`, `missing_price_level`, `missing_cuisine`, `google_says_closed`, `temp_closed`, `perm_closed`
+**Scanner issue types (planned):** `missing_hours`, `missing_price_level`, `missing_menu_link`, `missing_reservations`, `operating_status_unknown`, `google_says_closed`
 
 **Resolution tools:** Stage 1 (Google Places backfill), website enrichment (Stage 6)
 
-**Key principle:** Operating status (temp/perm closed) should be auto-detected from Google Places `businessStatus` field AND manually overridable from Coverage Ops.
+**Key principle:** Classification (category/cuisine) belongs to Tier 1 identity. Tier 2 assumes identity is already coherent, then answers visitability and arrival expectations (status, hours, price, reservation/menu affordances).
 
-**Status:** Partially implemented. Hours and price level come from Google Places. Operating status detection and cuisine classification need scanner integration.
+Operating status (temp/perm closed) should be auto-detected from Google Places `businessStatus` field AND manually overridable from Coverage Ops.
+
+**Status:** Partially implemented. `google_says_closed` exists in Coverage Ops today; Tier 2 v1 adds scanner/UI coverage for missing hours, price level, menu links, reservation links, and operating status unknown.
 
 ---
 
@@ -321,9 +323,13 @@ The issue scanner (`lib/coverage/issue-scanner.ts`) should evolve to check cover
 ### Next phase (Tier 2)
 - `missing_hours` — no hours data
 - `missing_price_level` — no price level (restaurants only)
-- `missing_cuisine` — no cuisine type (restaurants only)
-- `google_says_closed` — Google businessStatus indicates closure
+- `missing_menu_link` — no menu URL available for entities that should expose one
+- `missing_reservations` — no reservation URL for reservation-relevant entities
 - `operating_status_unknown` — no businessStatus data
+- `google_says_closed` — Google businessStatus indicates closure
+
+### Next phase (Tier 1 classification)
+- `missing_classification` — category/cuisine unresolved for entity type expectations
 
 ### Future (Tiers 3-6)
 - `no_surfaces` — no merchant surfaces captured

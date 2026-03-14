@@ -106,6 +106,11 @@ const ISSUE_TYPE_LABELS: Record<string, string> = {
   enrichment_incomplete: 'Never Enriched',
   missing_coords: 'Missing Coordinates',
   missing_neighborhood: 'Missing Neighborhood',
+  missing_hours: 'Missing Opening Hours',
+  missing_price_level: 'Missing Price Level',
+  missing_menu_link: 'Missing Menu Link',
+  missing_reservations: 'Missing Reservation Link',
+  operating_status_unknown: 'Operating Status Unknown',
   missing_website: 'Missing Website',
   missing_phone: 'Missing Phone',
   missing_instagram: 'Missing Instagram',
@@ -186,6 +191,56 @@ const TOOL_ACTIONS: Record<string, ToolConfig> = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ entityId: issue.entity_id }),
+      }),
+  },
+  missing_hours: {
+    label: 'Run Stage 1',
+    queuedLabel: 'Queued',
+    invoke: (issue) =>
+      fetch('/api/admin/tools/enrich-stage', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug: issue.entity_slug, stage: 1 }),
+      }),
+  },
+  missing_price_level: {
+    label: 'Run Stage 1',
+    queuedLabel: 'Queued',
+    invoke: (issue) =>
+      fetch('/api/admin/tools/enrich-stage', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug: issue.entity_slug, stage: 1 }),
+      }),
+  },
+  operating_status_unknown: {
+    label: 'Run Stage 1',
+    queuedLabel: 'Queued',
+    invoke: (issue) =>
+      fetch('/api/admin/tools/enrich-stage', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug: issue.entity_slug, stage: 1 }),
+      }),
+  },
+  missing_menu_link: {
+    label: 'Run Stage 6',
+    queuedLabel: 'Queued',
+    invoke: (issue) =>
+      fetch('/api/admin/tools/enrich-stage', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug: issue.entity_slug, stage: 6 }),
+      }),
+  },
+  missing_reservations: {
+    label: 'Run Stage 6',
+    queuedLabel: 'Queued',
+    invoke: (issue) =>
+      fetch('/api/admin/tools/enrich-stage', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug: issue.entity_slug, stage: 6 }),
       }),
   },
   missing_website: {
