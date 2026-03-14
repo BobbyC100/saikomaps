@@ -4,7 +4,7 @@ doc_type: architecture
 status: active
 owner: Bobby Ciccaglione
 created: '2026-03-10'
-last_updated: '2026-03-10'
+last_updated: '2026-03-14'
 project_id: SAIKO
 systems:
   - database
@@ -190,6 +190,53 @@ These fields currently exist on `entities` but belong in `place_coverage_status`
 ### Lifecycle
 
 High-churn. Changes frequently with machine activity. Designed for rapid read/write from pipeline scripts.
+
+---
+
+## Coverage Tier 2 Visit Facts (Current Contract)
+
+Coverage Tier 2 Visit Facts is implemented in the current coverage pipeline
+(`scripts/coverage-run.ts`) and summarized in `/coverage` and `/admin/coverage`.
+
+### Issue types
+
+- `missing_hours`
+- `missing_price_level`
+- `missing_menu_link`
+- `missing_reservations`
+- `operating_status_unknown`
+- `google_says_closed`
+
+### Read precedence
+
+For visit-fact fields, detection is canonical-first:
+
+1. `canonical_entity_state`
+2. fallback to `entities` where applicable
+
+Applied fields:
+
+- hours: `canonical_entity_state.hours_json` -> `entities.hours`
+- price level: `canonical_entity_state.price_level` -> `entities.priceLevel`
+- reservation URL: `canonical_entity_state.reservation_url` -> `entities.reservationUrl`
+- menu URL: `canonical_entity_state.menu_url` (canonical source)
+- operating status: `entities.businessStatus`
+
+### Applicability gates
+
+`entities.primary_vertical` gates whether an issue is relevant:
+
+- price-level checks: food/beverage-forward verticals
+- menu checks: menu-likely verticals
+- reservation checks: reservation-likely verticals
+
+`operating_status_unknown` only applies when `entities.googlePlaceId` exists.
+
+### Backward compatibility
+
+The existing `missing_groups` contract used by `coverage:queue` and
+`coverage:apply*` remains unchanged. Tier 2 issue detection is additive and does
+not replace current apply-pipeline group semantics.
 
 ---
 

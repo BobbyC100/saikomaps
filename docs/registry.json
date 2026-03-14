@@ -1,6 +1,6 @@
 {
-  "generated": "2026-03-10T18:52:41.890Z",
-  "doc_count": 44,
+  "generated": "2026-03-14T20:46:37.161Z",
+  "doc_count": 47,
   "docs": [
     {
       "doc_id": "ARCH-AI-OPERATING-LAYER",
@@ -17,6 +17,27 @@
         "platform"
       ],
       "related_docs": []
+    },
+    {
+      "doc_id": "ARCH-ENTITY-CLASSIFICATION-LAYERS-V1",
+      "doc_type": "architecture",
+      "status": "active",
+      "title": "Entity Classification Layers (v1)",
+      "path": "docs/architecture/entity-classification-layers-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-14",
+      "last_updated": "2026-03-14",
+      "project_id": "SAIKO",
+      "summary": "Plain-language model for entityType vs primary_vertical vs category/cuisine_type in current schema and operations.",
+      "systems": [
+        "fields-v2",
+        "coverage-pipeline",
+        "place-pages"
+      ],
+      "related_docs": [
+        "docs/FIELDS_V2_TARGET_ARCHITECTURE.md",
+        "docs/system/coverage-tier2-visit-facts-contract-v1.md"
+      ]
     },
     {
       "doc_id": "ARCH-README",
@@ -49,6 +70,31 @@
         "platform"
       ],
       "related_docs": []
+    },
+    {
+      "doc_id": "ARCH-UNIFIED-SOCIAL-V1",
+      "doc_type": "architecture",
+      "status": "draft",
+      "title": "Unified Social Signals — Architecture Specification",
+      "path": "docs/architecture/unified-social-signals-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-14",
+      "last_updated": "2026-03-14",
+      "project_id": "SAIKO",
+      "summary": "Unified social signals schema replacing platform-specific tables with three platform-agnostic tables (social_accounts, social_content, social_metric_snapshots) supporting Instagram, TikTok, and YouTube through a single ingestion and signal extraction layer.",
+      "systems": [
+        "social-signals",
+        "enrichment-pipeline",
+        "fields-v2",
+        "coverage-operations"
+      ],
+      "related_docs": [
+        "docs/architecture/social-fields-spec-v1.md",
+        "docs/architecture/instagram-api-integration-v1.md",
+        "docs/architecture/instagram-implementation-v1.md",
+        "docs/architecture/identity-scoring-v1.md",
+        "docs/system/coverage-tier2-visit-facts-contract-v1.md"
+      ]
     },
     {
       "doc_id": "DEC-001",
@@ -237,7 +283,7 @@
       "path": "docs/FIELDS_V2_TARGET_ARCHITECTURE.md",
       "owner": "Bobby Ciccaglione",
       "created": "2026-03-10",
-      "last_updated": "2026-03-10",
+      "last_updated": "2026-03-14",
       "project_id": "SAIKO",
       "summary": "",
       "systems": [
@@ -295,7 +341,7 @@
       "path": "docs/saiko-merchant-data-hierarchy.md",
       "owner": "Bobby Ciccaglione",
       "created": "2026-03-10",
-      "last_updated": "2026-03-10",
+      "last_updated": "2026-03-14",
       "project_id": "SAIKO",
       "summary": "",
       "systems": [],
@@ -433,7 +479,7 @@
       "path": "docs/README.md",
       "owner": "Bobby Ciccaglione",
       "created": "2026-03-10",
-      "last_updated": "2026-03-10",
+      "last_updated": "2026-03-14",
       "project_id": "SAIKO",
       "summary": "",
       "systems": [],
@@ -554,6 +600,27 @@
       "related_docs": [
         "docs/skai/research-ai-knowledge-architecture-v1.md",
         "docs/skai/decision-index-spec-v1.md"
+      ]
+    },
+    {
+      "doc_id": "SYS-COVERAGE-TIER2-VISIT-FACTS-CONTRACT-V1",
+      "doc_type": "system",
+      "status": "active",
+      "title": "Coverage Tier 2 Visit Facts Contract (v1)",
+      "path": "docs/system/coverage-tier2-visit-facts-contract-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-14",
+      "last_updated": "2026-03-14",
+      "project_id": "SAIKO",
+      "summary": "Canonical contract for Coverage Tier 2 Visit Facts in the current coverage-run pipeline.",
+      "systems": [
+        "coverage-pipeline",
+        "fields-v2",
+        "admin"
+      ],
+      "related_docs": [
+        "docs/FIELDS_V2_TARGET_ARCHITECTURE.md",
+        "docs/architecture/entity-classification-layers-v1.md"
       ]
     },
     {

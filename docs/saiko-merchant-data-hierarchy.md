@@ -4,7 +4,7 @@ doc_type: architecture
 status: active
 owner: Bobby Ciccaglione
 created: '2026-03-10'
-last_updated: '2026-03-10'
+last_updated: '2026-03-14'
 project_id: SAIKO
 summary: ''
 ---
@@ -27,6 +27,15 @@ Blocks earn their space. If a tier has no data, it collapses cleanly and silentl
 ---
 
 ## Tier Structure
+
+### Tier Namespace Clarification
+
+The tiers in this document define UI rendering order for merchant/place surfaces.
+They are separate from coverage-operation tiers used by the pipeline and audit
+scripts. In coverage operations, Tier 2 refers to Visit Facts issue detection
+(`missing_hours`, `missing_price_level`, `missing_menu_link`,
+`missing_reservations`, `operating_status_unknown`, `google_says_closed`), not
+the render blocks described below.
 
 ### Tier 0 — Identity + Action
 
