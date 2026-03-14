@@ -209,28 +209,19 @@ async function main() {
         
         // Write to database
         if (!args.dryRun) {
-          // Legacy write (retained during Fields v2 transition)
-          await prisma.golden_records.update({
-            where: { canonical_id: record.canonical_id },
-            data: {
-              tagline: result.tagline,
-              tagline_candidates: result.taglineCandidates,
-              tagline_pattern: result.taglinePattern,
-              tagline_generated_at: new Date(),
-              tagline_signals: result.signalsSnapshot as any,
-              tagline_version: 2,
-            },
-          });
+          // Fields v2: write to interpretation_cache.
+          // canonical_id is the entity_id in both the legacy shim and the new derived_signals path.
+          const interpretationEntityId: string | null = record.canonical_id
+            ?? (record.google_place_id
+              ? await prisma.canonical_entity_state.findFirst({
+                  where: { google_place_id: record.google_place_id },
+                  select: { entity_id: true },
+                }).then(r => r?.entity_id ?? null).catch(() => null)
+              : null);
 
-          // Fields v2: write to interpretation_cache (additive, non-fatal)
-          const canonicalState = await prisma.canonical_entity_state.findFirst({
-            where: { google_place_id: record.google_place_id ?? undefined },
-            select: { entity_id: true },
-          }).catch(() => null);
-
-          if (canonicalState) {
+          if (interpretationEntityId) {
             await writeInterpretationCache(prisma, {
-              entityId: canonicalState.entity_id,
+              entityId: interpretationEntityId,
               outputType: 'TAGLINE',
               content: {
                 text: result.tagline,

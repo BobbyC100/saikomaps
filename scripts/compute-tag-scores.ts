@@ -29,12 +29,18 @@ type PlaceInputRow = {
   energy_scores: { energy_score: number; energy_confidence: number }[];
 };
 
+/**
+ * Fetch tag-score inputs, reading google_places_attributes + description
+ * from canonical_entity_state (Fields v2) and energy_scores from entities relation.
+ */
 async function fetchPlaceIdToPlaceData(
   placeIds: string[],
   energyVersion: string
 ): Promise<Map<string, PlaceInputRow>> {
   const map = new Map<string, PlaceInputRow>();
   if (placeIds.length === 0) return map;
+
+  // Fetch entities with energy scores
   const places = await db.entities.findMany({
     where: { id: { in: placeIds } },
     select: {
@@ -43,32 +49,33 @@ async function fetchPlaceIdToPlaceData(
       description: true,
       category: true,
       googlePlacesAttributes: true,
-      googlePlaceId: true,
       energy_scores: {
         where: { version: energyVersion },
         select: { energy_score: true, energy_confidence: true },
       },
     },
   });
-  const googleIds = [...new Set(places.map((p) => p.googlePlaceId).filter((id): id is string => id != null))];
-  let aboutCopyByGoogleId = new Map<string, string | null>();
-  if (googleIds.length > 0) {
-    const golden = await db.golden_records.findMany({
-      where: { google_place_id: { in: googleIds } },
-      select: { google_place_id: true, about_copy: true },
-    });
-    for (const g of golden) {
-      if (g.google_place_id) aboutCopyByGoogleId.set(g.google_place_id, g.about_copy);
-    }
-  }
+
+  // Fetch canonical_entity_state for richer google_places_attributes + description
+  const cesRows: { entity_id: string; description: string | null; google_places_attributes: unknown; category: string | null }[] =
+    await db.$queryRaw`
+      SELECT entity_id, description, google_places_attributes, category
+      FROM canonical_entity_state
+      WHERE entity_id = ANY(${placeIds})
+    `;
+  const cesMap = new Map(cesRows.map(r => [r.entity_id, r]));
+
   for (const p of places) {
+    const ces = cesMap.get(p.id);
     map.set(p.id, {
       id: p.id,
       slug: p.slug,
-      description: p.description,
-      category: p.category,
-      googlePlacesAttributes: p.googlePlacesAttributes,
-      about_copy: p.googlePlaceId ? aboutCopyByGoogleId.get(p.googlePlaceId) ?? null : null,
+      // Prefer CES description over entities description
+      description: ces?.description ?? p.description,
+      category: ces?.category ?? p.category,
+      // Prefer CES google_places_attributes (141 populated) over entities (0 populated)
+      googlePlacesAttributes: ces?.google_places_attributes ?? p.googlePlacesAttributes,
+      about_copy: null, // not tracked in CES; buildCoverageAboutText handles nulls
       energy_scores: p.energy_scores,
     });
   }

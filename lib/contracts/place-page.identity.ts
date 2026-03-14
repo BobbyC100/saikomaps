@@ -21,6 +21,7 @@ export type IdentityBlockInputs = {
 };
 
 /**
+ * @deprecated Use getIdentitySublineV2() for the canonical identity line.
  * Returns the three display-ready strings the identity block needs.
  *
  * @param place   - PlacePageLocation (from contract)
@@ -68,6 +69,7 @@ function toTitleCase(str: string): string {
 }
 
 /**
+ * @deprecated Use getIdentitySublineV2() for the canonical identity line.
  * Returns a comma-separated identity line suitable for the top-of-page profile header.
  *
  * Follows sign-style offering composition: what the operator would put on a sign.
@@ -106,12 +108,24 @@ export function getProfileIdentityLine(
 }
 
 // ---------------------------------------------------------------------------
-// Identity Subline v2 — facts-based, neighborhood + base noun + max 2 facets
+// Identity Line — canonical structural sentence
+// Pattern: "[Offering] [Format] [and Secondary] in [Neighborhood]"
+//
+// Examples:
+//   "French restaurant in the Arts District"
+//   "Natural wine bar in Silver Lake"
+//   "Wood-fired bakery in Venice"
+//   "All-day café in Echo Park"
+//   "Restaurant in Silver Lake"  (fallback)
+//
+// Design: calm, precise, industry-native, guidebook-like.
+// Uses hospitality vocabulary — Saiko standardizes grammar, removes hype.
+// Target: 6–12 words.
 // ---------------------------------------------------------------------------
 
 const VERTICAL_NOUN: Record<string, string> = {
   EAT: 'restaurant',
-  COFFEE: 'cafe',
+  COFFEE: 'café',
   WINE: 'wine bar',
   DRINKS: 'bar',
   BAKERY: 'bakery',
@@ -124,45 +138,71 @@ const VERTICAL_NOUN: Record<string, string> = {
   ACTIVITY: 'venue',
 };
 
+/** Wine program qualifiers that add meaning when prepended to "wine bar" */
+const WINE_QUALIFIER: Record<string, string> = {
+  natural: 'Natural',
+  // 'classic' is the default expectation for a wine bar — omit
+  // 'eclectic', 'minimal', 'none' don't add clarity — omit
+};
+
 /**
- * Returns a facts-based identity subline for the top-of-page identity block.
+ * Returns a natural-language identity sentence for the top-of-page identity block.
  *
- * Format: "{neighborhood} {base noun} · {facet1} · {facet2}"
- * Examples:
- *   "Echo Park restaurant · dinner · wine"
- *   "Silver Lake wine bar · cocktails"
- *   "Los Feliz cafe"
+ * This is the canonical structural description of a place on Saiko.
+ * Replaces the older dot-separated subline format.
  *
- * Rules:
- *   - Base noun derived from primaryVertical (never from vibe tags)
- *   - Facets: at most 2, drawn from {lunch, dinner, cocktails, wine, beer}
- *   - Never outputs an empty string — returns null if no data
+ * Model: [Offering] [Format] in [Neighborhood]
+ *
+ * Example outputs:
+ *   "French restaurant in the Arts District"
+ *   "Natural wine bar in Silver Lake"
+ *   "Café in Los Feliz"
+ *   "Restaurant in Echo Park"          (fallback: no cuisine)
+ *   "French restaurant"                 (fallback: no neighborhood)
+ *   null                                (no data at all)
+ *
+ * Pure function — no DB access.
  */
 export function getIdentitySublineV2(
-  place: Pick<PlacePageLocation, 'neighborhood' | 'primaryVertical' | 'offeringSignals'>
+  place: Pick<
+    PlacePageLocation,
+    'neighborhood' | 'primaryVertical' | 'cuisineType' | 'offeringSignals'
+  >
 ): string | null {
-  const noun = place.primaryVertical ? (VERTICAL_NOUN[place.primaryVertical] ?? null) : null;
+  const vertical = place.primaryVertical ?? null;
+  const noun = vertical ? (VERTICAL_NOUN[vertical] ?? null) : null;
+  const neighborhood = place.neighborhood?.trim() || null;
+  const cuisineType = place.cuisineType?.trim() || null;
+  const wineProgramIntent = place.offeringSignals?.wineProgramIntent ?? null;
 
-  const base: string[] = [];
-  if (place.neighborhood?.trim()) base.push(place.neighborhood.trim());
-  if (noun) base.push(noun);
+  // No noun and no neighborhood → nothing useful to say
+  if (!noun && !neighborhood) return null;
 
-  if (base.length === 0) return null;
+  // Build the qualified format phrase: "[Qualifier] [noun]"
+  let formatPhrase: string;
 
-  const os = place.offeringSignals;
-  const facets: string[] = [];
-
-  if (os) {
-    if (os.servesLunch === true && facets.length < 2) facets.push('lunch');
-    if (os.servesDinner === true && facets.length < 2) facets.push('dinner');
-    if (os.servesCocktails === true && facets.length < 2) facets.push('cocktails');
-    if (os.servesWine === true && facets.length < 2) facets.push('wine');
-    // beer only surfaces if no wine/cocktail facet already used
-    if (os.servesBeer === true && facets.length < 2 && !facets.includes('cocktails') && !facets.includes('wine')) {
-      facets.push('beer');
-    }
+  if (vertical === 'WINE' && noun) {
+    // Wine bars: qualify with program intent (e.g. "Natural wine bar")
+    const qualifier = wineProgramIntent ? (WINE_QUALIFIER[wineProgramIntent] ?? null) : null;
+    formatPhrase = qualifier ? `${qualifier} ${noun}` : noun;
+  } else if (vertical === 'EAT' && noun) {
+    // Restaurants: qualify with cuisine (e.g. "French restaurant")
+    formatPhrase = cuisineType ? `${cuisineType} ${noun}` : noun;
+  } else if (noun) {
+    // Other verticals: use noun as-is (bakery, café, bar, etc.)
+    formatPhrase = noun;
+  } else {
+    // No vertical — best-effort from cuisine
+    formatPhrase = cuisineType ? `${cuisineType} restaurant` : 'restaurant';
   }
 
-  const baseStr = base.join(' ');
-  return facets.length > 0 ? `${baseStr} · ${facets.join(' · ')}` : baseStr;
+  // Capitalize first letter
+  formatPhrase = formatPhrase.charAt(0).toUpperCase() + formatPhrase.slice(1);
+
+  // Append location
+  if (neighborhood) {
+    return `${formatPhrase} in ${neighborhood}`;
+  }
+
+  return formatPhrase;
 }

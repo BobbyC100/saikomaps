@@ -1,9 +1,8 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   Saiko Place Page — Canonical Spec v1 (Tokenized)
+   Saiko Place Page — Canonical Spec v2 (Two-Column Layout)
 
    All tunable values live in the #place-page custom-property block below.
    Change a token value → one-line edit, zero selector work.
-   See docs/ui/place-page/patch-log.md for the patch log.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 /* ---------------------------------------------------------------------------
@@ -18,9 +17,9 @@
   --pp-color-quote-border: rgba(195, 176, 145, 0.3);
 
   /* Typography — Typeface Roles
-     Display / Editorial (title, longform)  → Instrument Serif (serif, imported in globals)
-     Interface / Data (subline, actions, labels, chips) → DM Sans (sans, imported in globals)
-     Prose serif (curator notes, pull quotes) → Libre Baskerville (already loaded via pp-font-serif)
+     Display / Editorial (title, longform)  → Instrument Serif
+     Interface / Data (subline, actions, labels, chips) → DM Sans
+     Prose serif (curator notes, pull quotes) → Libre Baskerville
   */
   --pp-font-display: 'Instrument Serif', Georgia, serif;
   --pp-font-ui: 'DM Sans', sans-serif;
@@ -49,11 +48,47 @@
   --pp-grid-gap: 24px;
   --pp-sidebar-gap: 32px;
   --pp-sidebar-pad: 24px;
-  --pp-canvas-max: 1280px;
+  --pp-canvas-max: 1040px;
   --pp-canvas-pad-x: 32px;
   --pp-canvas-pad-x-mob: 20px;
   --pp-content-ratio: 7fr;
   --pp-sidebar-ratio: 5fr;
+
+  /* ── Saiko Type System v1.2 ── */
+  --sk-type-display-font: var(--pp-font-display);
+  --sk-type-display-size: 40px;
+  --sk-type-display-line-height: 44px;
+  --sk-type-display-weight: 400;
+
+  --sk-type-identity-size: 12px;
+  --sk-type-identity-line-height: 18px;
+  --sk-type-identity-weight: 500;
+  --sk-type-identity-tracking: 0.1em;
+
+  --sk-type-section-size: 11px;
+  --sk-type-section-line-height: 12px;
+  --sk-type-section-weight: 500;
+  --sk-type-section-tracking: 0.12em;
+
+  --sk-type-body-size: 15px;
+  --sk-type-body-line-height: 24px;
+  --sk-type-body-weight: 400;
+
+  --sk-type-utility-size: 13px;
+  --sk-type-utility-line-height: 16px;
+  --sk-type-utility-weight: 500;
+
+  --sk-space-tight: 4px;
+  --sk-space-base: 12px;
+  --sk-space-stack: 24px;
+  --sk-space-break: 40px;
+
+  --sk-color-text-primary: rgba(34, 30, 24, 1);
+  --sk-color-text-muted: rgba(34, 30, 24, 0.6);
+  --sk-color-border-muted: rgba(34, 30, 24, 0.22);
+
+  /* Scroll */
+  scroll-behavior: smooth;
 
   /* Section Headers (L1 / L2) */
   --pp-l1-size: 13px;
@@ -66,7 +101,7 @@
 }
 
 /* ---------------------------------------------------------------------------
-   1. Document Frame (global posture)
+   1. Document Frame
    --------------------------------------------------------------------------- */
 #document-frame {
   padding-top: max(96px, env(safe-area-inset-top));
@@ -74,40 +109,30 @@
 }
 
 /* ---------------------------------------------------------------------------
-   2. Page Canvas + Grid
+   2. Page Canvas (block container — children flow naturally)
    --------------------------------------------------------------------------- */
 #page-canvas {
   max-width: var(--pp-canvas-max);
   margin: 0 auto;
   padding: 0 var(--pp-canvas-pad-x) 72px;
-  display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: var(--pp-grid-gap);
 }
 
 /* ---------------------------------------------------------------------------
-   3. Top Section: Identity (left) + Rail (right)
+   3. Two-Column Body (main + sidebar)
    --------------------------------------------------------------------------- */
-#top-section {
-  grid-column: 1 / -1;
+#two-column-body {
   display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-template-columns: var(--pp-content-ratio) var(--pp-sidebar-ratio);
   gap: var(--pp-grid-gap);
   margin-top: var(--pp-hero-gap);
 }
 
-#identity-column {
-  grid-column: 1 / span 8;
-}
-
-#rail-column {
-  grid-column: 9 / span 4;
-}
-
-/* Identity stack: H1 → Subline → Signals → Facts Band → Description → Place Character */
+/* ---------------------------------------------------------------------------
+   4. Main Column (left — identity + editorial)
+   --------------------------------------------------------------------------- */
 #place-title {
   margin: 0 0 0.25em;
-  font-family: var(--pp-font-display); /* display/editorial — must not be removed; see typography tests */
+  font-family: var(--pp-font-display);
   font-size: var(--pp-font-title);
   font-weight: 600;
   color: var(--pp-color-text);
@@ -116,7 +141,7 @@
 
 #identity-subline {
   margin: 0 0 0.5em;
-  font-family: var(--pp-font-ui); /* interface/data tier — uppercase label row */
+  font-family: var(--pp-font-ui);
   font-size: var(--pp-l2-size);
   color: var(--pp-color-text);
   opacity: 0.8;
@@ -133,41 +158,26 @@
   line-height: 1.4;
 }
 
-#identity-description {
-  margin-top: 1.25em;
-  font-size: calc(var(--pp-font-body) + 1px);
-  line-height: var(--pp-lh-body);
-  color: var(--pp-color-text);
-}
-
-#identity-description p::first-letter {
-  font-size: 1.18em;
-  font-weight: 500;
-}
-
-/* Facts Band */
-#facts-band {
-  min-height: 44px;
+/* Primary CTAs (Reserve + Directions only) */
+#primary-ctas {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: 0 1.5em;
-  border-top: var(--pp-rule-weight-light) solid var(--pp-color-rule);
-  border-bottom: var(--pp-rule-weight-light) solid var(--pp-color-rule);
   margin-top: 1.25em;
   padding: 10px 0;
+  border-top: var(--pp-rule-weight-light) solid var(--pp-color-rule);
+  border-bottom: var(--pp-rule-weight-light) solid var(--pp-color-rule);
   font-family: var(--pp-font-ui);
   font-size: var(--pp-font-small);
-  color: var(--pp-color-text);
-  opacity: 0.85;
 }
 
-#facts-band a {
+#primary-ctas a {
   color: var(--pp-color-link);
   text-decoration: none;
 }
 
-#facts-band a:hover {
+#primary-ctas a:hover {
   text-decoration: underline;
   text-underline-offset: 3px;
 }
@@ -177,40 +187,144 @@
   opacity: 0.6;
 }
 
-/* ---------------------------------------------------------------------------
-   4. Right Rail: margin notes, crown lane, muted, fragmented
-   --------------------------------------------------------------------------- */
-#rail-column {
-  border-left: var(--pp-rule-weight-light) solid var(--pp-color-rule);
-  padding-left: 16px;
+/* ABOUT / Description */
+#identity-description {
+  font-size: calc(var(--pp-font-body) + 1px);
+  line-height: var(--pp-lh-body);
+  color: var(--pp-color-text);
+}
+
+#identity-description p {
+  margin: 0;
+}
+
+#identity-description p::first-letter {
+  font-size: 1.18em;
+  font-weight: 500;
+}
+
+/* Offering rows */
+#offering-signals-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1em;
+}
+
+.offering-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15em;
+}
+
+.offering-label {
+  font-size: var(--pp-font-micro);
+  font-weight: 500;
+  color: var(--pp-color-text);
+  opacity: 0.5;
+  letter-spacing: 0.02em;
+}
+
+.offering-sentence {
+  margin: 0;
+  font-size: calc(var(--pp-font-body) + 1px);
+  line-height: var(--pp-lh-body);
+  color: var(--pp-color-text);
+}
+
+/* Signature Dishes */
+#signature-dishes-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: var(--pp-font-small);
+  color: var(--pp-color-text);
+  line-height: var(--pp-lh-list);
+}
+
+#signature-dishes-list li {
+  padding-left: 12px;
   position: relative;
+  margin-bottom: 6px;
 }
 
-#rail-column::before {
-  content: '';
-  display: block;
-  height: 56px;
+#signature-dishes-list li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: var(--pp-color-accent);
 }
 
-.rail-block {
+/* Curator Note */
+#curator-note p {
+  font-family: var(--pp-font-serif);
+  font-size: var(--pp-font-body);
+  font-style: italic;
+  color: var(--pp-color-text);
+  line-height: var(--pp-lh-list);
+  margin: 0;
+}
+
+#curator-note .curator-byline {
   font-size: var(--pp-font-micro);
   color: var(--pp-color-text);
-  opacity: 0.75;
-  margin-bottom: 1em;
-}
-
-.rail-block:last-child {
+  opacity: 0.5;
+  margin-top: 8px;
   margin-bottom: 0;
+  font-style: normal;
+  font-family: inherit;
 }
 
-.rail-block strong {
-  font-weight: 600;
-  opacity: 0.9;
+/* Tips */
+#tips-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: var(--pp-font-small);
+  color: var(--pp-color-text);
+  line-height: var(--pp-lh-list);
 }
 
-/* ---------------------------------------------------------------------------
-   5. Section containers with reference globe (bottom-right)
-   --------------------------------------------------------------------------- */
+#tips-list li {
+  padding-left: 12px;
+  position: relative;
+  margin-bottom: 6px;
+}
+
+#tips-list li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: var(--pp-color-accent);
+}
+
+/* Pull Quote */
+#pull-quote {
+  margin: 0;
+  border-left: var(--pp-rule-weight) solid var(--pp-color-quote-border);
+  padding-left: 16px;
+}
+
+#pull-quote p {
+  font-family: var(--pp-font-serif);
+  font-size: var(--pp-font-quote);
+  line-height: var(--pp-lh-list);
+  color: var(--pp-color-text);
+  opacity: 0.85;
+  margin: 0;
+}
+
+#pull-quote cite {
+  font-size: var(--pp-font-micro);
+  color: var(--pp-color-text);
+  opacity: 0.6;
+  font-style: normal;
+  display: block;
+  margin-top: 6px;
+}
+
+/* Coverage (old main-column styles removed — coverage now in appendix) */
+
+/* Section reference globe (bottom-right) */
 .section-with-reference {
   position: relative;
   padding-bottom: 24px;
@@ -241,235 +355,162 @@
 }
 
 /* ---------------------------------------------------------------------------
-   6. Editorial Stack (below top section)
+   5. Section Header — Saiko Type System v1.2
+   Left-anchored label, rule extends right. Replaces .labeled-divider.
    --------------------------------------------------------------------------- */
-#editorial-stack {
-  grid-column: 1 / span 8;
-  margin-top: var(--pp-section-gap);
+.sk-section-header {
+  display: flex;
+  align-items: center;
+  gap: var(--sk-space-base);
+  margin-top: var(--sk-space-stack);
+  margin-bottom: var(--sk-space-base);
 }
 
-#editorial-stack hr {
+.sk-section-header::after {
+  content: '';
+  height: 1px;
+  flex: 1 1 auto;
+  background: var(--sk-color-border-muted);
+  margin-right: 16px;
+}
+
+/* Span inside section header + standalone .sk-section role */
+.sk-section-header span,
+.sk-section {
+  font-family: var(--pp-font-ui);
+  font-size: var(--sk-type-section-size);
+  font-weight: var(--sk-type-section-weight);
+  line-height: var(--sk-type-section-line-height);
+  text-transform: uppercase;
+  letter-spacing: var(--sk-type-section-tracking);
+  color: var(--sk-color-text-primary);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Heavy Rule (major zone separator) */
+.heavy-rule {
   border: none;
-  border-top: var(--pp-rule-weight-light) solid var(--pp-color-rule);
-  margin: var(--pp-section-pad) 0;
+  border-top: var(--pp-rule-weight) solid var(--pp-color-rule);
+  margin: var(--pp-section-gap) 0;
 }
 
-.editorial-block {
-  margin-bottom: 0;
+/* ---------------------------------------------------------------------------
+   6. Sidebar Column (right — structured facts rail)
+   --------------------------------------------------------------------------- */
+#sidebar-column {
+  min-width: 0;
 }
 
-.editorial-block h2 {
-  font-size: var(--pp-font-micro);
-  font-weight: var(--pp-l1-weight);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+.sidebar-spacer {
+  height: 140px;
+}
+
+/* Hours */
+#hours-block .hours-table {
+  font-family: var(--pp-font-ui);
+  font-size: var(--pp-font-small);
   color: var(--pp-color-text);
-  opacity: 0.7;
-  margin: 0 0 0.5em;
 }
 
-#curator-note p {
-  font-family: var(--pp-font-serif);
+#hours-block .hours-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 3px 0;
+  opacity: 0.75;
+}
+
+#hours-block .hours-day {
+  font-weight: 500;
+  min-width: 28px;
+}
+
+#hours-block .hours-time {
+  text-align: right;
+}
+
+#hours-block .hours-row-today {
+  font-weight: 600;
+  opacity: 1;
+}
+
+/* Address */
+#address-block .address-text {
+  font-family: var(--pp-font-ui);
   font-size: var(--pp-font-body);
-  font-style: italic;
-  color: var(--pp-color-text);
-  line-height: var(--pp-lh-list);
-  margin: 0;
-}
-
-#curator-note .curator-byline {
-  font-size: var(--pp-font-micro);
-  color: var(--pp-color-text);
-  opacity: 0.5;
-  margin-top: 8px;
-  margin-bottom: 0;
-  font-style: normal;
-  font-family: inherit;
-}
-
-#tips-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  font-size: var(--pp-font-small);
-  color: var(--pp-color-text);
-  line-height: var(--pp-lh-list);
-}
-
-#tips-list li {
-  padding-left: 12px;
-  position: relative;
-  margin-bottom: 6px;
-}
-
-#tips-list li::before {
-  content: '•';
-  position: absolute;
-  left: 0;
-  color: var(--pp-color-accent);
-}
-
-#pull-quote {
-  margin: 0;
-  border-left: var(--pp-rule-weight) solid var(--pp-color-quote-border);
-  padding-left: 16px;
-}
-
-#pull-quote p {
-  font-family: var(--pp-font-serif);
-  font-size: var(--pp-font-quote);
-  line-height: var(--pp-lh-list);
-  color: var(--pp-color-text);
-  opacity: 0.85;
-  margin: 0;
-}
-
-#pull-quote cite {
-  font-size: var(--pp-font-micro);
-  color: var(--pp-color-text);
-  opacity: 0.6;
-  font-style: normal;
-  display: block;
-  margin-top: 6px;
-}
-
-/* ---------------------------------------------------------------------------
-   6b. Place Character (Fields interpretation layer)
-   --------------------------------------------------------------------------- */
-#place-character {
-  margin-top: 1.25em;
-}
-
-#place-character h2 {
-  font-size: var(--pp-l1-size);
-  font-weight: var(--pp-l1-weight);
-  text-transform: uppercase;
-  letter-spacing: var(--pp-l1-spacing);
-  color: var(--pp-color-text);
-  opacity: var(--pp-l1-opacity);
-  margin: 0 0 1.25em;
-}
-
-#place-character-rows {
-  display: flex;
-  flex-direction: column;
-  gap: 1.1em;
-}
-
-.character-row {
-  display: flex;
-  flex-direction: column;
-  gap: 0.15em;
-}
-
-.character-label {
-  font-size: var(--pp-font-micro);
-  font-weight: 500;
-  color: var(--pp-color-text);
-  opacity: 0.5;
-  letter-spacing: 0.02em;
-}
-
-.character-sentence {
-  margin: 0;
-  font-size: calc(var(--pp-font-body) + 1px);
   line-height: var(--pp-lh-body);
   color: var(--pp-color-text);
-}
-
-/* ---------------------------------------------------------------------------
-   6c. Offering Signals (Food + Wine deterministic lines)
-   --------------------------------------------------------------------------- */
-#offering-signals {
-  margin-top: 1.25em;
-}
-
-#offering-signals h2 {
-  font-size: var(--pp-l1-size);
-  font-weight: var(--pp-l1-weight);
-  text-transform: uppercase;
-  letter-spacing: var(--pp-l1-spacing);
-  color: var(--pp-color-text);
-  opacity: var(--pp-l1-opacity);
-  margin: 0 0 1.25em;
-}
-
-#offering-signals-rows {
-  display: flex;
-  flex-direction: column;
-  gap: 1.1em;
-}
-
-.offering-row {
-  display: flex;
-  flex-direction: column;
-  gap: 0.15em;
-}
-
-.offering-label {
-  font-size: var(--pp-font-micro);
-  font-weight: 500;
-  color: var(--pp-color-text);
-  opacity: 0.5;
-  letter-spacing: 0.02em;
-}
-
-.offering-sentence {
   margin: 0;
-  font-size: calc(var(--pp-font-body) + 1px);
-  line-height: var(--pp-lh-body);
-  color: var(--pp-color-text);
 }
 
-/* ---------------------------------------------------------------------------
-   6d. Coverage (editorial links)
-   --------------------------------------------------------------------------- */
-#coverage-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
+#address-block .map-link {
+  display: inline-block;
   font-size: var(--pp-font-small);
-  color: var(--pp-color-text);
-  line-height: var(--pp-lh-list);
-}
-
-#coverage-list li {
-  margin-bottom: 6px;
-}
-
-#coverage-list a {
   color: var(--pp-color-link);
   text-decoration: none;
+  margin-top: 4px;
 }
 
-#coverage-list a:hover {
+#address-block .map-link:hover {
   text-decoration: underline;
   text-underline-offset: 3px;
 }
 
-.coverage-excerpt {
-  margin: 2px 0 0;
-  font-size: var(--pp-font-micro);
+/* Links */
+#links-block .links-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+#links-block .links-list li {
+  margin-bottom: 6px;
+}
+
+#links-block .links-list a {
+  font-family: var(--pp-font-ui);
+  font-size: var(--pp-font-small);
+  color: var(--pp-color-link);
+  text-decoration: none;
+}
+
+#links-block .links-list a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Scene / Atmosphere / Ambiance tag blocks */
+.sidebar-tag-block p {
+  margin: 0 0 0.35em;
+  font-size: var(--pp-font-body);
+  line-height: var(--pp-lh-body);
   color: var(--pp-color-text);
-  opacity: 0.7;
-  line-height: 1.4;
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+}
+
+.sidebar-tag-block p:last-child {
+  margin-bottom: 0;
+}
+
+.sidebar-tag-block .tag-line {
+  font-size: var(--pp-font-small);
+  opacity: 0.75;
 }
 
 /* ---------------------------------------------------------------------------
-   7. Photos Section (2×3 grid, compact, clickable)
+   7. Photos Section — compact editorial preview (max 6 square tiles)
+   Layout: P1 (2×2 span) | P2+P3 stacked (1×1 each) | P4+P5+P6 bottom row
+   Two-column section: photo grid (≤640px) | utility rail (address/links/scene/hours)
    --------------------------------------------------------------------------- */
 #photos-section {
-  grid-column: 1 / span 8;
-  margin-top: var(--pp-section-gap);
   padding-top: var(--pp-section-pad);
-  border-top: var(--pp-rule-weight-light) solid var(--pp-color-rule);
+  display: grid;
+  grid-template-columns: minmax(0, 640px) 1fr;
+  column-gap: 32px;
+  align-items: start;
 }
 
 #photos-section h2 {
+  grid-column: 1 / -1;
   font-size: var(--pp-font-micro);
   font-weight: var(--pp-l1-weight);
   text-transform: uppercase;
@@ -482,11 +523,12 @@
 #photos-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: auto auto auto;
   gap: 10px;
 }
 
 #photos-grid .photo-tile {
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 1 / 1;
   overflow: hidden;
   background: rgba(0, 0, 0, 0.04);
   cursor: pointer;
@@ -501,14 +543,479 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center;
   display: block;
 }
 
+/* P1: spans 2 columns and 2 rows */
+#photos-grid .photo-tile-1 {
+  grid-column: 1 / 3;
+  grid-row: 1 / 3;
+}
+
+/* P2: top-right */
+#photos-grid .photo-tile-2 {
+  grid-column: 3;
+  grid-row: 1;
+}
+
+/* P3: below P2 */
+#photos-grid .photo-tile-3 {
+  grid-column: 3;
+  grid-row: 2;
+}
+
+/* P4, P5, P6: bottom row — handled by default flow in row 3 */
+
+/* ── Right utility rail (links / scene / hours / address / phone) ── */
+#photos-utility-rail {
+  min-width: 0;
+}
+
+/* Rail: tighter spacing + suppress rule (clean headers in narrow column) */
+#photos-utility-rail .sk-section-header {
+  margin-top: 1.25em;
+  margin-bottom: 0.9em;
+}
+
+#photos-utility-rail .sk-section-header:first-child {
+  margin-top: 0;
+}
+
+#photos-utility-rail .sk-section-header::after {
+  display: none;
+}
+
+/* Globe reference icon sitting inline with a labeled-divider span */
+.label-ref {
+  display: inline-flex;
+  align-items: center;
+  width: 12px;
+  height: 12px;
+  color: var(--pp-color-text);
+  opacity: 0.38;
+  flex-shrink: 0;
+  text-decoration: none;
+  transition: opacity 0.15s;
+}
+.label-ref:hover { opacity: 0.7; }
+.label-ref svg { width: 12px; height: 12px; }
+
+/* Visual separator between editorial (links/scene) and utility (hours/address/phone) groups */
+.rail-divider {
+  border: none;
+  border-top: var(--pp-rule-weight-light) solid var(--pp-color-rule);
+  margin: 1.25em 0 0;
+}
+
+/* Hours: compact footprint in utility rail context */
+#hours-block .hours-table {
+  font-size: var(--pp-font-micro);
+}
+
+#hours-block .hours-row {
+  padding: 3px 0;
+}
+
+/* Phone: link-style action matching map-link / links-list pattern */
+#phone-block .phone-link {
+  display: inline-block;
+  font-family: var(--pp-font-ui);
+  font-size: var(--pp-font-small);
+  color: var(--pp-color-link);
+  text-decoration: none;
+}
+
+#phone-block .phone-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 /* ---------------------------------------------------------------------------
-   8. Recognitions (capped display, hide if 0)
+   8. More Maps (3-card grid from appearsOn)
+   --------------------------------------------------------------------------- */
+#more-maps {
+  padding-top: var(--pp-section-pad);
+}
+
+#more-maps > h2 {
+  font-size: var(--pp-font-micro);
+  font-weight: var(--pp-l1-weight);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--pp-color-text);
+  opacity: 0.7;
+  margin: 0 0 0.75em;
+}
+
+#more-maps-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.map-card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  text-decoration: none;
+  color: var(--pp-color-text);
+  transition: box-shadow 0.15s;
+}
+
+.map-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.map-card-image {
+  height: 120px;
+  background-size: cover;
+  background-position: center;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+.map-card-body {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.map-card-type {
+  font-family: var(--pp-font-ui);
+  font-size: var(--pp-font-pico);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  opacity: 0.5;
+}
+
+.map-card-title {
+  font-family: var(--pp-font-display);
+  font-size: var(--pp-font-body);
+  line-height: var(--pp-lh-tight);
+}
+
+.map-card-creator {
+  font-family: var(--pp-font-ui);
+  font-size: var(--pp-font-micro);
+  opacity: 0.6;
+}
+
+/* ---------------------------------------------------------------------------
+   9. Saiko Type System v1.2 — Role Classes
+   Scoped to #place-page for specificity over single-ID rules.
+   --------------------------------------------------------------------------- */
+
+#place-page .sk-display {
+  font-family: var(--sk-type-display-font);
+  font-size: var(--sk-type-display-size);
+  line-height: var(--sk-type-display-line-height);
+  font-weight: var(--sk-type-display-weight);
+  color: var(--sk-color-text-primary);
+}
+
+#place-page .sk-identity {
+  font-size: var(--sk-type-identity-size);
+  line-height: var(--sk-type-identity-line-height);
+  font-weight: var(--sk-type-identity-weight);
+  text-transform: uppercase;
+  letter-spacing: var(--sk-type-identity-tracking);
+  color: var(--sk-color-text-muted);
+}
+
+#place-page .sk-label {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 400;
+  color: var(--sk-color-text-muted);
+}
+
+#place-page .sk-value {
+  font-size: var(--sk-type-body-size);
+  line-height: var(--sk-type-body-line-height);
+  font-weight: var(--sk-type-body-weight);
+  color: var(--sk-color-text-primary);
+}
+
+#place-page .sk-prose {
+  font-size: var(--sk-type-body-size);
+  line-height: var(--sk-type-body-line-height);
+  font-weight: var(--sk-type-body-weight);
+  color: var(--sk-color-text-primary);
+}
+
+#place-page .sk-utility {
+  font-family: var(--pp-font-ui);
+  font-size: var(--sk-type-utility-size);
+  line-height: var(--sk-type-utility-line-height);
+  font-weight: var(--sk-type-utility-weight);
+  color: var(--sk-color-text-primary);
+}
+
+#place-page .sk-utility-tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Apply prose role to About description paragraphs */
+#identity-description p {
+  font-size: var(--sk-type-body-size);
+  line-height: var(--sk-type-body-line-height);
+  font-weight: var(--sk-type-body-weight);
+  color: var(--sk-color-text-primary);
+}
+
+/* Apply label/value roles to Offering fields */
+.offering-label {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 400;
+  color: var(--sk-color-text-muted);
+  letter-spacing: 0;
+  opacity: 1;
+}
+
+.offering-sentence {
+  font-size: var(--sk-type-body-size);
+  line-height: var(--sk-type-body-line-height);
+  font-weight: var(--sk-type-body-weight);
+  color: var(--sk-color-text-primary);
+}
+
+/* Apply utility role to action links and sidebar content */
+#primary-ctas a,
+#links-block .links-list a,
+#address-block .map-link,
+#phone-block .phone-link {
+  font-size: var(--sk-type-utility-size);
+  line-height: var(--sk-type-utility-line-height);
+  font-weight: var(--sk-type-utility-weight);
+}
+
+/* Apply value role to sidebar tag content */
+.sidebar-tag-block p {
+  font-size: var(--sk-type-body-size);
+  line-height: var(--sk-type-body-line-height);
+  color: var(--sk-color-text-primary);
+}
+
+/* ---------------------------------------------------------------------------
+   10. Appendix — TRACES provenance (three-column grid)
+   --------------------------------------------------------------------------- */
+
+/* Target flash animation for anchor navigation */
+@keyframes target-flash {
+  0%   { background-color: rgba(195, 176, 145, 0.18); }
+  100% { background-color: transparent; }
+}
+
+#place-appendix {
+  margin-top: var(--pp-section-gap);
+  padding-top: 1.25em;
+  display: grid;
+  grid-template-columns: 200px 1fr 240px;
+  column-gap: 24px;
+  row-gap: 16px;
+}
+
+/* ── Shared column headers (INDEX | REFERENCES | COVERAGE) ── */
+#appendix-index h2,
+#appendix-references > h2,
+#appendix-coverage h2 {
+  font-family: var(--pp-font-ui);
+  font-size: var(--pp-font-micro);
+  font-weight: var(--pp-l1-weight);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--pp-color-text);
+  opacity: 0.7;
+  margin: 0 0 0.6em;
+}
+
+/* ── Index column ── */
+#appendix-index {
+  position: sticky;
+  top: 96px;
+  align-self: start;
+}
+
+#appendix-index ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+#appendix-index li {
+  margin-bottom: 3px;
+}
+
+#appendix-index a {
+  font-family: var(--pp-font-ui);
+  font-size: var(--pp-font-nano);
+  text-transform: uppercase;
+  letter-spacing: var(--pp-l1-spacing);
+  color: var(--pp-color-text);
+  opacity: var(--pp-l1-opacity);
+  text-decoration: none;
+  transition: opacity 0.15s;
+}
+
+#appendix-index a:hover {
+  opacity: 1;
+}
+
+.reference-legend {
+  margin-top: 1.25em;
+  font-family: var(--pp-font-ui);
+  font-size: var(--pp-font-nano);
+  color: var(--pp-color-text);
+  opacity: 0.45;
+  line-height: 1.4;
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
+}
+
+.reference-legend .legend-globe {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* ── References column ── */
+.appendix-ref-group {
+  margin-bottom: 1em;
+  padding: 2px 0;
+  transition: background-color 0.3s ease;
+}
+
+.appendix-ref-group:target {
+  animation: target-flash 1.4s ease-out;
+}
+
+.appendix-ref-group h3 {
+  font-family: var(--pp-font-ui);
+  font-size: var(--pp-font-nano);
+  font-weight: var(--pp-l1-weight);
+  text-transform: uppercase;
+  letter-spacing: var(--pp-l1-spacing);
+  color: var(--pp-color-text);
+  opacity: 0.6;
+  margin: 0 0 0.3em;
+}
+
+.appendix-ref-entries {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-family: var(--pp-font-ui);
+  font-size: var(--pp-font-micro);
+  color: var(--pp-color-text);
+  opacity: 0.85;
+  line-height: 1.5;
+}
+
+.appendix-ref-entries li {
+  margin-bottom: 2px;
+}
+
+#appendix-methodology p {
+  font-size: var(--pp-font-micro);
+  margin: 0;
+}
+
+#appendix-methodology a {
+  color: var(--pp-color-link);
+  text-decoration: none;
+}
+
+#appendix-methodology a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ── Coverage column ── */
+
+.coverage-entries {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.coverage-entry {
+  margin-bottom: 1.5em;
+  font-family: var(--pp-font-ui);
+  font-size: var(--pp-font-micro);
+  color: var(--pp-color-text);
+  line-height: 1.5;
+}
+
+.coverage-entry:last-child {
+  margin-bottom: 0;
+}
+
+.coverage-source-name {
+  font-weight: 500;
+  display: block;
+}
+
+.coverage-entry .coverage-excerpt {
+  margin: 2px 0 4px;
+  opacity: 0.7;
+  line-height: 1.4;
+  font-style: italic;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.coverage-date {
+  font-size: var(--pp-font-nano);
+  opacity: 0.55;
+  margin-right: 0.75em;
+}
+
+.coverage-read-link {
+  font-size: var(--pp-font-nano);
+  color: var(--pp-color-link);
+  text-decoration: none;
+}
+
+.coverage-read-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.coverage-empty {
+  font-family: var(--pp-font-ui);
+  font-size: var(--pp-font-micro);
+  color: var(--pp-color-text);
+  opacity: 0.4;
+  font-style: italic;
+}
+
+/* ── Plate mark ── */
+#plate-mark {
+  grid-column: 1 / -1;
+  margin-top: 1.5em;
+  padding-top: 1em;
+  border-top: var(--pp-rule-weight-light) solid var(--pp-color-rule);
+  font-family: var(--pp-font-ui);
+  font-size: var(--pp-font-nano);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--pp-color-text);
+  opacity: 0.6;
+  text-align: center;
+}
+
+/* ---------------------------------------------------------------------------
+   10. Recognitions
    --------------------------------------------------------------------------- */
 #recognitions-section {
-  grid-column: 1 / -1;
   margin-top: var(--pp-section-gap);
   padding-top: var(--pp-section-pad);
   border-top: var(--pp-rule-weight-light) solid var(--pp-color-rule);
@@ -538,109 +1045,7 @@
 }
 
 /* ---------------------------------------------------------------------------
-   9. Reference Ledger (bottom, calm typography)
-   --------------------------------------------------------------------------- */
-#reference-ledger {
-  grid-column: 1 / -1;
-  margin-top: 3em;
-  padding-top: var(--pp-section-gap);
-  border-top: var(--pp-rule-weight-light) solid var(--pp-color-rule);
-}
-
-#reference-ledger h2 {
-  font-size: var(--pp-font-micro);
-  font-weight: var(--pp-l1-weight);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--pp-color-text);
-  opacity: 0.7;
-  margin: 0 0 1em;
-}
-
-.ledger-group {
-  margin-bottom: 1.5em;
-}
-
-.ledger-group:last-child {
-  margin-bottom: 0;
-}
-
-.ledger-group h3 {
-  font-size: var(--pp-font-nano);
-  font-weight: var(--pp-l1-weight);
-  text-transform: uppercase;
-  letter-spacing: var(--pp-l1-spacing);
-  color: var(--pp-color-text);
-  opacity: 0.6;
-  margin: 0 0 0.5em;
-}
-
-.ledger-entries {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  font-size: var(--pp-font-micro);
-  color: var(--pp-color-text);
-  opacity: 0.85;
-  line-height: 1.5;
-}
-
-.ledger-entries li {
-  margin-bottom: 4px;
-}
-
-.ledger-entries .ledger-date {
-  opacity: 0.65;
-  margin-left: 0.5em;
-}
-
-#reference-ledger .methodology-link {
-  margin-top: 1.5em;
-  font-size: var(--pp-font-micro);
-}
-
-#reference-ledger .methodology-link a {
-  color: var(--pp-color-link);
-  text-decoration: none;
-}
-
-#reference-ledger .methodology-link a:hover {
-  text-decoration: underline;
-}
-
-/* ---------------------------------------------------------------------------
-  10. Unsupported tablet (768–1024px)
-   --------------------------------------------------------------------------- */
-#unsupported-tablet {
-  display: none;
-}
-
-@media (min-width: 768px) and (max-width: 1024px) {
-  #document-frame #page-canvas {
-    display: none;
-  }
-
-  #unsupported-tablet {
-    display: block;
-    max-width: var(--pp-canvas-max);
-    margin: 0 auto;
-    padding: 2em var(--pp-canvas-pad-x);
-    text-align: center;
-  }
-
-  #unsupported-tablet p {
-    margin: 0;
-    color: var(--pp-color-text);
-    font-size: var(--pp-font-body);
-    opacity: 0.85;
-    max-width: 360px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-}
-
-/* ---------------------------------------------------------------------------
-  11. Minimal mobile fallback (stack vertically)
+   11. Mobile (<768px) — single column stack
    --------------------------------------------------------------------------- */
 @media (max-width: 767px) {
   #page-canvas {
@@ -648,35 +1053,52 @@
     padding-right: var(--pp-canvas-pad-x-mob);
   }
 
-  #top-section {
+  #two-column-body {
     grid-template-columns: 1fr;
   }
 
-  #identity-column,
-  #rail-column,
-  #editorial-stack,
-  #photos-section,
-  #recognitions-section,
-  #reference-ledger,
-  #appearances-as-subject,
-  #appearances-as-host {
-    grid-column: 1 / -1;
+  .sidebar-spacer {
+    display: none;
   }
 
-  #rail-column {
-    border-left: none;
-    padding-left: 0;
+  #sidebar-column {
     border-top: var(--pp-rule-weight-light) solid var(--pp-color-rule);
     padding-top: 1em;
     margin-top: 1em;
   }
 
-  #rail-column::before {
-    height: 0;
+  #more-maps-grid {
+    grid-template-columns: 1fr;
+  }
+
+  #photos-section {
+    grid-template-columns: 1fr;
   }
 
   #photos-grid {
     grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: auto;
     gap: 8px;
+  }
+
+  /* On mobile, reset all explicit grid placements to simple 2-col flow */
+  #photos-grid .photo-tile-1,
+  #photos-grid .photo-tile-2,
+  #photos-grid .photo-tile-3 {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
+  /* Appendix: hide index, stack references + coverage */
+  #appendix-index {
+    display: none;
+  }
+
+  #place-appendix {
+    grid-template-columns: 1fr;
+  }
+
+  #plate-mark {
+    grid-column: 1;
   }
 }

@@ -179,6 +179,9 @@ export async function writeClaimAndSanction(
 
   // 3. Apply sanction — retire old, write new, update canonical_entity_state
   if (!dryRun) {
+    // Ensure canonical_entity_state row exists before writing the sanction (FK requirement)
+    await applyToCanonicalState(db, input.entityId, input.attributeKey, input.rawValue);
+
     await db.canonical_sanctions.updateMany({
       where: { entity_id: input.entityId, attribute_key: input.attributeKey, is_current: true },
       data: { is_current: false },
@@ -194,9 +197,6 @@ export async function writeClaimAndSanction(
         is_current: true,
       },
     });
-
-    // Update the canonical_entity_state field
-    await applyToCanonicalState(db, input.entityId, input.attributeKey, input.rawValue);
   }
 
   return {

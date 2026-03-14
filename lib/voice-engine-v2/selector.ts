@@ -12,7 +12,7 @@ import {
 
 const anthropic = new Anthropic();
 
-const MODEL = 'claude-sonnet-4-20250514';
+const MODEL = 'claude-haiku-4-5-20251001';
 const MAX_TOKENS = 64;
 
 // ============================================

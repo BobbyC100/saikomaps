@@ -538,8 +538,9 @@ export interface DiscoveredSurfaceRow {
 export async function findDiscoveredSurfaces(params: {
   limit?: number;
   surfaceType?: string;
+  entityId?: string;
 }): Promise<DiscoveredSurfaceRow[]> {
-  const { limit = 50, surfaceType } = params;
+  const { limit = 50, surfaceType, entityId } = params;
 
   const rows = await prisma.merchant_surfaces.findMany({
     where: {
@@ -547,6 +548,7 @@ export async function findDiscoveredSurfaces(params: {
       surface_type: surfaceType
         ? surfaceType
         : { notIn: [...SKIP_FETCH_TYPES] },
+      ...(entityId ? { entity_id: entityId } : {}),
     },
     select: { id: true, entity_id: true, surface_type: true, source_url: true },
     take: limit,

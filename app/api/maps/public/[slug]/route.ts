@@ -47,36 +47,33 @@ export async function GET(
       (mp) => mp.entities.businessStatus !== 'CLOSED_PERMANENTLY'
     );
 
-    // Fetch identity signals for places
-    const googlePlaceIds = openMapPlaces
-      .map(mp => mp.entities.googlePlaceId)
-      .filter((id): id is string => id !== null);
-    
-    const identitySignals = await db.golden_records.findMany({
+    // Fetch identity signals from derived_signals (Fields v2)
+    const entityIds = openMapPlaces.map(mp => mp.entities.id);
+
+    const derivedRows = await db.derived_signals.findMany({
       where: {
-        google_place_id: { in: googlePlaceIds },
+        entity_id: { in: entityIds },
+        signal_key: 'identity_signals',
       },
       select: {
-        google_place_id: true,
-        place_personality: true,
-        price_tier: true,
+        entity_id: true,
+        signal_value: true,
       },
     });
-    
-    // Build map of google_place_id -> identity signals
+
+    // Build map of entity_id -> identity signals
     const signalsMap = new Map<string, { place_personality: string | null; price_tier: string | null }>();
-    identitySignals.forEach(record => {
-      if (record.google_place_id) {
-        signalsMap.set(record.google_place_id, {
-          place_personality: record.place_personality,
-          price_tier: record.price_tier,
-        });
-      }
+    derivedRows.forEach(row => {
+      const sv = row.signal_value as Record<string, unknown> | null;
+      signalsMap.set(row.entity_id, {
+        place_personality: (sv?.place_personality as string) ?? null,
+        price_tier: (sv?.price_tier as string) ?? null,
+      });
     });
     
     // Enrich mapPlaces with identity signals (closed places already excluded)
     const enrichedMapPlaces = openMapPlaces.map(mp => {
-      const signals = mp.entities.googlePlaceId ? signalsMap.get(mp.entities.googlePlaceId) : null;
+      const signals = signalsMap.get(mp.entities.id) ?? null;
       return {
         ...mp,
         places: {

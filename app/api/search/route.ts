@@ -146,35 +146,21 @@ export async function GET(request: NextRequest) {
       take: 50,
     })
     
-    // Fetch identity signals + menu/winelist status + language_signals from golden_records
-    const googlePlaceIds = places
-      .map(p => p.googlePlaceId)
-      .filter((id): id is string => id !== null);
-    
-    const goldenRecords = await prisma.golden_records.findMany({
+    // Fetch identity signals from derived_signals (Fields v2)
+    const entityIds = places.map(p => p.id);
+
+    const derivedRows = await prisma.derived_signals.findMany({
       where: {
-        google_place_id: { in: googlePlaceIds },
+        entity_id: { in: entityIds },
+        signal_key: 'identity_signals',
       },
       select: {
-        google_place_id: true,
-        place_personality: true,
-        identity_signals: true,
-        menu_signals: {
-          select: {
-            status: true,
-            payload: true,
-          },
-        },
-        winelist_signals: {
-          select: {
-            status: true,
-            payload: true,
-          },
-        },
+        entity_id: true,
+        signal_value: true,
       },
     });
-    
-    // Build map of google_place_id → identity data
+
+    // Build map of entity_id → identity data
     const identityMap = new Map<string, {
       personality: string | null;
       languageSignals: string[];
@@ -183,19 +169,17 @@ export async function GET(request: NextRequest) {
       menuPayload: any;
       winelistPayload: any;
     }>();
-    goldenRecords.forEach(record => {
-      if (record.google_place_id) {
-        const sig = record.identity_signals as Record<string, unknown> | null;
-        const languageSignals = Array.isArray(sig?.language_signals) ? (sig!.language_signals as string[]) : [];
-        identityMap.set(record.google_place_id, {
-          personality: record.place_personality,
-          languageSignals,
-          menuSignalsStatus: record.menu_signals?.status || null,
-          winelistSignalsStatus: record.winelist_signals?.status || null,
-          menuPayload: record.menu_signals?.payload || null,
-          winelistPayload: record.winelist_signals?.payload || null,
-        });
-      }
+    derivedRows.forEach(row => {
+      const sv = row.signal_value as Record<string, unknown> | null;
+      const languageSignals = Array.isArray(sv?.language_signals) ? (sv!.language_signals as string[]) : [];
+      identityMap.set(row.entity_id, {
+        personality: (sv?.place_personality as string) ?? null,
+        languageSignals,
+        menuSignalsStatus: null, // future: wire from derived_signals
+        winelistSignalsStatus: null,
+        menuPayload: null,
+        winelistPayload: null,
+      });
     });
 
     // Helper: Calculate distance in miles
@@ -224,7 +208,7 @@ export async function GET(request: NextRequest) {
     const rankedPlaces = places
       .map((place) => {
         const nameLower = place.name.toLowerCase()
-        const identity = place.googlePlaceId ? identityMap.get(place.googlePlaceId) : null;
+        const identity = identityMap.get(place.id) ?? null;
         const languageSignals = identity?.languageSignals ?? [];
         let score = 0
 

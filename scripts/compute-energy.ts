@@ -22,34 +22,32 @@ const DEFAULT_VERSION = 'energy_v1';
 
 type GoldenRow = { canonical_id: string; slug: string; description: string | null; about_copy: string | null; google_places_attributes: unknown; category: string | null };
 
+/**
+ * Fetch energy-relevant fields for a set of entity IDs.
+ * Reads from canonical_entity_state (Fields v2) with entities join for slug.
+ * Falls back gracefully when CES row is missing.
+ */
 async function fetchPlaceIdToGolden(placeIds: string[]): Promise<Map<string, GoldenRow>> {
   const placeIdToGolden = new Map<string, GoldenRow>();
   if (placeIds.length === 0) return placeIdToGolden;
-  const places = await db.entities.findMany({
-    where: { id: { in: placeIds } },
-    select: { id: true, googlePlaceId: true },
-  });
-  const googleIds = [...new Set(places.map((p) => p.googlePlaceId).filter((id): id is string => id != null))];
-  const golden = await db.golden_records.findMany({
-    where: { google_place_id: { in: googleIds } },
-    select: { canonical_id: true, slug: true, description: true, about_copy: true, google_places_attributes: true, category: true, google_place_id: true },
-  });
-  const googleIdToPlaceId = new Map<string, string>();
-  for (const p of places) {
-    if (p.googlePlaceId) googleIdToPlaceId.set(p.googlePlaceId, p.id);
-  }
-  for (const g of golden) {
-    const placeId = g.google_place_id ? googleIdToPlaceId.get(g.google_place_id) : undefined;
-    if (placeId) {
-      placeIdToGolden.set(placeId, {
-        canonical_id: g.canonical_id,
-        slug: g.slug,
-        description: g.description,
-        about_copy: g.about_copy,
-        google_places_attributes: g.google_places_attributes,
-        category: g.category,
-      });
-    }
+
+  const rows: { entity_id: string; slug: string; description: string | null; google_places_attributes: unknown; category: string | null }[] =
+    await db.$queryRaw`
+      SELECT ces.entity_id, e.slug, ces.description, ces.google_places_attributes, ces.category
+      FROM canonical_entity_state ces
+      JOIN entities e ON e.id = ces.entity_id
+      WHERE ces.entity_id = ANY(${placeIds})
+    `;
+
+  for (const r of rows) {
+    placeIdToGolden.set(r.entity_id, {
+      canonical_id: r.entity_id,
+      slug: r.slug,
+      description: r.description,
+      about_copy: null, // not tracked in CES; buildCoverageAboutText handles nulls
+      google_places_attributes: r.google_places_attributes,
+      category: r.category,
+    });
   }
   return placeIdToGolden;
 }
@@ -70,57 +68,27 @@ async function getPlaceIds(placeIdArg: string | null, laOnly: boolean, limitArg:
   if (placeIdArg) {
     const place = await db.entities.findUnique({
       where: { id: placeIdArg },
-      select: { id: true, googlePlaceId: true },
+      select: { id: true },
     });
     if (!place) {
       console.error('Place not found:', placeIdArg);
       process.exit(1);
     }
-    if (!place.googlePlaceId) {
-      console.error('Place has no googlePlaceId:', placeIdArg);
+    const golden = await fetchPlaceIdToGolden([place.id]);
+    if (!golden.has(place.id)) {
+      console.error('No canonical_entity_state row for place:', placeIdArg);
       process.exit(1);
     }
-    const golden = await db.golden_records.findFirst({
-      where: { google_place_id: place.googlePlaceId },
-      select: { canonical_id: true, slug: true, description: true, about_copy: true, google_places_attributes: true, category: true },
-    });
-    if (!golden) {
-      console.error('No golden record for place:', placeIdArg);
-      process.exit(1);
-    }
-    placeIdToGolden.set(place.id, golden);
-    return { placeIds: [place.id], placeIdToGolden };
+    return { placeIds: [place.id], placeIdToGolden: golden };
   }
 
-  const places = await db.entities.findMany({
-    where: { googlePlaceId: { not: null } },
-    select: { id: true, googlePlaceId: true },
-  });
-  const googleIds = [...new Set(places.map((p) => p.googlePlaceId).filter((id): id is string => id != null))];
-  const golden = await db.golden_records.findMany({
-    where: { google_place_id: { in: googleIds } },
-    select: { canonical_id: true, slug: true, description: true, about_copy: true, google_places_attributes: true, category: true, google_place_id: true },
-  });
-  const googleIdToPlaceId = new Map<string, string>();
-  for (const p of places) {
-    if (p.googlePlaceId) googleIdToPlaceId.set(p.googlePlaceId, p.id);
-  }
-  const placeIds: string[] = [];
-  for (const g of golden) {
-    const placeId = g.google_place_id ? googleIdToPlaceId.get(g.google_place_id) : undefined;
-    if (placeId) {
-      if (!placeIdToGolden.has(placeId)) placeIds.push(placeId);
-      placeIdToGolden.set(placeId, {
-        canonical_id: g.canonical_id,
-        slug: g.slug,
-        description: g.description,
-        about_copy: g.about_copy,
-        google_places_attributes: g.google_places_attributes,
-        category: g.category,
-      });
-    }
-  }
-  return { placeIds, placeIdToGolden };
+  // --all: find all entities that have a canonical_entity_state row
+  const cesIds: { entity_id: string }[] = await db.$queryRaw`
+    SELECT entity_id FROM canonical_entity_state
+  `;
+  const allIds = cesIds.map(r => r.entity_id);
+  const golden = await fetchPlaceIdToGolden(allIds);
+  return { placeIds: allIds, placeIdToGolden: golden };
 }
 
 async function main() {

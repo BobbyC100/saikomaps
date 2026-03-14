@@ -7,16 +7,24 @@ created: '2026-03-13'
 last_updated: '2026-03-13'
 project_id: SAIKO
 summary: >-
-  Instagram integration implementation plan and system impact — new tables, sync
-  rules, temporal signal architecture, interpretation layer impact, photo
-  strategy, attachment model
+  Instagram integration implementation plan and system impact — tables, sync
+  rules, temporal signals, interpretation layer, photo strategy, attachment
+  model. V0.2 adds current state assessment, implementation phases, and data
+  review results.
+systems:
+  - instagram-api
+  - enrichment-pipeline
+  - merchant-surfaces
+related_docs:
+  - docs/architecture/instagram-api-integration-v1.md
+  - docs/architecture/instagram-ingestion-field-spec-v1.md
 ---
 # Instagram Integration — Implementation & Impact Doc
 
-**Version:** 0.1
+**Version:** 0.2
 **Draft Date:** 2026-03-13
 **Author:** Bobby / Claude
-**Status:** Pre-engineering handoff — pending data review
+**Status:** Pre-engineering handoff — data review complete
 
 ## 1. Purpose & Architectural Intent
 
@@ -48,7 +56,73 @@ Instagram unlocks capabilities that no other source in the current stack can pro
 
 **Contextual display.** Instagram is the data foundation for showing users information that is true right now, not just true in general. This is one of the most meaningful product differentiators we can build. Users learn that Saiko knows things other platforms do not. That builds trust compounding over time.
 
-## 3. Affected Systems
+## 3. Current State & What's Already Done
+
+As of 2026-03-13, significant infrastructure already exists. This section distinguishes what is built from what remains.
+
+### Component Status
+
+| Component | Status | Notes |
+|---|---|---|
+| `instagram_accounts` table | ✅ Schema exists | Empty — no ingestion run yet |
+| `instagram_media` table | ✅ Schema exists | Empty — no ingestion run yet |
+| `instagram_insight_snapshots` table | ✅ Schema exists | Empty |
+| `instagram_temporal_signals` table | ❌ Not yet created | New — defined in Section 6 |
+| `ingest-instagram.ts` | ✅ Operational | Business Discovery + batch + /me modes |
+| API credentials | ✅ Configured | Never-expiring Page Access Token + IG User ID in `.env.local` |
+| `merchant_surfaces` IG records | ✅ 90 rows exist | ~70 entities with discovered IG URLs |
+| `entities.instagram` column | ⚠️ 7 populated | Quality issues; needs backfill from surfaces |
+| API route serves IG handle | ✅ Working | Returns `entities.instagram` to client |
+| Place page renders IG link | ✅ Working | StatusCell + primary CTAs |
+| Caption signal extraction | ❌ Not built | Phase 2 |
+| Temporal signal extraction | ❌ Not built | Phase 3 |
+| Photo candidate scoring | ❌ Not built | Phase 4 |
+| SceneSense IG wiring | ❌ Not built | Phase 5 |
+| Contextual display UI | ❌ Not built | Phase 6 |
+
+### Key Credentials
+
+- **Facebook Page "Saiko Fields"** Graph API ID: `1048011751721611`
+- **Instagram Business Account ID:** `17841401035810011`
+- **Meta App:** TRACES THREE (app ID `1325848402713479`, development mode)
+- **Token scopes:** `pages_show_list`, `instagram_basic`, `instagram_manage_insights`, `pages_read_engagement`
+- **Token type:** Never-expiring Page Access Token (derived from long-lived user token)
+
+### Handle Data Quality
+
+The `entities.instagram` column has 7 entries but quality is poor. Meanwhile, `merchant_surfaces` has 90 instagram URLs across ~70 entities discovered by the surface pipeline. There is an immediate opportunity to backfill `entities.instagram` from `merchant_surfaces` by extracting clean handles from surface URLs.
+
+Known handle issues:
+- `LA Tutors 123` has literal string `"null"` (not SQL NULL)
+- `Mochomitoss` has full URL `https://www.instagram.com/mochomitosss/` instead of clean handle
+- Several handles don't resolve via Business Discovery (account may not be Business/Professional type)
+
+### Batch Dry Run Results (2026-03-13)
+
+| Entity | Handle | Status | Posts | Followers |
+|---|---|---|---|---|
+| Brothers Cousins | @brotherscousinstacos | ✅ Found | 209 | 61,721 |
+| Tacos El Toro | @tacoseltoro_ | ✅ Found | 929 | 32,994 |
+| Tacos Pasadita | @tacospasadita_ | ✅ Found | 30 | 2,911 |
+| Balam Kitchen | @balammexicankitchen | ❌ Not found | — | — |
+| Seco | @secolosangeles | ❌ Not found | — | — |
+| Mochomitoss | @mochomitosss | ❌ Not found | — | — |
+| LA Tutors 123 | @null | ❌ Bad data | — | — |
+
+### Caption Data Observations
+
+From the three successful accounts, caption characteristics vary significantly:
+- **Brothers Cousins:** Bilingual (English/Spanish), operational content (location announcements, hours, closures), moderate caption length
+- **Tacos El Toro:** Primarily Spanish, personal/storytelling content mixed with operational info, high posting cadence (929 posts)
+- **Tacos Pasadita:** Primarily Spanish, location-focused, shorter captions with emoji-heavy formatting
+
+This is a small sample skewed toward taco trucks. The ~70 entities with `merchant_surfaces` instagram records include fine dining, wine bars, and chef-driven restaurants likely to have richer caption signal density for SceneSense extraction.
+
+### Platform Constraint
+
+The TRACES THREE app is in **development mode**. All API calls are limited to test users and business accounts that have granted access. Before batch ingest at scale, the app will need Meta App Review approval. This is not a blocker for the current entity set but will be for production scale.
+
+## 4. Affected Systems
 
 The following systems are affected by the Instagram integration. This is not an exhaustive engineering audit — it is a map of known impact areas. Engineering should treat this as a starting point for discovery, not a complete specification.
 
@@ -66,9 +140,9 @@ The following systems are affected by the Instagram integration. This is not an 
 
 **Operational:** Fetch cost and rate limit management, storage growth planning, re-parse capability via raw payload preservation.
 
-## 4. New Tables
+## 5. Tables
 
-Three new tables. A fourth for temporal signals is defined in section 6.
+Three tables already exist in the Prisma schema (empty, never populated). A fourth for temporal signals is new and defined in Section 7.
 
 ### instagram_accounts
 
@@ -104,7 +178,7 @@ Append only. Never overwrite old values.
 
 **Sync rule:** Append only on every fetch. Historical snapshots are the record.
 
-## 5. Sync & Ingest Rules
+## 6. Sync & Ingest Rules
 
 Each table has a distinct sync behavior. These are not interchangeable.
 
@@ -118,7 +192,7 @@ Each table has a distinct sync behavior. These are not interchangeable.
 
 **Raw payloads** are preserved on all three tables specifically so signals can be re-extracted later without re-fetching. This is a deliberate cost decision. We paid for the fetch. We should be able to use it more than once.
 
-## 6. Temporal Signal Architecture
+## 7. Temporal Signal Architecture
 
 This is the most novel section in the document. Nothing in the current system thinks about time the way Instagram requires. This section defines a new signal class that did not previously exist in the platform.
 
@@ -148,7 +222,7 @@ A scheduled job will need to run expiry sweeps to set is_expired as signals age 
 
 **Open question:** How do temporal signals interact with `entities.hours`? If a post says "closed Sunday" but hours say open, who wins and does anything in the UI surface the conflict? This is a product decision to be made when contextual display is scoped.
 
-## 7. Interpretation Layer Impact
+## 8. Interpretation Layer Impact
 
 Every interpretation feature in the current stack was built against a fixed input set. Instagram expands that input set in ways that are largely positive but require awareness before wiring.
 
@@ -164,7 +238,7 @@ The concern worth flagging is that features may have been built with hardcoded a
 
 The longer-term architectural direction this points toward is a **source arbitration layer** — a unified signal pool with source, recency, and confidence attached, from which features draw without needing to know the specific origin. Instagram is the forcing function that makes this worth designing toward. Engineering should be aware of this direction even if the refactor is deferred.
 
-## 8. Photo Strategy
+## 9. Photo Strategy
 
 Instagram photos should be ingested using the same pipeline philosophy as Google photos. The goal is a unified pool of quality-vetted photo candidates with source metadata attached. The rendering layer — TRACES — decides what gets displayed. The data layer surfaces the best candidates it can.
 
@@ -181,7 +255,7 @@ Instagram photos should be ingested using the same pipeline philosophy as Google
 
 **Flag for engineering:** Instagram photo ingestion should mirror the existing Google photo pipeline wherever possible. Do not build a separate system. Extend what exists. TRACES consumes from a unified candidate pool with source metadata, not from source-specific photo tables. Review how the Google photo pipeline currently works before building the Instagram photo ingest path.
 
-## 9. Attachment Model
+## 10. Attachment Model
 
 Instagram attaches to `merchant_surface` first, not directly to `entities`. This is the structural decision that everything else depends on.
 
@@ -193,7 +267,7 @@ This keeps Instagram as a source record — a signal contributor — not a core 
 
 **Unmatched accounts:** The ingest job needs a fallback state for Instagram accounts that cannot be confidently matched to an entity. Proposed: `source_status` set to `unmatched`. Unresolved accounts should not be dropped — they should be queued for review. Identity resolution for unmatched accounts is an open question.
 
-## 10. Future Considerations
+## 11. Future Considerations
 
 These are capabilities the architecture should not close the door on. Engineering should be aware they are coming.
 
@@ -211,19 +285,63 @@ These are capabilities the architecture should not close the door on. Engineerin
 
 **Instagram as identity signal.** For entities where Instagram is the primary or only merchant-authored presence, there may be a future case for Instagram signals contributing to identity line assembly. Not now.
 
-## 11. Open Questions
+## 12. Implementation Phases
 
-### Answered by data review tomorrow
+### Phase 0 — Plumbing (DONE)
+- ✅ `instagram_accounts`, `instagram_media`, `instagram_insight_snapshots` tables in schema
+- ✅ `ingest-instagram.ts` script operational (Business Discovery, batch, /me modes)
+- ✅ API credentials configured (never-expiring Page Access Token + IG User ID)
+- ✅ `merchant_surfaces` has 90 instagram surface records across ~70 entities
+- ✅ API route returns instagram handle; place page renders instagram link
 
-- What does the actual Instagram data look like across our merchant set?
-- What percentage of merchants have active accounts vs dormant vs none?
-- What is the average caption length and quality?
-- How many posts per week across the corpus?
-- What percentage of captions have extractable signals vs noise?
+### Phase 1 — Data Quality & First Real Ingest
+- Backfill `entities.instagram` from `merchant_surfaces` (extract handles from ~90 URLs)
+- Validate handles against Business Discovery API, flag unresolvable
+- Fix known bad data (literal `"null"`, full URLs instead of handles)
+- Run first real `--batch` ingest (populate `instagram_accounts` + `instagram_media`)
+- Data review: caption length distribution, posting cadence, signal density across merchant types
+
+### Phase 2 — Caption Signal Extraction
+- Build caption extraction job (evergreen signals → `language_signals`)
+- Wire extracted signals into Stage 5 (identity signal extraction) as supplemental input
+- Define signal taxonomy: cuisine markers, producer mentions, philosophy language, dish names
+- Handle bilingual content (significant Spanish-language caption presence in current data)
+
+### Phase 3 — Temporal Signals
+- Create `instagram_temporal_signals` table (new — only table not yet in schema)
+- Build temporal extraction job (closures, events, hours changes, special menus)
+- Build expiry sweep job (`is_expired` flag management)
+- Capture-only — no display UI yet
+
+### Phase 4 — Photo Candidate Pipeline
+- Score `instagram_media` for display candidacy (`is_display_candidate`)
+- Integrate into unified photo candidate pool alongside Google photos
+- Source metadata preserved for TRACES rendering decisions
+
+### Phase 5 — Interpretation Layer Wiring
+- Audit hardcoded source assumptions in SceneSense, ABOUT synthesis, confidence scoring
+- Wire Instagram signals into confidence model as corroborating source
+- Caption register awareness for ABOUT synthesis (Instagram tone ≠ website tone)
+
+### Phase 6 — Contextual Display
+- Design temporal signal display UI
+- Define minimum confidence thresholds for surfacing closures/events
+- Product decision: Instagram vs. Google hours conflict resolution
+
+## 13. Open Questions
+
+### Data review (partially answered 2026-03-13)
+
+- ✅ **What does the actual Instagram data look like?** — See Section 3. Three accounts resolved: Brothers Cousins (209 posts, 61K followers), Tacos El Toro (929 posts, 33K followers), Tacos Pasadita (30 posts, 2.9K followers). Small sample skewed toward taco trucks. Broader data review needed after Phase 1 handle backfill.
+- ✅ **Is `merchant_surface` built and wired?** — Yes. 90 instagram surface records exist across ~70 entities. Surface types: homepage (115), about (89), instagram (90), contact (84), menu (74), reservation (10), drinks (4).
+- ⏳ What percentage of merchants have active accounts vs dormant vs none? (Needs Phase 1 backfill first)
+- ⏳ What is the average caption length and quality across the full set?
+- ⏳ How many posts per week across the corpus?
+- ⏳ What percentage of captions have extractable signals vs noise?
 
 ### Engineering discoveries
 
-- Is `merchant_surface` built and wired to entities?
+- ✅ **Is `merchant_surface` built and wired to entities?** — Yes. Resolved.
 - Which interpretation features have hardcoded source assumptions that need refactoring before Instagram signals can flow in cleanly?
 - How does the existing Google photo pipeline work and how cleanly can Instagram photos be added to it?
 - What is the current confidence scoring model and where does source weighting live?
@@ -252,3 +370,4 @@ These are capabilities the architecture should not close the door on. Engineerin
 | Version | Date | Changes | Author |
 |---------|------|---------|--------|
 | 0.1 | 2026-03-13 | Initial implementation doc from planning session | Bobby / Claude |
+| 0.2 | 2026-03-13 | Added current state (Section 3), implementation phases (Section 12), answered open questions from data review, renumbered sections | Bobby / Claude |

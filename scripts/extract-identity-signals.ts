@@ -95,7 +95,7 @@ interface GoldenRecordInput {
 // ============================================================================
 
 const CONFIG = {
-  model: 'claude-sonnet-4-20250514',
+  model: 'claude-haiku-4-5-20251001',
   maxTokens: 1024,
   requestDelayMs: 500,  // Rate limiting between API calls
   batchSize: 10,
@@ -307,7 +307,14 @@ function parseExtractionResult(text: string): ExtractionResult | null {
     parsed.signature_dishes = Array.isArray(parsed.signature_dishes) ? parsed.signature_dishes : [];
     parsed.key_producers = Array.isArray(parsed.key_producers) ? parsed.key_producers : [];
     parsed.language_signals = Array.isArray(parsed.language_signals) ? parsed.language_signals : [];
-    
+
+    // Coerce core signal fields — Haiku sometimes returns arrays instead of strings
+    for (const field of ['cuisine_posture', 'service_model', 'price_tier', 'wine_program_intent', 'place_personality', 'origin_story_type'] as const) {
+      if (Array.isArray(parsed[field])) {
+        parsed[field] = parsed[field][0] ?? null;
+      }
+    }
+
     return parsed as ExtractionResult;
   } catch (error) {
     console.error('Failed to parse extraction result:', error);
@@ -405,24 +412,6 @@ async function writeSignals(
     confidence_tier: getConfidenceTier(result.confidence),
   };
   
-  // Bridge: write back to golden_records if a row exists for this entity.
-  // updateMany silently skips when no row matches — safe for entities that
-  // were never in the legacy pipeline.
-  await prisma.golden_records.updateMany({
-    where: { canonical_id: canonicalId },
-    data: {
-      cuisine_posture: result.cuisine_posture,
-      service_model: result.service_model,
-      price_tier: result.price_tier,
-      wine_program_intent: result.wine_program_intent,
-      place_personality: result.place_personality,
-      identity_signals: identitySignals,
-      signals_generated_at: new Date(),
-      signals_version: 1,
-      updated_at: new Date(),
-    },
-  });
-
   // Fields v2: write derived_signals.
   // canonical_id === entity_id (same UUID), so use it directly — no lookup needed.
   const entityId = canonicalId;
@@ -477,7 +466,7 @@ async function main() {
   //                      that are in the entities table but are not Saiko Maps
   //                      product entities.
   // "Already processed": derived_signals WHERE signal_key = 'identity_signals'.
-  // Content source     : entities.description (v2-native) and/or golden_records
+  // Content source     : entities.description (v2-native) and/or merchant_surface_artifacts
   //                      bridge for menu_raw_text / winelist_raw_text / about_copy.
 
   // 1. All entities in canonical scope within the LA product bounding box.
@@ -516,38 +505,59 @@ async function main() {
 
   const unprocessed = candidates.filter(e => !processedIds.has(e.id));
 
-  // 3. Batch-fetch scraped text from golden_records via google_place_id (bridge).
-  //    menu_raw_text / winelist_raw_text / about_copy live here when the legacy
-  //    scraping pipeline has run for a given entity.
-  const gpids = unprocessed
-    .map(e => e.googlePlaceId)
-    .filter((g): g is string => g != null);
+  // 3. Batch-fetch parsed surface artifacts from the merchant_surfaces pipeline (stages 2-4).
+  //    artifact_json.text_blocks is a string[]; join them into a single string.
+  const entityIdsForArtifacts = unprocessed.map(e => e.id);
 
-  const goldenRows = gpids.length
-    ? await prisma.golden_records.findMany({
-        where: { google_place_id: { in: gpids } },
+  type ArtifactRow = {
+    merchant_surface: { entity_id: string; surface_type: string };
+    artifact_json: unknown;
+  };
+  const surfaceArtifacts: ArtifactRow[] = entityIdsForArtifacts.length
+    ? await prisma.merchant_surface_artifacts.findMany({
+        where: {
+          merchant_surface: {
+            entity_id: { in: entityIdsForArtifacts },
+            surface_type: { in: ['menu', 'about', 'homepage'] },
+            parse_status: 'parse_success',
+          },
+        },
         select: {
-          google_place_id: true,
-          menu_raw_text: true,
-          winelist_raw_text: true,
-          about_copy: true,
+          artifact_json: true,
+          merchant_surface: { select: { entity_id: true, surface_type: true } },
         },
       })
     : [];
-  const goldenByGpid = new Map(goldenRows.map(g => [g.google_place_id, g]));
+
+  // Index by entityId → { menu_text, about_text }
+  function textBlocksToString(artifact_json: unknown): string {
+    const j = artifact_json as Record<string, unknown>;
+    const blocks = Array.isArray(j?.text_blocks) ? (j.text_blocks as string[]) : [];
+    return blocks.join('\n').trim();
+  }
+
+  const surfaceTextByEntity = new Map<string, { menu_text: string; about_text: string }>();
+  for (const row of surfaceArtifacts) {
+    const eid = row.merchant_surface.entity_id;
+    const st  = row.merchant_surface.surface_type;
+    if (!surfaceTextByEntity.has(eid)) surfaceTextByEntity.set(eid, { menu_text: '', about_text: '' });
+    const entry = surfaceTextByEntity.get(eid)!;
+    const text = textBlocksToString(row.artifact_json);
+    if (st === 'menu' && text.length > entry.menu_text.length) entry.menu_text = text;
+    if ((st === 'about' || st === 'homepage') && text.length > entry.about_text.length) entry.about_text = text;
+  }
 
   // 4. Build records — require at least one content field above the minimum
   //    useful length. Content shorter than minContentChars is "minimal" quality:
   //    the AI returns mostly-null fields with hold-tier confidence, wastes an
   //    API call, and produces an empty derived_signal that blocks future runs.
-  //    Priority: golden_records fields first; fall back to entities.description
-  //    as about_copy substitute when no golden_records row exists.
+  //    Priority: merchant_surface_artifacts text first, then entities.description as last resort.
   const { minContentChars } = CONFIG;
   const allRecords: GoldenRecordInput[] = unprocessed.flatMap(e => {
-    const gr = e.googlePlaceId ? goldenByGpid.get(e.googlePlaceId) : undefined;
-    const menu_raw_text     = gr?.menu_raw_text     ?? null;
-    const winelist_raw_text = gr?.winelist_raw_text ?? null;
-    const about_copy        = gr?.about_copy ?? e.description ?? null;
+    const sa  = surfaceTextByEntity.get(e.id);
+    const menu_raw_text     = sa?.menu_text  || null;
+    const winelist_raw_text = null; // future: wire from surface artifacts when winelist parsing exists
+    const about_copy        = (sa?.about_text || null) ?? e.description ?? null;
     const hasUsableMenu  = (menu_raw_text?.length  ?? 0) >= minContentChars;
     const hasUsableAbout = (about_copy?.length     ?? 0) >= minContentChars;
     if (!hasUsableMenu && !hasUsableAbout) return [];

@@ -5,9 +5,8 @@
  *
  * Resilient: if optional tables (place_photo_eval, energy_scores, place_tag_scores)
  * do not exist, falls back to minimal query using only core tables.
- * Identity signals (language_signals): primary source is derived_signals (Fields v2 path).
- * Falls back to golden_records.identity_signals during bridge period while derived_signals is populated.
- * FieldsMembership now FKs to entities.id — no golden_records lookup is needed for fieldsMembership counts.
+ * Identity signals (language_signals): sourced from derived_signals (Fields v2 path).
+ * FieldsMembership FKs to entities.id directly.
  */
 
 import { db } from '@/lib/db';
@@ -164,21 +163,7 @@ async function fetchPlaceForPRLBySlugFull(
     where: { entityId: place.id, removedAt: null },
   });
 
-  // Bridge: fall back to golden_records identity_signals only when derived_signals is empty.
-  // Remove once derived_signals is fully populated for all entities.
-  if (!derivedIdentity) {
-    const gpid = place.googlePlaceId;
-    if (gpid) {
-      const gr = await db.golden_records.findFirst({
-        where: { google_place_id: gpid },
-        select: { identity_signals: true },
-      });
-      if (gr) {
-        const identSig = gr.identity_signals as Record<string, unknown> | null;
-        hasLanguageSignals = Array.isArray(identSig?.language_signals) && (identSig!.language_signals as string[]).length > 0;
-      }
-    }
-  }
+  // derived_signals is the sole source for identity signals (golden_records dropped)
 
   const hasTagSignals = hasTagScores || hasLanguageSignals;
 
@@ -261,22 +246,8 @@ async function fetchPlaceForPRLBySlugMinimal(
       where: { entityId: place.id, removedAt: null },
     });
 
-    // Bridge: fall back to golden_records identity_signals only when derived_signals is empty.
-    if (!derivedIdentityMinimal) {
-      const gpid = place.googlePlaceId;
-      if (gpid) {
-        const gr = await db.golden_records.findFirst({
-          where: { google_place_id: gpid },
-          select: { identity_signals: true },
-        });
-        if (gr) {
-          const identSig = gr.identity_signals as Record<string, unknown> | null;
-          hasLanguageSignalsMinimal = Array.isArray(identSig?.language_signals) && (identSig!.language_signals as string[]).length > 0;
-        }
-      }
-    }
   } catch {
-    /* derived_signals, golden_records, or FieldsMembership may not exist */
+    /* derived_signals or FieldsMembership may not exist */
   }
 
   const categoryDisplay =
@@ -419,9 +390,7 @@ async function fetchPlaceForPRLBatchFull(args?: {
 
   const placeIds = places.map((p) => p.id);
 
-  const gpids = places.map((p) => p.googlePlaceId).filter(Boolean) as string[];
-
-  // Primary: derived_signals for language_signals (Fields v2 path)
+  // derived_signals for language_signals (Fields v2 path)
   const derivedSignalsBatch = placeIds.length > 0
     ? await db.derived_signals.findMany({
         where: { entity_id: { in: placeIds }, signal_key: 'identity_signals' },
@@ -441,7 +410,7 @@ async function fetchPlaceForPRLBatchFull(args?: {
     );
   }
 
-  const [mapCounts, goldenRecs, fieldsMembershipCounts] = await Promise.all([
+  const [mapCounts, fieldsMembershipCounts] = await Promise.all([
     db.map_places.groupBy({
       by: ['entityId'],
       where: {
@@ -450,15 +419,6 @@ async function fetchPlaceForPRLBatchFull(args?: {
       },
       _count: { id: true },
     }),
-    // Bridge: golden_records identity_signals for entities not yet in derived_signals.
-    // canonical_id no longer needed — FieldsMembership now FKs to entities.id.
-    gpids.length > 0
-      ? db.golden_records.findMany({
-          where: { google_place_id: { in: gpids } },
-          select: { google_place_id: true, identity_signals: true },
-        })
-      : Promise.resolve([]),
-    // FieldsMembership: query by entity IDs directly (no golden_records canonical_id needed).
     placeIds.length > 0
       ? db.fieldsMembership.groupBy({
           by: ['entityId'],
@@ -473,22 +433,6 @@ async function fetchPlaceForPRLBatchFull(args?: {
   );
   const fieldsCountByEntityId = new Map(
     fieldsMembershipCounts.map((c) => [c.entityId, c._count.id])
-  );
-
-  // Bridge: golden_records language signals for entities not yet in derived_signals
-  const entityIdByGpid = new Map<string, string>(
-    places.filter((p) => p.googlePlaceId).map((p) => [p.googlePlaceId!, p.id])
-  );
-  const goldenLanguageByGpid = new Map<string, boolean>(
-    goldenRecs.map((g) => {
-      const entityId = g.google_place_id ? entityIdByGpid.get(g.google_place_id) : undefined;
-      const alreadyDerived = entityId ? derivedLanguageByEntityId.has(entityId) : false;
-      const sig = alreadyDerived ? null : (g.identity_signals as Record<string, unknown> | null);
-      return [
-        g.google_place_id ?? '',
-        !alreadyDerived && Array.isArray(sig?.language_signals) && (sig!.language_signals as string[]).length > 0,
-      ];
-    })
   );
 
   const curatorNotes = await Promise.all(
@@ -517,11 +461,8 @@ async function fetchPlaceForPRLBatchFull(args?: {
         : null;
 
     const hasTagScores = place._count.place_tag_scores > 0;
-    // Primary: derived_signals; bridge: golden_records via gpid
     const hasLanguageSignalsBatch =
-      derivedLanguageByEntityId.get(place.id) ??
-      goldenLanguageByGpid.get(place.googlePlaceId ?? '') ??
-      false;
+      derivedLanguageByEntityId.get(place.id) ?? false;
     const hasTagSignals = hasTagScores || hasLanguageSignalsBatch;
 
     const editorialArr = place.editorialSources as unknown[] | null;
@@ -587,12 +528,9 @@ async function fetchPlaceForPRLBatchMinimal(args?: {
   });
 
   const placeIds = places.map((p) => p.id);
-  const gpids = places.map((p) => p.googlePlaceId).filter(Boolean) as string[];
 
   let mapCountByPlace = new Map<string, number>();
-  // Primary: derived_signals language signals; bridge: golden_records for entities not yet derived
   let derivedLangByEntityIdMinimal = new Map<string, boolean>();
-  let goldenLangByGpidMinimal = new Map<string, boolean>();
   let fieldsCountByEntityIdMinimal = new Map<string, number>();
   const curatorNoteByPlace = new Map<string, string | null>();
 
@@ -618,21 +556,12 @@ async function fetchPlaceForPRLBatchMinimal(args?: {
     }
     derivedLangByEntityIdMinimal = derivedLangTemp;
 
-    const [mapCounts, goldenRecs, fieldsCounts] = await Promise.all([
+    const [mapCounts, fieldsCounts] = await Promise.all([
       db.map_places.groupBy({
         by: ['entityId'],
         where: { entityId: { in: placeIds }, lists: { status: 'PUBLISHED' } },
         _count: { id: true },
       }),
-      // Bridge: golden_records identity_signals for entities not yet in derived_signals.
-      // canonical_id no longer needed — FieldsMembership now FKs to entities.id.
-      gpids.length > 0
-        ? db.golden_records.findMany({
-            where: { google_place_id: { in: gpids } },
-            select: { google_place_id: true, identity_signals: true },
-          })
-        : Promise.resolve([]),
-      // FieldsMembership: query by entity IDs directly.
       placeIds.length > 0
         ? db.fieldsMembership.groupBy({
             by: ['entityId'],
@@ -644,25 +573,6 @@ async function fetchPlaceForPRLBatchMinimal(args?: {
     mapCountByPlace = new Map(mapCounts.map((m) => [m.entityId, m._count.id]));
     fieldsCountByEntityIdMinimal = new Map(fieldsCounts.map((c) => [c.entityId, c._count.id]));
 
-    const entityIdByGpidMinimal = new Map<string, string>(
-      places.filter((p) => p.googlePlaceId).map((p) => [p.googlePlaceId!, p.id])
-    );
-    const goldenLangTemp = new Map<string, boolean>();
-    for (const g of goldenRecs) {
-      // Bridge: only read language signals if derived_signals has nothing for this entity
-      if (g.google_place_id) {
-        const entityId = entityIdByGpidMinimal.get(g.google_place_id);
-        if (entityId && !derivedLangByEntityIdMinimal.has(entityId)) {
-          const sig = g.identity_signals as Record<string, unknown> | null;
-          goldenLangTemp.set(
-            g.google_place_id,
-            Array.isArray(sig?.language_signals) && (sig!.language_signals as string[]).length > 0,
-          );
-        }
-      }
-    }
-    goldenLangByGpidMinimal = goldenLangTemp;
-
     const notes = await Promise.all(
       placeIds.map((id) =>
         getCuratorNoteForPlace(id).catch(() => null)
@@ -670,7 +580,7 @@ async function fetchPlaceForPRLBatchMinimal(args?: {
     );
     placeIds.forEach((id, i) => curatorNoteByPlace.set(id, notes[i]));
   } catch {
-    /* map_places, golden_records, or derived_signals may not exist */
+    /* map_places or derived_signals may not exist */
   }
 
   return places.map((place) => {
@@ -678,11 +588,8 @@ async function fetchPlaceForPRLBatchMinimal(args?: {
     const googlePhotosCount = Array.isArray(googlePhotosArr)
       ? googlePhotosArr.length
       : 0;
-    // Primary: derived_signals; bridge: golden_records (fixes pre-existing bug where this was always false)
     const hasLanguageSignalsBatchMinimal =
-      derivedLangByEntityIdMinimal.get(place.id) ??
-      goldenLangByGpidMinimal.get(place.googlePlaceId ?? '') ??
-      false;
+      derivedLangByEntityIdMinimal.get(place.id) ?? false;
     const editorialArr = place.editorialSources as unknown[] | null;
     const hasEditorialSources = (editorialArr?.length ?? 0) > 0;
     const hasPullQuote = !!(place.pullQuote?.trim());

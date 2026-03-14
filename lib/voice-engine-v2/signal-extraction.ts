@@ -18,12 +18,12 @@ import { IdentitySignals, PlaceContext, TaglineGenerationInputV2 } from './types
 const prisma = new PrismaClient();
 
 // ============================================
-// SIGNAL EXTRACTION FROM GOLDEN RECORDS
+// SIGNAL EXTRACTION
 // ============================================
 
 /**
- * Extract identity signals and context from a record shaped like a golden_records row
- * (or the shim produced by fetchRecordsForTaglineGeneration from entities + derived_signals).
+ * Extract identity signals and context from a record shaped by
+ * fetchRecordsForTaglineGeneration (entities + derived_signals).
  */
 export function extractSignalsFromGoldenRecord(record: any): {
   signals: IdentitySignals;
@@ -66,7 +66,7 @@ export function extractSignalsFromGoldenRecord(record: any): {
 }
 
 /**
- * Build complete tagline generation input from golden record
+ * Build complete tagline generation input from entity record
  */
 export function buildTaglineInputFromGoldenRecord(
   record: any,
@@ -128,7 +128,7 @@ export async function fetchRecordsForTaglineGeneration(options: {
     },
   });
 
-  // Shape into golden_records-compatible records for downstream compatibility
+  // Shape records for downstream extraction functions
   return derivedRows
     .filter((d) => options.reprocess || !d.entity.tagline)
     .map((d) => {
@@ -160,7 +160,7 @@ export async function fetchRecordsForTaglineGeneration(options: {
 // ============================================
 
 /**
- * Derive popularity tier from golden record metadata
+ * Derive popularity tier from entity metadata
  */
 function derivePopularityTier(record: any): 'institution' | 'known' | 'discovery' | null {
   // Use place_personality if it's 'institution'

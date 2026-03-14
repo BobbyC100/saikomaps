@@ -12,6 +12,7 @@
 
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { parseGoldenIdentifier } from '@/lib/utils/parseGoldenIdentifier';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -95,9 +96,13 @@ function ResultsTable({ results }: { results: IntakeResult[] }) {
   const router = useRouter();
   const [enrichStates, setEnrichStates] = useState<Record<string, EnrichState>>({});
   const pollRefs = useRef<Record<string, ReturnType<typeof setInterval>>>({});
-  // overrides: input name → new result, for rows force-created from ambiguous state
+  // overrides: input name → new result, for rows force-created or resolved from ambiguous state
   const [overrides, setOverrides] = useState<Record<string, IntakeResult>>({});
   const [forceCreateLoading, setForceCreateLoading] = useState<Record<string, boolean>>({});
+  // Resolve state — auto Google Places lookup + manual paste input for ambiguous rows
+  const [resolveLoading, setResolveLoading] = useState<Record<string, boolean>>({});
+  const [resolveErrors, setResolveErrors] = useState<Record<string, string>>({});
+  const [resolveInputs, setResolveInputs] = useState<Record<string, string>>({});
 
   // Start polling DB for enrichment_stage after triggering
   const startPolling = useCallback((slug: string) => {
@@ -112,8 +117,10 @@ function ResultsTable({ results }: { results: IntakeResult[] }) {
           setEnrichStates((s) => ({ ...s, [slug]: 'done' }));
           clearInterval(pollRefs.current[slug]);
           delete pollRefs.current[slug];
-          // Navigate to the place page after a brief moment to show ✓ Enriched
-          setTimeout(() => router.push(`/place/${slug}`), 1200);
+          // Navigate to the place page only for single-entry intake (not CSV batches)
+          if (results.length === 1) {
+            setTimeout(() => router.push(`/place/${slug}`), 1200);
+          }
         }
       } catch {
         // network hiccup — keep polling
@@ -156,6 +163,81 @@ function ResultsTable({ results }: { results: IntakeResult[] }) {
     }
   }, []);
 
+  const handleResolve = useCallback(async (inputName: string) => {
+    setResolveLoading((s) => ({ ...s, [inputName]: true }));
+    setResolveErrors((s) => { const next = { ...s }; delete next[inputName]; return next; });
+
+    try {
+      const res = await fetch('/api/admin/intake/resolve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: inputName }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Resolve failed');
+
+      const result = data.result;
+      if (result.outcome === 'no_results') {
+        setResolveErrors((s) => ({ ...s, [inputName]: result.message }));
+        return;
+      }
+
+      if (result.outcome === 'matched' || result.outcome === 'created') {
+        setOverrides((s) => ({ ...s, [inputName]: result }));
+      }
+    } catch (err: any) {
+      setResolveErrors((s) => ({ ...s, [inputName]: err.message }));
+    } finally {
+      setResolveLoading((s) => ({ ...s, [inputName]: false }));
+    }
+  }, []);
+
+  const handleManualResolve = useCallback(async (inputName: string, rawIdentifier: string) => {
+    const parsed = parseGoldenIdentifier(rawIdentifier);
+    if (parsed.type === 'unknown' || Object.keys(parsed.intakeFields).length === 0) {
+      setResolveErrors((s) => ({
+        ...s,
+        [inputName]: 'Unrecognized format. Paste a Google Maps URL, GPID, Instagram URL/handle, or website URL.',
+      }));
+      return;
+    }
+
+    setResolveLoading((s) => ({ ...s, [inputName]: true }));
+    setResolveErrors((s) => { const next = { ...s }; delete next[inputName]; return next; });
+
+    try {
+      const res = await fetch('/api/admin/intake', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: inputName, ...parsed.intakeFields }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Resolve failed');
+
+      const result: IntakeResult = data.results?.[0];
+      if (result) {
+        setOverrides((s) => ({ ...s, [inputName]: result }));
+        setResolveInputs((s) => { const next = { ...s }; delete next[inputName]; return next; });
+      }
+    } catch (err: any) {
+      setResolveErrors((s) => ({ ...s, [inputName]: err.message }));
+    } finally {
+      setResolveLoading((s) => ({ ...s, [inputName]: false }));
+    }
+  }, []);
+
+  const handleResolveAll = useCallback(async () => {
+    const ambiguousRows = results
+      .map((r) => overrides[r.input] ?? r)
+      .filter((r) => r.outcome === 'ambiguous');
+    if (ambiguousRows.length === 0) return;
+
+    // Fire all resolve calls in parallel
+    await Promise.allSettled(
+      ambiguousRows.map((r) => handleResolve(r.input))
+    );
+  }, [results, overrides, handleResolve]);
+
   const handleEnrich = useCallback(async (slug: string) => {
     setEnrichStates((s) => ({ ...s, [slug]: 'queued' }));
     try {
@@ -167,8 +249,30 @@ function ResultsTable({ results }: { results: IntakeResult[] }) {
     }
   }, [startPolling]);
 
+  // Count remaining ambiguous rows (accounting for overrides)
+  const ambiguousCount = results
+    .map((r) => overrides[r.input] ?? r)
+    .filter((r) => r.outcome === 'ambiguous').length;
+  const isAnyResolving = Object.values(resolveLoading).some(Boolean);
+
   return (
-    <div className="mt-6 overflow-x-auto rounded-lg border" style={{ borderColor: C.border }}>
+    <div className="mt-6">
+      {ambiguousCount > 0 && (
+        <div className="mb-3 flex items-center gap-3">
+          <button
+            onClick={handleResolveAll}
+            disabled={isAnyResolving}
+            style={{ backgroundColor: C.accent, color: '#fff' }}
+            className="px-4 py-2 rounded text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 transition-opacity"
+          >
+            {isAnyResolving ? 'Resolving...' : `Resolve All (${ambiguousCount})`}
+          </button>
+          <span className="text-xs" style={{ color: C.muted }}>
+            Auto-searches Google Places for each ambiguous row
+          </span>
+        </div>
+      )}
+      <div className="overflow-x-auto rounded-lg border" style={{ borderColor: C.border }}>
       <table className="w-full text-sm" style={{ color: C.text }}>
         <thead>
           <tr style={{ backgroundColor: C.bg, borderBottom: `1px solid ${C.border}` }}>
@@ -241,26 +345,72 @@ function ResultsTable({ results }: { results: IntakeResult[] }) {
                     </button>
                   )}
                   {r.outcome === 'ambiguous' && (
-                    <span className="flex items-center gap-2">
-                      <a
-                        href={googleSearchUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        title="Search Google to verify"
-                        style={{ color: C.muted }}
-                        className="text-xs hover:underline"
-                      >
-                        🔍 Verify
-                      </a>
-                      <button
-                        onClick={() => handleForceCreate(r.input)}
-                        disabled={isForceLoading}
-                        style={{ backgroundColor: C.bg, color: C.text, border: `1px solid ${C.border}` }}
-                        className="px-3 py-1 rounded text-xs font-semibold hover:opacity-80 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        {isForceLoading ? 'Creating…' : 'Create Anyway'}
-                      </button>
-                    </span>
+                    <div className="space-y-2">
+                      {/* Row 1: auto-resolve + force create */}
+                      <span className="flex items-center gap-2">
+                        <button
+                          onClick={() => handleResolve(r.input)}
+                          disabled={resolveLoading[r.input]}
+                          style={{ backgroundColor: C.accent, color: '#fff' }}
+                          className="px-3 py-1 rounded text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 transition-opacity"
+                        >
+                          {resolveLoading[r.input] ? 'Resolving...' : 'Resolve'}
+                        </button>
+                        <button
+                          onClick={() => handleForceCreate(r.input)}
+                          disabled={isForceLoading}
+                          style={{ backgroundColor: C.bg, color: C.text, border: `1px solid ${C.border}` }}
+                          className="px-3 py-1 rounded text-xs font-semibold hover:opacity-80 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {isForceLoading ? 'Creating...' : 'Create Anyway'}
+                        </button>
+                      </span>
+
+                      {/* Row 2: manual paste input */}
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="text"
+                          value={resolveInputs[r.input] ?? ''}
+                          onChange={(e) => setResolveInputs((s) => ({ ...s, [r.input]: e.target.value }))}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && resolveInputs[r.input]?.trim()) {
+                              handleManualResolve(r.input, resolveInputs[r.input]);
+                            }
+                          }}
+                          placeholder="Or paste a link / ID..."
+                          className="flex-1 px-2 py-1 rounded border text-xs outline-none focus:ring-1"
+                          style={{
+                            backgroundColor: C.cardBg,
+                            borderColor: C.border,
+                            color: C.text,
+                            minWidth: '180px',
+                          }}
+                        />
+                        <button
+                          onClick={() => handleManualResolve(r.input, resolveInputs[r.input] ?? '')}
+                          disabled={!resolveInputs[r.input]?.trim() || resolveLoading[r.input]}
+                          style={{ backgroundColor: C.accent, color: '#fff' }}
+                          className="px-2 py-1 rounded text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 transition-opacity whitespace-nowrap"
+                        >
+                          Go
+                        </button>
+                      </div>
+
+                      {/* Detected type indicator */}
+                      {resolveInputs[r.input]?.trim() && (() => {
+                        const parsed = parseGoldenIdentifier(resolveInputs[r.input]);
+                        return parsed.type !== 'unknown' ? (
+                          <p className="text-xs" style={{ color: C.accent }}>
+                            Detected: {parsed.label}
+                          </p>
+                        ) : null;
+                      })()}
+
+                      {/* Error message */}
+                      {resolveErrors[r.input] && (
+                        <p className="text-xs" style={{ color: C.red }}>{resolveErrors[r.input]}</p>
+                      )}
+                    </div>
                   )}
                 </td>
               </tr>
@@ -268,6 +418,7 @@ function ResultsTable({ results }: { results: IntakeResult[] }) {
           })}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }

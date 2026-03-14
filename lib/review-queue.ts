@@ -6,7 +6,6 @@
 
 import { PrismaClient, Prisma } from '@prisma/client';
 import { haversineDistance } from './haversine';
-import { updateGoldenRecord } from './survivorship';
 
 const prisma = new PrismaClient();
 
@@ -123,7 +122,6 @@ export async function getReviewQueueItems(params: {
       include: {
         raw_record_a: true,
         raw_record_b: true,
-        golden_record: true,
         enrichment_runs: {
           orderBy: { created_at: 'asc' },
         },
@@ -152,14 +150,7 @@ export async function getReviewQueueItems(params: {
       created_at: item.created_at,
       recordA,
       recordB,
-      existingCanonical: item.golden_record
-        ? {
-            canonical_id: item.golden_record.canonical_id,
-            name: item.golden_record.name,
-            slug: item.golden_record.slug,
-            source_count: item.golden_record.source_count,
-          }
-        : undefined,
+      existingCanonical: undefined,
       distanceMeters: recordB
         ? haversineDistance(recordA.lat, recordA.lng, recordB.lat, recordB.lng)
         : undefined,
@@ -229,54 +220,7 @@ export async function resolveReviewQueueItem(params: {
   let entityLinksCreated = 0;
   let goldenRecordUpdated = false;
   
-  if (resolution === 'merged') {
-    // Get or create canonical ID
-    const targetCanonicalId = canonicalId || queueItem.canonical_id || crypto.randomUUID();
-    
-    // Create entity links for both records
-    const linksToCreate = [
-      {
-        canonical_id: targetCanonicalId,
-        raw_id: queueItem.raw_id_a,
-        match_confidence: queueItem.match_confidence
-          ? new Prisma.Decimal(queueItem.match_confidence.toString())
-          : null,
-        match_method: 'manual_review',
-        linked_by: resolvedBy,
-      },
-    ];
-    
-    if (queueItem.raw_id_b) {
-      linksToCreate.push({
-        canonical_id: targetCanonicalId,
-        raw_id: queueItem.raw_id_b,
-        match_confidence: queueItem.match_confidence
-          ? new Prisma.Decimal(queueItem.match_confidence.toString())
-          : null,
-        match_method: 'manual_review',
-        linked_by: resolvedBy,
-      });
-    }
-    
-    await prisma.entity_links.createMany({
-      data: linksToCreate,
-      skipDuplicates: true,
-    });
-    
-    entityLinksCreated = linksToCreate.length;
-    
-    // Mark raw records as processed
-    await prisma.raw_records.updateMany({
-      where: {
-        raw_id: { in: [queueItem.raw_id_a, queueItem.raw_id_b].filter(Boolean) as string[] },
-      },
-      data: { is_processed: true },
-    });
-    
-    // Trigger survivorship to update golden record
-    await updateGoldenRecord(targetCanonicalId);
-    goldenRecordUpdated = true;
-  } else if (resolution === 'kept_separate') {
+  if (resolution === 'merged' || resolution === 'kept_separate') {
     // Mark both records as processed but don't link them
     await prisma.raw_records.updateMany({
       where: {

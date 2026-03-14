@@ -1,0 +1,17 @@
+{
+  "patch_type": "frontmatter_update",
+  "target_doc": "docs/architecture/instagram-implementation-v1.md",
+  "changes": {
+    "last_updated": "2026-03-13",
+    "systems": [
+      "instagram-api",
+      "enrichment-pipeline",
+      "merchant-surfaces"
+    ],
+    "related_docs": [
+      "docs/architecture/instagram-api-integration-v1.md",
+      "docs/architecture/instagram-ingestion-field-spec-v1.md"
+    ],
+    "summary": "Instagram integration implementation plan and system impact — tables, sync rules, temporal signals, interpretation layer, photo strategy, attachment model. V0.2 adds current state assessment, implementation phases, and data review results."
+  }
+}

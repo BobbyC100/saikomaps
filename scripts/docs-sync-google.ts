@@ -13,8 +13,9 @@
  *   npm run docs:sync-google -- --auth   ← opens browser once, saves tokens
  *
  * Subsequent runs (silent):
- *   npm run docs:sync-google
+ *   npm run docs:sync-google                            ← only uploads changed docs (content-hash diff)
  *   npm run docs:sync-google -- --dry-run
+ *   npm run docs:sync-google -- --force                 ← re-upload all, ignoring hashes
  *   npm run docs:sync-google -- --doc-id SYS-PROMOTION-FLOW-V1
  *
  * Required env vars (.env):
@@ -29,6 +30,7 @@
  *     TRACES/
  */
 
+import { createHash } from 'crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { homedir } from 'os';
 import { join, resolve } from 'path';
@@ -54,6 +56,7 @@ interface DocSyncState {
   google_doc_id: string;
   google_doc_url: string;
   last_synced: string;
+  content_hash?: string;
 }
 
 interface SyncMap {
@@ -81,6 +84,7 @@ const SCOPES = ['https://www.googleapis.com/auth/drive'];
 const args = process.argv.slice(2);
 const dryRun = args.includes('--dry-run');
 const authMode = args.includes('--auth');
+const forceAll = args.includes('--force');
 const singleDocId = (() => {
   const idx = args.indexOf('--doc-id');
   return idx !== -1 ? args[idx + 1] : null;
@@ -107,6 +111,10 @@ function saveSyncMap(map: SyncMap): void {
 function markdownToHtml(markdown: string): string {
   const stripped = markdown.replace(/^---[\s\S]*?---\n/, '');
   return marked(stripped) as string;
+}
+
+function hashContent(content: string): string {
+  return createHash('sha256').update(content).digest('hex').slice(0, 16);
 }
 
 // ── OAuth2 ────────────────────────────────────────────────────────────────────
@@ -270,16 +278,26 @@ async function main() {
   }
 
   let synced = 0;
+  let skipped = 0;
   let failed = 0;
 
   for (const doc of toSync) {
     const docPath = join(ROOT, doc.path);
     if (!existsSync(docPath)) { console.warn(`  [skip] ${doc.path} not found`); continue; }
 
-    const html = markdownToHtml(readFileSync(docPath, 'utf-8'));
+    const rawContent = readFileSync(docPath, 'utf-8');
+    const currentHash = hashContent(rawContent);
+    const existing = syncMap.docs[doc.doc_id];
+
+    if (!forceAll && existing?.content_hash === currentHash) {
+      console.log(`  [unchanged] ${doc.doc_id}`);
+      skipped++;
+      continue;
+    }
+
+    const html = markdownToHtml(rawContent);
     const title = doc.title || doc.doc_id;
     const folderId = syncMap.folders[doc.project_id] ?? rootFolderId!;
-    const existing = syncMap.docs[doc.doc_id];
 
     try {
       const result = await uploadDoc(title, html, folderId, existing?.google_doc_id);
@@ -287,6 +305,7 @@ async function main() {
         google_doc_id: result.id,
         google_doc_url: result.url,
         last_synced: new Date().toISOString(),
+        content_hash: currentHash,
       };
       console.log(`  [${existing ? 'updated' : 'created'}] ${doc.doc_id}  →  ${result.url}`);
       synced++;
@@ -298,7 +317,7 @@ async function main() {
 
   syncMap.last_synced = new Date().toISOString();
   saveSyncMap(syncMap);
-  console.log(`\n[docs:sync-google] Done. ${synced} synced, ${failed} failed.`);
+  console.log(`\n[docs:sync-google] Done. ${synced} synced, ${skipped} unchanged, ${failed} failed.`);
 }
 
 main().catch(err => {

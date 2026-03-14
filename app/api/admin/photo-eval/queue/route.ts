@@ -12,8 +12,7 @@ export async function GET() {
   >`
     SELECT p.id, p.slug, p.name, p.google_place_id
     FROM v_places_la_bbox p
-    JOIN golden_records gr ON gr.canonical_id = p.id
-    WHERE gr.promotion_status IN ('PUBLISHED', 'VERIFIED', 'PENDING')
+    WHERE p.status = 'OPEN'
     ORDER BY random()
     LIMIT 25
   `;

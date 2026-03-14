@@ -149,6 +149,25 @@ async function processOne(input: IntakeInput): Promise<IntakeResult> {
     };
   }
 
+  // 2b. Instagram handle match
+  if (instagram) {
+    const cleanHandle = instagram.replace(/^@/, '').toLowerCase();
+    const allWithIg = await db.entities.findMany({
+      where: { instagram: { not: null } },
+      select: { id: true, slug: true, name: true, status: true, googlePlaceId: true, instagram: true },
+    });
+    const igMatch = allWithIg.find(
+      (e) => e.instagram && e.instagram.replace(/^@/, '').toLowerCase() === cleanHandle
+    );
+    if (igMatch) {
+      return {
+        input: displayInput,
+        outcome: 'matched',
+        entity: { id: igMatch.id, slug: igMatch.slug, name: igMatch.name, status: igMatch.status as string, googlePlaceId: igMatch.googlePlaceId },
+      };
+    }
+  }
+
   // 3. Slug exact match
   const candidateSlug = slugify(resolvedName, { lower: true, strict: true });
   const bySlug = await db.entities.findUnique({
@@ -187,7 +206,10 @@ async function processOne(input: IntakeInput): Promise<IntakeResult> {
   //    to avoid false-ambiguous on name alone
   if (website) return createCandidate();
 
-  // 6 & 7. Fuzzy name scan (only when no website to anchor on)
+  // 5b. Instagram provided but not matched above — same rationale as website
+  if (instagram) return createCandidate();
+
+  // 6 & 7. Fuzzy name scan (only when no strong identifier to anchor on)
   const allEntities = await db.entities.findMany({
     select: { id: true, slug: true, name: true, status: true, googlePlaceId: true },
   });
@@ -238,7 +260,7 @@ function parseCSV(text: string): IntakeInput[] {
     const row: Record<string, string> = {};
     header.forEach((col, idx) => { row[col] = values[idx] || ''; });
 
-    const name = row['Name'] || row['Place Name'] || row['name'] || '';
+    const name = row['Name'] || row['Place Name'] || row['name'] || row['place_name'] || '';
     if (!name) continue;
 
     inputs.push({

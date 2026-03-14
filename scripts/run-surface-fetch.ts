@@ -42,8 +42,10 @@ import {
 const isDryRun      = process.argv.includes('--dry-run');
 const limitArg      = process.argv.find((a) => a.startsWith('--limit='));
 const typeArg       = process.argv.find((a) => a.startsWith('--surface-type='));
-const limit         = limitArg ? parseInt(limitArg.split('=')[1], 10) : 50;
-const surfaceType   = typeArg  ? typeArg.split('=')[1]                : undefined;
+const entityArg     = process.argv.find((a) => a.startsWith('--entity-id='));
+const limit         = limitArg   ? parseInt(limitArg.split('=')[1], 10) : 50;
+const surfaceType   = typeArg    ? typeArg.split('=')[1]                : undefined;
+const entityId      = entityArg  ? entityArg.split('=')[1]             : undefined;
 
 // ---------------------------------------------------------------------------
 // Main
@@ -55,7 +57,7 @@ async function main() {
   if (isDryRun) console.log('🏃 DRY RUN — no rows will be written\n');
   if (surfaceType) console.log(`   surface type filter: ${surfaceType}\n`);
 
-  const rows = await findDiscoveredSurfaces({ limit, surfaceType });
+  const rows = await findDiscoveredSurfaces({ limit, surfaceType, entityId });
 
   if (rows.length === 0) {
     console.log('No discovered surfaces to fetch.');

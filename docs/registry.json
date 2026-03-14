@@ -1,7 +1,30 @@
 {
-  "generated": "2026-03-12T15:52:14.392Z",
-  "doc_count": 44,
+  "generated": "2026-03-13T07:51:31.833Z",
+  "doc_count": 61,
   "docs": [
+    {
+      "doc_id": "COVOPS-APPROACH-V1",
+      "doc_type": "architecture",
+      "status": "active",
+      "title": "Coverage Operations — Architectural Position",
+      "path": "docs/architecture/coverage-ops-approach-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-13",
+      "last_updated": "2026-03-13",
+      "project_id": "SAIKO",
+      "summary": "Architectural position for Coverage Operations — introduces entity_issues as a unified operational layer over existing queue fragments, with tool readiness assessment and phased implementation plan.",
+      "systems": [
+        "coverage-operations",
+        "fields-data-layer",
+        "data-pipeline"
+      ],
+      "related_docs": [
+        "docs/architecture/fields-era-overview-v1.md",
+        "docs/system/coverage-dashboard-design-v1.md",
+        "docs/ENRICHMENT-OPERATIONS-INVENTORY.md",
+        "docs/FIELDS_V2_TARGET_ARCHITECTURE.md"
+      ]
+    },
     {
       "doc_id": "ARCH-AI-OPERATING-LAYER",
       "doc_type": "architecture",
@@ -35,6 +58,54 @@
       "related_docs": []
     },
     {
+      "doc_id": "ARCHITECTURE-INSTAGRAM-API-INTEGRATION-V1",
+      "doc_type": "architecture",
+      "status": "active",
+      "title": "Instagram API Integration — Current State",
+      "path": "docs/architecture/instagram-api-integration-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-13",
+      "last_updated": "2026-03-13",
+      "project_id": "SAIKO",
+      "summary": "Instagram Graph API integration state — Meta app config, permissions, verified endpoints, architectural models for media ingestion",
+      "systems": [],
+      "related_docs": []
+    },
+    {
+      "doc_id": "ARCHITECTURE-INSTAGRAM-IMPLEMENTATION-V1",
+      "doc_type": "architecture",
+      "status": "active",
+      "title": "Instagram Integration — Implementation & Impact Doc",
+      "path": "docs/architecture/instagram-implementation-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-13",
+      "last_updated": "2026-03-13",
+      "project_id": "SAIKO",
+      "summary": "Instagram integration implementation plan and system impact — new tables, sync rules, temporal signal architecture, interpretation layer impact, photo strategy, attachment model",
+      "systems": [],
+      "related_docs": []
+    },
+    {
+      "doc_id": "DEC-002",
+      "doc_type": "decision",
+      "status": "active",
+      "title": "DEC-002 — Repo-Based Canonical Knowledge Store",
+      "path": "docs/decisions/DEC-002.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "Wed Mar 11 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "last_updated": "Wed Mar 11 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "project_id": "KNOWLEDGE-SYSTEM",
+      "summary": "All canonical knowledge documents live in the repository under /docs, using markdown with structured frontmatter for both human readability and machine parsing.",
+      "systems": [
+        "knowledge-system",
+        "repo-workflow"
+      ],
+      "related_docs": [
+        "docs/decisions/DEC-001.md",
+        "docs/skai/decision-index-spec-v1.md"
+      ]
+    },
+    {
       "doc_id": "FEAT-MARKETS-SPEC-V1-2",
       "doc_type": "spec",
       "status": "active",
@@ -47,6 +118,113 @@
       "summary": "",
       "systems": [],
       "related_docs": []
+    },
+    {
+      "doc_id": "FIELDS-ENRICHMENT-OPS-INVENTORY-V1",
+      "doc_type": "reference",
+      "status": "active",
+      "title": "Enrichment Operations Inventory",
+      "path": "docs/ENRICHMENT-OPERATIONS-INVENTORY.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "Thu Mar 12 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "last_updated": "Thu Mar 12 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "project_id": "FIELDS",
+      "summary": "Canonical inventory of all enrichment operations available on an entity record — automated (Google Places, neighborhood lookup), semi-automated (GPID, Instagram, Photos), and human-only (editorial fields). Coverage Dashboard and Entity Profile are designed from this inventory outward.",
+      "systems": [
+        "fields-data-layer",
+        "data-pipeline",
+        "admin"
+      ],
+      "related_docs": [
+        "docs/COVERAGE-DASHBOARD-DESIGN-PRINCIPLES.md",
+        "docs/ENTITY-PROFILE-SPEC.md",
+        "docs/architecture/fields-era-overview-v1.md"
+      ]
+    },
+    {
+      "doc_id": "FIELDS-ENTITY-AWARENESS-STAGE-V1",
+      "doc_type": "architecture",
+      "status": "active",
+      "title": "Awareness Stage — Workbench",
+      "path": "docs/architecture/entity-awareness-stage-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "Wed Mar 11 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "last_updated": "Wed Mar 11 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "project_id": "FIELDS",
+      "summary": "Defines the Awareness stage — Saiko's pre-identity, pre-enrichment intake layer. Covers source abstraction, organization responsibilities, readiness signals, and the workbench model.",
+      "systems": [
+        "entity-resolution",
+        "fields-data-layer"
+      ],
+      "related_docs": [
+        "docs/architecture/entity-pipeline-overview-v1.md",
+        "docs/architecture/fields-era-overview-v1.md",
+        "docs/FIELDS_V2_TARGET_ARCHITECTURE.md"
+      ]
+    },
+    {
+      "doc_id": "FIELDS-ENTITY-PIPELINE-OVERVIEW-V1",
+      "doc_type": "architecture",
+      "status": "active",
+      "title": "Entity Pipeline — Overview",
+      "path": "docs/architecture/entity-pipeline-overview-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "Wed Mar 11 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "last_updated": "Wed Mar 11 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "project_id": "FIELDS",
+      "summary": "High-level model of the stages through which an entity moves inside Saiko — from first contact (Awareness) through Identification to Enrichment. Mental model only; does not prescribe UI, schema, or workflow.",
+      "systems": [
+        "entity-resolution",
+        "fields-data-layer"
+      ],
+      "related_docs": [
+        "docs/FIELDS_V2_TARGET_ARCHITECTURE.md",
+        "docs/architecture/fields-era-overview-v1.md",
+        "docs/ENTITIES_CONTRACT_RECONCILIATION.md"
+      ]
+    },
+    {
+      "doc_id": "FIELDS-ERA-OVERVIEW-V1",
+      "doc_type": "architecture",
+      "status": "active",
+      "title": "Entity Record Awareness (ERA) — One-Pager",
+      "path": "docs/architecture/fields-era-overview-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "Wed Mar 11 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "last_updated": "Wed Mar 11 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "project_id": "SAIKO",
+      "summary": "Defines Entity Record Awareness (ERA) — how Saiko becomes aware a place exists, separating awareness from canonical (Golden) status to prevent silent drift.",
+      "systems": [
+        "fields-data-layer",
+        "data-pipeline"
+      ],
+      "related_docs": [
+        "docs/PLATFORM_DATA_LAYER.md",
+        "docs/FIELDS_V2_TARGET_ARCHITECTURE.md",
+        "docs/RESOLVER_AND_PLACES_DATA_FLOW.md",
+        "docs/PROVENANCE_SYSTEM.md"
+      ]
+    },
+    {
+      "doc_id": "FIELDS-VERTICAL-TAXONOMY-V1",
+      "doc_type": "architecture",
+      "status": "active",
+      "title": "Saiko Vertical Taxonomy",
+      "path": "docs/architecture/vertical-taxonomy-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "Wed Mar 11 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "last_updated": "Wed Mar 11 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "project_id": "SAIKO",
+      "summary": "Defines Saiko's 12-vertical taxonomy — the primary domains of urban life used to classify every place in the system. Documents anthropological rationale, system role, technical anchors, and design implications.",
+      "systems": [
+        "fields-data-layer",
+        "entity-resolution"
+      ],
+      "related_docs": [
+        "docs/architecture/entity-pipeline-overview-v1.md",
+        "docs/architecture/fields-era-overview-v1.md",
+        "docs/FIELDS_V2_TARGET_ARCHITECTURE.md"
+      ]
     },
     {
       "doc_id": "OPS-STALE-DEPLOYMENTS",
@@ -80,6 +258,65 @@
       "related_docs": []
     },
     {
+      "doc_id": "PIPE-INSTAGRAM-WORKSTREAM-V1",
+      "doc_type": "spec",
+      "status": "active",
+      "title": "Instagram Integration — Workstream & Execution Plan",
+      "path": "docs/pipelines/instagram-integration-workstream-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-13",
+      "last_updated": "2026-03-13",
+      "project_id": "SAIKO",
+      "summary": "Phased execution plan for Instagram integration — 6 phases from data quality through contextual display. Codebase readiness assessment, effort estimates, timing, and per-phase task checklists.",
+      "systems": [
+        "instagram-api",
+        "enrichment-pipeline",
+        "merchant-surfaces",
+        "scenesense"
+      ],
+      "related_docs": [
+        "docs/architecture/instagram-implementation-v1.md",
+        "docs/architecture/instagram-api-integration-v1.md",
+        "docs/architecture/instagram-ingestion-field-spec-v1.md"
+      ]
+    },
+    {
+      "doc_id": "PIPE-CAPTURE-PROFILES-V1",
+      "doc_type": "spec",
+      "status": "active",
+      "title": "(untitled)",
+      "path": "docs/pipelines/pipe-capture-profiles-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "Wed Mar 11 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "last_updated": "Wed Mar 11 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "project_id": "FIELDS",
+      "summary": "Defines capture profiles for each source type — what to attempt when a source is touched, and what can be promoted to Facts-tier vs stored as raw material.",
+      "systems": [
+        "fields-data-layer",
+        "entity-resolution"
+      ],
+      "related_docs": [
+        "docs/FIELDS_V2_TARGET_ARCHITECTURE.md",
+        "docs/architecture/entity-pipeline-overview-v1.md"
+      ]
+    },
+    {
+      "doc_id": "SAIKO-ADMIN-SPRING-CLEANING-2026-03",
+      "doc_type": "document",
+      "status": "active",
+      "title": "Admin Spring Cleaning Log — March 2026",
+      "path": "docs/ADMIN-SPRING-CLEANING-LOG.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "Thu Mar 12 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "last_updated": "Thu Mar 12 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "project_id": "SAIKO",
+      "summary": "Record of admin routes and features retired or fixed in March 2026 — Review Queue, Energy Engine, Appearances auth, GPID Queue URL. Captures rationale for each retirement.",
+      "systems": [
+        "admin"
+      ],
+      "related_docs": []
+    },
+    {
       "doc_id": "SAIKO-APP-OVERVIEW",
       "doc_type": "overview",
       "status": "active",
@@ -92,6 +329,26 @@
       "summary": "",
       "systems": [],
       "related_docs": []
+    },
+    {
+      "doc_id": "SAIKO-COVERAGE-DASHBOARD-DESIGN-V1",
+      "doc_type": "architecture",
+      "status": "active",
+      "title": "Coverage Dashboard — Design Principles",
+      "path": "docs/COVERAGE-DASHBOARD-DESIGN-PRINCIPLES.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "Thu Mar 12 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "last_updated": "Thu Mar 12 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "project_id": "SAIKO",
+      "summary": "Design principles for the Coverage Dashboard — a work surface for resolving data gaps, organized by solution type (automated vs. semi-automated vs. human-only) rather than by missing field.",
+      "systems": [
+        "admin",
+        "coverage-dashboard"
+      ],
+      "related_docs": [
+        "docs/ENRICHMENT-OPERATIONS-INVENTORY.md",
+        "docs/ENTITY-PROFILE-SPEC.md"
+      ]
     },
     {
       "doc_id": "SAIKO-DATA-PIPELINE-QUICK-START",
@@ -156,6 +413,26 @@
       "related_docs": []
     },
     {
+      "doc_id": "SAIKO-DEFERRED-MIGRATION-GATES",
+      "doc_type": "architecture",
+      "status": "active",
+      "title": "Deferred Migration Gates",
+      "path": "docs/DEFERRED_MIGRATION_GATES.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "Wed Mar 11 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "last_updated": "Wed Mar 11 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "project_id": "SAIKO",
+      "summary": "Gate conditions that must be satisfied before applying the two deferred Fields v2 migrations — slim entities and legacy table drop.",
+      "systems": [
+        "fields-data-layer",
+        "database"
+      ],
+      "related_docs": [
+        "docs/FIELDS_V2_TARGET_ARCHITECTURE.md",
+        "docs/ENTITIES_CONTRACT_RECONCILIATION.md"
+      ]
+    },
+    {
       "doc_id": "SAIKO-ENERGY-SCORE-SPEC",
       "doc_type": "spec",
       "status": "active",
@@ -168,6 +445,48 @@
       "summary": "",
       "systems": [],
       "related_docs": []
+    },
+    {
+      "doc_id": "SAIKO-ENTITIES-CONTRACT-RECONCILIATION",
+      "doc_type": "architecture",
+      "status": "active",
+      "title": "Entities Contract Reconciliation",
+      "path": "docs/ENTITIES_CONTRACT_RECONCILIATION.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "Wed Mar 11 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "last_updated": "Wed Mar 11 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "project_id": "SAIKO",
+      "summary": "Field-level audit and decision log for the entities table — what belongs, what migrates, and what is retired as part of the Fields v2 architecture.",
+      "systems": [
+        "fields-data-layer",
+        "database"
+      ],
+      "related_docs": [
+        "docs/FIELDS_V2_TARGET_ARCHITECTURE.md",
+        "docs/DEFERRED_MIGRATION_GATES.md",
+        "docs/PLATFORM_DATA_LAYER.md"
+      ]
+    },
+    {
+      "doc_id": "SAIKO-ENTITY-PROFILE-SPEC-V1",
+      "doc_type": "spec",
+      "status": "active",
+      "title": "Entity Profile Page — Spec",
+      "path": "docs/ENTITY-PROFILE-SPEC.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "Thu Mar 12 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "last_updated": "Thu Mar 12 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "project_id": "SAIKO",
+      "summary": "Spec for /admin/entity/[id] — the canonical single-entity admin view showing all field states with inline resolution actions and a TimeFOLD editorial slot.",
+      "systems": [
+        "admin",
+        "entity-profile"
+      ],
+      "related_docs": [
+        "docs/ENRICHMENT-OPERATIONS-INVENTORY.md",
+        "docs/COVERAGE-DASHBOARD-DESIGN-PRINCIPLES.md",
+        "docs/architecture/entity-pipeline-overview-v1.md"
+      ]
     },
     {
       "doc_id": "SAIKO-ENV-TEMPLATE",
@@ -206,14 +525,21 @@
       "title": "Saiko Fields v2 — Target Architecture Spec",
       "path": "docs/FIELDS_V2_TARGET_ARCHITECTURE.md",
       "owner": "Bobby Ciccaglione",
-      "created": "2026-03-10",
-      "last_updated": "2026-03-10",
+      "created": "Mon Mar 09 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "last_updated": "Wed Mar 11 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
       "project_id": "SAIKO",
-      "summary": "",
+      "summary": "Defines the four-layer Fields v2 architecture — entities routing shell, canonical_entity_state, interpretation_cache, and place_coverage_status — with anti-drift rules and current migration status.",
       "systems": [
+        "fields-data-layer",
         "database"
       ],
-      "related_docs": []
+      "related_docs": [
+        "docs/PLATFORM_DATA_LAYER.md",
+        "docs/PROVENANCE_SYSTEM.md",
+        "docs/architecture/fields-era-overview-v1.md",
+        "docs/ENTITIES_CONTRACT_RECONCILIATION.md",
+        "docs/DEFERRED_MIGRATION_GATES.md"
+      ]
     },
     {
       "doc_id": "SAIKO-FORMALITY-SCORE-SPEC",
@@ -456,7 +782,7 @@
     {
       "doc_id": "SKAI-DOC-TRACES-PLACE-PAGE-DESIGN-001",
       "doc_type": "traces",
-      "status": "draft",
+      "status": "active",
       "title": "Place Page Design v1",
       "path": "docs/traces/place-page-design-v1.md",
       "owner": "Bobby Ciccaglione",
@@ -497,7 +823,7 @@
     {
       "doc_id": "SKAI/RESEARCH-AI-KNOWLEDGE-ARCHITECTURE-V1",
       "doc_type": "research",
-      "status": "draft",
+      "status": "active",
       "title": "AI-Native Knowledge & Data Architecture Patterns (2023–2026)",
       "path": "docs/skai/research-ai-knowledge-architecture-v1.md",
       "owner": "Bobby Ciccaglione",
@@ -683,6 +1009,20 @@
         "docs/skai/research-ai-knowledge-architecture-v1.md",
         "docs/skai/decision-index-spec-v1.md"
       ]
+    },
+    {
+      "doc_id": "SYS-COVERAGE-DASHBOARD-DESIGN-V1",
+      "doc_type": "system",
+      "status": "active",
+      "title": "Coverage Dashboard — Design Principles",
+      "path": "docs/system/coverage-dashboard-design-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-13",
+      "last_updated": "2026-03-13",
+      "project_id": "KNOWLEDGE-SYSTEM",
+      "summary": "Design principles for the Coverage Dashboard — work surface, not report; smart counts; group by solution; automation first",
+      "systems": [],
+      "related_docs": []
     },
     {
       "doc_id": "SYS-DRAFT-TRIGGER-V1",

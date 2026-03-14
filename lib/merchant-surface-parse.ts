@@ -504,16 +504,18 @@ export interface SurfaceParseRow {
  *   parse_status = 'parse_pending'
  */
 export async function findSurfacesToParse(params: {
-  limit?:      number;
+  limit?:       number;
   surfaceType?: string;
+  entityId?:    string;
 }): Promise<SurfaceParseRow[]> {
-  const { limit = 50, surfaceType } = params;
+  const { limit = 50, surfaceType, entityId } = params;
 
   const rows = await prisma.merchant_surfaces.findMany({
     where: {
       fetch_status:  'fetch_success',
       parse_status:  'parse_pending',
       ...(surfaceType ? { surface_type: surfaceType } : {}),
+      ...(entityId    ? { entity_id:    entityId }    : {}),
     },
     select: {
       id:           true,

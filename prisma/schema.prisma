@@ -302,6 +302,12 @@ model entities {
   fieldsMemberships     FieldsMembership[]
   traceSignalsCache     TraceSignalsCache?
 
+  // Instagram ingestion
+  instagram_accounts    instagram_accounts[]
+
+  // Coverage Operations
+  entity_issues         entity_issues[]
+
   @@map("entities")
   @@index([category])
   @@index([categoryId])
@@ -775,7 +781,6 @@ model raw_records {
   is_processed Boolean   @default(false)
 
   // Relations
-  entity_links_from        entity_links[]
   resolution_links         resolution_links[]
   review_queue_a           review_queue[] @relation("ReviewQueueRecordA")
   review_queue_b           review_queue[] @relation("ReviewQueueRecordB")
@@ -790,187 +795,9 @@ model raw_records {
 }
 
 /// Entity links - maps raw records to canonical entities
-model entity_links {
-  canonical_id String
-  raw_id       String
+// entity_links model removed — was FK to golden_records (dropped)
 
-  // Match metadata
-  match_confidence Decimal? @db.Decimal(4, 3) // 0.000 to 1.000
-  match_method     String // 'placekey_exact', 'dedupe_ml', 'manual_review', 'seed_record'
-  match_features   Json? // Feature scores that led to this match
-
-  // Lifecycle
-  is_active Boolean  @default(true)
-  linked_at DateTime @default(now())
-  linked_by String? // 'system', 'manual:bobby', etc.
-
-  // Relations
-  raw_record    raw_records    @relation(fields: [raw_id], references: [raw_id])
-  golden_record golden_records @relation(fields: [canonical_id], references: [canonical_id])
-
-  @@id([canonical_id, raw_id])
-  @@index([raw_id])
-  @@index([canonical_id])
-  @@index([match_method])
-}
-
-/// Golden records - the computed "truth" that the app queries
-model golden_records {
-  canonical_id String @id @default(uuid())
-
-  // Identifiers
-  placekey        String? @unique
-  google_place_id String?
-  slug            String  @unique
-
-  // Core fields (computed from survivorship rules)
-  name         String
-  name_display String?
-
-  // Location
-  lat            Decimal? @db.Decimal(10, 7)
-  lng            Decimal? @db.Decimal(11, 7)
-  address_street String?
-  address_city   String?
-  address_state  String?
-  address_zip    String?
-  neighborhood   String?
-
-  // Classification
-  category    String?
-  cuisines    String[]
-  price_level Int?
-
-  // Contact
-  phone            String?
-  website          String?
-  instagram_handle String?
-
-  // Website provenance (website-only; no enrichment logic yet)
-  website_source       String?  // Source enum: defined in next step
-  website_source_class String?  // first_party | third_party | ai_inferred
-  website_confidence   Decimal? @db.Decimal(3, 2) // 0.00–1.00
-  website_updated_at   DateTime?
-
-  // Hours
-  hours_json           Json?
-  hours_irregular      Boolean @default(false)
-  instagram_hours_raw  String? // Raw hours text captured from Instagram profile/bio
-
-  // Editorial enrichment
-  description       String?
-  // vibe_tags removed — was deprecated; vibe signals stored in identity_signals.vibe_words via derived_signals
-  signature_dishes  String[]
-  pro_tips          String[]
-  pull_quote        String?
-  pull_quote_source String?
-  pull_quote_url    String?
-
-  // Status
-  business_status String @default("operational") // 'operational', 'closed_temporarily', 'closed_permanently'
-
-  // Lifecycle Management
-  lifecycle_status LifecycleStatus @default(ACTIVE) @map("lifecycle_status")
-  archive_reason   ArchiveReason?  @map("archive_reason")
-  archived_at      DateTime?       @map("archived_at")
-  archived_by      String?         @map("archived_by")
-
-  // Provenance (which source won each field)
-  source_attribution Json
-  
-  // Confidence-resolved provenance (v2)
-  provenance_v2 Json?
-
-  // Metadata
-  created_at       DateTime  @default(now())
-  updated_at       DateTime  @updatedAt
-  last_resolved_at DateTime?
-  enriched_at      DateTime? // Last attempted enrichment (success or failure)
-
-  // Geographic scope (for selective enrichment)
-  county String? // 'Los Angeles', 'Orange', 'San Diego', etc.
-
-  // Quality signals
-  data_completeness Decimal? @db.Decimal(3, 2) // 0.00 to 1.00
-  source_count      Int      @default(1)
-
-  // Golden-first intake (Ken spec): gated promotion
-  confidence       Float?   // 0–1, set by resolver
-  promotion_status PromotionStatus @default(PENDING) @map("promotion_status")
-
-  // Merge quality & field-level provenance (sources table + batch recompute)
-  match_confidence  Float?  @map("match_confidence")   // 0–1, resolution confidence
-  merge_quality     Float?  @map("merge_quality")      // 0–1, overall merge quality
-  field_confidences Json?   @map("field_confidences")  // critical fields only: name, address, lat, lng, phone, website, hours, category, instagram, etc.
-  winner_sources    Json?   @map("winner_sources")     // field -> source slug (references sources.slug)
-  field_conflicts   Json?   @map("field_conflicts")    // array of field names that had conflicts
-
-  // Menu & Wine List Scraper Fields
-  menu_url            String? // Discovered menu page URL
-  menu_source_url     String? // Page where menu link was found
-  menu_raw_text       String? // Extracted menu content for AI processing
-  winelist_url        String? // Discovered wine list URL
-  winelist_source_url String? // Page where wine list link was found
-  winelist_raw_text   String? // Extracted wine list content
-  about_copy          String? // "Our Story" / "About Us" content
-  about_source_url    String? // URL of about page
-  // Website About extraction staging (WO-FIELDS-WEBSITE-ABOUT-EXTRACTION-001)
-  // Separate from about_copy/description so extraction can land without touching human-authored fields.
-  website_about_url           String?   // Discovered about-page URL
-  website_about_raw           String?   // Extracted clean text (max 2 000 chars)
-  website_about_extracted_at  DateTime? // When the extraction was run
-  scraped_at          DateTime? // Last successful scrape timestamp
-  scrape_status       String? // 'success' | 'partial' | 'blocked' | 'timeout' | 'failed'
-
-  // Identity Signal Fields (AI-extracted from scraped content)
-  cuisine_posture      String? // produce-driven | protein-centric | carb-forward | seafood-focused | balanced
-  service_model        String? // tasting-menu | a-la-carte | small-plates | family-style | counter
-  price_tier           String? // $ | $$ | $$$ | $$$$
-  wine_program_intent  String? // natural | classic | eclectic | minimal | none
-  place_personality    String? // neighborhood-joint | destination | chef-driven | scene | hidden-gem | institution
-  identity_signals     Json? // Extended signals: signature_dishes, key_producers, vibe_words, etc.
-  signals_generated_at DateTime? // When signals were extracted
-  signals_version      Int? // Increment when extraction prompt changes
-  signals_reviewed     Boolean   @default(false)
-  signals_reviewed_by  String?
-  signals_reviewed_at  DateTime?
-
-  // Voice Engine v2.0 — Tagline Fields
-  tagline              String?
-  tagline_candidates   String[]  @default([])
-  tagline_pattern      String? // 'food' | 'neighborhood' | 'vibe' | 'authority'
-  tagline_generated_at DateTime?
-  tagline_signals      Json? // Snapshot of identity signals used for generation
-  tagline_version      Int? // Voice engine version (2)
-
-  // Google Places "About" attributes (structured JSONB)
-  google_places_attributes            Json?
-  google_places_attributes_fetched_at DateTime?
-
-  // Energy + Formality scoring (pipeline-generated, auditable)
-  energy_score         Int?      // 0–100
-  energy_confidence    Float?    // 0–1
-  energy_version       String?   // e.g. "energy_v1_locked"
-  energy_computed_at   DateTime?
-  formality_score      Int?
-  formality_confidence Float?
-  formality_version    String?
-  formality_computed_at DateTime?
-
-  // Relations
-  entity_links      entity_links[]
-  resolution_links  resolution_links[]
-  review_queue      review_queue[]
-  provenance        provenance[]
-  menu_signals      menu_signals?
-  winelist_signals  winelist_signals?
-
-  @@index([neighborhood])
-  @@index([category])
-  @@index([business_status])
-  @@index([slug])
-  @@index([promotion_status])
-}
+// golden_records model removed — replaced by canonical_entity_state + derived_signals (Fields v2)
 
 /// Resolution links - audit trail for raw → golden resolution (Ken spec)
 model resolution_links {
@@ -984,7 +811,6 @@ model resolution_links {
   created_at       DateTime        @default(now()) @map("created_at")
 
   raw_record    raw_records     @relation(fields: [raw_record_id], references: [raw_id])
-  golden_record golden_records? @relation(fields: [golden_record_id], references: [canonical_id])
 
   @@index([raw_record_id])
   @@index([golden_record_id])
@@ -1025,7 +851,6 @@ model review_queue {
   resolved_at DateTime?
 
   // Relations
-  golden_record      golden_records?          @relation(fields: [canonical_id], references: [canonical_id])
   raw_record_a       raw_records              @relation("ReviewQueueRecordA", fields: [raw_id_a], references: [raw_id])
   raw_record_b       raw_records?             @relation("ReviewQueueRecordB", fields: [raw_id_b], references: [raw_id])
   audit_logs         review_audit_log[]
@@ -1100,66 +925,13 @@ model sources {
   @@index([trust_tier])
 }
 
-// ============================================================================
-// PROVENANCE SYSTEM
-// Chain of custody - proves Bobby added every place, not AI
-// ============================================================================
-
-/// Provenance - Chain of custody for places
-model provenance {
-  id       String @id @default(cuid())
-  place_id String @map("place_id")
-
-  // WHO - Chain of custody (NEVER 'claude', 'cursor', 'ai', 'auto', 'bot')
-  added_by String @map("added_by") // 'bobby', 'bobby_bulk_import'
-
-  // WHY - Source justification (flexible, not enforced)
-  source_type String?   @map("source_type") // 'editorial', 'google_saves', 'chef_rec', 'video', 'personal', 'map_feature'
-  source_name String?   @map("source_name") // 'Eater LA', 'Jonathan Gold', 'Bobby Google Saves', 'Chef David Chang'
-  source_url  String?   @map("source_url") // article/video link if available
-  source_date DateTime? @map("source_date") // when the source was published (if known)
-
-  // CONTEXT
-  notes String? // freeform: "Mentioned in 'Best Tacos' video", "My go-to since 2019"
-
-  // BATCH TRACKING
-  import_batch String? @map("import_batch") // 'sgv_expansion', 'beach_cities', 'initial_google_saves', 'sfv_expansion'
-
-  // SOURCE QUALITY & VERIFICATION
-  source_tier         Int?               @map("source_tier") // 1, 2, 3, or 4
-  verification_status VerificationStatus @default(UNVERIFIED) @map("verification_status")
-  source_verified_at  DateTime?          @map("source_verified_at")
-  source_verified_by  String?            @map("source_verified_by")
-
-  // TIMESTAMPS
-  created_at DateTime @default(now()) @map("created_at")
-
-  // RELATIONS
-  golden_record golden_records @relation(fields: [place_id], references: [canonical_id], onDelete: Cascade)
-
-  @@index([place_id])
-  @@index([added_by])
-  @@index([import_batch])
-}
+// provenance model removed — was FK to golden_records (dropped)
 
 // ============================================================================
 // ENUMS FOR LIFECYCLE AND VERIFICATION
 // ============================================================================
 
-enum LifecycleStatus {
-  ACTIVE
-  LEGACY_FAVORITE
-  FLAG_FOR_REVIEW
-  ARCHIVED
-  CLOSED_PERMANENTLY
-}
-
-// Golden-first intake (Ken spec)
-enum PromotionStatus {
-  PENDING
-  VERIFIED
-  PUBLISHED
-}
+// LifecycleStatus, PromotionStatus enums removed — only used by golden_records
 
 enum ResolutionType {
   matched
@@ -1173,25 +945,7 @@ enum MatchMethod {
   fuzzy
 }
 
-enum ArchiveReason {
-  CLOSED
-  AGED_OUT
-  QUALITY_DECLINE
-  DATA_ERROR
-  MANUAL
-}
-
-enum VerificationStatus {
-  UNVERIFIED
-  SOURCE_CONFIRMED
-  FOUNDER_VERIFIED
-}
-
-enum signal_status {
-  ok
-  partial
-  failed
-}
+// ArchiveReason, VerificationStatus, signal_status enums removed — only used by golden_records + provenance + menu/winelist_signals
 
 // ============================================================================
 // NEWSLETTER INGESTION — APPROVAL FRAMEWORK V1
@@ -1273,58 +1027,7 @@ model operational_overlays {
 
 // ============================================================================
 // SIGNAL EXTRACTION SYSTEM
-// AI analysis of scraped menu + winelist content
-// ============================================================================
-
-/// Menu signals - structured analysis of menu_raw_text
-model menu_signals {
-  id                String         @id @default(cuid())
-  golden_record_id  String         @unique
-  golden_record     golden_records @relation(fields: [golden_record_id], references: [canonical_id], onDelete: Cascade)
-
-  schema_version    Int            @default(1)
-  model_version     String?
-  source_scraped_at DateTime?
-  analyzed_at       DateTime       @default(now())
-  status            signal_status  @default(ok)
-  error             String?
-
-  payload           Json?
-  evidence          Json?
-  confidence        Float?
-
-  created_at        DateTime       @default(now())
-  updated_at        DateTime       @updatedAt
-
-  @@map("menu_signals")
-  @@index([analyzed_at])
-  @@index([status])
-}
-
-/// Winelist signals - structured analysis of winelist_raw_text
-model winelist_signals {
-  id                String         @id @default(cuid())
-  golden_record_id  String         @unique
-  golden_record     golden_records @relation(fields: [golden_record_id], references: [canonical_id], onDelete: Cascade)
-
-  schema_version    Int            @default(1)
-  model_version     String?
-  source_scraped_at DateTime?
-  analyzed_at       DateTime       @default(now())
-  status            signal_status  @default(ok)
-  error             String?
-
-  payload           Json?
-  evidence          Json?
-  confidence        Float?
-
-  created_at        DateTime       @default(now())
-  updated_at        DateTime       @updatedAt
-
-  @@map("winelist_signals")
-  @@index([analyzed_at])
-  @@index([status])
-}
+// menu_signals, winelist_signals models removed — were FK to golden_records (dropped)
 
 // ============================================================================
 // ENERGY + WEIGHTED TAG ENGINE (v1)
@@ -1486,7 +1189,7 @@ model OperatorPlaceCandidate {
 }
 
 /// Entity-Actor relationships (Saiko Trace)
-/// Canonical for golden_records. Do not use for app-facing Place UI.
+/// Canonical view for the map_places dataset. Do not use for app-facing Place UI.
 model EntityActorRelationship {
   id         String    @id @default(uuid())
   entityId   String    @map("entity_id")
@@ -1833,7 +1536,7 @@ model observed_claims {
 // D. Canonical Entity State
 // The system's currently sanctioned belief about an entity.
 // One row per entity. All values must be backed by a canonical_sanctions row.
-// Replaces golden_records for the fields the product actually needs.
+// Canonical entity state — the fields the product actually needs.
 // ---------------------------------------------------------------------------
 
 model canonical_entity_state {
@@ -1933,7 +1636,7 @@ model sanction_conflicts {
 // ---------------------------------------------------------------------------
 // H. Derived Signals
 // Computed outputs from claims and/or canonical state. Never canonical.
-// Versioned so recompute is safe. Replaces AI signal fields in golden_records.
+// Versioned so recompute is safe.
 // energy_scores and place_tag_scores remain separate (already correct layer).
 // ---------------------------------------------------------------------------
 
@@ -1982,4 +1685,107 @@ model interpretation_cache {
   @@unique([entity_id, output_type, prompt_version])
   @@index([entity_id])
   @@index([entity_id, output_type, is_current])
+}
+
+// =============================================================================
+// Instagram Ingestion (v1)
+// =============================================================================
+
+/// One row per connected Instagram account. Mutable — overwrite on each fetch.
+/// Linked to entities via entity_id FK.
+model instagram_accounts {
+  id                       String    @id @default(uuid())
+  entity_id                String    @map("entity_id")
+  instagram_user_id        String    @unique @map("instagram_user_id")
+  username                 String
+  account_type             String?   @map("account_type")     // BUSINESS | CREATOR | PERSONAL
+  media_count              Int?      @map("media_count")
+  canonical_instagram_url  String?   @map("canonical_instagram_url")
+  last_fetched_at          DateTime? @map("last_fetched_at")
+  last_successful_fetch_at DateTime? @map("last_successful_fetch_at")
+  source_status            String    @default("active") @map("source_status") // active | revoked | error
+  raw_payload              Json?     @map("raw_payload")
+  created_at               DateTime  @default(now()) @map("created_at")
+  updated_at               DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  entity entities @relation(fields: [entity_id], references: [id], onDelete: Cascade)
+  media  instagram_media[]
+
+  @@index([entity_id])
+  @@index([username])
+  @@map("instagram_accounts")
+}
+
+/// One row per Instagram post/media object. Upsert by instagram_media_id.
+/// timestamp (original post time) is immutable; mutable fields refreshed on re-fetch.
+model instagram_media {
+  id                 String   @id @default(uuid())
+  instagram_media_id String   @unique @map("instagram_media_id")
+  instagram_user_id  String   @map("instagram_user_id")
+  media_type         String   @map("media_type")        // IMAGE | VIDEO | CAROUSEL_ALBUM
+  media_url          String?  @map("media_url")          // CDN URL (expires)
+  thumbnail_url      String?  @map("thumbnail_url")      // for VIDEO type
+  permalink          String   @map("permalink")           // permanent IG URL
+  caption            String?
+  timestamp          DateTime                             // original post time (immutable)
+  fetched_at         DateTime @default(now()) @map("fetched_at")
+  raw_payload        Json?    @map("raw_payload")
+
+  account instagram_accounts @relation(fields: [instagram_user_id], references: [instagram_user_id], onDelete: Cascade)
+
+  @@index([instagram_user_id])
+  @@index([timestamp])
+  @@index([instagram_user_id, timestamp])
+  @@map("instagram_media")
+}
+
+/// Append-only insight snapshots. One row per metric observation.
+/// Never update or overwrite existing rows.
+model instagram_insight_snapshots {
+  id           String   @id @default(uuid())
+  subject_type String   @map("subject_type")   // 'account' | 'media'
+  subject_id   String   @map("subject_id")     // instagram_user_id or instagram_media_id
+  metric_name  String   @map("metric_name")    // impressions | reach | engagement
+  metric_value Decimal  @map("metric_value") @db.Decimal(12, 2)
+  observed_at  DateTime @default(now()) @map("observed_at")
+  window_label String?  @map("window_label")   // day | week | days_28 | lifetime
+  raw_payload  Json?    @map("raw_payload")
+
+  @@index([subject_type, subject_id])
+  @@index([subject_id, metric_name, observed_at])
+  @@index([observed_at])
+  @@map("instagram_insight_snapshots")
+}
+
+// ---------------------------------------------------------------------------
+// Entity Issues — Coverage Operations unified operational layer
+// One row per (entity_id, issue_type). Represents an actionable problem.
+// Generated by the issue scanner, resolved by resolution tools or human action.
+// See docs/architecture/coverage-ops-approach-v1.md (COVOPS-APPROACH-V1).
+// ---------------------------------------------------------------------------
+
+model entity_issues {
+  id               String    @id @default(uuid())
+  entity_id        String    @map("entity_id")
+  problem_class    String    @map("problem_class")     // identity | location | contact | social | editorial
+  issue_type       String    @map("issue_type")        // unresolved_identity | missing_neighborhood | etc.
+  status           String    @default("open")           // open | needs_automation | processing | needs_human | resolved | suppressed
+  severity         String    @default("medium")         // critical | high | medium | low
+  blocking_publish Boolean   @default(false) @map("blocking_publish")
+  recommended_tool String?   @map("recommended_tool")  // derive_neighborhood | enrich_stage | instagram_discover | gpid_resolution
+  detail           Json?                                // arbitrary context: { missing_fields, enrichment_stage, etc. }
+  resolved_at      DateTime? @map("resolved_at")
+  resolved_by      String?   @map("resolved_by")       // SYSTEM | SCANNER | user_id
+  suppressed_reason String?  @map("suppressed_reason")  // confirmed_none | not_applicable | wont_fix
+  created_at       DateTime  @default(now()) @map("created_at")
+  updated_at       DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  entity entities @relation(fields: [entity_id], references: [id], onDelete: Cascade)
+
+  @@unique([entity_id, issue_type])
+  @@index([status])
+  @@index([problem_class, status])
+  @@index([issue_type, status])
+  @@index([severity, status])
+  @@map("entity_issues")
 }

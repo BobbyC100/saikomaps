@@ -35,15 +35,11 @@ export async function GET(request: NextRequest) {
         }
       }),
       
-      // Total golden records
-      prisma.golden_records.count(),
-      
-      // Auto-linked via Placekey or dedupe
-      prisma.entity_links.count({
-        where: { 
-          match_method: { in: ['placekey_exact', 'dedupe_ml'] }
-        }
-      }),
+      // Total entities
+      prisma.entities.count(),
+
+      // Auto-linked (legacy entity_links dropped — return 0)
+      Promise.resolve(0),
       
       // Total raw records
       prisma.raw_records.count(),
@@ -79,19 +75,19 @@ export async function GET(request: NextRequest) {
       })
     ]);
     
-    // Calculate data quality metrics
-    const goldenRecords = await prisma.golden_records.findMany({
+    // Calculate data quality metrics from entities
+    const entitiesForQuality = await prisma.entities.findMany({
       select: {
-        instagram_handle: true,
+        instagram: true,
         phone: true,
         description: true,
       }
     });
-    
+
     const qualityMetrics = {
-      hasInstagram: goldenRecords.filter(g => g.instagram_handle).length,
-      hasPhone: goldenRecords.filter(g => g.phone).length,
-      hasDescription: goldenRecords.filter(g => g.description).length,
+      hasInstagram: entitiesForQuality.filter(e => e.instagram).length,
+      hasPhone: entitiesForQuality.filter(e => e.phone).length,
+      hasDescription: entitiesForQuality.filter(e => e.description).length,
     };
     
     // Get queue breakdown by conflict type

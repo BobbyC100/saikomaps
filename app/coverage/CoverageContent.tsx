@@ -14,26 +14,14 @@ function normVertical(primary_vertical: string | null) {
 }
 
 export async function CoverageContent() {
-  const [totalPlaces, laCounty, orangeCounty, neighborhoods, hoodVerticalRows] = await Promise.all([
-    db.golden_records.count({
-      where: { lifecycle_status: 'ACTIVE' }
+  const [totalPlaces, neighborhoods, hoodVerticalRows] = await Promise.all([
+    db.entities.count({
+      where: { status: 'OPEN' }
     }),
-    db.golden_records.count({
-      where: {
-        lifecycle_status: 'ACTIVE',
-        county: 'Los Angeles'
-      }
-    }),
-    db.golden_records.count({
-      where: {
-        lifecycle_status: 'ACTIVE',
-        county: 'Orange'
-      }
-    }),
-    db.golden_records.groupBy({
+    db.entities.groupBy({
       by: ['neighborhood'],
       where: {
-        lifecycle_status: 'ACTIVE',
+        status: 'OPEN',
         neighborhood: { not: null }
       },
       _count: true,
@@ -44,7 +32,6 @@ export async function CoverageContent() {
       },
       take: 20
     }),
-    // Places: neighborhood × primary_vertical (reporting uses primary_vertical)
     db.entities.groupBy({
       by: ['neighborhood', 'primary_vertical'],
       _count: true
@@ -75,16 +62,6 @@ export async function CoverageContent() {
           <div className="bg-white rounded-xl p-6 shadow-sm">
             <div className="text-sm text-[#8B7355] mb-2">Total Places</div>
             <div className="text-3xl font-bold text-[#36454F]">{totalPlaces.toLocaleString()}</div>
-          </div>
-
-          <div className="bg-white rounded-xl p-6 shadow-sm">
-            <div className="text-sm text-[#8B7355] mb-2">LA County</div>
-            <div className="text-3xl font-bold text-[#36454F]">{laCounty.toLocaleString()}</div>
-          </div>
-
-          <div className="bg-white rounded-xl p-6 shadow-sm">
-            <div className="text-sm text-[#8B7355] mb-2">Orange County</div>
-            <div className="text-3xl font-bold text-[#36454F]">{orangeCounty.toLocaleString()}</div>
           </div>
         </div>
 

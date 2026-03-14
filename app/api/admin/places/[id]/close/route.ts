@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 /**
  * POST /api/admin/places/[id]/close
- * Mark a place as closed
+ * Mark a place as closed (updates entities table)
  */
 export async function POST(
   request: NextRequest,
@@ -14,30 +14,25 @@ export async function POST(
   try {
     const { id } = await params;
     const body = await request.json();
-    const { status = 'PERMANENTLY_CLOSED', reason } = body;
+    const { reason } = body;
 
-    console.log('[Close Place API] Marking place as closed:', { id, status, reason });
+    console.log('[Close Place API] Marking place as closed:', { id, reason });
 
-    // Update golden_record
-    const updated = await prisma.golden_records.update({
-      where: { canonical_id: id },
+    const updated = await prisma.entities.update({
+      where: { id },
       data: {
-        lifecycle_status: status === 'PERMANENTLY_CLOSED' ? 'CLOSED_PERMANENTLY' : 'ARCHIVED',
-        archive_reason: 'CLOSED',
-        archived_at: new Date(),
-        archived_by: 'admin',
-        updated_at: new Date(),
+        status: 'CLOSED',
       },
       select: {
-        canonical_id: true,
+        id: true,
         name: true,
-        lifecycle_status: true,
+        status: true,
       },
     });
 
     console.log('[Close Place API] Successfully closed:', {
       name: updated.name,
-      status: updated.lifecycle_status,
+      status: updated.status,
     });
 
     return NextResponse.json({

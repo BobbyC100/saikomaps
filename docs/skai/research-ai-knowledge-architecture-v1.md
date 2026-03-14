@@ -3,7 +3,7 @@ doc_id: SKAI/RESEARCH-AI-KNOWLEDGE-ARCHITECTURE-V1
 doc_type: research
 title: AI-Native Knowledge & Data Architecture Patterns (2023–2026)
 version: "0.1"
-status: draft
+status: active
 owner: Bobby Ciccaglione
 created: 2026-03-09
 last_updated: 2026-03-09

@@ -85,6 +85,7 @@ export async function GET(
         website: true,
         instagram: true,
         description: true,
+        description_source: true,
         category: true,
         neighborhood: true,
         cuisineType: true,
@@ -100,7 +101,7 @@ export async function GET(
         pullQuoteUrl: true,
         reservationUrl: true,
         merchant_signals: {
-          select: { menu_url: true, winelist_url: true },
+          select: { menu_url: true, winelist_url: true, reservation_url: true },
         },
         map_places: {
           select: {
@@ -185,7 +186,7 @@ export async function GET(
     const publishedMapPlaces = entity.map_places.filter((mp) => mp.lists && mp.lists.status === 'PUBLISHED');
     const mapIds = publishedMapPlaces.map(mp => mp.lists!.id);
 
-    const [activeOverlays, placeCounts, coverageSources] = await Promise.all([
+    const [activeOverlays, placeCounts, coverageSources, identitySignalsRow, offeringProgramsRow] = await Promise.all([
       getActiveOverlays({ placeId: entity.id, now: new Date() }).catch((err) => {
         console.error(`[Newsletter Overlay] Failed to fetch overlays for place ${entity.slug}:`, err);
         return [] as Awaited<ReturnType<typeof getActiveOverlays>>;
@@ -202,6 +203,16 @@ export async function GET(
         select: { source_name: true, url: true, excerpt: true, published_at: true },
         orderBy: { created_at: 'asc' },
       }).catch(() => [] as { source_name: string; url: string; excerpt: string | null; published_at: Date | null }[]),
+      db.derived_signals.findFirst({
+        where: { entity_id: entity.id, signal_key: 'identity_signals' },
+        select: { signal_value: true },
+        orderBy: { computed_at: 'desc' },
+      }).catch(() => null),
+      db.derived_signals.findFirst({
+        where: { entity_id: entity.id, signal_key: 'offering_programs' },
+        select: { signal_value: true },
+        orderBy: { computed_at: 'desc' },
+      }).catch(() => null),
     ]);
 
     // Service facts from google_places_attributes — null until that column is added to entities
@@ -253,6 +264,12 @@ export async function GET(
       curatorMapPlace?.lists?.users?.email?.split('@')[0] ||
       null;
 
+    // Identity signals — extract all fields from derived_signals.identity_signals
+    const sv = identitySignalsRow?.signal_value as Record<string, unknown> | null ?? null;
+    const placePersonality = (sv?.place_personality as string | null) ?? null;
+    const signatureDishes = Array.isArray(sv?.signature_dishes) ? (sv.signature_dishes as string[]) : [];
+    const languageSignals = Array.isArray(sv?.language_signals) ? (sv.language_signals as string[]) : [];
+
     // SceneSense
     const placeForPRL = await fetchPlaceForPRLBySlug(slug);
     const scenesenseResult = placeForPRL
@@ -260,26 +277,54 @@ export async function GET(
           placeForPRL,
           neighborhood: entity.neighborhood,
           category: entity.category ?? entity.category_rel?.slug ?? null,
-          identitySignals: null,
+          identitySignals: sv ? { place_personality: placePersonality, language_signals: languageSignals, signature_dishes: signatureDishes } : null,
         })
       : { prl: 1 as const, mode: 'LITE' as const, scenesense: null, prlResult: null as never };
 
-    // Offering signals — all null until derived_signals table is populated
+    // Offering signals — read from derived_signals.identity_signals when available
     const offeringSignals = {
-      servesBeer: null,
-      servesWine: null,
-      servesVegetarianFood: null,
-      servesLunch: null,
-      servesDinner: null,
-      servesCocktails: null,
-      cuisinePosture: null,
-      serviceModel: null,
-      priceTier: null,
-      wineProgramIntent: null,
+      servesBeer: null,           // future: google_places_attributes
+      servesWine: null,           // future: google_places_attributes
+      servesVegetarianFood: null, // future: google_places_attributes
+      servesLunch: null,          // future: google_places_attributes
+      servesDinner: null,         // future: google_places_attributes
+      servesCocktails: null,      // future: google_places_attributes
+      cuisinePosture: (sv?.cuisine_posture as string | null) ?? null,
+      serviceModel: (sv?.service_model as string | null) ?? null,
+      priceTier: (sv?.price_tier as string | null) ?? null,
+      wineProgramIntent: (sv?.wine_program_intent as string | null) ?? null,
     };
 
     const menuUrl: string | null = entity.merchant_signals?.menu_url ?? null;
     const winelistUrl: string | null = entity.merchant_signals?.winelist_url ?? null;
+    const reservationUrl: string | null =
+      (entity.merchant_signals as { reservation_url?: string } | null)?.reservation_url ??
+      entity.reservationUrl ??
+      null;
+
+    // Parse offering programs from derived_signals
+    const opv = offeringProgramsRow?.signal_value as Record<string, unknown> | null ?? null;
+    const PROGRAM_KEYS = [
+      'food_program', 'wine_program', 'beer_program', 'cocktail_program',
+      'non_alcoholic_program', 'coffee_tea_program', 'service_program',
+    ] as const;
+    const DEFAULT_PROGRAM = { maturity: 'unknown' as const, signals: [] };
+    const offeringPrograms = opv
+      ? Object.fromEntries(
+          PROGRAM_KEYS.map((k) => {
+            const raw = opv[k] as Record<string, unknown> | undefined;
+            return [
+              k,
+              raw
+                ? {
+                    maturity: (raw.maturity as string) ?? 'unknown',
+                    signals: Array.isArray(raw.signals) ? (raw.signals as string[]) : [],
+                  }
+                : DEFAULT_PROGRAM,
+            ];
+          })
+        )
+      : null;
 
     const location: PlacePageLocation = {
       id: entity.id,
@@ -299,10 +344,11 @@ export async function GET(
       businessStatus: businessStatus ?? null,
       cuisineType: entity.cuisineType ?? null,
       googlePlaceId: entity.googlePlaceId ?? null,
-      reservationUrl: entity.reservationUrl ?? null,
+      reservationUrl,
       menuUrl,
       winelistUrl,
       description: entity.description ?? null,
+      descriptionSource: entity.description_source ?? null,
       tagline: entity.tagline ?? null,
       pullQuote: entity.pullQuote ?? null,
       pullQuoteAuthor: entity.pullQuoteAuthor ?? null,
@@ -316,6 +362,9 @@ export async function GET(
       prl: scenesenseResult.prl,
       scenesense: scenesenseResult.scenesense ?? null,
       offeringSignals,
+      offeringPrograms: offeringPrograms as PlacePageLocation['offeringPrograms'],
+      placePersonality,
+      signatureDishes,
       coverageSources: coverageSources.map((src) => ({
         sourceName: src.source_name,
         url: src.url,
