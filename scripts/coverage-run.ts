@@ -20,7 +20,9 @@
  */
 
 import { Prisma } from '@prisma/client';
-import { db } from '@/lib/db';
+// Use relative import here: coverage:run:local currently executes this script
+// in a runtime path that does not resolve @/* aliases.
+import { db } from '../lib/db';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -38,6 +40,21 @@ export const COVERAGE_MISSING_GROUPS = [
 
 export type MissingGroup = (typeof COVERAGE_MISSING_GROUPS)[number];
 
+export const TIER2_VISIT_FACT_ISSUES = [
+  'missing_hours',
+  'missing_price_level',
+  'missing_menu_link',
+  'missing_reservations',
+  'operating_status_unknown',
+  'google_says_closed',
+] as const;
+
+export type Tier2VisitFactIssue = (typeof TIER2_VISIT_FACT_ISSUES)[number];
+
+const PRICE_LEVEL_VERTICALS = new Set(['EAT', 'COFFEE', 'WINE', 'DRINKS', 'BAKERY']);
+const MENU_VERTICALS = new Set(['EAT', 'COFFEE', 'WINE', 'DRINKS', 'BAKERY', 'PURVEYORS']);
+const RESERVATION_VERTICALS = new Set(['EAT', 'WINE', 'DRINKS', 'STAY']);
+
 export interface CoverageCandidate {
   place_id: string;
   slug: string;
@@ -45,6 +62,7 @@ export interface CoverageCandidate {
   google_place_id: string | null;
   dedupe_key: string;
   missing_groups: MissingGroup[];
+  tier2_issues: Tier2VisitFactIssue[];
   reason: string;
 }
 
@@ -74,6 +92,7 @@ export interface CoverageRunReport {
     total_places: number;
     by_prl: Record<string, number>;
     by_missing_group: Record<string, number>;
+    by_tier2_issue: Record<string, number>;
     candidates_count: number;
     excluded_by_ttl: number;
     excluded_by_backoff: number;
@@ -147,6 +166,68 @@ const LA_BBOX = {
 function nonTrivialText(s: string | null | undefined, minLen = 40): boolean {
   if (!s) return false;
   return s.trim().length >= minLen;
+}
+
+function hasValue(v: unknown): boolean {
+  return v !== null && v !== undefined;
+}
+
+function hasNonEmptyText(v: string | null | undefined): boolean {
+  return typeof v === 'string' && v.trim().length > 0;
+}
+
+function canonicalFirst<T>(canonical: T | null | undefined, fallback: T | null | undefined): T | null {
+  if (canonical !== null && canonical !== undefined) return canonical;
+  if (fallback !== null && fallback !== undefined) return fallback;
+  return null;
+}
+
+function detectTier2VisitFactIssues(place: {
+  primary_vertical: string | null;
+  googlePlaceId: string | null;
+  businessStatus: string | null;
+  hours: unknown;
+  priceLevel: number | null;
+  reservationUrl: string | null;
+  canonical_state: {
+    hours_json: unknown;
+    price_level: number | null;
+    reservation_url: string | null;
+    menu_url: string | null;
+  } | null;
+}): Tier2VisitFactIssue[] {
+  const issues: Tier2VisitFactIssue[] = [];
+  const primaryVertical = place.primary_vertical;
+  const ces = place.canonical_state;
+
+  const effectiveHours = canonicalFirst(ces?.hours_json, place.hours);
+  if (!hasValue(effectiveHours)) {
+    issues.push('missing_hours');
+  }
+
+  const effectivePriceLevel = canonicalFirst(ces?.price_level, place.priceLevel);
+  if (primaryVertical && PRICE_LEVEL_VERTICALS.has(primaryVertical) && !hasValue(effectivePriceLevel)) {
+    issues.push('missing_price_level');
+  }
+
+  if (primaryVertical && MENU_VERTICALS.has(primaryVertical) && !hasNonEmptyText(ces?.menu_url)) {
+    issues.push('missing_menu_link');
+  }
+
+  const effectiveReservationUrl = canonicalFirst(ces?.reservation_url, place.reservationUrl);
+  if (primaryVertical && RESERVATION_VERTICALS.has(primaryVertical) && !hasNonEmptyText(effectiveReservationUrl)) {
+    issues.push('missing_reservations');
+  }
+
+  if (place.googlePlaceId && !hasNonEmptyText(place.businessStatus)) {
+    issues.push('operating_status_unknown');
+  }
+
+  if (place.businessStatus === 'CLOSED_PERMANENTLY') {
+    issues.push('google_says_closed');
+  }
+
+  return issues;
 }
 
 function computeMissingGroups(place: {
@@ -262,6 +343,7 @@ export async function runCoverageAudit(options?: {
       total_places: 0,
       by_prl: {},
       by_missing_group: {},
+      by_tier2_issue: {},
       candidates_count: 0,
       excluded_by_ttl: 0,
       excluded_by_backoff: 0,
@@ -288,12 +370,22 @@ export async function runCoverageAudit(options?: {
     id: string;
     slug: string;
     name: string;
+    primary_vertical: string | null;
     googlePlaceId: string | null;
+    businessStatus: string | null;
     hours: unknown;
+    priceLevel: number | null;
+    reservationUrl: string | null;
     description: string | null;
     pullQuote: string | null;
     googlePhotos: unknown;
     googlePlacesAttributes: unknown;
+    canonical_state: {
+      hours_json: unknown;
+      price_level: number | null;
+      reservation_url: string | null;
+      menu_url: string | null;
+    } | null;
     place_photo_eval: { tier: string }[];
     map_places: { descriptor: string | null }[];
   };
@@ -306,12 +398,24 @@ export async function runCoverageAudit(options?: {
       id: true,
       slug: true,
       name: true,
+      primary_vertical: true,
       googlePlaceId: true,
+      businessStatus: true,
       hours: true,
+      priceLevel: true,
+      reservationUrl: true,
       description: true,
       pullQuote: true,
       googlePhotos: true,
       googlePlacesAttributes: true,
+      canonical_state: {
+        select: {
+          hours_json: true,
+          price_level: true,
+          reservation_url: true,
+          menu_url: true,
+        },
+      },
       place_photo_eval: { select: { tier: true } },
       map_places: {
         where: { lists: { status: 'PUBLISHED' } },
@@ -430,6 +534,10 @@ export async function runCoverageAudit(options?: {
       report.counts.by_missing_group[g] =
         (report.counts.by_missing_group[g] ?? 0) + 1;
     }
+    const tier2Issues = detectTier2VisitFactIssues(p);
+    for (const issue of tier2Issues) {
+      report.counts.by_tier2_issue[issue] = (report.counts.by_tier2_issue[issue] ?? 0) + 1;
+    }
 
     const status = statusByDedupeKey.get(dedupeKey);
     if (status?.last_attempt_status === 'RUNNING') {
@@ -456,6 +564,7 @@ export async function runCoverageAudit(options?: {
       google_place_id: p.googlePlaceId,
       dedupe_key: dedupeKey,
       missing_groups: missing,
+      tier2_issues: tier2Issues,
       reason: `Missing: ${missing.join(', ')}`,
     });
   }
@@ -498,6 +607,20 @@ export async function runCoverageAudit(options?: {
       });
     }
   }
+
+  // Keep google_says_closed visible in Tier 2 reporting without changing
+  // apply-candidate selection (which intentionally excludes CLOSED_PERMANENTLY).
+  const closedCount = await db.entities.count({
+    where: {
+      ...(laOnlyFlag && {
+        latitude: { gte: LA_BBOX.latMin, lte: LA_BBOX.latMax },
+        longitude: { gte: LA_BBOX.lngMin, lte: LA_BBOX.lngMax },
+      }),
+      businessStatus: 'CLOSED_PERMANENTLY',
+    },
+  });
+  report.counts.by_tier2_issue.google_says_closed =
+    (report.counts.by_tier2_issue.google_says_closed ?? 0) + closedCount;
 
   const gpids = places.map((p) => p.googlePlaceId).filter(Boolean) as string[];
   if (gpids.length > 0) {
@@ -572,6 +695,10 @@ async function main() {
   }
   console.log('\nCounts by missing group:');
   for (const [k, v] of Object.entries(report.counts.by_missing_group).sort()) {
+    console.log(`  ${k}: ${v}`);
+  }
+  console.log('\nCounts by Tier 2 issue:');
+  for (const [k, v] of Object.entries(report.counts.by_tier2_issue).sort()) {
     console.log(`  ${k}: ${v}`);
   }
   console.log('\nExclusions:');

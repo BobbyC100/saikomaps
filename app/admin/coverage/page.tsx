@@ -1,5 +1,5 @@
 /**
- * Admin coverage page — same content as /coverage, available at /admin/coverage
+ * Admin coverage page — same content as /coverage, including Tier 2 visit-facts summary.
  */
 
 import { CoverageContent } from '@/app/coverage/CoverageContent'
