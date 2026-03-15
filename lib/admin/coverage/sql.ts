@@ -1,11 +1,12 @@
 /**
  * Data Coverage Audit — SQL Queries
- * 
+ *
  * Cohort Definitions (targeting entities table):
+ * - All: all active entities (status != 'PERMANENTLY_CLOSED')
+ * - OPEN: entities with status = 'OPEN'
+ * - CANDIDATE: entities with status = 'CANDIDATE'
  * - Reachable: entities on at least one PUBLISHED list (via map_places → lists)
- * - Addressable: active entities with slug
- * - Total DB: all active entities (status != 'PERMANENTLY_CLOSED')
- * 
+ *
  * All queries are SELECT-only, designed for <5s execution.
  */
 
@@ -16,7 +17,7 @@
 export const OVERVIEW_COUNTS_SQL = `
 WITH
 active_entities AS (
-  SELECT p.id
+  SELECT p.id, p.status::text as status, p.slug, p.google_place_id, p.neighborhood
   FROM entities p
   WHERE p.status != 'PERMANENTLY_CLOSED'
 ),
@@ -25,18 +26,15 @@ reachable AS (
   FROM map_places mp
   JOIN lists l ON l.id = mp.map_id
   WHERE l.status = 'PUBLISHED'
-),
-addressable AS (
-  SELECT p.id
-  FROM entities p
-  WHERE p.status != 'PERMANENTLY_CLOSED'
-    AND p.slug IS NOT NULL
 )
 SELECT
   (SELECT COUNT(*) FROM active_entities) AS total_db,
-  (SELECT COUNT(*) FROM addressable) AS addressable,
+  (SELECT COUNT(*) FROM active_entities WHERE status = 'OPEN') AS open_count,
+  (SELECT COUNT(*) FROM active_entities WHERE status = 'CANDIDATE') AS candidate_count,
+  (SELECT COUNT(*) FROM active_entities WHERE slug IS NOT NULL) AS addressable,
   (SELECT COUNT(*) FROM reachable) AS reachable,
-  ((SELECT COUNT(*) FROM addressable) - (SELECT COUNT(*) FROM reachable)) AS dark_inventory;
+  (SELECT COUNT(DISTINCT neighborhood) FROM active_entities WHERE neighborhood IS NOT NULL AND neighborhood != '') AS neighborhoods,
+  (SELECT COUNT(*) FROM active_entities WHERE google_place_id IS NOT NULL) AS has_gpid;
 `;
 
 export const REACHABLE_NOT_ACTIVE_SANITY_SQL = `
@@ -52,67 +50,58 @@ WHERE p.id IS NULL OR p.status = 'PERMANENTLY_CLOSED';
 `;
 
 // ============================================================================
-// MISSING FIELDS VIEW (Reachable cohort only)
+// MISSING FIELDS VIEW — All entities (not just Reachable)
 // ============================================================================
 
-export const REACHABLE_MISSING_FIELDS_SQL = `
-WITH reachable AS (
-  SELECT DISTINCT mp.entity_id
-  FROM map_places mp
-  JOIN lists l ON l.id = mp.map_id
-  WHERE l.status = 'PUBLISHED'
-),
-r AS (
+export const ALL_MISSING_FIELDS_SQL = `
+WITH r AS (
   SELECT p.*
   FROM entities p
-  JOIN reachable rc ON rc.entity_id = p.id
   WHERE p.status != 'PERMANENTLY_CLOSED'
 )
-SELECT 'slug'            AS field, COUNT(*) AS missing FROM r WHERE r.slug IS NULL
+SELECT 'slug'            AS field, COUNT(*) AS missing, (SELECT COUNT(*) FROM r) AS total FROM r WHERE r.slug IS NULL
 UNION ALL
-SELECT 'name'            AS field, COUNT(*) AS missing FROM r WHERE r.name IS NULL OR r.name = ''
+SELECT 'name'            AS field, COUNT(*) AS missing, (SELECT COUNT(*) FROM r) AS total FROM r WHERE r.name IS NULL OR r.name = ''
 UNION ALL
-SELECT 'latlng'          AS field, COUNT(*) AS missing FROM r WHERE r.latitude IS NULL OR r.longitude IS NULL
+SELECT 'latlng'          AS field, COUNT(*) AS missing, (SELECT COUNT(*) FROM r) AS total FROM r WHERE r.latitude IS NULL OR r.longitude IS NULL
 UNION ALL
-SELECT 'google_place_id' AS field, COUNT(*) AS missing FROM r WHERE r.google_place_id IS NULL
+SELECT 'google_place_id' AS field, COUNT(*) AS missing, (SELECT COUNT(*) FROM r) AS total FROM r WHERE r.google_place_id IS NULL
 UNION ALL
-SELECT 'hours'           AS field, COUNT(*) AS missing FROM r WHERE r.hours IS NULL
+SELECT 'hours'           AS field, COUNT(*) AS missing, (SELECT COUNT(*) FROM r) AS total FROM r WHERE r.hours IS NULL
 UNION ALL
-SELECT 'phone'           AS field, COUNT(*) AS missing FROM r WHERE r.phone IS NULL OR r.phone = ''
+SELECT 'phone'           AS field, COUNT(*) AS missing, (SELECT COUNT(*) FROM r) AS total FROM r WHERE r.phone IS NULL OR r.phone = ''
 UNION ALL
-SELECT 'website'         AS field, COUNT(*) AS missing FROM r WHERE r.website IS NULL OR r.website = ''
+SELECT 'website'         AS field, COUNT(*) AS missing, (SELECT COUNT(*) FROM r) AS total FROM r WHERE r.website IS NULL OR r.website = ''
 UNION ALL
-SELECT 'instagram'       AS field, COUNT(*) AS missing FROM r WHERE r.instagram IS NULL OR r.instagram = ''
+SELECT 'instagram'       AS field, COUNT(*) AS missing, (SELECT COUNT(*) FROM r) AS total FROM r WHERE r.instagram IS NULL OR r.instagram = ''
 UNION ALL
-SELECT 'neighborhood'    AS field, COUNT(*) AS missing FROM r WHERE r.neighborhood IS NULL OR r.neighborhood = ''
+SELECT 'neighborhood'    AS field, COUNT(*) AS missing, (SELECT COUNT(*) FROM r) AS total FROM r WHERE r.neighborhood IS NULL OR r.neighborhood = ''
 ORDER BY missing DESC;
 `;
 
+// Keep old name for backwards compat
+export const REACHABLE_MISSING_FIELDS_SQL = ALL_MISSING_FIELDS_SQL;
+
 // ============================================================================
-// NEIGHBORHOODS VIEW (Reachable quality ranking)
+// NEIGHBORHOODS VIEW — All entities
 // ============================================================================
 
-export const REACHABLE_NEIGHBORHOOD_SCORECARD_SQL = `
-WITH reachable AS (
-  SELECT DISTINCT mp.entity_id
-  FROM map_places mp
-  JOIN lists l ON l.id = mp.map_id
-  WHERE l.status = 'PUBLISHED'
-),
-r AS (
+export const ALL_NEIGHBORHOOD_SCORECARD_SQL = `
+WITH r AS (
   SELECT
     p.id,
     COALESCE(NULLIF(p.neighborhood,''), 'Unknown') AS neighborhood,
     p.slug, p.name, p.latitude, p.longitude, p.google_place_id,
-    p.hours, p.phone, p.website
+    p.hours, p.phone, p.website, p.status::text as entity_status
   FROM entities p
-  JOIN reachable rc ON rc.entity_id = p.id
   WHERE p.status != 'PERMANENTLY_CLOSED'
 ),
 agg AS (
   SELECT
     neighborhood,
     COUNT(*) AS entities,
+    SUM(CASE WHEN entity_status = 'OPEN' THEN 1 ELSE 0 END) AS open_count,
+    SUM(CASE WHEN entity_status = 'CANDIDATE' THEN 1 ELSE 0 END) AS candidate_count,
     SUM(CASE WHEN slug IS NOT NULL THEN 1 ELSE 0 END) AS has_slug,
     SUM(CASE WHEN name IS NOT NULL AND name <> '' THEN 1 ELSE 0 END) AS has_name,
     SUM(CASE WHEN latitude IS NOT NULL AND longitude IS NOT NULL THEN 1 ELSE 0 END) AS has_latlng,
@@ -133,31 +122,27 @@ agg AS (
 )
 SELECT *
 FROM agg
-WHERE entities >= 5
+WHERE entities >= 3
 ORDER BY (tier1_complete::float / entities) ASC, entities DESC;
 `;
 
+export const REACHABLE_NEIGHBORHOOD_SCORECARD_SQL = ALL_NEIGHBORHOOD_SCORECARD_SQL;
+
 // ============================================================================
-// RED FLAGS VIEW (Reachable Tier-1 failures)
+// RED FLAGS VIEW — All entities missing Tier 1 fields
 // ============================================================================
 
-export const REACHABLE_REDFLAGS_SQL = `
-WITH reachable AS (
-  SELECT DISTINCT mp.entity_id
-  FROM map_places mp
-  JOIN lists l ON l.id = mp.map_id
-  WHERE l.status = 'PUBLISHED'
-),
-r AS (
+export const ALL_REDFLAGS_SQL = `
+WITH r AS (
   SELECT p.*
   FROM entities p
-  JOIN reachable rc ON rc.entity_id = p.id
   WHERE p.status != 'PERMANENTLY_CLOSED'
 )
 SELECT
   id,
   slug,
   name,
+  status::text as entity_status,
   COALESCE(NULLIF(neighborhood,''), 'Unknown') AS neighborhood,
   latitude,
   longitude,
@@ -183,6 +168,8 @@ WHERE
 ORDER BY severity DESC
 LIMIT 200;
 `;
+
+export const REACHABLE_REDFLAGS_SQL = ALL_REDFLAGS_SQL;
 
 // ============================================================================
 // FIELD BREAKDOWN VIEW (Cross-cohort comparison)

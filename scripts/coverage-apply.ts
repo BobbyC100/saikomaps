@@ -393,6 +393,8 @@ async function main() {
             key === 'placesDataCachedAt' ? 'places_data_cached_at' :
             key === 'businessStatus' ? 'business_status' :
             key === 'hoursJson' ? 'hours_json' :
+            key === 'googlePlacesAttributes' ? 'google_places_attributes' :
+            key === 'googlePhotos' ? 'google_photos' :
             key;
           sets.push(`${col} = $${i++}`);
           values.push(value);

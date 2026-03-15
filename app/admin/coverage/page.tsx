@@ -9,9 +9,9 @@ import { runOne, runMany } from '@/lib/admin/coverage/run';
 import {
   OVERVIEW_COUNTS_SQL,
   REACHABLE_NOT_ACTIVE_SANITY_SQL,
-  REACHABLE_MISSING_FIELDS_SQL,
-  REACHABLE_NEIGHBORHOOD_SCORECARD_SQL,
-  REACHABLE_REDFLAGS_SQL,
+  ALL_MISSING_FIELDS_SQL,
+  ALL_NEIGHBORHOOD_SCORECARD_SQL,
+  ALL_REDFLAGS_SQL,
   FIELDS_BREAKDOWN_REACHABLE_SQL,
   FIELDS_BREAKDOWN_ADDRESSABLE_SQL,
   FIELDS_BREAKDOWN_TOTALDB_SQL,
@@ -144,41 +144,35 @@ export default async function AdminCoveragePage({
 
 // ── Overview ──
 async function OverviewView() {
-  const [counts, sanity] = await Promise.all([
-    runOne<OverviewCounts>(OVERVIEW_COUNTS_SQL),
-    runOne<ReachableNotActiveSanity>(REACHABLE_NOT_ACTIVE_SANITY_SQL),
-  ]);
+  const counts = await runOne<OverviewCounts>(OVERVIEW_COUNTS_SQL);
+
+  const total = Number(counts.total_db);
+  const gpidPct = total > 0 ? ((Number(counts.has_gpid) / total) * 100).toFixed(0) : '0';
 
   const cards = [
-    { label: 'Total DB', value: bn(counts.total_db) },
-    { label: 'Addressable (has slug)', value: bn(counts.addressable) },
-    { label: 'Reachable (on published list)', value: bn(counts.reachable) },
-    { label: 'Dark Inventory', value: bn(counts.dark_inventory), sub: 'Addressable but not reachable' },
+    { label: 'Total Entities', value: bn(counts.total_db), sub: `${bn(counts.neighborhoods)} neighborhoods` },
+    { label: 'OPEN', value: bn(counts.open_count), sub: 'Enriched / active' },
+    { label: 'CANDIDATE', value: bn(counts.candidate_count), sub: 'Needs enrichment' },
+    { label: 'Has GPID', value: bn(counts.has_gpid), sub: `${gpidPct}% identified` },
+    { label: 'Published', value: bn(counts.reachable), sub: 'On a list — visible on maps' },
   ];
 
   return (
-    <>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        {cards.map((c) => (
-          <div key={c.label} className="bg-white rounded-xl p-5 shadow-sm">
-            <div className="text-xs text-[#8B7355] mb-1">{c.label}</div>
-            <div className="text-2xl font-bold text-[#36454F]">{c.value}</div>
-            {c.sub && <div className="text-xs text-[#8B7355] mt-1">{c.sub}</div>}
-          </div>
-        ))}
-      </div>
-      {Number(sanity.reachable_not_active) > 0 && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-sm text-red-800">
-          ⚠ {bn(sanity.reachable_not_active)} reachable entities are closed/missing — sanity check failed
+    <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+      {cards.map((c) => (
+        <div key={c.label} className="bg-white rounded-xl p-5 shadow-sm">
+          <div className="text-xs text-[#8B7355] mb-1">{c.label}</div>
+          <div className="text-2xl font-bold text-[#36454F]">{c.value}</div>
+          {c.sub && <div className="text-xs text-[#8B7355] mt-1">{c.sub}</div>}
         </div>
-      )}
-    </>
+      ))}
+    </div>
   );
 }
 
 // ── Missing Fields ──
 async function MissingFieldsView() {
-  const rows = await runMany<MissingFieldRow>(REACHABLE_MISSING_FIELDS_SQL);
+  const rows = await runMany<MissingFieldRow>(ALL_MISSING_FIELDS_SQL);
   const TIER1 = new Set(['slug', 'name', 'latlng', 'google_place_id']);
   const TIER2 = new Set(['hours', 'phone', 'website']);
 
@@ -186,12 +180,11 @@ async function MissingFieldsView() {
     <div className="bg-white rounded-xl p-6 shadow-sm">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h2 className="text-xl font-bold text-[#36454F] mb-1">Missing Fields — Reachable Cohort</h2>
-          <p className="text-sm text-[#8B7355]">Places on at least one published list</p>
+          <h2 className="text-xl font-bold text-[#36454F] mb-1">Missing Fields — All Entities</h2>
+          <p className="text-sm text-[#8B7355]">Field completeness across the entire inventory</p>
         </div>
         <div className="flex gap-2">
-          <CopyCommandButton command="npm run coverage:apply:neon -- --apply" label="Copy: coverage:apply" variant="warning" />
-          <CopyCommandButton command="npm run enrich:google" label="Copy: enrich:google" />
+          <CopyCommandButton command="npm run coverage:apply:neon -- --apply --limit=50" label="Copy: coverage:apply" variant="warning" />
         </div>
       </div>
       <table className="w-full text-left text-sm">
@@ -199,13 +192,18 @@ async function MissingFieldsView() {
           <tr className="border-b border-[#C3B091]/40">
             <th className="py-2 pr-4 text-[#8B7355] font-medium">Field</th>
             <th className="py-2 pr-4 text-[#8B7355] font-medium">Tier</th>
-            <th className="py-2 text-[#8B7355] font-medium text-right">Missing</th>
+            <th className="py-2 pr-4 text-[#8B7355] font-medium text-right">Has</th>
+            <th className="py-2 pr-4 text-[#8B7355] font-medium text-right">Missing</th>
+            <th className="py-2 text-[#8B7355] font-medium text-right">Coverage</th>
           </tr>
         </thead>
         <tbody>
           {rows.map((r) => {
             const tier = TIER1.has(r.field) ? 'Tier 1' : TIER2.has(r.field) ? 'Tier 2' : 'Tier 3';
             const missing = Number(r.missing);
+            const total = Number(r.total);
+            const has = total - missing;
+            const coverage = total > 0 ? ((has / total) * 100).toFixed(1) : '0';
             return (
               <tr key={r.field} className="border-b border-[#C3B091]/20">
                 <td className="py-2 pr-4 text-[#36454F] font-mono text-xs">{r.field}</td>
@@ -216,8 +214,12 @@ async function MissingFieldsView() {
                     'bg-stone-100 text-stone-600'
                   }`}>{tier}</span>
                 </td>
-                <td className={`py-2 text-right font-medium ${missing > 0 ? 'text-red-600' : 'text-green-600'}`}>
+                <td className="py-2 pr-4 text-right text-green-600 font-medium">{bn(has)}</td>
+                <td className={`py-2 pr-4 text-right font-medium ${missing > 0 ? 'text-red-600' : 'text-green-600'}`}>
                   {bn(r.missing)}
+                </td>
+                <td className={`py-2 text-right font-medium ${Number(coverage) >= 90 ? 'text-green-600' : Number(coverage) >= 60 ? 'text-yellow-600' : 'text-red-600'}`}>
+                  {coverage}%
                 </td>
               </tr>
             );
@@ -230,12 +232,12 @@ async function MissingFieldsView() {
 
 // ── Neighborhoods ──
 async function NeighborhoodsView() {
-  const rows = await runMany<NeighborhoodScorecard>(REACHABLE_NEIGHBORHOOD_SCORECARD_SQL);
+  const rows = await runMany<NeighborhoodScorecard>(ALL_NEIGHBORHOOD_SCORECARD_SQL);
 
   return (
     <div className="bg-white rounded-xl p-6 shadow-sm overflow-x-auto">
-      <h2 className="text-xl font-bold text-[#36454F] mb-1">Neighborhood Scorecard — Reachable</h2>
-      <p className="text-sm text-[#8B7355] mb-4">Neighborhoods with 5+ places, sorted by Tier 1 completion (worst first)</p>
+      <h2 className="text-xl font-bold text-[#36454F] mb-1">Neighborhood Scorecard — All Entities</h2>
+      <p className="text-sm text-[#8B7355] mb-4">Neighborhoods with 3+ entities, sorted by Tier 1 completion (worst first)</p>
       <table className="w-full text-left text-sm">
         <thead>
           <tr className="border-b border-[#C3B091]/40">
@@ -280,14 +282,14 @@ async function NeighborhoodsView() {
 
 // ── Red Flags ──
 async function RedFlagsView() {
-  const rows = await runMany<RedFlag>(REACHABLE_REDFLAGS_SQL);
+  const rows = await runMany<RedFlag>(ALL_REDFLAGS_SQL);
 
   return (
     <div className="bg-white rounded-xl p-6 shadow-sm overflow-x-auto">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h2 className="text-xl font-bold text-[#36454F] mb-1">Red Flags — Reachable Tier 1 Failures</h2>
-          <p className="text-sm text-[#8B7355]">Places on published lists missing critical fields (top 200 by severity)</p>
+          <h2 className="text-xl font-bold text-[#36454F] mb-1">Red Flags — Tier 1 Failures</h2>
+          <p className="text-sm text-[#8B7355]">Entities missing critical identity fields (top 200 by severity)</p>
         </div>
         <CopyCommandButton command="npm run coverage:apply:neon -- --apply" label="Copy: coverage:apply (bulk fix)" variant="warning" />
       </div>
@@ -297,6 +299,7 @@ async function RedFlagsView() {
             <th className="py-2 pr-3 text-[#8B7355] font-medium">Name</th>
             <th className="py-2 pr-3 text-[#8B7355] font-medium">Slug</th>
             <th className="py-2 pr-3 text-[#8B7355] font-medium">Neighborhood</th>
+            <th className="py-2 pr-3 text-[#8B7355] font-medium text-center">Status</th>
             <th className="py-2 pr-3 text-[#8B7355] font-medium text-center">Severity</th>
             <th className="py-2 pr-3 text-[#8B7355] font-medium">Issues</th>
             <th className="py-2 text-[#8B7355] font-medium text-right">Actions</th>
@@ -308,6 +311,11 @@ async function RedFlagsView() {
               <td className="py-2 pr-3 text-[#36454F] font-medium">{r.name || '(no name)'}</td>
               <td className="py-2 pr-3 text-[#36454F] font-mono text-xs">{r.slug ?? '(none)'}</td>
               <td className="py-2 pr-3 text-[#8B7355]">{r.neighborhood}</td>
+              <td className="py-2 pr-3 text-center">
+                <span className={`text-xs px-2 py-0.5 rounded-full ${
+                  (r as any).entity_status === 'CANDIDATE' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'
+                }`}>{(r as any).entity_status ?? 'OPEN'}</span>
+              </td>
               <td className="py-2 pr-3 text-center">
                 <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
                   Number(r.severity) >= 3 ? 'bg-red-100 text-red-700' :

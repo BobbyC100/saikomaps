@@ -6,9 +6,12 @@
 // Overview counts
 export interface OverviewCounts {
   total_db: bigint;
+  open_count: bigint;
+  candidate_count: bigint;
   addressable: bigint;
   reachable: bigint;
-  dark_inventory: bigint;
+  neighborhoods: bigint;
+  has_gpid: bigint;
 }
 
 export interface ReachableNotActiveSanity {
@@ -19,6 +22,7 @@ export interface ReachableNotActiveSanity {
 export interface MissingFieldRow {
   field: string;
   missing: bigint;
+  total: bigint;
 }
 
 export type FieldTier = 'Tier 1' | 'Tier 2' | 'Tier 3';
@@ -31,6 +35,9 @@ export interface MissingFieldWithTier extends MissingFieldRow {
 export interface NeighborhoodScorecard {
   neighborhood: string;
   places: bigint;
+  entities: bigint;
+  open_count: bigint;
+  candidate_count: bigint;
   has_slug: bigint;
   has_name: bigint;
   has_latlng: bigint;
