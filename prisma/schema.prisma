@@ -699,6 +699,7 @@ enum PersonRole {
 
 enum PlaceStatus {
   OPEN
+  CANDIDATE
   CLOSED
   PERMANENTLY_CLOSED
 }
@@ -1981,4 +1982,23 @@ model interpretation_cache {
   @@unique([entity_id, output_type, prompt_version])
   @@index([entity_id])
   @@index([entity_id, output_type, is_current])
+}
+
+model skai_chunks {
+  id          Int      @id @default(autoincrement())
+  doc_id      String
+  chunk_index Int
+  content     String
+  embedding   Unsupported("vector(1536)")?
+  category    String?
+  systems     String[]
+  tags        String[]
+  source      String   @default("repo")
+  source_url  String?
+  file_path   String?
+  updated_at  DateTime? @db.Timestamptz
+  created_at  DateTime  @default(now()) @db.Timestamptz
+
+  @@index([doc_id])
+  @@index([category])
 }

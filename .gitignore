@@ -33,3 +33,6 @@ tsconfig.tsbuildinfo
 
 # DB dumps (local restore artifacts)
 data/neon-restore.dump
+
+# Pipeline logs (generated per-run, not source-controlled)
+data/logs/
