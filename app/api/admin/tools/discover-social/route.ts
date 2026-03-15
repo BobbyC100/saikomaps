@@ -137,7 +137,7 @@ Return JSON (no markdown fences): { "website_url": "https://..." or null, "confi
     const handle = parsed.tiktok_handle ? cleanTiktokHandle(parsed.tiktok_handle) : null;
     if (!handle) return { discovered: null, confidence, reasoning: reasoning || 'No handle found', saved: false };
     if ((confidence === 'high' || confidence === 'medium') && !dryRun) {
-      await db.entities.update({ where: { id: entity.id }, data: { tiktok: handle } });
+      await db.$executeRaw`UPDATE entities SET tiktok = ${handle} WHERE id = ${entity.id}`;
       return { discovered: handle, confidence, reasoning, saved: true };
     }
     return { discovered: handle, confidence, reasoning, saved: false };
