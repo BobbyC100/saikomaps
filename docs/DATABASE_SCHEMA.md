@@ -8,7 +8,20 @@ last_updated: '2026-03-10'
 project_id: SAIKO
 systems:
   - database
-summary: ''
+  - entities
+summary: >-
+  Detailed database schema reference for Saiko Maps: all models (User, List,
+  Location/legacy, Place/canonical, MapPlace, ViewerBookmark, ActivitySpot,
+  ImportJob), enums, field definitions, indexes, relations, entity relationship
+  diagrams, and key data flows (map creation, viewing, enrichment).
+related_docs:
+  - docs/APP_OVERVIEW.md
+  - docs/MIGRATION_GUIDE.md
+  - docs/architecture/system_contract.md
+  - docs/DATA_SYNC_RUNBOOK.md
+category: engineering
+tags: [schema, entities]
+source: repo
 ---
 # Saiko Maps - Database Schema
 

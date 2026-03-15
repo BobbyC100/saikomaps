@@ -6,7 +6,17 @@ owner: Bobby Ciccaglione
 created: '2026-03-10'
 last_updated: '2026-03-10'
 project_id: SAIKO
-summary: ''
+summary: 'Local development quickstart: npm install, Prisma migration/seed/reset commands, dev server, environment variables, and merchant page testing instructions for scenarios A/B/C.'
+systems:
+  - platform
+  - database
+related_docs:
+  - docs/DATABASE_SETUP.md
+  - docs/ENV_TEMPLATE.md
+  - docs/saiko-merchant-data-hierarchy.md
+category: engineering
+tags: [pipeline]
+source: repo
 ---
 # Local Development
 

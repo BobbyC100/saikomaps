@@ -1,3 +1,26 @@
+---
+doc_id: SCRIPTS-SQL-README
+doc_type: reference
+status: active
+owner: Bobby Ciccaglione
+created: '2026-02-15'
+last_updated: '2026-03-14'
+project_id: SAIKO
+summary: >-
+  Index of ad-hoc SQL scripts for backfills, verification, and rollout —
+  Phase 2 field verification, confidence_bucket backfill, with Neon console
+  and CLI execution instructions.
+systems:
+  - data-pipeline
+  - identity
+related_docs:
+  - scripts/sql/README-gpid-rollout.md
+  - docs/DATABASE_SCHEMA.md
+category: engineering
+tags: [schema, migration, pipeline, identity]
+source: repo
+---
+
 # SQL Scripts
 
 Ad-hoc SQL for backfills, verification, and rollout.

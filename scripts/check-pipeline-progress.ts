@@ -70,6 +70,13 @@ async function checkProgress() {
       county: 'Los Angeles',
     },
   });
+  const merchantSignalMenuRows = await prisma.$queryRaw<{ count: bigint }[]>`
+    SELECT COUNT(*)::bigint AS count
+    FROM merchant_signals
+    WHERE menu_url IS NOT NULL
+      AND btrim(menu_url) <> ''
+  `;
+  const merchantSignalMenuCount = Number(merchantSignalMenuRows[0]?.count ?? 0);
 
   console.log('📊 PHASE 1: WEBSITE SCRAPING');
   console.log('─'.repeat(50));
@@ -82,6 +89,7 @@ async function checkProgress() {
   console.log(`  ├─ Menu URLs: ${withMenu} (${Math.round((withMenu / totalWithWebsites) * 100)}%)`);
   console.log(`  ├─ Wine lists: ${withWineList} (${Math.round((withWineList / totalWithWebsites) * 100)}%)`);
   console.log(`  └─ About copy: ${withAbout} (${Math.round((withAbout / totalWithWebsites) * 100)}%)`);
+  console.log(`  • merchant_signals.menu_url (non-empty): ${merchantSignalMenuCount}`);
   console.log('');
 
   // Phase 2: Extraction stats

@@ -6,7 +6,17 @@ owner: Bobby Ciccaglione
 created: '2026-03-10'
 last_updated: '2026-03-10'
 project_id: SAIKO
-summary: ''
+summary: 'Locked specification for the Energy score (0-100): measures environmental stimulation via popular-times density, crowd/noise language, operational flags, compression proxies, and sensory modifiers, with confidence scoring, missing-data handling, and calibration examples.'
+systems:
+  - scenesense
+  - signals
+related_docs:
+  - docs/FORMALITY_SCORE_SPEC.md
+  - docs/scenesense/display-contract-v1.md
+  - docs/voice/saiko-voice-layer.md
+category: domain
+tags: [scenesense, energy, signals]
+source: repo
 ---
 # Energy Score — Specification (Locked)
 

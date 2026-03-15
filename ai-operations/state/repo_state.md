@@ -1,3 +1,24 @@
+---
+doc_id: AI-OPS-REPO-STATE
+doc_type: reference
+status: active
+owner: Bobby Ciccaglione
+created: '2026-03-09'
+last_updated: '2026-03-09'
+project_id: SAIKO
+systems:
+  - ai-operations
+summary: >-
+  Auto-generated repo state snapshot — branch, commit, and PR status for AI
+  agent boot context.
+related_docs:
+  - docs/system/boot-context-inventory.md
+  - ai-operations/system_contract.md
+category: operations
+tags: [ai-ops, registry]
+source: repo
+---
+
 # Repo State
 
 Generated: 2026-03-09T21:04:08.469Z

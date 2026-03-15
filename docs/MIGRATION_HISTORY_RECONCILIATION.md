@@ -8,7 +8,15 @@ last_updated: '2026-03-10'
 project_id: SAIKO
 systems:
   - database
-summary: ''
+  - fields-v2
+summary: 'Analysis of the forked Prisma migration history: 7 DB-only migrations, 8 unapplied local migrations, slim_entities rollback root cause, column-rename risks, and a phased reconciliation plan to restore a clean migration baseline.'
+related_docs:
+  - docs/FIELDS_V2_CUTOVER_SPEC.md
+  - docs/FIELDS_V2_TARGET_ARCHITECTURE.md
+  - docs/PROD_MIGRATION_OPERATOR_RUNBOOK.md
+category: engineering
+tags: [migration, schema]
+source: repo
 ---
 # Migration History Reconciliation Analysis
 

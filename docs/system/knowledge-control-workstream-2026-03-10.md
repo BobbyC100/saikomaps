@@ -8,7 +8,17 @@ last_updated: '2026-03-10'
 project_id: KNOWLEDGE-SYSTEM
 systems:
   - knowledge-system
-summary: ''
+  - boot-system
+summary: >-
+  Workstream template and progress snapshot for the knowledge control system — defines a standard format for capturing workstream goals, decisions, infrastructure, state changes, gaps, and resume instructions for Boot continuity.
+related_docs:
+  - docs/system/boot-context-inventory.md
+  - docs/system/document-registry-audit.md
+  - docs/skai/decision-index-spec-v1.md
+  - docs/skai/research-ai-knowledge-architecture-v1.md
+category: operations
+tags: [skai, registry, ai-ops]
+source: repo
 ---
 
 docs/templates/workstream-template.md

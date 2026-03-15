@@ -8,7 +8,20 @@ last_updated: '2026-03-10'
 project_id: SAIKO
 systems:
   - platform
-summary: ''
+  - entities
+  - database
+  - signals
+summary: >-
+  Foundational architectural contract for SaikoFields and TRACES: system identity,
+  layer responsibilities (SPORT/Fields/TRACES), core data model rules (entities,
+  actors, collections, traces), platform boundaries, and operational constraints.
+related_docs:
+  - ai-operations/system_contract.md
+  - docs/architecture/ai_operating_layer.md
+  - docs/DATABASE_SCHEMA.md
+category: operations
+tags: [ai-ops, decisions]
+source: repo
 ---
 # SYSTEM CONTRACT
 SaikoFields / TRACES

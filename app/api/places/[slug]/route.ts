@@ -4,10 +4,10 @@
  * Returns canonical PlacePageData — shape is locked by lib/contracts/place-page.ts.
  * Drift is caught by tests/contracts/place-page.contract.test.ts.
  *
- * Read strategy (temporary — entities-direct):
- *   All data fields read directly from entities table columns (post-26-migration state).
- *   canonical_entity_state, derived_signals, and interpretation_cache are wired in
- *   once those tables are created and populated (add_fields_v2_schema + populate scripts).
+ * Read strategy (entities-direct + interpretation_cache):
+ *   Most data fields read directly from entities table columns (post-26-migration state).
+ *   Taglines are read from interpretation_cache (Fields v2) with entities.tagline fallback.
+ *   canonical_entity_state and derived_signals are wired in once populated.
  *   golden_records fallback removed — that table is deferred for drop.
  */
 
@@ -253,6 +253,21 @@ export async function GET(
       curatorMapPlace?.lists?.users?.email?.split('@')[0] ||
       null;
 
+    // Tagline from interpretation_cache (Fields v2), fallback to entities.tagline
+    const cachedTagline = await db.interpretation_cache.findFirst({
+      where: {
+        entity_id: entity.id,
+        output_type: 'TAGLINE',
+        is_current: true,
+      },
+      select: { content: true },
+    }).catch(() => null);
+
+    const tagline: string | null =
+      (cachedTagline?.content as { text?: string } | null)?.text
+      ?? entity.tagline
+      ?? null;
+
     // SceneSense
     const placeForPRL = await fetchPlaceForPRLBySlug(slug);
     const scenesenseResult = placeForPRL
@@ -264,18 +279,39 @@ export async function GET(
         })
       : { prl: 1 as const, mode: 'LITE' as const, scenesense: null, prlResult: null as never };
 
-    // Offering signals — all null until derived_signals table is populated
+    // Offering signals from derived_signals (Fields v2)
+    const [offeringPrograms, menuIdentity] = await Promise.all([
+      db.derived_signals.findFirst({
+        where: { entity_id: entity.id, signal_key: 'offering_programs' },
+        select: { signal_value: true },
+        orderBy: { computed_at: 'desc' },
+      }).catch(() => null),
+      db.derived_signals.findFirst({
+        where: { entity_id: entity.id, signal_key: 'menu_identity' },
+        select: { signal_value: true },
+        orderBy: { computed_at: 'desc' },
+      }).catch(() => null),
+    ]);
+
+    const programs = offeringPrograms?.signal_value as Record<string, { maturity?: string }> | null;
+    const identity = menuIdentity?.signal_value as Record<string, unknown> | null;
+
+    const hasProgramPresence = (key: string) => {
+      const m = programs?.[key]?.maturity;
+      return m && m !== 'none' && m !== 'unknown' ? true : null;
+    };
+
     const offeringSignals = {
-      servesBeer: null,
-      servesWine: null,
-      servesVegetarianFood: null,
-      servesLunch: null,
-      servesDinner: null,
-      servesCocktails: null,
-      cuisinePosture: null,
-      serviceModel: null,
-      priceTier: null,
-      wineProgramIntent: null,
+      servesBeer: hasProgramPresence('beer_program'),
+      servesWine: hasProgramPresence('wine_program'),
+      servesVegetarianFood: null as boolean | null, // no program mapping yet
+      servesLunch: null as boolean | null,           // no program mapping yet
+      servesDinner: null as boolean | null,          // no program mapping yet
+      servesCocktails: hasProgramPresence('cocktail_program'),
+      cuisinePosture: (identity?.cuisine_posture as string) ?? null,
+      serviceModel: (identity?.service_model as string) ?? null,
+      priceTier: (identity?.price_tier as string) ?? null,
+      wineProgramIntent: (identity?.wine_program_intent as string) ?? null,
     };
 
     const menuUrl: string | null = entity.merchant_signals?.menu_url ?? null;
@@ -303,7 +339,7 @@ export async function GET(
       menuUrl,
       winelistUrl,
       description: entity.description ?? null,
-      tagline: entity.tagline ?? null,
+      tagline,
       pullQuote: entity.pullQuote ?? null,
       pullQuoteAuthor: entity.pullQuoteAuthor ?? null,
       pullQuoteSource: entity.pullQuoteSource ?? null,

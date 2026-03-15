@@ -6,7 +6,17 @@ owner: Bobby Ciccaglione
 created: '2026-03-10'
 last_updated: '2026-03-10'
 project_id: SAIKO
-summary: ''
+summary: 'Changelog and design notes for the SaikoAI extraction system prompt (v2.1) — covers curator note voice rules, null field editor hints, source age penalties, price normalization, and the Google Places vs SaikoAI field split.'
+systems:
+  - enrichment-pipeline
+  - ai-operations
+  - signals
+related_docs:
+  - docs/PIPELINE_COMMANDS.md
+  - docs/PLATFORM_DATA_LAYER.md
+category: domain
+tags: [enrichment, signals, voice-engine]
+source: repo
 ---
 # SaikoAI Extraction Prompt — V2.1
 

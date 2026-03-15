@@ -6,10 +6,18 @@ owner: Bobby Ciccaglione
 created: 2026-03-10T00:00:00.000Z
 last_updated: 2026-03-10T00:00:00.000Z
 project_id: KNOWLEDGE-SYSTEM
+summary: >-
+  Audit of existing registry files (system registry and decision index) against the SKI/BASE-002 document registry specification — identifies schema coverage gaps and recommends building a full docs/registry.json.
 systems:
   - knowledge-system
 related_docs:
   - docs/skai/research-ai-knowledge-architecture-v1.md
+  - docs/skai/decision-index-spec-v1.md
+  - docs/decisions/DEC-001.md
+  - docs/system/boot-context-inventory.md
+category: operations
+tags: [skai, registry]
+source: repo
 ---
 
 # Document Registry Audit

@@ -12,6 +12,9 @@ systems:
 related_docs:
   - docs/system/knowledge-control-workstream-2026-03-10.md
 summary: Defines when reusable knowledge must become a controlled draft.
+category: operations
+tags: [skai, registry]
+source: repo
 ---
 
 # Draft Trigger v1

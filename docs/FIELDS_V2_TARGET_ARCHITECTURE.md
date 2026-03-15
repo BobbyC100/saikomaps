@@ -8,7 +8,18 @@ last_updated: '2026-03-14'
 project_id: SAIKO
 systems:
   - database
-summary: ''
+  - fields-v2
+  - entities
+  - coverage-pipeline
+summary: 'Target architecture for Fields v2: four-layer model (entities routing shell, canonical_entity_state, interpretation_cache, place_coverage_status) with anti-drift rules, allowed/disallowed fields per layer, Coverage Tier 2 Visit Facts contract, and current migration status.'
+related_docs:
+  - docs/FIELDS_V2_CUTOVER_SPEC.md
+  - docs/MIGRATION_HISTORY_RECONCILIATION.md
+  - docs/system/coverage-tier2-visit-facts-contract-v1.md
+  - docs/architecture/entity-classification-layers-v1.md
+category: engineering
+tags: [fields-v2, canonical, entities, coverage]
+source: repo
 ---
 # Saiko Fields v2 — Target Architecture Spec
 

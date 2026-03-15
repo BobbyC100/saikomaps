@@ -6,7 +6,20 @@ owner: Bobby Ciccaglione
 created: '2026-03-10'
 last_updated: '2026-03-10'
 project_id: SAIKO
-summary: ''
+summary: >-
+  Feature spec for adding recurring public markets (farmers markets, night markets,
+  food halls) as first-class Places with placeType/category taxonomy, marketSchedule
+  JSON field, MarketFactsCard component, and API changes.
+systems:
+  - entities
+  - database
+  - place-pages
+related_docs:
+  - docs/DATABASE_SCHEMA.md
+  - docs/APP_OVERVIEW.md
+category: product
+tags: [markets, collections, places]
+source: repo
 ---
 # Markets Integration — SPEC v1.2
 

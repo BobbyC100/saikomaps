@@ -8,7 +8,18 @@ last_updated: '2026-03-10'
 project_id: SAIKO
 systems:
   - database
-summary: ''
+  - fields-v2
+  - entities
+  - data-pipeline
+  - coverage-pipeline
+summary: 'Phased cutover plan for Fields v2: export safety snapshots, seed registries, populate canonical_entity_state, rewire API routes and downstream systems (SceneSense, Voice Engine, search), slim entities, and drop legacy tables with rollback procedures and script freeze list.'
+related_docs:
+  - docs/FIELDS_V2_TARGET_ARCHITECTURE.md
+  - docs/MIGRATION_HISTORY_RECONCILIATION.md
+  - docs/architecture/identity-scoring-v1.md
+category: engineering
+tags: [fields-v2, canonical, migration, entities]
+source: repo
 ---
 # Fields v2 — Cutover Spec
 

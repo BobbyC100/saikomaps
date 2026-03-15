@@ -93,6 +93,9 @@ export interface CoverageRunReport {
     by_prl: Record<string, number>;
     by_missing_group: Record<string, number>;
     by_tier2_issue: Record<string, number>;
+    candidate_identity_direct: number;
+    candidate_identity_repaired_via_gpid: number;
+    candidate_identity_unresolved: number;
     candidates_count: number;
     excluded_by_ttl: number;
     excluded_by_backoff: number;
@@ -189,6 +192,7 @@ function detectTier2VisitFactIssues(place: {
   hours: unknown;
   priceLevel: number | null;
   reservationUrl: string | null;
+  merchant_signal_menu_url: string | null;
   canonical_state: {
     hours_json: unknown;
     price_level: number | null;
@@ -210,7 +214,8 @@ function detectTier2VisitFactIssues(place: {
     issues.push('missing_price_level');
   }
 
-  if (primaryVertical && MENU_VERTICALS.has(primaryVertical) && !hasNonEmptyText(ces?.menu_url)) {
+  const effectiveMenuUrl = canonicalFirst(ces?.menu_url, place.merchant_signal_menu_url);
+  if (primaryVertical && MENU_VERTICALS.has(primaryVertical) && !hasNonEmptyText(effectiveMenuUrl)) {
     issues.push('missing_menu_link');
   }
 
@@ -344,6 +349,9 @@ export async function runCoverageAudit(options?: {
       by_prl: {},
       by_missing_group: {},
       by_tier2_issue: {},
+      candidate_identity_direct: 0,
+      candidate_identity_repaired_via_gpid: 0,
+      candidate_identity_unresolved: 0,
       candidates_count: 0,
       excluded_by_ttl: 0,
       excluded_by_backoff: 0,
@@ -386,6 +394,9 @@ export async function runCoverageAudit(options?: {
       reservation_url: string | null;
       menu_url: string | null;
     } | null;
+    merchant_signals: {
+      menu_url: string | null;
+    } | null;
     place_photo_eval: { tier: string }[];
     map_places: { descriptor: string | null }[];
   };
@@ -413,6 +424,11 @@ export async function runCoverageAudit(options?: {
           hours_json: true,
           price_level: true,
           reservation_url: true,
+          menu_url: true,
+        },
+      },
+      merchant_signals: {
+        select: {
           menu_url: true,
         },
       },
@@ -454,6 +470,32 @@ export async function runCoverageAudit(options?: {
       p.id,
       (mp?.descriptor?.trim() as string) ?? null
     );
+  }
+
+  const placeById = new Map<string, PlaceRow>();
+  const placeByGooglePlaceId = new Map<string, PlaceRow>();
+  for (const p of places) {
+    placeById.set(p.id, p as PlaceRow);
+    if (p.googlePlaceId?.trim()) {
+      placeByGooglePlaceId.set(p.googlePlaceId, p as PlaceRow);
+    }
+  }
+
+  function resolveCandidateEntityIdentity(input: {
+    id: string;
+    googlePlaceId: string | null;
+  }): { place: PlaceRow; path: 'direct' | 'google_place_id_repair' } | null {
+    const byId = placeById.get(input.id);
+    if (byId) {
+      return { place: byId, path: 'direct' };
+    }
+    if (input.googlePlaceId?.trim()) {
+      const byGpid = placeByGooglePlaceId.get(input.googlePlaceId);
+      if (byGpid) {
+        return { place: byGpid, path: 'google_place_id_repair' };
+      }
+    }
+    return null;
   }
 
   report.counts.total_places = places.length;
@@ -516,13 +558,29 @@ export async function runCoverageAudit(options?: {
   const candidates: CoverageCandidate[] = [];
 
   for (const p of places) {
-    const dedupeKey = (p.googlePlaceId ?? p.id).trim() || p.id;
+    const resolved = resolveCandidateEntityIdentity({
+      id: p.id,
+      googlePlaceId: p.googlePlaceId,
+    });
+    if (!resolved) {
+      // Quarantine unresolved identity drift; do not compute Tier 2 on dead identities.
+      report.counts.candidate_identity_unresolved++;
+      continue;
+    }
+    if (resolved.path === 'direct') {
+      report.counts.candidate_identity_direct++;
+    } else {
+      report.counts.candidate_identity_repaired_via_gpid++;
+    }
+
+    const effectivePlace = resolved.place;
+    const dedupeKey = (effectivePlace.googlePlaceId ?? effectivePlace.id).trim() || effectivePlace.id;
     const tagSignals = tagSignalsByPlaceId.get(p.id);
     const missing = computeMissingGroups({
-      ...p,
+      ...effectivePlace,
       has_energy: tagSignals?.has_energy,
       has_pts: tagSignals?.has_pts,
-      curatorNote: curatorNoteByPlace.get(p.id),
+      curatorNote: curatorNoteByPlace.get(effectivePlace.id),
     });
 
     if (missing.length === 0) {
@@ -534,7 +592,16 @@ export async function runCoverageAudit(options?: {
       report.counts.by_missing_group[g] =
         (report.counts.by_missing_group[g] ?? 0) + 1;
     }
-    const tier2Issues = detectTier2VisitFactIssues(p);
+    const tier2Issues = detectTier2VisitFactIssues({
+      primary_vertical: effectivePlace.primary_vertical,
+      googlePlaceId: effectivePlace.googlePlaceId,
+      businessStatus: effectivePlace.businessStatus,
+      hours: effectivePlace.hours,
+      priceLevel: effectivePlace.priceLevel,
+      reservationUrl: effectivePlace.reservationUrl,
+      merchant_signal_menu_url: effectivePlace.merchant_signals?.menu_url ?? null,
+      canonical_state: effectivePlace.canonical_state,
+    });
     for (const issue of tier2Issues) {
       report.counts.by_tier2_issue[issue] = (report.counts.by_tier2_issue[issue] ?? 0) + 1;
     }
@@ -558,10 +625,10 @@ export async function runCoverageAudit(options?: {
     }
 
     candidates.push({
-      place_id: p.id,
-      slug: p.slug,
-      name: p.name,
-      google_place_id: p.googlePlaceId,
+      place_id: effectivePlace.id,
+      slug: effectivePlace.slug,
+      name: effectivePlace.name,
+      google_place_id: effectivePlace.googlePlaceId,
       dedupe_key: dedupeKey,
       missing_groups: missing,
       tier2_issues: tier2Issues,
@@ -706,6 +773,12 @@ async function main() {
   console.log(`  excluded_by_ttl: ${report.counts.excluded_by_ttl}`);
   console.log(`  excluded_by_backoff: ${report.counts.excluded_by_backoff}`);
   console.log(`  excluded_by_running: ${report.counts.excluded_by_running}`);
+  console.log('\nCandidate identity resolution:');
+  console.log(`  direct: ${report.counts.candidate_identity_direct}`);
+  console.log(
+    `  repaired_via_google_place_id: ${report.counts.candidate_identity_repaired_via_gpid}`
+  );
+  console.log(`  unresolved_quarantined: ${report.counts.candidate_identity_unresolved}`);
   console.log(`\nCandidates: ${report.counts.candidates_count}`);
 
   console.log('\nTop 20 candidates:');

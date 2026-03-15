@@ -8,7 +8,14 @@ last_updated: '2026-03-10'
 project_id: SAIKO
 systems:
   - data-pipeline
-summary: ''
+  - enrichment-pipeline
+summary: 'Quick reference for scraping/extraction pipeline commands — progress checks, log monitoring, manual phase triggers, and expected timelines for the two-phase (scrape + AI extract) workflow.'
+related_docs:
+  - docs/DATA_PIPELINE_QUICK_START.md
+  - docs/RESOLVER_AND_PLACES_DATA_FLOW.md
+category: engineering
+tags: [pipeline, ingestion, era]
+source: repo
 ---
 # Saiko Maps — Pipeline Commands
 

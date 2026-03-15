@@ -1,3 +1,26 @@
+---
+doc_id: DATA-BENCHMARKS
+doc_type: reference
+status: active
+owner: Bobby Ciccaglione
+created: '2026-02-01'
+last_updated: '2026-03-14'
+project_id: SAIKO
+summary: >-
+  Benchmark tooling for source collector — scores Approach A (CSE) vs Approach B
+  (Claude-native) on publication coverage, content quality, and metadata. Includes
+  batch collection, head-to-head comparison, and review/triage workflows.
+systems:
+  - enrichment-pipeline
+  - data-pipeline
+related_docs:
+  - data/README.md
+  - docs/DATA_PIPELINE_QUICK_START.md
+category: engineering
+tags: [pipeline, ingestion, enrichment]
+source: repo
+---
+
 # SaikoAI Source Collector — Benchmark
 
 Scores Approach A and/or B on publication coverage, content quality, and metadata.

@@ -6,7 +6,18 @@ owner: Bobby Ciccaglione
 created: '2026-03-10'
 last_updated: '2026-03-14'
 project_id: SAIKO
-summary: ''
+summary: 'Locked data hierarchy (v2.1) governing merchant/place page rendering: five tiers (Identity+Action, Visual Identity, Editorial+Context, Reference Facts, Discovery) with collapse logic, render order, failure modes, and testing scenarios A/B/C.'
+systems:
+  - place-pages
+  - platform
+related_docs:
+  - docs/LOCAL_DEV.md
+  - docs/ui/place-page/patch-log.md
+  - docs/scenesense/display-contract-v1.md
+  - docs/FIELDS_V2_TARGET_ARCHITECTURE.md
+category: domain
+tags: [entities, places, ui]
+source: repo
 ---
 # Saiko Merchant Data Hierarchy
 

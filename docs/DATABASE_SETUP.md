@@ -8,7 +8,15 @@ last_updated: '2026-03-10'
 project_id: SAIKO
 systems:
   - database
-summary: ''
+  - platform
+summary: 'Step-by-step guide for installing PostgreSQL, creating the saiko_maps database, configuring DATABASE_URL, and running Prisma migrations for local development.'
+related_docs:
+  - docs/LOCAL_DEV.md
+  - docs/ENV_TEMPLATE.md
+  - docs/DATABASE_SCHEMA.md
+category: engineering
+tags: [schema, migration]
+source: repo
 ---
 # Database Setup for Saiko Maps
 

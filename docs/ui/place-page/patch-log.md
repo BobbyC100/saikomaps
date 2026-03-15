@@ -6,7 +6,16 @@ owner: Bobby Ciccaglione
 created: '2026-03-10'
 last_updated: '2026-03-10'
 project_id: SAIKO
-summary: ''
+summary: >-
+  Changelog of visual patches to the Place Page UI — includes CSS token reference table (35+ custom properties), patch convention (PP-NNN format), and log of all applied patches with scope and risk annotations.
+systems:
+  - place-pages
+related_docs:
+  - docs/voice/saiko-voice-layer.md
+  - docs/scenesense/display-contract-v1.md
+category: operations
+tags: [ui, places]
+source: repo
 ---
 # Place Page — UI Patch Log
 

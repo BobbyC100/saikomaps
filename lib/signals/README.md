@@ -1,3 +1,28 @@
+---
+doc_id: LIB-SIGNALS-README
+doc_type: architecture
+status: active
+owner: Bobby Ciccaglione
+created: '2026-02-15'
+last_updated: '2026-03-14'
+project_id: SAIKO
+summary: >-
+  Menu & winelist signal extraction architecture — structured AI analysis of
+  menu_raw_text and winelist_raw_text from golden_records, with staleness rules,
+  fresh-skip logic, payload schemas (cuisine indicators, price signals, wine
+  program size), batch processing, and error handling patterns.
+systems:
+  - signals
+  - enrichment-pipeline
+related_docs:
+  - lib/signals/RERUN_GUARD_AND_DATA_INTEGRITY.md
+  - lib/signals/VERIFICATION.md
+  - docs/offering-signals/offering-signals-v1.md
+category: engineering
+tags: [signals, pipeline, enrichment, offerings]
+source: repo
+---
+
 # Menu & Winelist Signal Extraction — V1
 
 Structured AI analysis of `menu_raw_text` and `winelist_raw_text` from `golden_records`.

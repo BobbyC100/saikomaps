@@ -6,7 +6,21 @@ owner: Bobby Ciccaglione
 created: '2026-03-10'
 last_updated: '2026-03-10'
 project_id: SAIKO
-summary: ''
+summary: >-
+  Copy-paste runbook for syncing data between Neon (production) and Supabase
+  databases: identify source of truth via row counts, run sync-db.ts with
+  dry-run/apply modes, switch dev DB target (local vs Neon), and verify via
+  the debug/db endpoint.
+systems:
+  - database
+  - data-pipeline
+related_docs:
+  - docs/DATABASE_SCHEMA.md
+  - docs/DATABASE_SETUP.md
+  - docs/LOCAL_DEV.md
+category: operations
+tags: [pipeline, migration]
+source: repo
 ---
 # Data Sync Runbook
 

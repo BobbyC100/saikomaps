@@ -1,3 +1,25 @@
+---
+doc_id: COMP-SEARCH-RESULTS
+doc_type: reference
+status: active
+owner: Bobby Ciccaglione
+created: '2026-02-01'
+last_updated: '2026-03-14'
+project_id: SAIKO
+summary: >-
+  HorizontalBentoCard component spec — 35/65 photo/info grid layout, Field Notes
+  aesthetic, graceful degradation for missing data, editorial signal badges
+  (Eater 38, Michelin, etc.), design tokens, and responsive grid usage.
+systems:
+  - ui
+related_docs:
+  - docs/saiko-merchant-data-hierarchy.md
+  - components/homepage/README.md
+category: product
+tags: [ui, places, signals]
+source: repo
+---
+
 # HorizontalBentoCard Component
 
 Reusable card component for displaying place information in search results, lists, and collections.

@@ -1,3 +1,24 @@
+---
+doc_id: AI-OPS-SYSTEM-CONTRACT
+doc_type: architecture
+status: active
+owner: Bobby Ciccaglione
+created: '2026-03-09'
+last_updated: '2026-03-09'
+project_id: SAIKO
+systems:
+  - platform
+  - ai-operations
+summary: >-
+  Canonical system context — organizational layers (SPORT/Fields/Traces), agent
+  roles, engineering principles, and source-of-truth definitions.
+related_docs:
+  - docs/architecture/system_contract.md
+category: operations
+tags: [ai-ops, decisions]
+source: repo
+---
+
 # Saiko System Context
 
 ## Organizational Structure

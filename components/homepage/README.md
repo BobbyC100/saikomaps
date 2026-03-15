@@ -1,3 +1,25 @@
+---
+doc_id: COMP-HOMEPAGE
+doc_type: reference
+status: active
+owner: Bobby Ciccaglione
+created: '2026-02-01'
+last_updated: '2026-03-14'
+project_id: SAIKO
+summary: >-
+  Homepage component inventory — Hero (watercolor map), SectionHeader,
+  NeighborhoodCard, CategoryCard, HomepageFooter with Field Notes color palette,
+  typography specs (Libre Baskerville, Inter Tight), and responsive grid breakpoints.
+systems:
+  - ui
+related_docs:
+  - docs/README.md
+  - docs/APP_OVERVIEW.md
+category: product
+tags: [ui, places]
+source: repo
+---
+
 # Homepage Components
 
 Clean, editorial homepage for Saiko Maps featuring a watercolor illustrated map hero.

@@ -1,3 +1,26 @@
+---
+doc_id: SCRIPTS-SQL-GPID-ROLLOUT
+doc_type: runbook
+status: active
+owner: Bobby Ciccaglione
+created: '2026-02-27'
+last_updated: '2026-03-14'
+project_id: SAIKO
+summary: >-
+  Rollout runbook for the GPID partial unique index — preflight duplicate check,
+  CONCURRENTLY index creation for production, dev migration path, and verification
+  queries. Prevents duplicate google_place_id rows in places table.
+systems:
+  - identity
+  - data-pipeline
+related_docs:
+  - scripts/sql/README.md
+  - docs/DATABASE_SCHEMA.md
+category: operations
+tags: [identity, schema, migration, pipeline]
+source: repo
+---
+
 # GPID partial unique index — rollout
 
 **Goal:** DB-level guardrail so we never have two `places` rows with the same non-empty `google_place_id`. Many rows may have NULL or blank.

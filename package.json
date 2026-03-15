@@ -119,6 +119,7 @@
     "coverage:apply:tags:local": "REQUIRE_DB_HOST=localhost REQUIRE_DB_NAME=saiko_maps ./scripts/db-local.sh node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/coverage-apply-tags.ts",
     "coverage:apply:description:neon": "./scripts/db-neon.sh node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/coverage-apply-description.ts",
     "coverage:apply:description:local": "REQUIRE_DB_HOST=localhost REQUIRE_DB_NAME=saiko_maps ./scripts/db-local.sh node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/coverage-apply-description.ts",
+    "signals:menu:sync:local": "./scripts/db-local.sh node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/sync-menu-url-signals-from-surface-scans.ts",
     "eval:tag-scores": "node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/eval-tag-scores.ts",
     "eval:tag-scores:neon:la": "./scripts/db-neon.sh node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/eval-tag-scores.ts --la-only",
     "eval:tag-scores:neon:la:v1": "npm run eval:tag-scores:neon:la -- --gold=data/gold_sets/vibe_tags_la_v1.csv --threshold=0.5",
@@ -170,6 +171,7 @@
     "natural": "^8.1.0",
     "next": "^16.1.6",
     "next-auth": "^4.24.13",
+    "openai": "^6.29.0",
     "papaparse": "^5.5.3",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
@@ -179,6 +181,7 @@
     "slugify": "^1.6.6",
     "tailwind-merge": "^2.5.0",
     "uuid": "^13.0.0",
+    "xlsx": "^0.18.5",
     "zod": "^3.23.8",
     "zustand": "^5.0.0"
   },

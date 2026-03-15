@@ -8,7 +8,17 @@ last_updated: '2026-03-10'
 project_id: SAIKO
 systems:
   - database
-summary: ''
+  - entities
+  - data-pipeline
+summary: 'Gradual rollout guide for migrating the merchant page API from the legacy places table to golden_records: dual-query wrapper, feature flags, percentage-based rollout, data quality monitoring, and rollback plan.'
+related_docs:
+  - docs/FIELDS_V2_CUTOVER_SPEC.md
+  - docs/FIELDS_V2_TARGET_ARCHITECTURE.md
+  - docs/RESOLVER_AND_PLACES_DATA_FLOW.md
+  - ai-operations/GETTING_STARTED.md
+category: engineering
+tags: [migration, entities, pipeline]
+source: repo
 ---
 # Migration Guide: Places → Golden Records
 

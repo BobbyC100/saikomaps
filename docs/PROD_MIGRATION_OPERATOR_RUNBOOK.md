@@ -8,7 +8,14 @@ last_updated: '2026-03-10'
 project_id: SAIKO
 systems:
   - database
-summary: ''
+summary: 'Step-by-step operator runbook for recovering from a failed Prisma migration in production and deploying remaining migrations — includes preflight checks, resolve commands, and stop conditions.'
+related_docs:
+  - docs/MIGRATION_GUIDE.md
+  - docs/MIGRATION_HISTORY_RECONCILIATION.md
+  - docs/DATABASE_SETUP.md
+category: operations
+tags: [migration, schema]
+source: repo
 ---
 # Production Migration Operator Runbook
 

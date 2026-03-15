@@ -1,3 +1,27 @@
+---
+doc_id: LIB-VOICE-ENGINE-V1
+doc_type: architecture
+status: superseded
+owner: Bobby Ciccaglione
+created: '2026-02-05'
+last_updated: '2026-02-05'
+project_id: SAIKO
+summary: >-
+  Voice Engine v1.1 architecture — modular vocabulary system generating restaurant
+  taglines from Google Places API signals, with curated word pools, four phrase
+  patterns (food/neighborhood/vibe/authority), banned word validation, ad unit
+  assignment, and Claude Haiku generation pipeline.
+systems:
+  - voice-engine
+  - enrichment-pipeline
+related_docs:
+  - lib/voice-engine-v2/README.md
+  - docs/voice/saiko-voice-layer.md
+category: domain
+tags: [voice-engine, enrichment, signals, cultural-data]
+source: repo
+---
+
 # Saiko Voice Engine v1.1
 
 A modular vocabulary system that generates short, charming restaurant taglines by combining curated word pools with merchant-specific data from the Google Places API.

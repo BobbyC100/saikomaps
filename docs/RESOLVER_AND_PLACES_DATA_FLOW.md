@@ -8,7 +8,18 @@ last_updated: '2026-03-10'
 project_id: SAIKO
 systems:
   - data-pipeline
-summary: ''
+  - identity
+  - entities
+  - database
+summary: 'Detailed architecture reference for the resolver pipeline data flow — which tables are written (golden_records, entity_links, raw_records, review_queue), when is_processed is set, how promotion to places works, and confidence gating logic.'
+related_docs:
+  - docs/PROVENANCE_SYSTEM.md
+  - docs/MIGRATION_GUIDE.md
+  - docs/PLACE_IDENTITY_SYSTEM_FEATURE_OVERVIEW.md
+  - docs/architecture/identity-scoring-v1.md
+category: engineering
+tags: [identity, entities, pipeline, confidence]
+source: repo
 ---
 # Resolver pipeline and golden_records → places data flow
 

@@ -14,6 +14,9 @@ related_docs:
   - docs/FIELDS_V2_TARGET_ARCHITECTURE.md
   - docs/architecture/entity-classification-layers-v1.md
 summary: Canonical contract for Coverage Tier 2 Visit Facts in the current coverage-run pipeline.
+category: engineering
+tags: [coverage, fields-v2, pipeline]
+source: repo
 ---
 
 # Coverage Tier 2 Visit Facts Contract (v1)

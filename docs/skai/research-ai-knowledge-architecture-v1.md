@@ -3,16 +3,25 @@ doc_id: SKAI/RESEARCH-AI-KNOWLEDGE-ARCHITECTURE-V1
 doc_type: research
 title: AI-Native Knowledge & Data Architecture Patterns (2023–2026)
 version: "0.1"
-status: draft
+status: active
 owner: Bobby Ciccaglione
 created: 2026-03-09
 last_updated: 2026-03-09
 project_id: KNOWLEDGE-SYSTEM
 source_type: research synthesis
+summary: >-
+  Research synthesis of AI-native knowledge and data architecture patterns (2023-2026) — covers repo-as-canonical-store, document governance, ADRs, AI context files, RAG pipelines, and recommended architecture for small AI-native startups.
 systems:
   - knowledge-system
 related_docs:
   - docs/skai/decision-index-spec-v1.md
+  - docs/skai/retrieval-layer-v1.md
+  - docs/system/document-registry-audit.md
+  - docs/system/boot-context-inventory.md
+  - docs/decisions/DEC-001.md
+category: operations
+tags: [skai, registry, ai-ops]
+source: repo
 ---
 
 # AI-Native Knowledge & Data Architecture Patterns (2023–2026)

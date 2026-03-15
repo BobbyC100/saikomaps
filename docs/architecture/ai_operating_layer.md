@@ -7,8 +7,18 @@ created: '2026-03-10'
 last_updated: '2026-03-10'
 project_id: SAIKO
 systems:
+  - ai-operations
+  - boot-system
   - platform
-summary: ''
+summary: >-
+  Index of operational systems governing AI-assisted engineering in Saiko:
+  boot protocol, system contract, drift prevention, session logs, and Cursor rules.
+related_docs:
+  - docs/architecture/system_contract.md
+  - ai-operations/system_contract.md
+category: operations
+tags: [ai-ops, decisions]
+source: repo
 ---
 # AI OPERATING LAYER
 Saiko Engineering System

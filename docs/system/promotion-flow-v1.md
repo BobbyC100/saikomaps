@@ -13,6 +13,9 @@ related_docs:
   - docs/system/draft-trigger-v1.md
   - docs/system/knowledge-control-workstream-2026-03-10.md
 summary: Defines the controlled path from approved draft to canonical document.
+category: operations
+tags: [skai, registry]
+source: repo
 ---
 
 # Promotion Flow v1

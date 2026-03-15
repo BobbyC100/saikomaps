@@ -1,15 +1,22 @@
 ---
 doc_id: SS-DISPLAY-CONTRACT-V1
 doc_type: domain-spec
-status: active
+status: superseded
 owner: Bobby Ciccaglione
 created: '2026-03-10'
 last_updated: '2026-03-10'
 project_id: TRACES
 systems:
   - scenesense
-  - traces
-summary: ''
+  - place-pages
+  - voice-engine
+summary: >-
+  SceneSense display contract defining the output shape (atmosphere/ambiance/scene surfaces), PRL gating, signal routing from identity_signals to rendered labels, confidence floors, lint guardrails, and UI rendering obligations.
+related_docs:
+  - docs/voice/saiko-voice-layer.md
+category: product
+tags: [scenesense, ui, signals]
+source: repo
 ---
 # SKAI-DOC-SS-001 — SceneSense Display Contract v1
 

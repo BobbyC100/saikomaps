@@ -6,7 +6,17 @@ owner: Bobby Ciccaglione
 created: '2026-03-10'
 last_updated: '2026-03-10'
 project_id: SAIKO
-summary: ''
+summary: 'Runbook for fixing production place page 404s caused by an empty Neon database — covers error-handling UI changes and seed script execution to populate initial places.'
+systems:
+  - database
+  - place-pages
+  - platform
+related_docs:
+  - docs/DATABASE_SETUP.md
+  - docs/SITEMAP.md
+category: operations
+tags: [places, pipeline]
+source: repo
 ---
 # Production Place Page Fix - Runbook
 

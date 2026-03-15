@@ -14,6 +14,9 @@ related_docs:
   - docs/FIELDS_V2_TARGET_ARCHITECTURE.md
   - docs/system/coverage-tier2-visit-facts-contract-v1.md
 summary: Plain-language model for entityType vs primary_vertical vs category/cuisine_type in current schema and operations.
+category: domain
+tags: [entities, classification, identity]
+source: repo
 ---
 
 # Entity Classification Layers (v1)

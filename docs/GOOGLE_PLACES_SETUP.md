@@ -6,7 +6,17 @@ owner: Bobby Ciccaglione
 created: '2026-03-10'
 last_updated: '2026-03-10'
 project_id: SAIKO
-summary: ''
+summary: 'Troubleshooting guide for enabling the legacy Google Places Text Search API: GCP console setup, API key restrictions, env var configuration, and backfill verification commands.'
+systems:
+  - identity
+  - enrichment-pipeline
+related_docs:
+  - docs/ENV_TEMPLATE.md
+  - docs/DATABASE_SETUP.md
+  - docs/DATA_PIPELINE_QUICK_START.md
+category: engineering
+tags: [identity, pipeline]
+source: repo
 ---
 # Google Places API — Unblock Legacy Text Search
 

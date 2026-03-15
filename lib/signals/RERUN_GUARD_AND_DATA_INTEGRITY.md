@@ -1,3 +1,24 @@
+---
+doc_id: LIB-SIGNALS-RERUN-GUARD
+doc_type: policy
+status: active
+owner: Bobby Ciccaglione
+created: '2026-02-15'
+last_updated: '2026-02-15'
+project_id: SAIKO
+systems:
+  - signals
+  - data-pipeline
+summary: >-
+  Data integrity policy for menu & winelist signal extraction — freshness rules,
+  preflight quality gates, cost protection, and rerun safety invariants.
+related_docs:
+  - lib/signals/VERIFICATION.md
+category: engineering
+tags: [signals, pipeline, ingestion]
+source: repo
+---
+
 # Menu & Winelist Signals — Rerun Guard + Data Integrity Policy (v1)
 
 ## Objective

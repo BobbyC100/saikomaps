@@ -6,7 +6,18 @@ owner: Bobby Ciccaglione
 created: '2026-03-10'
 last_updated: '2026-03-10'
 project_id: SAIKO
-summary: ''
+summary: >-
+  Diagnostic playbook for when place pages or the API serve stale data — covers
+  build-id header verification, browser/CDN cache bypass, .next reset, and
+  expected header values for local/staging/production environments.
+systems:
+  - platform
+  - place-pages
+related_docs:
+  - docs/APP_OVERVIEW.md
+category: operations
+tags: [pipeline, ui, places]
+source: repo
 ---
 # Debugging Stale Deployments & Local Updates
 

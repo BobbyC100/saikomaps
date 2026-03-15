@@ -8,7 +8,14 @@ last_updated: '2026-03-10'
 project_id: SAIKO
 systems:
   - data-pipeline
-summary: ''
+  - identity
+summary: 'Quick reference for the provenance audit system — commands for running audits, backfilling provenance after new imports, current batch tracking, and expansion workflow.'
+related_docs:
+  - docs/PROVENANCE_SYSTEM.md
+  - docs/RESOLVER_AND_PLACES_DATA_FLOW.md
+category: engineering
+tags: [provenance, pipeline]
+source: repo
 ---
 # Provenance System - Quick Reference
 

@@ -6,7 +6,16 @@ owner: Bobby Ciccaglione
 created: '2026-03-10'
 last_updated: '2026-03-10'
 project_id: SAIKO
-summary: ''
+summary: 'Template for all required and optional environment variables: DATABASE_URL, Google Places/Maps API keys, Anthropic API key, AWS S3/CloudFront, NextAuth, and Clerk auth.'
+systems:
+  - platform
+related_docs:
+  - docs/DATABASE_SETUP.md
+  - docs/LOCAL_DEV.md
+  - docs/GOOGLE_PLACES_SETUP.md
+category: engineering
+tags: [pipeline]
+source: repo
 ---
 # Environment Variables Setup
 

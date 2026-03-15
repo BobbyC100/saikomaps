@@ -9,11 +9,17 @@ created: 2026-03-09T00:00:00.000Z
 last_updated: 2026-03-09T00:00:00.000Z
 project_id: KNOWLEDGE-SYSTEM
 supersedes: none
+summary: >-
+  Field specification for the Decision Index — the retrieval layer above the document store that indexes atomic decisions with controlled vocabularies, enabling decision-level retrieval at project kickoff, postmortem, and design time.
 systems:
   - knowledge-system
-  - decision-system
 related_docs:
   - docs/decisions/DEC-001.md
+  - docs/skai/research-ai-knowledge-architecture-v1.md
+  - docs/system/document-registry-audit.md
+category: operations
+tags: [skai, decisions, registry]
+source: repo
 ---
 
 # Decision Index v1

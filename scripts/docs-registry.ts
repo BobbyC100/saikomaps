@@ -39,10 +39,14 @@ interface RegistryEntry {
   summary: string;
   systems: string[];
   related_docs: string[];
+  category: string | null;
+  tags: string[];
+  source: string;
+  source_url?: string;
 }
 
 interface Registry {
-  generated: string;
+  generated_at: string;
   doc_count: number;
   docs: RegistryEntry[];
 }
@@ -52,6 +56,20 @@ interface Registry {
 const ROOT = process.cwd();
 const DOCS_DIR = join(ROOT, 'docs');
 const REGISTRY_PATH = join(DOCS_DIR, 'registry.json');
+
+// Additional directories outside docs/ that contain controlled documents
+const EXTRA_SCAN_DIRS = [
+  join(ROOT, 'ai-operations'),
+  join(ROOT, 'lib/signals'),
+  join(ROOT, 'lib/voice-engine'),
+  join(ROOT, 'lib/voice-engine-v2'),
+  join(ROOT, 'scripts/sql'),
+  join(ROOT, 'data'),
+  join(ROOT, 'components/homepage'),
+  join(ROOT, 'components/search-results'),
+  join(ROOT, 'public'),
+  join(ROOT, '.github'),
+];
 
 function walkDocs(dir: string): string[] {
   const results: string[] = [];
@@ -83,7 +101,20 @@ function toStringArray(val: unknown): string[] {
 
 // ── Scan ──────────────────────────────────────────────────────────────────────
 
-const allFiles = walkDocs(DOCS_DIR);
+// Individual files outside scanned directories
+const EXTRA_FILES = [
+  join(ROOT, 'README.md'),
+];
+
+const allFiles = [
+  ...walkDocs(DOCS_DIR),
+  ...EXTRA_SCAN_DIRS.flatMap((dir) => {
+    try { return walkDocs(dir); } catch { return []; }
+  }),
+  ...EXTRA_FILES.filter((f) => {
+    try { statSync(f); return true; } catch { return false; }
+  }),
+];
 const entries: RegistryEntry[] = [];
 const skipped: string[] = [];
 
@@ -109,7 +140,7 @@ for (const absPath of allFiles) {
     continue;
   }
 
-  entries.push({
+  const entry: RegistryEntry = {
     doc_id:       String(fm.doc_id),
     doc_type:     String(fm.doc_type     ?? 'document'),
     status:       String(fm.status       ?? 'unknown'),
@@ -122,14 +153,23 @@ for (const absPath of allFiles) {
     summary:      String(fm.summary      ?? ''),
     systems:      toStringArray(fm.systems),
     related_docs: toStringArray(fm.related_docs),
-  });
+    category:     fm.category ? String(fm.category) : null,
+    tags:         toStringArray(fm.tags),
+    source:       String(fm.source ?? 'repo'),
+  };
+
+  if (fm.source_url) {
+    entry.source_url = String(fm.source_url);
+  }
+
+  entries.push(entry);
 }
 
 // Sort by doc_id for stable output
 entries.sort((a, b) => a.doc_id.localeCompare(b.doc_id));
 
 const registry: Registry = {
-  generated: new Date().toISOString(),
+  generated_at: new Date().toISOString(),
   doc_count: entries.length,
   docs: entries,
 };

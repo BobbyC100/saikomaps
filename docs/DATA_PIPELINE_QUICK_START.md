@@ -8,7 +8,19 @@ last_updated: '2026-03-10'
 project_id: SAIKO
 systems:
   - data-pipeline
-summary: ''
+  - enrichment-pipeline
+summary: >-
+  Quick-start reference for the data pipeline: current state of data completeness
+  (critical gaps in Instagram, pull quotes, vibe tags), audit/update scripts built,
+  pipeline goals (automated backfill, AI content generation, refresh scheduling),
+  and key commands.
+related_docs:
+  - docs/PIPELINE_COMMANDS.md
+  - docs/APP_OVERVIEW.md
+  - docs/DATABASE_SCHEMA.md
+category: engineering
+tags: [pipeline, ingestion, era]
+source: repo
 ---
 # Data Pipeline Quick Reference
 

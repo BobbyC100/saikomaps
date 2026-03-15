@@ -6,11 +6,21 @@ owner: Bobby Ciccaglione
 created: 2026-03-10
 last_updated: 2026-03-10
 project_id: KNOWLEDGE-SYSTEM
+summary: >-
+  Comprehensive inventory of all files relevant to the Boot Up context system — session artifacts, AI operations layer, architecture docs, decision system, registries, cursor rules, and recommended boot retrieval targets.
 systems:
   - boot-system
+  - knowledge-system
+  - ai-operations
 related_docs:
   - docs/skai/research-ai-knowledge-architecture-v1.md
   - docs/skai/decision-index-spec-v1.md
+  - docs/system/document-registry-audit.md
+  - ai-operations/state/repo_state.md
+  - ai-operations/system_contract.md
+category: operations
+tags: [ai-ops, skai]
+source: repo
 ---
 
 # Boot Context Inventory

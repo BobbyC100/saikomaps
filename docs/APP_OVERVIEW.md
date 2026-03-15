@@ -6,7 +6,23 @@ owner: Bobby Ciccaglione
 created: '2026-03-10'
 last_updated: '2026-03-10'
 project_id: SAIKO
-summary: ''
+summary: >-
+  Comprehensive application overview of Saiko Maps: core concept (curated map
+  platform), major features (map creation, place enrichment, Voice Engine, Field
+  Notes template, smart geography), tech stack, data models, key workflows,
+  design system, and architectural decisions.
+systems:
+  - platform
+  - place-pages
+  - voice-engine
+  - entities
+related_docs:
+  - docs/DATABASE_SCHEMA.md
+  - docs/DATA_PIPELINE_QUICK_START.md
+  - docs/architecture/system_contract.md
+category: product
+tags: [places, ui]
+source: repo
 ---
 # Saiko Maps - Application Overview
 

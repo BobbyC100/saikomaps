@@ -1,3 +1,26 @@
+---
+doc_id: DATA-BATCH-EXTRACTION
+doc_type: reference
+status: active
+owner: Bobby Ciccaglione
+created: '2026-02-01'
+last_updated: '2026-03-14'
+project_id: SAIKO
+summary: >-
+  Data directory structure and workflow for batch extraction — seed lists
+  (places.json, places-curated.json), source collection, AI extraction,
+  and output review pipeline.
+systems:
+  - enrichment-pipeline
+  - data-pipeline
+related_docs:
+  - docs/DATA_PIPELINE_QUICK_START.md
+  - docs/PIPELINE_COMMANDS.md
+category: engineering
+tags: [pipeline, ingestion, enrichment, era]
+source: repo
+---
+
 # SaikoAI Batch Extraction — Data
 
 ## Structure

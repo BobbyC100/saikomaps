@@ -6,7 +6,16 @@ owner: Bobby Ciccaglione
 created: '2026-03-10'
 last_updated: '2026-03-10'
 project_id: SAIKO
-summary: ''
+summary: 'Locked specification for the Formality score (0-100): measures behavioral constraint via service model, price tier, reservation norms, dress/ritual language, and tableware cues, with confidence scoring, missing-data handling, and LA calibration examples.'
+systems:
+  - scenesense
+  - signals
+related_docs:
+  - docs/ENERGY_SCORE_SPEC.md
+  - docs/scenesense/display-contract-v1.md
+category: domain
+tags: [scenesense, formality, signals]
+source: repo
 ---
 # Formality Score — Specification (Locked)
 

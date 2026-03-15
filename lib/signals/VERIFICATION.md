@@ -1,3 +1,24 @@
+---
+doc_id: LIB-SIGNALS-VERIFICATION
+doc_type: checklist
+status: active
+owner: Bobby Ciccaglione
+created: '2026-02-15'
+last_updated: '2026-02-15'
+project_id: SAIKO
+systems:
+  - signals
+  - data-pipeline
+summary: >-
+  Verification checklist for menu & winelist signal extraction — fresh-skip
+  correctness, staleness triggers, DB integrity, and API hygiene tests.
+related_docs:
+  - lib/signals/RERUN_GUARD_AND_DATA_INTEGRITY.md
+category: engineering
+tags: [signals, pipeline]
+source: repo
+---
+
 # Menu & Winelist Signal Extraction — Verification Checklist
 
 ## ✅ All Critical Issues Fixed

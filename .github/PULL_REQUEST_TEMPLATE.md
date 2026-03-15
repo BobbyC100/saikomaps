@@ -1,3 +1,25 @@
+---
+doc_id: GH-PR-TEMPLATE
+doc_type: reference
+status: active
+owner: Bobby Ciccaglione
+created: '2026-02-01'
+last_updated: '2026-03-14'
+project_id: SAIKO
+summary: >-
+  GitHub PR template for merchant page implementation — tier order verification,
+  component behavior checks (HoursCard, Instagram, PhotoCollage), collapse logic
+  guards, scenario A/B/C testing, and promotion drift checklist.
+systems:
+  - ui
+related_docs:
+  - docs/saiko-merchant-data-hierarchy.md
+  - docs/ui/place-page/patch-log.md
+category: operations
+tags: [ui, places]
+source: repo
+---
+
 # Merchant Page Implementation — PR Checklist
 
 Before submitting this PR, verify against the **Implementation Sanity Checklist** (`merchant-page-implementation-checklist.md`).

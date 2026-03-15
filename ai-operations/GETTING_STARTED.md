@@ -1,4 +1,26 @@
-# 🎉 Entity Resolution System - Complete Implementation
+---
+doc_id: AI-OPS-GETTING-STARTED
+doc_type: guide
+status: active
+owner: Bobby Ciccaglione
+created: '2026-03-09'
+last_updated: '2026-03-09'
+project_id: SAIKO
+systems:
+  - entity-resolution
+  - identity
+summary: >-
+  Getting started guide for the Entity Resolution System — MDM setup, review
+  queue, CSV ingestion, and resolver pipeline quickstart.
+related_docs:
+  - docs/MIGRATION_GUIDE.md
+  - docs/architecture/identity-scoring-v1.md
+category: operations
+tags: [ai-ops]
+source: repo
+---
+
+# Entity Resolution System - Complete Implementation
 
 ## What You Have
 

@@ -6,7 +6,18 @@ owner: Bobby Ciccaglione
 created: '2026-03-10'
 last_updated: '2026-03-10'
 project_id: SAIKO
-summary: ''
+summary: 'Architectural operating instruction defining the three-layer separation (Ingestion, Storage, Product API) and v0 API contracts (PlaceCard, PlaceDetail, Search, Recommendation) for the Saiko Data Layer as a standalone product.'
+systems:
+  - platform
+  - data-pipeline
+  - signals
+related_docs:
+  - docs/DATABASE_SCHEMA.md
+  - docs/FIELDS_V2_TARGET_ARCHITECTURE.md
+  - docs/saiko-merchant-data-hierarchy.md
+category: engineering
+tags: [entities, pipeline, places]
+source: repo
 ---
 # PLATFORM_DATA_LAYER.md
 

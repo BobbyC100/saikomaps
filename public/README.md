@@ -1,3 +1,25 @@
+---
+doc_id: PUBLIC-ADMIN-STANDALONE
+doc_type: reference
+status: active
+owner: Bobby Ciccaglione
+created: '2026-02-01'
+last_updated: '2026-03-14'
+project_id: SAIKO
+summary: >-
+  Standalone HTML admin interface for the Saiko Resolver — no-build-step React app
+  with review queue, keyboard shortcuts (M/D/S/F), demo mode with mock data,
+  dashboard stats, and CORS setup instructions for API connection.
+systems:
+  - ui
+  - identity
+related_docs:
+  - docs/APP_OVERVIEW.md
+category: operations
+tags: [ui, identity, pipeline]
+source: repo
+---
+
 # Standalone Admin UI
 
 ## Overview

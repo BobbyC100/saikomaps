@@ -9,7 +9,14 @@ project_id: TRACES
 systems:
   - voice-engine
   - traces
-summary: ''
+summary: >-
+  Saiko Voice Layer specification — translates structured SceneSense signals into editorial natural-language sentences for the TRACES identity block, with phrase mapping tables, rendering logic, and architectural guardrails.
+related_docs:
+  - docs/scenesense/display-contract-v1.md
+  - docs/ui/place-page/patch-log.md
+category: domain
+tags: [voice-engine, cultural-data]
+source: repo
 ---
 # SAI-DOC-VOICE-001 — Saiko Voice Layer
 

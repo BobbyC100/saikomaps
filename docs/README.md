@@ -6,7 +6,18 @@ owner: Bobby Ciccaglione
 created: '2026-03-10'
 last_updated: '2026-03-14'
 project_id: SAIKO
-summary: ''
+summary: 'Top-level project README for Saiko Maps — product vision, template system (Postcard/Neon/Field Notes/Zine), brand guide, key surfaces (map view, merchant profile, share cards), auth architecture, and development setup.'
+systems:
+  - platform
+  - place-pages
+related_docs:
+  - docs/APP_OVERVIEW.md
+  - docs/SITEMAP.md
+  - docs/saiko-merchant-data-hierarchy.md
+  - docs/ENV_TEMPLATE.md
+category: product
+tags: [places, ui]
+source: repo
 ---
 # Saiko Maps
 

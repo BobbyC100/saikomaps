@@ -1,3 +1,27 @@
+---
+doc_id: LIB-VOICE-ENGINE-V2
+doc_type: architecture
+status: active
+owner: Bobby Ciccaglione
+created: '2026-02-10'
+last_updated: '2026-02-10'
+project_id: SAIKO
+summary: >-
+  Voice Engine v2.0 architecture — generates taglines from identity signals
+  extracted from scraped website content (cuisine_posture, place_personality,
+  signature_dishes), with personality-driven pattern selection, signal-weighted
+  auto-selection, and Claude Haiku generation. Supersedes v1.1.
+systems:
+  - voice-engine
+  - enrichment-pipeline
+related_docs:
+  - lib/voice-engine/README.md
+  - docs/voice/saiko-voice-layer.md
+category: domain
+tags: [voice-engine, enrichment, signals, identity, cultural-data]
+source: repo
+---
+
 # Saiko Voice Engine v2.0
 
 **Status**: Implemented  

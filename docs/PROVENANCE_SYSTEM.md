@@ -8,7 +8,15 @@ last_updated: '2026-03-10'
 project_id: SAIKO
 systems:
   - data-pipeline
-summary: ''
+  - identity
+summary: 'Architecture and policy for the provenance chain-of-custody system — ensures every place is human-approved (never AI-added), defines source types, forbidden actors, audit commands, and the database schema for provenance records.'
+related_docs:
+  - docs/PROVENANCE_QUICK_REF.md
+  - docs/RESOLVER_AND_PLACES_DATA_FLOW.md
+  - docs/DATABASE_SCHEMA.md
+category: engineering
+tags: [provenance, entities, pipeline]
+source: repo
 ---
 # Saiko Maps - Provenance System
 

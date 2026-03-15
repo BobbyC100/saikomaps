@@ -7,9 +7,21 @@ created: '2026-03-10'
 last_updated: '2026-03-10'
 project_id: TRACES
 systems:
-  - offering-signals
-  - traces
-summary: ''
+  - signals
+  - enrichment-pipeline
+  - voice-engine
+summary: >-
+  Domain spec for Offering Signals v1: atomic, confidence-scored facts about a
+  place's food, beverage, and service offerings. Defines the three-layer model,
+  priority tiers (Identity/Distinctive/Detail), crawl/extraction policy with
+  stop-early rule, Instagram bio constraints, and the full signal vocabulary.
+related_docs:
+  - docs/voice/saiko-voice-layer.md
+  - docs/scenesense/display-contract-v1.md
+  - lib/signals/RERUN_GUARD_AND_DATA_INTEGRITY.md
+category: domain
+tags: [offerings, signals, cultural-data]
+source: repo
 ---
 # Offering Signals v1
 

@@ -6,7 +6,17 @@ owner: Bobby Ciccaglione
 created: '2026-03-10'
 last_updated: '2026-03-10'
 project_id: SAIKO
-summary: ''
+summary: 'Complete sitemap of all public, auth, creator, editor, and API routes in the Saiko Maps application — includes URL patterns, route groups, authentication requirements, and API endpoint specifications.'
+systems:
+  - platform
+  - place-pages
+related_docs:
+  - docs/README.md
+  - docs/APP_OVERVIEW.md
+  - docs/saiko-merchant-data-hierarchy.md
+category: engineering
+tags: [ui, places]
+source: repo
 ---
 # Saiko Maps - Sitemap
 
