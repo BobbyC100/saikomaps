@@ -40,7 +40,7 @@ async function getEntityWithCounts(entityId: string) {
       JOIN merchant_surfaces ms ON msa.merchant_surface_id = ms.id
       WHERE ms.entity_id = ${entityId}
     `,
-    db.entity_issues.count({ where: { entity_id: entityId } }),
+    db.$queryRaw<[{ count: bigint }]>`SELECT COUNT(*) as count FROM entity_issues WHERE entity_id = ${entityId}`.then(r => Number(r[0].count)).catch(() => 0),
   ]);
 
   return {
