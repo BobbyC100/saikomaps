@@ -137,8 +137,8 @@ export async function POST(request: NextRequest) {
         addressText: hostPlaceId ? undefined : addressText ?? undefined,
         scheduleText,
         status,
-        sources: body.sources ?? undefined,
-        confidence: body.confidence ?? undefined,
+        sources: body.sources ? (body.sources as any) : undefined,
+        confidence: body.confidence ? (body.confidence as any) : undefined,
       },
       include: {
         subjectEntity: { select: { id: true, name: true, slug: true } },
