@@ -1,6 +1,6 @@
 /**
- * Admin Coverage Ops — tabbed operations dashboard.
- * Views: Overview, Missing Fields, Neighborhoods, Red Flags, Field Breakdown, Tier 2 Visit Facts.
+ * Admin Coverage Ops — 4-tab operations dashboard.
+ * Tabs: Overview, Tier Health, Pipeline, Neighborhoods.
  * All server-rendered from raw SQL (lib/admin/coverage/sql.ts).
  */
 
@@ -8,71 +8,25 @@ import Link from 'next/link';
 import { runOne, runMany } from '@/lib/admin/coverage/run';
 import {
   OVERVIEW_COUNTS_SQL,
-  REACHABLE_NOT_ACTIVE_SANITY_SQL,
-  ALL_MISSING_FIELDS_SQL,
+  TIER_COMPLETION_SQL,
+  ENRICHMENT_STAGE_SQL,
+  RECENT_RUNS_SQL,
+  TIER_FIELD_STATS_SQL,
+  TIER1_ISSUES_SQL,
   ALL_NEIGHBORHOOD_SCORECARD_SQL,
-  ALL_REDFLAGS_SQL,
-  FIELDS_BREAKDOWN_REACHABLE_SQL,
-  FIELDS_BREAKDOWN_ADDRESSABLE_SQL,
-  FIELDS_BREAKDOWN_TOTALDB_SQL,
 } from '@/lib/admin/coverage/sql';
 import type {
   OverviewCounts,
-  ReachableNotActiveSanity,
-  MissingFieldRow,
+  TierCompletion,
+  EnrichmentStage,
+  RecentRun,
+  TierFieldStat,
+  Tier1Issue,
   NeighborhoodScorecard,
-  RedFlag,
-  FieldBreakdown,
 } from '@/lib/admin/coverage/types';
-import { db } from '@/lib/db';
-import { CopyCommandButton, RedFlagActions, Tier2PlaceActions, BulkActionBar } from './components/ActionButtons';
+import { CopyCommandButton, RedFlagActions } from './components/ActionButtons';
 
 export const dynamic = 'force-dynamic';
-
-// Tier 2 visit-facts detection (inline, same as CoverageContent)
-type Tier2Issue =
-  | 'missing_hours'
-  | 'missing_price_level'
-  | 'missing_menu_link'
-  | 'missing_reservations'
-  | 'operating_status_unknown'
-  | 'google_says_closed';
-
-const PRICE_LEVEL_VERTICALS = new Set(['EAT', 'COFFEE', 'WINE', 'DRINKS', 'BAKERY']);
-const MENU_VERTICALS = new Set(['EAT', 'COFFEE', 'WINE', 'DRINKS', 'BAKERY', 'PURVEYORS']);
-const RESERVATION_VERTICALS = new Set(['EAT', 'WINE', 'DRINKS', 'STAY']);
-
-const TIER2_META: Record<Tier2Issue, { label: string; action: string }> = {
-  missing_hours: { label: 'Missing Opening Hours', action: 'Run coverage:apply (Google details hours)' },
-  missing_price_level: { label: 'Missing Price Level', action: 'Run coverage:apply (Google attrs/details)' },
-  missing_menu_link: { label: 'Missing Menu Link', action: 'Run scan-merchant-surfaces → populate-canonical-state' },
-  missing_reservations: { label: 'Missing Reservation Link', action: 'Run scan-merchant-surfaces → populate-canonical-state' },
-  operating_status_unknown: { label: 'Operating Status Unknown', action: 'Run coverage:apply to refresh business status' },
-  google_says_closed: { label: 'Google Says Closed', action: 'Verify closure, then run place:close if confirmed' },
-};
-
-function hasVal(v: unknown) { return v !== null && v !== undefined; }
-function hasText(v: string | null | undefined) { return typeof v === 'string' && v.trim().length > 0; }
-function canonFirst<T>(c: T | null | undefined, f: T | null | undefined): T | null {
-  return c ?? f ?? null;
-}
-
-function detectTier2(place: {
-  primary_vertical: string | null; googlePlaceId: string | null; businessStatus: string | null;
-  hours: unknown; priceLevel: number | null; reservationUrl: string | null;
-  canonical_state: { hours_json: unknown; price_level: number | null; reservation_url: string | null; menu_url: string | null } | null;
-}): Tier2Issue[] {
-  const issues: Tier2Issue[] = [];
-  const v = place.primary_vertical;
-  const ces = place.canonical_state;
-  if (!hasVal(canonFirst(ces?.hours_json, place.hours))) issues.push('missing_hours');
-  if (v && PRICE_LEVEL_VERTICALS.has(v) && !hasVal(canonFirst(ces?.price_level, place.priceLevel))) issues.push('missing_price_level');
-  if (v && MENU_VERTICALS.has(v) && !hasText(ces?.menu_url)) issues.push('missing_menu_link');
-  if (v && RESERVATION_VERTICALS.has(v) && !hasText(canonFirst(ces?.reservation_url, place.reservationUrl))) issues.push('missing_reservations');
-  if (place.googlePlaceId && !hasText(place.businessStatus)) issues.push('operating_status_unknown');
-  if (place.businessStatus === 'CLOSED_PERMANENTLY') issues.push('google_says_closed');
-  return issues;
-}
 
 // ── Helpers ──
 function bn(v: bigint | number): string { return Number(v).toLocaleString(); }
@@ -81,14 +35,27 @@ function pct(n: bigint | number, d: bigint | number): string {
   if (den === 0) return '—';
   return `${((num / den) * 100).toFixed(1)}%`;
 }
+function pctNum(n: bigint | number, d: bigint | number): number {
+  const num = Number(n), den = Number(d);
+  if (den === 0) return 0;
+  return (num / den) * 100;
+}
+function pctColor(v: number): string {
+  if (v >= 90) return 'text-green-600';
+  if (v >= 60) return 'text-yellow-600';
+  return 'text-red-600';
+}
+function barColor(v: number): string {
+  if (v >= 90) return 'bg-green-500';
+  if (v >= 60) return 'bg-yellow-500';
+  return 'bg-red-500';
+}
 
 const VIEWS = [
   { id: 'overview', label: 'Overview' },
-  { id: 'missing', label: 'Missing Fields' },
+  { id: 'tiers', label: 'Tier Health' },
+  { id: 'pipeline', label: 'Enrichment Tools' },
   { id: 'neighborhoods', label: 'Neighborhoods' },
-  { id: 'redflags', label: 'Red Flags' },
-  { id: 'breakdown', label: 'Field Breakdown' },
-  { id: 'tier2', label: 'Tier 2 Visit Facts' },
 ] as const;
 
 type View = (typeof VIEWS)[number]['id'];
@@ -108,9 +75,9 @@ export default async function AdminCoveragePage({
         <header className="mb-6 flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-[#36454F]">Coverage Ops</h1>
-            <p className="text-[#8B7355] text-sm">Data quality triage &amp; coverage gaps</p>
+            <p className="text-[#8B7355] text-sm">Data quality triage &amp; enrichment pipeline</p>
           </div>
-          <Link href="/admin" className="text-sm text-[#8B7355] hover:text-[#36454F]">← Admin</Link>
+          <Link href="/admin" className="text-sm text-[#8B7355] hover:text-[#36454F]">&larr; Admin</Link>
         </header>
 
         {/* Tab nav */}
@@ -132,19 +99,24 @@ export default async function AdminCoveragePage({
 
         {/* View content */}
         {view === 'overview' && <OverviewView />}
-        {view === 'missing' && <MissingFieldsView />}
+        {view === 'tiers' && <TierHealthView />}
+        {view === 'pipeline' && <PipelineView />}
         {view === 'neighborhoods' && <NeighborhoodsView />}
-        {view === 'redflags' && <RedFlagsView />}
-        {view === 'breakdown' && <BreakdownView />}
-        {view === 'tier2' && <Tier2View />}
       </div>
     </div>
   );
 }
 
-// ── Overview ──
+// ══════════════════════════════════════════════════════════════════════════════
+// TAB 1: OVERVIEW (enhanced with tier bars + enrichment funnel)
+// ══════════════════════════════════════════════════════════════════════════════
+
 async function OverviewView() {
-  const counts = await runOne<OverviewCounts>(OVERVIEW_COUNTS_SQL);
+  const [counts, tiers, stages] = await Promise.all([
+    runOne<OverviewCounts>(OVERVIEW_COUNTS_SQL),
+    runOne<TierCompletion>(TIER_COMPLETION_SQL),
+    runMany<EnrichmentStage>(ENRICHMENT_STAGE_SQL),
+  ]);
 
   const total = Number(counts.total_db);
   const gpidPct = total > 0 ? ((Number(counts.has_gpid) / total) * 100).toFixed(0) : '0';
@@ -154,89 +126,395 @@ async function OverviewView() {
     { label: 'OPEN', value: bn(counts.open_count), sub: 'Enriched / active' },
     { label: 'CANDIDATE', value: bn(counts.candidate_count), sub: 'Needs enrichment' },
     { label: 'Has GPID', value: bn(counts.has_gpid), sub: `${gpidPct}% identified` },
-    { label: 'Published', value: bn(counts.reachable), sub: 'On a list — visible on maps' },
+    { label: 'Published', value: bn(counts.reachable), sub: 'On a list' },
+  ];
+
+  // Tier completion bars
+  const tierBars = [
+    { label: 'Tier 1 — Identity', desc: 'slug + name + latlng + GPID', complete: Number(tiers.tier1_complete), total: Number(tiers.total) },
+    { label: 'Tier 2 — Operational', desc: 'hours + phone + website', complete: Number(tiers.tier2_complete), total: Number(tiers.total) },
+    { label: 'Tier 3 — Enrichment', desc: 'instagram + neighborhood', complete: Number(tiers.tier3_complete), total: Number(tiers.total) },
+  ];
+
+  // Enrichment funnel from stage data
+  const noneCount = stages.find(s => s.stage === 'none')?.count ?? 0;
+  const completeCount = stages.find(s => s.stage === '7')?.count ?? 0;
+  const inProgressCount = stages
+    .filter(s => s.stage !== 'none' && s.stage !== '7')
+    .reduce((sum, s) => sum + s.count, 0);
+  const publishedCount = Number(counts.reachable);
+
+  const funnel = [
+    { label: 'Never Enriched', count: noneCount, color: 'bg-stone-200 text-stone-700' },
+    { label: 'In Progress', count: inProgressCount, color: 'bg-blue-100 text-blue-700' },
+    { label: 'Fully Enriched', count: completeCount, color: 'bg-green-100 text-green-700' },
+    { label: 'Published', count: publishedCount, color: 'bg-emerald-100 text-emerald-700' },
   ];
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
-      {cards.map((c) => (
-        <div key={c.label} className="bg-white rounded-xl p-5 shadow-sm">
-          <div className="text-xs text-[#8B7355] mb-1">{c.label}</div>
-          <div className="text-2xl font-bold text-[#36454F]">{c.value}</div>
-          {c.sub && <div className="text-xs text-[#8B7355] mt-1">{c.sub}</div>}
-        </div>
-      ))}
-    </div>
-  );
-}
-
-// ── Missing Fields ──
-async function MissingFieldsView() {
-  const rows = await runMany<MissingFieldRow>(ALL_MISSING_FIELDS_SQL);
-  const TIER1 = new Set(['slug', 'name', 'latlng', 'google_place_id']);
-  const TIER2 = new Set(['hours', 'phone', 'website']);
-
-  return (
-    <div className="bg-white rounded-xl p-6 shadow-sm">
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <h2 className="text-xl font-bold text-[#36454F] mb-1">Missing Fields — All Entities</h2>
-          <p className="text-sm text-[#8B7355]">Field completeness across the entire inventory</p>
-        </div>
-        <div className="flex gap-2">
-          <CopyCommandButton command="npm run coverage:apply:neon -- --apply --limit=50" label="Copy: coverage:apply" variant="warning" />
-        </div>
+    <>
+      {/* Summary cards */}
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+        {cards.map((c) => (
+          <div key={c.label} className="bg-white rounded-xl p-5 shadow-sm">
+            <div className="text-xs text-[#8B7355] mb-1">{c.label}</div>
+            <div className="text-2xl font-bold text-[#36454F]">{c.value}</div>
+            {c.sub && <div className="text-xs text-[#8B7355] mt-1">{c.sub}</div>}
+          </div>
+        ))}
       </div>
-      <table className="w-full text-left text-sm">
-        <thead>
-          <tr className="border-b border-[#C3B091]/40">
-            <th className="py-2 pr-4 text-[#8B7355] font-medium">Field</th>
-            <th className="py-2 pr-4 text-[#8B7355] font-medium">Tier</th>
-            <th className="py-2 pr-4 text-[#8B7355] font-medium text-right">Has</th>
-            <th className="py-2 pr-4 text-[#8B7355] font-medium text-right">Missing</th>
-            <th className="py-2 text-[#8B7355] font-medium text-right">Coverage</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((r) => {
-            const tier = TIER1.has(r.field) ? 'Tier 1' : TIER2.has(r.field) ? 'Tier 2' : 'Tier 3';
-            const missing = Number(r.missing);
-            const total = Number(r.total);
-            const has = total - missing;
-            const coverage = total > 0 ? ((has / total) * 100).toFixed(1) : '0';
+
+      {/* Tier completion bars */}
+      <div className="bg-white rounded-xl p-6 shadow-sm mb-6">
+        <h2 className="text-lg font-bold text-[#36454F] mb-4">Tier Completion</h2>
+        <div className="space-y-4">
+          {tierBars.map((t) => {
+            const p = t.total > 0 ? (t.complete / t.total) * 100 : 0;
             return (
-              <tr key={r.field} className="border-b border-[#C3B091]/20">
-                <td className="py-2 pr-4 text-[#36454F] font-mono text-xs">{r.field}</td>
-                <td className="py-2 pr-4">
-                  <span className={`text-xs px-2 py-0.5 rounded-full ${
-                    tier === 'Tier 1' ? 'bg-red-100 text-red-700' :
-                    tier === 'Tier 2' ? 'bg-yellow-100 text-yellow-700' :
-                    'bg-stone-100 text-stone-600'
-                  }`}>{tier}</span>
-                </td>
-                <td className="py-2 pr-4 text-right text-green-600 font-medium">{bn(has)}</td>
-                <td className={`py-2 pr-4 text-right font-medium ${missing > 0 ? 'text-red-600' : 'text-green-600'}`}>
-                  {bn(r.missing)}
-                </td>
-                <td className={`py-2 text-right font-medium ${Number(coverage) >= 90 ? 'text-green-600' : Number(coverage) >= 60 ? 'text-yellow-600' : 'text-red-600'}`}>
-                  {coverage}%
-                </td>
-              </tr>
+              <div key={t.label}>
+                <div className="flex items-center justify-between mb-1">
+                  <div>
+                    <span className="text-sm font-medium text-[#36454F]">{t.label}</span>
+                    <span className="text-xs text-[#8B7355] ml-2">{t.desc}</span>
+                  </div>
+                  <span className={`text-sm font-bold ${pctColor(p)}`}>
+                    {bn(t.complete)} / {bn(t.total)} ({p.toFixed(1)}%)
+                  </span>
+                </div>
+                <div className="w-full bg-stone-100 rounded-full h-3">
+                  <div className={`h-3 rounded-full transition-all ${barColor(p)}`} style={{ width: `${Math.min(p, 100)}%` }} />
+                </div>
+              </div>
             );
           })}
-        </tbody>
-      </table>
+        </div>
+      </div>
+
+      {/* Enrichment funnel */}
+      <div className="bg-white rounded-xl p-6 shadow-sm">
+        <h2 className="text-lg font-bold text-[#36454F] mb-4">Enrichment Funnel</h2>
+        <div className="flex items-center gap-2">
+          {funnel.map((f, i) => (
+            <div key={f.label} className="flex items-center gap-2">
+              <div className={`rounded-lg px-4 py-3 text-center ${f.color}`}>
+                <div className="text-2xl font-bold">{f.count.toLocaleString()}</div>
+                <div className="text-xs font-medium mt-0.5">{f.label}</div>
+              </div>
+              {i < funnel.length - 1 && (
+                <svg className="w-5 h-5 text-[#C3B091]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// TAB 2: TIER HEALTH (replaces Missing Fields, Red Flags, Field Breakdown, Tier 2)
+// ══════════════════════════════════════════════════════════════════════════════
+
+async function TierHealthView() {
+  const [fieldStats, tier1Issues, stages] = await Promise.all([
+    runMany<TierFieldStat>(TIER_FIELD_STATS_SQL),
+    runMany<Tier1Issue>(TIER1_ISSUES_SQL),
+    runMany<EnrichmentStage>(ENRICHMENT_STAGE_SQL),
+  ]);
+
+  const tierGroups = [
+    { tier: 1, label: 'Tier 1 — Identity', desc: 'slug, name, latlng, GPID' },
+    { tier: 2, label: 'Tier 2 — Operational', desc: 'hours, phone, website, price, menu, reservation' },
+    { tier: 3, label: 'Tier 3 — Enrichment', desc: 'instagram, neighborhood, description' },
+  ];
+
+  // Compute avg coverage per tier for summary strip
+  const tierSummaries = tierGroups.map((group) => {
+    const fields = fieldStats.filter((f) => Number(f.tier) === group.tier);
+    const avgCoverage = fields.length > 0
+      ? fields.reduce((sum, f) => sum + pctNum(f.has, f.total), 0) / fields.length
+      : 0;
+    return { ...group, avgCoverage, fieldCount: fields.length };
+  });
+
+  // ERA stage data
+  const totalEntities = stages.reduce((sum, s) => sum + s.count, 0);
+  const stageLabels: Record<string, string> = {
+    'none': 'Not Started',
+    '1': 'Stage 1 — Google Identity',
+    '2': 'Stage 2 — Surface Discovery',
+    '3': 'Stage 3 — Surface Fetch',
+    '4': 'Stage 4 — Surface Parse',
+    '5': 'Stage 5 — AI Identity',
+    '6': 'Stage 6 — Website Enrichment',
+    '7': 'Stage 7 — Tagline Gen (Complete)',
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* ── Summary strip: all tiers at a glance ── */}
+      <div className="grid grid-cols-3 gap-4">
+        {tierSummaries.map((t) => (
+          <div key={t.tier} className="bg-white rounded-xl p-5 shadow-sm text-center">
+            <div className="text-xs text-[#8B7355] mb-1">{t.label}</div>
+            <div className={`text-3xl font-bold ${pctColor(t.avgCoverage)}`}>{t.avgCoverage.toFixed(0)}%</div>
+            <div className="text-xs text-[#8B7355] mt-1">{t.desc}</div>
+            <div className="mt-3 w-full bg-stone-100 rounded-full h-2.5">
+              <div className={`h-2.5 rounded-full ${barColor(t.avgCoverage)}`} style={{ width: `${Math.min(t.avgCoverage, 100)}%` }} />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* ── ERA Pipeline Progress ── */}
+      <div className="bg-white rounded-xl p-6 shadow-sm">
+        <h2 className="text-lg font-bold text-[#36454F] mb-1">ERA Pipeline Progress</h2>
+        <p className="text-sm text-[#8B7355] mb-4">{totalEntities} entities — how far through the enrichment pipeline</p>
+        <div className="space-y-2">
+          {stages.map((s) => {
+            const p = totalEntities > 0 ? (s.count / totalEntities) * 100 : 0;
+            const isNone = s.stage === 'none';
+            const isComplete = s.stage === '7';
+            return (
+              <div key={s.stage} className="flex items-center gap-3">
+                <div className="w-56 text-sm text-[#36454F] truncate font-medium">
+                  {stageLabels[s.stage] ?? `Stage ${s.stage}`}
+                </div>
+                <div className="flex-1 bg-stone-100 rounded-full h-5 relative">
+                  <div
+                    className={`h-5 rounded-full transition-all ${isComplete ? 'bg-green-500' : isNone ? 'bg-stone-300' : 'bg-blue-400'}`}
+                    style={{ width: `${Math.max(p, 1)}%` }}
+                  />
+                </div>
+                <div className={`w-20 text-right text-sm font-bold ${isComplete ? 'text-green-600' : isNone ? 'text-stone-500' : 'text-blue-600'}`}>
+                  {s.count.toLocaleString()}
+                </div>
+                <div className="w-14 text-right text-xs text-[#8B7355]">{p.toFixed(1)}%</div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ── Per-tier field breakdowns ── */}
+      {tierGroups.map((group) => {
+        const fields = fieldStats.filter((f) => Number(f.tier) === group.tier);
+        const avgCoverage = fields.length > 0
+          ? fields.reduce((sum, f) => sum + pctNum(f.has, f.total), 0) / fields.length
+          : 0;
+
+        return (
+          <div key={group.tier} className="bg-white rounded-xl p-6 shadow-sm">
+            {/* Tier header */}
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className="text-xl font-bold text-[#36454F]">{group.label}</h2>
+                <p className="text-sm text-[#8B7355]">{group.desc}</p>
+              </div>
+              <div className="text-right">
+                <div className={`text-2xl font-bold ${pctColor(avgCoverage)}`}>{avgCoverage.toFixed(1)}%</div>
+                <div className="text-xs text-[#8B7355]">avg field coverage</div>
+              </div>
+            </div>
+
+            {/* Field stats table */}
+            <table className="w-full text-left text-sm mb-4">
+              <thead>
+                <tr className="border-b border-[#C3B091]/40">
+                  <th className="py-2 pr-4 text-[#8B7355] font-medium">Field</th>
+                  <th className="py-2 pr-4 text-[#8B7355] font-medium text-right">Has</th>
+                  <th className="py-2 pr-4 text-[#8B7355] font-medium text-right">Missing</th>
+                  <th className="py-2 pr-4 text-[#8B7355] font-medium text-right">Coverage</th>
+                  <th className="py-2 text-[#8B7355] font-medium" style={{ width: '40%' }}>Bar</th>
+                </tr>
+              </thead>
+              <tbody>
+                {fields.map((f) => {
+                  const p = pctNum(f.has, f.total);
+                  return (
+                    <tr key={f.field} className="border-b border-[#C3B091]/20">
+                      <td className="py-2 pr-4 text-[#36454F] font-mono text-xs">{f.field}</td>
+                      <td className="py-2 pr-4 text-right text-green-600 font-medium">{Number(f.has).toLocaleString()}</td>
+                      <td className={`py-2 pr-4 text-right font-medium ${Number(f.missing) > 0 ? 'text-red-600' : 'text-green-600'}`}>
+                        {Number(f.missing).toLocaleString()}
+                      </td>
+                      <td className={`py-2 pr-4 text-right font-medium ${pctColor(p)}`}>{p.toFixed(1)}%</td>
+                      <td className="py-2">
+                        <div className="w-full bg-stone-100 rounded-full h-2">
+                          <div className={`h-2 rounded-full ${barColor(p)}`} style={{ width: `${Math.min(p, 100)}%` }} />
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+
+            {/* Tier 1 drill-down: entities with issues */}
+            {group.tier === 1 && tier1Issues.length > 0 && (
+              <details className="mt-4">
+                <summary className="cursor-pointer text-sm font-medium text-[#36454F] hover:text-[#8B7355]">
+                  {tier1Issues.length} entities with Tier 1 issues (expand)
+                </summary>
+                <div className="mt-3 overflow-x-auto">
+                  <table className="w-full text-left text-sm">
+                    <thead>
+                      <tr className="border-b border-[#C3B091]/40">
+                        <th className="py-2 pr-3 text-[#8B7355] font-medium">Name</th>
+                        <th className="py-2 pr-3 text-[#8B7355] font-medium">Slug</th>
+                        <th className="py-2 pr-3 text-[#8B7355] font-medium">Neighborhood</th>
+                        <th className="py-2 pr-3 text-[#8B7355] font-medium text-center">Status</th>
+                        <th className="py-2 pr-3 text-[#8B7355] font-medium">Issues</th>
+                        <th className="py-2 text-[#8B7355] font-medium text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {tier1Issues.map((e) => (
+                        <tr key={e.id} className="border-b border-[#C3B091]/20">
+                          <td className="py-2 pr-3 text-[#36454F] font-medium">{e.name || '(no name)'}</td>
+                          <td className="py-2 pr-3 font-mono text-xs text-[#36454F]">{e.slug ?? '(none)'}</td>
+                          <td className="py-2 pr-3 text-[#8B7355]">{e.neighborhood}</td>
+                          <td className="py-2 pr-3 text-center">
+                            <span className={`text-xs px-2 py-0.5 rounded-full ${
+                              e.entity_status === 'CANDIDATE' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'
+                            }`}>{e.entity_status}</span>
+                          </td>
+                          <td className="py-2 pr-3">
+                            <div className="flex flex-wrap gap-1">
+                              {(Array.isArray(e.issues) ? e.issues : []).map((issue) => (
+                                <span key={issue} className="text-xs bg-red-50 text-red-700 px-2 py-0.5 rounded">{issue}</span>
+                              ))}
+                            </div>
+                          </td>
+                          <td className="py-2 text-right">
+                            <RedFlagActions placeId={e.id} slug={e.slug} />
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }
 
-// ── Neighborhoods ──
+// ══════════════════════════════════════════════════════════════════════════════
+// TAB 3: PIPELINE (enrichment stage histogram + tool inventory + recent runs)
+// ══════════════════════════════════════════════════════════════════════════════
+
+// Static tool inventory
+const TOOL_INVENTORY = [
+  { name: 'Social discovery', command: 'node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/discover-social.ts --mode=instagram --limit=50', cost: 'Free', fields: 'instagram, tiktok handles', costColor: 'text-green-600' },
+  { name: 'Website fetch + parse', command: 'node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/scan-merchant-surfaces.ts', cost: 'Free', fields: 'menu, reservation, hours, phone, about', costColor: 'text-green-600' },
+  { name: 'Populate canonical', command: 'node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/populate-canonical-state.ts', cost: 'Free', fields: 'Evidence → canonical_entity_state', costColor: 'text-green-600' },
+  { name: 'Website enrichment', command: 'npm run enrich:website', cost: 'Free', fields: 'Website crawl + parse', costColor: 'text-green-600' },
+  { name: 'Menu URL sync', command: 'npm run signals:menu:sync:local', cost: 'Free', fields: 'menu_url from merchant signals', costColor: 'text-green-600' },
+  { name: 'ERA pipeline (full)', command: 'node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/enrich-place.ts --slug=SLUG', cost: 'OpenAI $$', fields: 'All stages (1-7)', costColor: 'text-yellow-600' },
+  { name: 'ERA: identity signals', command: 'node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/enrich-place.ts --slug=SLUG --only=5', cost: 'OpenAI $', fields: 'AI identity extraction', costColor: 'text-yellow-600' },
+  { name: 'ERA: tagline gen', command: 'node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/enrich-place.ts --slug=SLUG --only=7', cost: 'OpenAI $', fields: 'Tagline generation', costColor: 'text-yellow-600' },
+  { name: 'Google enrich', command: 'npm run enrich:google', cost: 'Google $', fields: 'Google Places identity data', costColor: 'text-red-600' },
+  { name: 'Coverage apply (Google)', command: 'npm run coverage:apply:neon -- --apply --limit=50', cost: 'Google $$', fields: 'hours, phone, latlng, photos, price_level', costColor: 'text-red-600' },
+];
+
+async function PipelineView() {
+  const recentRuns = await runMany<RecentRun>(RECENT_RUNS_SQL);
+
+  return (
+    <div className="space-y-6">
+      {/* Tool inventory */}
+      <div className="bg-white rounded-xl p-6 shadow-sm">
+        <h2 className="text-lg font-bold text-[#36454F] mb-1">Tool Inventory</h2>
+        <p className="text-sm text-[#8B7355] mb-4">All enrichment tools — free tools first, paid as fallback</p>
+        <table className="w-full text-left text-sm">
+          <thead>
+            <tr className="border-b border-[#C3B091]/40">
+              <th className="py-2 pr-4 text-[#8B7355] font-medium">Tool</th>
+              <th className="py-2 pr-4 text-[#8B7355] font-medium">Cost</th>
+              <th className="py-2 pr-4 text-[#8B7355] font-medium">Fields</th>
+              <th className="py-2 text-[#8B7355] font-medium text-right">Run</th>
+            </tr>
+          </thead>
+          <tbody>
+            {TOOL_INVENTORY.map((tool) => (
+              <tr key={tool.name} className="border-b border-[#C3B091]/20">
+                <td className="py-2.5 pr-4 text-[#36454F] font-medium">{tool.name}</td>
+                <td className={`py-2.5 pr-4 text-xs font-bold ${tool.costColor}`}>{tool.cost}</td>
+                <td className="py-2.5 pr-4 text-[#8B7355] text-xs">{tool.fields}</td>
+                <td className="py-2.5 text-right">
+                  <CopyCommandButton command={tool.command} label="Copy" />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Recent runs */}
+      <div className="bg-white rounded-xl p-6 shadow-sm">
+        <h2 className="text-lg font-bold text-[#36454F] mb-1">Recent Enrichment Runs</h2>
+        <p className="text-sm text-[#8B7355] mb-4">Last 15 entries from place_coverage_status</p>
+        {recentRuns.length === 0 ? (
+          <p className="text-center text-[#8B7355] py-8">No enrichment runs recorded yet.</p>
+        ) : (
+          <table className="w-full text-left text-sm">
+            <thead>
+              <tr className="border-b border-[#C3B091]/40">
+                <th className="py-2 pr-3 text-[#8B7355] font-medium">Entity</th>
+                <th className="py-2 pr-3 text-[#8B7355] font-medium">Slug</th>
+                <th className="py-2 pr-3 text-[#8B7355] font-medium">Source</th>
+                <th className="py-2 pr-3 text-[#8B7355] font-medium text-center">Status</th>
+                <th className="py-2 text-[#8B7355] font-medium text-right">Last Attempt</th>
+              </tr>
+            </thead>
+            <tbody>
+              {recentRuns.map((r) => (
+                <tr key={r.id} className="border-b border-[#C3B091]/20">
+                  <td className="py-2 pr-3 text-[#36454F] font-medium">{r.entity_name}</td>
+                  <td className="py-2 pr-3 font-mono text-xs">
+                    {r.slug ? (
+                      <Link href={`/place/${r.slug}`} className="text-blue-600 hover:underline">{r.slug}</Link>
+                    ) : '(none)'}
+                  </td>
+                  <td className="py-2 pr-3 text-[#8B7355] text-xs">{r.source ?? '—'}</td>
+                  <td className="py-2 pr-3 text-center">
+                    <span className={`text-xs px-2 py-0.5 rounded-full ${
+                      r.run_status === 'COMPLETE' ? 'bg-green-100 text-green-700' :
+                      r.run_status === 'ERROR' ? 'bg-red-100 text-red-700' :
+                      'bg-stone-100 text-stone-600'
+                    }`}>{r.run_status ?? 'PENDING'}</span>
+                  </td>
+                  <td className="py-2 text-right text-xs text-[#8B7355]">
+                    {r.last_attempt_at ? new Date(r.last_attempt_at).toLocaleDateString('en-US', {
+                      month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
+                    }) : '—'}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// TAB 4: NEIGHBORHOODS (kept as-is)
+// ══════════════════════════════════════════════════════════════════════════════
+
 async function NeighborhoodsView() {
   const rows = await runMany<NeighborhoodScorecard>(ALL_NEIGHBORHOOD_SCORECARD_SQL);
 
   return (
     <div className="bg-white rounded-xl p-6 shadow-sm overflow-x-auto">
-      <h2 className="text-xl font-bold text-[#36454F] mb-1">Neighborhood Scorecard — All Entities</h2>
+      <h2 className="text-xl font-bold text-[#36454F] mb-1">Neighborhood Scorecard</h2>
       <p className="text-sm text-[#8B7355] mb-4">Neighborhoods with 3+ entities, sorted by Tier 1 completion (worst first)</p>
       <table className="w-full text-left text-sm">
         <thead>
@@ -277,246 +555,5 @@ async function NeighborhoodsView() {
         </tbody>
       </table>
     </div>
-  );
-}
-
-// ── Red Flags ──
-async function RedFlagsView() {
-  const rows = await runMany<RedFlag>(ALL_REDFLAGS_SQL);
-
-  return (
-    <div className="bg-white rounded-xl p-6 shadow-sm overflow-x-auto">
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <h2 className="text-xl font-bold text-[#36454F] mb-1">Red Flags — Tier 1 Failures</h2>
-          <p className="text-sm text-[#8B7355]">Entities missing critical identity fields (top 200 by severity)</p>
-        </div>
-        <CopyCommandButton command="npm run coverage:apply:neon -- --apply" label="Copy: coverage:apply (bulk fix)" variant="warning" />
-      </div>
-      <table className="w-full text-left text-sm">
-        <thead>
-          <tr className="border-b border-[#C3B091]/40">
-            <th className="py-2 pr-3 text-[#8B7355] font-medium">Name</th>
-            <th className="py-2 pr-3 text-[#8B7355] font-medium">Slug</th>
-            <th className="py-2 pr-3 text-[#8B7355] font-medium">Neighborhood</th>
-            <th className="py-2 pr-3 text-[#8B7355] font-medium text-center">Status</th>
-            <th className="py-2 pr-3 text-[#8B7355] font-medium text-center">Severity</th>
-            <th className="py-2 pr-3 text-[#8B7355] font-medium">Issues</th>
-            <th className="py-2 text-[#8B7355] font-medium text-right">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((r) => (
-            <tr key={r.id} className="border-b border-[#C3B091]/20">
-              <td className="py-2 pr-3 text-[#36454F] font-medium">{r.name || '(no name)'}</td>
-              <td className="py-2 pr-3 text-[#36454F] font-mono text-xs">{r.slug ?? '(none)'}</td>
-              <td className="py-2 pr-3 text-[#8B7355]">{r.neighborhood}</td>
-              <td className="py-2 pr-3 text-center">
-                <span className={`text-xs px-2 py-0.5 rounded-full ${
-                  (r as any).entity_status === 'CANDIDATE' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'
-                }`}>{(r as any).entity_status ?? 'OPEN'}</span>
-              </td>
-              <td className="py-2 pr-3 text-center">
-                <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
-                  Number(r.severity) >= 3 ? 'bg-red-100 text-red-700' :
-                  Number(r.severity) >= 2 ? 'bg-yellow-100 text-yellow-700' :
-                  'bg-stone-100 text-stone-600'
-                }`}>{String(r.severity)}</span>
-              </td>
-              <td className="py-2 pr-3">
-                <div className="flex flex-wrap gap-1">
-                  {(Array.isArray(r.reasons) ? r.reasons : []).map((reason) => (
-                    <span key={reason} className="text-xs bg-red-50 text-red-700 px-2 py-0.5 rounded">
-                      {reason}
-                    </span>
-                  ))}
-                </div>
-              </td>
-              <td className="py-2 text-right">
-                <RedFlagActions placeId={r.id} slug={r.slug} />
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      {rows.length === 0 && (
-        <p className="text-center text-[#8B7355] py-8">No Tier 1 red flags found.</p>
-      )}
-    </div>
-  );
-}
-
-// ── Field Breakdown ──
-async function BreakdownView() {
-  const [reachable, addressable, totalDb] = await Promise.all([
-    runOne<FieldBreakdown>(FIELDS_BREAKDOWN_REACHABLE_SQL),
-    runOne<FieldBreakdown>(FIELDS_BREAKDOWN_ADDRESSABLE_SQL),
-    runOne<FieldBreakdown>(FIELDS_BREAKDOWN_TOTALDB_SQL),
-  ]);
-
-  const fields = ['slug', 'name', 'latlng', 'google_id', 'hours', 'phone', 'website', 'instagram', 'neighborhood'] as const;
-  const fieldKey = (f: string) => `has_${f}` as keyof FieldBreakdown;
-
-  return (
-    <div className="bg-white rounded-xl p-6 shadow-sm overflow-x-auto">
-      <h2 className="text-xl font-bold text-[#36454F] mb-1">Field Breakdown — Cross-Cohort</h2>
-      <p className="text-sm text-[#8B7355] mb-4">Coverage comparison across Reachable / Addressable / Total DB</p>
-      <table className="w-full text-left text-sm">
-        <thead>
-          <tr className="border-b border-[#C3B091]/40">
-            <th className="py-2 pr-4 text-[#8B7355] font-medium">Field</th>
-            <th className="py-2 pr-4 text-[#8B7355] font-medium text-right">Reachable</th>
-            <th className="py-2 pr-4 text-[#8B7355] font-medium text-right">%</th>
-            <th className="py-2 pr-4 text-[#8B7355] font-medium text-right">Addressable</th>
-            <th className="py-2 pr-4 text-[#8B7355] font-medium text-right">%</th>
-            <th className="py-2 pr-4 text-[#8B7355] font-medium text-right">Total DB</th>
-            <th className="py-2 text-[#8B7355] font-medium text-right">%</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr className="border-b border-[#C3B091]/40 bg-stone-50">
-            <td className="py-2 pr-4 text-[#36454F] font-medium italic">Total</td>
-            <td className="py-2 pr-4 text-right text-[#36454F] font-medium">{bn(reachable.total)}</td>
-            <td className="py-2 pr-4 text-right text-[#8B7355]">—</td>
-            <td className="py-2 pr-4 text-right text-[#36454F] font-medium">{bn(addressable.total)}</td>
-            <td className="py-2 pr-4 text-right text-[#8B7355]">—</td>
-            <td className="py-2 pr-4 text-right text-[#36454F] font-medium">{bn(totalDb.total)}</td>
-            <td className="py-2 text-right text-[#8B7355]">—</td>
-          </tr>
-          {fields.map((f) => {
-            const k = fieldKey(f);
-            return (
-              <tr key={f} className="border-b border-[#C3B091]/20">
-                <td className="py-2 pr-4 text-[#36454F] font-mono text-xs">{f}</td>
-                <td className="py-2 pr-4 text-right text-[#36454F]">{bn(reachable[k])}</td>
-                <td className="py-2 pr-4 text-right text-[#8B7355]">{pct(reachable[k], reachable.total)}</td>
-                <td className="py-2 pr-4 text-right text-[#36454F]">{bn(addressable[k])}</td>
-                <td className="py-2 pr-4 text-right text-[#8B7355]">{pct(addressable[k], addressable.total)}</td>
-                <td className="py-2 pr-4 text-right text-[#36454F]">{bn(totalDb[k])}</td>
-                <td className="py-2 text-right text-[#8B7355]">{pct(totalDb[k], totalDb.total)}</td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
-// ── Tier 2 Visit Facts ──
-async function Tier2View() {
-  const tier2Rows = await db.entities.findMany({
-    select: {
-      id: true, slug: true, name: true, neighborhood: true,
-      primary_vertical: true, googlePlaceId: true, businessStatus: true,
-      hours: true, priceLevel: true, reservationUrl: true,
-      canonical_state: {
-        select: { hours_json: true, price_level: true, reservation_url: true, menu_url: true },
-      },
-    },
-  });
-
-  // Aggregate counts
-  const counts: Record<Tier2Issue, number> = {
-    missing_hours: 0, missing_price_level: 0, missing_menu_link: 0,
-    missing_reservations: 0, operating_status_unknown: 0, google_says_closed: 0,
-  };
-
-  // Per-place issue list for drill-down
-  const placeIssues: { id: string; slug: string | null; name: string; neighborhood: string | null; issues: Tier2Issue[] }[] = [];
-
-  for (const row of tier2Rows) {
-    const issues = detectTier2(row);
-    for (const i of issues) counts[i]++;
-    if (issues.length > 0) {
-      placeIssues.push({ id: row.id, slug: row.slug, name: row.name, neighborhood: row.neighborhood, issues });
-    }
-  }
-
-  // Sort by most issues first
-  placeIssues.sort((a, b) => b.issues.length - a.issues.length);
-
-  return (
-    <>
-      {/* Summary table */}
-      <div className="bg-white rounded-xl p-6 shadow-sm mb-6">
-        <h2 className="text-xl font-bold text-[#36454F] mb-1">Tier 2 Visit Facts Summary</h2>
-        <p className="text-sm text-[#8B7355] mb-4">
-          Canonical-first detection (canonical_entity_state → entities fallback) with vertical applicability gates
-        </p>
-        <table className="w-full text-left text-sm">
-          <thead>
-            <tr className="border-b border-[#C3B091]/40">
-              <th className="py-2 pr-4 text-[#8B7355] font-medium">Issue</th>
-              <th className="py-2 pr-4 text-[#8B7355] font-medium text-right">Count</th>
-              <th className="py-2 pr-4 text-[#8B7355] font-medium">Action</th>
-              <th className="py-2 text-[#8B7355] font-medium text-right">Run</th>
-            </tr>
-          </thead>
-          <tbody>
-            {(Object.keys(TIER2_META) as Tier2Issue[]).map((key) => (
-              <tr key={key} className="border-b border-[#C3B091]/20">
-                <td className="py-2 pr-4 text-[#36454F]">
-                  <div className="font-medium">{TIER2_META[key].label}</div>
-                  <div className="text-xs text-[#8B7355] font-mono mt-0.5">{key}</div>
-                </td>
-                <td className={`py-2 pr-4 text-right font-medium ${counts[key] > 0 ? 'text-red-600' : 'text-green-600'}`}>
-                  {counts[key].toLocaleString()}
-                </td>
-                <td className="py-2 pr-4 text-[#8B7355] text-sm">{TIER2_META[key].action}</td>
-                <td className="py-2 text-right">
-                  <BulkActionBar issueType={key} count={counts[key]} />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Per-place drill-down */}
-      <div className="bg-white rounded-xl p-6 shadow-sm overflow-x-auto">
-        <h2 className="text-xl font-bold text-[#36454F] mb-1">Places with Issues ({placeIssues.length})</h2>
-        <p className="text-sm text-[#8B7355] mb-4">Sorted by number of issues (worst first)</p>
-        <table className="w-full text-left text-sm">
-          <thead>
-            <tr className="border-b border-[#C3B091]/40">
-              <th className="py-2 pr-3 text-[#8B7355] font-medium">Name</th>
-              <th className="py-2 pr-3 text-[#8B7355] font-medium">Slug</th>
-              <th className="py-2 pr-3 text-[#8B7355] font-medium">Neighborhood</th>
-              <th className="py-2 pr-3 text-[#8B7355] font-medium">Issues</th>
-              <th className="py-2 text-[#8B7355] font-medium text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {placeIssues.slice(0, 100).map((p) => (
-              <tr key={p.id} className="border-b border-[#C3B091]/20">
-                <td className="py-2 pr-3 text-[#36454F] font-medium">{p.name}</td>
-                <td className="py-2 pr-3 font-mono text-xs text-[#36454F]">
-                  {p.slug ? (
-                    <Link href={`/place/${p.slug}`} className="text-blue-600 hover:underline">{p.slug}</Link>
-                  ) : '(none)'}
-                </td>
-                <td className="py-2 pr-3 text-[#8B7355]">{p.neighborhood ?? '(none)'}</td>
-                <td className="py-2 pr-3">
-                  <div className="flex flex-wrap gap-1">
-                    {p.issues.map((issue) => (
-                      <span key={issue} className="text-xs bg-yellow-50 text-yellow-700 px-2 py-0.5 rounded">
-                        {TIER2_META[issue].label}
-                      </span>
-                    ))}
-                  </div>
-                </td>
-                <td className="py-2 text-right">
-                  <Tier2PlaceActions placeId={p.id} slug={p.slug} issues={p.issues} />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        {placeIssues.length > 100 && (
-          <p className="text-sm text-[#8B7355] mt-4">Showing first 100 of {placeIssues.length} places.</p>
-        )}
-      </div>
-    </>
   );
 }

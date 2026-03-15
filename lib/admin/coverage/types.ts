@@ -88,3 +88,49 @@ export interface CrossCohortRow {
   total_db_count: bigint;
   total_db_pct: number;
 }
+
+// ── Dashboard v2 types (4-tab redesign) ──
+
+// Tier completion (Overview tier bars)
+export interface TierCompletion {
+  total: bigint;
+  tier1_complete: bigint;
+  tier2_complete: bigint;
+  tier3_complete: bigint;
+}
+
+// Enrichment stage distribution (Pipeline view)
+export interface EnrichmentStage {
+  stage: string;
+  count: number;
+}
+
+// Recent enrichment runs (Pipeline view)
+export interface RecentRun {
+  id: string;
+  entity_name: string;
+  slug: string | null;
+  run_status: string | null;
+  last_attempt_at: Date | null;
+  source: string | null;
+  last_missing_groups: string | null;
+}
+
+// Per-field stats across tiers (Tier Health view)
+export interface TierFieldStat {
+  tier: number;
+  field: string;
+  has: number;
+  missing: number;
+  total: number;
+}
+
+// Tier 1 issue entities (Tier Health drill-down)
+export interface Tier1Issue {
+  id: string;
+  slug: string | null;
+  name: string;
+  entity_status: string;
+  neighborhood: string;
+  issues: string[];
+}

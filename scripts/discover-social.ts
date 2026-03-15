@@ -1,9 +1,9 @@
 #!/usr/bin/env npx tsx
 /**
- * Social Discovery — Claude-powered web search for Instagram handles & websites.
+ * Social Discovery — OpenAI-powered web search for Instagram handles & websites.
  *
- * Uses Claude Haiku + web_search tool to find official Instagram handles and
- * websites for entities that are missing them. Same proven pattern as collect-b.ts.
+ * Uses GPT-4.1-mini + web_search_preview tool to find official Instagram handles and
+ * websites for entities that are missing them.
  *
  * Usage:
  *   npx tsx scripts/discover-social.ts --mode=instagram --limit=5 --dry-run
@@ -17,11 +17,11 @@
  *   --limit=N                       Max entities per run (default 50)
  *   --dry-run                       Print results, no DB writes
  *   --delay=N                       Seconds between calls (default 2)
- *   --verbose                       Show full Claude response details
+ *   --verbose                       Show full response details
  */
 
 import 'dotenv/config';
-import Anthropic from '@anthropic-ai/sdk';
+import OpenAI from 'openai';
 
 // Prisma client — load-env.js handles DATABASE_URL before this import
 const { PrismaClient } = require('@prisma/client');
@@ -31,8 +31,8 @@ const db = new PrismaClient();
 // Config
 // ---------------------------------------------------------------------------
 
-const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY || '';
-const CLAUDE_MODEL = 'claude-haiku-4-5-20251001';
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY || '';
+const MODEL = 'gpt-4.1-mini';
 const DEFAULT_DELAY_MS = 2000;
 const DEFAULT_LIMIT = 50;
 
@@ -96,13 +96,12 @@ function parseArgs() {
 // Prompts
 // ---------------------------------------------------------------------------
 
-function buildInstagramPrompt(entity: Entity): { system: string; user: string } {
+function buildInstagramPrompt(entity: Entity): string {
   const city = 'Los Angeles';
   const neighborhood = entity.neighborhood ? ` (${entity.neighborhood})` : '';
   const category = entity.category ?? 'restaurant';
 
-  return {
-    system: `You are a social media researcher. Your job is to find the official Instagram handle for a specific ${category} in ${city}.
+  return `You are a social media researcher. Find the official Instagram handle for this ${category} in ${city}.
 
 Rules:
 - Only return the OFFICIAL account for this specific business — not fan pages, food bloggers, or similarly-named businesses
@@ -112,31 +111,28 @@ Rules:
 - If you find multiple possible accounts, pick the one most likely to be official
 - If you cannot confidently identify the official account, say so
 
-Return your answer as a JSON object (no markdown fences):
-{
-  "instagram_handle": "@handle" or null,
-  "confidence": "high" | "medium" | "low",
-  "source_url": "URL where you found/confirmed this" or null,
-  "reasoning": "Brief explanation of how you found it and why you're confident"
-}`,
-    user: `Find the official Instagram handle for:
+Search for "${entity.name} ${city} instagram" and "${entity.name} ${entity.neighborhood ?? city}" on Instagram. Check their website if available for social links.
 
 **Name:** ${entity.name}
 **Location:** ${city}${neighborhood}
 **Category:** ${category}
 ${entity.website ? `**Website:** ${entity.website}` : ''}
 
-Search for "${entity.name} ${city} instagram" and "${entity.name} ${entity.neighborhood ?? city}" on Instagram. Check their website if available for social links.`,
-  };
+Return your answer as a JSON object (no markdown fences):
+{
+  "instagram_handle": "@handle" or null,
+  "confidence": "high" | "medium" | "low",
+  "source_url": "URL where you found/confirmed this" or null,
+  "reasoning": "Brief explanation of how you found it and why you're confident"
+}`;
 }
 
-function buildWebsitePrompt(entity: Entity): { system: string; user: string } {
+function buildWebsitePrompt(entity: Entity): string {
   const city = 'Los Angeles';
   const neighborhood = entity.neighborhood ? ` (${entity.neighborhood})` : '';
   const category = entity.category ?? 'restaurant';
 
-  return {
-    system: `You are a web researcher. Your job is to find the official website for a specific ${category} in ${city}.
+  return `You are a web researcher. Find the official website for this ${category} in ${city}.
 
 Rules:
 - Only return the OFFICIAL website for this specific business
@@ -145,21 +141,19 @@ Rules:
 - If the business only has social media and no website, return null
 - If you find a domain that redirects to an ordering platform, that's acceptable if it's their own domain
 
+Search for "${entity.name} ${city} ${category}" and "${entity.name} ${entity.neighborhood ?? city} official website".
+
+**Name:** ${entity.name}
+**Location:** ${city}${neighborhood}
+**Category:** ${category}
+
 Return your answer as a JSON object (no markdown fences):
 {
   "website_url": "https://..." or null,
   "confidence": "high" | "medium" | "low",
   "source_url": "URL where you confirmed this" or null,
   "reasoning": "Brief explanation of how you found it and why you're confident"
-}`,
-    user: `Find the official website for:
-
-**Name:** ${entity.name}
-**Location:** ${city}${neighborhood}
-**Category:** ${category}
-
-Search for "${entity.name} ${city} ${category}" and "${entity.name} ${entity.neighborhood ?? city} official website".`,
-  };
+}`;
 }
 
 // ---------------------------------------------------------------------------
@@ -203,11 +197,11 @@ function cleanUrl(raw: string): string | null {
 }
 
 // ---------------------------------------------------------------------------
-// Claude web_search call
+// OpenAI web_search call via Responses API
 // ---------------------------------------------------------------------------
 
 async function discover(
-  client: Anthropic,
+  client: OpenAI,
   entity: Entity,
   mode: 'instagram' | 'website',
   verbose: boolean,
@@ -216,33 +210,46 @@ async function discover(
   const start = Date.now();
 
   try {
-    const response = await client.messages.create({
-      model: CLAUDE_MODEL,
-      max_tokens: 2048,
-      system: prompt.system,
-      tools: [{ type: 'web_search_20250305' as any, name: 'web_search' } as any],
-      messages: [{ role: 'user', content: prompt.user }],
+    const response = await client.responses.create({
+      model: MODEL,
+      tools: [{ type: 'web_search_preview' }],
+      input: prompt,
     });
 
     const timeMs = Date.now() - start;
-    const textBlocks = response.content.filter((b: any) => b.type === 'text');
-    const fullText = textBlocks.map((b: any) => b.text).join('\n');
+
+    // Extract text from output items
+    const textItems = response.output.filter((item: any) => item.type === 'message');
+    const fullText = textItems
+      .flatMap((item: any) => item.content ?? [])
+      .filter((c: any) => c.type === 'output_text')
+      .map((c: any) => c.text)
+      .join('\n');
 
     if (verbose) {
-      const searches = response.content.filter((b: any) => b.type === 'tool_use' && b.name === 'web_search').length;
-      console.log(`    [${timeMs}ms | ${response.usage.input_tokens}in/${response.usage.output_tokens}out | ${searches} searches]`);
+      const searches = response.output.filter((item: any) => item.type === 'web_search_call').length;
+      console.log(`    [${timeMs}ms | ${searches} searches]`);
     }
 
     // Extract JSON from response
-    const jsonMatch = fullText.match(/\{[\s\S]*?\}/);
-    if (!jsonMatch) {
+    // Try to find JSON in code fences first, then bare JSON
+    let jsonStr: string | null = null;
+    const fenceMatch = fullText.match(/```(?:json)?\s*\n?([\s\S]*?)\n?```/);
+    if (fenceMatch) {
+      jsonStr = fenceMatch[1].trim();
+    } else {
+      const jsonMatch = fullText.match(/\{[\s\S]*?\}/);
+      if (jsonMatch) jsonStr = jsonMatch[0];
+    }
+
+    if (!jsonStr) {
       console.log(`    WARNING: No JSON in response for ${entity.name}`);
-      return { entityId: entity.id, entityName: entity.name, slug: entity.slug, mode, discovered: null, confidence: 'low', reasoning: 'No JSON in Claude response', action: 'error' };
+      return { entityId: entity.id, entityName: entity.name, slug: entity.slug, mode, discovered: null, confidence: 'low', reasoning: 'No JSON in response', action: 'error' };
     }
 
     let parsed: any;
     try {
-      parsed = JSON.parse(jsonMatch[0]);
+      parsed = JSON.parse(jsonStr);
     } catch {
       // Try more aggressive extraction
       const start = fullText.indexOf('{');
@@ -275,7 +282,7 @@ async function discover(
       return { entityId: entity.id, entityName: entity.name, slug: entity.slug, mode, discovered: url, confidence, reasoning, action: confidence === 'high' || confidence === 'medium' ? 'set' : 'skipped_low_conf' };
     }
   } catch (err: any) {
-    console.error(`    ERROR for ${entity.name}: ${err.message}`);
+    console.error(`    ERROR for ${entity.name}: ${err.status ?? ''} ${err.message}`);
     return { entityId: entity.id, entityName: entity.name, slug: entity.slug, mode, discovered: null, confidence: 'low', reasoning: err.message, action: 'error' };
   }
 }
@@ -287,14 +294,14 @@ async function discover(
 async function main() {
   const { mode, slug, limit, dryRun, delayMs, verbose } = parseArgs();
 
-  console.log(`[Discover Social] mode=${mode} limit=${limit} dryRun=${dryRun} delay=${delayMs}ms`);
+  console.log(`[Discover Social] mode=${mode} limit=${limit} dryRun=${dryRun} delay=${delayMs}ms model=${MODEL}`);
 
-  if (!ANTHROPIC_API_KEY) {
-    console.error('[Discover Social] ANTHROPIC_API_KEY not set');
+  if (!OPENAI_API_KEY) {
+    console.error('[Discover Social] OPENAI_API_KEY not set');
     process.exit(1);
   }
 
-  const client = new Anthropic({ apiKey: ANTHROPIC_API_KEY });
+  const client = new OpenAI({ apiKey: OPENAI_API_KEY });
   const modes: ('instagram' | 'website')[] = mode === 'both' ? ['instagram', 'website'] : [mode as 'instagram' | 'website'];
 
   for (const currentMode of modes) {
@@ -325,8 +332,6 @@ async function main() {
     if (entities.length === 0) continue;
 
     const results: DiscoveryResult[] = [];
-    let totalInput = 0;
-    let totalOutput = 0;
 
     for (let i = 0; i < entities.length; i++) {
       const entity = entities[i];
