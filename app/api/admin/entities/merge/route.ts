@@ -93,22 +93,22 @@ export async function POST(request: NextRequest) {
       // 2. Reassign FK references from deleteId to keepId
 
       // entity_issues has unique(entity_id, issue_type) — delete overlapping issues first
-      const keepIssues = await tx.entity_issues.findMany({
-        where: { entity_id: keepId },
-        select: { issue_type: true },
-      });
-      const keepIssueTypes = new Set(keepIssues.map((i: { issue_type: string }) => i.issue_type));
+      // (entity_issues has no Prisma model, so use raw SQL)
+      const keepIssues = await tx.$queryRaw<{ issue_type: string }[]>`
+        SELECT issue_type FROM entity_issues WHERE entity_id = ${keepId}
+      `;
+      const keepIssueTypes = new Set(keepIssues.map((i) => i.issue_type));
       // Delete issues from the duplicate that already exist on the kept entity
       if (keepIssueTypes.size > 0) {
-        await tx.entity_issues.deleteMany({
-          where: { entity_id: deleteId, issue_type: { in: [...keepIssueTypes] } },
-        });
+        const types = [...keepIssueTypes];
+        await tx.$executeRaw`
+          DELETE FROM entity_issues WHERE entity_id = ${deleteId} AND issue_type = ANY(${types})
+        `;
       }
       // Reassign remaining issues
-      await tx.entity_issues.updateMany({
-        where: { entity_id: deleteId },
-        data: { entity_id: keepId },
-      });
+      await tx.$executeRaw`
+        UPDATE entity_issues SET entity_id = ${keepId} WHERE entity_id = ${deleteId}
+      `;
 
       // For tables with compound unique constraints, delete overlapping rows
       // from the duplicate first, then reassign the rest. For simple FK tables,
@@ -261,23 +261,21 @@ export async function POST(request: NextRequest) {
 
       // 4. Clean up duplicate issues that reference the deleted entity
       // Resolve any potential_duplicate issues on OTHER entities that point to the deleted entity
-      await tx.entity_issues.updateMany({
-        where: {
-          issue_type: 'potential_duplicate',
-          status: 'open',
-          detail: { path: ['duplicate_of_id'], equals: deleteId },
-        },
-        data: { status: 'resolved', resolved_at: new Date(), resolved_by: 'merge' },
-      });
+      await tx.$executeRaw`
+        UPDATE entity_issues
+        SET status = 'resolved', resolved_at = NOW(), resolved_by = 'merge'
+        WHERE issue_type = 'potential_duplicate'
+          AND status = 'open'
+          AND detail->>'duplicate_of_id' = ${deleteId}
+      `;
       // Also resolve any potential_duplicate issue on the kept entity (it was the duplicate pair)
-      await tx.entity_issues.updateMany({
-        where: {
-          entity_id: keepId,
-          issue_type: 'potential_duplicate',
-          status: 'open',
-        },
-        data: { status: 'resolved', resolved_at: new Date(), resolved_by: 'merge' },
-      });
+      await tx.$executeRaw`
+        UPDATE entity_issues
+        SET status = 'resolved', resolved_at = NOW(), resolved_by = 'merge'
+        WHERE entity_id = ${keepId}
+          AND issue_type = 'potential_duplicate'
+          AND status = 'open'
+      `;
     });
 
     return NextResponse.json({
