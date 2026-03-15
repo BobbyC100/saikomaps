@@ -126,7 +126,10 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'issueId is required' }, { status: 400 });
       }
 
-      const issue = await db.entity_issues.findUnique({ where: { id: issueId } });
+      const issues = await db.$queryRaw<{ id: string; issue_type: string; status: string }[]>`
+        SELECT id, issue_type, status FROM entity_issues WHERE id = ${issueId}
+      `;
+      const issue = issues[0];
       if (!issue) {
         return NextResponse.json({ error: `Issue not found: ${issueId}` }, { status: 404 });
       }
@@ -135,14 +138,10 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ issueId, status: 'already_resolved' });
       }
 
-      await db.entity_issues.update({
-        where: { id: issueId },
-        data: {
-          status: 'resolved',
-          resolved_at: new Date(),
-          resolved_by: 'HUMAN',
-        },
-      });
+      await db.$executeRaw`
+        UPDATE entity_issues SET status = 'resolved', resolved_at = NOW(), resolved_by = 'HUMAN'
+        WHERE id = ${issueId}
+      `;
 
       return NextResponse.json({ issueId, issue_type: issue.issue_type, status: 'resolved' });
     }
@@ -160,24 +159,23 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      const issue = await db.entity_issues.findUnique({ where: { id: issueId } });
-      if (!issue) {
+      const issues2 = await db.$queryRaw<{ id: string; issue_type: string }[]>`
+        SELECT id, issue_type FROM entity_issues WHERE id = ${issueId}
+      `;
+      const issue2 = issues2[0];
+      if (!issue2) {
         return NextResponse.json({ error: `Issue not found: ${issueId}` }, { status: 404 });
       }
 
-      await db.entity_issues.update({
-        where: { id: issueId },
-        data: {
-          status: 'suppressed',
-          suppressed_reason: reason,
-          resolved_at: new Date(),
-          resolved_by: 'HUMAN',
-        },
-      });
+      await db.$executeRaw`
+        UPDATE entity_issues
+        SET status = 'suppressed', suppressed_reason = ${reason}, resolved_at = NOW(), resolved_by = 'HUMAN'
+        WHERE id = ${issueId}
+      `;
 
       return NextResponse.json({
         issueId,
-        issue_type: issue.issue_type,
+        issue_type: issue2.issue_type,
         status: 'suppressed',
         reason,
       });

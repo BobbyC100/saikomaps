@@ -316,9 +316,9 @@ export async function scanForDuplicates(
 
   // Now upsert entity_issues for each pair
   // First, get all existing potential_duplicate issues
-  const existingDupIssues = await prisma.entity_issues.findMany({
-    where: { issue_type: 'potential_duplicate' },
-  });
+  const existingDupIssues = await prisma.$queryRaw<{ id: string; entity_id: string; issue_type: string; status: string; detail: Record<string, unknown> | null }[]>`
+    SELECT id, entity_id, issue_type, status, detail FROM entity_issues WHERE issue_type = 'potential_duplicate'
+  `;
 
   // Build a map: entity_id -> existing issue(s)
   const existingByEntity = new Map<string, typeof existingDupIssues>();
@@ -362,19 +362,21 @@ export async function scanForDuplicates(
       } else if (matchingExisting.status === 'resolved') {
         // Re-open if resolved but still detected
         if (!dryRun) {
-          await prisma.entity_issues.update({
-            where: { id: matchingExisting.id },
-            data: { status: 'open', resolved_at: null, resolved_by: null, detail },
-          });
+          const detailJson = JSON.stringify(detail);
+          await prisma.$executeRaw`
+            UPDATE entity_issues SET status = 'open', resolved_at = NULL, resolved_by = NULL, detail = ${detailJson}::jsonb
+            WHERE id = ${matchingExisting.id}
+          `;
         }
         summary.issues_created++;
       } else {
         // Already open — update detail in case reasons changed
         if (!dryRun) {
-          await prisma.entity_issues.update({
-            where: { id: matchingExisting.id },
-            data: { detail },
-          });
+          const updateDetailJson = JSON.stringify(detail);
+          await prisma.$executeRaw`
+            UPDATE entity_issues SET detail = ${updateDetailJson}::jsonb
+            WHERE id = ${matchingExisting.id}
+          `;
         }
         summary.issues_unchanged++;
       }
@@ -383,30 +385,13 @@ export async function scanForDuplicates(
       // and this entity may already have a duplicate issue for a different pair.
       // In that case, update the existing issue with the new pair info.
       if (!dryRun) {
-        await prisma.entity_issues.upsert({
-          where: {
-            entity_id_issue_type: {
-              entity_id: pair.entity.id,
-              issue_type: 'potential_duplicate',
-            },
-          },
-          create: {
-            entity_id: pair.entity.id,
-            problem_class: 'identity',
-            issue_type: 'potential_duplicate',
-            status: 'open',
-            severity: 'high',
-            blocking_publish: false,
-            recommended_tool: 'merge_entities',
-            detail,
-          },
-          update: {
-            status: 'open',
-            detail,
-            resolved_at: null,
-            resolved_by: null,
-          },
-        });
+        const upsertDetailJson = JSON.stringify(detail);
+        await prisma.$executeRaw`
+          INSERT INTO entity_issues (entity_id, problem_class, issue_type, status, severity, blocking_publish, recommended_tool, detail)
+          VALUES (${pair.entity.id}, 'identity', 'potential_duplicate', 'open', 'high', false, 'merge_entities', ${upsertDetailJson}::jsonb)
+          ON CONFLICT (entity_id, issue_type)
+          DO UPDATE SET status = 'open', detail = ${upsertDetailJson}::jsonb, resolved_at = NULL, resolved_by = NULL
+        `;
       }
       summary.issues_created++;
       if (verbose) {
@@ -429,10 +414,10 @@ export async function scanForDuplicates(
     if (['resolved', 'suppressed'].includes(issue.status)) continue;
 
     if (!dryRun) {
-      await prisma.entity_issues.update({
-        where: { id: issue.id },
-        data: { status: 'resolved', resolved_at: new Date(), resolved_by: 'SCANNER' },
-      });
+      await prisma.$executeRaw`
+        UPDATE entity_issues SET status = 'resolved', resolved_at = NOW(), resolved_by = 'SCANNER'
+        WHERE id = ${issue.id}
+      `;
     }
     summary.issues_resolved++;
     if (verbose) {

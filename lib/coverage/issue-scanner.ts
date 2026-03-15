@@ -480,9 +480,9 @@ export async function scanEntities(
     };
 
     // Get existing issues for this entity (all statuses)
-    const existingIssues = await prisma.entity_issues.findMany({
-      where: { entity_id: entity.id },
-    });
+    const existingIssues = await prisma.$queryRaw<{ id: string; entity_id: string; issue_type: string; status: string; detail: unknown }[]>`
+      SELECT id, entity_id, issue_type, status, detail FROM entity_issues WHERE entity_id = ${entity.id}
+    `;
     const issueMap = new Map(existingIssues.map((i) => [i.issue_type, i]));
 
     for (const rule of ISSUE_RULES) {
@@ -503,15 +503,12 @@ export async function scanEntities(
           } else if (existing.status === 'resolved') {
             // Re-open resolved issue — problem recurred
             if (!dryRun) {
-              await prisma.entity_issues.update({
-                where: { id: existing.id },
-                data: {
-                  status: 'open',
-                  resolved_at: null,
-                  resolved_by: null,
-                  detail: detection.detail ?? existing.detail,
-                },
-              });
+              const reopenDetail = JSON.stringify(detection.detail ?? existing.detail);
+              await prisma.$executeRaw`
+                UPDATE entity_issues SET status = 'open', resolved_at = NULL, resolved_by = NULL,
+                  detail = ${reopenDetail}::jsonb
+                WHERE id = ${existing.id}
+              `;
             }
             result.issues_created++;
             if (verbose) {
@@ -524,18 +521,11 @@ export async function scanEntities(
         } else {
           // New issue
           if (!dryRun) {
-            await prisma.entity_issues.create({
-              data: {
-                entity_id: entity.id,
-                problem_class: rule.problem_class,
-                issue_type: rule.issue_type,
-                status: 'open',
-                severity: rule.severity,
-                blocking_publish: rule.blocking_publish,
-                recommended_tool: rule.recommended_tool,
-                detail: detection.detail ?? undefined,
-              },
-            });
+            const createDetail = detection.detail ? JSON.stringify(detection.detail) : null;
+            await prisma.$executeRaw`
+              INSERT INTO entity_issues (entity_id, problem_class, issue_type, status, severity, blocking_publish, recommended_tool, detail)
+              VALUES (${entity.id}, ${rule.problem_class}, ${rule.issue_type}, 'open', ${rule.severity}, ${rule.blocking_publish}, ${rule.recommended_tool}, ${createDetail}::jsonb)
+            `;
           }
           result.issues_created++;
           if (verbose) {
@@ -547,14 +537,10 @@ export async function scanEntities(
         if (existing && !['resolved', 'suppressed'].includes(existing.status)) {
           // Was active, now resolved
           if (!dryRun) {
-            await prisma.entity_issues.update({
-              where: { id: existing.id },
-              data: {
-                status: 'resolved',
-                resolved_at: new Date(),
-                resolved_by: 'SCANNER',
-              },
-            });
+            await prisma.$executeRaw`
+              UPDATE entity_issues SET status = 'resolved', resolved_at = NOW(), resolved_by = 'SCANNER'
+              WHERE id = ${existing.id}
+            `;
           }
           result.issues_resolved++;
           if (verbose) {
