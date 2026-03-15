@@ -463,6 +463,10 @@ Update `/api/admin/tools/discover-social/route.ts`:
 // 'all_social' runs instagram + tiktok + youtube discovery in one call
 ```
 
+> **Current implementation note (2026-03-15):** `scripts/discover-social.ts` uses
+> **OpenAI GPT-4.1-mini** with the `web_search_preview` tool for Instagram, TikTok,
+> and website discovery. The API route delegates to this script.
+
 YouTube URL extraction patterns:
 ```
 youtube.com/channel/{id}

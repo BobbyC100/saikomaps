@@ -4,7 +4,7 @@ doc_type: reference
 status: active
 owner: Bobby Ciccaglione
 created: '2026-03-10'
-last_updated: '2026-03-10'
+last_updated: '2026-03-15'
 project_id: SAIKO
 systems:
   - database
@@ -186,8 +186,9 @@ source: repo
 
 ---
 
-### **Place** (`places`) [CANONICAL ENTITY]
+### **Entity** (`entities`) [CANONICAL ENTITY]
 **Purpose:** Canonical place entity with full Google + AI enrichment
+> **Note:** Table was renamed from `places` to `entities` via migration `20260228100000_places_to_entities`. Prisma model name is `entities`.
 
 **Core Data:**
 - `id` (UUID, PK)
@@ -196,6 +197,7 @@ source: repo
 - `name`, `address`
 - `latitude`, `longitude` (Decimal 10,8 / 11,8)
 - `phone`, `website`, `instagram`
+- `tiktok` — **DB column exists but NOT in Prisma schema** (use `$executeRaw` to write)
 - `hours` (JSON)
 - `description`
 
@@ -468,3 +470,45 @@ Place now "enriched" and ready for display
 - Migrate remaining Location data to Place/MapPlace
 - Update all queries to use Place/MapPlace
 - Deprecate Location model
+
+---
+
+## DB Tables & Columns Without Prisma Models
+
+> **IMPORTANT:** These tables/columns exist in the production database but have NO corresponding Prisma model or field. Any code referencing them must use `$queryRaw` / `$executeRaw` instead of the typed Prisma client. Using `db.tableName.method()` will cause TypeScript build failures on Vercel.
+
+### Tables without Prisma models
+
+| Table | Purpose | FK to entities | Notes |
+|-------|---------|---------------|-------|
+| `entity_issues` | Data quality issues per entity | `entity_id` | Has unique constraint `(entity_id, issue_type)`. JSONB `detail` column. |
+| `instagram_accounts` | Instagram account metadata | `entity_id` | Stores `instagram_user_id`, profile data. Will be superseded by `social_accounts` (see unified-social-signals-v1). |
+
+### Columns without Prisma fields
+
+| Table | Column | Type | Notes |
+|-------|--------|------|-------|
+| `entities` | `tiktok` | TEXT | TikTok handle. Added via DB migration but not in Prisma schema. |
+
+### How to work with these
+
+```typescript
+// Reading
+const issues = await db.$queryRaw<{ id: string; issue_type: string }[]>`
+  SELECT id, issue_type FROM entity_issues WHERE entity_id = ${entityId}
+`;
+
+// Writing
+await db.$executeRaw`
+  UPDATE entities SET tiktok = ${handle} WHERE id = ${entityId}
+`;
+
+// Counting
+const count = await db.$queryRaw<[{ count: bigint }]>`
+  SELECT COUNT(*) as count FROM entity_issues WHERE entity_id = ${entityId}
+`.then(r => Number(r[0].count));
+```
+
+### Why not just add them to Prisma?
+
+The migration history has a fork between DB-only migrations and local migration files (see `MIGRATION_HISTORY_RECONCILIATION.md`). Running `prisma migrate` is unsafe until the fork is reconciled. Adding models to `schema.prisma` without a matching migration would create further drift.

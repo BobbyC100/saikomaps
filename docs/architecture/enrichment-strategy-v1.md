@@ -42,7 +42,7 @@ Run all free sources. Order within this phase is flexible — optimize for signa
 ### Phase 3: AI Extraction
 - Parse fetched surfaces (websites, social content, editorial articles) using AI
 - Extract structured signals from unstructured content
-- Cost: OpenAI API (low per-entity)
+- Cost: mixed — OpenAI for social discovery (GPT-4.1-mini + web search), Anthropic for identity extraction + taglines
 
 ### Phase 4: Paid API (gaps only)
 - **Google Places API** — only for fields still missing after free enrichment, or to confirm existing data
@@ -179,29 +179,32 @@ Source → Fetch → Extract → Evidence → Sanction → Canonical → Product
 - Enrichment score should measure `canonical_entity_state` completeness, not `entities` fields
 - No enrichment tools write to evidence tables — they skip straight to `entities`
 
-## Coverage Ops Dashboard (Rebuild Required)
+## Coverage Ops Dashboard
 
-### Current Problem
-Dashboard is scoped to "Reachable" (on published list) — which is 0 entities. Entire dashboard shows empty tables.
+Implemented at `/admin/coverage`. 4-tab layout, server-rendered from raw SQL (`lib/admin/coverage/sql.ts`). Scoped to all non-permanently-closed entities.
 
-### Required Fix
-- Default scope: **All entities** (or Addressable)
-- Filter options: All / OPEN / CANDIDATE / by neighborhood / by entity type
-- Surface all enrichment tools (not just Google API)
-- Show enrichment phase progress per entity
+### Tab Structure
 
-### Tool Inventory (should be accessible from dashboard)
-| Tool | Cost | Current State |
-|------|------|---------------|
-| Social discovery | Free | CLI only (`scripts/discover-social.ts`) |
-| Instagram API | Free | Have access, not wired to dashboard |
-| TikTok API | Free | Have access, not wired to dashboard |
-| Website fetch + parse | Free | ERA stages 2-4, CLI only |
-| AI identity extraction | OpenAI | ERA stage 5, CLI only |
-| AI tagline generation | OpenAI | ERA stage 7, CLI only |
-| Editorial discovery | Free | Not built |
-| Menu URL sync | Free | CLI only (`scripts/sync-menu-url-signals...`) |
-| Google Places API | Paid | Only tool surfaced in dashboard |
+| Tab | Query param | Purpose |
+|-----|-------------|---------|
+| **Overview** | `?view=overview` | Summary cards, tier completion bars, enrichment funnel |
+| **Tier Health** | `?view=tiers` | Summary strip, ERA pipeline histogram, per-tier field breakdowns |
+| **Enrichment Tools** | `?view=pipeline` | Tool inventory with copy-to-clipboard + recent enrichment runs |
+| **Neighborhoods** | `?view=neighborhoods` | Scorecard grid by neighborhood |
+
+### Tool Inventory (accessible from Enrichment Tools tab)
+| Tool | Cost | Provider | Command |
+|------|------|----------|---------|
+| Social discovery | Free | OpenAI GPT-4.1-mini | `node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/discover-social.ts` |
+| Website fetch + parse | Free | — | `node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/scan-merchant-surfaces.ts` |
+| Populate canonical | Free | — | `node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/populate-canonical-state.ts` |
+| Website enrichment | Free | — | `npm run enrich:website` |
+| Menu URL sync | Free | — | `npm run signals:menu:sync:local` |
+| AI identity extraction | Anthropic $ | Anthropic | ERA stage 5 via `enrich-place.ts` |
+| AI tagline generation | Anthropic $ | Anthropic | ERA stage 7 via `enrich-place.ts` |
+| ERA pipeline (full) | Anthropic $ | Anthropic | `node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/enrich-place.ts --slug=SLUG` |
+| Coverage apply (Google) | Google $$ | Google Places API | `node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/coverage-apply.ts --apply` |
+| Editorial discovery | — | Not built | — |
 
 ## Enrichment Score
 

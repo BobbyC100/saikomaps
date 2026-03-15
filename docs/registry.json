@@ -1,6 +1,6 @@
 {
   "generated_at": "2026-03-14T21:57:39.360Z",
-  "doc_count": 70,
+  "doc_count": 71,
   "docs": [
     {
       "doc_id": "AI-OPS-BOOT-PROTOCOL",
@@ -238,6 +238,34 @@
         "social",
         "signals",
         "pipeline",
+        "enrichment"
+      ],
+      "source": "repo"
+    },
+    {
+      "doc_id": "ARCH-COVERAGE-OPS-DASHBOARD-V1",
+      "doc_type": "architecture",
+      "status": "active",
+      "title": "Coverage Ops Dashboard v1",
+      "path": "docs/architecture/coverage-ops-dashboard-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-15",
+      "last_updated": "2026-03-15",
+      "project_id": "SAIKO",
+      "summary": "4-tab coverage operations dashboard spec — Overview, Tier Health, Enrichment Tools, Neighborhoods. Replaces prior 6-tab layout.",
+      "systems": [
+        "coverage-operations",
+        "admin-tools"
+      ],
+      "related_docs": [
+        "docs/architecture/enrichment-strategy-v1.md",
+        "docs/system/coverage-tier2-visit-facts-contract-v1.md"
+      ],
+      "category": "engineering",
+      "tags": [
+        "coverage",
+        "dashboard",
+        "admin",
         "enrichment"
       ],
       "source": "repo"

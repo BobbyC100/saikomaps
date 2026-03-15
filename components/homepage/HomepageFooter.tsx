@@ -20,6 +20,7 @@ export function HomepageFooter() {
             <h4>Saiko</h4>
             <Link href="/about">About</Link>
             <Link href="/contact">Contact</Link>
+            <Link href="/privacy">Privacy</Link>
           </div>
         </div>
       </div>

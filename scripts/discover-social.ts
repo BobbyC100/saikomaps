@@ -118,13 +118,10 @@ Search for "${entity.name} ${city} instagram" and "${entity.name} ${entity.neigh
 **Category:** ${category}
 ${entity.website ? `**Website:** ${entity.website}` : ''}
 
-Return your answer as a JSON object (no markdown fences):
-{
-  "instagram_handle": "@handle" or null,
-  "confidence": "high" | "medium" | "low",
-  "source_url": "URL where you found/confirmed this" or null,
-  "reasoning": "Brief explanation of how you found it and why you're confident"
-}`;
+You MUST return ONLY a JSON object with no other text before or after it:
+{"instagram_handle": "@handle or null", "confidence": "high or medium or low", "source_url": "URL or null", "reasoning": "brief explanation"}
+
+If you cannot find the handle, return: {"instagram_handle": null, "confidence": "low", "source_url": null, "reasoning": "why not found"}`;
 }
 
 function buildWebsitePrompt(entity: Entity): string {
@@ -147,13 +144,10 @@ Search for "${entity.name} ${city} ${category}" and "${entity.name} ${entity.nei
 **Location:** ${city}${neighborhood}
 **Category:** ${category}
 
-Return your answer as a JSON object (no markdown fences):
-{
-  "website_url": "https://..." or null,
-  "confidence": "high" | "medium" | "low",
-  "source_url": "URL where you confirmed this" or null,
-  "reasoning": "Brief explanation of how you found it and why you're confident"
-}`;
+You MUST return ONLY a JSON object with no other text before or after it:
+{"website_url": "https://... or null", "confidence": "high or medium or low", "source_url": "URL or null", "reasoning": "brief explanation"}
+
+If you cannot find the website, return: {"website_url": null, "confidence": "low", "source_url": null, "reasoning": "why not found"}`;
 }
 
 // ---------------------------------------------------------------------------
@@ -219,16 +213,31 @@ async function discover(
     const timeMs = Date.now() - start;
 
     // Extract text from output items
-    const textItems = response.output.filter((item: any) => item.type === 'message');
-    const fullText = textItems
-      .flatMap((item: any) => item.content ?? [])
-      .filter((c: any) => c.type === 'output_text')
-      .map((c: any) => c.text)
-      .join('\n');
+    // The Responses API returns different item types: 'message' (with content[].text),
+    // and top-level 'output_text' items. Handle both.
+    let fullText = '';
+    for (const item of response.output as any[]) {
+      if (item.type === 'message') {
+        for (const c of item.content ?? []) {
+          if (c.type === 'output_text') fullText += c.text + '\n';
+          if (c.type === 'text') fullText += c.text + '\n';
+        }
+      } else if (item.type === 'output_text') {
+        fullText += item.text + '\n';
+      }
+    }
+    fullText = fullText.trim();
 
     if (verbose) {
       const searches = response.output.filter((item: any) => item.type === 'web_search_call').length;
-      console.log(`    [${timeMs}ms | ${searches} searches]`);
+      const types = (response.output as any[]).map((i: any) => i.type).join(', ');
+      console.log(`    [${timeMs}ms | ${searches} searches | types: ${types}]`);
+      if (!fullText) {
+        const msgItems = (response.output as any[]).filter((i: any) => i.type === 'message');
+        for (const m of msgItems) {
+          console.log(`    DEBUG message.content: ${JSON.stringify(m.content).slice(0, 500)}`);
+        }
+      }
     }
 
     // Extract JSON from response
@@ -243,7 +252,13 @@ async function discover(
     }
 
     if (!jsonStr) {
+      // Model responded in prose without JSON — check if it's a "not found" response
+      const lower = fullText.toLowerCase();
+      if (lower.includes("couldn't find") || lower.includes('could not find') || lower.includes('unable to find') || lower.includes('no official') || lower.includes('not find')) {
+        return { entityId: entity.id, entityName: entity.name, slug: entity.slug, mode, discovered: null, confidence: 'low', reasoning: 'Model could not find handle (prose response)', action: 'not_found' };
+      }
       console.log(`    WARNING: No JSON in response for ${entity.name}`);
+      if (verbose) console.log(`    RESPONSE TEXT: ${fullText.slice(0, 300)}`);
       return { entityId: entity.id, entityName: entity.name, slug: entity.slug, mode, discovered: null, confidence: 'low', reasoning: 'No JSON in response', action: 'error' };
     }
 
