@@ -27,7 +27,7 @@
  *   identity / google_says_closed     — Google businessStatus is CLOSED_TEMPORARILY or CLOSED_PERMANENTLY (high)
  */
 
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Prisma } from '@prisma/client';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -509,7 +509,7 @@ export async function scanEntities(
                   status: 'open',
                   resolved_at: null,
                   resolved_by: null,
-                  detail: detection.detail ?? existing.detail,
+                  detail: (detection.detail ?? existing.detail ?? Prisma.JsonNull) as Prisma.InputJsonValue,
                 },
               });
             }
@@ -533,7 +533,7 @@ export async function scanEntities(
                 severity: rule.severity,
                 blocking_publish: rule.blocking_publish,
                 recommended_tool: rule.recommended_tool,
-                detail: detection.detail ?? undefined,
+                detail: detection.detail ? (detection.detail as Prisma.InputJsonValue) : undefined,
               },
             });
           }

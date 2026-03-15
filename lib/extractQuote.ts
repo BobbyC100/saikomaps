@@ -59,7 +59,7 @@ function extractBestSentences(content: string): string | null {
     .trim();
   
   // Split into sentences (basic approach)
-  const sentences = cleaned.match(/[^.!?]+[.!?]+/g) || [];
+  const sentences: string[] = cleaned.match(/[^.!?]+[.!?]+/g) ?? [];
   if (sentences.length === 0) {
     // Fallback: just truncate at word boundary
     return truncateQuote(cleaned, 180);

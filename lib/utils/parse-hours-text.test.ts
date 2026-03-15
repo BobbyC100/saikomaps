@@ -99,8 +99,7 @@ describe('parseHoursText — rejects ambiguous / un-parseable input', () => {
   it('returns null for "by appointment"', () => {
     const r = parseHoursText('By appointment only');
     expect(r.ok).toBe(false);
-    if (r.ok) return;
-    expect(r.reason).toMatch(/bail pattern/i);
+    expect((r as { ok: false; reason: string }).reason).toMatch(/bail pattern/i);
   });
 
   it('returns null for "call ahead"', () => {
@@ -122,8 +121,7 @@ describe('parseHoursText — rejects ambiguous / un-parseable input', () => {
     // Only 2 days parseable — not enough confidence
     const r = parseHoursText('Mon: 11am–9pm\nFri: 5pm–10pm');
     expect(r.ok).toBe(false);
-    if (r.ok) return;
-    expect(r.reason).toMatch(/distinct day/i);
+    expect((r as { ok: false; reason: string }).reason).toMatch(/distinct day/i);
   });
 
   it('rejects ambiguous Fri–Mon range (wraps week boundary)', () => {

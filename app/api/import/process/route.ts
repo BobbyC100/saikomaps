@@ -135,13 +135,14 @@ export async function POST(request: NextRequest) {
 
     // Enrich locations synchronously (for MVP - ensures coordinates are available)
     console.log('[IMPORT] Starting synchronous enrichment...')
-    const enrichmentResult = await enrichLocationsSync(list.id, locations, importJob.id)
+    const validatedLocations = locations as Array<{ name: string; address?: string; comment?: string; url?: string }>
+    const enrichmentResult = await enrichLocationsSync(list.id, validatedLocations, importJob.id)
     console.log('[IMPORT] Enrichment complete:', enrichmentResult)
     
     // Continue enrichment in background for any remaining locations
     if (enrichmentResult.remaining > 0) {
       console.log('[IMPORT] Starting background enrichment for', enrichmentResult.remaining, 'remaining locations...')
-      const remainingLocations = locations.slice(enrichmentResult.enriched)
+      const remainingLocations = validatedLocations.slice(enrichmentResult.enriched)
       processLocationsAsync(importJob.id, list.id, remainingLocations, enrichmentResult.enriched).catch((error) => {
         console.error('[IMPORT] Background enrichment failed:', error)
       })

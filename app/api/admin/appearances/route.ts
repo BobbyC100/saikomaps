@@ -137,8 +137,8 @@ export async function POST(request: NextRequest) {
         addressText: hostPlaceId ? undefined : addressText ?? undefined,
         scheduleText,
         status,
-        sources: body.sources ?? undefined,
-        confidence: body.confidence ?? undefined,
+        sources: (body.sources ?? undefined) as any,
+        confidence: (body.confidence ?? undefined) as any,
       },
       include: {
         subjectEntity: { select: { id: true, name: true, slug: true } },
@@ -161,8 +161,8 @@ export async function POST(request: NextRequest) {
         confidence: appearance.confidence,
         createdAt: appearance.createdAt,
         updatedAt: appearance.updatedAt,
-        subjectPlace: appearance.subjectEntity,
-        hostPlace: appearance.hostEntity,
+        subjectPlace: (appearance as any).subjectEntity,
+        hostPlace: (appearance as any).hostEntity,
       },
     });
   } catch (err) {

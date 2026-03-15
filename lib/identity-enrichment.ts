@@ -399,6 +399,7 @@ export async function runIdentityEnrichment(
     gpid: rawJson?.google_place_id ?? null,
     website: rawJson?.website ?? null,
     instagram: rawJson?.instagram ?? rawJson?.instagram_handle ?? null,
+    tiktok: rawJson?.tiktok ?? null,
     verifiedAddress: null,
     phone: recordPhone,
     category: recordCategory,

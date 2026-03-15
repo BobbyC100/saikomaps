@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
 
     // Search places
     const results = await searchPlace(searchQuery, {
-      locationBias,
+      locationBias: locationBias as { latitude: number; longitude: number } | undefined,
       maxResults: 10,
     })
 

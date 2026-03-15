@@ -334,15 +334,16 @@ export async function discoverEntitySurfaces(
   const fetched = await fetchPage(websiteUrl);
 
   if (!fetched.ok) {
+    const failure = fetched as FetchFailure;
     result.homepageRowId = await writeSurface({
       entityId,
       surfaceType: 'homepage',
       sourceUrl: websiteUrl,
       fetchStatus: 'fetch_failed',
-      metadataJson: { error: fetched.error, fetch_duration_ms: fetched.durationMs },
+      metadataJson: { error: failure.error, fetch_duration_ms: failure.durationMs },
     });
     result.homepageStatus = 'fetch_failed';
-    result.error = fetched.error;
+    result.error = failure.error;
     return result;
   }
 
