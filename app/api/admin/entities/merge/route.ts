@@ -217,10 +217,9 @@ export async function POST(request: NextRequest) {
         where: { entity_id: deleteId },
         data: { entity_id: keepId },
       });
-      await tx.instagram_accounts.updateMany({
-        where: { entity_id: deleteId },
-        data: { entity_id: keepId },
-      });
+      await tx.$executeRaw`
+        UPDATE instagram_accounts SET entity_id = ${keepId} WHERE entity_id = ${deleteId}
+      `;
       await tx.observed_claims.updateMany({
         where: { entity_id: deleteId },
         data: { entity_id: keepId },
