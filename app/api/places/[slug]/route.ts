@@ -4,10 +4,12 @@
  * Returns canonical PlacePageData — shape is locked by lib/contracts/place-page.ts.
  * Drift is caught by tests/contracts/place-page.contract.test.ts.
  *
- * Read strategy (temporary — entities-direct):
- *   All data fields read directly from entities table columns (post-26-migration state).
- *   canonical_entity_state, derived_signals, and interpretation_cache are wired in
- *   once those tables are created and populated (add_fields_v2_schema + populate scripts).
+ * Read strategy (hybrid — entities + evidence layer):
+ *   Identity/operational fields read from entities table columns (post-26-migration state).
+ *   derived_signals wired for identity_signals + offering_programs.
+ *   interpretation_cache wired for tagline + pull_quote (ERA Stage 7 output),
+ *     with entities columns as fallback for non-enriched places.
+ *   canonical_entity_state reads pending — next phase of Fields v2 cutover.
  *   golden_records fallback removed — that table is deferred for drop.
  */
 
@@ -187,7 +189,7 @@ export async function GET(
     const publishedMapPlaces = entity.map_places.filter((mp) => mp.lists && mp.lists.status === 'PUBLISHED');
     const mapIds = publishedMapPlaces.map(mp => mp.lists!.id);
 
-    const [activeOverlays, placeCounts, coverageSources, identitySignalsRow, offeringProgramsRow] = await Promise.all([
+    const [activeOverlays, placeCounts, coverageSources, identitySignalsRow, offeringProgramsRow, taglineRow, pullQuoteRow] = await Promise.all([
       getActiveOverlays({ placeId: entity.id, now: new Date() }).catch((err) => {
         console.error(`[Newsletter Overlay] Failed to fetch overlays for place ${entity.slug}:`, err);
         return [] as Awaited<ReturnType<typeof getActiveOverlays>>;
@@ -213,6 +215,18 @@ export async function GET(
         where: { entity_id: entity.id, signal_key: 'offering_programs' },
         select: { signal_value: true },
         orderBy: { computed_at: 'desc' },
+      }).catch(() => null),
+      // Tagline from interpretation_cache (ERA Stage 7 output)
+      db.interpretation_cache.findFirst({
+        where: { entity_id: entity.id, output_type: 'TAGLINE', is_current: true },
+        select: { content: true },
+        orderBy: { generated_at: 'desc' },
+      }).catch(() => null),
+      // Pull quote from interpretation_cache
+      db.interpretation_cache.findFirst({
+        where: { entity_id: entity.id, output_type: 'PULL_QUOTE', is_current: true },
+        select: { content: true },
+        orderBy: { generated_at: 'desc' },
       }).catch(() => null),
     ]);
 
@@ -351,11 +365,28 @@ export async function GET(
       winelistUrl,
       description: entity.description ?? null,
       descriptionSource: entity.description_source ?? null,
-      tagline: entity.tagline ?? null,
-      pullQuote: entity.pullQuote ?? null,
-      pullQuoteAuthor: entity.pullQuoteAuthor ?? null,
-      pullQuoteSource: entity.pullQuoteSource ?? null,
-      pullQuoteUrl: entity.pullQuoteUrl ?? null,
+      // Tagline: interpretation_cache (ERA) → entities fallback
+      tagline: (() => {
+        const tc = taglineRow?.content as { text?: string } | null;
+        return tc?.text ?? entity.tagline ?? null;
+      })(),
+      // Pull quote: interpretation_cache → entities fallback
+      pullQuote: (() => {
+        const pq = pullQuoteRow?.content as { text?: string; author?: string; source_name?: string; source_url?: string } | null;
+        return pq?.text ?? entity.pullQuote ?? null;
+      })(),
+      pullQuoteAuthor: (() => {
+        const pq = pullQuoteRow?.content as { author?: string } | null;
+        return pq?.author ?? entity.pullQuoteAuthor ?? null;
+      })(),
+      pullQuoteSource: (() => {
+        const pq = pullQuoteRow?.content as { source_name?: string } | null;
+        return pq?.source_name ?? entity.pullQuoteSource ?? null;
+      })(),
+      pullQuoteUrl: (() => {
+        const pq = pullQuoteRow?.content as { source_url?: string } | null;
+        return pq?.source_url ?? entity.pullQuoteUrl ?? null;
+      })(),
       tips: entity.tips ?? [],
       curatorNote: curatorNote ?? null,
       curatorCreatorName: curatorCreatorName ?? null,

@@ -70,13 +70,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: `Entity not found: ${slug}` }, { status: 404 });
     }
 
-    // Promote CANDIDATE → OPEN so enrich-place.ts can find it
-    if (entity.status === 'CANDIDATE') {
-      await db.entities.update({
-        where: { slug },
-        data: { status: 'OPEN' },
-      });
-    }
+    // Promote CANDIDATE → OPEN so enrich-place.ts can find it,
+    // and reset enrichment_stage + last_enriched_at so pipeline re-runs stages (especially stage 6)
+    await db.entities.update({
+      where: { slug },
+      data: {
+        ...(entity.status === 'CANDIDATE' ? { status: 'OPEN' } : {}),
+        enrichment_stage: null,
+        last_enriched_at: null,
+      },
+    });
 
     // Build spawn args — Stage 1 uses backfill-google-places.ts (enrich-place.ts
     // skips stage 1 by design to prevent uncontrolled API spend).

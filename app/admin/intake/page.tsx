@@ -238,6 +238,22 @@ function ResultsTable({ results }: { results: IntakeResult[] }) {
     );
   }, [results, overrides, handleResolve]);
 
+  const [isCreatingAll, setIsCreatingAll] = useState(false);
+  const handleCreateAll = useCallback(async () => {
+    const ambiguousRows = results
+      .map((r) => overrides[r.input] ?? r)
+      .filter((r) => r.outcome === 'ambiguous');
+    if (ambiguousRows.length === 0) return;
+    setIsCreatingAll(true);
+    try {
+      await Promise.allSettled(
+        ambiguousRows.map((r) => handleForceCreate(r.input))
+      );
+    } finally {
+      setIsCreatingAll(false);
+    }
+  }, [results, overrides, handleForceCreate]);
+
   const handleEnrich = useCallback(async (slug: string) => {
     setEnrichStates((s) => ({ ...s, [slug]: 'queued' }));
     try {
@@ -260,15 +276,23 @@ function ResultsTable({ results }: { results: IntakeResult[] }) {
       {ambiguousCount > 0 && (
         <div className="mb-3 flex items-center gap-3">
           <button
+            onClick={handleCreateAll}
+            disabled={isCreatingAll}
+            style={{ backgroundColor: C.green, color: '#fff' }}
+            className="px-4 py-2 rounded text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 transition-opacity"
+          >
+            {isCreatingAll ? 'Creating...' : `Create All (${ambiguousCount})`}
+          </button>
+          <button
             onClick={handleResolveAll}
             disabled={isAnyResolving}
-            style={{ backgroundColor: C.accent, color: '#fff' }}
+            style={{ backgroundColor: C.bg, color: C.text, border: `1px solid ${C.border}` }}
             className="px-4 py-2 rounded text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-90 transition-opacity"
           >
             {isAnyResolving ? 'Resolving...' : `Resolve All (${ambiguousCount})`}
           </button>
           <span className="text-xs" style={{ color: C.muted }}>
-            Auto-searches Google Places for each ambiguous row
+            Create All skips Google Places — pushes straight to CANDIDATE
           </span>
         </div>
       )}

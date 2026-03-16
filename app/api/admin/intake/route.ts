@@ -260,7 +260,7 @@ function parseCSV(text: string): IntakeInput[] {
     const row: Record<string, string> = {};
     header.forEach((col, idx) => { row[col] = values[idx] || ''; });
 
-    const name = row['Name'] || row['Place Name'] || row['name'] || row['place_name'] || '';
+    const name = row['Name'] || row['Place Name'] || row['name'] || row['place_name'] || row['place'] || row['Place'] || row['Title'] || row['title'] || row['Location'] || row['location'] || '';
     if (!name) continue;
 
     inputs.push({

@@ -1,7 +1,49 @@
 {
-  "generated": "2026-03-15T22:30:00.000Z",
-  "doc_count": 86,
+  "generated": "2026-03-16T05:20:17.835Z",
+  "doc_count": 73,
   "docs": [
+    {
+      "doc_id": "ARCH-ENTITY-LIFECYCLE-CLOSURE-V1",
+      "doc_type": "architecture",
+      "status": "draft",
+      "title": "Entity Lifecycle and Closure Specification",
+      "path": "docs/architecture/entity-lifecycle-and-closure-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-16",
+      "last_updated": "2026-03-16",
+      "project_id": "SAIKO",
+      "summary": "Lifecycle state management, closure as claim-based evidence, status_claims ledger, Reference Confidence Model. Companion to PI-CONCEPT-V1.",
+      "systems": [
+        "fields",
+        "entity-lifecycle"
+      ],
+      "related_docs": [
+        "docs/architecture/place-identity-concept-v1.md",
+        "docs/architecture/entity-classification-layers-v1.md"
+      ]
+    },
+    {
+      "doc_id": "PI-CONCEPT-V1",
+      "doc_type": "architecture",
+      "status": "draft",
+      "title": "Place Identity Concept Document",
+      "path": "docs/architecture/place-identity-concept-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-16",
+      "last_updated": "2026-03-16",
+      "project_id": "SAIKO",
+      "summary": "Canonical definition of Place Identity — fields, lifecycle states, identity resolution, anchors, brand evolution. Layer 1 concept doc.",
+      "systems": [
+        "fields",
+        "entity-identity"
+      ],
+      "related_docs": [
+        "docs/architecture/entity-lifecycle-and-closure-v1.md",
+        "docs/architecture/entity-classification-layers-v1.md",
+        "docs/architecture/identity-scoring-v1.md",
+        "docs/architecture/enrichment-strategy-v1.md"
+      ]
+    },
     {
       "doc_id": "ARCH-AI-OPERATING-LAYER",
       "doc_type": "architecture",
@@ -19,10 +61,30 @@
       "related_docs": []
     },
     {
+      "doc_id": "ARCH-COVERAGE-OPS-DASHBOARD-V1",
+      "doc_type": "architecture",
+      "status": "active",
+      "title": "Coverage Ops Dashboard v1",
+      "path": "docs/architecture/coverage-ops-dashboard-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-15",
+      "last_updated": "2026-03-15",
+      "project_id": "SAIKO",
+      "summary": "4-tab coverage operations dashboard spec — Overview, Tier Health, Enrichment Tools, Neighborhoods. Replaces prior 6-tab layout.",
+      "systems": [
+        "coverage-operations",
+        "admin-tools"
+      ],
+      "related_docs": [
+        "docs/architecture/enrichment-strategy-v1.md",
+        "docs/system/coverage-tier2-visit-facts-contract-v1.md"
+      ]
+    },
+    {
       "doc_id": "ARCH-COVERAGE-TIERS-V1",
       "doc_type": "architecture",
       "status": "active",
-      "title": "Coverage Tiers \u2014 Entity Enrichment Model",
+      "title": "Coverage Tiers — Entity Enrichment Model",
       "path": "docs/architecture/coverage-tiers-v1.md",
       "owner": "Bobby Ciccaglione",
       "created": "2026-03-14",
@@ -57,7 +119,7 @@
       "created": "2026-03-14",
       "last_updated": "2026-03-14",
       "project_id": "SAIKO",
-      "summary": "Plain-language explanation of entity classification layers in the current schema \u2014 entityType vs primary_vertical vs category vs cuisine_type \u2014 including operational authority and usage guidance.",
+      "summary": "Plain-language explanation of entity classification layers in the current schema — entityType vs primary_vertical vs category vs cuisine_type — including operational authority and usage guidance.",
       "systems": [
         "fields-data-layer",
         "coverage-operations",
@@ -73,13 +135,13 @@
       "doc_id": "ARCH-IDENTITY-SCORING-V1",
       "doc_type": "architecture",
       "status": "active",
-      "title": "Identity Scoring \u2014 Weighted Anchor Model",
+      "title": "Identity Scoring — Weighted Anchor Model",
       "path": "docs/architecture/identity-scoring-v1.md",
       "owner": "Bobby Ciccaglione",
       "created": "2026-03-14",
       "last_updated": "2026-03-14",
       "project_id": "SAIKO",
-      "summary": "Weighted anchor scoring model for entity identity confidence. GPID is not required \u2014 entities reach publication threshold through any combination of anchors that demonstrates sufficient identity certainty.",
+      "summary": "Weighted anchor scoring model for entity identity confidence. GPID is not required — entities reach publication threshold through any combination of anchors that demonstrates sufficient identity certainty.",
       "systems": [
         "identity-enrichment",
         "coverage-operations"
@@ -93,7 +155,7 @@
       "doc_id": "ARCH-SOCIAL-FIELDS-V1",
       "doc_type": "architecture",
       "status": "active",
-      "title": "Social Fields \u2014 Entity-Level Specification",
+      "title": "Social Fields — Entity-Level Specification",
       "path": "docs/architecture/social-fields-spec-v1.md",
       "owner": "Bobby Ciccaglione",
       "created": "2026-03-14",
@@ -128,41 +190,30 @@
       "related_docs": []
     },
     {
-      "doc_id": "ARCH-UNIFIED-SOCIAL-V1",
-      "doc_type": "architecture",
-      "status": "draft",
-      "title": "Unified Social Signals \u2014 Architecture Specification",
-      "path": "docs/architecture/unified-social-signals-v1.md",
+      "doc_id": "ARCHITECTURE-FIELDS-INGESTION-PIPELINE-V1",
+      "doc_type": "document",
+      "status": "active",
+      "title": "(untitled)",
+      "path": "docs/architecture/fields-ingestion-pipeline-v1.md",
       "owner": "Bobby Ciccaglione",
-      "created": "2026-03-14",
-      "last_updated": "2026-03-14",
+      "created": "2026-03-16",
+      "last_updated": "2026-03-16",
       "project_id": "SAIKO",
-      "summary": "Unified social signals schema replacing platform-specific tables with three platform-agnostic tables (social_accounts, social_content, social_metric_snapshots) supporting Instagram, TikTok, and YouTube through a single ingestion and signal extraction layer.",
-      "systems": [
-        "social-signals",
-        "enrichment-pipeline",
-        "fields-v2",
-        "coverage-operations"
-      ],
-      "related_docs": [
-        "docs/architecture/social-fields-spec-v1.md",
-        "docs/architecture/instagram-api-integration-v1.md",
-        "docs/architecture/instagram-implementation-v1.md",
-        "docs/architecture/identity-scoring-v1.md",
-        "docs/architecture/coverage-ops-approach-v1.md"
-      ]
+      "summary": "",
+      "systems": [],
+      "related_docs": []
     },
     {
       "doc_id": "ARCHITECTURE-INSTAGRAM-API-INTEGRATION-V1",
       "doc_type": "architecture",
       "status": "active",
-      "title": "Instagram API Integration \u2014 Current State",
+      "title": "Instagram API Integration — Current State",
       "path": "docs/architecture/instagram-api-integration-v1.md",
       "owner": "Bobby Ciccaglione",
       "created": "2026-03-13",
       "last_updated": "2026-03-13",
       "project_id": "SAIKO",
-      "summary": "Instagram Graph API integration state \u2014 Meta app config, permissions, verified endpoints, architectural models for media ingestion",
+      "summary": "Instagram Graph API integration state — Meta app config, permissions, verified endpoints, architectural models for media ingestion",
       "systems": [],
       "related_docs": []
     },
@@ -170,13 +221,13 @@
       "doc_id": "ARCHITECTURE-INSTAGRAM-IMPLEMENTATION-V1",
       "doc_type": "architecture",
       "status": "active",
-      "title": "Instagram Integration \u2014 Implementation & Impact Doc",
+      "title": "Instagram Integration — Implementation & Impact Doc",
       "path": "docs/architecture/instagram-implementation-v1.md",
       "owner": "Bobby Ciccaglione",
       "created": "2026-03-13",
       "last_updated": "2026-03-13",
       "project_id": "SAIKO",
-      "summary": "Instagram integration implementation plan and system impact \u2014 tables, sync rules, temporal signals, interpretation layer, photo strategy, attachment model. V0.2 adds current state assessment, implementation phases, and data review results.",
+      "summary": "Instagram integration implementation plan and system impact — tables, sync rules, temporal signals, interpretation layer, photo strategy, attachment model. V0.2 adds current state assessment, implementation phases, and data review results.",
       "systems": [
         "instagram-api",
         "enrichment-pipeline",
@@ -191,13 +242,13 @@
       "doc_id": "ARCHITECTURE-INSTAGRAM-INGESTION-V1",
       "doc_type": "architecture",
       "status": "draft",
-      "title": "Instagram Ingestion \u2014 Field Spec v1",
+      "title": "Instagram Ingestion — Field Spec v1",
       "path": "docs/architecture/instagram-ingestion-field-spec-v1.md",
       "owner": "Bobby Ciccaglione",
       "created": "2026-03-13",
       "last_updated": "2026-03-13",
       "project_id": "SAIKO",
-      "summary": "Instagram ingestion schema \u2014 3 tables, field definitions, sync rules. Engineering handoff for migration + Prisma models.",
+      "summary": "Instagram ingestion schema — 3 tables, field definitions, sync rules. Engineering handoff for migration + Prisma models.",
       "systems": [],
       "related_docs": []
     },
@@ -205,13 +256,13 @@
       "doc_id": "COVOPS-APPROACH-V1",
       "doc_type": "architecture",
       "status": "active",
-      "title": "Coverage Operations \u2014 Architectural Position",
+      "title": "Coverage Operations — Architectural Position",
       "path": "docs/architecture/coverage-ops-approach-v1.md",
       "owner": "Bobby Ciccaglione",
       "created": "Thu Mar 12 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
       "last_updated": "Fri Mar 13 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
       "project_id": "SAIKO",
-      "summary": "Architectural position for Coverage Operations \u2014 introduces entity_issues as a unified operational layer over existing queue fragments, with tool readiness assessment and phased implementation plan.",
+      "summary": "Architectural position for Coverage Operations — introduces entity_issues as a unified operational layer over existing queue fragments, with tool readiness assessment and phased implementation plan.",
       "systems": [
         "coverage-operations",
         "fields-data-layer",
@@ -228,7 +279,7 @@
       "doc_id": "DEC-002",
       "doc_type": "decision",
       "status": "active",
-      "title": "DEC-002 \u2014 Repo-Based Canonical Knowledge Store",
+      "title": "DEC-002 — Repo-Based Canonical Knowledge Store",
       "path": "docs/decisions/DEC-002.md",
       "owner": "Bobby Ciccaglione",
       "created": "Wed Mar 11 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
@@ -245,10 +296,24 @@
       ]
     },
     {
+      "doc_id": "ENRICH-STRATEGY-V1",
+      "doc_type": "document",
+      "status": "draft",
+      "title": "Entity Enrichment Strategy",
+      "path": "docs/architecture/enrichment-strategy-v1.md",
+      "owner": "bobby",
+      "created": "Sat Mar 14 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "last_updated": "",
+      "project_id": "",
+      "summary": "",
+      "systems": [],
+      "related_docs": []
+    },
+    {
       "doc_id": "FEAT-MARKETS-SPEC-V1-2",
       "doc_type": "spec",
       "status": "active",
-      "title": "Markets Integration \u2014 SPEC v1.2",
+      "title": "Markets Integration — SPEC v1.2",
       "path": "docs/features/markets/SPEC_v1.2.md",
       "owner": "Bobby Ciccaglione",
       "created": "2026-03-10",
@@ -268,7 +333,7 @@
       "created": "Thu Mar 12 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
       "last_updated": "Thu Mar 12 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
       "project_id": "FIELDS",
-      "summary": "Canonical inventory of all enrichment operations available on an entity record \u2014 automated (Google Places, neighborhood lookup), semi-automated (GPID, Instagram, Photos), and human-only (editorial fields). Coverage Dashboard and Entity Profile are designed from this inventory outward.",
+      "summary": "Canonical inventory of all enrichment operations available on an entity record — automated (Google Places, neighborhood lookup), semi-automated (GPID, Instagram, Photos), and human-only (editorial fields). Coverage Dashboard and Entity Profile are designed from this inventory outward.",
       "systems": [
         "fields-data-layer",
         "data-pipeline",
@@ -284,13 +349,13 @@
       "doc_id": "FIELDS-ENTITY-AWARENESS-STAGE-V1",
       "doc_type": "architecture",
       "status": "active",
-      "title": "Awareness Stage \u2014 Workbench",
+      "title": "Awareness Stage — Workbench",
       "path": "docs/architecture/entity-awareness-stage-v1.md",
       "owner": "Bobby Ciccaglione",
       "created": "Wed Mar 11 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
       "last_updated": "Wed Mar 11 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
       "project_id": "FIELDS",
-      "summary": "Defines the Awareness stage \u2014 Saiko's pre-identity, pre-enrichment intake layer. Covers source abstraction, organization responsibilities, readiness signals, and the workbench model.",
+      "summary": "Defines the Awareness stage — Saiko's pre-identity, pre-enrichment intake layer. Covers source abstraction, organization responsibilities, readiness signals, and the workbench model.",
       "systems": [
         "entity-resolution",
         "fields-data-layer"
@@ -305,13 +370,13 @@
       "doc_id": "FIELDS-ENTITY-PIPELINE-OVERVIEW-V1",
       "doc_type": "architecture",
       "status": "active",
-      "title": "Entity Pipeline \u2014 Overview",
+      "title": "Entity Pipeline — Overview",
       "path": "docs/architecture/entity-pipeline-overview-v1.md",
       "owner": "Bobby Ciccaglione",
       "created": "Wed Mar 11 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
       "last_updated": "Wed Mar 11 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
       "project_id": "FIELDS",
-      "summary": "High-level model of the stages through which an entity moves inside Saiko \u2014 from first contact (Awareness) through Identification to Enrichment. Mental model only; does not prescribe UI, schema, or workflow.",
+      "summary": "High-level model of the stages through which an entity moves inside Saiko — from first contact (Awareness) through Identification to Enrichment. Mental model only; does not prescribe UI, schema, or workflow.",
       "systems": [
         "entity-resolution",
         "fields-data-layer"
@@ -326,13 +391,13 @@
       "doc_id": "FIELDS-ERA-OVERVIEW-V1",
       "doc_type": "architecture",
       "status": "active",
-      "title": "Entity Record Awareness (ERA) \u2014 One-Pager",
+      "title": "Entity Record Awareness (ERA) — One-Pager",
       "path": "docs/architecture/fields-era-overview-v1.md",
       "owner": "Bobby Ciccaglione",
       "created": "Wed Mar 11 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
       "last_updated": "Wed Mar 11 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
       "project_id": "SAIKO",
-      "summary": "Defines Entity Record Awareness (ERA) \u2014 how Saiko becomes aware a place exists, separating awareness from canonical (Golden) status to prevent silent drift.",
+      "summary": "Defines Entity Record Awareness (ERA) — how Saiko becomes aware a place exists, separating awareness from canonical (Golden) status to prevent silent drift.",
       "systems": [
         "fields-data-layer",
         "data-pipeline"
@@ -354,7 +419,7 @@
       "created": "Wed Mar 11 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
       "last_updated": "Fri Mar 13 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
       "project_id": "SAIKO",
-      "summary": "Defines Saiko's 12-vertical taxonomy \u2014 the primary domains of urban life used to classify every place in the system. Documents anthropological rationale, system role, technical anchors, and design implications.",
+      "summary": "Defines Saiko's 12-vertical taxonomy — the primary domains of urban life used to classify every place in the system. Documents anthropological rationale, system role, technical anchors, and design implications.",
       "systems": [
         "fields-data-layer",
         "entity-resolution"
@@ -426,7 +491,7 @@
       "created": "Wed Mar 11 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
       "last_updated": "Wed Mar 11 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
       "project_id": "FIELDS",
-      "summary": "Defines capture profiles for each source type \u2014 what to attempt when a source is touched, and what can be promoted to Facts-tier vs stored as raw material.",
+      "summary": "Defines capture profiles for each source type — what to attempt when a source is touched, and what can be promoted to Facts-tier vs stored as raw material.",
       "systems": [
         "fields-data-layer",
         "entity-resolution"
@@ -440,13 +505,13 @@
       "doc_id": "PIPE-INSTAGRAM-WORKSTREAM-V1",
       "doc_type": "spec",
       "status": "active",
-      "title": "Instagram Integration \u2014 Workstream & Execution Plan",
+      "title": "Instagram Integration — Workstream & Execution Plan",
       "path": "docs/pipelines/instagram-integration-workstream-v1.md",
       "owner": "Bobby Ciccaglione",
       "created": "2026-03-13",
       "last_updated": "2026-03-13",
       "project_id": "SAIKO",
-      "summary": "Phased execution plan for Instagram integration \u2014 6 phases from data quality through contextual display. Includes codebase readiness assessment, effort estimates, timing recommendations, and per-phase task checklists.",
+      "summary": "Phased execution plan for Instagram integration — 6 phases from data quality through contextual display. Includes codebase readiness assessment, effort estimates, timing recommendations, and per-phase task checklists.",
       "systems": [
         "instagram-api",
         "enrichment-pipeline",
@@ -463,13 +528,13 @@
       "doc_id": "SAIKO-ADMIN-SPRING-CLEANING-2026-03",
       "doc_type": "document",
       "status": "active",
-      "title": "Admin Spring Cleaning Log \u2014 March 2026",
+      "title": "Admin Spring Cleaning Log — March 2026",
       "path": "docs/ADMIN-SPRING-CLEANING-LOG.md",
       "owner": "Bobby Ciccaglione",
       "created": "Thu Mar 12 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
       "last_updated": "Thu Mar 12 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
       "project_id": "SAIKO",
-      "summary": "Record of admin routes and features retired or fixed in March 2026 \u2014 Review Queue, Energy Engine, Appearances auth, GPID Queue URL. Captures rationale for each retirement.",
+      "summary": "Record of admin routes and features retired or fixed in March 2026 — Review Queue, Energy Engine, Appearances auth, GPID Queue URL. Captures rationale for each retirement.",
       "systems": [
         "admin"
       ],
@@ -493,13 +558,13 @@
       "doc_id": "SAIKO-COVERAGE-DASHBOARD-DESIGN-V1",
       "doc_type": "architecture",
       "status": "active",
-      "title": "Coverage Dashboard \u2014 Design Principles",
+      "title": "Coverage Dashboard — Design Principles",
       "path": "docs/COVERAGE-DASHBOARD-DESIGN-PRINCIPLES.md",
       "owner": "Bobby Ciccaglione",
       "created": "Thu Mar 12 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
       "last_updated": "Thu Mar 12 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
       "project_id": "SAIKO",
-      "summary": "Design principles for the Coverage Dashboard \u2014 a work surface for resolving data gaps, organized by solution type (automated vs. semi-automated vs. human-only) rather than by missing field.",
+      "summary": "Design principles for the Coverage Dashboard — a work surface for resolving data gaps, organized by solution type (automated vs. semi-automated vs. human-only) rather than by missing field.",
       "systems": [
         "admin",
         "coverage-dashboard"
@@ -581,7 +646,7 @@
       "created": "Wed Mar 11 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
       "last_updated": "Wed Mar 11 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
       "project_id": "SAIKO",
-      "summary": "Gate conditions that must be satisfied before applying the two deferred Fields v2 migrations \u2014 slim entities and legacy table drop.",
+      "summary": "Gate conditions that must be satisfied before applying the two deferred Fields v2 migrations — slim entities and legacy table drop.",
       "systems": [
         "fields-data-layer",
         "database"
@@ -595,7 +660,7 @@
       "doc_id": "SAIKO-ENERGY-SCORE-SPEC",
       "doc_type": "spec",
       "status": "active",
-      "title": "Energy Score \u2014 Specification (Locked)",
+      "title": "Energy Score — Specification (Locked)",
       "path": "docs/ENERGY_SCORE_SPEC.md",
       "owner": "Bobby Ciccaglione",
       "created": "2026-03-10",
@@ -615,7 +680,7 @@
       "created": "Wed Mar 11 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
       "last_updated": "Wed Mar 11 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
       "project_id": "SAIKO",
-      "summary": "Field-level audit and decision log for the entities table \u2014 what belongs, what migrates, and what is retired as part of the Fields v2 architecture.",
+      "summary": "Field-level audit and decision log for the entities table — what belongs, what migrates, and what is retired as part of the Fields v2 architecture.",
       "systems": [
         "fields-data-layer",
         "database"
@@ -630,13 +695,13 @@
       "doc_id": "SAIKO-ENTITY-PROFILE-SPEC-V1",
       "doc_type": "spec",
       "status": "active",
-      "title": "Entity Profile Page \u2014 Spec",
+      "title": "Entity Profile Page — Spec",
       "path": "docs/ENTITY-PROFILE-SPEC.md",
       "owner": "Bobby Ciccaglione",
       "created": "Thu Mar 12 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
       "last_updated": "Thu Mar 12 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
       "project_id": "SAIKO",
-      "summary": "Spec for /admin/entity/[id] \u2014 the canonical single-entity admin view showing all field states with inline resolution actions and a TimeFOLD editorial slot.",
+      "summary": "Spec for /admin/entity/[id] — the canonical single-entity admin view showing all field states with inline resolution actions and a TimeFOLD editorial slot.",
       "systems": [
         "admin",
         "entity-profile"
@@ -665,7 +730,7 @@
       "doc_id": "SAIKO-FIELDS-V2-CUTOVER-SPEC",
       "doc_type": "spec",
       "status": "active",
-      "title": "Fields v2 \u2014 Cutover Spec",
+      "title": "Fields v2 — Cutover Spec",
       "path": "docs/FIELDS_V2_CUTOVER_SPEC.md",
       "owner": "Bobby Ciccaglione",
       "created": "2026-03-10",
@@ -681,13 +746,13 @@
       "doc_id": "SAIKO-FIELDS-V2-TARGET-ARCHITECTURE",
       "doc_type": "architecture",
       "status": "active",
-      "title": "Saiko Fields v2 \u2014 Target Architecture Spec",
+      "title": "Saiko Fields v2 — Target Architecture Spec",
       "path": "docs/FIELDS_V2_TARGET_ARCHITECTURE.md",
       "owner": "Bobby Ciccaglione",
       "created": "Mon Mar 09 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
       "last_updated": "Wed Mar 11 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
       "project_id": "SAIKO",
-      "summary": "Defines the four-layer Fields v2 architecture \u2014 entities routing shell, canonical_entity_state, interpretation_cache, and place_coverage_status \u2014 with anti-drift rules and current migration status.",
+      "summary": "Defines the four-layer Fields v2 architecture — entities routing shell, canonical_entity_state, interpretation_cache, and place_coverage_status — with anti-drift rules and current migration status.",
       "systems": [
         "fields-data-layer",
         "database"
@@ -704,7 +769,7 @@
       "doc_id": "SAIKO-FORMALITY-SCORE-SPEC",
       "doc_type": "spec",
       "status": "active",
-      "title": "Formality Score \u2014 Specification (Locked)",
+      "title": "Formality Score — Specification (Locked)",
       "path": "docs/FORMALITY_SCORE_SPEC.md",
       "owner": "Bobby Ciccaglione",
       "created": "2026-03-10",
@@ -718,7 +783,7 @@
       "doc_id": "SAIKO-GOOGLE-PLACES-SETUP",
       "doc_type": "reference",
       "status": "active",
-      "title": "Google Places API \u2014 Unblock Legacy Text Search",
+      "title": "Google Places API — Unblock Legacy Text Search",
       "path": "docs/GOOGLE_PLACES_SETUP.md",
       "owner": "Bobby Ciccaglione",
       "created": "2026-03-10",
@@ -760,7 +825,7 @@
       "doc_id": "SAIKO-MIGRATION-GUIDE",
       "doc_type": "guide",
       "status": "active",
-      "title": "Migration Guide: Places \u2192 Golden Records",
+      "title": "Migration Guide: Places → Golden Records",
       "path": "docs/MIGRATION_GUIDE.md",
       "owner": "Bobby Ciccaglione",
       "created": "2026-03-10",
@@ -792,7 +857,7 @@
       "doc_id": "SAIKO-PIPELINE-COMMANDS",
       "doc_type": "reference",
       "status": "active",
-      "title": "Saiko Maps \u2014 Pipeline Commands",
+      "title": "Saiko Maps — Pipeline Commands",
       "path": "docs/PIPELINE_COMMANDS.md",
       "owner": "Bobby Ciccaglione",
       "created": "2026-03-10",
@@ -898,7 +963,7 @@
       "doc_id": "SAIKO-RESOLVER-AND-PLACES-DATA-FLOW",
       "doc_type": "architecture",
       "status": "active",
-      "title": "Resolver pipeline and golden_records \u2192 places data flow",
+      "title": "Resolver pipeline and golden_records → places data flow",
       "path": "docs/RESOLVER_AND_PLACES_DATA_FLOW.md",
       "owner": "Bobby Ciccaglione",
       "created": "2026-03-10",
@@ -914,7 +979,7 @@
       "doc_id": "SAIKO-SAIKOAI-EXTRACTION-PROMPT-V2-1",
       "doc_type": "document",
       "status": "active",
-      "title": "SaikoAI Extraction Prompt \u2014 V2.1",
+      "title": "SaikoAI Extraction Prompt — V2.1",
       "path": "docs/saikoai-extraction-prompt-v2.1.md",
       "owner": "Bobby Ciccaglione",
       "created": "2026-03-10",
@@ -948,7 +1013,7 @@
       "created": "Tue Mar 10 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
       "last_updated": "Tue Mar 10 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
       "project_id": "PLACE-PAGE",
-      "summary": "Canonical design spec for the Saiko place profile page \u2014 wireframe, data sources, content model, and rendering rules.",
+      "summary": "Canonical design spec for the Saiko place profile page — wireframe, data sources, content model, and rendering rules.",
       "systems": [
         "place-page",
         "enrichment-pipeline",
@@ -983,7 +1048,7 @@
       "doc_id": "SKAI/RESEARCH-AI-KNOWLEDGE-ARCHITECTURE-V1",
       "doc_type": "research",
       "status": "active",
-      "title": "AI-Native Knowledge & Data Architecture Patterns (2023\u20132026)",
+      "title": "AI-Native Knowledge & Data Architecture Patterns (2023–2026)",
       "path": "docs/skai/research-ai-knowledge-architecture-v1.md",
       "owner": "Bobby Ciccaglione",
       "created": "Sun Mar 08 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
@@ -1001,7 +1066,7 @@
       "doc_id": "SS-DISPLAY-CONTRACT-V1",
       "doc_type": "domain-spec",
       "status": "superseded",
-      "title": "SKAI-DOC-SS-001 \u2014 SceneSense Display Contract v1",
+      "title": "SKAI-DOC-SS-001 — SceneSense Display Contract v1",
       "path": "docs/scenesense/display-contract-v1.md",
       "owner": "Bobby Ciccaglione",
       "created": "2026-03-10",
@@ -1071,7 +1136,7 @@
       "created": "2026-03-12",
       "last_updated": "2026-03-12",
       "project_id": "TRACES",
-      "summary": "Defines the Atmosphere lens \u2014 physical and sensory environment of the dining space.",
+      "summary": "Defines the Atmosphere lens — physical and sensory environment of the dining space.",
       "systems": [
         "scenesense",
         "traces"
@@ -1093,7 +1158,7 @@
       "created": "2026-03-12",
       "last_updated": "2026-03-12",
       "project_id": "TRACES",
-      "summary": "Defines the Energy lens \u2014 activity level and temporal rhythm of the place.",
+      "summary": "Defines the Energy lens — activity level and temporal rhythm of the place.",
       "systems": [
         "scenesense",
         "traces"
@@ -1115,7 +1180,7 @@
       "created": "2026-03-12",
       "last_updated": "2026-03-12",
       "project_id": "TRACES",
-      "summary": "Defines the Scene lens \u2014 social patterns of use and behavioral expectations.",
+      "summary": "Defines the Scene lens — social patterns of use and behavioral expectations.",
       "systems": [
         "scenesense",
         "traces"
@@ -1173,13 +1238,13 @@
       "doc_id": "SYS-COVERAGE-DASHBOARD-DESIGN-V1",
       "doc_type": "system",
       "status": "active",
-      "title": "Coverage Dashboard \u2014 Design Principles",
+      "title": "Coverage Dashboard — Design Principles",
       "path": "docs/system/coverage-dashboard-design-v1.md",
       "owner": "Bobby Ciccaglione",
       "created": "2026-03-13",
       "last_updated": "2026-03-13",
       "project_id": "KNOWLEDGE-SYSTEM",
-      "summary": "Design principles for the Coverage Dashboard \u2014 work surface, not report; smart counts; group by solution; automation first",
+      "summary": "Design principles for the Coverage Dashboard — work surface, not report; smart counts; group by solution; automation first",
       "systems": [],
       "related_docs": []
     },
@@ -1193,7 +1258,7 @@
       "created": "2026-03-14",
       "last_updated": "2026-03-14",
       "project_id": "SAIKO",
-      "summary": "Canonical issue contract for Coverage Ops v1 \u2014 issue types, severity, gating, and UI action mappings.",
+      "summary": "Canonical issue contract for Coverage Ops v1 — issue types, severity, gating, and UI action mappings.",
       "systems": [
         "coverage-operations",
         "issue-scanner",
@@ -1248,7 +1313,7 @@
       "doc_id": "VOICE-SAIKO-VOICE-LAYER",
       "doc_type": "domain-spec",
       "status": "active",
-      "title": "SAI-DOC-VOICE-001 \u2014 Saiko Voice Layer",
+      "title": "SAI-DOC-VOICE-001 — Saiko Voice Layer",
       "path": "docs/voice/saiko-voice-layer.md",
       "owner": "Bobby Ciccaglione",
       "created": "2026-03-10",
@@ -1260,446 +1325,6 @@
         "traces"
       ],
       "related_docs": []
-    },
-    {
-      "doc_id": "ARCH-COVERAGE-OPS-DASHBOARD-V1",
-      "doc_type": "architecture",
-      "status": "active",
-      "title": "Coverage Ops Dashboard v1",
-      "path": "docs/architecture/coverage-ops-dashboard-v1.md",
-      "owner": "Bobby Ciccaglione",
-      "created": "2026-03-15",
-      "last_updated": "2026-03-15",
-      "project_id": "SAIKO",
-      "summary": "4-tab coverage operations dashboard spec \u2014 Overview, Tier Health, Enrichment Tools, Neighborhoods.",
-      "systems": [
-        "coverage-operations",
-        "admin-tools"
-      ],
-      "related_docs": [
-        "docs/architecture/enrichment-strategy-v1.md",
-        "docs/system/coverage-tier2-visit-facts-contract-v1.md"
-      ]
-    },
-    {
-      "doc_id": "ENRICH-STRATEGY-V1",
-      "doc_type": "architecture",
-      "status": "draft",
-      "title": "Entity Enrichment Strategy v1",
-      "path": "docs/architecture/enrichment-strategy-v1.md",
-      "owner": "Bobby Ciccaglione",
-      "created": "2026-03-15",
-      "last_updated": "2026-03-15",
-      "project_id": "SAIKO",
-      "summary": "Entity enrichment lifecycle, phase ordering (free before paid), evidence vs canonical, editorial pipeline, coverage ops dashboard.",
-      "systems": [
-        "enrichment",
-        "coverage-operations"
-      ],
-      "related_docs": [
-        "docs/architecture/coverage-ops-dashboard-v1.md",
-        "docs/architecture/coverage-tiers-v1.md"
-      ]
-    },
-    {
-      "doc_id": "AI-OPS-GETTING-STARTED",
-      "doc_type": "guide",
-      "status": "active",
-      "title": "Entity Resolution System - Complete Implementation",
-      "path": "ai-operations/GETTING_STARTED.md",
-      "owner": "Bobby Ciccaglione",
-      "created": "2026-03-09",
-      "last_updated": "2026-03-09",
-      "project_id": "SAIKO",
-      "summary": "Getting started guide for the Entity Resolution System \u2014 MDM setup, review queue, CSV ingestion, and resolver pipeline quickstart.",
-      "systems": [
-        "entity-resolution",
-        "identity"
-      ],
-      "related_docs": [
-        "docs/MIGRATION_GUIDE.md",
-        "docs/architecture/identity-scoring-v1.md"
-      ],
-      "category": "operations",
-      "tags": [
-        "ai-ops"
-      ],
-      "source": "repo"
-    },
-    {
-      "doc_id": "AI-OPS-REPO-STATE",
-      "doc_type": "reference",
-      "status": "active",
-      "title": "Repo State",
-      "path": "ai-operations/state/repo_state.md",
-      "owner": "Bobby Ciccaglione",
-      "created": "2026-03-09",
-      "last_updated": "2026-03-09",
-      "project_id": "SAIKO",
-      "summary": "Auto-generated repo state snapshot \u2014 branch, commit, and PR status for AI agent boot context.",
-      "systems": [
-        "ai-operations"
-      ],
-      "related_docs": [
-        "docs/system/boot-context-inventory.md",
-        "ai-operations/system_contract.md"
-      ],
-      "category": "operations",
-      "tags": [
-        "ai-ops",
-        "registry"
-      ],
-      "source": "repo"
-    },
-    {
-      "doc_id": "COMP-HOMEPAGE",
-      "doc_type": "reference",
-      "status": "active",
-      "title": "Homepage Components",
-      "path": "components/homepage/README.md",
-      "owner": "Bobby Ciccaglione",
-      "created": "2026-02-01",
-      "last_updated": "2026-03-14",
-      "project_id": "SAIKO",
-      "summary": "Homepage component inventory \u2014 Hero (watercolor map), SectionHeader, NeighborhoodCard, CategoryCard, HomepageFooter with Field Notes color palette, typography specs (Libre Baskerville, Inter Tight), and responsive grid breakpoints.",
-      "systems": [
-        "ui"
-      ],
-      "related_docs": [
-        "docs/README.md",
-        "docs/APP_OVERVIEW.md"
-      ],
-      "category": "product",
-      "tags": [
-        "ui",
-        "places"
-      ],
-      "source": "repo"
-    },
-    {
-      "doc_id": "COMP-SEARCH-RESULTS",
-      "doc_type": "reference",
-      "status": "active",
-      "title": "HorizontalBentoCard Component",
-      "path": "components/search-results/README.md",
-      "owner": "Bobby Ciccaglione",
-      "created": "2026-02-01",
-      "last_updated": "2026-03-14",
-      "project_id": "SAIKO",
-      "summary": "HorizontalBentoCard component spec \u2014 35/65 photo/info grid layout, Field Notes aesthetic, graceful degradation for missing data, editorial signal badges (Eater 38, Michelin, etc.), design tokens, and responsive grid usage.",
-      "systems": [
-        "ui"
-      ],
-      "related_docs": [
-        "docs/saiko-merchant-data-hierarchy.md",
-        "components/homepage/README.md"
-      ],
-      "category": "product",
-      "tags": [
-        "ui",
-        "places",
-        "signals"
-      ],
-      "source": "repo"
-    },
-    {
-      "doc_id": "DATA-BATCH-EXTRACTION",
-      "doc_type": "reference",
-      "status": "active",
-      "title": "SaikoAI Batch Extraction \u2014 Data",
-      "path": "data/README.md",
-      "owner": "Bobby Ciccaglione",
-      "created": "2026-02-01",
-      "last_updated": "2026-03-14",
-      "project_id": "SAIKO",
-      "summary": "Data directory structure and workflow for batch extraction \u2014 seed lists (places.json, places-curated.json), source collection, AI extraction, and output review pipeline.",
-      "systems": [
-        "enrichment-pipeline",
-        "data-pipeline"
-      ],
-      "related_docs": [
-        "docs/DATA_PIPELINE_QUICK_START.md",
-        "docs/PIPELINE_COMMANDS.md"
-      ],
-      "category": "engineering",
-      "tags": [
-        "pipeline",
-        "ingestion",
-        "enrichment",
-        "era"
-      ],
-      "source": "repo"
-    },
-    {
-      "doc_id": "DATA-BENCHMARKS",
-      "doc_type": "reference",
-      "status": "active",
-      "title": "SaikoAI Source Collector \u2014 Benchmark",
-      "path": "data/benchmarks/README.md",
-      "owner": "Bobby Ciccaglione",
-      "created": "2026-02-01",
-      "last_updated": "2026-03-14",
-      "project_id": "SAIKO",
-      "summary": "Benchmark tooling for source collector \u2014 scores Approach A (CSE) vs Approach B (Claude-native) on publication coverage, content quality, and metadata. Includes batch collection, head-to-head comparison, and review/triage workflows.",
-      "systems": [
-        "enrichment-pipeline",
-        "data-pipeline"
-      ],
-      "related_docs": [
-        "data/README.md",
-        "docs/DATA_PIPELINE_QUICK_START.md"
-      ],
-      "category": "engineering",
-      "tags": [
-        "pipeline",
-        "ingestion",
-        "enrichment"
-      ],
-      "source": "repo"
-    },
-    {
-      "doc_id": "GH-PR-TEMPLATE",
-      "doc_type": "reference",
-      "status": "active",
-      "title": "Merchant Page Implementation \u2014 PR Checklist",
-      "path": ".github/PULL_REQUEST_TEMPLATE.md",
-      "owner": "Bobby Ciccaglione",
-      "created": "2026-02-01",
-      "last_updated": "2026-03-14",
-      "project_id": "SAIKO",
-      "summary": "GitHub PR template for merchant page implementation \u2014 tier order verification, component behavior checks (HoursCard, Instagram, PhotoCollage), collapse logic guards, scenario A/B/C testing, and promotion drift checklist.",
-      "systems": [
-        "ui"
-      ],
-      "related_docs": [
-        "docs/saiko-merchant-data-hierarchy.md",
-        "docs/ui/place-page/patch-log.md"
-      ],
-      "category": "operations",
-      "tags": [
-        "ui",
-        "places"
-      ],
-      "source": "repo"
-    },
-    {
-      "doc_id": "LIB-SIGNALS-README",
-      "doc_type": "architecture",
-      "status": "active",
-      "title": "Menu & Winelist Signal Extraction \u2014 V1",
-      "path": "lib/signals/README.md",
-      "owner": "Bobby Ciccaglione",
-      "created": "2026-02-15",
-      "last_updated": "2026-03-14",
-      "project_id": "SAIKO",
-      "summary": "Menu & winelist signal extraction architecture \u2014 structured AI analysis of menu_raw_text and winelist_raw_text from golden_records, with staleness rules, fresh-skip logic, payload schemas (cuisine indicators, price signals, wine program size), batch processing, and error handling patterns.",
-      "systems": [
-        "signals",
-        "enrichment-pipeline"
-      ],
-      "related_docs": [
-        "lib/signals/RERUN_GUARD_AND_DATA_INTEGRITY.md",
-        "lib/signals/VERIFICATION.md",
-        "docs/offering-signals/offering-signals-v1.md"
-      ],
-      "category": "engineering",
-      "tags": [
-        "signals",
-        "pipeline",
-        "enrichment",
-        "offerings"
-      ],
-      "source": "repo"
-    },
-    {
-      "doc_id": "LIB-SIGNALS-RERUN-GUARD",
-      "doc_type": "policy",
-      "status": "active",
-      "title": "Menu & Winelist Signals \u2014 Rerun Guard + Data Integrity Policy (v1)",
-      "path": "lib/signals/RERUN_GUARD_AND_DATA_INTEGRITY.md",
-      "owner": "Bobby Ciccaglione",
-      "created": "2026-02-15",
-      "last_updated": "2026-02-15",
-      "project_id": "SAIKO",
-      "summary": "Data integrity policy for menu & winelist signal extraction \u2014 freshness rules, preflight quality gates, cost protection, and rerun safety invariants.",
-      "systems": [
-        "signals",
-        "data-pipeline"
-      ],
-      "related_docs": [
-        "lib/signals/VERIFICATION.md"
-      ],
-      "category": "engineering",
-      "tags": [
-        "signals",
-        "pipeline",
-        "ingestion"
-      ],
-      "source": "repo"
-    },
-    {
-      "doc_id": "LIB-SIGNALS-VERIFICATION",
-      "doc_type": "checklist",
-      "status": "active",
-      "title": "Menu & Winelist Signal Extraction \u2014 Verification Checklist",
-      "path": "lib/signals/VERIFICATION.md",
-      "owner": "Bobby Ciccaglione",
-      "created": "2026-02-15",
-      "last_updated": "2026-02-15",
-      "project_id": "SAIKO",
-      "summary": "Verification checklist for menu & winelist signal extraction \u2014 fresh-skip correctness, staleness triggers, DB integrity, and API hygiene tests.",
-      "systems": [
-        "signals",
-        "data-pipeline"
-      ],
-      "related_docs": [
-        "lib/signals/RERUN_GUARD_AND_DATA_INTEGRITY.md"
-      ],
-      "category": "engineering",
-      "tags": [
-        "signals",
-        "pipeline"
-      ],
-      "source": "repo"
-    },
-    {
-      "doc_id": "LIB-VOICE-ENGINE-V1",
-      "doc_type": "architecture",
-      "status": "superseded",
-      "title": "Saiko Voice Engine v1.1",
-      "path": "lib/voice-engine/README.md",
-      "owner": "Bobby Ciccaglione",
-      "created": "2026-02-05",
-      "last_updated": "2026-02-05",
-      "project_id": "SAIKO",
-      "summary": "Voice Engine v1.1 architecture \u2014 modular vocabulary system generating restaurant taglines from Google Places API signals, with curated word pools, four phrase patterns (food/neighborhood/vibe/authority), banned word validation, ad unit assignment, and Claude Haiku generation pipeline.",
-      "systems": [
-        "voice-engine",
-        "enrichment-pipeline"
-      ],
-      "related_docs": [
-        "lib/voice-engine-v2/README.md",
-        "docs/voice/saiko-voice-layer.md"
-      ],
-      "category": "domain",
-      "tags": [
-        "voice-engine",
-        "enrichment",
-        "signals",
-        "cultural-data"
-      ],
-      "source": "repo"
-    },
-    {
-      "doc_id": "LIB-VOICE-ENGINE-V2",
-      "doc_type": "architecture",
-      "status": "active",
-      "title": "Saiko Voice Engine v2.0",
-      "path": "lib/voice-engine-v2/README.md",
-      "owner": "Bobby Ciccaglione",
-      "created": "2026-02-10",
-      "last_updated": "2026-02-10",
-      "project_id": "SAIKO",
-      "summary": "Voice Engine v2.0 architecture \u2014 generates taglines from identity signals extracted from scraped website content (cuisine_posture, place_personality, signature_dishes), with personality-driven pattern selection, signal-weighted auto-selection, and Claude Haiku generation. Supersedes v1.1.",
-      "systems": [
-        "voice-engine",
-        "enrichment-pipeline"
-      ],
-      "related_docs": [
-        "lib/voice-engine/README.md",
-        "docs/voice/saiko-voice-layer.md"
-      ],
-      "category": "domain",
-      "tags": [
-        "voice-engine",
-        "enrichment",
-        "signals",
-        "identity",
-        "cultural-data"
-      ],
-      "source": "repo"
-    },
-    {
-      "doc_id": "PUBLIC-ADMIN-STANDALONE",
-      "doc_type": "reference",
-      "status": "active",
-      "title": "Standalone Admin UI",
-      "path": "public/README.md",
-      "owner": "Bobby Ciccaglione",
-      "created": "2026-02-01",
-      "last_updated": "2026-03-14",
-      "project_id": "SAIKO",
-      "summary": "Standalone HTML admin interface for the Saiko Resolver \u2014 no-build-step React app with review queue, keyboard shortcuts (M/D/S/F), demo mode with mock data, dashboard stats, and CORS setup instructions for API connection.",
-      "systems": [
-        "ui",
-        "identity"
-      ],
-      "related_docs": [
-        "docs/APP_OVERVIEW.md"
-      ],
-      "category": "operations",
-      "tags": [
-        "ui",
-        "identity",
-        "pipeline"
-      ],
-      "source": "repo"
-    },
-    {
-      "doc_id": "SCRIPTS-SQL-GPID-ROLLOUT",
-      "doc_type": "runbook",
-      "status": "active",
-      "title": "GPID partial unique index \u2014 rollout",
-      "path": "scripts/sql/README-gpid-rollout.md",
-      "owner": "Bobby Ciccaglione",
-      "created": "2026-02-27",
-      "last_updated": "2026-03-14",
-      "project_id": "SAIKO",
-      "summary": "Rollout runbook for the GPID partial unique index \u2014 preflight duplicate check, CONCURRENTLY index creation for production, dev migration path, and verification queries. Prevents duplicate google_place_id rows in places table.",
-      "systems": [
-        "identity",
-        "data-pipeline"
-      ],
-      "related_docs": [
-        "scripts/sql/README.md",
-        "docs/DATABASE_SCHEMA.md"
-      ],
-      "category": "operations",
-      "tags": [
-        "identity",
-        "schema",
-        "migration",
-        "pipeline"
-      ],
-      "source": "repo"
-    },
-    {
-      "doc_id": "SCRIPTS-SQL-README",
-      "doc_type": "reference",
-      "status": "active",
-      "title": "SQL Scripts",
-      "path": "scripts/sql/README.md",
-      "owner": "Bobby Ciccaglione",
-      "created": "2026-02-15",
-      "last_updated": "2026-03-14",
-      "project_id": "SAIKO",
-      "summary": "Index of ad-hoc SQL scripts for backfills, verification, and rollout \u2014 Phase 2 field verification, confidence_bucket backfill, with Neon console and CLI execution instructions.",
-      "systems": [
-        "data-pipeline",
-        "identity"
-      ],
-      "related_docs": [
-        "scripts/sql/README-gpid-rollout.md",
-        "docs/DATABASE_SCHEMA.md"
-      ],
-      "category": "engineering",
-      "tags": [
-        "schema",
-        "migration",
-        "pipeline",
-        "identity"
-      ],
-      "source": "repo"
     }
   ]
 }

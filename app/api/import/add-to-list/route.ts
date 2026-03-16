@@ -35,7 +35,7 @@ function parseCsvToPlaces(fileContent: string): PlaceInput[] {
   if (parseResult.errors.length > 0) throw new Error('Failed to parse CSV');
   const places: PlaceInput[] = [];
   for (const row of parseResult.data as Record<string, unknown>[]) {
-    const name = (row.Title || row.Name || row.name || '') as string;
+    const name = (row.Title || row.Name || row.name || row.place || row.Place || row.location || row.Location || row.restaurant || row.Restaurant || row.venue || row.Venue || row.business || row.Business || '') as string;
     if (!name || String(name).trim() === '') continue;
     places.push({
       name: String(name).trim(),

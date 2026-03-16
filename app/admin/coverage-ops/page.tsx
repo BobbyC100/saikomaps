@@ -10,7 +10,7 @@
  */
 
 import Link from 'next/link';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -85,6 +85,24 @@ const C = {
   red: '#991B1B',
   redBg: '#FEE2E2',
 };
+
+const STAGE_LABELS: Record<number, string> = {
+  1: 'Google Places',
+  2: 'Surface discovery',
+  3: 'Surface fetch',
+  4: 'Surface parse',
+  5: 'AI signals',
+  6: 'Website enrichment',
+  7: 'Tagline AI',
+};
+const TOTAL_STAGES = 7;
+
+interface EnrichProgress {
+  slug: string;
+  stage: number | null; // current completed stage (1-7), null = queued/not started
+  done: boolean;
+  error?: string;
+}
 
 const SEVERITY_STYLES: Record<string, { bg: string; color: string; label: string }> = {
   critical: { bg: '#FEE2E2', color: '#991B1B', label: 'CRIT' },
@@ -330,11 +348,11 @@ export default function CoverageOpsPage() {
   // Bulk action state
   const [bulkRunning, setBulkRunning] = useState<string | null>(null);
 
-  // Merge modal state
-  const [mergeState, setMergeState] = useState<MergeState | null>(null);
-  const [merging, setMerging] = useState(false);
+  // Enrichment progress tracking (keyed by entity slug)
+  const [enrichProgress, setEnrichProgress] = useState<Record<string, EnrichProgress>>({});
+  const enrichPollTimers = useRef<Record<string, ReturnType<typeof setInterval>>>({});
 
-  // ── Data fetching ──
+  // ── Data fetching (must be defined before startEnrichPolling) ──
 
   const fetchData = useCallback(async () => {
     try {
@@ -367,6 +385,94 @@ export default function CoverageOpsPage() {
       setLoading(false);
     }
   }, []);
+
+  const startEnrichPolling = useCallback((slug: string) => {
+    console.log(`[Enrich] Starting polling for ${slug}`);
+
+    // Don't double-poll
+    if (enrichPollTimers.current[slug]) {
+      console.log(`[Enrich] Already polling ${slug}, skipping`);
+      return;
+    }
+
+    // Initialize progress state immediately with visual indicator
+    setEnrichProgress((prev) => ({
+      ...prev,
+      [slug]: { slug, stage: null, done: false },
+    }));
+
+    let pollAttempts = 0;
+    const poll = async () => {
+      pollAttempts++;
+      try {
+        const res = await fetch(`/api/admin/enrich/${slug}`);
+        if (!res.ok) {
+          console.warn(`[Enrich Poll] ${slug}: API returned ${res.status}`);
+          return;
+        }
+        const data = await res.json();
+        const stageNum = data.enrichment_stage ? parseInt(data.enrichment_stage, 10) : null;
+
+        console.log(`[Enrich Poll] ${slug}: attempt #${pollAttempts}, stage=${stageNum}, done=${data.done}`);
+
+        setEnrichProgress((prev) => ({
+          ...prev,
+          [slug]: { slug, stage: stageNum, done: data.done },
+        }));
+
+        if (data.done) {
+          console.log(`[Enrich Complete] ${slug}: enrichment finished at stage ${stageNum}`);
+          clearInterval(enrichPollTimers.current[slug]);
+          delete enrichPollTimers.current[slug];
+          // Re-scan this entity's issues (enrichment wrote new data), then refresh dashboard
+          fetch('/api/admin/tools/scan-issues', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'scan', slug }),
+          }).then(() => fetchData()).catch(() => fetchData());
+        }
+      } catch (err) {
+        console.error(`[Enrich Poll] ${slug}: polling error:`, err);
+        // keep polling on transient errors
+      }
+    };
+
+    // Delay first poll to let the pipeline write enrichment_stage, then every 2 seconds
+    const initialTimeout = setTimeout(() => {
+      console.log(`[Enrich Poll] ${slug}: starting polling loop (initial delay elapsed)`);
+      poll();
+    }, 3500);
+
+    enrichPollTimers.current[slug] = setInterval(poll, 2000);
+
+    // Safety timeout: stop polling after 5 minutes
+    const safetyTimeout = setTimeout(() => {
+      if (enrichPollTimers.current[slug]) {
+        console.warn(`[Enrich Safety] ${slug}: polling timeout (5 min), stopping`);
+        clearInterval(enrichPollTimers.current[slug]);
+        clearTimeout(initialTimeout);
+        delete enrichPollTimers.current[slug];
+        setEnrichProgress((prev) => {
+          const cur = prev[slug];
+          if (cur && !cur.done) {
+            return { ...prev, [slug]: { ...cur, done: true, error: 'Polling timeout' } };
+          }
+          return prev;
+        });
+      }
+    }, 5 * 60 * 1000);
+  }, [fetchData]);
+
+  // Cleanup poll timers on unmount
+  useEffect(() => {
+    return () => {
+      Object.values(enrichPollTimers.current).forEach(clearInterval);
+    };
+  }, []);
+
+  // Merge modal state
+  const [mergeState, setMergeState] = useState<MergeState | null>(null);
+  const [merging, setMerging] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -427,13 +533,32 @@ export default function CoverageOpsPage() {
         const isCompleted = data?.status === 'completed';
         const wasSaved = isCompleted && Object.values(data.results ?? {}).some((r: any) => r.saved);
 
+        // Detect GPID resolution success (seed-gpid-queue returns { matched: N })
+        const gpidMatched = data?.action === 'seed-gpid-queue' && (data?.matched ?? 0) > 0;
+        // Detect GPID queued for human review
+        const gpidQueued = data?.action === 'seed-gpid-queue' && (data?.queued ?? 0) > 0;
+
         setActionStates((prev) => ({ ...prev, [issue.id]: 'done' }));
 
-        if (wasSaved) {
-          // Data was written inline — auto-resolve this issue
+        if (wasSaved || gpidMatched) {
+          // Data was written inline — auto-resolve this issue & re-scan entity
           await handleResolve(issue.id);
-          const discovered = Object.values(data.results).map((r: any) => r.discovered).filter(Boolean).join(', ');
-          setToast({ message: `Found ${discovered} for ${issue.entity_name}`, type: 'success' });
+          if (gpidMatched) {
+            setToast({ message: `GPID found for ${issue.entity_name}`, type: 'success' });
+          } else {
+            const discovered = Object.values(data.results).map((r: any) => r.discovered).filter(Boolean).join(', ');
+            setToast({ message: `Found ${discovered} for ${issue.entity_name}`, type: 'success' });
+          }
+          // Re-scan this entity so related issues get updated
+          if (issue.entity_id) {
+            fetch('/api/admin/tools/scan-issues', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ action: 'scan', entityId: issue.entity_id }),
+            }).then(() => fetchData());
+          }
+        } else if (gpidQueued) {
+          setToast({ message: `${issue.entity_name}: queued for human GPID review`, type: 'success' });
         } else if (isCompleted && !wasSaved) {
           const reasoning = Object.values(data.results ?? {}).map((r: any) => r.reasoning).filter(Boolean).join('; ');
           setToast({ message: `${issue.entity_name}: ${reasoning || 'Not found'}`, type: 'error' });
@@ -442,6 +567,10 @@ export default function CoverageOpsPage() {
             message: `${tool.queuedLabel === 'Done' ? 'Completed' : 'Queued'}: ${ISSUE_TYPE_LABELS[issue.issue_type] ?? issue.issue_type} for ${issue.entity_name}`,
             type: 'success',
           });
+          // Start progress polling for background enrichment jobs
+          if (data?.status === 'queued' && issue.entity_slug) {
+            startEnrichPolling(issue.entity_slug);
+          }
         }
       } else {
         setActionStates((prev) => ({ ...prev, [issue.id]: 'error' }));
@@ -604,6 +733,7 @@ export default function CoverageOpsPage() {
     setBulkRunning(bulkLabel);
     let succeeded = 0;
     let failed = 0;
+    let resolved = 0;
 
     // Check if any of these issue types use batchOnce — if so, invoke once and mark all done
     const firstTool = TOOL_ACTIONS[matching[0].issue_type];
@@ -627,6 +757,8 @@ export default function CoverageOpsPage() {
       }
     } else {
       // Run sequentially to avoid overwhelming the server
+      let resolved = 0;
+      const entityIdsToRescan = new Set<string>();
       for (const issue of matching) {
         const tool = TOOL_ACTIONS[issue.issue_type];
         if (!tool?.invoke) continue;
@@ -634,8 +766,24 @@ export default function CoverageOpsPage() {
         try {
           const res = await tool.invoke(issue);
           if (res.ok) {
+            const data = await res.json().catch(() => null);
             setActionStates((prev) => ({ ...prev, [issue.id]: 'done' }));
             succeeded++;
+
+            // Detect inline success (GPID matched, social discovered, etc.)
+            const gpidMatched = data?.action === 'seed-gpid-queue' && (data?.matched ?? 0) > 0;
+            const wasSaved = data?.status === 'completed' && Object.values(data?.results ?? {}).some((r: any) => r.saved);
+
+            if (gpidMatched || wasSaved) {
+              await handleResolve(issue.id);
+              resolved++;
+              if (issue.entity_id) entityIdsToRescan.add(issue.entity_id);
+            }
+
+            // Start progress polling for background enrichment jobs
+            if (data?.status === 'queued' && issue.entity_slug) {
+              startEnrichPolling(issue.entity_slug);
+            }
           } else {
             setActionStates((prev) => ({ ...prev, [issue.id]: 'error' }));
             failed++;
@@ -645,11 +793,26 @@ export default function CoverageOpsPage() {
           failed++;
         }
       }
+
+      // Re-scan entities that had inline data written, then refresh dashboard
+      if (entityIdsToRescan.size > 0) {
+        await Promise.allSettled(
+          [...entityIdsToRescan].map((eid) =>
+            fetch('/api/admin/tools/scan-issues', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ action: 'scan', entityId: eid }),
+            })
+          )
+        );
+        await fetchData();
+      }
     }
 
     setBulkRunning(null);
+    const resolvedMsg = resolved > 0 ? `, ${resolved} resolved` : '';
     setToast({
-      message: `Bulk ${bulkLabel}: ${succeeded} queued${failed ? `, ${failed} failed` : ''}`,
+      message: `Bulk ${bulkLabel}: ${succeeded} processed${resolvedMsg}${failed ? `, ${failed} failed` : ''}`,
       type: failed > 0 ? 'error' : 'success',
     });
   };
@@ -873,6 +1036,7 @@ export default function CoverageOpsPage() {
                     key={issue.id}
                     issue={issue}
                     actionState={actionStates[issue.id] ?? 'idle'}
+                    enrichProgress={enrichProgress[issue.entity_slug] ?? null}
                     onAction={() => handleAction(issue)}
                     onSuppress={(reason) => handleSuppress(issue.id, reason)}
                     onResolve={() => handleResolve(issue.id)}
@@ -1026,6 +1190,7 @@ function SeverityPill({ severity }: { severity: string }) {
 function IssueRowComponent({
   issue,
   actionState,
+  enrichProgress,
   onAction,
   onSuppress,
   onResolve,
@@ -1033,6 +1198,7 @@ function IssueRowComponent({
 }: {
   issue: IssueRow;
   actionState: 'idle' | 'running' | 'done' | 'error';
+  enrichProgress: EnrichProgress | null;
   onAction: () => void;
   onSuppress: (reason: string) => void;
   onResolve: () => void;
@@ -1142,6 +1308,29 @@ function IssueRowComponent({
             </span>
           )}
         </div>
+        {/* Enrichment Progress Bar */}
+        {enrichProgress && !enrichProgress.done && (
+          <>
+            <EnrichProgressBar progress={enrichProgress} />
+            <div className="text-[9px] mt-0.5" style={{ color: C.muted }}>
+              Running in background…
+            </div>
+          </>
+        )}
+        {enrichProgress?.done && (
+          <div className="flex items-center gap-1.5 mt-1">
+            <span className="text-[10px] font-semibold" style={{ color: C.green }}>
+              ✓ Enrichment complete (stage {enrichProgress.stage}/{TOTAL_STAGES})
+            </span>
+          </div>
+        )}
+        {enrichProgress?.error && (
+          <div className="flex items-center gap-1.5 mt-1">
+            <span className="text-[10px] font-semibold" style={{ color: C.red }}>
+              ✗ {enrichProgress.error}
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Inline Edit Field */}
@@ -1280,6 +1469,54 @@ function IssueRowComponent({
         </div>
       </div>
     )}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Enrichment Progress Bar                                            */
+/* ------------------------------------------------------------------ */
+
+function EnrichProgressBar({ progress }: { progress: EnrichProgress }) {
+  const currentStage = progress.stage ?? 0;
+  const pct = Math.round((currentStage / TOTAL_STAGES) * 100);
+  const currentLabel = currentStage > 0
+    ? STAGE_LABELS[currentStage] ?? `Stage ${currentStage}`
+    : 'Starting…';
+  const nextLabel = currentStage < TOTAL_STAGES
+    ? STAGE_LABELS[currentStage + 1] ?? ''
+    : '';
+
+  return (
+    <div className="flex items-center gap-2 mt-1.5">
+      {/* Bar */}
+      <div
+        className="flex-1 h-2 rounded-full overflow-hidden"
+        style={{ backgroundColor: `${C.border}44`, maxWidth: 200 }}
+      >
+        <div
+          className="h-full rounded-full transition-all duration-700 ease-out"
+          style={{
+            width: `${pct}%`,
+            backgroundColor: currentStage > 0 ? C.accent : `${C.accent}80`,
+            minWidth: currentStage >= 0 ? 6 : 0,
+          }}
+        />
+      </div>
+      {/* Label */}
+      <span className="text-[10px] font-medium whitespace-nowrap" style={{ color: C.accent }}>
+        {currentStage > 0 ? (
+          <>
+            {currentStage}/{TOTAL_STAGES}
+            {' · '}
+            {nextLabel ? `→ ${nextLabel}` : currentLabel}
+          </>
+        ) : (
+          <>
+            <span className="inline-block animate-pulse">●</span> {currentLabel}
+          </>
+        )}
+      </span>
     </div>
   );
 }

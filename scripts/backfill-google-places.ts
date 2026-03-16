@@ -23,6 +23,7 @@ import {
 } from "@/lib/google-places";
 import { getSaikoCategory, parseCuisineType } from "@/lib/categoryMapping";
 import { jaroWinklerSimilarity, normalizeName } from "@/lib/similarity";
+import { scanEntities } from "@/lib/coverage/issue-scanner";
 
 // Minimum name-similarity between entity name and Google Places result name.
 // Only enforced when we searched by name (no pre-existing GPID) to avoid
@@ -246,6 +247,17 @@ async function main() {
   console.log(`Enriched: ${enriched}`);
   if (failed > 0) console.log(`Failed: ${failed}`);
   if (dryRun) console.log("(No changes were made — run without --dry-run to apply)");
+
+  // Auto-rescan issues for affected entities so dashboard reflects new data
+  if (!dryRun && enriched > 0 && slug) {
+    console.log("\nRe-scanning issues...");
+    try {
+      const scanResult = await scanEntities(prisma, { slugs: [slug] });
+      console.log(`  Issues: ${scanResult.issues_created} created, ${scanResult.issues_resolved} resolved, ${scanResult.issues_unchanged} unchanged`);
+    } catch (e) {
+      console.error("  Issue rescan failed (non-fatal):", e);
+    }
+  }
 }
 
 main()

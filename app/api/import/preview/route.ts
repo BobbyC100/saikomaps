@@ -52,8 +52,31 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const locations = parseResult.data;
-    
+    const rawLocations = parseResult.data as Record<string, string>[];
+
+    // Detect the name/title column — support common variations
+    const headers = parseResult.meta.fields || [];
+    const titleAliases = ['title', 'name', 'place', 'location', 'restaurant', 'business', 'venue'];
+    const detectedTitleCol = headers.find((h: string) =>
+      titleAliases.includes(h.toLowerCase().trim())
+    );
+
+    if (!detectedTitleCol) {
+      return NextResponse.json(
+        { error: `Could not find a name column. Expected one of: ${titleAliases.join(', ')}. Found columns: ${headers.join(', ')}` },
+        { status: 400 }
+      );
+    }
+
+    // Normalize rows: map detected column to "Title" so downstream code is consistent
+    const locations = rawLocations.map((row) => {
+      const normalized: Record<string, string> = { ...row };
+      if (detectedTitleCol !== 'Title') {
+        normalized.Title = row[detectedTitleCol] || '';
+      }
+      return normalized;
+    });
+
     // Basic validation
     const validLocations = locations.filter((loc: any) => {
       return loc.Title && loc.Title.trim() !== '';
@@ -66,6 +89,8 @@ export async function POST(request: NextRequest) {
       totalRows: locations.length,
       validRows: validLocations.length,
       invalidRows: invalidCount,
+      columns: headers,
+      titleColumn: detectedTitleCol,
       locations: validLocations.slice(0, 100), // Return first 100 for preview
       message: `Parsed ${validLocations.length} valid locations`,
     });

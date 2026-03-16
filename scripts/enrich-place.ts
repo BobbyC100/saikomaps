@@ -23,6 +23,7 @@
 
 import { spawnSync } from 'child_process';
 import { PrismaClient } from '@prisma/client';
+import { scanEntities } from '@/lib/coverage/issue-scanner';
 
 // ---------------------------------------------------------------------------
 // Args
@@ -143,12 +144,14 @@ async function run(stage: number, label: string, script: string, extraArgs: stri
   const stageArgs = dryRun ? [...extraArgs, '--dry-run'] : extraArgs;
   console.log(`\n${'─'.repeat(60)}`);
   console.log(`Stage ${stage}: ${label}`);
-  console.log(`  ${[TSX, script, ...stageArgs].join(' ')}`);
+  console.log(`  node -r ./scripts/load-env.js ${TSX} ${script} ${stageArgs.join(' ')}`);
   console.log('─'.repeat(60));
 
-  const result = spawnSync(TSX, [script, ...stageArgs], {
+  // Ensure env vars are loaded in child process (especially ANTHROPIC_API_KEY)
+  const result = spawnSync('node', ['-r', './scripts/load-env.js', TSX, script, ...stageArgs], {
     stdio: 'inherit',
     env: process.env,
+    cwd: process.cwd(),
   });
 
   if (result.status !== 0) {
@@ -158,10 +161,15 @@ async function run(stage: number, label: string, script: string, extraArgs: stri
 
   // Track highest completed stage
   if (!dryRun && entityId) {
-    await db.entities.update({
-      where: { id: entityId },
-      data: { enrichment_stage: String(stage) },
-    }).catch(() => {}); // non-fatal
+    try {
+      await db.entities.update({
+        where: { id: entityId },
+        data: { enrichment_stage: String(stage) },
+      });
+      console.log(`  ✓ enrichment_stage updated to ${stage}`);
+    } catch (err: any) {
+      console.error(`  ✗ Failed to update enrichment_stage: ${err.message}`);
+    }
   }
 
   return true;
@@ -235,17 +243,32 @@ async function runBatch(n: number) {
       }
     }
 
-    // Auto-clear needs_human_review if tagline was successfully generated
+    // Mark enrichment timestamp + auto-clear review flag
     if (!dryRun && !failed) {
+      try {
+        await db.entities.update({
+          where: { id: entity.id },
+          data: { last_enriched_at: new Date() },
+        });
+        console.log(`  ✓ last_enriched_at updated`);
+      } catch (err: any) {
+        console.error(`  ✗ Failed to update last_enriched_at: ${err.message}`);
+      }
+
       const hasTagline = await db.interpretation_cache.findFirst({
         where: { entity_id: entity.id, output_type: 'TAGLINE', is_current: true },
         select: { entity_id: true },
       });
       if (hasTagline) {
-        await db.entities.update({
-          where: { id: entity.id },
-          data: { needs_human_review: false },
-        });
+        try {
+          await db.entities.update({
+            where: { id: entity.id },
+            data: { needs_human_review: false },
+          });
+          console.log(`  ✓ needs_human_review cleared`);
+        } catch (err: any) {
+          console.error(`  ✗ Failed to clear needs_human_review: ${err.message}`);
+        }
       }
     }
 
@@ -352,17 +375,46 @@ async function main() {
     }
   }
 
-  // Auto-clear needs_human_review if tagline was successfully generated
+  // Mark enrichment timestamp + auto-clear review flag
   if (!dryRun) {
+    const anyRan = results.some((r) => r.status === 'ran');
+    if (anyRan) {
+      try {
+        await db.entities.update({
+          where: { id: entity.id },
+          data: { last_enriched_at: new Date() },
+        });
+        console.log(`  ✓ last_enriched_at updated`);
+      } catch (err: any) {
+        console.error(`  ✗ Failed to update last_enriched_at: ${err.message}`);
+      }
+    }
+
     const hasTagline = await db.interpretation_cache.findFirst({
       where: { entity_id: entity.id, output_type: 'TAGLINE', is_current: true },
       select: { entity_id: true },
     });
     if (hasTagline) {
-      await db.entities.update({
-        where: { id: entity.id },
-        data: { needs_human_review: false },
-      });
+      try {
+        await db.entities.update({
+          where: { id: entity.id },
+          data: { needs_human_review: false },
+        });
+        console.log(`  ✓ needs_human_review cleared`);
+      } catch (err: any) {
+        console.error(`  ✗ Failed to clear needs_human_review: ${err.message}`);
+      }
+    }
+  }
+
+  // Auto-rescan issues for this entity so dashboard reflects new data
+  if (!dryRun) {
+    console.log('\nRe-scanning issues...');
+    try {
+      const scanResult = await scanEntities(db, { slugs: [entity.slug!] });
+      console.log(`  Issues: ${scanResult.issues_created} created, ${scanResult.issues_resolved} resolved, ${scanResult.issues_unchanged} unchanged`);
+    } catch (e) {
+      console.error('  Issue rescan failed (non-fatal):', e);
     }
   }
 

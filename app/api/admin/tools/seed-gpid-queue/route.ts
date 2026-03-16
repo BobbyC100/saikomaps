@@ -120,28 +120,39 @@ async function resolveEntity(
       return { status: 'NO_MATCH', reason: 'TEXT_ZERO_RESULTS', candidates: [] };
     }
 
-    if (textResults.length === 1) {
-      const score = nameSim(cleaned, textResults[0].name);
-      if (score >= NAME_SIM_THRESHOLD) {
-        return {
-          status: 'MATCH',
-          reason: 'TEXT_SINGLE_HIGH_SIM',
-          gpid: textResults[0].placeId,
-          similarity: score,
-          candidates,
-        };
+    // Score all results and pick the best
+    let bestResult = textResults[0];
+    let bestScore = nameSim(cleaned, bestResult.name);
+    for (const r of textResults.slice(1)) {
+      const score = nameSim(cleaned, r.name);
+      if (score > bestScore) {
+        bestScore = score;
+        bestResult = r;
       }
-      return { status: 'NO_MATCH', reason: 'TEXT_LOW_SIM', similarity: score, candidates };
     }
 
-    // Multiple results — ambiguous
-    const bestText = textResults[0];
-    const score = nameSim(cleaned, bestText.name);
+    // If best match is strong, return MATCH even if there are other results
+    if (bestScore >= NAME_SIM_THRESHOLD) {
+      return {
+        status: 'MATCH',
+        reason: textResults.length === 1 ? 'TEXT_SINGLE_HIGH_SIM' : 'TEXT_BEST_HIGH_SIM',
+        gpid: bestResult.placeId,
+        similarity: bestScore,
+        candidates,
+      };
+    }
+
+    // If best match is moderate-to-weak, only MATCH if it's the only result
+    if (textResults.length === 1) {
+      return { status: 'NO_MATCH', reason: 'TEXT_LOW_SIM', similarity: bestScore, candidates };
+    }
+
+    // Multiple results with no strong match — ambiguous
     return {
       status: 'AMBIGUOUS',
       reason: `TEXT_MULTI_RESULTS`,
-      similarity: score,
-      gpid: bestText.placeId,
+      similarity: bestScore,
+      gpid: bestResult.placeId,
       candidates,
     };
   } catch (err) {
