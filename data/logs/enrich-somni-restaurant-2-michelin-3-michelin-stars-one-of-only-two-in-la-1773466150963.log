@@ -1,0 +1,9 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+
+Backfill Google Places — 1 place(s) to process
+
+  ✅ somni-restaurant-2-michelin-3-michelin-stars-one-of-only-two-in-la (Somni)
+
+--- Backfill Complete ---
+Enriched: 1

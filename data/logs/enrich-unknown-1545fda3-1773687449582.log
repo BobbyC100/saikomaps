@@ -1,0 +1,140 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  enable debug logging with { debug: true }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
+
+Enrich: Hauser & Wirth (unknown-1545fda3)
+  ID:      1545fda3-5d3d-4101-8eb9-20c5bfdadf2b
+  Website: https://www.hauserwirth.com/
+  GPID:    ChIJ0yp3zD7GwoARoWoWU4X2g8g
+
+Stage 1: Google Places identity commit — skipped (Google Places identity resolved separately via backfill-google-places.ts)
+
+────────────────────────────────────────────────────────────
+Stage 2: Surface discovery
+  ./node_modules/.bin/tsx scripts/run-surface-discovery.ts --entity-id=1545fda3-5d3d-4101-8eb9-20c5bfdadf2b --limit=1
+────────────────────────────────────────────────────────────
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+🔍 Merchant Surface Discovery
+
+Found 1 entities needing discovery
+
+  Hauser & Wirth (1545fda3…) https://www.hauserwirth.com/ … ✓ homepage fetched · 0 surfaces discovered
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Discovery complete
+   Entities processed : 1
+   Homepage succeeded  : 1
+   Homepage failed     : 0
+   Surface rows written: 1
+  ✓ enrichment_stage updated to 2
+
+Stage 3: Surface fetch — skipped (no surfaces with fetch_status=discovered)
+
+────────────────────────────────────────────────────────────
+Stage 4: Surface parse
+  ./node_modules/.bin/tsx scripts/run-surface-parse.ts --entity-id=1545fda3-5d3d-4101-8eb9-20c5bfdadf2b --limit=20
+────────────────────────────────────────────────────────────
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  enable debug logging with { debug: true }
+🔍 Merchant Surface Parse Pass
+
+   artifact_type    : parse_v1
+   artifact_version : 1
+
+Found 1 surface to parse
+
+  [homepage   ] https://www.hauserwirth.com/ … ✓ parsed
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Parse pass complete
+   Surfaces processed : 1
+   Parsed (artifacts) : 1
+   Deduped (skipped)  : 0
+   Failed             : 0
+  ✓ enrichment_stage updated to 4
+
+────────────────────────────────────────────────────────────
+Stage 5: Identity signal extraction (AI)
+  ./node_modules/.bin/tsx scripts/extract-identity-signals.ts --place=Hauser & Wirth
+────────────────────────────────────────────────────────────
+
+🔮 Saiko Maps — Identity Signal Extraction
+==========================================
+🔸 Single place: "Hauser & Wirth"
+
+📍 Found 1 places to process
+   (1 in canonical scope · 1 unprocessed · 1 with extractable content)
+
+[1/1] Hauser & Wirth
+    Held (confidence 0.00) — write skipped, will retry when content improves
+
+==========================================
+📊 EXTRACTION SUMMARY
+==========================================
+Total processed:   1
+Extracted:         0
+Held (low conf):   1  ← not written, will retry
+Skipped (no data): 0
+Failed:            0
+
+By Confidence Tier:
+  Publish (≥0.7):  0
+  Review (0.4-0.7): 0
+  Hold (<0.4):     1
+
+By Input Quality:
+  Good (2+ sources): 0
+  Partial (1 source): 1
+  Minimal:          0
+  None:             0
+==========================================
+
+✅ Database updated
+  ✓ enrichment_stage updated to 5
+
+────────────────────────────────────────────────────────────
+Stage 6: Website enrichment
+  ./node_modules/.bin/tsx scripts/run-website-enrichment.ts --slug=unknown-1545fda3
+────────────────────────────────────────────────────────────
+[34mprisma:query[39m SELECT "public"."entities"."id", "public"."entities"."website", "public"."entities"."name", "public"."entities"."category" FROM "public"."entities" WHERE ("public"."entities"."slug" = $1 AND "public"."entities"."website" IS NOT NULL) ORDER BY "public"."entities"."updated_at" DESC LIMIT $2 OFFSET $3
+Website enrichment: 1 places (mode=default, ignoreThrottle=false, dryRun=false)
+
+  Hauser & Wirth | 429 | conf=0.40 | cat=—
+[34mprisma:query[39m INSERT INTO "public"."merchant_enrichment_runs" ("id","entity_id","source_url","final_url","fetched_at","http_status","extraction_json","confidence","cost_usd","created_at") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING "public"."merchant_enrichment_runs"."id", "public"."merchant_enrichment_runs"."entity_id", "public"."merchant_enrichment_runs"."source_url", "public"."merchant_enrichment_runs"."final_url", "public"."merchant_enrichment_runs"."fetched_at", "public"."merchant_enrichment_runs"."http_status", "public"."merchant_enrichment_runs"."extraction_json", "public"."merchant_enrichment_runs"."confidence", "public"."merchant_enrichment_runs"."cost_usd", "public"."merchant_enrichment_runs"."created_at"
+[34mprisma:query[39m SELECT "public"."entities"."id", "public"."entities"."category" FROM "public"."entities" WHERE ("public"."entities"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+[34mprisma:query[39m UPDATE "public"."entities" SET "last_enriched_at" = $1, "needs_human_review" = $2, "updated_at" = $3 WHERE ("public"."entities"."id" = $4 AND 1=1) RETURNING "public"."entities"."id"
+Done.
+[34mprisma:query[39m INSERT INTO "public"."place_job_log" ("id","entity_id","entity_type","job_type","pages_fetched","ai_calls","duration_ms","estimated_cost","created_at") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING "public"."place_job_log"."id", "public"."place_job_log"."entity_id", "public"."place_job_log"."entity_type", "public"."place_job_log"."job_type", "public"."place_job_log"."pages_fetched", "public"."place_job_log"."ai_calls", "public"."place_job_log"."duration_ms", "public"."place_job_log"."estimated_cost", "public"."place_job_log"."created_at"
+  ✓ enrichment_stage updated to 6
+
+────────────────────────────────────────────────────────────
+Stage 7: Tagline generation (AI)
+  ./node_modules/.bin/tsx scripts/generate-taglines-v2.ts --place=Hauser & Wirth
+────────────────────────────────────────────────────────────
+
+🎙️  Saiko Voice Engine v2.0 — Tagline Generator
+==========================================
+🔸 Single place: "Hauser & Wirth"
+🔸 Concurrency: 5
+
+📍 Fetching records with identity signals...
+📍 Found 0 places to process
+
+No records to process. Exiting.
+  ✓ enrichment_stage updated to 7
+  ✓ last_enriched_at updated
+
+Re-scanning issues...
+  Issues: 0 created, 1 resolved, 5 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Hauser & Wirth
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  ✓ Stage 2: Surface discovery (ran)
+  · Stage 3: Surface fetch (skipped)
+  ✓ Stage 4: Surface parse (ran)
+  ✓ Stage 5: Identity signal extraction (AI) (ran)
+  ✓ Stage 6: Website enrichment (ran)
+  ✓ Stage 7: Tagline generation (AI) (ran)
+

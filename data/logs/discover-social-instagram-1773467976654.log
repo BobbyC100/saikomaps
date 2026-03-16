@@ -1,0 +1,21 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  write to custom object with { processEnv: myObject }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
+[Discover Social] mode=instagram limit=50 dryRun=false delay=2000ms
+
+============================================================
+  Discovering: INSTAGRAM
+============================================================
+
+Found 1 entities missing instagram
+
+  [1/1] Chengdu Taste (chengdu-taste-restaurant-4-iconic-sgv-sichuan-essential)
+    NOT FOUND: After extensive searching, no official Instagram business account could be confidently identified for the Chengdu Taste Alhambra location specifically. While the restaurant chain operates dedicated Instagram accounts for other locations (Seattle, Rowland Heights, Houston), the Alhambra original location does not appear to maintain its own Instagram business account. The restaurant has an official website (chengdu-taste-alhambra.com) and Facebook page, but neither provides an Instagram handle link. An Instagram location page exists but is not a business account handle.
+
+────────────────────────────────────────────────────────────
+  INSTAGRAM RESULTS
+────────────────────────────────────────────────────────────
+  ENTITY                         DISCOVERED                CONF     ACTION
+  ═══════════════════════════════════════════════════════════════════════════
+  Chengdu Taste                  —                         low      not_found
+
+  Total: 1 | Set: 0 | Not found: 1 | Skipped: 0 | Errors: 0

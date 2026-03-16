@@ -1,0 +1,22 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+[Discover Social] mode=instagram limit=50 dryRun=false delay=2000ms
+
+============================================================
+  Discovering: INSTAGRAM
+============================================================
+
+Found 1 entities missing instagram
+
+  [1/1] Barranco's Fruit (barranco-s-fruit)
+    FOUND: barrancosfruit (high)
+    SAVED: instagram = barrancosfruit
+
+────────────────────────────────────────────────────────────
+  INSTAGRAM RESULTS
+────────────────────────────────────────────────────────────
+  ENTITY                         DISCOVERED                CONF     ACTION
+  ═══════════════════════════════════════════════════════════════════════════
+  Barranco's Fruit               barrancosfruit            high     set
+
+  Total: 1 | Set: 1 | Not found: 0 | Skipped: 0 | Errors: 0

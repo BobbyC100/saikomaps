@@ -1,0 +1,76 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  suppress all logs with { quiet: true }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+
+Enrich: Destination HiFi (destination-hifi)
+  ID:      30c47132-075e-4f5d-844f-afe06b784009
+  Website: https://destinationhifi.com/
+  GPID:    ChIJKeUl_pKVwoAR_F6_IbBfYlQ
+
+Stage 1: Google Places identity commit — skipped (Google Places identity resolved separately via backfill-google-places.ts)
+
+Stage 2: Surface discovery — skipped (surface rows already exist)
+
+Stage 3: Surface fetch — skipped (no surfaces with fetch_status=discovered)
+
+Stage 4: Surface parse — skipped (no surfaces pending parse)
+
+────────────────────────────────────────────────────────────
+Stage 5: Identity signal extraction (AI)
+  ./node_modules/.bin/tsx scripts/extract-identity-signals.ts --place=Destination HiFi
+────────────────────────────────────────────────────────────
+
+🔮 Saiko Maps — Identity Signal Extraction
+==========================================
+🔸 Single place: "Destination HiFi"
+
+📍 Found 0 places to process
+   (0 in canonical scope · 0 unprocessed · 0 with extractable content)
+
+No records to process. Exiting.
+
+────────────────────────────────────────────────────────────
+Stage 6: Website enrichment
+  ./node_modules/.bin/tsx scripts/run-website-enrichment.ts --slug=destination-hifi
+────────────────────────────────────────────────────────────
+[34mprisma:query[39m SELECT "public"."entities"."id", "public"."entities"."website", "public"."entities"."name", "public"."entities"."category" FROM "public"."entities" WHERE ("public"."entities"."slug" = $1 AND "public"."entities"."website" IS NOT NULL) ORDER BY "public"."entities"."updated_at" DESC LIMIT $2 OFFSET $3
+Website enrichment: 1 places (mode=default, ignoreThrottle=false, dryRun=false)
+
+  Destination HiFi FULL ERROR:
+SyntaxError: Invalid regular expression: /^/collections/.*+.*/: Nothing to repeat
+    at new RegExp (<anonymous>)
+    at isPathDisallowed [90m(/Users/bobbyciccaglione/code/saiko-maps/[39mlib/website-enrichment/fetch.ts:43:18[90m)[39m
+    at fetchWithLimits [90m(/Users/bobbyciccaglione/code/saiko-maps/[39mlib/website-enrichment/fetch.ts:68:11[90m)[39m
+[90m    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at async runEnrichmentForPlace [90m(/Users/bobbyciccaglione/code/saiko-maps/[39mlib/website-enrichment/pipeline.ts:57:22[90m)[39m
+    at async main [90m(/Users/bobbyciccaglione/code/saiko-maps/[39mscripts/run-website-enrichment.ts:111:23[90m)[39m
+Done.
+
+────────────────────────────────────────────────────────────
+Stage 7: Tagline generation (AI)
+  ./node_modules/.bin/tsx scripts/generate-taglines-v2.ts --place=Destination HiFi
+────────────────────────────────────────────────────────────
+
+🎙️  Saiko Voice Engine v2.0 — Tagline Generator
+==========================================
+🔸 Single place: "Destination HiFi"
+🔸 Concurrency: 5
+
+📍 Fetching records with identity signals...
+📍 Found 0 places to process
+
+No records to process. Exiting.
+
+Re-scanning issues...
+  Issues: 0 created, 1 resolved, 6 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Destination HiFi
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  ✓ Stage 5: Identity signal extraction (AI) (ran)
+  ✓ Stage 6: Website enrichment (ran)
+  ✓ Stage 7: Tagline generation (AI) (ran)
+

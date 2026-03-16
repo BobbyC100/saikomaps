@@ -1,0 +1,22 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+[Discover Social] mode=instagram limit=50 dryRun=false delay=2000ms
+
+============================================================
+  Discovering: INSTAGRAM
+============================================================
+
+Found 1 entities missing instagram
+
+  [1/1] The Hollywood Roosevelt (the-hollywood-roosevelt-hotel-hotel-iconic-historic-hollywood-landmark-old-schoo)
+    FOUND: thehollywoodroosevelt (high)
+    SAVED: instagram = thehollywoodroosevelt
+
+────────────────────────────────────────────────────────────
+  INSTAGRAM RESULTS
+────────────────────────────────────────────────────────────
+  ENTITY                         DISCOVERED                CONF     ACTION
+  ═══════════════════════════════════════════════════════════════════════════
+  The Hollywood Roosevelt        thehollywoodroosevelt     high     set
+
+  Total: 1 | Set: 1 | Not found: 0 | Skipped: 0 | Errors: 0

@@ -1,0 +1,21 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  override existing env vars with { override: true }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+[Discover Social] mode=website limit=50 dryRun=false delay=2000ms
+
+============================================================
+  Discovering: WEBSITE
+============================================================
+
+Found 1 entities missing website
+
+  [1/1] Baja Subs Market & Deli (baja-subs-market-deli-northridge)
+    FOUND: https://www.asianflavorsstore.com (low)
+
+────────────────────────────────────────────────────────────
+  WEBSITE RESULTS
+────────────────────────────────────────────────────────────
+  ENTITY                         DISCOVERED                CONF     ACTION
+  ═══════════════════════════════════════════════════════════════════════════
+  Baja Subs Market & Deli        https://www.asianflavorss low      skipped_low_conf
+
+  Total: 1 | Set: 0 | Not found: 0 | Skipped: 1 | Errors: 0

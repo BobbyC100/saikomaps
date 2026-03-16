@@ -1,0 +1,61 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+
+Enrich: Avalon Vintage (avalon-vintage)
+  ID:      3eaa0a18-6a1d-4b25-9c5f-d04690cd99d2
+  Website: —
+  GPID:    ChIJ4VZZnBrEwoARPtJuX-MvyLU
+
+Stage 1: Google Places identity commit — skipped (Google Places identity resolved separately via backfill-google-places.ts)
+
+Stage 2: Surface discovery — skipped (no website)
+
+Stage 3: Surface fetch — skipped (no surfaces with fetch_status=discovered)
+
+Stage 4: Surface parse — skipped (no surfaces pending parse)
+
+────────────────────────────────────────────────────────────
+Stage 5: Identity signal extraction (AI)
+  ./node_modules/.bin/tsx scripts/extract-identity-signals.ts --place=Avalon Vintage
+────────────────────────────────────────────────────────────
+
+🔮 Saiko Maps — Identity Signal Extraction
+==========================================
+🔸 Single place: "Avalon Vintage"
+
+📍 Found 0 places to process
+   (0 in canonical scope · 0 unprocessed · 0 with extractable content)
+
+No records to process. Exiting.
+
+Stage 6: Website enrichment — skipped (no website)
+
+────────────────────────────────────────────────────────────
+Stage 7: Tagline generation (AI)
+  ./node_modules/.bin/tsx scripts/generate-taglines-v2.ts --place=Avalon Vintage
+────────────────────────────────────────────────────────────
+
+🎙️  Saiko Voice Engine v2.0 — Tagline Generator
+==========================================
+🔸 Single place: "Avalon Vintage"
+🔸 Concurrency: 5
+
+📍 Fetching records with identity signals...
+📍 Found 0 places to process
+
+No records to process. Exiting.
+
+Re-scanning issues...
+  Issues: 0 created, 1 resolved, 7 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Avalon Vintage
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  ✓ Stage 5: Identity signal extraction (AI) (ran)
+  · Stage 6: Website enrichment (skipped)
+  ✓ Stage 7: Tagline generation (AI) (ran)
+

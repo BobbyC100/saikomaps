@@ -1,0 +1,21 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+
+Enrich: BALAM Mexican Kitchen (balam-kitchen)
+  ID:      9d737c3c-bf1f-48d8-8ac5-fdd32177fc36
+  Website: https://www.instagram.com/balamtaco?igsh=MWE2NjR1bTFtb2o4aA==
+  GPID:    ChIJbca7L4bLwoARVPEhV0ff0a0
+
+Stage 6: Website enrichment — skipped (last_enriched_at already set)
+
+════════════════════════════════════════════════════════════
+Enrichment summary: BALAM Mexican Kitchen
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+

@@ -1,0 +1,21 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  suppress all logs with { quiet: true }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔄 add secrets lifecycle management: https://dotenvx.com/ops
+
+Enrich: 8540 S Sepulveda Blvd (8540-s-sepulveda-blvd-westchester)
+  ID:      cb7e6aef-4ed2-4c90-aa11-c92f5c5fef24
+  Website: —
+  GPID:    ChIJ3Vl5CM2wwoARH3ZCjzo_lOI
+
+Stage 6: Website enrichment — skipped (no website)
+
+════════════════════════════════════════════════════════════
+Enrichment summary: 8540 S Sepulveda Blvd
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+

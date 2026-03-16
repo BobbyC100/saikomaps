@@ -1,0 +1,21 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  override existing env vars with { override: true }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 📡 add observability to secrets: https://dotenvx.com/ops
+[Discover Social] mode=instagram limit=50 dryRun=false delay=2000ms
+
+============================================================
+  Discovering: INSTAGRAM
+============================================================
+
+Found 1 entities missing instagram
+
+  [1/1] 8540 S Sepulveda Blvd (8540-s-sepulveda-blvd-westchester)
+    NOT FOUND: Address 8540 S Sepulveda Blvd is a medical plaza building, not a restaurant. Multiple sources (LoopNet, Waze, Yelp) confirm it houses medical and dental offices, imaging centers, and pharmacies. This is not an 'eat' establishment, so there is no restaurant Instagram handle to find.
+
+────────────────────────────────────────────────────────────
+  INSTAGRAM RESULTS
+────────────────────────────────────────────────────────────
+  ENTITY                         DISCOVERED                CONF     ACTION
+  ═══════════════════════════════════════════════════════════════════════════
+  8540 S Sepulveda Blvd          —                         high     not_found
+
+  Total: 1 | Set: 0 | Not found: 1 | Skipped: 0 | Errors: 0

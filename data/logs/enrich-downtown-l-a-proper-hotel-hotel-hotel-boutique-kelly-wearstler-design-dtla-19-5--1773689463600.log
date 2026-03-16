@@ -1,0 +1,12 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+
+Backfill Google Places — 1 place(s) to process
+
+  ✅ downtown-l-a-proper-hotel-hotel-hotel-boutique-kelly-wearstler-design-dtla-19-5- (Downtown LA Proper Hotel)
+
+--- Backfill Complete ---
+Enriched: 1
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 4 unchanged

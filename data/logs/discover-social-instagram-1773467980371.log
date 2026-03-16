@@ -1,0 +1,21 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+[Discover Social] mode=instagram limit=50 dryRun=false delay=2000ms
+
+============================================================
+  Discovering: INSTAGRAM
+============================================================
+
+Found 1 entities missing instagram
+
+  [1/1] Ennis House (unknown-c5241182)
+    NOT FOUND: Ennis House is a historic residential landmark, not a restaurant or food business. The Instagram account @the.ennis.house exists but represents the architectural property, not an 'eat' establishment as specified.
+
+────────────────────────────────────────────────────────────
+  INSTAGRAM RESULTS
+────────────────────────────────────────────────────────────
+  ENTITY                         DISCOVERED                CONF     ACTION
+  ═══════════════════════════════════════════════════════════════════════════
+  Ennis House                    —                         low      not_found
+
+  Total: 1 | Set: 0 | Not found: 1 | Skipped: 0 | Errors: 0

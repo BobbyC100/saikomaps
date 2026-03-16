@@ -1,0 +1,21 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  enable debug logging with { debug: true }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+
+Enrich: Venice Beach Basketball Courts (unknown-2959e986)
+  ID:      2959e986-5f6d-49d6-8649-b5ce03272e27
+  Website: —
+  GPID:    ChIJ-YGylLm6woARWAySgUQblFg
+
+Stage 6: Website enrichment — skipped (no website)
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Venice Beach Basketball Courts
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+

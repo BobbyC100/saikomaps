@@ -1,0 +1,22 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+[Discover Social] mode=instagram limit=50 dryRun=false delay=2000ms
+
+============================================================
+  Discovering: INSTAGRAM
+============================================================
+
+Found 1 entities missing instagram
+
+  [1/1] Roasted Duck by Pa Ord (roasted-duck-by-pa-ord-restaurant-4-iconic-thai-town-new-eater-38-addition)
+    FOUND: roastduck_bypaord (high)
+    SAVED: instagram = roastduck_bypaord
+
+────────────────────────────────────────────────────────────
+  INSTAGRAM RESULTS
+────────────────────────────────────────────────────────────
+  ENTITY                         DISCOVERED                CONF     ACTION
+  ═══════════════════════════════════════════════════════════════════════════
+  Roasted Duck by Pa Ord         roastduck_bypaord         high     set
+
+  Total: 1 | Set: 1 | Not found: 0 | Skipped: 0 | Errors: 0

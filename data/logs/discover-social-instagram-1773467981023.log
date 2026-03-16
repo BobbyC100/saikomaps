@@ -1,0 +1,22 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+[Discover Social] mode=instagram limit=50 dryRun=false delay=2000ms
+
+============================================================
+  Discovering: INSTAGRAM
+============================================================
+
+Found 1 entities missing instagram
+
+  [1/1] Gucci Osteria da Massimo Bottura (gucci-osteria-da-massimo-bottura-restaurant-2-michelin-1-michelin-star-beverly-h)
+    FOUND: gucciosteria (high)
+    SAVED: instagram = gucciosteria
+
+────────────────────────────────────────────────────────────
+  INSTAGRAM RESULTS
+────────────────────────────────────────────────────────────
+  ENTITY                         DISCOVERED                CONF     ACTION
+  ═══════════════════════════════════════════════════════════════════════════
+  Gucci Osteria da Massimo Bottu gucciosteria              high     set
+
+  Total: 1 | Set: 1 | Not found: 0 | Skipped: 0 | Errors: 0

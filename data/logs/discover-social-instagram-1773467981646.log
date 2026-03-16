@@ -1,0 +1,21 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  override existing env vars with { override: true }
+[Discover Social] mode=instagram limit=50 dryRun=false delay=2000ms
+
+============================================================
+  Discovering: INSTAGRAM
+============================================================
+
+Found 1 entities missing instagram
+
+  [1/1] Jeffrey H Denham, MD (jeffrey-h-denham-md)
+    NOT FOUND: Jeffrey H Denham, MD is a physician, not a food/restaurant business. Extensive search found no Instagram account associated with him. His professional presence is limited to medical directories and hospital affiliations. The task appears to have confused a medical professional with a restaurant business.
+
+────────────────────────────────────────────────────────────
+  INSTAGRAM RESULTS
+────────────────────────────────────────────────────────────
+  ENTITY                         DISCOVERED                CONF     ACTION
+  ═══════════════════════════════════════════════════════════════════════════
+  Jeffrey H Denham, MD           —                         high     not_found
+
+  Total: 1 | Set: 0 | Not found: 1 | Skipped: 0 | Errors: 0

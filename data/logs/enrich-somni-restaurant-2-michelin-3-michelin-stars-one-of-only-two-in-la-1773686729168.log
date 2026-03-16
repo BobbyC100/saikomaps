@@ -1,0 +1,12 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+
+Backfill Google Places — 1 place(s) to process
+
+  ✅ somni-restaurant-2-michelin-3-michelin-stars-one-of-only-two-in-la (Somni)
+
+--- Backfill Complete ---
+Enriched: 1
+
+Re-scanning issues...
+  Issues: 0 created, 0 resolved, 5 unchanged

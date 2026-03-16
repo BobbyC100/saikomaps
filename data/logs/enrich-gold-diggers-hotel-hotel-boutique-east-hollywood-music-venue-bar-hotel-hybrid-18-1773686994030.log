@@ -1,0 +1,12 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+
+Backfill Google Places — 1 place(s) to process
+
+  ✅ gold-diggers-hotel-hotel-boutique-east-hollywood-music-venue-bar-hotel-hybrid-18 (Gold Diggers Bar)
+
+--- Backfill Complete ---
+Enriched: 1
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 5 unchanged

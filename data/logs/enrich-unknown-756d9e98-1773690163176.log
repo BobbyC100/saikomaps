@@ -1,0 +1,22 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
+PrismaClientInitializationError: 
+Invalid `prisma.entities.findMany()` invocation in
+/Users/bobbyciccaglione/code/saiko-maps/scripts/backfill-google-places.ts:102:40
+
+   99   where = { placesDataCachedAt: null };
+  100 }
+  101 
+→ 102 const places = await prisma.entities.findMany(
+Can't reach database server at `ep-spring-sun-aiht1nns-pooler.c-4.us-east-1.aws.neon.tech:5432`
+
+Please make sure your database server is running at `ep-spring-sun-aiht1nns-pooler.c-4.us-east-1.aws.neon.tech:5432`.
+    at ei.handleRequestError [90m(/Users/bobbyciccaglione/code/saiko-maps/[39mnode_modules/[4m@prisma/client[24m/src/runtime/RequestHandler.ts:242:13[90m)[39m
+    at ei.handleAndLogRequestError [90m(/Users/bobbyciccaglione/code/saiko-maps/[39mnode_modules/[4m@prisma/client[24m/src/runtime/RequestHandler.ts:174:12[90m)[39m
+    at ei.request [90m(/Users/bobbyciccaglione/code/saiko-maps/[39mnode_modules/[4m@prisma/client[24m/src/runtime/RequestHandler.ts:143:12[90m)[39m
+    at async a [90m(/Users/bobbyciccaglione/code/saiko-maps/[39mnode_modules/[4m@prisma/client[24m/src/runtime/getPrismaClient.ts:833:24[90m)[39m
+    at async main [90m(/Users/bobbyciccaglione/code/saiko-maps/[39mscripts/backfill-google-places.ts:102:18[90m)[39m {
+  clientVersion: [32m'6.18.0'[39m,
+  errorCode: [90mundefined[39m,
+  retryable: [90mundefined[39m
+}

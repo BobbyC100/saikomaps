@@ -1,0 +1,21 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 📡 add observability to secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  enable debug logging with { debug: true }
+
+Enrich: Taqueria Frontera (taqueria-frontera-cypress-park)
+  ID:      6ba4be1d-ad74-4b7e-afb3-6a801090f358
+  Website: —
+  GPID:    ChIJq-wlGADHwoARfnCcqPOh9Jw
+
+Stage 6: Website enrichment — skipped (no website)
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Taqueria Frontera
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+

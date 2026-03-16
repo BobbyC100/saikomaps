@@ -1,0 +1,21 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  override existing env vars with { override: true }
+[Discover Social] mode=instagram limit=50 dryRun=false delay=2000ms
+
+============================================================
+  Discovering: INSTAGRAM
+============================================================
+
+Found 1 entities missing instagram
+
+  [1/1] Tire Shop Taqueria (tire-shop-taqueria-south-central)
+    NOT FOUND: While I confirmed the business exists at 4069 S Avalon Blvd in South LA (officially called Taqueria San Miguel but known as Tire Shop Taqueria), I could not confidently identify the official Instagram handle. Multiple 'Taqueria San Miguel' accounts exist on Instagram, but I cannot verify which one belongs to this specific location without being able to access and cross-reference account content with their address and location information.
+
+────────────────────────────────────────────────────────────
+  INSTAGRAM RESULTS
+────────────────────────────────────────────────────────────
+  ENTITY                         DISCOVERED                CONF     ACTION
+  ═══════════════════════════════════════════════════════════════════════════
+  Tire Shop Taqueria             —                         low      not_found
+
+  Total: 1 | Set: 0 | Not found: 1 | Skipped: 0 | Errors: 0

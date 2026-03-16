@@ -1,0 +1,22 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  enable debug logging with { debug: true }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
+[Discover Social] mode=instagram limit=50 dryRun=false delay=2000ms
+
+============================================================
+  Discovering: INSTAGRAM
+============================================================
+
+Found 1 entities missing instagram
+
+  [1/1] The Huntington Library, Art Museum, and Botanical Gardens (unknown-5933d98f)
+    FOUND: thehuntingtonlibrary (high)
+    SAVED: instagram = thehuntingtonlibrary
+
+────────────────────────────────────────────────────────────
+  INSTAGRAM RESULTS
+────────────────────────────────────────────────────────────
+  ENTITY                         DISCOVERED                CONF     ACTION
+  ═══════════════════════════════════════════════════════════════════════════
+  The Huntington Library, Art Mu thehuntingtonlibrary      high     set
+
+  Total: 1 | Set: 1 | Not found: 0 | Skipped: 0 | Errors: 0

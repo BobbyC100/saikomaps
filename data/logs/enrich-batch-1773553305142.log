@@ -1,0 +1,577 @@
+[batch-enrich] Starting batch of 23 slugs at Sat Mar 14 22:41:45 PDT 2026
+[batch-enrich] Enriching ahead-stereo at Sat Mar 14 22:41:45 PDT 2026
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/Users/bobbyciccaglione/code/saiko-maps/scripts/enrich-place.ts' imported from /Users/bobbyciccaglione/code/saiko-maps/
+    at finalizeResolution (node:internal/modules/esm/resolve:274:11)
+    at moduleResolve (node:internal/modules/esm/resolve:859:10)
+    at defaultResolve (node:internal/modules/esm/resolve:983:11)
+    at nextResolve (node:internal/modules/esm/hooks:748:28)
+    at resolveBase (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553305599:2:3744)
+    at async resolveDirectory (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553305599:2:4237)
+    at async resolve (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553305599:2:5355)
+    at async nextResolve (node:internal/modules/esm/hooks:748:22)
+    at async Hooks.resolve (node:internal/modules/esm/hooks:240:24)
+    at async handleMessage (node:internal/modules/esm/worker:199:18) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///Users/bobbyciccaglione/code/saiko-maps/scripts/enrich-place.ts'
+}
+
+Node.js v22.20.0
+[batch-enrich] FAILED: ahead-stereo
+[batch-enrich] Finished ahead-stereo at Sat Mar 14 22:41:45 PDT 2026
+[batch-enrich] Enriching gryphon-audio at Sat Mar 14 22:41:45 PDT 2026
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/Users/bobbyciccaglione/code/saiko-maps/scripts/enrich-place.ts' imported from /Users/bobbyciccaglione/code/saiko-maps/
+    at finalizeResolution (node:internal/modules/esm/resolve:274:11)
+    at moduleResolve (node:internal/modules/esm/resolve:859:10)
+    at defaultResolve (node:internal/modules/esm/resolve:983:11)
+    at nextResolve (node:internal/modules/esm/hooks:748:28)
+    at resolveBase (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553305960:2:3744)
+    at async resolveDirectory (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553305960:2:4237)
+    at async resolve (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553305960:2:5355)
+    at async nextResolve (node:internal/modules/esm/hooks:748:22)
+    at async Hooks.resolve (node:internal/modules/esm/hooks:240:24)
+    at async handleMessage (node:internal/modules/esm/worker:199:18) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///Users/bobbyciccaglione/code/saiko-maps/scripts/enrich-place.ts'
+}
+
+Node.js v22.20.0
+[batch-enrich] FAILED: gryphon-audio
+[batch-enrich] Finished gryphon-audio at Sat Mar 14 22:41:46 PDT 2026
+[batch-enrich] Enriching audio-specialist at Sat Mar 14 22:41:46 PDT 2026
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/Users/bobbyciccaglione/code/saiko-maps/scripts/enrich-place.ts' imported from /Users/bobbyciccaglione/code/saiko-maps/
+    at finalizeResolution (node:internal/modules/esm/resolve:274:11)
+    at moduleResolve (node:internal/modules/esm/resolve:859:10)
+    at defaultResolve (node:internal/modules/esm/resolve:983:11)
+    at nextResolve (node:internal/modules/esm/hooks:748:28)
+    at resolveBase (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553306146:2:3744)
+    at async resolveDirectory (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553306146:2:4237)
+    at async resolve (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553306146:2:5355)
+    at async nextResolve (node:internal/modules/esm/hooks:748:22)
+    at async Hooks.resolve (node:internal/modules/esm/hooks:240:24)
+    at async handleMessage (node:internal/modules/esm/worker:199:18) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///Users/bobbyciccaglione/code/saiko-maps/scripts/enrich-place.ts'
+}
+
+Node.js v22.20.0
+[batch-enrich] FAILED: audio-specialist
+[batch-enrich] Finished audio-specialist at Sat Mar 14 22:41:46 PDT 2026
+[batch-enrich] Enriching george-meyer-av at Sat Mar 14 22:41:46 PDT 2026
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  write to custom object with { processEnv: myObject }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
+
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/Users/bobbyciccaglione/code/saiko-maps/scripts/enrich-place.ts' imported from /Users/bobbyciccaglione/code/saiko-maps/
+    at finalizeResolution (node:internal/modules/esm/resolve:274:11)
+    at moduleResolve (node:internal/modules/esm/resolve:859:10)
+    at defaultResolve (node:internal/modules/esm/resolve:983:11)
+    at nextResolve (node:internal/modules/esm/hooks:748:28)
+    at resolveBase (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553306333:2:3744)
+    at async resolveDirectory (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553306333:2:4237)
+    at async resolve (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553306333:2:5355)
+    at async nextResolve (node:internal/modules/esm/hooks:748:22)
+    at async Hooks.resolve (node:internal/modules/esm/hooks:240:24)
+    at async handleMessage (node:internal/modules/esm/worker:199:18) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///Users/bobbyciccaglione/code/saiko-maps/scripts/enrich-place.ts'
+}
+
+Node.js v22.20.0
+[batch-enrich] FAILED: george-meyer-av
+[batch-enrich] Finished george-meyer-av at Sat Mar 14 22:41:46 PDT 2026
+[batch-enrich] Enriching british-audio-guys at Sat Mar 14 22:41:46 PDT 2026
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
+
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/Users/bobbyciccaglione/code/saiko-maps/scripts/enrich-place.ts' imported from /Users/bobbyciccaglione/code/saiko-maps/
+    at finalizeResolution (node:internal/modules/esm/resolve:274:11)
+    at moduleResolve (node:internal/modules/esm/resolve:859:10)
+    at defaultResolve (node:internal/modules/esm/resolve:983:11)
+    at nextResolve (node:internal/modules/esm/hooks:748:28)
+    at resolveBase (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553306511:2:3744)
+    at async resolveDirectory (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553306511:2:4237)
+    at async resolve (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553306511:2:5355)
+    at async nextResolve (node:internal/modules/esm/hooks:748:22)
+    at async Hooks.resolve (node:internal/modules/esm/hooks:240:24)
+    at async handleMessage (node:internal/modules/esm/worker:199:18) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///Users/bobbyciccaglione/code/saiko-maps/scripts/enrich-place.ts'
+}
+
+Node.js v22.20.0
+[batch-enrich] FAILED: british-audio-guys
+[batch-enrich] Finished british-audio-guys at Sat Mar 14 22:41:46 PDT 2026
+[batch-enrich] Enriching scott-walker-audio at Sat Mar 14 22:41:46 PDT 2026
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  write to custom object with { processEnv: myObject }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/Users/bobbyciccaglione/code/saiko-maps/scripts/enrich-place.ts' imported from /Users/bobbyciccaglione/code/saiko-maps/
+    at finalizeResolution (node:internal/modules/esm/resolve:274:11)
+    at moduleResolve (node:internal/modules/esm/resolve:859:10)
+    at defaultResolve (node:internal/modules/esm/resolve:983:11)
+    at nextResolve (node:internal/modules/esm/hooks:748:28)
+    at resolveBase (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553306691:2:3744)
+    at async resolveDirectory (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553306691:2:4237)
+    at async resolve (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553306691:2:5355)
+    at async nextResolve (node:internal/modules/esm/hooks:748:22)
+    at async Hooks.resolve (node:internal/modules/esm/hooks:240:24)
+    at async handleMessage (node:internal/modules/esm/worker:199:18) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///Users/bobbyciccaglione/code/saiko-maps/scripts/enrich-place.ts'
+}
+
+Node.js v22.20.0
+[batch-enrich] FAILED: scott-walker-audio
+[batch-enrich] Finished scott-walker-audio at Sat Mar 14 22:41:46 PDT 2026
+[batch-enrich] Enriching high-end-by-oz at Sat Mar 14 22:41:46 PDT 2026
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/Users/bobbyciccaglione/code/saiko-maps/scripts/enrich-place.ts' imported from /Users/bobbyciccaglione/code/saiko-maps/
+    at finalizeResolution (node:internal/modules/esm/resolve:274:11)
+    at moduleResolve (node:internal/modules/esm/resolve:859:10)
+    at defaultResolve (node:internal/modules/esm/resolve:983:11)
+    at nextResolve (node:internal/modules/esm/hooks:748:28)
+    at resolveBase (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553306859:2:3744)
+    at async resolveDirectory (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553306859:2:4237)
+    at async resolve (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553306859:2:5355)
+    at async nextResolve (node:internal/modules/esm/hooks:748:22)
+    at async Hooks.resolve (node:internal/modules/esm/hooks:240:24)
+    at async handleMessage (node:internal/modules/esm/worker:199:18) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///Users/bobbyciccaglione/code/saiko-maps/scripts/enrich-place.ts'
+}
+
+Node.js v22.20.0
+[batch-enrich] FAILED: high-end-by-oz
+[batch-enrich] Finished high-end-by-oz at Sat Mar 14 22:41:46 PDT 2026
+[batch-enrich] Enriching common-wave-hi-fi at Sat Mar 14 22:41:46 PDT 2026
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/Users/bobbyciccaglione/code/saiko-maps/scripts/enrich-place.ts' imported from /Users/bobbyciccaglione/code/saiko-maps/
+    at finalizeResolution (node:internal/modules/esm/resolve:274:11)
+    at moduleResolve (node:internal/modules/esm/resolve:859:10)
+    at defaultResolve (node:internal/modules/esm/resolve:983:11)
+    at nextResolve (node:internal/modules/esm/hooks:748:28)
+    at resolveBase (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553307158:2:3744)
+    at async resolveDirectory (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553307158:2:4237)
+    at async resolve (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553307158:2:5355)
+    at async nextResolve (node:internal/modules/esm/hooks:748:22)
+    at async Hooks.resolve (node:internal/modules/esm/hooks:240:24)
+    at async handleMessage (node:internal/modules/esm/worker:199:18) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///Users/bobbyciccaglione/code/saiko-maps/scripts/enrich-place.ts'
+}
+
+Node.js v22.20.0
+[batch-enrich] FAILED: common-wave-hi-fi
+[batch-enrich] Finished common-wave-hi-fi at Sat Mar 14 22:41:47 PDT 2026
+[batch-enrich] Enriching destination-hifi at Sat Mar 14 22:41:47 PDT 2026
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
+
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/Users/bobbyciccaglione/code/saiko-maps/scripts/enrich-place.ts' imported from /Users/bobbyciccaglione/code/saiko-maps/
+    at finalizeResolution (node:internal/modules/esm/resolve:274:11)
+    at moduleResolve (node:internal/modules/esm/resolve:859:10)
+    at defaultResolve (node:internal/modules/esm/resolve:983:11)
+    at nextResolve (node:internal/modules/esm/hooks:748:28)
+    at resolveBase (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553307355:2:3744)
+    at async resolveDirectory (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553307355:2:4237)
+    at async resolve (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553307355:2:5355)
+    at async nextResolve (node:internal/modules/esm/hooks:748:22)
+    at async Hooks.resolve (node:internal/modules/esm/hooks:240:24)
+    at async handleMessage (node:internal/modules/esm/worker:199:18) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///Users/bobbyciccaglione/code/saiko-maps/scripts/enrich-place.ts'
+}
+
+Node.js v22.20.0
+[batch-enrich] FAILED: destination-hifi
+[batch-enrich] Finished destination-hifi at Sat Mar 14 22:41:47 PDT 2026
+[batch-enrich] Enriching optimal-enchantment at Sat Mar 14 22:41:47 PDT 2026
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
+
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/Users/bobbyciccaglione/code/saiko-maps/scripts/enrich-place.ts' imported from /Users/bobbyciccaglione/code/saiko-maps/
+    at finalizeResolution (node:internal/modules/esm/resolve:274:11)
+    at moduleResolve (node:internal/modules/esm/resolve:859:10)
+    at defaultResolve (node:internal/modules/esm/resolve:983:11)
+    at nextResolve (node:internal/modules/esm/hooks:748:28)
+    at resolveBase (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553307532:2:3744)
+    at async resolveDirectory (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553307532:2:4237)
+    at async resolve (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553307532:2:5355)
+    at async nextResolve (node:internal/modules/esm/hooks:748:22)
+    at async Hooks.resolve (node:internal/modules/esm/hooks:240:24)
+    at async handleMessage (node:internal/modules/esm/worker:199:18) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///Users/bobbyciccaglione/code/saiko-maps/scripts/enrich-place.ts'
+}
+
+Node.js v22.20.0
+[batch-enrich] FAILED: optimal-enchantment
+[batch-enrich] Finished optimal-enchantment at Sat Mar 14 22:41:47 PDT 2026
+[batch-enrich] Enriching venice-audio at Sat Mar 14 22:41:47 PDT 2026
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/Users/bobbyciccaglione/code/saiko-maps/scripts/enrich-place.ts' imported from /Users/bobbyciccaglione/code/saiko-maps/
+    at finalizeResolution (node:internal/modules/esm/resolve:274:11)
+    at moduleResolve (node:internal/modules/esm/resolve:859:10)
+    at defaultResolve (node:internal/modules/esm/resolve:983:11)
+    at nextResolve (node:internal/modules/esm/hooks:748:28)
+    at resolveBase (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553307718:2:3744)
+    at async resolveDirectory (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553307718:2:4237)
+    at async resolve (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553307718:2:5355)
+    at async nextResolve (node:internal/modules/esm/hooks:748:22)
+    at async Hooks.resolve (node:internal/modules/esm/hooks:240:24)
+    at async handleMessage (node:internal/modules/esm/worker:199:18) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///Users/bobbyciccaglione/code/saiko-maps/scripts/enrich-place.ts'
+}
+
+Node.js v22.20.0
+[batch-enrich] FAILED: venice-audio
+[batch-enrich] Finished venice-audio at Sat Mar 14 22:41:47 PDT 2026
+[batch-enrich] Enriching the-source-av at Sat Mar 14 22:41:47 PDT 2026
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔄 add secrets lifecycle management: https://dotenvx.com/ops
+
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/Users/bobbyciccaglione/code/saiko-maps/scripts/enrich-place.ts' imported from /Users/bobbyciccaglione/code/saiko-maps/
+    at finalizeResolution (node:internal/modules/esm/resolve:274:11)
+    at moduleResolve (node:internal/modules/esm/resolve:859:10)
+    at defaultResolve (node:internal/modules/esm/resolve:983:11)
+    at nextResolve (node:internal/modules/esm/hooks:748:28)
+    at resolveBase (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553307892:2:3744)
+    at async resolveDirectory (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553307892:2:4237)
+    at async resolve (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553307892:2:5355)
+    at async nextResolve (node:internal/modules/esm/hooks:748:22)
+    at async Hooks.resolve (node:internal/modules/esm/hooks:240:24)
+    at async handleMessage (node:internal/modules/esm/worker:199:18) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///Users/bobbyciccaglione/code/saiko-maps/scripts/enrich-place.ts'
+}
+
+Node.js v22.20.0
+[batch-enrich] FAILED: the-source-av
+[batch-enrich] Finished the-source-av at Sat Mar 14 22:41:47 PDT 2026
+[batch-enrich] Enriching hi-fi-project at Sat Mar 14 22:41:47 PDT 2026
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 📡 add observability to secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/Users/bobbyciccaglione/code/saiko-maps/scripts/enrich-place.ts' imported from /Users/bobbyciccaglione/code/saiko-maps/
+    at finalizeResolution (node:internal/modules/esm/resolve:274:11)
+    at moduleResolve (node:internal/modules/esm/resolve:859:10)
+    at defaultResolve (node:internal/modules/esm/resolve:983:11)
+    at nextResolve (node:internal/modules/esm/hooks:748:28)
+    at resolveBase (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553308071:2:3744)
+    at async resolveDirectory (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553308071:2:4237)
+    at async resolve (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553308071:2:5355)
+    at async nextResolve (node:internal/modules/esm/hooks:748:22)
+    at async Hooks.resolve (node:internal/modules/esm/hooks:240:24)
+    at async handleMessage (node:internal/modules/esm/worker:199:18) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///Users/bobbyciccaglione/code/saiko-maps/scripts/enrich-place.ts'
+}
+
+Node.js v22.20.0
+[batch-enrich] FAILED: hi-fi-project
+[batch-enrich] Finished hi-fi-project at Sat Mar 14 22:41:48 PDT 2026
+[batch-enrich] Enriching a-sound-decision at Sat Mar 14 22:41:48 PDT 2026
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔄 add secrets lifecycle management: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/Users/bobbyciccaglione/code/saiko-maps/scripts/enrich-place.ts' imported from /Users/bobbyciccaglione/code/saiko-maps/
+    at finalizeResolution (node:internal/modules/esm/resolve:274:11)
+    at moduleResolve (node:internal/modules/esm/resolve:859:10)
+    at defaultResolve (node:internal/modules/esm/resolve:983:11)
+    at nextResolve (node:internal/modules/esm/hooks:748:28)
+    at resolveBase (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553308241:2:3744)
+    at async resolveDirectory (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553308241:2:4237)
+    at async resolve (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553308241:2:5355)
+    at async nextResolve (node:internal/modules/esm/hooks:748:22)
+    at async Hooks.resolve (node:internal/modules/esm/hooks:240:24)
+    at async handleMessage (node:internal/modules/esm/worker:199:18) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///Users/bobbyciccaglione/code/saiko-maps/scripts/enrich-place.ts'
+}
+
+Node.js v22.20.0
+[batch-enrich] FAILED: a-sound-decision
+[batch-enrich] Finished a-sound-decision at Sat Mar 14 22:41:48 PDT 2026
+[batch-enrich] Enriching audio-element at Sat Mar 14 22:41:48 PDT 2026
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/Users/bobbyciccaglione/code/saiko-maps/scripts/enrich-place.ts' imported from /Users/bobbyciccaglione/code/saiko-maps/
+    at finalizeResolution (node:internal/modules/esm/resolve:274:11)
+    at moduleResolve (node:internal/modules/esm/resolve:859:10)
+    at defaultResolve (node:internal/modules/esm/resolve:983:11)
+    at nextResolve (node:internal/modules/esm/hooks:748:28)
+    at resolveBase (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553308406:2:3744)
+    at async resolveDirectory (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553308406:2:4237)
+    at async resolve (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553308406:2:5355)
+    at async nextResolve (node:internal/modules/esm/hooks:748:22)
+    at async Hooks.resolve (node:internal/modules/esm/hooks:240:24)
+    at async handleMessage (node:internal/modules/esm/worker:199:18) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///Users/bobbyciccaglione/code/saiko-maps/scripts/enrich-place.ts'
+}
+
+Node.js v22.20.0
+[batch-enrich] FAILED: audio-element
+[batch-enrich] Finished audio-element at Sat Mar 14 22:41:48 PDT 2026
+[batch-enrich] Enriching analogue-haven at Sat Mar 14 22:41:48 PDT 2026
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔄 add secrets lifecycle management: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/Users/bobbyciccaglione/code/saiko-maps/scripts/enrich-place.ts' imported from /Users/bobbyciccaglione/code/saiko-maps/
+    at finalizeResolution (node:internal/modules/esm/resolve:274:11)
+    at moduleResolve (node:internal/modules/esm/resolve:859:10)
+    at defaultResolve (node:internal/modules/esm/resolve:983:11)
+    at nextResolve (node:internal/modules/esm/hooks:748:28)
+    at resolveBase (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553308571:2:3744)
+    at async resolveDirectory (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553308571:2:4237)
+    at async resolve (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553308571:2:5355)
+    at async nextResolve (node:internal/modules/esm/hooks:748:22)
+    at async Hooks.resolve (node:internal/modules/esm/hooks:240:24)
+    at async handleMessage (node:internal/modules/esm/worker:199:18) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///Users/bobbyciccaglione/code/saiko-maps/scripts/enrich-place.ts'
+}
+
+Node.js v22.20.0
+[batch-enrich] FAILED: analogue-haven
+[batch-enrich] Finished analogue-haven at Sat Mar 14 22:41:48 PDT 2026
+[batch-enrich] Enriching rewind-audio at Sat Mar 14 22:41:48 PDT 2026
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  write to custom object with { processEnv: myObject }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/Users/bobbyciccaglione/code/saiko-maps/scripts/enrich-place.ts' imported from /Users/bobbyciccaglione/code/saiko-maps/
+    at finalizeResolution (node:internal/modules/esm/resolve:274:11)
+    at moduleResolve (node:internal/modules/esm/resolve:859:10)
+    at defaultResolve (node:internal/modules/esm/resolve:983:11)
+    at nextResolve (node:internal/modules/esm/hooks:748:28)
+    at resolveBase (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553308734:2:3744)
+    at async resolveDirectory (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553308734:2:4237)
+    at async resolve (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553308734:2:5355)
+    at async nextResolve (node:internal/modules/esm/hooks:748:22)
+    at async Hooks.resolve (node:internal/modules/esm/hooks:240:24)
+    at async handleMessage (node:internal/modules/esm/worker:199:18) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///Users/bobbyciccaglione/code/saiko-maps/scripts/enrich-place.ts'
+}
+
+Node.js v22.20.0
+[batch-enrich] FAILED: rewind-audio
+[batch-enrich] Finished rewind-audio at Sat Mar 14 22:41:48 PDT 2026
+[batch-enrich] Enriching valencia-hi-fi at Sat Mar 14 22:41:48 PDT 2026
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 📡 add observability to secrets: https://dotenvx.com/ops
+
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/Users/bobbyciccaglione/code/saiko-maps/scripts/enrich-place.ts' imported from /Users/bobbyciccaglione/code/saiko-maps/
+    at finalizeResolution (node:internal/modules/esm/resolve:274:11)
+    at moduleResolve (node:internal/modules/esm/resolve:859:10)
+    at defaultResolve (node:internal/modules/esm/resolve:983:11)
+    at nextResolve (node:internal/modules/esm/hooks:748:28)
+    at resolveBase (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553308897:2:3744)
+    at async resolveDirectory (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553308897:2:4237)
+    at async resolve (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553308897:2:5355)
+    at async nextResolve (node:internal/modules/esm/hooks:748:22)
+    at async Hooks.resolve (node:internal/modules/esm/hooks:240:24)
+    at async handleMessage (node:internal/modules/esm/worker:199:18) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///Users/bobbyciccaglione/code/saiko-maps/scripts/enrich-place.ts'
+}
+
+Node.js v22.20.0
+[batch-enrich] FAILED: valencia-hi-fi
+[batch-enrich] Finished valencia-hi-fi at Sat Mar 14 22:41:48 PDT 2026
+[batch-enrich] Enriching the-voice-of-vintage at Sat Mar 14 22:41:48 PDT 2026
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/Users/bobbyciccaglione/code/saiko-maps/scripts/enrich-place.ts' imported from /Users/bobbyciccaglione/code/saiko-maps/
+    at finalizeResolution (node:internal/modules/esm/resolve:274:11)
+    at moduleResolve (node:internal/modules/esm/resolve:859:10)
+    at defaultResolve (node:internal/modules/esm/resolve:983:11)
+    at nextResolve (node:internal/modules/esm/hooks:748:28)
+    at resolveBase (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553309061:2:3744)
+    at async resolveDirectory (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553309061:2:4237)
+    at async resolve (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553309061:2:5355)
+    at async nextResolve (node:internal/modules/esm/hooks:748:22)
+    at async Hooks.resolve (node:internal/modules/esm/hooks:240:24)
+    at async handleMessage (node:internal/modules/esm/worker:199:18) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///Users/bobbyciccaglione/code/saiko-maps/scripts/enrich-place.ts'
+}
+
+Node.js v22.20.0
+[batch-enrich] FAILED: the-voice-of-vintage
+[batch-enrich] Finished the-voice-of-vintage at Sat Mar 14 22:41:49 PDT 2026
+[batch-enrich] Enriching pro-audio-la at Sat Mar 14 22:41:49 PDT 2026
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/Users/bobbyciccaglione/code/saiko-maps/scripts/enrich-place.ts' imported from /Users/bobbyciccaglione/code/saiko-maps/
+    at finalizeResolution (node:internal/modules/esm/resolve:274:11)
+    at moduleResolve (node:internal/modules/esm/resolve:859:10)
+    at defaultResolve (node:internal/modules/esm/resolve:983:11)
+    at nextResolve (node:internal/modules/esm/hooks:748:28)
+    at resolveBase (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553309224:2:3744)
+    at async resolveDirectory (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553309224:2:4237)
+    at async resolve (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553309224:2:5355)
+    at async nextResolve (node:internal/modules/esm/hooks:748:22)
+    at async Hooks.resolve (node:internal/modules/esm/hooks:240:24)
+    at async handleMessage (node:internal/modules/esm/worker:199:18) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///Users/bobbyciccaglione/code/saiko-maps/scripts/enrich-place.ts'
+}
+
+Node.js v22.20.0
+[batch-enrich] FAILED: pro-audio-la
+[batch-enrich] Finished pro-audio-la at Sat Mar 14 22:41:49 PDT 2026
+[batch-enrich] Enriching audio-video-services at Sat Mar 14 22:41:49 PDT 2026
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔄 add secrets lifecycle management: https://dotenvx.com/ops
+
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/Users/bobbyciccaglione/code/saiko-maps/scripts/enrich-place.ts' imported from /Users/bobbyciccaglione/code/saiko-maps/
+    at finalizeResolution (node:internal/modules/esm/resolve:274:11)
+    at moduleResolve (node:internal/modules/esm/resolve:859:10)
+    at defaultResolve (node:internal/modules/esm/resolve:983:11)
+    at nextResolve (node:internal/modules/esm/hooks:748:28)
+    at resolveBase (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553309388:2:3744)
+    at async resolveDirectory (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553309388:2:4237)
+    at async resolve (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553309388:2:5355)
+    at async nextResolve (node:internal/modules/esm/hooks:748:22)
+    at async Hooks.resolve (node:internal/modules/esm/hooks:240:24)
+    at async handleMessage (node:internal/modules/esm/worker:199:18) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///Users/bobbyciccaglione/code/saiko-maps/scripts/enrich-place.ts'
+}
+
+Node.js v22.20.0
+[batch-enrich] FAILED: audio-video-services
+[batch-enrich] Finished audio-video-services at Sat Mar 14 22:41:49 PDT 2026
+[batch-enrich] Enriching audiovisual-architects at Sat Mar 14 22:41:49 PDT 2026
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  write to custom object with { processEnv: myObject }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
+
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/Users/bobbyciccaglione/code/saiko-maps/scripts/enrich-place.ts' imported from /Users/bobbyciccaglione/code/saiko-maps/
+    at finalizeResolution (node:internal/modules/esm/resolve:274:11)
+    at moduleResolve (node:internal/modules/esm/resolve:859:10)
+    at defaultResolve (node:internal/modules/esm/resolve:983:11)
+    at nextResolve (node:internal/modules/esm/hooks:748:28)
+    at resolveBase (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553309550:2:3744)
+    at async resolveDirectory (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553309550:2:4237)
+    at async resolve (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553309550:2:5355)
+    at async nextResolve (node:internal/modules/esm/hooks:748:22)
+    at async Hooks.resolve (node:internal/modules/esm/hooks:240:24)
+    at async handleMessage (node:internal/modules/esm/worker:199:18) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///Users/bobbyciccaglione/code/saiko-maps/scripts/enrich-place.ts'
+}
+
+Node.js v22.20.0
+[batch-enrich] FAILED: audiovisual-architects
+[batch-enrich] Finished audiovisual-architects at Sat Mar 14 22:41:49 PDT 2026
+[batch-enrich] Enriching video-and-audio-center at Sat Mar 14 22:41:49 PDT 2026
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  enable debug logging with { debug: true }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  enable debug logging with { debug: true }
+
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/Users/bobbyciccaglione/code/saiko-maps/scripts/enrich-place.ts' imported from /Users/bobbyciccaglione/code/saiko-maps/
+    at finalizeResolution (node:internal/modules/esm/resolve:274:11)
+    at moduleResolve (node:internal/modules/esm/resolve:859:10)
+    at defaultResolve (node:internal/modules/esm/resolve:983:11)
+    at nextResolve (node:internal/modules/esm/hooks:748:28)
+    at resolveBase (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553309713:2:3744)
+    at async resolveDirectory (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553309713:2:4237)
+    at async resolve (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773553309713:2:5355)
+    at async nextResolve (node:internal/modules/esm/hooks:748:22)
+    at async Hooks.resolve (node:internal/modules/esm/hooks:240:24)
+    at async handleMessage (node:internal/modules/esm/worker:199:18) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///Users/bobbyciccaglione/code/saiko-maps/scripts/enrich-place.ts'
+}
+
+Node.js v22.20.0
+[batch-enrich] FAILED: video-and-audio-center
+[batch-enrich] Finished video-and-audio-center at Sat Mar 14 22:41:49 PDT 2026
+[batch-enrich] Batch complete at Sat Mar 14 22:41:49 PDT 2026

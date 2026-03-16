@@ -1,0 +1,115 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+
+Enrich: The Daily Planet (the-daily-planet)
+  ID:      041c6f2e-4161-45a0-865c-ffb04890c65b
+  Website: http://www.thedailyplanetbookstore.com/
+  GPID:    ChIJEygfzUa_woARgE_ZkZL6aXU
+
+Stage 1: Google Places identity commit — skipped (Google Places identity resolved separately via backfill-google-places.ts)
+
+────────────────────────────────────────────────────────────
+Stage 2: Surface discovery
+  ./node_modules/.bin/tsx scripts/run-surface-discovery.ts --entity-id=041c6f2e-4161-45a0-865c-ffb04890c65b --limit=1
+────────────────────────────────────────────────────────────
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 📡 add observability to secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+🔍 Merchant Surface Discovery
+
+Found 1 entities needing discovery
+
+  The Daily Planet (041c6f2e…) http://www.thedailyplanetbookstore.com/ … ✓ homepage fetched · 1 surface discovered: instagram
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Discovery complete
+   Entities processed : 1
+   Homepage succeeded  : 1
+   Homepage failed     : 0
+   Surface rows written: 2
+
+────────────────────────────────────────────────────────────
+Stage 3: Surface fetch
+  ./node_modules/.bin/tsx scripts/run-surface-fetch.ts --entity-id=041c6f2e-4161-45a0-865c-ffb04890c65b --limit=20
+────────────────────────────────────────────────────────────
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔄 add secrets lifecycle management: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+📥 Merchant Surface Fetch Pass
+
+No discovered surfaces to fetch.
+
+────────────────────────────────────────────────────────────
+Stage 4: Surface parse
+  ./node_modules/.bin/tsx scripts/run-surface-parse.ts --entity-id=041c6f2e-4161-45a0-865c-ffb04890c65b --limit=20
+────────────────────────────────────────────────────────────
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 📡 add observability to secrets: https://dotenvx.com/ops
+🔍 Merchant Surface Parse Pass
+
+   artifact_type    : parse_v1
+   artifact_version : 1
+
+Found 1 surface to parse
+
+  [homepage   ] https://shop.theheartworm.com/collections/thedailyplanet … ✓ parsed
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Parse pass complete
+   Surfaces processed : 1
+   Parsed (artifacts) : 1
+   Deduped (skipped)  : 0
+   Failed             : 0
+
+────────────────────────────────────────────────────────────
+Stage 5: Identity signal extraction (AI)
+  ./node_modules/.bin/tsx scripts/extract-identity-signals.ts --place=The Daily Planet
+────────────────────────────────────────────────────────────
+
+🔮 Saiko Maps — Identity Signal Extraction
+==========================================
+🔸 Single place: "The Daily Planet"
+
+📍 Found 0 places to process
+   (0 in canonical scope · 0 unprocessed · 0 with extractable content)
+
+No records to process. Exiting.
+
+────────────────────────────────────────────────────────────
+Stage 6: Website enrichment
+  ./node_modules/.bin/tsx scripts/run-website-enrichment.ts --slug=the-daily-planet
+────────────────────────────────────────────────────────────
+prisma:query SELECT "public"."entities"."id", "public"."entities"."website", "public"."entities"."name", "public"."entities"."category" FROM "public"."entities" WHERE ("public"."entities"."slug" = $1 AND "public"."entities"."website" IS NOT NULL) ORDER BY "public"."entities"."updated_at" DESC LIMIT $2 OFFSET $3
+Website enrichment: 1 places (mode=default, ignoreThrottle=false, dryRun=false)
+
+  The Daily Planet | 200 | conf=0.40 | cat=Shop
+prisma:query INSERT INTO "public"."merchant_enrichment_runs" ("id","entity_id","source_url","final_url","fetched_at","http_status","extraction_json","confidence","cost_usd","created_at") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING "public"."merchant_enrichment_runs"."id", "public"."merchant_enrichment_runs"."entity_id", "public"."merchant_enrichment_runs"."source_url", "public"."merchant_enrichment_runs"."final_url", "public"."merchant_enrichment_runs"."fetched_at", "public"."merchant_enrichment_runs"."http_status", "public"."merchant_enrichment_runs"."extraction_json", "public"."merchant_enrichment_runs"."confidence", "public"."merchant_enrichment_runs"."cost_usd", "public"."merchant_enrichment_runs"."created_at"
+prisma:query SELECT "public"."entities"."id", "public"."entities"."category" FROM "public"."entities" WHERE ("public"."entities"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+prisma:query UPDATE "public"."entities" SET "last_enriched_at" = $1, "needs_human_review" = $2, "updated_at" = $3 WHERE ("public"."entities"."id" = $4 AND 1=1) RETURNING "public"."entities"."id"
+prisma:query INSERT INTO "public"."place_job_log" ("id","entity_id","entity_type","job_type","pages_fetched","ai_calls","duration_ms","estimated_cost","created_at") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING "public"."place_job_log"."id", "public"."place_job_log"."entity_id", "public"."place_job_log"."entity_type", "public"."place_job_log"."job_type", "public"."place_job_log"."pages_fetched", "public"."place_job_log"."ai_calls", "public"."place_job_log"."duration_ms", "public"."place_job_log"."estimated_cost", "public"."place_job_log"."created_at"
+Done.
+
+────────────────────────────────────────────────────────────
+Stage 7: Tagline generation (AI)
+  ./node_modules/.bin/tsx scripts/generate-taglines-v2.ts --place=The Daily Planet
+────────────────────────────────────────────────────────────
+
+🎙️  Saiko Voice Engine v2.0 — Tagline Generator
+==========================================
+🔸 Single place: "The Daily Planet"
+🔸 Concurrency: 5
+
+📍 Fetching records with identity signals...
+📍 Found 0 places to process
+
+No records to process. Exiting.
+
+════════════════════════════════════════════════════════════
+Enrichment summary: The Daily Planet
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  ✓ Stage 2: Surface discovery (ran)
+  ✓ Stage 3: Surface fetch (ran)
+  ✓ Stage 4: Surface parse (ran)
+  ✓ Stage 5: Identity signal extraction (AI) (ran)
+  ✓ Stage 6: Website enrichment (ran)
+  ✓ Stage 7: Tagline generation (AI) (ran)
+

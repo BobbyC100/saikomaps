@@ -1,0 +1,9 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔄 add secrets lifecycle management: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+
+Backfill Google Places — 1 place(s) to process
+
+  ✅ tacos-los-cholos (Tacos Los Cholos Hp)
+
+--- Backfill Complete ---
+Enriched: 1

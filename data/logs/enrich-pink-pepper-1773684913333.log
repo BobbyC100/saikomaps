@@ -1,0 +1,9 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
+
+Backfill Google Places — 1 place(s) to process
+
+  ✅ pink-pepper (Pink Pepper)
+
+--- Backfill Complete ---
+Enriched: 1

@@ -1,0 +1,22 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+[Discover Social] mode=website limit=50 dryRun=false delay=2000ms
+
+============================================================
+  Discovering: WEBSITE
+============================================================
+
+Found 1 entities missing website
+
+  [1/1] Angel's Tijuana Tacos (angel-s-tijuana-tacos-restaurant-3-hot2025-al-pastor-specialist-resy-pick)
+    FOUND: https://www.angelstijuanatacos.net (high)
+    SAVED: website = https://www.angelstijuanatacos.net
+
+────────────────────────────────────────────────────────────
+  WEBSITE RESULTS
+────────────────────────────────────────────────────────────
+  ENTITY                         DISCOVERED                CONF     ACTION
+  ═══════════════════════════════════════════════════════════════════════════
+  Angel's Tijuana Tacos          https://www.angelstijuana high     set
+
+  Total: 1 | Set: 1 | Not found: 0 | Skipped: 0 | Errors: 0

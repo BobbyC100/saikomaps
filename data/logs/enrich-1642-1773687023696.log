@@ -1,0 +1,12 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+
+Backfill Google Places — 1 place(s) to process
+
+  ✅ 1642 (1642)
+
+--- Backfill Complete ---
+Enriched: 1
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 3 unchanged

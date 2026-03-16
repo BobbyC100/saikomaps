@@ -1,0 +1,19 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
+
+Backfill Google Places — 1 place(s) to process
+
+  ✓ name match: "Alba Los Angeles" (similarity 0.87)
+  ❌ alba-la (Alba LA): 
+Invalid `prisma.entities.update()` invocation in
+/Users/bobbyciccaglione/code/saiko-maps/scripts/backfill-google-places.ts:224:31
+
+  221 };
+  222 
+  223 if (!dryRun) {
+→ 224   await prisma.entities.update(
+Unique constraint failed on the fields: (`google_place_id`)
+
+--- Backfill Complete ---
+Enriched: 0
+Failed: 1

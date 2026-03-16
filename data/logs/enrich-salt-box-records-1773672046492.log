@@ -1,0 +1,118 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+
+Enrich: Salt Box Records (salt-box-records)
+  ID:      62ba935f-2bbd-4aed-a44a-c636af65ae5e
+  Website: https://saltboxrecordsla.com/
+  GPID:    ChIJV3bCd1nGwoARSXTs5vcb5Zs
+
+Stage 1: Google Places identity commit — skipped (Google Places identity resolved separately via backfill-google-places.ts)
+
+────────────────────────────────────────────────────────────
+Stage 2: Surface discovery
+  ./node_modules/.bin/tsx scripts/run-surface-discovery.ts --entity-id=62ba935f-2bbd-4aed-a44a-c636af65ae5e --limit=1
+────────────────────────────────────────────────────────────
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
+🔍 Merchant Surface Discovery
+
+Found 1 entities needing discovery
+
+  Salt Box Records (62ba935f…) https://saltboxrecordsla.com/ … ✓ homepage fetched · 1 surface discovered: instagram
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Discovery complete
+   Entities processed : 1
+   Homepage succeeded  : 1
+   Homepage failed     : 0
+   Surface rows written: 2
+
+────────────────────────────────────────────────────────────
+Stage 3: Surface fetch
+  ./node_modules/.bin/tsx scripts/run-surface-fetch.ts --entity-id=62ba935f-2bbd-4aed-a44a-c636af65ae5e --limit=20
+────────────────────────────────────────────────────────────
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔄 add secrets lifecycle management: https://dotenvx.com/ops
+📥 Merchant Surface Fetch Pass
+
+No discovered surfaces to fetch.
+
+────────────────────────────────────────────────────────────
+Stage 4: Surface parse
+  ./node_modules/.bin/tsx scripts/run-surface-parse.ts --entity-id=62ba935f-2bbd-4aed-a44a-c636af65ae5e --limit=20
+────────────────────────────────────────────────────────────
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔄 add secrets lifecycle management: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+🔍 Merchant Surface Parse Pass
+
+   artifact_type    : parse_v1
+   artifact_version : 1
+
+Found 1 surface to parse
+
+  [homepage   ] https://saltboxrecordsla.com/ … ✓ parsed
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Parse pass complete
+   Surfaces processed : 1
+   Parsed (artifacts) : 1
+   Deduped (skipped)  : 0
+   Failed             : 0
+
+────────────────────────────────────────────────────────────
+Stage 5: Identity signal extraction (AI)
+  ./node_modules/.bin/tsx scripts/extract-identity-signals.ts --place=Salt Box Records
+────────────────────────────────────────────────────────────
+
+🔮 Saiko Maps — Identity Signal Extraction
+==========================================
+🔸 Single place: "Salt Box Records"
+
+📍 Found 0 places to process
+   (0 in canonical scope · 0 unprocessed · 0 with extractable content)
+
+No records to process. Exiting.
+
+────────────────────────────────────────────────────────────
+Stage 6: Website enrichment
+  ./node_modules/.bin/tsx scripts/run-website-enrichment.ts --slug=salt-box-records
+────────────────────────────────────────────────────────────
+prisma:query SELECT "public"."entities"."id", "public"."entities"."website", "public"."entities"."name", "public"."entities"."category" FROM "public"."entities" WHERE ("public"."entities"."slug" = $1 AND "public"."entities"."website" IS NOT NULL) ORDER BY "public"."entities"."updated_at" DESC LIMIT $2 OFFSET $3
+Website enrichment: 1 places (mode=default, ignoreThrottle=false, dryRun=false)
+
+  Salt Box Records FULL ERROR:
+SyntaxError: Invalid regular expression: /^/collections/.*+.*/: Nothing to repeat
+    at new RegExp (<anonymous>)
+    at isPathDisallowed (/Users/bobbyciccaglione/code/saiko-maps/lib/website-enrichment/fetch.ts:43:18)
+    at fetchWithLimits (/Users/bobbyciccaglione/code/saiko-maps/lib/website-enrichment/fetch.ts:68:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async runEnrichmentForPlace (/Users/bobbyciccaglione/code/saiko-maps/lib/website-enrichment/pipeline.ts:57:22)
+    at async main (/Users/bobbyciccaglione/code/saiko-maps/scripts/run-website-enrichment.ts:111:23)
+Done.
+
+────────────────────────────────────────────────────────────
+Stage 7: Tagline generation (AI)
+  ./node_modules/.bin/tsx scripts/generate-taglines-v2.ts --place=Salt Box Records
+────────────────────────────────────────────────────────────
+
+🎙️  Saiko Voice Engine v2.0 — Tagline Generator
+==========================================
+🔸 Single place: "Salt Box Records"
+🔸 Concurrency: 5
+
+📍 Fetching records with identity signals...
+📍 Found 0 places to process
+
+No records to process. Exiting.
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Salt Box Records
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  ✓ Stage 2: Surface discovery (ran)
+  ✓ Stage 3: Surface fetch (ran)
+  ✓ Stage 4: Surface parse (ran)
+  ✓ Stage 5: Identity signal extraction (AI) (ran)
+  ✓ Stage 6: Website enrichment (ran)
+  ✓ Stage 7: Tagline generation (AI) (ran)
+

@@ -1,0 +1,83 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  override existing env vars with { override: true }
+
+Enrich: endorffeine (endorffeine-coffee-6-coffee-arts-district)
+  ID:      3cd72c30-fc68-45aa-885a-f25c1bf2fae4
+  Website: http://endorffeine.coffee/
+  GPID:    ChIJsTjh9VrGwoARfOkMqZCZRXQ
+
+Stage 1: Google Places identity commit — skipped (Google Places identity resolved separately via backfill-google-places.ts)
+
+Stage 2: Surface discovery — skipped (surface rows already exist)
+
+────────────────────────────────────────────────────────────
+Stage 3: Surface fetch
+  node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/run-surface-fetch.ts --entity-id=3cd72c30-fc68-45aa-885a-f25c1bf2fae4 --limit=20
+────────────────────────────────────────────────────────────
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 📡 add observability to secrets: https://dotenvx.com/ops
+📥 Merchant Surface Fetch Pass
+
+No discovered surfaces to fetch.
+  ✓ enrichment_stage updated to 3
+
+Stage 4: Surface parse — skipped (no surfaces pending parse)
+
+Stage 5: Identity signal extraction (AI) — skipped (identity_signals already in derived_signals)
+
+────────────────────────────────────────────────────────────
+Stage 6: Website enrichment
+  node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/run-website-enrichment.ts --slug=endorffeine-coffee-6-coffee-arts-district
+────────────────────────────────────────────────────────────
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  override existing env vars with { override: true }
+[34mprisma:query[39m SELECT "public"."entities"."id", "public"."entities"."website", "public"."entities"."name", "public"."entities"."category" FROM "public"."entities" WHERE ("public"."entities"."slug" = $1 AND "public"."entities"."website" IS NOT NULL) ORDER BY "public"."entities"."updated_at" DESC LIMIT $2 OFFSET $3
+Website enrichment: 1 places (mode=default, ignoreThrottle=false, dryRun=false)
+
+  endorffeine | 200 | conf=0.80 | cat=Cafe
+[34mprisma:query[39m INSERT INTO "public"."merchant_enrichment_runs" ("id","entity_id","source_url","final_url","fetched_at","http_status","extraction_json","confidence","cost_usd","created_at") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING "public"."merchant_enrichment_runs"."id", "public"."merchant_enrichment_runs"."entity_id", "public"."merchant_enrichment_runs"."source_url", "public"."merchant_enrichment_runs"."final_url", "public"."merchant_enrichment_runs"."fetched_at", "public"."merchant_enrichment_runs"."http_status", "public"."merchant_enrichment_runs"."extraction_json", "public"."merchant_enrichment_runs"."confidence", "public"."merchant_enrichment_runs"."cost_usd", "public"."merchant_enrichment_runs"."created_at"
+[34mprisma:query[39m INSERT INTO "public"."merchant_signals" ("entity_id","inferred_category","menu_url","social_links","extraction_confidence","last_updated_at") VALUES ($1,$2,$3,$4,$5,$6) ON CONFLICT ("entity_id") DO UPDATE SET "inferred_category" = $7, "menu_url" = $8, "social_links" = $9, "extraction_confidence" = $10, "last_updated_at" = $11 WHERE ("public"."merchant_signals"."entity_id" = $12 AND 1=1) RETURNING "public"."merchant_signals"."entity_id", "public"."merchant_signals"."inferred_category", "public"."merchant_signals"."inferred_cuisine", "public"."merchant_signals"."reservation_provider", "public"."merchant_signals"."reservation_url", "public"."merchant_signals"."ordering_provider", "public"."merchant_signals"."ordering_url", "public"."merchant_signals"."menu_url", "public"."merchant_signals"."winelist_url", "public"."merchant_signals"."social_links", "public"."merchant_signals"."extraction_confidence", "public"."merchant_signals"."last_updated_at"
+[34mprisma:query[39m INSERT INTO "public"."observed_claims" ("claim_id","entity_id","attribute_key","raw_value","normalized_value","source_id","source_url","observed_at","extracted_at","extraction_method","confidence","resolution_method","supersedes_claim_id","is_active") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,CAST($10::text AS "public"."ExtractionMethod"),$11,CAST($12::text AS "public"."ClaimResolutionMethod"),$13,$14) RETURNING "public"."observed_claims"."claim_id", "public"."observed_claims"."entity_id", "public"."observed_claims"."attribute_key", "public"."observed_claims"."raw_value", "public"."observed_claims"."normalized_value", "public"."observed_claims"."source_id", "public"."observed_claims"."source_url", "public"."observed_claims"."observed_at", "public"."observed_claims"."extracted_at", "public"."observed_claims"."extraction_method"::text, "public"."observed_claims"."confidence", "public"."observed_claims"."resolution_method"::text, "public"."observed_claims"."resolution_confidence", "public"."observed_claims"."supersedes_claim_id", "public"."observed_claims"."is_active"
+[34mprisma:query[39m SELECT "public"."canonical_sanctions"."sanction_id", "public"."canonical_sanctions"."claim_id" FROM "public"."canonical_sanctions" WHERE ("public"."canonical_sanctions"."entity_id" = $1 AND "public"."canonical_sanctions"."attribute_key" = $2 AND "public"."canonical_sanctions"."is_current" = $3) LIMIT $4 OFFSET $5
+[34mprisma:query[39m SELECT "public"."source_registry"."id", "public"."source_registry"."trust_tier", "public"."source_registry"."requires_human_approval" FROM "public"."source_registry" WHERE ("public"."source_registry"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+[34mprisma:query[39m SELECT "public"."attribute_registry"."attribute_key", "public"."attribute_registry"."sanction_threshold", "public"."attribute_registry"."attribute_class"::text FROM "public"."attribute_registry" WHERE ("public"."attribute_registry"."attribute_key" = $1 AND 1=1) LIMIT $2 OFFSET $3
+[34mprisma:query[39m INSERT INTO "public"."canonical_entity_state" ("entity_id","name","menu_url","tips","last_sanctioned_at","sanctioned_by") VALUES ($1,$2,$3,$4,$5,$6) ON CONFLICT ("entity_id") DO UPDATE SET "menu_url" = $7, "last_sanctioned_at" = $8 WHERE ("public"."canonical_entity_state"."entity_id" = $9 AND 1=1) RETURNING "public"."canonical_entity_state"."entity_id", "public"."canonical_entity_state"."name", "public"."canonical_entity_state"."google_place_id", "public"."canonical_entity_state"."latitude", "public"."canonical_entity_state"."longitude", "public"."canonical_entity_state"."address", "public"."canonical_entity_state"."neighborhood", "public"."canonical_entity_state"."phone", "public"."canonical_entity_state"."website", "public"."canonical_entity_state"."instagram", "public"."canonical_entity_state"."tiktok", "public"."canonical_entity_state"."hours_json", "public"."canonical_entity_state"."price_level", "public"."canonical_entity_state"."reservation_url", "public"."canonical_entity_state"."menu_url", "public"."canonical_entity_state"."winelist_url", "public"."canonical_entity_state"."description", "public"."canonical_entity_state"."cuisine_type", "public"."canonical_entity_state"."category", "public"."canonical_entity_state"."tips", "public"."canonical_entity_state"."google_photos", "public"."canonical_entity_state"."google_places_attributes", "public"."canonical_entity_state"."last_sanctioned_at", "public"."canonical_entity_state"."sanctioned_by"
+[34mprisma:query[39m BEGIN
+[34mprisma:query[39m UPDATE "public"."canonical_sanctions" SET "is_current" = $1 WHERE ("public"."canonical_sanctions"."entity_id" = $2 AND "public"."canonical_sanctions"."attribute_key" = $3 AND "public"."canonical_sanctions"."is_current" = $4)
+[34mprisma:query[39m COMMIT
+[34mprisma:query[39m INSERT INTO "public"."canonical_sanctions" ("sanction_id","entity_id","attribute_key","claim_id","sanctioned_at","sanctioned_by","sanction_method","is_current") VALUES ($1,$2,$3,$4,$5,$6,CAST($7::text AS "public"."SanctionMethod"),$8) RETURNING "public"."canonical_sanctions"."sanction_id", "public"."canonical_sanctions"."entity_id", "public"."canonical_sanctions"."attribute_key", "public"."canonical_sanctions"."claim_id", "public"."canonical_sanctions"."sanctioned_at", "public"."canonical_sanctions"."sanctioned_by", "public"."canonical_sanctions"."sanction_method"::text, "public"."canonical_sanctions"."is_current"
+[34mprisma:query[39m INSERT INTO "public"."observed_claims" ("claim_id","entity_id","attribute_key","raw_value","normalized_value","source_id","source_url","observed_at","extracted_at","extraction_method","confidence","resolution_method","supersedes_claim_id","is_active") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,CAST($10::text AS "public"."ExtractionMethod"),$11,CAST($12::text AS "public"."ClaimResolutionMethod"),$13,$14) RETURNING "public"."observed_claims"."claim_id", "public"."observed_claims"."entity_id", "public"."observed_claims"."attribute_key", "public"."observed_claims"."raw_value", "public"."observed_claims"."normalized_value", "public"."observed_claims"."source_id", "public"."observed_claims"."source_url", "public"."observed_claims"."observed_at", "public"."observed_claims"."extracted_at", "public"."observed_claims"."extraction_method"::text, "public"."observed_claims"."confidence", "public"."observed_claims"."resolution_method"::text, "public"."observed_claims"."resolution_confidence", "public"."observed_claims"."supersedes_claim_id", "public"."observed_claims"."is_active"
+[34mprisma:query[39m SELECT "public"."source_registry"."id", "public"."source_registry"."trust_tier", "public"."source_registry"."requires_human_approval" FROM "public"."source_registry" WHERE ("public"."source_registry"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+[34mprisma:query[39m SELECT "public"."attribute_registry"."attribute_key", "public"."attribute_registry"."sanction_threshold", "public"."attribute_registry"."attribute_class"::text FROM "public"."attribute_registry" WHERE ("public"."attribute_registry"."attribute_key" = $1 AND 1=1) LIMIT $2 OFFSET $3
+[34mprisma:query[39m SELECT "public"."canonical_sanctions"."sanction_id", "public"."canonical_sanctions"."claim_id" FROM "public"."canonical_sanctions" WHERE ("public"."canonical_sanctions"."entity_id" = $1 AND "public"."canonical_sanctions"."attribute_key" = $2 AND "public"."canonical_sanctions"."is_current" = $3) LIMIT $4 OFFSET $5
+[34mprisma:query[39m INSERT INTO "public"."canonical_entity_state" ("entity_id","name","website","tips","last_sanctioned_at","sanctioned_by") VALUES ($1,$2,$3,$4,$5,$6) ON CONFLICT ("entity_id") DO UPDATE SET "website" = $7, "last_sanctioned_at" = $8 WHERE ("public"."canonical_entity_state"."entity_id" = $9 AND 1=1) RETURNING "public"."canonical_entity_state"."entity_id", "public"."canonical_entity_state"."name", "public"."canonical_entity_state"."google_place_id", "public"."canonical_entity_state"."latitude", "public"."canonical_entity_state"."longitude", "public"."canonical_entity_state"."address", "public"."canonical_entity_state"."neighborhood", "public"."canonical_entity_state"."phone", "public"."canonical_entity_state"."website", "public"."canonical_entity_state"."instagram", "public"."canonical_entity_state"."tiktok", "public"."canonical_entity_state"."hours_json", "public"."canonical_entity_state"."price_level", "public"."canonical_entity_state"."reservation_url", "public"."canonical_entity_state"."menu_url", "public"."canonical_entity_state"."winelist_url", "public"."canonical_entity_state"."description", "public"."canonical_entity_state"."cuisine_type", "public"."canonical_entity_state"."category", "public"."canonical_entity_state"."tips", "public"."canonical_entity_state"."google_photos", "public"."canonical_entity_state"."google_places_attributes", "public"."canonical_entity_state"."last_sanctioned_at", "public"."canonical_entity_state"."sanctioned_by"
+[34mprisma:query[39m BEGIN
+[34mprisma:query[39m UPDATE "public"."canonical_sanctions" SET "is_current" = $1 WHERE ("public"."canonical_sanctions"."entity_id" = $2 AND "public"."canonical_sanctions"."attribute_key" = $3 AND "public"."canonical_sanctions"."is_current" = $4)
+[34mprisma:query[39m COMMIT
+[34mprisma:query[39m INSERT INTO "public"."canonical_sanctions" ("sanction_id","entity_id","attribute_key","claim_id","sanctioned_at","sanctioned_by","sanction_method","is_current") VALUES ($1,$2,$3,$4,$5,$6,CAST($7::text AS "public"."SanctionMethod"),$8) RETURNING "public"."canonical_sanctions"."sanction_id", "public"."canonical_sanctions"."entity_id", "public"."canonical_sanctions"."attribute_key", "public"."canonical_sanctions"."claim_id", "public"."canonical_sanctions"."sanctioned_at", "public"."canonical_sanctions"."sanctioned_by", "public"."canonical_sanctions"."sanction_method"::text, "public"."canonical_sanctions"."is_current"
+[34mprisma:query[39m SELECT "public"."entities"."id", "public"."entities"."category" FROM "public"."entities" WHERE ("public"."entities"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+[34mprisma:query[39m UPDATE "public"."entities" SET "last_enriched_at" = $1, "needs_human_review" = $2, "updated_at" = $3 WHERE ("public"."entities"."id" = $4 AND 1=1) RETURNING "public"."entities"."id"
+[34mprisma:query[39m INSERT INTO "public"."place_job_log" ("id","entity_id","entity_type","job_type","pages_fetched","ai_calls","duration_ms","estimated_cost","created_at") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING "public"."place_job_log"."id", "public"."place_job_log"."entity_id", "public"."place_job_log"."entity_type", "public"."place_job_log"."job_type", "public"."place_job_log"."pages_fetched", "public"."place_job_log"."ai_calls", "public"."place_job_log"."duration_ms", "public"."place_job_log"."estimated_cost", "public"."place_job_log"."created_at"
+Done.
+  ✓ enrichment_stage updated to 6
+
+Stage 7: Tagline generation (AI) — skipped (TAGLINE already in interpretation_cache)
+  ✓ last_enriched_at updated
+  ✓ needs_human_review cleared
+
+Re-scanning issues...
+  Issues: 0 created, 1 resolved, 5 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: endorffeine
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  ✓ Stage 3: Surface fetch (ran)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  ✓ Stage 6: Website enrichment (ran)
+  · Stage 7: Tagline generation (AI) (skipped)
+

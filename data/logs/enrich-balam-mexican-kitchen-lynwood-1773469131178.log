@@ -1,0 +1,19 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 📡 add observability to secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
+
+Backfill Google Places — 1 place(s) to process
+
+  ✓ name match: "BALAM Mexican Kitchen" (similarity 1.00)
+  ❌ balam-mexican-kitchen-lynwood (Balam Mexican Kitchen): 
+Invalid `prisma.entities.update()` invocation in
+/Users/bobbyciccaglione/code/saiko-maps/scripts/backfill-google-places.ts:224:31
+
+  221 };
+  222 
+  223 if (!dryRun) {
+→ 224   await prisma.entities.update(
+Unique constraint failed on the fields: (`google_place_id`)
+
+--- Backfill Complete ---
+Enriched: 0
+Failed: 1

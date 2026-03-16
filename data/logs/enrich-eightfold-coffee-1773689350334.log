@@ -1,0 +1,12 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  override existing env vars with { override: true }
+
+Backfill Google Places — 1 place(s) to process
+
+  ✅ eightfold-coffee (Eightfold Coffee)
+
+--- Backfill Complete ---
+Enriched: 1
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 5 unchanged

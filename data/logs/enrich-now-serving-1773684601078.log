@@ -1,0 +1,9 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔄 add secrets lifecycle management: https://dotenvx.com/ops
+
+Backfill Google Places — 1 place(s) to process
+
+  ✅ now-serving (Now Serving)
+
+--- Backfill Complete ---
+Enriched: 1

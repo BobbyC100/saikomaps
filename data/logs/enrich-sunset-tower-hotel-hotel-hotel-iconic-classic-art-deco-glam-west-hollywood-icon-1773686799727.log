@@ -1,0 +1,12 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  override existing env vars with { override: true }
+
+Backfill Google Places — 1 place(s) to process
+
+  ✅ sunset-tower-hotel-hotel-hotel-iconic-classic-art-deco-glam-west-hollywood-icon (Sunset Tower Hotel)
+
+--- Backfill Complete ---
+Enriched: 1
+
+Re-scanning issues...
+  Issues: 0 created, 0 resolved, 5 unchanged

@@ -1,0 +1,12 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 📡 add observability to secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
+
+Backfill Google Places — 1 place(s) to process
+
+  ✅ kuya-lord-restaurant-3-hot2025-james-beard-winner-filipino (Kuya Lord)
+
+--- Backfill Complete ---
+Enriched: 1
+
+Re-scanning issues...
+  Issues: 0 created, 0 resolved, 3 unchanged

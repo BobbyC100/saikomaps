@@ -1,0 +1,110 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+
+Enrich: Page Against the Machine (page-against-the-machine)
+  ID:      a0fb78a7-e897-4c57-8202-3e39d79f310f
+  Website: https://www.patmbooks.com/
+  GPID:    ChIJp6U4C9sx3YARssXxfo0qov4
+
+Stage 1: Google Places identity commit — skipped (Google Places identity resolved separately via backfill-google-places.ts)
+
+────────────────────────────────────────────────────────────
+Stage 2: Surface discovery
+  ./node_modules/.bin/tsx scripts/run-surface-discovery.ts --entity-id=a0fb78a7-e897-4c57-8202-3e39d79f310f --limit=1
+────────────────────────────────────────────────────────────
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
+🔍 Merchant Surface Discovery
+
+Found 1 entities needing discovery
+
+  Page Against the Machine (a0fb78a7…) https://www.patmbooks.com/ … ✓ homepage fetched · 0 surfaces discovered
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Discovery complete
+   Entities processed : 1
+   Homepage succeeded  : 1
+   Homepage failed     : 0
+   Surface rows written: 1
+
+Stage 3: Surface fetch — skipped (no surfaces with fetch_status=discovered)
+
+────────────────────────────────────────────────────────────
+Stage 4: Surface parse
+  ./node_modules/.bin/tsx scripts/run-surface-parse.ts --entity-id=a0fb78a7-e897-4c57-8202-3e39d79f310f --limit=20
+────────────────────────────────────────────────────────────
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+🔍 Merchant Surface Parse Pass
+
+   artifact_type    : parse_v1
+   artifact_version : 1
+
+Found 1 surface to parse
+
+  [homepage   ] https://www.patmbooks.com/ … ✓ parsed
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Parse pass complete
+   Surfaces processed : 1
+   Parsed (artifacts) : 1
+   Deduped (skipped)  : 0
+   Failed             : 0
+
+────────────────────────────────────────────────────────────
+Stage 5: Identity signal extraction (AI)
+  ./node_modules/.bin/tsx scripts/extract-identity-signals.ts --place=Page Against the Machine
+────────────────────────────────────────────────────────────
+
+🔮 Saiko Maps — Identity Signal Extraction
+==========================================
+🔸 Single place: "Page Against the Machine"
+
+📍 Found 0 places to process
+   (0 in canonical scope · 0 unprocessed · 0 with extractable content)
+
+No records to process. Exiting.
+
+────────────────────────────────────────────────────────────
+Stage 6: Website enrichment
+  ./node_modules/.bin/tsx scripts/run-website-enrichment.ts --slug=page-against-the-machine
+────────────────────────────────────────────────────────────
+prisma:query SELECT "public"."entities"."id", "public"."entities"."website", "public"."entities"."name", "public"."entities"."category" FROM "public"."entities" WHERE ("public"."entities"."slug" = $1 AND "public"."entities"."website" IS NOT NULL) ORDER BY "public"."entities"."updated_at" DESC LIMIT $2 OFFSET $3
+Website enrichment: 1 places (mode=default, ignoreThrottle=false, dryRun=false)
+
+  Page Against the Machine FULL ERROR:
+SyntaxError: Invalid regular expression: /^/collections/.*+.*/: Nothing to repeat
+    at new RegExp (<anonymous>)
+    at isPathDisallowed (/Users/bobbyciccaglione/code/saiko-maps/lib/website-enrichment/fetch.ts:43:18)
+    at fetchWithLimits (/Users/bobbyciccaglione/code/saiko-maps/lib/website-enrichment/fetch.ts:68:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async runEnrichmentForPlace (/Users/bobbyciccaglione/code/saiko-maps/lib/website-enrichment/pipeline.ts:57:22)
+    at async main (/Users/bobbyciccaglione/code/saiko-maps/scripts/run-website-enrichment.ts:111:23)
+Done.
+
+────────────────────────────────────────────────────────────
+Stage 7: Tagline generation (AI)
+  ./node_modules/.bin/tsx scripts/generate-taglines-v2.ts --place=Page Against the Machine
+────────────────────────────────────────────────────────────
+
+🎙️  Saiko Voice Engine v2.0 — Tagline Generator
+==========================================
+🔸 Single place: "Page Against the Machine"
+🔸 Concurrency: 5
+
+📍 Fetching records with identity signals...
+📍 Found 0 places to process
+
+No records to process. Exiting.
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Page Against the Machine
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  ✓ Stage 2: Surface discovery (ran)
+  · Stage 3: Surface fetch (skipped)
+  ✓ Stage 4: Surface parse (ran)
+  ✓ Stage 5: Identity signal extraction (AI) (ran)
+  ✓ Stage 6: Website enrichment (ran)
+  ✓ Stage 7: Tagline generation (AI) (ran)
+

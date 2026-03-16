@@ -1,0 +1,21 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+
+Enrich: Tacos el toro (al vapor) (tacos-el-toro)
+  ID:      156669d8-0f35-48f4-98af-c2d87350cc12
+  Website: —
+  GPID:    ChIJ0QNNVCLPwoARrdbeZ_tOZmI
+
+Stage 6: Website enrichment — skipped (no website)
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Tacos el toro (al vapor)
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+

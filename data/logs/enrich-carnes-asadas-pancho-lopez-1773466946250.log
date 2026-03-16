@@ -1,0 +1,19 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+
+Backfill Google Places — 1 place(s) to process
+
+  ✓ name match: "Carnes Asadas Pancho Lopez, Mexican Food in Los Angeles CA 🇲🇽" (similarity 0.90)
+  ❌ carnes-asadas-pancho-lopez (Carnes Asadas Pancho Lopez): 
+Invalid `prisma.entities.update()` invocation in
+/Users/bobbyciccaglione/code/saiko-maps/scripts/backfill-google-places.ts:224:31
+
+  221 };
+  222 
+  223 if (!dryRun) {
+→ 224   await prisma.entities.update(
+Unique constraint failed on the fields: (`google_place_id`)
+
+--- Backfill Complete ---
+Enriched: 0
+Failed: 1

@@ -1,0 +1,9 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  suppress all logs with { quiet: true }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+
+Backfill Google Places — 1 place(s) to process
+
+  ✅ camélia-restaurant-3-hot2025-french-japanese-bon-appétit-2025 (Camelia)
+
+--- Backfill Complete ---
+Enriched: 1

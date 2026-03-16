@@ -1,0 +1,61 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  override existing env vars with { override: true }
+
+Enrich: Hoyka Thai at Echo Park (hoy-ka-thai-noodle-2)
+  ID:      842bdc6f-0c95-41d3-b44a-6a63a72a2494
+  Website: —
+  GPID:    ChIJHZB_0MfHwoARZAPeuK1zJsQ
+
+Stage 1: Google Places identity commit — skipped (Google Places identity resolved separately via backfill-google-places.ts)
+
+Stage 2: Surface discovery — skipped (no website)
+
+Stage 3: Surface fetch — skipped (no surfaces with fetch_status=discovered)
+
+Stage 4: Surface parse — skipped (no surfaces pending parse)
+
+────────────────────────────────────────────────────────────
+Stage 5: Identity signal extraction (AI)
+  ./node_modules/.bin/tsx scripts/extract-identity-signals.ts --place=Hoyka Thai at Echo Park
+────────────────────────────────────────────────────────────
+
+🔮 Saiko Maps — Identity Signal Extraction
+==========================================
+🔸 Single place: "Hoyka Thai at Echo Park"
+
+📍 Found 0 places to process
+   (0 in canonical scope · 0 unprocessed · 0 with extractable content)
+
+No records to process. Exiting.
+
+Stage 6: Website enrichment — skipped (no website)
+
+────────────────────────────────────────────────────────────
+Stage 7: Tagline generation (AI)
+  ./node_modules/.bin/tsx scripts/generate-taglines-v2.ts --place=Hoyka Thai at Echo Park
+────────────────────────────────────────────────────────────
+
+🎙️  Saiko Voice Engine v2.0 — Tagline Generator
+==========================================
+🔸 Single place: "Hoyka Thai at Echo Park"
+🔸 Concurrency: 5
+
+📍 Fetching records with identity signals...
+📍 Found 0 places to process
+
+No records to process. Exiting.
+
+Re-scanning issues...
+  Issues: 0 created, 1 resolved, 8 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Hoyka Thai at Echo Park
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  ✓ Stage 5: Identity signal extraction (AI) (ran)
+  · Stage 6: Website enrichment (skipped)
+  ✓ Stage 7: Tagline generation (AI) (ran)
+

@@ -1,0 +1,12 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+
+Backfill Google Places — 1 place(s) to process
+
+  ✅ unknown-5933d98f (The Huntington Library, Art Museum, and Botanical Gardens)
+
+--- Backfill Complete ---
+Enriched: 1
+
+Re-scanning issues...
+  Issues: 0 created, 0 resolved, 4 unchanged

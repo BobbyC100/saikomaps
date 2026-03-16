@@ -1,0 +1,22 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/Users/bobbyciccaglione/code/saiko-maps/scripts/enrich-place.ts' imported from /Users/bobbyciccaglione/code/saiko-maps/
+    at finalizeResolution (node:internal/modules/esm/resolve:274:11)
+    at moduleResolve (node:internal/modules/esm/resolve:859:10)
+    at defaultResolve (node:internal/modules/esm/resolve:983:11)
+    at nextResolve (node:internal/modules/esm/hooks:748:28)
+    at resolveBase (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773552982455:2:3744)
+    at async resolveDirectory (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773552982455:2:4237)
+    at async resolve (file:///Users/bobbyciccaglione/code/saiko-maps/node_modules/tsx/dist/esm/index.mjs?1773552982455:2:5355)
+    at async nextResolve (node:internal/modules/esm/hooks:748:22)
+    at async Hooks.resolve (node:internal/modules/esm/hooks:240:24)
+    at async handleMessage (node:internal/modules/esm/worker:199:18) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///Users/bobbyciccaglione/code/saiko-maps/scripts/enrich-place.ts'
+}
+
+Node.js v22.20.0

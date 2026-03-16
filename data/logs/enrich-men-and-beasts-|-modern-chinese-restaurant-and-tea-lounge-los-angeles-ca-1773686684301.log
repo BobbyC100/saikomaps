@@ -1,0 +1,12 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 📡 add observability to secrets: https://dotenvx.com/ops
+
+Backfill Google Places — 1 place(s) to process
+
+  ✅ men-and-beasts-|-modern-chinese-restaurant-and-tea-lounge-los-angeles-ca (Men & Beasts | Modern Chinese Restaurant & Tea Lounge - Los Angeles, CA)
+
+--- Backfill Complete ---
+Enriched: 1
+
+Re-scanning issues...
+  Issues: 0 created, 0 resolved, 3 unchanged

@@ -1,0 +1,9 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+
+Backfill Google Places — 1 place(s) to process
+
+  ✅ kuya-lord-restaurant-3-hot2025-james-beard-winner-filipino (Kuya Lord)
+
+--- Backfill Complete ---
+Enriched: 1

@@ -1,0 +1,118 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 📡 add observability to secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  enable debug logging with { debug: true }
+
+Enrich: Supervinyl (supervinyl)
+  ID:      57cc5b18-1457-4404-86c6-33779fb048dc
+  Website: http://supervinylusa.com/
+  GPID:    ChIJi26N8fe_woAR2x4f5ZxQmMI
+
+Stage 1: Google Places identity commit — skipped (Google Places identity resolved separately via backfill-google-places.ts)
+
+────────────────────────────────────────────────────────────
+Stage 2: Surface discovery
+  ./node_modules/.bin/tsx scripts/run-surface-discovery.ts --entity-id=57cc5b18-1457-4404-86c6-33779fb048dc --limit=1
+────────────────────────────────────────────────────────────
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  enable debug logging with { debug: true }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔄 add secrets lifecycle management: https://dotenvx.com/ops
+🔍 Merchant Surface Discovery
+
+Found 1 entities needing discovery
+
+  Supervinyl (57cc5b18…) http://supervinylusa.com/ … ✓ homepage fetched · 1 surface discovered: instagram
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Discovery complete
+   Entities processed : 1
+   Homepage succeeded  : 1
+   Homepage failed     : 0
+   Surface rows written: 2
+
+────────────────────────────────────────────────────────────
+Stage 3: Surface fetch
+  ./node_modules/.bin/tsx scripts/run-surface-fetch.ts --entity-id=57cc5b18-1457-4404-86c6-33779fb048dc --limit=20
+────────────────────────────────────────────────────────────
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+📥 Merchant Surface Fetch Pass
+
+No discovered surfaces to fetch.
+
+────────────────────────────────────────────────────────────
+Stage 4: Surface parse
+  ./node_modules/.bin/tsx scripts/run-surface-parse.ts --entity-id=57cc5b18-1457-4404-86c6-33779fb048dc --limit=20
+────────────────────────────────────────────────────────────
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔄 add secrets lifecycle management: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
+🔍 Merchant Surface Parse Pass
+
+   artifact_type    : parse_v1
+   artifact_version : 1
+
+Found 1 surface to parse
+
+  [homepage   ] https://supervinylusa.com/ … ✓ parsed
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Parse pass complete
+   Surfaces processed : 1
+   Parsed (artifacts) : 1
+   Deduped (skipped)  : 0
+   Failed             : 0
+
+────────────────────────────────────────────────────────────
+Stage 5: Identity signal extraction (AI)
+  ./node_modules/.bin/tsx scripts/extract-identity-signals.ts --place=Supervinyl
+────────────────────────────────────────────────────────────
+
+🔮 Saiko Maps — Identity Signal Extraction
+==========================================
+🔸 Single place: "Supervinyl"
+
+📍 Found 0 places to process
+   (0 in canonical scope · 0 unprocessed · 0 with extractable content)
+
+No records to process. Exiting.
+
+────────────────────────────────────────────────────────────
+Stage 6: Website enrichment
+  ./node_modules/.bin/tsx scripts/run-website-enrichment.ts --slug=supervinyl
+────────────────────────────────────────────────────────────
+prisma:query SELECT "public"."entities"."id", "public"."entities"."website", "public"."entities"."name", "public"."entities"."category" FROM "public"."entities" WHERE ("public"."entities"."slug" = $1 AND "public"."entities"."website" IS NOT NULL) ORDER BY "public"."entities"."updated_at" DESC LIMIT $2 OFFSET $3
+Website enrichment: 1 places (mode=default, ignoreThrottle=false, dryRun=false)
+
+  Supervinyl FULL ERROR:
+SyntaxError: Invalid regular expression: /^/collections/.*+.*/: Nothing to repeat
+    at new RegExp (<anonymous>)
+    at isPathDisallowed (/Users/bobbyciccaglione/code/saiko-maps/lib/website-enrichment/fetch.ts:43:18)
+    at fetchWithLimits (/Users/bobbyciccaglione/code/saiko-maps/lib/website-enrichment/fetch.ts:68:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async runEnrichmentForPlace (/Users/bobbyciccaglione/code/saiko-maps/lib/website-enrichment/pipeline.ts:57:22)
+    at async main (/Users/bobbyciccaglione/code/saiko-maps/scripts/run-website-enrichment.ts:111:23)
+Done.
+
+────────────────────────────────────────────────────────────
+Stage 7: Tagline generation (AI)
+  ./node_modules/.bin/tsx scripts/generate-taglines-v2.ts --place=Supervinyl
+────────────────────────────────────────────────────────────
+
+🎙️  Saiko Voice Engine v2.0 — Tagline Generator
+==========================================
+🔸 Single place: "Supervinyl"
+🔸 Concurrency: 5
+
+📍 Fetching records with identity signals...
+📍 Found 0 places to process
+
+No records to process. Exiting.
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Supervinyl
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  ✓ Stage 2: Surface discovery (ran)
+  ✓ Stage 3: Surface fetch (ran)
+  ✓ Stage 4: Surface parse (ran)
+  ✓ Stage 5: Identity signal extraction (AI) (ran)
+  ✓ Stage 6: Website enrichment (ran)
+  ✓ Stage 7: Tagline generation (AI) (ran)
+

@@ -1,0 +1,21 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+
+Enrich: Tacos La Güera (tacos-la-guera)
+  ID:      b2bc0ff6-1ae2-4b9a-bd93-e09ffbdafdca
+  Website: —
+  GPID:    ChIJPUYty93FwoARiOTepFrjTf0
+
+Stage 6: Website enrichment — skipped (no website)
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Tacos La Güera
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+

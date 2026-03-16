@@ -1,0 +1,22 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  write to custom object with { processEnv: myObject }
+[Discover Social] mode=website limit=50 dryRun=false delay=2000ms
+
+============================================================
+  Discovering: WEBSITE
+============================================================
+
+Found 1 entities missing website
+
+  [1/1] Balam Mexican Kitchen (balam-mexican-kitchen-lynwood)
+    FOUND: https://balam.top/ (high)
+    SAVED: website = https://balam.top/
+
+────────────────────────────────────────────────────────────
+  WEBSITE RESULTS
+────────────────────────────────────────────────────────────
+  ENTITY                         DISCOVERED                CONF     ACTION
+  ═══════════════════════════════════════════════════════════════════════════
+  Balam Mexican Kitchen          https://balam.top/        high     set
+
+  Total: 1 | Set: 1 | Not found: 0 | Skipped: 0 | Errors: 0

@@ -1,0 +1,21 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  write to custom object with { processEnv: myObject }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  enable debug logging with { debug: true }
+[Discover Social] mode=website limit=50 dryRun=false delay=2000ms
+
+============================================================
+  Discovering: WEBSITE
+============================================================
+
+Found 1 entities missing website
+
+  [1/1] Simōn (simon-la)
+    NOT FOUND: After extensive searching, Simón (the Silver Lake mariscos food truck at 3667 W Sunset Blvd) does not appear to have an official website. The business maintains an Instagram presence (@simonfoodla) with 8,792 followers but no standalone domain or dedicated website. All online presence is through social media and third-party delivery/review platforms (Uber Eats, Postmates, Yelp, etc.), which are aggregators and not acceptable per the guidelines.
+
+────────────────────────────────────────────────────────────
+  WEBSITE RESULTS
+────────────────────────────────────────────────────────────
+  ENTITY                         DISCOVERED                CONF     ACTION
+  ═══════════════════════════════════════════════════════════════════════════
+  Simōn                          —                         high     not_found
+
+  Total: 1 | Set: 0 | Not found: 1 | Skipped: 0 | Errors: 0

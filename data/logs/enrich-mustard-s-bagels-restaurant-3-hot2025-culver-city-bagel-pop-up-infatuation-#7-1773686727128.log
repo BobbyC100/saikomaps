@@ -1,0 +1,12 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 📡 add observability to secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+
+Backfill Google Places — 1 place(s) to process
+
+  ✅ mustard-s-bagels-restaurant-3-hot2025-culver-city-bagel-pop-up-infatuation-#7 (Mustard's Bagels)
+
+--- Backfill Complete ---
+Enriched: 1
+
+Re-scanning issues...
+  Issues: 0 created, 0 resolved, 5 unchanged

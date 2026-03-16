@@ -1,0 +1,61 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+
+Enrich: Alejandra's Quesadilla Cart de Oaxaca (alejandra-s-quesadilla-cart-de-oaxaca)
+  ID:      571c08b9-10ee-49bb-bcbe-8402ab599679
+  Website: —
+  GPID:    ChIJaT4PZsXHwoARS-vewm09HHo
+
+Stage 1: Google Places identity commit — skipped (Google Places identity resolved separately via backfill-google-places.ts)
+
+Stage 2: Surface discovery — skipped (no website)
+
+Stage 3: Surface fetch — skipped (no surfaces with fetch_status=discovered)
+
+Stage 4: Surface parse — skipped (no surfaces pending parse)
+
+────────────────────────────────────────────────────────────
+Stage 5: Identity signal extraction (AI)
+  ./node_modules/.bin/tsx scripts/extract-identity-signals.ts --place=Alejandra's Quesadilla Cart de Oaxaca
+────────────────────────────────────────────────────────────
+
+🔮 Saiko Maps — Identity Signal Extraction
+==========================================
+🔸 Single place: "Alejandra's Quesadilla Cart de Oaxaca"
+
+📍 Found 0 places to process
+   (1 in canonical scope · 1 unprocessed · 0 with extractable content)
+
+No records to process. Exiting.
+
+Stage 6: Website enrichment — skipped (no website)
+
+────────────────────────────────────────────────────────────
+Stage 7: Tagline generation (AI)
+  ./node_modules/.bin/tsx scripts/generate-taglines-v2.ts --place=Alejandra's Quesadilla Cart de Oaxaca
+────────────────────────────────────────────────────────────
+
+🎙️  Saiko Voice Engine v2.0 — Tagline Generator
+==========================================
+🔸 Single place: "Alejandra's Quesadilla Cart de Oaxaca"
+🔸 Concurrency: 5
+
+📍 Fetching records with identity signals...
+📍 Found 0 places to process
+
+No records to process. Exiting.
+
+Re-scanning issues...
+  Issues: 0 created, 1 resolved, 6 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Alejandra's Quesadilla Cart de Oaxaca
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  ✓ Stage 5: Identity signal extraction (AI) (ran)
+  · Stage 6: Website enrichment (skipped)
+  ✓ Stage 7: Tagline generation (AI) (ran)
+

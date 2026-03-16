@@ -1,0 +1,68 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+
+Enrich: The LINE LA (the-line-la-hotel-hotel-neighborhood-koreatown-greenhouse-restaurant-strong-bar-)
+  ID:      2491a858-5422-4a01-aaab-25cc3e18dea6
+  Website: https://www.thelinehotel.com/los-angeles/
+  GPID:    ChIJEz1I84K4woARzSOwF86sb5c
+
+Stage 1: Google Places identity commit — skipped (Google Places identity resolved separately via backfill-google-places.ts)
+
+Stage 2: Surface discovery — skipped (surface rows already exist)
+
+────────────────────────────────────────────────────────────
+Stage 3: Surface fetch
+  ./node_modules/.bin/tsx scripts/run-surface-fetch.ts --entity-id=2491a858-5422-4a01-aaab-25cc3e18dea6 --limit=20
+────────────────────────────────────────────────────────────
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  enable debug logging with { debug: true }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+📥 Merchant Surface Fetch Pass
+
+Found 1 discovered surface to fetch
+
+  [contact] https://www.thelinehotel.com/contact/ … ↩ deduped
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Fetch pass complete
+   Surfaces processed : 1
+   Captured (new rows) : 0
+   Deduped (skipped)   : 1
+   Failed              : 0
+
+Stage 4: Surface parse — skipped (no surfaces pending parse)
+
+Stage 5: Identity signal extraction (AI) — skipped (identity_signals already in derived_signals)
+
+────────────────────────────────────────────────────────────
+Stage 6: Website enrichment
+  ./node_modules/.bin/tsx scripts/run-website-enrichment.ts --slug=the-line-la-hotel-hotel-neighborhood-koreatown-greenhouse-restaurant-strong-bar-
+────────────────────────────────────────────────────────────
+[34mprisma:query[39m SELECT "public"."entities"."id", "public"."entities"."website", "public"."entities"."name", "public"."entities"."category" FROM "public"."entities" WHERE ("public"."entities"."slug" = $1 AND "public"."entities"."website" IS NOT NULL) ORDER BY "public"."entities"."updated_at" DESC LIMIT $2 OFFSET $3
+Website enrichment: 1 places (mode=default, ignoreThrottle=false, dryRun=false)
+
+  The LINE LA FULL ERROR:
+SyntaxError: Invalid regular expression: /^?replytocom.*/: Nothing to repeat
+    at new RegExp (<anonymous>)
+    at isPathDisallowed [90m(/Users/bobbyciccaglione/code/saiko-maps/[39mlib/website-enrichment/fetch.ts:43:18[90m)[39m
+    at fetchWithLimits [90m(/Users/bobbyciccaglione/code/saiko-maps/[39mlib/website-enrichment/fetch.ts:68:11[90m)[39m
+[90m    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at async runEnrichmentForPlace [90m(/Users/bobbyciccaglione/code/saiko-maps/[39mlib/website-enrichment/pipeline.ts:57:22[90m)[39m
+    at async main [90m(/Users/bobbyciccaglione/code/saiko-maps/[39mscripts/run-website-enrichment.ts:111:23[90m)[39m
+Done.
+
+Stage 7: Tagline generation (AI) — skipped (TAGLINE already in interpretation_cache)
+
+Re-scanning issues...
+  Issues: 0 created, 1 resolved, 4 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: The LINE LA
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  ✓ Stage 3: Surface fetch (ran)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  ✓ Stage 6: Website enrichment (ran)
+  · Stage 7: Tagline generation (AI) (skipped)
+

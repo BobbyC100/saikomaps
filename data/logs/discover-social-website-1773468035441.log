@@ -1,0 +1,22 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  override existing env vars with { override: true }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  write to custom object with { processEnv: myObject }
+[Discover Social] mode=website limit=50 dryRun=false delay=2000ms
+
+============================================================
+  Discovering: WEBSITE
+============================================================
+
+Found 1 entities missing website
+
+  [1/1] Rustic Canyon (rustic-canyon-restaurant-4-iconic-santa-monica-farm-to-table)
+    FOUND: https://rusticcanyonrestaurant.com/ (high)
+    SAVED: website = https://rusticcanyonrestaurant.com/
+
+────────────────────────────────────────────────────────────
+  WEBSITE RESULTS
+────────────────────────────────────────────────────────────
+  ENTITY                         DISCOVERED                CONF     ACTION
+  ═══════════════════════════════════════════════════════════════════════════
+  Rustic Canyon                  https://rusticcanyonresta high     set
+
+  Total: 1 | Set: 1 | Not found: 0 | Skipped: 0 | Errors: 0

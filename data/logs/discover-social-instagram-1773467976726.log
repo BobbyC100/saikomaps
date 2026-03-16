@@ -1,0 +1,21 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+[Discover Social] mode=instagram limit=50 dryRun=false delay=2000ms
+
+============================================================
+  Discovering: INSTAGRAM
+============================================================
+
+Found 1 entities missing instagram
+
+  [1/1] Alejandra's Quesadilla Cart de Oaxaca (alejandra-s-quesadilla-cart-de-oaxaca)
+    SKIP: already has IG handle: alejandrasquesadillas
+
+────────────────────────────────────────────────────────────
+  INSTAGRAM RESULTS
+────────────────────────────────────────────────────────────
+  ENTITY                         DISCOVERED                CONF     ACTION
+  ═══════════════════════════════════════════════════════════════════════════
+  Alejandra's Quesadilla Cart de alejandrasquesadillas     high     already_set
+
+  Total: 1 | Set: 0 | Not found: 0 | Skipped: 1 | Errors: 0

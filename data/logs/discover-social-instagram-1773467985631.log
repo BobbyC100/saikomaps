@@ -1,0 +1,21 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  override existing env vars with { override: true }
+[Discover Social] mode=instagram limit=50 dryRun=false delay=2000ms
+
+============================================================
+  Discovering: INSTAGRAM
+============================================================
+
+Found 1 entities missing instagram
+
+  [1/1] Angel's Tijuana Tacos (angel-s-tijuana-tacos-restaurant-3-hot2025-al-pastor-specialist-resy-pick)
+    SKIP: already has IG handle: angelstijuanatacos
+
+────────────────────────────────────────────────────────────
+  INSTAGRAM RESULTS
+────────────────────────────────────────────────────────────
+  ENTITY                         DISCOVERED                CONF     ACTION
+  ═══════════════════════════════════════════════════════════════════════════
+  Angel's Tijuana Tacos          angelstijuanatacos        high     already_set
+
+  Total: 1 | Set: 0 | Not found: 0 | Skipped: 1 | Errors: 0

@@ -1,0 +1,9 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔄 add secrets lifecycle management: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+
+Backfill Google Places — 1 place(s) to process
+
+  ✅ chevaliers-books (Chevalier's Books)
+
+--- Backfill Complete ---
+Enriched: 1
