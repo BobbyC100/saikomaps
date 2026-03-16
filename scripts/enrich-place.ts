@@ -77,11 +77,15 @@ async function getEntity() {
 async function shouldSkip(stage: number, entity: Awaited<ReturnType<typeof getEntity>>): Promise<{ skip: boolean; reason: string }> {
   switch (stage) {
     case 1: {
-      // Google Places identity (GPID lookup + place data) is a cost-controlled
-      // operation managed by backfill-google-places.ts, run as a separate batch.
-      // Never auto-triggered per-entity to prevent wrong-place matches and
-      // uncontrolled API spend. Run: npm run backfill:google -- --slug=<slug>
-      return { skip: true, reason: 'Google Places identity resolved separately via backfill-google-places.ts' };
+      // Skip only if Google Places data has actually been fetched and cached
+      const full = await db.entities.findUnique({
+        where: { id: entity.id },
+        select: { placesDataCachedAt: true },
+      });
+      if (full?.placesDataCachedAt) {
+        return { skip: true, reason: 'Google Places data already cached (placesDataCachedAt set)' };
+      }
+      return { skip: false, reason: '' };
     }
     case 2: {
       const existing = await db.merchant_surfaces.findFirst({

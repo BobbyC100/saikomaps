@@ -81,10 +81,9 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Build spawn args — Stage 1 uses backfill-google-places.ts (enrich-place.ts
-    // skips stage 1 by design to prevent uncontrolled API spend).
+    // Build spawn args — all stages now go through enrich-place.ts which handles
+    // stage tracking (enrichment_stage updates) and skip logic.
     const projectRoot = path.resolve(process.cwd());
-    let spawnArgs: string[];
     let description: string;
 
     // Scripts require `node -r ./scripts/load-env.js` to load .env.local
@@ -92,33 +91,42 @@ export async function POST(request: NextRequest) {
     // starts a fresh process without those vars.
     const tsxBin = path.join(projectRoot, 'node_modules', '.bin', 'tsx');
 
-    if (stage === 1) {
-      spawnArgs = ['-r', './scripts/load-env.js', tsxBin, 'scripts/backfill-google-places.ts', '--slug', slug];
-      description = `Running Google Places backfill for ${slug}`;
+    const spawnArgs = ['-r', './scripts/load-env.js', tsxBin, 'scripts/enrich-place.ts', `--slug=${slug}`];
+    if (stage !== undefined) {
+      spawnArgs.push(`--only=${stage}`);
+      description = `Running stage ${stage} (${STAGE_LABELS[stage]}) only`;
+    } else if (from !== undefined) {
+      spawnArgs.push(`--from=${from}`);
+      description = `Running stages ${from}-7 (from ${STAGE_LABELS[from]})`;
     } else {
-      spawnArgs = ['-r', './scripts/load-env.js', tsxBin, 'scripts/enrich-place.ts', `--slug=${slug}`];
-      if (stage !== undefined) {
-        spawnArgs.push(`--only=${stage}`);
-        description = `Running stage ${stage} (${STAGE_LABELS[stage]}) only`;
-      } else if (from !== undefined) {
-        spawnArgs.push(`--from=${from}`);
-        description = `Running stages ${from}-7 (from ${STAGE_LABELS[from]})`;
-      } else {
-        description = 'Running full enrichment pipeline (stages 1-7)';
-      }
+      description = 'Running full enrichment pipeline (stages 1-7)';
     }
 
     const logFile = path.join(projectRoot, 'data', 'logs', `enrich-${slug}-${Date.now()}.log`);
     const fs = await import('fs');
+    fs.writeFileSync(logFile, `[${new Date().toISOString()}] ${description} for ${slug}\n`);
     const logFd = fs.openSync(logFile, 'a');
 
     const child = spawn('node', spawnArgs, {
       cwd: projectRoot,
-      detached: true,
+      detached: false,
       stdio: ['ignore', logFd, logFd],
       env: { ...process.env },
     });
-    child.unref();
+
+    // Monitor process completion
+    child.on('close', (code) => {
+      try {
+        fs.appendFileSync(logFile, `\n[${new Date().toISOString()}] Process exited with code: ${code}\n`);
+        fs.closeSync(logFd);
+      } catch (_) {}
+    });
+    child.on('error', (err) => {
+      try {
+        fs.appendFileSync(logFile, `\n[ERROR] ${err.message}\n`);
+        fs.closeSync(logFd);
+      } catch (_) {}
+    });
 
     return NextResponse.json(
       {
