@@ -1,0 +1,173 @@
+[2026-03-16T21:15:36.095Z] Starting enrichment for palihouse-west-hollywood-hotel-hotel-boutique-design-forward-west-hollywood-clas
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+
+Enrich: Palihouse West Hollywood (palihouse-west-hollywood-hotel-hotel-boutique-design-forward-west-hollywood-clas)
+  ID:      487d732b-ee68-4625-bfac-b44614d7d8ab
+  Website: https://www.palisociety.com/hotels/west-hollywood/
+  GPID:    ChIJ6VTz-ea5woARHVKKCrJaIVc
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Stage 2: Surface discovery — skipped (surface rows already exist)
+
+────────────────────────────────────────────────────────────
+Stage 3: Surface fetch
+  node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/run-surface-fetch.ts --entity-id=487d732b-ee68-4625-bfac-b44614d7d8ab --limit=20
+────────────────────────────────────────────────────────────
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  suppress all logs with { quiet: true }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+📥 Merchant Surface Fetch Pass
+
+Found 2 discovered surfaces to fetch
+
+  [contact] https://www.palisociety.com/contact-us … ↩ deduped
+  [about] https://www.palisociety.com/about-palisociety … ↩ deduped
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Fetch pass complete
+   Surfaces processed : 2
+   Captured (new rows) : 0
+   Deduped (skipped)   : 2
+   Failed              : 0
+  ✓ enrichment_stage updated to 3
+
+Stage 4: Surface parse — skipped (no surfaces pending parse)
+
+────────────────────────────────────────────────────────────
+Stage 5: Identity signal extraction (AI)
+  node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/extract-identity-signals.ts --place=Palihouse West Hollywood
+────────────────────────────────────────────────────────────
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  suppress all logs with { quiet: true }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔄 add secrets lifecycle management: https://dotenvx.com/ops
+
+🔮 Saiko Maps — Identity Signal Extraction
+==========================================
+🔸 Single place: "Palihouse West Hollywood"
+
+📍 Found 1 places to process
+   (1 in canonical scope · 1 unprocessed · 1 with extractable content)
+
+[1/1] Palihouse West Hollywood
+    Held (confidence 0.35) — write skipped, will retry when content improves
+
+==========================================
+📊 EXTRACTION SUMMARY
+==========================================
+Total processed:   1
+Extracted:         0
+Held (low conf):   1  ← not written, will retry
+Skipped (no data): 0
+Failed:            0
+
+By Confidence Tier:
+  Publish (≥0.7):  0
+  Review (0.4-0.7): 0
+  Hold (<0.4):     1
+
+By Input Quality:
+  Good (2+ sources): 0
+  Partial (1 source): 1
+  Minimal:          0
+  None:             0
+==========================================
+
+✅ Database updated
+  ✓ enrichment_stage updated to 5
+
+────────────────────────────────────────────────────────────
+Stage 6: Website enrichment
+  node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/run-website-enrichment.ts --slug=palihouse-west-hollywood-hotel-hotel-boutique-design-forward-west-hollywood-clas
+────────────────────────────────────────────────────────────
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  suppress all logs with { quiet: true }
+[34mprisma:query[39m SELECT "public"."entities"."id", "public"."entities"."website", "public"."entities"."name", "public"."entities"."category" FROM "public"."entities" WHERE ("public"."entities"."slug" = $1 AND "public"."entities"."website" IS NOT NULL) ORDER BY "public"."entities"."updated_at" DESC LIMIT $2 OFFSET $3
+Website enrichment: 1 places (mode=default, ignoreThrottle=false, dryRun=false)
+
+  Palihouse West Hollywood | 200 | conf=0.80 | cat=Hotel
+[34mprisma:query[39m INSERT INTO "public"."merchant_enrichment_runs" ("id","entity_id","source_url","final_url","fetched_at","http_status","extraction_json","confidence","cost_usd","created_at") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING "public"."merchant_enrichment_runs"."id", "public"."merchant_enrichment_runs"."entity_id", "public"."merchant_enrichment_runs"."source_url", "public"."merchant_enrichment_runs"."final_url", "public"."merchant_enrichment_runs"."fetched_at", "public"."merchant_enrichment_runs"."http_status", "public"."merchant_enrichment_runs"."extraction_json", "public"."merchant_enrichment_runs"."confidence", "public"."merchant_enrichment_runs"."cost_usd", "public"."merchant_enrichment_runs"."created_at"
+[34mprisma:query[39m INSERT INTO "public"."merchant_signals" ("entity_id","inferred_category","social_links","extraction_confidence","last_updated_at") VALUES ($1,$2,$3,$4,$5) ON CONFLICT ("entity_id") DO UPDATE SET "inferred_category" = $6, "social_links" = $7, "extraction_confidence" = $8, "last_updated_at" = $9 WHERE ("public"."merchant_signals"."entity_id" = $10 AND 1=1) RETURNING "public"."merchant_signals"."entity_id", "public"."merchant_signals"."inferred_category", "public"."merchant_signals"."inferred_cuisine", "public"."merchant_signals"."reservation_provider", "public"."merchant_signals"."reservation_url", "public"."merchant_signals"."ordering_provider", "public"."merchant_signals"."ordering_url", "public"."merchant_signals"."menu_url", "public"."merchant_signals"."winelist_url", "public"."merchant_signals"."social_links", "public"."merchant_signals"."extraction_confidence", "public"."merchant_signals"."last_updated_at"
+[34mprisma:query[39m INSERT INTO "public"."observed_claims" ("claim_id","entity_id","attribute_key","raw_value","normalized_value","source_id","source_url","observed_at","extracted_at","extraction_method","confidence","resolution_method","supersedes_claim_id","is_active") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,CAST($10::text AS "public"."ExtractionMethod"),$11,CAST($12::text AS "public"."ClaimResolutionMethod"),$13,$14) RETURNING "public"."observed_claims"."claim_id", "public"."observed_claims"."entity_id", "public"."observed_claims"."attribute_key", "public"."observed_claims"."raw_value", "public"."observed_claims"."normalized_value", "public"."observed_claims"."source_id", "public"."observed_claims"."source_url", "public"."observed_claims"."observed_at", "public"."observed_claims"."extracted_at", "public"."observed_claims"."extraction_method"::text, "public"."observed_claims"."confidence", "public"."observed_claims"."resolution_method"::text, "public"."observed_claims"."resolution_confidence", "public"."observed_claims"."supersedes_claim_id", "public"."observed_claims"."is_active"
+[34mprisma:query[39m SELECT "public"."canonical_sanctions"."sanction_id", "public"."canonical_sanctions"."claim_id" FROM "public"."canonical_sanctions" WHERE ("public"."canonical_sanctions"."entity_id" = $1 AND "public"."canonical_sanctions"."attribute_key" = $2 AND "public"."canonical_sanctions"."is_current" = $3) LIMIT $4 OFFSET $5
+[34mprisma:query[39m SELECT "public"."source_registry"."id", "public"."source_registry"."trust_tier", "public"."source_registry"."requires_human_approval" FROM "public"."source_registry" WHERE ("public"."source_registry"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+[31mprisma:error[39m 
+Invalid `db.attribute_registry.findUnique()` invocation in
+/Users/bobbyciccaglione/code/saiko-maps/lib/fields-v2/write-claim.ts:80:27
+
+  77 ): Promise<'AUTO_HIGH_CONFIDENCE' | 'AUTO_SOLE_SOURCE' | 'STORE_ONLY' | 'CONFLICT'> {
+  78   const [source, attribute, existingSanction] = await Promise.all([
+  79     db.source_registry.findUnique({ where: { id: sourceId }, select: { trust_tier: true, requires_human_approval: true } }),
+→ 80     db.attribute_registry.findUnique(
+Can't reach database server at `ep-spring-sun-aiht1nns-pooler.c-4.us-east-1.aws.neon.tech:5432`
+
+Please make sure your database server is running at `ep-spring-sun-aiht1nns-pooler.c-4.us-east-1.aws.neon.tech:5432`.
+[Fields v2] write-claim failed for website on 487d732b-ee68-4625-bfac-b44614d7d8ab: PrismaClientKnownRequestError: 
+Invalid `db.attribute_registry.findUnique()` invocation in
+/Users/bobbyciccaglione/code/saiko-maps/lib/fields-v2/write-claim.ts:80:27
+
+  77 ): Promise<'AUTO_HIGH_CONFIDENCE' | 'AUTO_SOLE_SOURCE' | 'STORE_ONLY' | 'CONFLICT'> {
+  78   const [source, attribute, existingSanction] = await Promise.all([
+  79     db.source_registry.findUnique({ where: { id: sourceId }, select: { trust_tier: true, requires_human_approval: true } }),
+→ 80     db.attribute_registry.findUnique(
+Can't reach database server at `ep-spring-sun-aiht1nns-pooler.c-4.us-east-1.aws.neon.tech:5432`
+
+Please make sure your database server is running at `ep-spring-sun-aiht1nns-pooler.c-4.us-east-1.aws.neon.tech:5432`.
+    at ei.handleRequestError [90m(/Users/bobbyciccaglione/code/saiko-maps/[39mnode_modules/[4m@prisma/client[24m/src/runtime/RequestHandler.ts:228:13[90m)[39m
+    at ei.handleAndLogRequestError [90m(/Users/bobbyciccaglione/code/saiko-maps/[39mnode_modules/[4m@prisma/client[24m/src/runtime/RequestHandler.ts:174:12[90m)[39m
+    at ei.request [90m(/Users/bobbyciccaglione/code/saiko-maps/[39mnode_modules/[4m@prisma/client[24m/src/runtime/RequestHandler.ts:143:12[90m)[39m
+    at async a [90m(/Users/bobbyciccaglione/code/saiko-maps/[39mnode_modules/[4m@prisma/client[24m/src/runtime/getPrismaClient.ts:833:24[90m)[39m
+    at async Promise.all (index 1)
+    at async determineSanctionMethod [90m(/Users/bobbyciccaglione/code/saiko-maps/[39mlib/fields-v2/write-claim.ts:78:49[90m)[39m
+    at async writeClaimAndSanction [90m(/Users/bobbyciccaglione/code/saiko-maps/[39mlib/fields-v2/write-claim.ts:147:26[90m)[39m
+    at async applyWriteRules [90m(/Users/bobbyciccaglione/code/saiko-maps/[39mlib/website-enrichment/write-rules.ts:82:9[90m)[39m
+    at async main [90m(/Users/bobbyciccaglione/code/saiko-maps/[39mscripts/run-website-enrichment.ts:124:9[90m)[39m {
+  code: [32m'P1001'[39m,
+  meta: {
+    modelName: [32m'attribute_registry'[39m,
+    database_location: [32m'ep-spring-sun-aiht1nns-pooler.c-4.us-east-1.aws.neon.tech:5432'[39m
+  },
+  clientVersion: [32m'6.18.0'[39m
+}
+[34mprisma:query[39m SELECT "public"."entities"."id", "public"."entities"."category" FROM "public"."entities" WHERE ("public"."entities"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+[34mprisma:query[39m UPDATE "public"."entities" SET "last_enriched_at" = $1, "needs_human_review" = $2, "updated_at" = $3 WHERE ("public"."entities"."id" = $4 AND 1=1) RETURNING "public"."entities"."id"
+[34mprisma:query[39m INSERT INTO "public"."place_job_log" ("id","entity_id","entity_type","job_type","pages_fetched","ai_calls","duration_ms","estimated_cost","created_at") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING "public"."place_job_log"."id", "public"."place_job_log"."entity_id", "public"."place_job_log"."entity_type", "public"."place_job_log"."job_type", "public"."place_job_log"."pages_fetched", "public"."place_job_log"."ai_calls", "public"."place_job_log"."duration_ms", "public"."place_job_log"."estimated_cost", "public"."place_job_log"."created_at"
+Done.
+  ✓ enrichment_stage updated to 6
+
+────────────────────────────────────────────────────────────
+Stage 7: Tagline generation (AI)
+  node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/generate-taglines-v2.ts --place=Palihouse West Hollywood
+────────────────────────────────────────────────────────────
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 📡 add observability to secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+
+🎙️  Saiko Voice Engine v2.0 — Tagline Generator
+==========================================
+🔸 Single place: "Palihouse West Hollywood"
+🔸 Concurrency: 5
+
+📍 Fetching records with identity signals...
+📍 Found 0 places to process
+
+No records to process. Exiting.
+  ✓ enrichment_stage updated to 7
+  ✓ last_enriched_at updated
+
+Re-scanning issues...
+  Issues: 0 created, 1 resolved, 5 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Palihouse West Hollywood
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  ✓ Stage 3: Surface fetch (ran)
+  · Stage 4: Surface parse (skipped)
+  ✓ Stage 5: Identity signal extraction (AI) (ran)
+  ✓ Stage 6: Website enrichment (ran)
+  ✓ Stage 7: Tagline generation (AI) (ran)
+
+
+[2026-03-16T21:16:10.072Z] Process exited with code: 0

@@ -1,0 +1,27 @@
+[2026-03-16T20:27:22.429Z] Running stage 1 (Google Places identity commit) only for ocean-eyebrow-threading
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
+
+Enrich: Ocean Eyebrow Threading (ocean-eyebrow-threading)
+  ID:      5cf8f4f7-ae9c-477d-afb9-a488b60b9886
+  Website: http://www.oceaneyebrowthreading.com/
+  GPID:    ChIJB1IfJDS0woARM8yRx7oPbp0
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 6 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Ocean Eyebrow Threading
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:27:24.602Z] Process exited with code: 0

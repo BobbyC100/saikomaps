@@ -1,0 +1,26 @@
+[2026-03-16T21:23:25.248Z] Running stage 1 (Google Places identity commit) only for unknown-6293f468
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔄 add secrets lifecycle management: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  suppress all logs with { quiet: true }
+PrismaClientInitializationError: 
+Invalid `db.entities.findUnique()` invocation in
+/Users/bobbyciccaglione/code/saiko-maps/scripts/enrich-place.ts:59:36
+
+  56 const db = new PrismaClient();
+  57 
+  58 async function getEntity() {
+→ 59   const entity = await db.entities.findUnique(
+Can't reach database server at `ep-spring-sun-aiht1nns-pooler.c-4.us-east-1.aws.neon.tech:5432`
+
+Please make sure your database server is running at `ep-spring-sun-aiht1nns-pooler.c-4.us-east-1.aws.neon.tech:5432`.
+    at ei.handleRequestError [90m(/Users/bobbyciccaglione/code/saiko-maps/[39mnode_modules/[4m@prisma/client[24m/src/runtime/RequestHandler.ts:242:13[90m)[39m
+    at ei.handleAndLogRequestError [90m(/Users/bobbyciccaglione/code/saiko-maps/[39mnode_modules/[4m@prisma/client[24m/src/runtime/RequestHandler.ts:174:12[90m)[39m
+    at ei.request [90m(/Users/bobbyciccaglione/code/saiko-maps/[39mnode_modules/[4m@prisma/client[24m/src/runtime/RequestHandler.ts:143:12[90m)[39m
+    at async a [90m(/Users/bobbyciccaglione/code/saiko-maps/[39mnode_modules/[4m@prisma/client[24m/src/runtime/getPrismaClient.ts:833:24[90m)[39m
+    at async getEntity [90m(/Users/bobbyciccaglione/code/saiko-maps/[39mscripts/enrich-place.ts:59:18[90m)[39m
+    at async main [90m(/Users/bobbyciccaglione/code/saiko-maps/[39mscripts/enrich-place.ts:345:18[90m)[39m {
+  clientVersion: [32m'6.18.0'[39m,
+  errorCode: [90mundefined[39m,
+  retryable: [90mundefined[39m
+}
+
+[2026-03-16T21:23:30.802Z] Process exited with code: 1

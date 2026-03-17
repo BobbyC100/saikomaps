@@ -1,0 +1,27 @@
+[2026-03-16T20:28:01.559Z] Running stage 1 (Google Places identity commit) only for video-and-audio-center
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  enable debug logging with { debug: true }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+
+Enrich: Video & Audio Center - Century City (video-and-audio-center)
+  ID:      f0b2a413-a979-4da0-b88c-446cd3f68e18
+  Website: https://videoandaudiocenter.com/?utm_source=gmb_centurycity&utm_medium=linktowebsite&utm_campaign=Organic
+  GPID:    ChIJsd_X9Iy7woARf7RkzreI4pY
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 5 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Video & Audio Center - Century City
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:28:04.056Z] Process exited with code: 0

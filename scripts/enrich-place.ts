@@ -10,6 +10,8 @@
  *   npm run enrich:place -- --slug=republique --dry-run
  *   npm run enrich:place -- --slug=republique --from=3     # resume from stage 3
  *   npm run enrich:place -- --slug=republique --only=5     # run only stage 5
+ *   npm run enrich:place -- --batch=50 --concurrency=5    # website-first bulk (stages 2-7)
+ *   npm run enrich:place -- --batch=50 --include-google   # include stage 1 (Google Places)
  *
  * Stages:
  *   1  Google Places identity commit  (GPID, coords, address, hours, photos)
@@ -21,7 +23,7 @@
  *   7  Tagline generation             (AI → interpretation_cache)
  */
 
-import { spawnSync } from 'child_process';
+import { spawnSync, spawn as spawnAsync } from 'child_process';
 import { PrismaClient } from '@prisma/client';
 import { scanEntities } from '@/lib/coverage/issue-scanner';
 
@@ -38,14 +40,21 @@ function getArg(name: string): string | null {
 
 const slug = getArg('slug');
 const dryRun = args.includes('--dry-run');
-const fromStage = parseInt(getArg('from') ?? '1', 10);
+const force = args.includes('--force');
+const includeGoogle = args.includes('--include-google');
+const fromStage = parseInt(getArg('from') ?? (includeGoogle ? '1' : '2'), 10);
 const onlyStage = getArg('only') ? parseInt(getArg('only')!, 10) : null;
 const batchArg = getArg('batch');
 const batchSize = batchArg ? parseInt(batchArg, 10) : null;
+const concurrencyArg = getArg('concurrency');
+const concurrency = concurrencyArg ? parseInt(concurrencyArg, 10) : 1;
 
 if (!slug && !batchSize) {
   console.error('Usage: npm run enrich:place -- --slug=<slug>');
   console.error('       npm run enrich:place -- --batch=N');
+  console.error('       npm run enrich:place -- --batch=N --concurrency=3');
+  console.error('       npm run enrich:place -- --batch=N --force  (include already-enriched entities)');
+  console.error('       npm run enrich:place -- --batch=N --include-google  (start from stage 1 instead of 2)');
   process.exit(1);
 }
 
@@ -144,22 +153,38 @@ async function shouldSkip(stage: number, entity: Awaited<ReturnType<typeof getEn
 
 const TSX = './node_modules/.bin/tsx';
 
-async function run(stage: number, label: string, script: string, extraArgs: string[], entityId?: string): Promise<boolean> {
+async function run(stage: number, label: string, script: string, extraArgs: string[], entityId?: string, async_: boolean = false): Promise<boolean> {
   const stageArgs = dryRun ? [...extraArgs, '--dry-run'] : extraArgs;
   console.log(`\n${'─'.repeat(60)}`);
   console.log(`Stage ${stage}: ${label}`);
   console.log(`  node -r ./scripts/load-env.js ${TSX} ${script} ${stageArgs.join(' ')}`);
   console.log('─'.repeat(60));
 
-  // Ensure env vars are loaded in child process (especially ANTHROPIC_API_KEY)
-  const result = spawnSync('node', ['-r', './scripts/load-env.js', TSX, script, ...stageArgs], {
-    stdio: 'inherit',
-    env: process.env,
-    cwd: process.cwd(),
-  });
+  let exitCode: number | null;
 
-  if (result.status !== 0) {
-    console.error(`\n⚠  Stage ${stage} exited with status ${result.status}`);
+  if (async_) {
+    // Async spawn — allows concurrent entity processing in batch mode
+    exitCode = await new Promise<number | null>((resolve) => {
+      const child = spawnAsync('node', ['-r', './scripts/load-env.js', TSX, script, ...stageArgs], {
+        stdio: 'inherit',
+        env: process.env,
+        cwd: process.cwd(),
+      });
+      child.on('close', (code) => resolve(code));
+      child.on('error', () => resolve(1));
+    });
+  } else {
+    // Sync spawn — simpler for single-entity mode
+    const result = spawnSync('node', ['-r', './scripts/load-env.js', TSX, script, ...stageArgs], {
+      stdio: 'inherit',
+      env: process.env,
+      cwd: process.cwd(),
+    });
+    exitCode = result.status;
+  }
+
+  if (exitCode !== 0) {
+    console.error(`\n⚠  Stage ${stage} exited with status ${exitCode}`);
     return false;
   }
 
@@ -184,20 +209,29 @@ async function run(stage: number, label: string, script: string, extraArgs: stri
 // ---------------------------------------------------------------------------
 
 async function runBatch(n: number) {
-  console.log(`\n🔁 Batch enrichment — ${n} entities\n`);
+  console.log(`\n🔁 Batch enrichment — ${n} entities (concurrency: ${concurrency})\n`);
   if (dryRun) console.log('   DRY RUN — no writes\n');
+  if (force) console.log('   FORCE MODE — including previously enriched entities\n');
 
-  // Pick N unenriched LA-area entities (no interpretation_cache TAGLINE yet)
+  // Pick N unenriched LA-area entities.
+  // Exclude entities that already have a TAGLINE (fully enriched)
+  // AND entities that already have last_enriched_at set (already ran pipeline
+  // but couldn't produce a tagline — re-running won't help).
   const enrichedIds = (await db.interpretation_cache.findMany({
     where: { output_type: 'TAGLINE', is_current: true },
     select: { entity_id: true },
   })).map((r) => r.entity_id).filter(Boolean) as string[];
 
+  const whereClause: any = {
+    id: { notIn: enrichedIds },
+    website: { not: null },  // website-first: only need a website to enrich
+  };
+  if (!force) {
+    whereClause.last_enriched_at = null; // skip already-enriched entities
+  }
+
   const candidates = await db.entities.findMany({
-    where: {
-      id: { notIn: enrichedIds },
-      googlePlaceId: { contains: 'woAR' },
-    },
+    where: whereClause,
     select: { id: true, name: true, slug: true, website: true, googlePlaceId: true, last_enriched_at: true },
     take: n * 3, // oversample for shuffle
   });
@@ -219,13 +253,13 @@ async function runBatch(n: number) {
   console.log('');
 
   const summary: { slug: string; status: 'ok' | 'failed' }[] = [];
+  const useAsync = concurrency > 1;
 
-  for (const entity of batch) {
+  async function enrichEntity(entity: typeof batch[0]): Promise<{ slug: string; status: 'ok' | 'failed' }> {
     console.log(`\n${'▓'.repeat(60)}`);
     console.log(`Enriching: ${entity.name} (${entity.slug})`);
     console.log('▓'.repeat(60));
 
-    // Re-use the stages array with this entity
     const stages = buildStages(entity);
     let failed = false;
 
@@ -233,13 +267,15 @@ async function runBatch(n: number) {
       if (stage.n < fromStage) continue;
       if (onlyStage !== null && stage.n !== onlyStage) continue;
 
-      const { skip, reason } = await shouldSkip(stage.n, entity);
-      if (skip) {
-        console.log(`  Stage ${stage.n}: ${stage.label} — skipped (${reason})`);
-        continue;
+      if (!force && onlyStage === null) {
+        const { skip, reason } = await shouldSkip(stage.n, entity);
+        if (skip) {
+          console.log(`  Stage ${stage.n}: ${stage.label} — skipped (${reason})`);
+          continue;
+        }
       }
 
-      const ok = await run(stage.n, stage.label, stage.script, stage.args(), entity.id);
+      const ok = await run(stage.n, stage.label, stage.script, stage.args(), entity.id, useAsync);
       if (!ok) {
         console.error(`  Pipeline stopped at stage ${stage.n} for ${entity.slug}`);
         failed = true;
@@ -276,7 +312,22 @@ async function runBatch(n: number) {
       }
     }
 
-    summary.push({ slug: entity.slug, status: failed ? 'failed' : 'ok' });
+    return { slug: entity.slug, status: failed ? 'failed' : 'ok' };
+  }
+
+  // Process entities with concurrency limit
+  if (concurrency > 1) {
+    const pLimit = require('p-limit');
+    const limit = pLimit(concurrency);
+    const results = await Promise.all(
+      batch.map((entity) => limit(() => enrichEntity(entity)))
+    );
+    summary.push(...results);
+  } else {
+    // Sequential — simpler output, uses spawnSync
+    for (const entity of batch) {
+      summary.push(await enrichEntity(entity));
+    }
   }
 
   console.log(`\n${'═'.repeat(60)}`);
@@ -363,11 +414,14 @@ async function main() {
       continue;
     }
 
-    const { skip, reason } = await shouldSkip(stage.n, entity);
-    if (skip) {
-      console.log(`\nStage ${stage.n}: ${stage.label} — skipped (${reason})`);
-      results.push({ n: stage.n, label: stage.label, status: 'skipped' });
-      continue;
+    // When --only or --force is set, skip checks are bypassed
+    if (!force && onlyStage === null) {
+      const { skip, reason } = await shouldSkip(stage.n, entity);
+      if (skip) {
+        console.log(`\nStage ${stage.n}: ${stage.label} — skipped (${reason})`);
+        results.push({ n: stage.n, label: stage.label, status: 'skipped' });
+        continue;
+      }
     }
 
     const ok = await run(stage.n, stage.label, stage.script, stage.args(), entity.id);

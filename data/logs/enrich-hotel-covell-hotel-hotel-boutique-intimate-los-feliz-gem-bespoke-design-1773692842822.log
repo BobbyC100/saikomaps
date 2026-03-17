@@ -1,0 +1,27 @@
+[2026-03-16T20:27:22.822Z] Running stage 1 (Google Places identity commit) only for hotel-covell-hotel-hotel-boutique-intimate-los-feliz-gem-bespoke-design
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔄 add secrets lifecycle management: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
+
+Enrich: Hotel Covell (hotel-covell-hotel-hotel-boutique-intimate-los-feliz-gem-bespoke-design)
+  ID:      9ef3e0b2-0cd9-4a35-a75e-606cd856a037
+  Website: http://www.hotelcovell.com/
+  GPID:    ChIJOwhhqK3AwoAR5kk9OjQ0mhA
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 0 created, 0 resolved, 6 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Hotel Covell
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:27:24.802Z] Process exited with code: 0

@@ -1,0 +1,27 @@
+[2026-03-16T20:27:56.242Z] Running stage 1 (Google Places identity commit) only for venice-audio
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+
+Enrich: venice audio (venice-audio)
+  ID:      8fa1faf2-7b0c-40d3-b7a3-4fc1f4813e33
+  Website: https://www.veniceaudio.com/
+  GPID:    ChIJ2bDov4W7woARVoPIpzZ-1Nc
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 6 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: venice audio
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:27:59.095Z] Process exited with code: 0

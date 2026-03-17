@@ -1,0 +1,28 @@
+[2026-03-16T21:23:15.424Z] Running stage 1 (Google Places identity commit) only for burritos-la-palma-el-monte
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  enable debug logging with { debug: true }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  suppress all logs with { quiet: true }
+
+Enrich: Burritos La Palma (burritos-la-palma-el-monte)
+  ID:      bed05625-221c-425d-908d-d2df59668320
+  Website: http://burritoslapalma.com/
+  GPID:    ChIJxztAvPDZwoARUKqI04RO2uE
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+  ✓ needs_human_review cleared
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 3 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Burritos La Palma
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T21:23:18.169Z] Process exited with code: 0

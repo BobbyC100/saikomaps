@@ -1,0 +1,27 @@
+[2026-03-16T20:26:08.280Z] Running stage 1 (Google Places identity commit) only for unknown-aab7c61f
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  write to custom object with { processEnv: myObject }
+
+Enrich: Elysian Park (unknown-aab7c61f)
+  ID:      aab7c61f-e42a-4375-9192-fa2912a75652
+  Website: https://recreation.parks.lacity.gov/park/elysian
+  GPID:    ChIJi7sKSe7GwoARnq0rarjBPC8
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 5 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Elysian Park
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:26:10.534Z] Process exited with code: 0

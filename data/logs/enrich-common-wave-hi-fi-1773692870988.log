@@ -1,0 +1,27 @@
+[2026-03-16T20:27:50.988Z] Running stage 1 (Google Places identity commit) only for common-wave-hi-fi
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+
+Enrich: Common Wave HiFi (common-wave-hi-fi)
+  ID:      1f41238d-3fd4-434f-a15a-881d5f164234
+  Website: http://www.commonwave.net/
+  GPID:    ChIJA4HtJQvHwoAR5e60mCEzzes
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 6 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Common Wave HiFi
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:27:54.128Z] Process exited with code: 0

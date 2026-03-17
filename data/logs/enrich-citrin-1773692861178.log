@@ -1,0 +1,27 @@
+[2026-03-16T20:27:41.178Z] Running stage 1 (Google Places identity commit) only for citrin
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  enable debug logging with { debug: true }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+
+Enrich: Citrin Restaurant (citrin)
+  ID:      2800b089-cbf1-40fd-82ca-2a5193852181
+  Website: http://citrinandmelisse.com/
+  GPID:    ChIJB1gJrcelwoARTqn5Yh3E57s
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 3 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Citrin Restaurant
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:27:43.689Z] Process exited with code: 0

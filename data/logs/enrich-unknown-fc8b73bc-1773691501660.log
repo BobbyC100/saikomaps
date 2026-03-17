@@ -1,0 +1,27 @@
+[2026-03-16T20:05:01.660Z] Running stage 1 (Google Places identity commit) only for unknown-fc8b73bc
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+
+Enrich: Griffith Observatory (unknown-fc8b73bc)
+  ID:      fc8b73bc-7977-4d7d-8459-208f6911d755
+  Website: https://griffithobservatory.org/
+  GPID:    ChIJywjU6WG_woAR3NrWwrEH_3M
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 5 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Griffith Observatory
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:05:04.120Z] Process exited with code: 0

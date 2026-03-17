@@ -1,0 +1,78 @@
+[2026-03-16T21:32:42.955Z] Starting enrichment for burritos-la-palma-el-monte
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  override existing env vars with { override: true }
+
+Enrich: Burritos La Palma (burritos-la-palma-el-monte)
+  ID:      bed05625-221c-425d-908d-d2df59668320
+  Website: http://burritoslapalma.com/
+  GPID:    ChIJxztAvPDZwoARUKqI04RO2uE
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Stage 2: Surface discovery — skipped (surface rows already exist)
+
+────────────────────────────────────────────────────────────
+Stage 3: Surface fetch
+  node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/run-surface-fetch.ts --entity-id=bed05625-221c-425d-908d-d2df59668320 --limit=20
+────────────────────────────────────────────────────────────
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔄 add secrets lifecycle management: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  enable debug logging with { debug: true }
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔄 add secrets lifecycle management: https://dotenvx.com/ops
+📥 Merchant Surface Fetch Pass
+
+Found 3 discovered surfaces to fetch
+
+  [menu] https://www.burritoslapalma.com/menu … ↩ deduped
+  [about] https://www.burritoslapalma.com/about … ↩ deduped
+  [contact] https://www.burritoslapalma.com/contact … ↩ deduped
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Fetch pass complete
+   Surfaces processed : 3
+   Captured (new rows) : 0
+   Deduped (skipped)   : 3
+   Failed              : 0
+  ✓ enrichment_stage updated to 3
+
+Stage 4: Surface parse — skipped (no surfaces pending parse)
+
+Stage 5: Identity signal extraction (AI) — skipped (identity_signals already in derived_signals)
+
+────────────────────────────────────────────────────────────
+Stage 6: Website enrichment
+  node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/run-website-enrichment.ts --slug=burritos-la-palma-el-monte
+────────────────────────────────────────────────────────────
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+[34mprisma:query[39m SELECT "public"."entities"."id", "public"."entities"."website", "public"."entities"."name", "public"."entities"."category" FROM "public"."entities" WHERE ("public"."entities"."slug" = $1 AND "public"."entities"."website" IS NOT NULL) ORDER BY "public"."entities"."updated_at" DESC LIMIT $2 OFFSET $3
+Website enrichment: 1 places (mode=default, ignoreThrottle=false, dryRun=false)
+
+  Burritos La Palma | 200 | conf=0.40 | cat=Restaurant
+[34mprisma:query[39m INSERT INTO "public"."merchant_enrichment_runs" ("id","entity_id","source_url","final_url","fetched_at","http_status","extraction_json","confidence","cost_usd","created_at") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING "public"."merchant_enrichment_runs"."id", "public"."merchant_enrichment_runs"."entity_id", "public"."merchant_enrichment_runs"."source_url", "public"."merchant_enrichment_runs"."final_url", "public"."merchant_enrichment_runs"."fetched_at", "public"."merchant_enrichment_runs"."http_status", "public"."merchant_enrichment_runs"."extraction_json", "public"."merchant_enrichment_runs"."confidence", "public"."merchant_enrichment_runs"."cost_usd", "public"."merchant_enrichment_runs"."created_at"
+[34mprisma:query[39m SELECT "public"."entities"."id", "public"."entities"."category" FROM "public"."entities" WHERE ("public"."entities"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+[34mprisma:query[39m UPDATE "public"."entities" SET "last_enriched_at" = $1, "needs_human_review" = $2, "updated_at" = $3 WHERE ("public"."entities"."id" = $4 AND 1=1) RETURNING "public"."entities"."id"
+Done.
+[34mprisma:query[39m INSERT INTO "public"."place_job_log" ("id","entity_id","entity_type","job_type","pages_fetched","ai_calls","duration_ms","estimated_cost","created_at") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING "public"."place_job_log"."id", "public"."place_job_log"."entity_id", "public"."place_job_log"."entity_type", "public"."place_job_log"."job_type", "public"."place_job_log"."pages_fetched", "public"."place_job_log"."ai_calls", "public"."place_job_log"."duration_ms", "public"."place_job_log"."estimated_cost", "public"."place_job_log"."created_at"
+  ✓ enrichment_stage updated to 6
+
+Stage 7: Tagline generation (AI) — skipped (TAGLINE already in interpretation_cache)
+  ✓ last_enriched_at updated
+  ✓ needs_human_review cleared
+
+Re-scanning issues...
+  Issues: 0 created, 1 resolved, 3 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Burritos La Palma
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  ✓ Stage 3: Surface fetch (ran)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  ✓ Stage 6: Website enrichment (ran)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T21:32:53.583Z] Process exited with code: 0

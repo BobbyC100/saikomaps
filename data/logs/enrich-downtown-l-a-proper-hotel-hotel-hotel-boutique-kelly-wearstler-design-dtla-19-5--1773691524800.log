@@ -1,0 +1,28 @@
+[2026-03-16T20:05:24.800Z] Running stage 1 (Google Places identity commit) only for downtown-l-a-proper-hotel-hotel-hotel-boutique-kelly-wearstler-design-dtla-19-5-
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+
+Enrich: Downtown LA Proper Hotel (downtown-l-a-proper-hotel-hotel-hotel-boutique-kelly-wearstler-design-dtla-19-5-)
+  ID:      7266e7e5-72b3-422c-b319-5e8b9ac84f4e
+  Website: https://www.properhotel.com/downtown-la/?utm_source=local-listings&utm_medium=organic&utm_campaign=local-listings
+  GPID:    ChIJPVoyBWbHwoAREu--ZMmvEpA
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+  ✓ needs_human_review cleared
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 3 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Downtown LA Proper Hotel
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:05:26.766Z] Process exited with code: 0

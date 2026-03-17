@@ -1,0 +1,70 @@
+[2026-03-16T23:40:08.998Z] Starting enrichment for gui-bbq-restaurant-and-bar
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+
+Enrich: Gui BBQ Restaurant & Bar (gui-bbq-restaurant-and-bar)
+  ID:      dbf7590b-6b66-46c8-a7b3-21fcc7e8a59a
+  Website: —
+  GPID:    ChIJgb9aOlgqw4ARpltCwjOjXEg
+
+Stage 2: Surface discovery — skipped (no website)
+
+Stage 3: Surface fetch — skipped (no surfaces with fetch_status=discovered)
+
+Stage 4: Surface parse — skipped (no surfaces pending parse)
+
+────────────────────────────────────────────────────────────
+Stage 5: Identity signal extraction (AI)
+  node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/extract-identity-signals.ts --place=Gui BBQ Restaurant & Bar
+────────────────────────────────────────────────────────────
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+
+🔮 Saiko Maps — Identity Signal Extraction
+==========================================
+🔸 Single place: "Gui BBQ Restaurant & Bar"
+🔸 Concurrency: 5
+
+📍 Found 0 places to process
+   (0 in canonical scope · 0 unprocessed · 0 with extractable content)
+
+No records to process. Exiting.
+  ✓ enrichment_stage updated to 5
+
+Stage 6: Website enrichment — skipped (no website)
+
+────────────────────────────────────────────────────────────
+Stage 7: Tagline generation (AI)
+  node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/generate-taglines-v2.ts --place=Gui BBQ Restaurant & Bar
+────────────────────────────────────────────────────────────
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  override existing env vars with { override: true }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 📡 add observability to secrets: https://dotenvx.com/ops
+
+🎙️  Saiko Voice Engine v2.0 — Tagline Generator
+==========================================
+🔸 Single place: "Gui BBQ Restaurant & Bar"
+🔸 Concurrency: 5
+
+📍 Fetching records with identity signals...
+📍 Found 0 places to process
+
+No records to process. Exiting.
+  ✓ enrichment_stage updated to 7
+  ✓ last_enriched_at updated
+
+Re-scanning issues...
+  Issues: 0 created, 1 resolved, 6 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Gui BBQ Restaurant & Bar
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  ✓ Stage 5: Identity signal extraction (AI) (ran)
+  · Stage 6: Website enrichment (skipped)
+  ✓ Stage 7: Tagline generation (AI) (ran)
+
+
+[2026-03-16T23:40:14.569Z] Process exited with code: 0

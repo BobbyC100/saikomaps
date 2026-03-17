@@ -1,0 +1,27 @@
+[2026-03-16T20:28:27.133Z] Running stage 1 (Google Places identity commit) only for the-salt-eaters-bookshop
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+
+Enrich: The Salt Eaters Bookshop (the-salt-eaters-bookshop)
+  ID:      a275a2c6-4237-48f1-9dfe-458f4add132e
+  Website: https://www.thesalteatersbooks.com/
+  GPID:    ChIJoXD9nJe3woARDCZo5xD14Yg
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 8 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: The Salt Eaters Bookshop
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:28:29.896Z] Process exited with code: 0

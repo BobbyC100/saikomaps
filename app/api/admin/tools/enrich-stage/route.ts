@@ -70,14 +70,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: `Entity not found: ${slug}` }, { status: 404 });
     }
 
-    // Promote CANDIDATE → OPEN so enrich-place.ts can find it,
-    // and reset enrichment_stage + last_enriched_at so pipeline re-runs stages (especially stage 6)
+    // Promote CANDIDATE → OPEN so enrich-place.ts can find it.
+    // Reset enrichment_stage for progress tracking, but preserve last_enriched_at
+    // so batch mode doesn't re-select entities that have already been through the pipeline.
     await db.entities.update({
       where: { slug },
       data: {
         ...(entity.status === 'CANDIDATE' ? { status: 'OPEN' } : {}),
         enrichment_stage: null,
-        last_enriched_at: null,
       },
     });
 
@@ -100,6 +100,11 @@ export async function POST(request: NextRequest) {
       description = `Running stages ${from}-7 (from ${STAGE_LABELS[from]})`;
     } else {
       description = 'Running full enrichment pipeline (stages 1-7)';
+    }
+    // When targeting a specific stage, pass --force so shouldSkip() is bypassed —
+    // the operator explicitly asked to re-run this stage.
+    if (stage !== undefined || from !== undefined) {
+      spawnArgs.push('--force');
     }
 
     const logFile = path.join(projectRoot, 'data', 'logs', `enrich-${slug}-${Date.now()}.log`);

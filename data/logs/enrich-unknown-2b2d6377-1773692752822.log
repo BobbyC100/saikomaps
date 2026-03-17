@@ -1,0 +1,27 @@
+[2026-03-16T20:25:52.822Z] Running stage 1 (Google Places identity commit) only for unknown-2b2d6377
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔄 add secrets lifecycle management: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  override existing env vars with { override: true }
+
+Enrich: The Culver City Municipal Plunge (unknown-2b2d6377)
+  ID:      2b2d6377-85b1-4bf0-b9ac-2727bedbc702
+  Website: http://www.culvercity.org/live/get-involved/recreational-activities/culver-city-pool
+  GPID:    ChIJDYcpnCO6woARQTFzB5-oe2U
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 0 created, 0 resolved, 6 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: The Culver City Municipal Plunge
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:25:55.225Z] Process exited with code: 0

@@ -1,0 +1,27 @@
+[2026-03-16T20:28:16.297Z] Running stage 1 (Google Places identity commit) only for foot-work
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  suppress all logs with { quiet: true }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+
+Enrich: Foot Work - Record Store & Bar 21+ (foot-work)
+  ID:      2ff1cf63-ce53-4dfd-bb50-3e03805064ea
+  Website: https://www.footworkrecords.com/
+  GPID:    ChIJ51220gsx3YARv_u1XOLZyJM
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 6 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Foot Work - Record Store & Bar 21+
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:28:18.719Z] Process exited with code: 0

@@ -1,0 +1,27 @@
+[2026-03-16T20:28:05.381Z] Running stage 1 (Google Places identity commit) only for mount-analog
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔄 add secrets lifecycle management: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+
+Enrich: Mount Analog (mount-analog)
+  ID:      465dc0c9-7ac1-42bf-aa23-aa61278bd693
+  Website: http://www.climbmountanalog.com/
+  GPID:    ChIJR0vrtxHEwoARj_JXOqSdGfM
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 6 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Mount Analog
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:28:08.871Z] Process exited with code: 0

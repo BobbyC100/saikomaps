@@ -1,0 +1,25 @@
+[2026-03-16T23:40:30.753Z] Running stage 1 (Google Places identity commit) only for dunsmoor
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
+
+Enrich: Dunsmoor (dunsmoor)
+  ID:      029eb806-0c5a-4e29-8b23-b254718e44e3
+  Website: https://www.dunsmoor.la/
+  GPID:    ChIJQxbwUsHBwoARqt0NKxponhU
+
+Re-scanning issues...
+  Issues: 0 created, 0 resolved, 1 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Dunsmoor
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T23:40:32.456Z] Process exited with code: 0

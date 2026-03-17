@@ -1,0 +1,27 @@
+[2026-03-16T21:24:26.511Z] Running stage 1 (Google Places identity commit) only for hotel-bel-air-hotel-hotel-iconic-dorchester-collection-secluded-westwood-luxury
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 📡 add observability to secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔄 add secrets lifecycle management: https://dotenvx.com/ops
+
+Enrich: Hotel Bel-Air (hotel-bel-air-hotel-hotel-iconic-dorchester-collection-secluded-westwood-luxury)
+  ID:      d72ff495-2588-41d6-886d-4978202e1a53
+  Website: https://www.dorchestercollection.com/los-angeles/hotel-bel-air/dining/the-restaurant-at-hotel-bel-air?utm_source=google&utm_medium=hba_local_profile&utm_campaign=the_restaurant&utm_content=la_dining
+  GPID:    ChIJ4XfXK_G8woARbUYxTMpyDo8
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 5 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Hotel Bel-Air
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T21:24:33.557Z] Process exited with code: 0

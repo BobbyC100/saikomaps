@@ -1,0 +1,27 @@
+[2026-03-16T20:28:49.564Z] Running stage 1 (Google Places identity commit) only for hi-fi-project
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+
+Enrich: HI-Fi Project Inc. (hi-fi-project)
+  ID:      5dbb00ca-e0b1-4d84-a1a8-c79ee2fe6071
+  Website: http://www.hifiproject.com/
+  GPID:    ChIJ7RqBUM2kwoARiMcJl609z4s
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 6 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: HI-Fi Project Inc.
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:28:52.417Z] Process exited with code: 0

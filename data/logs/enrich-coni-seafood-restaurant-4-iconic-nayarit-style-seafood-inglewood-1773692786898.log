@@ -1,0 +1,28 @@
+[2026-03-16T20:26:26.898Z] Running stage 1 (Google Places identity commit) only for coni-seafood-restaurant-4-iconic-nayarit-style-seafood-inglewood
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+
+Enrich: Coni’Seafood (coni-seafood-restaurant-4-iconic-nayarit-style-seafood-inglewood)
+  ID:      a0a04d97-7499-414d-83d6-826a223a2a46
+  Website: http://www.coniseafood.com/
+  GPID:    ChIJkyZE_nG6woARWEi-j3XdO2s
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+  ✓ needs_human_review cleared
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 3 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Coni’Seafood
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:26:29.924Z] Process exited with code: 0

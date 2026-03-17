@@ -1,0 +1,107 @@
+[2026-03-16T20:09:01.493Z] Starting enrichment for 88-club-restaurant-3-hot2025-mei-lin-top-chef-winner
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔄 add secrets lifecycle management: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+
+Enrich: 88 Club (88-club-restaurant-3-hot2025-mei-lin-top-chef-winner)
+  ID:      c1575ce5-87e5-40ce-a5ee-0a56123c4733
+  Website: https://www.88clubbh.com/
+  GPID:    ChIJi_R5HMm9woARv_qBcJatv_0
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Stage 2: Surface discovery — skipped (surface rows already exist)
+
+────────────────────────────────────────────────────────────
+Stage 3: Surface fetch
+  node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/run-surface-fetch.ts --entity-id=c1575ce5-87e5-40ce-a5ee-0a56123c4733 --limit=20
+────────────────────────────────────────────────────────────
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔄 add secrets lifecycle management: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 📡 add observability to secrets: https://dotenvx.com/ops
+📥 Merchant Surface Fetch Pass
+
+Found 1 discovered surface to fetch
+
+  [menu] https://www.88clubbh.com/menu/ … ↩ deduped
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Fetch pass complete
+   Surfaces processed : 1
+   Captured (new rows) : 0
+   Deduped (skipped)   : 1
+   Failed              : 0
+  ✓ enrichment_stage updated to 3
+
+Stage 4: Surface parse — skipped (no surfaces pending parse)
+
+────────────────────────────────────────────────────────────
+Stage 5: Identity signal extraction (AI)
+  node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/extract-identity-signals.ts --place=88 Club
+────────────────────────────────────────────────────────────
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔄 add secrets lifecycle management: https://dotenvx.com/ops
+
+🔮 Saiko Maps — Identity Signal Extraction
+==========================================
+🔸 Single place: "88 Club"
+
+📍 Found 0 places to process
+   (1 in canonical scope · 1 unprocessed · 0 with extractable content)
+
+No records to process. Exiting.
+  ✓ enrichment_stage updated to 5
+
+────────────────────────────────────────────────────────────
+Stage 6: Website enrichment
+  node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/run-website-enrichment.ts --slug=88-club-restaurant-3-hot2025-mei-lin-top-chef-winner
+────────────────────────────────────────────────────────────
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  enable debug logging with { debug: true }
+[34mprisma:query[39m SELECT "public"."entities"."id", "public"."entities"."website", "public"."entities"."name", "public"."entities"."category" FROM "public"."entities" WHERE ("public"."entities"."slug" = $1 AND "public"."entities"."website" IS NOT NULL) ORDER BY "public"."entities"."updated_at" DESC LIMIT $2 OFFSET $3
+Website enrichment: 1 places (mode=default, ignoreThrottle=false, dryRun=false)
+
+  88 Club | 200 | conf=0.65 | cat=Restaurant
+[34mprisma:query[39m INSERT INTO "public"."merchant_enrichment_runs" ("id","entity_id","source_url","final_url","fetched_at","http_status","extraction_json","confidence","cost_usd","created_at") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING "public"."merchant_enrichment_runs"."id", "public"."merchant_enrichment_runs"."entity_id", "public"."merchant_enrichment_runs"."source_url", "public"."merchant_enrichment_runs"."final_url", "public"."merchant_enrichment_runs"."fetched_at", "public"."merchant_enrichment_runs"."http_status", "public"."merchant_enrichment_runs"."extraction_json", "public"."merchant_enrichment_runs"."confidence", "public"."merchant_enrichment_runs"."cost_usd", "public"."merchant_enrichment_runs"."created_at"
+[34mprisma:query[39m INSERT INTO "public"."merchant_signals" ("entity_id","inferred_category","reservation_provider","reservation_url","menu_url","social_links","extraction_confidence","last_updated_at") VALUES ($1,$2,$3,$4,$5,$6,$7,$8) ON CONFLICT ("entity_id") DO UPDATE SET "inferred_category" = $9, "reservation_provider" = $10, "reservation_url" = $11, "menu_url" = $12, "social_links" = $13, "extraction_confidence" = $14, "last_updated_at" = $15 WHERE ("public"."merchant_signals"."entity_id" = $16 AND 1=1) RETURNING "public"."merchant_signals"."entity_id", "public"."merchant_signals"."inferred_category", "public"."merchant_signals"."inferred_cuisine", "public"."merchant_signals"."reservation_provider", "public"."merchant_signals"."reservation_url", "public"."merchant_signals"."ordering_provider", "public"."merchant_signals"."ordering_url", "public"."merchant_signals"."menu_url", "public"."merchant_signals"."winelist_url", "public"."merchant_signals"."social_links", "public"."merchant_signals"."extraction_confidence", "public"."merchant_signals"."last_updated_at"
+[34mprisma:query[39m SELECT "public"."entities"."id", "public"."entities"."category" FROM "public"."entities" WHERE ("public"."entities"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+[34mprisma:query[39m UPDATE "public"."entities" SET "last_enriched_at" = $1, "needs_human_review" = $2, "updated_at" = $3 WHERE ("public"."entities"."id" = $4 AND 1=1) RETURNING "public"."entities"."id"
+Done.
+[34mprisma:query[39m INSERT INTO "public"."place_job_log" ("id","entity_id","entity_type","job_type","pages_fetched","ai_calls","duration_ms","estimated_cost","created_at") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING "public"."place_job_log"."id", "public"."place_job_log"."entity_id", "public"."place_job_log"."entity_type", "public"."place_job_log"."job_type", "public"."place_job_log"."pages_fetched", "public"."place_job_log"."ai_calls", "public"."place_job_log"."duration_ms", "public"."place_job_log"."estimated_cost", "public"."place_job_log"."created_at"
+  ✓ enrichment_stage updated to 6
+
+────────────────────────────────────────────────────────────
+Stage 7: Tagline generation (AI)
+  node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/generate-taglines-v2.ts --place=88 Club
+────────────────────────────────────────────────────────────
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  suppress all logs with { quiet: true }
+
+🎙️  Saiko Voice Engine v2.0 — Tagline Generator
+==========================================
+🔸 Single place: "88 Club"
+🔸 Concurrency: 5
+
+📍 Fetching records with identity signals...
+📍 Found 0 places to process
+
+No records to process. Exiting.
+  ✓ enrichment_stage updated to 7
+  ✓ last_enriched_at updated
+
+Re-scanning issues...
+  Issues: 0 created, 1 resolved, 5 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: 88 Club
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  ✓ Stage 3: Surface fetch (ran)
+  · Stage 4: Surface parse (skipped)
+  ✓ Stage 5: Identity signal extraction (AI) (ran)
+  ✓ Stage 6: Website enrichment (ran)
+  ✓ Stage 7: Tagline generation (AI) (ran)
+
+
+[2026-03-16T20:09:22.694Z] Process exited with code: 0

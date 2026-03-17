@@ -1,0 +1,27 @@
+[2026-03-16T20:26:38.487Z] Running stage 1 (Google Places identity commit) only for psychic-wines-silver-lake
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  override existing env vars with { override: true }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  write to custom object with { processEnv: myObject }
+
+Enrich: Psychic Wines (psychic-wines-silver-lake)
+  ID:      93e418f6-a6c6-4ac6-89db-17b6d9fdb2eb
+  Website: http://www.psychicwinesla.com/
+  GPID:    ChIJIXDXyBTHwoARVoN7PbVzK9c
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 5 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Psychic Wines
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:26:40.317Z] Process exited with code: 0

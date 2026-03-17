@@ -1,0 +1,27 @@
+[2026-03-16T20:28:40.215Z] Running stage 1 (Google Places identity commit) only for pa-ord-noodle
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  suppress all logs with { quiet: true }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
+
+Enrich: Pa Ord Noodle (pa-ord-noodle)
+  ID:      41d4ceaf-90d5-4bac-9965-210d181481d0
+  Website: https://order.online/store/pa-ord-noodle-los-angeles-25605509/
+  GPID:    ChIJQTOi_FO_woARdr6tSH-AuPs
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 5 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Pa Ord Noodle
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:28:42.905Z] Process exited with code: 0

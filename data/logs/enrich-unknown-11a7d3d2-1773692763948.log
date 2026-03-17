@@ -1,0 +1,27 @@
+[2026-03-16T20:26:03.949Z] Running stage 1 (Google Places identity commit) only for unknown-11a7d3d2
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  suppress all logs with { quiet: true }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+
+Enrich: Dockweiler Beach (unknown-11a7d3d2)
+  ID:      11a7d3d2-c01e-46bf-a12c-fa358e6428da
+  Website: http://beaches.lacounty.gov/dockweiler-beach
+  GPID:    ChIJ1asLRlSwwoARcbzH4K6wTPc
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 4 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Dockweiler Beach
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:26:06.380Z] Process exited with code: 0

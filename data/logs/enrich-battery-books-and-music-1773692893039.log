@@ -1,0 +1,27 @@
+[2026-03-16T20:28:13.040Z] Running stage 1 (Google Places identity commit) only for battery-books-and-music
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+
+Enrich: The Battery Books & Music (battery-books-and-music)
+  ID:      573b09c4-5b10-4246-811a-817d5604f0e7
+  Website: https://thebatterybooksandmusic.com/
+  GPID:    ChIJVaWdhYnEwoARa0cThOs2eRo
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 6 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: The Battery Books & Music
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:28:15.995Z] Process exited with code: 0

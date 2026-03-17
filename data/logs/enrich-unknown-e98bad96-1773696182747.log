@@ -1,0 +1,28 @@
+[2026-03-16T21:23:02.747Z] Running stage 1 (Google Places identity commit) only for unknown-e98bad96
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 📡 add observability to secrets: https://dotenvx.com/ops
+
+Enrich: Jitlada Restaurant (unknown-e98bad96)
+  ID:      e98bad96-dd5b-4e75-8af4-33f75e947ae1
+  Website: http://jitladala.com/
+  GPID:    ChIJsR6mEFS_woAR-bYcpwWGTSg
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+  ✓ needs_human_review cleared
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 2 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Jitlada Restaurant
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T21:23:05.080Z] Process exited with code: 0

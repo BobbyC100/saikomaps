@@ -1,0 +1,28 @@
+[2026-03-16T20:04:38.235Z] Running stage 1 (Google Places identity commit) only for n-naka-restaurant-2-michelin-2-michelin-stars-kaiseki
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 📡 add observability to secrets: https://dotenvx.com/ops
+
+Enrich: n/naka (n-naka-restaurant-2-michelin-2-michelin-stars-kaiseki)
+  ID:      24e266d3-35c4-48a3-bec4-4986bc264033
+  Website: https://n-naka.com/
+  GPID:    ChIJb7GeyDS6woAROVvLEUiLZEk
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+  ✓ needs_human_review cleared
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 3 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: n/naka
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:04:41.797Z] Process exited with code: 0

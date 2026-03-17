@@ -1,0 +1,27 @@
+[2026-03-16T20:27:31.411Z] Running stage 1 (Google Places identity commit) only for gracias-senor-taqueria
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  enable debug logging with { debug: true }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+
+Enrich: Gracias Señor Taqueria (gracias-senor-taqueria)
+  ID:      74891795-04cb-4978-9973-f4d05d1ecb01
+  Website: http://graciasenor.com/
+  GPID:    ChIJ_7PW8-yjwoARo5CF0a7xEMk
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 5 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Gracias Señor Taqueria
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:27:33.587Z] Process exited with code: 0

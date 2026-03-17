@@ -1,0 +1,27 @@
+[2026-03-16T20:28:24.816Z] Running stage 1 (Google Places identity commit) only for reparations-club
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
+
+Enrich: Reparations Club (reparations-club)
+  ID:      89564299-cf5f-4fdb-a484-98c2f14afdfc
+  Website: http://rep.club/
+  GPID:    ChIJsS7A7ie5woARgQpDqZVO8EU
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 6 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Reparations Club
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:28:28.727Z] Process exited with code: 0

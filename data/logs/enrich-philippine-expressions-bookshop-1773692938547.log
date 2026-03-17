@@ -1,0 +1,27 @@
+[2026-03-16T20:28:58.547Z] Running stage 1 (Google Places identity commit) only for philippine-expressions-bookshop
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔄 add secrets lifecycle management: https://dotenvx.com/ops
+
+Enrich: Philippine Expressions Bookshop (philippine-expressions-bookshop)
+  ID:      70b804b5-32c5-4513-b46b-7f26b2f51a3e
+  Website: https://philippinebookshop.com/
+  GPID:    ChIJC-KJBDA23YARi9HBpxBvDTk
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 6 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Philippine Expressions Bookshop
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:29:01.141Z] Process exited with code: 0

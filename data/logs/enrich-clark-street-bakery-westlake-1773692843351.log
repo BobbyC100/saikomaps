@@ -1,0 +1,28 @@
+[2026-03-16T20:27:23.351Z] Running stage 1 (Google Places identity commit) only for clark-street-bakery-westlake
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔄 add secrets lifecycle management: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  override existing env vars with { override: true }
+
+Enrich: Clark Street Bakery (clark-street-bakery-westlake)
+  ID:      03424627-0f5b-45bf-bd91-5e9dc8fd148f
+  Website: https://clarkstreetbakery.com/
+  GPID:    ChIJw39VcmTHwoAR41_JNE9f480
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+  ✓ needs_human_review cleared
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 2 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Clark Street Bakery
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:27:25.834Z] Process exited with code: 0

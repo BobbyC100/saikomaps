@@ -1,0 +1,27 @@
+[2026-03-16T20:26:53.614Z] Running stage 1 (Google Places identity commit) only for berenjak-restaurant-3-hot2025-persian-from-london-arts-district-buzzy
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  override existing env vars with { override: true }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+
+Enrich: Berenjak (berenjak-restaurant-3-hot2025-persian-from-london-arts-district-buzzy)
+  ID:      1af2e0ab-c231-4a44-9b90-f8b50107f948
+  Website: https://berenjak.com/locations/downtown-los-angeles/
+  GPID:    ChIJi-NVGiDGwoARSYqOhBs8jYc
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 4 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Berenjak
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:26:55.449Z] Process exited with code: 0

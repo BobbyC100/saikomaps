@@ -1,0 +1,27 @@
+[2026-03-16T20:28:36.418Z] Running stage 1 (Google Places identity commit) only for page-against-the-machine
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+
+Enrich: Page Against The Machine (page-against-the-machine)
+  ID:      a0fb78a7-e897-4c57-8202-3e39d79f310f
+  Website: https://www.patmbooks.com/
+  GPID:    ChIJp6U4C9sx3YARssXxfo0qov4
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 6 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Page Against The Machine
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:28:38.870Z] Process exited with code: 0

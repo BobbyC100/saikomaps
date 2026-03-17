@@ -1,0 +1,27 @@
+[2026-03-16T20:26:57.425Z] Running stage 1 (Google Places identity commit) only for freehand-los-angeles-hotel-hotel-neighborhood-dtla-youthful-artsy-vibe-rooftop-b
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  override existing env vars with { override: true }
+
+Enrich: Freehand Los Angeles (freehand-los-angeles-hotel-hotel-neighborhood-dtla-youthful-artsy-vibe-rooftop-b)
+  ID:      4850809d-6a43-4701-8fca-036daeb7a3a6
+  Website: https://freehandhotels.com/los-angeles/?utm_source=google-my-business&utm_medium=organic&utm_campaign=hotel-los-angeles
+  GPID:    ChIJE80IjrXHwoARZo6wiQusTrc
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 4 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Freehand Los Angeles
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:26:59.261Z] Process exited with code: 0

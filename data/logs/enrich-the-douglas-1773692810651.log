@@ -1,0 +1,28 @@
+[2026-03-16T20:26:50.651Z] Running stage 1 (Google Places identity commit) only for the-douglas
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+
+Enrich: The Douglas (the-douglas)
+  ID:      5c5e60a8-85e3-4257-bc0a-dcf336d3b818
+  Website: http://www.thedouglasla.com/
+  GPID:    ChIJfT7yFiDHwoARORVyaJSlrsQ
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+  ✓ needs_human_review cleared
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 4 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: The Douglas
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:26:52.825Z] Process exited with code: 0

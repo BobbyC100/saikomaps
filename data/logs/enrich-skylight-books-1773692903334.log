@@ -1,0 +1,27 @@
+[2026-03-16T20:28:23.334Z] Running stage 1 (Google Places identity commit) only for skylight-books
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  override existing env vars with { override: true }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
+
+Enrich: Skylight Books (skylight-books)
+  ID:      595b1bd8-545e-4986-927f-61fcda17c516
+  Website: http://www.skylightbooks.com/
+  GPID:    ChIJa7Kw5a7AwoARL6luou4x25I
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 6 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Skylight Books
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:28:26.693Z] Process exited with code: 0

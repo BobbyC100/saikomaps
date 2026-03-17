@@ -1,0 +1,27 @@
+[2026-03-16T20:27:32.512Z] Running stage 1 (Google Places identity commit) only for borreguitas
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+
+Enrich: El borrego de oro #2 (borreguitas)
+  ID:      0203b5df-f896-4840-a20e-d40f72af2e3d
+  Website: http://barbacoaelborrego.com/
+  GPID:    ChIJd82liLnIwoARkOgOzwCKogQ
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 3 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: El borrego de oro #2
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:27:34.486Z] Process exited with code: 0

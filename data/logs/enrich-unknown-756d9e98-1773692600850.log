@@ -1,0 +1,27 @@
+[2026-03-16T20:23:20.850Z] Running stage 1 (Google Places identity commit) only for unknown-756d9e98
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 📡 add observability to secrets: https://dotenvx.com/ops
+
+Enrich: Heritage Square Museum (unknown-756d9e98)
+  ID:      756d9e98-8ddd-4c51-a519-2d5f7c408d83
+  Website: http://heritagesquare.org/
+  GPID:    ChIJ7Yhdw5zGwoARMQi5JDOtpuE
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 4 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Heritage Square Museum
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:23:23.116Z] Process exited with code: 0

@@ -1,0 +1,28 @@
+[2026-03-16T21:23:03.422Z] Running stage 1 (Google Places identity commit) only for kuya-lord-restaurant-3-hot2025-james-beard-winner-filipino
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
+
+Enrich: Kuya Lord (kuya-lord-restaurant-3-hot2025-james-beard-winner-filipino)
+  ID:      4c16c305-f557-4108-9ff8-0e554bbb822b
+  Website: https://kuyalord.com/
+  GPID:    ChIJx-fAMlC5woAR4sMclHgF3NA
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+  ✓ needs_human_review cleared
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 3 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Kuya Lord
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T21:23:05.763Z] Process exited with code: 0

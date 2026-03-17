@@ -1,0 +1,27 @@
+[2026-03-16T20:27:34.958Z] Running stage 1 (Google Places identity commit) only for not-yo-tacos
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  enable debug logging with { debug: true }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  enable debug logging with { debug: true }
+
+Enrich: NOT YO TACOS (not-yo-tacos)
+  ID:      5fe1322a-4de1-4517-a0a4-e4ac3417b18c
+  Website: https://notyotacos.com/
+  GPID:    ChIJffZXjEm3woARrov6LmYiFA8
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 4 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: NOT YO TACOS
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:27:36.826Z] Process exited with code: 0

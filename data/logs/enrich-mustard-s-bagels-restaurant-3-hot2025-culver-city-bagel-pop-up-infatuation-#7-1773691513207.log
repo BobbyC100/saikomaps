@@ -1,0 +1,27 @@
+[2026-03-16T20:05:13.207Z] Running stage 1 (Google Places identity commit) only for mustard-s-bagels-restaurant-3-hot2025-culver-city-bagel-pop-up-infatuation-#7
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  suppress all logs with { quiet: true }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  enable debug logging with { debug: true }
+
+Enrich: Mustard's Bagels (mustard-s-bagels-restaurant-3-hot2025-culver-city-bagel-pop-up-infatuation-#7)
+  ID:      4caf9f7c-bd4b-4f6f-93b0-75ff2f779c98
+  Website: https://mustardsbagels.com/
+  GPID:    ChIJfx0EdADFwoARSF3hsia7W8g
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 0 created, 0 resolved, 6 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Mustard's Bagels
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:05:14.874Z] Process exited with code: 0

@@ -1,0 +1,27 @@
+[2026-03-16T20:27:37.504Z] Running stage 1 (Google Places identity commit) only for greenleaf-cafe
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔄 add secrets lifecycle management: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  override existing env vars with { override: true }
+
+Enrich: Greenleaf Cafe (greenleaf-cafe)
+  ID:      db6d610a-7da1-4e96-a954-794b782a1fa6
+  Website: http://www.greenleafcafewhittier.com/
+  GPID:    ChIJ2TWXauvTwoAREeNiQBV33M4
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 4 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Greenleaf Cafe
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:27:39.582Z] Process exited with code: 0

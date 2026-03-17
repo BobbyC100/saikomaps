@@ -1,0 +1,26 @@
+[2026-03-16T23:40:32.139Z] Running stage 1 (Google Places identity commit) only for la-fe
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+
+Enrich: La Fe (la-fe)
+  ID:      b249d0f2-aa3b-44e1-8cfd-07308ca73c7d
+  Website: https://lafeonsunset.com/
+  GPID:    ChIJERg-8mnHwoARVLDwPHHG26A
+  ✓ needs_human_review cleared
+
+Re-scanning issues...
+  Issues: 0 created, 0 resolved, 3 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: La Fe
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T23:40:33.999Z] Process exited with code: 0

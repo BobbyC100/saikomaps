@@ -1,0 +1,28 @@
+[2026-03-16T20:05:46.323Z] Running stage 1 (Google Places identity commit) only for augustine-wine-bar-wine-bar-5-wine-bar-sherman-oaks
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+
+Enrich: Augustine Wine Bar (augustine-wine-bar-wine-bar-5-wine-bar-sherman-oaks)
+  ID:      3f4461a3-6074-4fa9-b170-364b8e7d282e
+  Website: http://www.augustinewinebar.com/
+  GPID:    ChIJ0V8uySeWwoARiOu1BAeRCdU
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+  ✓ needs_human_review cleared
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 3 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Augustine Wine Bar
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:05:49.360Z] Process exited with code: 0

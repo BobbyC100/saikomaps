@@ -1,0 +1,27 @@
+[2026-03-16T20:28:36.848Z] Running stage 1 (Google Places identity commit) only for bel-canto-books
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  enable debug logging with { debug: true }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  suppress all logs with { quiet: true }
+
+Enrich: Bel Canto Books Retro Row (bel-canto-books)
+  ID:      7b845caa-61a3-4cee-9dd9-26976a61d249
+  Website: https://belcantobooks.net/
+  GPID:    ChIJgwRU6Ugx3YARThHDyhgkeho
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 6 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Bel Canto Books Retro Row
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:28:39.279Z] Process exited with code: 0

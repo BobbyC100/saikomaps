@@ -1,0 +1,27 @@
+[2026-03-16T20:04:39.513Z] Running stage 1 (Google Places identity commit) only for silver-lake-pool-and-inn-hotel-hotel-boutique-relaxed-organic-vibe-silver-lake-e
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+
+Enrich: Silver Lake Pool & Inn (silver-lake-pool-and-inn-hotel-hotel-boutique-relaxed-organic-vibe-silver-lake-e)
+  ID:      048ab187-5259-4718-bae3-3ad6f7239311
+  Website: https://www.palisociety.com/hotels/silverlake
+  GPID:    ChIJB7x_3E7HwoARby2w2st4Mwg
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 5 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Silver Lake Pool & Inn
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:04:42.592Z] Process exited with code: 0

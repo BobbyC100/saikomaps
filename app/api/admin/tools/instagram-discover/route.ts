@@ -19,6 +19,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { spawn } from 'child_process';
 import path from 'path';
+import { writeClaimAndSanction } from '@/lib/fields-v2/write-claim';
 
 export async function POST(request: NextRequest) {
   try {
@@ -132,9 +133,14 @@ export async function POST(request: NextRequest) {
 
       // Confirm none
       if (none) {
-        await db.entities.update({
-          where: { id: entityId },
-          data: { instagram: 'NONE' },
+        await writeClaimAndSanction(db, {
+          entityId,
+          attributeKey: 'instagram',
+          rawValue: 'NONE',
+          sourceId: 'saiko_human',
+          extractionMethod: 'HUMAN',
+          confidence: 1.0,
+          resolutionMethod: 'HUMAN_REVIEW',
         });
 
         return NextResponse.json({
@@ -170,9 +176,14 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      await db.entities.update({
-        where: { id: entityId },
-        data: { instagram: cleanHandle },
+      await writeClaimAndSanction(db, {
+        entityId,
+        attributeKey: 'instagram',
+        rawValue: cleanHandle,
+        sourceId: 'saiko_human',
+        extractionMethod: 'HUMAN',
+        confidence: 1.0,
+        resolutionMethod: 'HUMAN_REVIEW',
       });
 
       return NextResponse.json({

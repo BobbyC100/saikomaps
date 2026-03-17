@@ -1,0 +1,27 @@
+[2026-03-16T20:26:49.581Z] Running stage 1 (Google Places identity commit) only for betsy-restaurant-3-hot2025-altadena-hearth-cooking-tyler-wells-comeback
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+
+Enrich: Betsy (betsy-restaurant-3-hot2025-altadena-hearth-cooking-tyler-wells-comeback)
+  ID:      280edc04-605d-4cf7-8be0-fdb91e3c7c0d
+  Website: https://betsyaltadena.com/
+  GPID:    ChIJyROYYDXDwoARx_7TxDXZi6Q
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 4 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Betsy
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:26:51.391Z] Process exited with code: 0

@@ -1,0 +1,28 @@
+[2026-03-16T20:26:01.565Z] Running stage 1 (Google Places identity commit) only for men-and-beasts-|-modern-chinese-restaurant-and-tea-lounge-los-angeles-ca
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  override existing env vars with { override: true }
+
+Enrich: Men & Beasts | Modern Chinese Restaurant & Tea Lounge - Los Angeles, CA (men-and-beasts-|-modern-chinese-restaurant-and-tea-lounge-los-angeles-ca)
+  ID:      65fa4e60-d067-4e86-8482-16fc5725381f
+  Website: https://menandbeasts.com/
+  GPID:    ChIJFycRzrHHwoARwBAa5sAAhOg
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+  ✓ needs_human_review cleared
+
+Re-scanning issues...
+  Issues: 0 created, 0 resolved, 4 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Men & Beasts | Modern Chinese Restaurant & Tea Lounge - Los Angeles, CA
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:26:03.876Z] Process exited with code: 0

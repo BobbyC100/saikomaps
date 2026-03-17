@@ -1,0 +1,27 @@
+[2026-03-16T20:26:14.845Z] Running stage 1 (Google Places identity commit) only for gucci-osteria-da-massimo-bottura-restaurant-2-michelin-1-michelin-star-beverly-h
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  override existing env vars with { override: true }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔄 add secrets lifecycle management: https://dotenvx.com/ops
+
+Enrich: Gucci Osteria da Massimo Bottura (gucci-osteria-da-massimo-bottura-restaurant-2-michelin-1-michelin-star-beverly-h)
+  ID:      10da04a9-d760-4dc0-819e-3f56189b1a0d
+  Website: https://www.gucciosteria.com/en/beverlyhills/?y_source=1_MTU0MDI1NDItNzE1LWxvY2F0aW9uLndlYnNpdGU%3D
+  GPID:    ChIJmY8Ttaa7woARqE-Ss5DafEo
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 0 created, 0 resolved, 6 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Gucci Osteria da Massimo Bottura
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:26:16.721Z] Process exited with code: 0

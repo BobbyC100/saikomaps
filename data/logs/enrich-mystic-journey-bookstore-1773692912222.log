@@ -1,0 +1,27 @@
+[2026-03-16T20:28:32.222Z] Running stage 1 (Google Places identity commit) only for mystic-journey-bookstore
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  enable debug logging with { debug: true }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+
+Enrich: Mystic Journey (mystic-journey-bookstore)
+  ID:      e8eb5766-1c4a-405b-a469-97fc2e0eeb1a
+  Website: https://www.mysticjourneyla.com/
+  GPID:    ChIJcwZVZ7-6woARA1HBAsjZRuc
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 6 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Mystic Journey
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:28:34.847Z] Process exited with code: 0

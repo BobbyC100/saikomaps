@@ -1,0 +1,28 @@
+[2026-03-16T20:25:56.987Z] Running stage 1 (Google Places identity commit) only for osteria-mozza-restaurant-1-michelin-star-nancy-silverton
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 📡 add observability to secrets: https://dotenvx.com/ops
+
+Enrich: Osteria Mozza (osteria-mozza-restaurant-1-michelin-star-nancy-silverton)
+  ID:      f01cf5b0-0cd7-4da8-bfad-bf4fd3a645ae
+  Website: http://www.osteriamozza.com/
+  GPID:    ChIJBacpEtO4woAR8TxewBOIolo
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+  ✓ needs_human_review cleared
+
+Re-scanning issues...
+  Issues: 0 created, 0 resolved, 4 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Osteria Mozza
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:25:59.678Z] Process exited with code: 0

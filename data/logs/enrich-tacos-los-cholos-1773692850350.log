@@ -1,0 +1,27 @@
+[2026-03-16T20:27:30.350Z] Running stage 1 (Google Places identity commit) only for tacos-los-cholos
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+
+Enrich: Tacos Los Cholos Hp (tacos-los-cholos)
+  ID:      950cd21a-ca5a-4580-bd1c-a161ddf39fff
+  Website: https://tacos-los-cholos-hp-huntington-park.cloveronline.com/
+  GPID:    ChIJo7zv39vJwoARNfSi2ovF67A
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 3 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Tacos Los Cholos Hp
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:27:32.346Z] Process exited with code: 0

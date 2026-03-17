@@ -1,0 +1,27 @@
+[2026-03-16T20:04:54.166Z] Running stage 1 (Google Places identity commit) only for unknown-c5241182
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  enable debug logging with { debug: true }
+
+Enrich: Ennis House (unknown-c5241182)
+  ID:      c5241182-299f-46dd-ad5e-399075f7c2bb
+  Website: https://www.ennishouse.com/
+  GPID:    ChIJGVMxsUfBwoAR29CvRYADzgQ
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 6 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Ennis House
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:04:57.167Z] Process exited with code: 0

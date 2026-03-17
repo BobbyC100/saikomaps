@@ -1,0 +1,28 @@
+[2026-03-16T20:25:55.555Z] Running stage 1 (Google Places identity commit) only for bar-covell-wine-bar-5-wine-bar-los-feliz
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+
+Enrich: Covell (bar-covell-wine-bar-5-wine-bar-los-feliz)
+  ID:      8e05af40-46d5-4fc1-ae34-e20e8dfdd810
+  Website: http://www.barcovell.com/
+  GPID:    ChIJD2HKqa3AwoAR8JTi02ZS2Hc
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+  ✓ needs_human_review cleared
+
+Re-scanning issues...
+  Issues: 0 created, 0 resolved, 4 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Covell
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:25:57.409Z] Process exited with code: 0

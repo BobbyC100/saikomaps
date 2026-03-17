@@ -1,0 +1,27 @@
+[2026-03-16T21:23:22.531Z] Running stage 1 (Google Places identity commit) only for unknown-14613925
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔄 add secrets lifecycle management: https://dotenvx.com/ops
+
+Enrich: The Orpheum Theatre (unknown-14613925)
+  ID:      14613925-acec-491d-b537-5c5a04847858
+  Website: http://www.laorpheum.com/
+  GPID:    ChIJWQrC-crHwoARJvmB0kX7tbI
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 4 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: The Orpheum Theatre
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T21:23:24.839Z] Process exited with code: 0

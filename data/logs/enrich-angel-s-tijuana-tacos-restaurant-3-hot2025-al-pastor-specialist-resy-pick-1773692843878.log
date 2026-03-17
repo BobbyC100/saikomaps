@@ -1,0 +1,27 @@
+[2026-03-16T20:27:23.878Z] Running stage 1 (Google Places identity commit) only for angel-s-tijuana-tacos-restaurant-3-hot2025-al-pastor-specialist-resy-pick
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+
+Enrich: Angel's Tijuana Tacos (angel-s-tijuana-tacos-restaurant-3-hot2025-al-pastor-specialist-resy-pick)
+  ID:      bf8030c3-62bd-425d-bc3a-41fcb51eb901
+  Website: https://www.angelstijuanatacos.net
+  GPID:    ChIJufsBaGXBwoAR5ZyunDVI1tc
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 3 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Angel's Tijuana Tacos
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:27:26.120Z] Process exited with code: 0

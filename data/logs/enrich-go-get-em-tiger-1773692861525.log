@@ -1,0 +1,27 @@
+[2026-03-16T20:27:41.525Z] Running stage 1 (Google Places identity commit) only for go-get-em-tiger
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+
+Enrich: Go Get Em Tiger (go-get-em-tiger)
+  ID:      fdac246a-b9ec-467e-9485-0c784a675c37
+  Website: https://www.gget.com/
+  GPID:    ChIJy4RMgUvGwoARxcVCshVZCwk
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 5 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Go Get Em Tiger
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:27:43.772Z] Process exited with code: 0

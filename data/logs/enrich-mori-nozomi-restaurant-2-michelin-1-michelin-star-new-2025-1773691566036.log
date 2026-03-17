@@ -1,0 +1,27 @@
+[2026-03-16T20:06:06.036Z] Running stage 1 (Google Places identity commit) only for mori-nozomi-restaurant-2-michelin-1-michelin-star-new-2025
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔄 add secrets lifecycle management: https://dotenvx.com/ops
+
+Enrich: Mori Nozomi (mori-nozomi-restaurant-2-michelin-1-michelin-star-new-2025)
+  ID:      002a8037-5201-405f-a2db-8e1d7e49793a
+  Website: https://www.morinozomi.com/
+  GPID:    ChIJh_EchAm7woAR_M_f_w6W50c
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 5 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Mori Nozomi
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:06:08.480Z] Process exited with code: 0

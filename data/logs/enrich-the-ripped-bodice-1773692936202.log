@@ -1,0 +1,27 @@
+[2026-03-16T20:28:56.203Z] Running stage 1 (Google Places identity commit) only for the-ripped-bodice
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  write to custom object with { processEnv: myObject }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+
+Enrich: The Ripped Bodice (the-ripped-bodice)
+  ID:      e6b32373-fe2e-4b6b-8790-44fe0291b45b
+  Website: http://therippedbodicela.com/
+  GPID:    ChIJ6T9xISq6woAR6cpfwo0qwmo
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 6 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: The Ripped Bodice
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:28:59.685Z] Process exited with code: 0

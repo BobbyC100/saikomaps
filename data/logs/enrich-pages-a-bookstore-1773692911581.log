@@ -1,0 +1,27 @@
+[2026-03-16T20:28:31.581Z] Running stage 1 (Google Places identity commit) only for pages-a-bookstore
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+
+Enrich: Pages: a bookstore (pages-a-bookstore)
+  ID:      0f7bc758-d5d0-4264-aa30-c46ae910e851
+  Website: http://www.pagesabookstore.com/
+  GPID:    ChIJb_UDs-yzwoARVWVP1HbyZm0
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 6 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Pages: a bookstore
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:28:34.152Z] Process exited with code: 0

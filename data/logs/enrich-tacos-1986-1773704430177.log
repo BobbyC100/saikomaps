@@ -1,0 +1,26 @@
+[2026-03-16T23:40:30.178Z] Running stage 1 (Google Places identity commit) only for tacos-1986
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
+
+Enrich: Tacos 1986 (tacos-1986)
+  ID:      place_tacos-1986_1773195234685
+  Website: http://www.tacos1986.com/
+  GPID:    ChIJc1UAXfrHwoARkMC2iYyz8R8
+  ✓ needs_human_review cleared
+
+Re-scanning issues...
+  Issues: 0 created, 0 resolved, 3 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Tacos 1986
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T23:40:31.959Z] Process exited with code: 0

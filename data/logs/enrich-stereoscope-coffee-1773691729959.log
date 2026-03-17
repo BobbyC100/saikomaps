@@ -1,0 +1,89 @@
+[2026-03-16T20:08:49.959Z] Starting enrichment for stereoscope-coffee
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  override existing env vars with { override: true }
+
+Enrich: Stereoscope Coffee (stereoscope-coffee)
+  ID:      2fbcfd11-ca07-4efb-a424-d29d2b454695
+  Website: http://stereoscopecoffee.com/
+  GPID:    ChIJgcifKa7HwoARcP9SQ3hQcfI
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Stage 2: Surface discovery — skipped (surface rows already exist)
+
+Stage 3: Surface fetch — skipped (no surfaces with fetch_status=discovered)
+
+Stage 4: Surface parse — skipped (no surfaces pending parse)
+
+────────────────────────────────────────────────────────────
+Stage 5: Identity signal extraction (AI)
+  node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/extract-identity-signals.ts --place=Stereoscope Coffee
+────────────────────────────────────────────────────────────
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+
+🔮 Saiko Maps — Identity Signal Extraction
+==========================================
+🔸 Single place: "Stereoscope Coffee"
+
+📍 Found 0 places to process
+   (1 in canonical scope · 1 unprocessed · 0 with extractable content)
+
+No records to process. Exiting.
+  ✓ enrichment_stage updated to 5
+
+────────────────────────────────────────────────────────────
+Stage 6: Website enrichment
+  node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/run-website-enrichment.ts --slug=stereoscope-coffee
+────────────────────────────────────────────────────────────
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  suppress all logs with { quiet: true }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  write to custom object with { processEnv: myObject }
+[34mprisma:query[39m SELECT "public"."entities"."id", "public"."entities"."website", "public"."entities"."name", "public"."entities"."category" FROM "public"."entities" WHERE ("public"."entities"."slug" = $1 AND "public"."entities"."website" IS NOT NULL) ORDER BY "public"."entities"."updated_at" DESC LIMIT $2 OFFSET $3
+Website enrichment: 1 places (mode=default, ignoreThrottle=false, dryRun=false)
+
+  Stereoscope Coffee FULL ERROR:
+SyntaxError: Invalid regular expression: /^/collections/.*+.*/: Nothing to repeat
+    at new RegExp (<anonymous>)
+    at isPathDisallowed [90m(/Users/bobbyciccaglione/code/saiko-maps/[39mlib/website-enrichment/fetch.ts:43:18[90m)[39m
+    at fetchWithLimits [90m(/Users/bobbyciccaglione/code/saiko-maps/[39mlib/website-enrichment/fetch.ts:68:11[90m)[39m
+[90m    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at async runEnrichmentForPlace [90m(/Users/bobbyciccaglione/code/saiko-maps/[39mlib/website-enrichment/pipeline.ts:57:22[90m)[39m
+    at async main [90m(/Users/bobbyciccaglione/code/saiko-maps/[39mscripts/run-website-enrichment.ts:111:23[90m)[39m
+Done.
+  ✓ enrichment_stage updated to 6
+
+────────────────────────────────────────────────────────────
+Stage 7: Tagline generation (AI)
+  node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/generate-taglines-v2.ts --place=Stereoscope Coffee
+────────────────────────────────────────────────────────────
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  enable debug logging with { debug: true }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+
+🎙️  Saiko Voice Engine v2.0 — Tagline Generator
+==========================================
+🔸 Single place: "Stereoscope Coffee"
+🔸 Concurrency: 5
+
+📍 Fetching records with identity signals...
+📍 Found 0 places to process
+
+No records to process. Exiting.
+  ✓ enrichment_stage updated to 7
+  ✓ last_enriched_at updated
+
+Re-scanning issues...
+  Issues: 0 created, 1 resolved, 3 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Stereoscope Coffee
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  ✓ Stage 5: Identity signal extraction (AI) (ran)
+  ✓ Stage 6: Website enrichment (ran)
+  ✓ Stage 7: Tagline generation (AI) (ran)
+
+
+[2026-03-16T20:09:05.836Z] Process exited with code: 0

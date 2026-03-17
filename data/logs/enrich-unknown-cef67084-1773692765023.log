@@ -1,0 +1,27 @@
+[2026-03-16T20:26:05.023Z] Running stage 1 (Google Places identity commit) only for unknown-cef67084
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
+
+Enrich: Descanso Gardens (unknown-cef67084)
+  ID:      cef67084-500d-4a6b-ba85-fe444dd62a7c
+  Website: http://www.descansogardens.org/
+  GPID:    ChIJx9y0KwfqwoAR5-sWU6kp8iA
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 4 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Descanso Gardens
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:26:07.445Z] Process exited with code: 0

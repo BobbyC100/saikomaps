@@ -1,0 +1,27 @@
+[2026-03-16T20:27:43.465Z] Running stage 1 (Google Places identity commit) only for guisados
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+
+Enrich: Guisados (guisados)
+  ID:      371f60ff-fdfd-4075-9d89-345e19561f19
+  Website: https://www.guisados.la/
+  GPID:    ChIJVfNmkUrGwoARPoiVkasCkqc
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 5 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Guisados
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:27:45.891Z] Process exited with code: 0

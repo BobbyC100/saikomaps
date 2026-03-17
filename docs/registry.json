@@ -1,49 +1,7 @@
 {
-  "generated": "2026-03-16T05:20:17.835Z",
-  "doc_count": 73,
+  "generated": "2026-03-17T00:45:00.000Z",
+  "doc_count": 84,
   "docs": [
-    {
-      "doc_id": "ARCH-ENTITY-LIFECYCLE-CLOSURE-V1",
-      "doc_type": "architecture",
-      "status": "draft",
-      "title": "Entity Lifecycle and Closure Specification",
-      "path": "docs/architecture/entity-lifecycle-and-closure-v1.md",
-      "owner": "Bobby Ciccaglione",
-      "created": "2026-03-16",
-      "last_updated": "2026-03-16",
-      "project_id": "SAIKO",
-      "summary": "Lifecycle state management, closure as claim-based evidence, status_claims ledger, Reference Confidence Model. Companion to PI-CONCEPT-V1.",
-      "systems": [
-        "fields",
-        "entity-lifecycle"
-      ],
-      "related_docs": [
-        "docs/architecture/place-identity-concept-v1.md",
-        "docs/architecture/entity-classification-layers-v1.md"
-      ]
-    },
-    {
-      "doc_id": "PI-CONCEPT-V1",
-      "doc_type": "architecture",
-      "status": "draft",
-      "title": "Place Identity Concept Document",
-      "path": "docs/architecture/place-identity-concept-v1.md",
-      "owner": "Bobby Ciccaglione",
-      "created": "2026-03-16",
-      "last_updated": "2026-03-16",
-      "project_id": "SAIKO",
-      "summary": "Canonical definition of Place Identity — fields, lifecycle states, identity resolution, anchors, brand evolution. Layer 1 concept doc.",
-      "systems": [
-        "fields",
-        "entity-identity"
-      ],
-      "related_docs": [
-        "docs/architecture/entity-lifecycle-and-closure-v1.md",
-        "docs/architecture/entity-classification-layers-v1.md",
-        "docs/architecture/identity-scoring-v1.md",
-        "docs/architecture/enrichment-strategy-v1.md"
-      ]
-    },
     {
       "doc_id": "ARCH-AI-OPERATING-LAYER",
       "doc_type": "architecture",
@@ -130,6 +88,20 @@
         "docs/architecture/coverage-tiers-v1.md",
         "docs/FIELDS_V2_TARGET_ARCHITECTURE.md"
       ]
+    },
+    {
+      "doc_id": "ARCH-ENTITY-LIFECYCLE-CLOSURE-V1",
+      "doc_type": "document",
+      "status": "DRAFT",
+      "title": "Entity Lifecycle and Closure Specification",
+      "path": "docs/architecture/entity-lifecycle-and-closure-v1.md",
+      "owner": "Bobby",
+      "created": "Sun Mar 15 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "last_updated": "Sun Mar 15 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "project_id": "",
+      "summary": "",
+      "systems": [],
+      "related_docs": []
     },
     {
       "doc_id": "ARCH-IDENTITY-SCORING-V1",
@@ -297,17 +269,47 @@
     },
     {
       "doc_id": "ENRICH-STRATEGY-V1",
-      "doc_type": "document",
-      "status": "draft",
+      "doc_type": "architecture",
+      "status": "active",
       "title": "Entity Enrichment Strategy",
       "path": "docs/architecture/enrichment-strategy-v1.md",
       "owner": "bobby",
-      "created": "Sat Mar 14 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
-      "last_updated": "",
-      "project_id": "",
-      "summary": "",
-      "systems": [],
-      "related_docs": []
+      "created": "2026-03-15",
+      "last_updated": "2026-03-16",
+      "project_id": "SAIKO",
+      "summary": "Entity enrichment lifecycle (Intake→Identify→Enrich→Assess→Publish), phased execution (free before paid), evidence-vs-canonical architecture, editorial coverage pipeline, and hard rules for enrichment ordering.",
+      "systems": [
+        "enrichment-pipeline",
+        "fields-data-layer"
+      ],
+      "related_docs": [
+        "docs/architecture/enrichment-playbook-v1.md",
+        "docs/architecture/coverage-tiers-v1.md",
+        "docs/architecture/identity-scoring-v1.md"
+      ]
+    },
+    {
+      "doc_id": "ENRICH-PLAYBOOK-V1",
+      "doc_type": "runbook",
+      "status": "active",
+      "title": "City Launch Enrichment Playbook",
+      "path": "docs/architecture/enrichment-playbook-v1.md",
+      "owner": "bobby",
+      "created": "2026-03-16",
+      "last_updated": "2026-03-16",
+      "project_id": "SAIKO",
+      "summary": "Reusable, sequenced playbook for enriching 1,000+ entities at city-launch scale. Tool inventory, fully-enriched benchmark, gap analysis, 7-phase execution sequence (free→paid), cost model (~$5-10 per 1K entities), monitoring, and new-city checklist.",
+      "systems": [
+        "enrichment-pipeline",
+        "fields-data-layer",
+        "coverage-operations"
+      ],
+      "related_docs": [
+        "docs/architecture/enrichment-strategy-v1.md",
+        "docs/architecture/coverage-ops-approach-v1.md",
+        "docs/architecture/identity-scoring-v1.md",
+        "docs/architecture/social-fields-spec-v1.md"
+      ]
     },
     {
       "doc_id": "FEAT-MARKETS-SPEC-V1-2",
@@ -482,6 +484,22 @@
       "related_docs": []
     },
     {
+      "doc_id": "PI-CONCEPT-V1",
+      "doc_type": "document",
+      "status": "DRAFT",
+      "title": "SAIKO FIELDS — Place Identity Concept Document",
+      "path": "docs/architecture/place-identity-concept-v1.md",
+      "owner": "Bobby",
+      "created": "",
+      "last_updated": "Sun Mar 15 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "project_id": "",
+      "summary": "",
+      "systems": [],
+      "related_docs": [
+        "SKAI-DOC-FIELDS-ATOMIC-SIGNALS-001"
+      ]
+    },
+    {
       "doc_id": "PIPE-CAPTURE-PROFILES-V1",
       "doc_type": "spec",
       "status": "active",
@@ -522,6 +540,25 @@
         "docs/architecture/instagram-implementation-v1.md",
         "docs/architecture/instagram-api-integration-v1.md",
         "docs/architecture/instagram-ingestion-field-spec-v1.md"
+      ]
+    },
+    {
+      "doc_id": "RES-CUISINE-TRADITIONS-V1",
+      "doc_type": "research",
+      "status": "active",
+      "title": "Cuisine Traditions as Structured Signals",
+      "path": "docs/research/cuisine-traditions-signals-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-16",
+      "last_updated": "2026-03-16",
+      "project_id": "TRACES",
+      "summary": "Research synthesis on cuisine traditions as structured signals for the Offering Signals model",
+      "systems": [
+        "offering-signals",
+        "scenesense"
+      ],
+      "related_docs": [
+        "docs/architecture/enrichment-strategy-v1.md"
       ]
     },
     {
@@ -725,6 +762,28 @@
       "summary": "",
       "systems": [],
       "related_docs": []
+    },
+    {
+      "doc_id": "SAIKO-FIELDS-IDENTITY-VERIFICATION-2026-03",
+      "doc_type": "verification",
+      "status": "active",
+      "title": "Place Identity - Implementation Verification",
+      "path": "docs/architecture/place-identity-implementation-verification-2026-03.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "Sun Mar 15 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "last_updated": "Sun Mar 15 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "project_id": "SAIKO",
+      "summary": "Repository and Neon DB verification snapshot for place identity implementation state as of 2026-03.",
+      "systems": [
+        "fields-data-layer",
+        "entity-resolution"
+      ],
+      "related_docs": [
+        "docs/architecture/place-identity-concept-v1.md",
+        "docs/architecture/identity-resolver-spec-v1.md",
+        "docs/architecture/identity-scoring-v1.md",
+        "docs/architecture/fields-ingestion-pipeline-v1.md"
+      ]
     },
     {
       "doc_id": "SAIKO-FIELDS-V2-CUTOVER-SPEC",
@@ -1002,6 +1061,162 @@
       "summary": "",
       "systems": [],
       "related_docs": []
+    },
+    {
+      "doc_id": "SKAI-DOC-FIELDS-ATOMIC-SIGNALS-001",
+      "doc_type": "architecture",
+      "status": "active",
+      "title": "Atomic Cultural Signals",
+      "path": "docs/architecture/atomic-cultural-signals-v1.md",
+      "owner": "Bobby",
+      "created": "Sun Mar 15 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "last_updated": "Sun Mar 15 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "project_id": "saiko-fields",
+      "summary": "Defines the atomic cultural signal model used to structure place data in Saiko Fields.",
+      "systems": [
+        "Fields",
+        "TRACES"
+      ],
+      "related_docs": [
+        "SKAI-DOC-FIELDS-SYSTEM-MAP-001",
+        "SKAI-DOC-FIELDS-IDENTITY-RESOLVER-001",
+        "SKAI-DOC-FIELDS-GLOSSARY-001",
+        "place-identity-concept-v1.md"
+      ]
+    },
+    {
+      "doc_id": "SKAI-DOC-FIELDS-DATA-LAYER-CONTRACT-001",
+      "doc_type": "architecture",
+      "status": "active",
+      "title": "Data Layer Contract",
+      "path": "docs/architecture/data-layer-contract-v1.md",
+      "owner": "Bobby",
+      "created": "Sun Mar 15 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "last_updated": "Sun Mar 15 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "project_id": "saiko-fields",
+      "summary": "Defines architectural boundaries and data access rules between the Saiko Data Layer, Fields platform, and TRACES consumer product.",
+      "systems": [
+        "Fields",
+        "TRACES"
+      ],
+      "related_docs": [
+        "SKAI-DOC-FIELDS-SYSTEM-MAP-001",
+        "SKAI-DOC-FIELDS-ATOMIC-SIGNALS-001",
+        "SKAI-DOC-FIELDS-IDENTITY-RESOLVER-001"
+      ]
+    },
+    {
+      "doc_id": "SKAI-DOC-FIELDS-DERIVED-SIGNALS-ENGINE-001",
+      "doc_type": "architecture",
+      "status": "active",
+      "title": "Derived Signals Engine",
+      "path": "docs/architecture/derived-signals-engine-v1.md",
+      "owner": "Bobby",
+      "created": "Sun Mar 15 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "last_updated": "Sun Mar 15 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "project_id": "saiko-fields",
+      "summary": "Defines how derived signals are computed, governed, versioned, and exposed within the Saiko Fields system.",
+      "systems": [
+        "Fields",
+        "TRACES"
+      ],
+      "related_docs": [
+        "SKAI-DOC-FIELDS-ATOMIC-SIGNALS-001",
+        "SKAI-DOC-FIELDS-SIGNALS-REGISTRY-001",
+        "SKAI-DOC-FIELDS-SYSTEM-MAP-001",
+        "SKAI-DOC-FIELDS-DATA-LAYER-CONTRACT-001",
+        "SKAI-DOC-FIELDS-GLOSSARY-001"
+      ]
+    },
+    {
+      "doc_id": "SKAI-DOC-FIELDS-GLOSSARY-001",
+      "doc_type": "architecture",
+      "status": "active",
+      "title": "Saiko Architecture Glossary",
+      "path": "docs/architecture/saiko-architecture-glossary-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "Sun Mar 15 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "last_updated": "Sun Mar 15 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "project_id": "SAIKO",
+      "summary": "Canonical glossary of core Fields and TRACES architecture terms for shared system language.",
+      "systems": [
+        "fields-data-layer",
+        "traces",
+        "knowledge-system"
+      ],
+      "related_docs": [
+        "docs/architecture/fields-system-map-v1.md",
+        "docs/architecture/place-identity-concept-v1.md",
+        "docs/architecture/identity-resolver-spec-v1.md",
+        "docs/scenesense/glossary-v1.md"
+      ]
+    },
+    {
+      "doc_id": "SKAI-DOC-FIELDS-IDENTITY-RESOLVER-001",
+      "doc_type": "architecture",
+      "status": "draft",
+      "title": "Identity Resolver Specification",
+      "path": "docs/architecture/identity-resolver-spec-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "Sun Mar 15 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "last_updated": "Sun Mar 15 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "project_id": "SAIKO",
+      "summary": "Resolver inputs, anchors, active matching logic, and future threshold model for entity identity resolution.",
+      "systems": [
+        "entity-resolution",
+        "fields-data-layer"
+      ],
+      "related_docs": [
+        "docs/architecture/place-identity-concept-v1.md",
+        "docs/architecture/identity-scoring-v1.md",
+        "docs/architecture/fields-ingestion-pipeline-v1.md",
+        "SKAI-DOC-FIELDS-ATOMIC-SIGNALS-001"
+      ]
+    },
+    {
+      "doc_id": "SKAI-DOC-FIELDS-SIGNALS-REGISTRY-001",
+      "doc_type": "architecture",
+      "status": "active",
+      "title": "Signals Registry",
+      "path": "docs/architecture/signals-registry-v1.md",
+      "owner": "Bobby",
+      "created": "Sun Mar 15 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "last_updated": "Sun Mar 15 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "project_id": "saiko-fields",
+      "summary": "Defines how atomic and derived cultural signals are formally structured and governed within the Saiko Fields system.",
+      "systems": [
+        "Fields",
+        "TRACES"
+      ],
+      "related_docs": [
+        "SKAI-DOC-FIELDS-ATOMIC-SIGNALS-001",
+        "SKAI-DOC-FIELDS-SYSTEM-MAP-001",
+        "SKAI-DOC-FIELDS-IDENTITY-RESOLVER-001",
+        "SKAI-DOC-FIELDS-GLOSSARY-001",
+        "SKAI-DOC-FIELDS-DATA-LAYER-CONTRACT-001"
+      ]
+    },
+    {
+      "doc_id": "SKAI-DOC-FIELDS-SYSTEM-MAP-001",
+      "doc_type": "architecture",
+      "status": "active",
+      "title": "Fields System Map - Signals to Interpretation",
+      "path": "docs/architecture/fields-system-map-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "Sun Mar 15 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "last_updated": "Sun Mar 15 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "project_id": "SAIKO",
+      "summary": "Top-level architecture map for Fields-to-TRACES flow from observations to cultural interpretation.",
+      "systems": [
+        "fields-data-layer",
+        "traces"
+      ],
+      "related_docs": [
+        "docs/architecture/place-identity-concept-v1.md",
+        "docs/architecture/fields-ingestion-pipeline-v1.md",
+        "docs/architecture/identity-scoring-v1.md",
+        "SKAI-DOC-FIELDS-ATOMIC-SIGNALS-001"
+      ]
     },
     {
       "doc_id": "SKAI-DOC-TRACES-PLACE-PAGE-DESIGN-001",
@@ -1308,6 +1523,23 @@
         "docs/system/draft-trigger-v1.md",
         "docs/system/knowledge-control-workstream-2026-03-10.md"
       ]
+    },
+    {
+      "doc_id": "SYS-RESEARCH-FORMAT-V1",
+      "doc_type": "system",
+      "status": "active",
+      "title": "Research Document Format",
+      "path": "docs/system/research-format-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-16",
+      "last_updated": "2026-03-16",
+      "project_id": "KNOWLEDGE-SYSTEM",
+      "summary": "Defines the standard format for research documents ingested into the Saiko knowledge base",
+      "systems": [
+        "knowledge-system",
+        "repo-workflow"
+      ],
+      "related_docs": []
     },
     {
       "doc_id": "VOICE-SAIKO-VOICE-LAYER",

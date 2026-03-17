@@ -1,0 +1,27 @@
+[2026-03-16T20:04:32.027Z] Running stage 1 (Google Places identity commit) only for alejandra-s-quesadilla-cart-de-oaxaca
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
+
+Enrich: Alejandra's Quesadilla Cart de Oaxaca (alejandra-s-quesadilla-cart-de-oaxaca)
+  ID:      571c08b9-10ee-49bb-bcbe-8402ab599679
+  Website: —
+  GPID:    ChIJaT4PZsXHwoARS-vewm09HHo
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 6 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Alejandra's Quesadilla Cart de Oaxaca
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:04:35.552Z] Process exited with code: 0

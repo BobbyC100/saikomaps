@@ -1,0 +1,28 @@
+[2026-03-16T20:05:49.916Z] Running stage 1 (Google Places identity commit) only for alba-los-angeles-restaurant-3-hot2025-italian-open-air-west-hollywood
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+
+Enrich: Alba Los Angeles (alba-los-angeles-restaurant-3-hot2025-italian-open-air-west-hollywood)
+  ID:      0b9d4be0-34b2-445c-b4bf-77c5538f0b89
+  Website: https://www.cucinaalba.com/
+  GPID:    ChIJK1i52rK_woARSal9_H7GrGc
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+  ✓ needs_human_review cleared
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 3 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Alba Los Angeles
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:05:53.736Z] Process exited with code: 0

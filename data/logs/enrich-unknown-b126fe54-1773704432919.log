@@ -1,0 +1,25 @@
+[2026-03-16T23:40:32.919Z] Running stage 1 (Google Places identity commit) only for unknown-b126fe54
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 📡 add observability to secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+
+Enrich: Bradbury Building (unknown-b126fe54)
+  ID:      b126fe54-b52c-432e-a4ed-75aeeff83bd9
+  Website: https://thebradburybuilding.com/
+  GPID:    ChIJBYuC8kvGwoAROxBTjwqfWpU
+
+Re-scanning issues...
+  Issues: 0 created, 0 resolved, 4 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Bradbury Building
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T23:40:34.670Z] Process exited with code: 0

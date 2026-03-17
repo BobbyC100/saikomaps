@@ -1,0 +1,52 @@
+[2026-03-16T20:25:45.645Z] Running stage 1 (Google Places identity commit) only for sawtelle-tuk-tuk
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+
+Enrich: Sawtelle Tuk Tuk (sawtelle-tuk-tuk)
+  ID:      3910c3c6-123e-4ea1-b322-f5e40bd5dbf4
+  Website: https://www.tuktukthailosangeles.com
+  GPID:    ChIJkdfntl25woAR38iYliqBLk
+
+────────────────────────────────────────────────────────────
+Stage 1: Google Places identity commit
+  node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/backfill-google-places.ts --slug sawtelle-tuk-tuk
+────────────────────────────────────────────────────────────
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
+
+Backfill Google Places — 1 place(s) to process
+
+  ⚠️  sawtelle-tuk-tuk (Sawtelle Tuk Tuk): getPlaceDetails failed, trying search...
+  ✓ name match: "Tuk Tuk Thai -- Thai Restaurant & Catering in Sawtelle, Los Angeles" (similarity 0.56)
+  ❌ sawtelle-tuk-tuk (Sawtelle Tuk Tuk): 
+Invalid `prisma.entities.update()` invocation in
+/Users/bobbyciccaglione/code/saiko-maps/scripts/backfill-google-places.ts:230:31
+
+  227 };
+  228 
+  229 if (!dryRun) {
+→ 230   await prisma.entities.update(
+Unique constraint failed on the fields: (`google_place_id`)
+
+--- Backfill Complete ---
+Enriched: 0
+Failed: 1
+  ✓ enrichment_stage updated to 1
+  ✓ last_enriched_at updated
+
+Re-scanning issues...
+  Issues: 0 created, 0 resolved, 8 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Sawtelle Tuk Tuk
+════════════════════════════════════════════════════════════
+  ✓ Stage 1: Google Places identity commit (ran)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:25:55.664Z] Process exited with code: 0

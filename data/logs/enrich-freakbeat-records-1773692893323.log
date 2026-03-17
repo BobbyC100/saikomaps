@@ -1,0 +1,27 @@
+[2026-03-16T20:28:13.323Z] Running stage 1 (Google Places identity commit) only for freakbeat-records
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+
+Enrich: Freakbeat Records (freakbeat-records)
+  ID:      e3230b9f-6e73-4826-b014-5922995deb66
+  Website: https://freakbeatrecords.com/
+  GPID:    ChIJPapC7yiWwoARSJQB2baFxQY
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 6 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Freakbeat Records
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:28:16.191Z] Process exited with code: 0

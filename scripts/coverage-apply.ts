@@ -24,6 +24,7 @@ import * as path from 'path';
 import { db } from '@/lib/db';
 import { getPlaceDetails, getPlaceAttributes } from '@/lib/google-places';
 import { runCoverageAudit, type CoverageCandidate, type MissingGroup } from './coverage-run';
+import { writeClaimAndSanction } from '@/lib/fields-v2/write-claim';
 
 // ---------------------------------------------------------------------------
 // Apply phase: only these groups
@@ -331,47 +332,53 @@ async function main() {
         await sleep(RATE_LIMIT_MS);
       }
 
-      const updates: {
-        hours?: object;
-        googlePhotos?: unknown[];
-        googlePlacesAttributes?: object;
-        businessStatus?: string;
-        placesDataCachedAt?: Date;
-      } = {};
+      // ── Evidence-first: write observed_claims via writeClaimAndSanction ──
+      const sourceUrl = `https://maps.googleapis.com/maps/api/place/details?place_id=${gpid}`;
+      const claimBase = {
+        entityId: place_id,
+        sourceId: 'google_places' as const,
+        sourceUrl,
+        extractionMethod: 'API' as const,
+        confidence: 0.95,
+        resolutionMethod: 'GOOGLE_PLACE_ID_EXACT' as const,
+      };
+
+      const claims: { attributeKey: string; rawValue: unknown }[] = [];
+      const fieldsWritten: string[] = [];
 
       if (details) {
-        if (details.businessStatus) {
-          updates.businessStatus = details.businessStatus;
-        }
         if (missing_groups.includes('NEED_HOURS') && details.openingHours) {
           const hours = formatHoursForStore(details.openingHours);
           if (hours) {
-            updates.hours = hours;
+            claims.push({ attributeKey: 'hours', rawValue: hours });
+            fieldsWritten.push('hours');
             report.counts.by_group.NEED_HOURS++;
           }
         }
         if (missing_groups.includes('NEED_GOOGLE_PHOTOS') && details.photos?.length) {
           const photos = formatPhotosForStore(details.photos, photosPerPlace);
           if (photos?.length) {
-            updates.googlePhotos = photos;
+            claims.push({ attributeKey: 'google_photos', rawValue: photos });
+            fieldsWritten.push('googlePhotos');
             report.counts.by_group.NEED_GOOGLE_PHOTOS++;
           }
         }
       }
 
       if (attrs && missing_groups.includes('NEED_GOOGLE_ATTRS')) {
-        updates.googlePlacesAttributes = attrs as object;
+        claims.push({ attributeKey: 'google_places_attributes', rawValue: attrs as object });
+        fieldsWritten.push('googlePlacesAttributes');
         report.counts.by_group.NEED_GOOGLE_ATTRS++;
       }
 
       const remainingMissing = missing_groups.filter((g) => {
-        if (g === 'NEED_HOURS' && updates.hours) return false;
-        if (g === 'NEED_GOOGLE_PHOTOS' && updates.googlePhotos?.length) return false;
-        if (g === 'NEED_GOOGLE_ATTRS' && updates.googlePlacesAttributes) return false;
+        if (g === 'NEED_HOURS' && fieldsWritten.includes('hours')) return false;
+        if (g === 'NEED_GOOGLE_PHOTOS' && fieldsWritten.includes('googlePhotos')) return false;
+        if (g === 'NEED_GOOGLE_ATTRS' && fieldsWritten.includes('googlePlacesAttributes')) return false;
         return true;
       });
 
-      if (Object.keys(updates).length === 0) {
+      if (claims.length === 0) {
         if (!dryRun) {
           await upsertCoverageStatus({
             placeId: place_id,
@@ -383,27 +390,14 @@ async function main() {
         report.counts.succeeded++;
         if (i < 5) console.log(`  ✓ ${slug} (no new data to write)`);
       } else if (!dryRun) {
-        updates.placesDataCachedAt = new Date();
-        const sets = [];
-        const values = [];
-        let i = 1;
-
-        for (const [key, value] of Object.entries(updates)) {
-          const col =
-            key === 'placesDataCachedAt' ? 'places_data_cached_at' :
-            key === 'businessStatus' ? 'business_status' :
-            key === 'hoursJson' ? 'hours_json' :
-            key;
-          sets.push(`${col} = $${i++}`);
-          values.push(value);
+        for (const claim of claims) {
+          await writeClaimAndSanction(db, { ...claimBase, ...claim });
         }
+        // Non-canonical metadata: cache timestamp and business status on entities
+        const metaUpdate: Record<string, unknown> = { placesDataCachedAt: new Date() };
+        if (details?.businessStatus) metaUpdate.businessStatus = details.businessStatus;
+        await db.entities.update({ where: { id: place_id }, data: metaUpdate });
 
-        values.push(place_id);
-
-        await db.$executeRawUnsafe(
-          `update public.entities set ${sets.join(', ')} where id = $${i}`,
-          ...values
-        );
         await upsertCoverageStatus({
           placeId: place_id,
           dedupeKey: dedupe_key,
@@ -411,16 +405,10 @@ async function main() {
           lastMissingGroups: remainingMissing,
         });
         report.counts.succeeded++;
-        if (i < 10)
-          console.log(
-            `  ✓ ${slug} → ${Object.keys(updates).filter((k) => k !== 'placesDataCachedAt').join(', ')}`
-          );
+        if (i < 10) console.log(`  ✓ ${slug} → ${fieldsWritten.join(', ')}`);
       } else {
         report.counts.succeeded++;
-        if (i < 10)
-          console.log(
-            `  [DRY] ${slug} would write: ${Object.keys(updates).filter((k) => k !== 'placesDataCachedAt').join(', ')}`
-          );
+        if (i < 10) console.log(`  [DRY] ${slug} would write: ${fieldsWritten.join(', ')}`);
       }
     } catch (e) {
       error = e instanceof Error ? e.message : String(e);

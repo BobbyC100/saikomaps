@@ -1,0 +1,27 @@
+[2026-03-16T20:27:51.204Z] Running stage 1 (Google Places identity commit) only for scott-walker-audio
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+
+Enrich: Scott Walker Audio (scott-walker-audio)
+  ID:      b3240340-7fd1-409a-a382-79264f751e46
+  Website: https://scottwalkeraudio.com/
+  GPID:    ChIJ99E8QN7R3IARD7alfyUUN_E
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 6 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Scott Walker Audio
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:27:54.206Z] Process exited with code: 0

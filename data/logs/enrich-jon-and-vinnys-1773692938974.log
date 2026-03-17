@@ -1,0 +1,27 @@
+[2026-03-16T20:28:58.974Z] Running stage 1 (Google Places identity commit) only for jon-and-vinnys
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔄 add secrets lifecycle management: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+
+Enrich: Jon & Vinny's Slauson (jon-and-vinnys)
+  ID:      afa33261-208a-47aa-8d93-d61f604fbdcb
+  Website: http://jonandvinnys.com/
+  GPID:    ChIJuRJR18-3woAREUGFH8SQegg
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 5 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Jon & Vinny's Slauson
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:29:02.051Z] Process exited with code: 0

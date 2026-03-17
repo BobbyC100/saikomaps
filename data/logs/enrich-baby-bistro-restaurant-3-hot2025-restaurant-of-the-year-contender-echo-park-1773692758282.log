@@ -1,0 +1,27 @@
+[2026-03-16T20:25:58.285Z] Running stage 1 (Google Places identity commit) only for baby-bistro-restaurant-3-hot2025-restaurant-of-the-year-contender-echo-park
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔄 add secrets lifecycle management: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+
+Enrich: Baby Bistro (baby-bistro-restaurant-3-hot2025-restaurant-of-the-year-contender-echo-park)
+  ID:      59eb5040-1690-4f26-b463-041855c99174
+  Website: https://babybistrola.com/
+  GPID:    ChIJpboOd2HHwoAR0kwNDqK4cgw
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 0 created, 0 resolved, 6 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Baby Bistro
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:26:00.584Z] Process exited with code: 0

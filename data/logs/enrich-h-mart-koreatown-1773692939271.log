@@ -1,0 +1,28 @@
+[2026-03-16T20:28:59.272Z] Running stage 1 (Google Places identity commit) only for h-mart-koreatown
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+
+Enrich: H Mart LA K-Town (h-mart-koreatown)
+  ID:      c1e8012d-a0fe-4494-b0c8-2597ea24b042
+  Website: http://www.hmart.com/
+  GPID:    ChIJg_z0TvS5woARjRk66TmEONk
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+  ✓ needs_human_review cleared
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 5 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: H Mart LA K-Town
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:29:02.342Z] Process exited with code: 0

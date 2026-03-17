@@ -1,0 +1,28 @@
+[2026-03-16T20:26:02.548Z] Running stage 1 (Google Places identity commit) only for alta-adams-restaurant-4-iconic-keith-corbin-south-la
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  enable debug logging with { debug: true }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔄 add secrets lifecycle management: https://dotenvx.com/ops
+
+Enrich: Alta Adams (alta-adams-restaurant-4-iconic-keith-corbin-south-la)
+  ID:      81513430-c4f3-4241-b0ed-51d2c634f8e1
+  Website: http://altaadams.com/
+  GPID:    ChIJ5XZfNW65woARIhG9hN44XQ4
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+  ✓ needs_human_review cleared
+
+Re-scanning issues...
+  Issues: 0 created, 0 resolved, 3 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Alta Adams
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:26:04.591Z] Process exited with code: 0

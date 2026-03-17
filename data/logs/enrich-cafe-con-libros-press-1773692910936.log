@@ -1,0 +1,27 @@
+[2026-03-16T20:28:30.937Z] Running stage 1 (Google Places identity commit) only for cafe-con-libros-press
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
+
+Enrich: Café Con Libros Press (cafe-con-libros-press)
+  ID:      6b88e4f6-cf87-4ca9-a780-8fe7e93fa9a5
+  Website: http://www.cafeconlibrospress.org/
+  GPID:    ChIJO0iQp-Utw4AR8UW_XcYdyVQ
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 6 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Café Con Libros Press
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:28:33.132Z] Process exited with code: 0

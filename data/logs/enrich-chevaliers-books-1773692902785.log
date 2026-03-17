@@ -1,0 +1,27 @@
+[2026-03-16T20:28:22.785Z] Running stage 1 (Google Places identity commit) only for chevaliers-books
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 📡 add observability to secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔄 add secrets lifecycle management: https://dotenvx.com/ops
+
+Enrich: Chevalier's Books (chevaliers-books)
+  ID:      08a4bc50-7900-498c-8fc0-f4a80218ca3b
+  Website: http://chevaliersbooks.com/
+  GPID:    ChIJ60gaU8e4woAR1XhgBsbB8YM
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 5 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Chevalier's Books
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:28:25.275Z] Process exited with code: 0

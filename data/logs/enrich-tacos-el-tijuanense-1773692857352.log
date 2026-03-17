@@ -1,0 +1,27 @@
+[2026-03-16T20:27:37.352Z] Running stage 1 (Google Places identity commit) only for tacos-el-tijuanense
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  override existing env vars with { override: true }
+
+Enrich: Tacos El Tijuanense (tacos-el-tijuanense)
+  ID:      5318120a-9946-4468-aaab-67e4e7060eaa
+  Website: https://order.online/business/tacos-el-tijuanense-902210/
+  GPID:    ChIJhTdQcmKRwoARFQZ5kdVid0c
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 3 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Tacos El Tijuanense
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:27:39.570Z] Process exited with code: 0

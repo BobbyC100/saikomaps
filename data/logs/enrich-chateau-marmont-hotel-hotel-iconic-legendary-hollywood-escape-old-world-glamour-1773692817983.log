@@ -1,0 +1,27 @@
+[2026-03-16T20:26:57.983Z] Running stage 1 (Google Places identity commit) only for chateau-marmont-hotel-hotel-iconic-legendary-hollywood-escape-old-world-glamour
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  write to custom object with { processEnv: myObject }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
+
+Enrich: Chateau Marmont (chateau-marmont-hotel-hotel-iconic-legendary-hollywood-escape-old-world-glamour)
+  ID:      b24be64a-0699-4253-8794-1cbf320792fd
+  Website: https://www.chateaumarmont.com/
+  GPID:    ChIJKROQJcC-woARXQdWnTspoVk
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 4 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Chateau Marmont
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:26:59.874Z] Process exited with code: 0

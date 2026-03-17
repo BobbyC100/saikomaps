@@ -1,0 +1,27 @@
+[2026-03-16T20:27:23.623Z] Running stage 1 (Google Places identity commit) only for hms-bounty-bar-4-iconic-koreatown-dive-new-eater-38-addition
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
+
+Enrich: HMS Bounty (hms-bounty-bar-4-iconic-koreatown-dive-new-eater-38-addition)
+  ID:      e0e938e8-6946-47fa-9092-c5c1688be83c
+  Website: http://www.thehmsbounty.com/
+  GPID:    ChIJq0s4r33HwoARAxVYxf8ypbk
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 4 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: HMS Bounty
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:27:25.834Z] Process exited with code: 0

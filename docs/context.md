@@ -1,8 +1,8 @@
 # Saiko — Context Snapshot
 
-> Generated: 2026-03-14T20:10:52.730Z
-> Source: docs/registry.json (2026-03-14T20:10:52.501Z)
-> Documents: 66 included / 69 total
+> Generated: 2026-03-17T00:26:46.159Z
+> Source: docs/registry.json (2026-03-17T00:45:00.000Z)
+> Documents: 79 included / 84 total
 > Filters: status=active
 
 ---
@@ -23,12 +23,14 @@ To regenerate: `npm run docs:context`
 - [SYS-COVERAGE-DASHBOARD-DESIGN-V1](#sys-coverage-dashboard-design-v1) — Coverage Dashboard — Design Principles: Design principles for the Coverage Dashboard — work surface, not report; smart counts; group by solution; automation first
 - [SYS-DRAFT-TRIGGER-V1](#sys-draft-trigger-v1) — Draft Trigger v1: Defines when reusable knowledge must become a controlled draft.
 - [SYS-PROMOTION-FLOW-V1](#sys-promotion-flow-v1) — Promotion Flow v1: Defines the controlled path from approved draft to canonical document.
+- [SYS-RESEARCH-FORMAT-V1](#sys-research-format-v1) — Research Document Format: Defines the standard format for research documents ingested into the Saiko knowledge base
 - [SKAI/RESEARCH-AI-KNOWLEDGE-ARCHITECTURE-V1](#skai-research-ai-knowledge-architecture-v1) — AI-Native Knowledge & Data Architecture Patterns (2023–2026)
 - [DEC-002](#dec-002) — DEC-002 — Repo-Based Canonical Knowledge Store: All canonical knowledge documents live in the repository under /docs, using markdown with structured frontmatter for both human readability and machine parsing.
 **PLACE-PAGE**
 - [SKAI-DOC-TRACES-PLACE-PAGE-DESIGN-001](#skai-doc-traces-place-page-design-001) — Place Page Design v1: Canonical design spec for the Saiko place profile page — wireframe, data sources, content model, and rendering rules.
 **SAIKO**
 - [ARCH-AI-OPERATING-LAYER](#arch-ai-operating-layer) — AI OPERATING LAYER
+- [ARCH-COVERAGE-OPS-DASHBOARD-V1](#arch-coverage-ops-dashboard-v1) — Coverage Ops Dashboard v1: 4-tab coverage operations dashboard spec — Overview, Tier Health, Enrichment Tools, Neighborhoods. Replaces prior 6-tab layout.
 - [ARCH-COVERAGE-TIERS-V1](#arch-coverage-tiers-v1) — Coverage Tiers — Entity Enrichment Model: Defines the coverage tier model for entity enrichment. Six tiers from raw identity through experiential interpretation, with enrichment strategy (merchant surfaces first, editorial sources second, human third), entity-type signal requirements, and scanner integration points.
 - [ARCH-ENTITY-CLASSIFICATION-LAYERS-V1](#arch-entity-classification-layers-v1) — Entity Classification Layers: Plain-language explanation of entity classification layers in the current schema — entityType vs primary_vertical vs category vs cuisine_type — including operational authority and usage guidance.
 - [ARCH-IDENTITY-SCORING-V1](#arch-identity-scoring-v1) — Identity Scoring — Weighted Anchor Model: Weighted anchor scoring model for entity identity confidence. GPID is not required — entities reach publication threshold through any combination of anchors that demonstrates sufficient identity certainty.
@@ -37,6 +39,7 @@ To regenerate: `npm run docs:context`
 - [ARCHITECTURE-INSTAGRAM-API-INTEGRATION-V1](#architecture-instagram-api-integration-v1) — Instagram API Integration — Current State: Instagram Graph API integration state — Meta app config, permissions, verified endpoints, architectural models for media ingestion
 - [ARCHITECTURE-INSTAGRAM-IMPLEMENTATION-V1](#architecture-instagram-implementation-v1) — Instagram Integration — Implementation & Impact Doc: Instagram integration implementation plan and system impact — tables, sync rules, temporal signals, interpretation layer, photo strategy, attachment model. V0.2 adds current state assessment, implementation phases, and data review results.
 - [COVOPS-APPROACH-V1](#covops-approach-v1) — Coverage Operations — Architectural Position: Architectural position for Coverage Operations — introduces entity_issues as a unified operational layer over existing queue fragments, with tool readiness assessment and phased implementation plan.
+- [ENRICH-STRATEGY-V1](#enrich-strategy-v1) — Entity Enrichment Strategy: Entity enrichment lifecycle (Intake→Identify→Enrich→Assess→Publish), phased execution (free before paid), evidence-vs-canonical architecture, editorial coverage pipeline, and hard rules for enrichment ordering.
 - [FIELDS-ERA-OVERVIEW-V1](#fields-era-overview-v1) — Entity Record Awareness (ERA) — One-Pager: Defines Entity Record Awareness (ERA) — how Saiko becomes aware a place exists, separating awareness from canonical (Golden) status to prevent silent drift.
 - [FIELDS-VERTICAL-TAXONOMY-V1](#fields-vertical-taxonomy-v1) — Saiko Vertical Taxonomy: Defines Saiko's 12-vertical taxonomy — the primary domains of urban life used to classify every place in the system. Documents anthropological rationale, system role, technical anchors, and design implications.
 - [SAIKO-COVERAGE-DASHBOARD-DESIGN-V1](#saiko-coverage-dashboard-design-v1) — Coverage Dashboard — Design Principles: Design principles for the Coverage Dashboard — a work surface for resolving data gaps, organized by solution type (automated vs. semi-automated vs. human-only) rather than by missing field.
@@ -47,6 +50,8 @@ To regenerate: `npm run docs:context`
 - [SAIKO-PLATFORM-DATA-LAYER](#saiko-platform-data-layer) — PLATFORM_DATA_LAYER.md
 - [SAIKO-PROVENANCE-SYSTEM](#saiko-provenance-system) — Saiko Maps - Provenance System
 - [SAIKO-RESOLVER-AND-PLACES-DATA-FLOW](#saiko-resolver-and-places-data-flow) — Resolver pipeline and golden_records → places data flow
+- [SKAI-DOC-FIELDS-GLOSSARY-001](#skai-doc-fields-glossary-001) — Saiko Architecture Glossary: Canonical glossary of core Fields and TRACES architecture terms for shared system language.
+- [SKAI-DOC-FIELDS-SYSTEM-MAP-001](#skai-doc-fields-system-map-001) — Fields System Map - Signals to Interpretation: Top-level architecture map for Fields-to-TRACES flow from observations to cultural interpretation.
 - [FEAT-MARKETS-SPEC-V1-2](#feat-markets-spec-v1-2) — Markets Integration — SPEC v1.2
 - [PIPE-INSTAGRAM-WORKSTREAM-V1](#pipe-instagram-workstream-v1) — Instagram Integration — Workstream & Execution Plan: Phased execution plan for Instagram integration — 6 phases from data quality through contextual display. Includes codebase readiness assessment, effort estimates, timing recommendations, and per-phase task checklists.
 - [SAIKO-ENERGY-SCORE-SPEC](#saiko-energy-score-spec) — Energy Score — Specification (Locked)
@@ -62,6 +67,7 @@ To regenerate: `npm run docs:context`
 - [SAIKO-PIPELINE-COMMANDS](#saiko-pipeline-commands) — Saiko Maps — Pipeline Commands
 - [SAIKO-PROVENANCE-QUICK-REF](#saiko-provenance-quick-ref) — Provenance System - Quick Reference
 - [SAIKO-SITEMAP](#saiko-sitemap) — Saiko Maps - Sitemap
+- [ENRICH-PLAYBOOK-V1](#enrich-playbook-v1) — City Launch Enrichment Playbook: Reusable, sequenced playbook for enriching 1,000+ entities at city-launch scale. Tool inventory, fully-enriched benchmark, gap analysis, 7-phase execution sequence (free→paid), cost model (~$5-10 per 1K entities), monitoring, and new-city checklist.
 - [OPS-STALE-DEPLOYMENTS](#ops-stale-deployments) — Debugging Stale Deployments & Local Updates
 - [SAIKO-DATA-SYNC-RUNBOOK](#saiko-data-sync-runbook) — Data Sync Runbook
 - [SAIKO-LOCAL-DEV](#saiko-local-dev) — Local Development
@@ -69,11 +75,18 @@ To regenerate: `npm run docs:context`
 - [SAIKO-PROD-PLACE-FIX-RUNBOOK](#saiko-prod-place-fix-runbook) — Production Place Page Fix - Runbook
 - [SAIKO-MIGRATION-GUIDE](#saiko-migration-guide) — Migration Guide: Places → Golden Records
 - [SAIKO-MIGRATION-HISTORY-RECONCILIATION](#saiko-migration-history-reconciliation) — Migration History Reconciliation Analysis
+- [ARCHITECTURE-FIELDS-INGESTION-PIPELINE-V1](#architecture-fields-ingestion-pipeline-v1) — (untitled)
 - [SAIKO-ADMIN-SPRING-CLEANING-2026-03](#saiko-admin-spring-cleaning-2026-03) — Admin Spring Cleaning Log — March 2026: Record of admin routes and features retired or fixed in March 2026 — Review Queue, Energy Engine, Appearances auth, GPID Queue URL. Captures rationale for each retirement.
 - [SAIKO-SAIKOAI-EXTRACTION-PROMPT-V2-1](#saiko-saikoai-extraction-prompt-v2-1) — SaikoAI Extraction Prompt — V2.1
 - [SAIKO-APP-OVERVIEW](#saiko-app-overview) — Saiko Maps - Application Overview
 - [SAIKO-README](#saiko-readme) — Saiko Maps
 - [OS-BEVERAGE-PROGRAM-VOCAB-V1](#os-beverage-program-vocab-v1) — Beverage Program + Signal Vocabulary (v1): Canonical beverage program model and signal vocabulary for derived offering enrichment. Defines 5 program containers, maturity scale, and locked signal sets for wine, beer, cocktail, non-alcoholic, and coffee/tea programs.
+- [SAIKO-FIELDS-IDENTITY-VERIFICATION-2026-03](#saiko-fields-identity-verification-2026-03) — Place Identity - Implementation Verification: Repository and Neon DB verification snapshot for place identity implementation state as of 2026-03.
+**saiko-fields**
+- [SKAI-DOC-FIELDS-ATOMIC-SIGNALS-001](#skai-doc-fields-atomic-signals-001) — Atomic Cultural Signals: Defines the atomic cultural signal model used to structure place data in Saiko Fields.
+- [SKAI-DOC-FIELDS-DATA-LAYER-CONTRACT-001](#skai-doc-fields-data-layer-contract-001) — Data Layer Contract: Defines architectural boundaries and data access rules between the Saiko Data Layer, Fields platform, and TRACES consumer product.
+- [SKAI-DOC-FIELDS-DERIVED-SIGNALS-ENGINE-001](#skai-doc-fields-derived-signals-engine-001) — Derived Signals Engine: Defines how derived signals are computed, governed, versioned, and exposed within the Saiko Fields system.
+- [SKAI-DOC-FIELDS-SIGNALS-REGISTRY-001](#skai-doc-fields-signals-registry-001) — Signals Registry: Defines how atomic and derived cultural signals are formally structured and governed within the Saiko Fields system.
 **TRACES**
 - [OS-OFFERING-SIGNALS-V1](#os-offering-signals-v1) — Offering Signals v1
 - [SS-DISPLAY-CONTRACT-V2](#ss-display-contract-v2) — SceneSense Display Contract v2: Display contract for the revised SceneSense three-lens model (Atmosphere / Energy / Scene). Supersedes SS-DISPLAY-CONTRACT-V1.
@@ -83,6 +96,7 @@ To regenerate: `npm run docs:context`
 - [SS-FW-004](#ss-fw-004) — Scene Lens: Defines the Scene lens — social patterns of use and behavioral expectations.
 - [SS-GLO-001](#ss-glo-001) — SceneSense Glossary of Terms: Canonical glossary of SceneSense terminology for engineers, editors, and models.
 - [VOICE-SAIKO-VOICE-LAYER](#voice-saiko-voice-layer) — SAI-DOC-VOICE-001 — Saiko Voice Layer
+- [RES-CUISINE-TRADITIONS-V1](#res-cuisine-traditions-v1) — Cuisine Traditions as Structured Signals: Research synthesis on cuisine traditions as structured signals for the Offering Signals model
 
 ---
 
@@ -1207,6 +1221,146 @@ No silent in-between state.
 
 ---
 
+## SYS-RESEARCH-FORMAT-V1
+
+| Field | Value |
+|-------|-------|
+| **Type** | system |
+| **Status** | active |
+| **Project** | KNOWLEDGE-SYSTEM |
+| **Path** | `docs/system/research-format-v1.md` |
+| **Last Updated** | 2026-03-16 |
+| **Summary** | Defines the standard format for research documents ingested into the Saiko knowledge base |
+| **Systems** | knowledge-system, repo-workflow |
+
+# Research Document Format
+
+## Purpose
+
+Defines the standard format for research documents ingested into the Saiko knowledge base. Research documents are synthesis artifacts — they compile findings from external sources, editorial analysis, and community intelligence into structured knowledge that informs future architecture, product design, and signal model decisions.
+
+Research documents are distinct from architecture docs (which specify current system behavior) and domain specs (which define vocabulary and contracts). Research captures **what we learned** and **what it implies**, not **what the system does**.
+
+## Directory and Naming
+
+- **Location:** `docs/research/`
+- **Filename pattern:** `{topic-slug}-v{N}.md` (e.g., `cuisine-traditions-signals-v1.md`)
+- **Doc ID prefix:** `RES-` (e.g., `RES-CUISINE-TRADITIONS-V1`)
+- **Doc type:** `research`
+
+The `docs-registry.ts` scanner discovers research docs automatically — no script changes needed.
+
+## Frontmatter Schema
+
+### Standard fields (required — same as all canonical docs)
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `doc_id` | string | `RES-{DESCRIPTIVE-NAME}-V{N}` |
+| `doc_type` | string | Always `research` |
+| `status` | enum | `active`, `draft`, `superseded`, `archived` |
+| `owner` | string | Document owner |
+| `created` | date | Creation date (YYYY-MM-DD) |
+| `last_updated` | date | Last modification date |
+| `project_id` | string | Which project this informs (SAIKO, TRACES, etc.) |
+| `systems` | array | System tags for cross-indexing |
+| `related_docs` | array | File paths to related canonical docs |
+| `summary` | string | One-line summary of the research |
+
+### Research-specific fields (optional but recommended)
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `research_domain` | string | Area of product/system this informs (e.g., `offering-signals`, `scenesense`, `coverage-ops`) |
+| `source_types` | array | Kinds of sources consulted: `academic`, `editorial`, `industry-taxonomy`, `food-community`, `primary-observation`, `trade-publication` |
+| `actionable` | boolean | Whether the doc contains concrete implementable recommendations |
+| `informs_docs` | array | Forward pointers to docs this research should feed into (can reference future/planned docs) |
+
+## Body Template
+
+```markdown
+# {Title}
+
+## Overview
+1-2 paragraph executive summary. What was researched, why, and the key finding.
+
+## Findings
+Organized by theme, not by source. Each section synthesizes across sources.
+
+### {Finding Theme 1}
+...
+
+### {Finding Theme 2}
+...
+
+## Signal / Design Implications
+What this means for Saiko's data model, product, or operations. Concrete proposed signals, fields, or architectural changes.
+
+## Recommendations
+Numbered, actionable items. Each should be implementable or testable.
+
+## Sources
+Bulleted list grouped by type. Enough to trace provenance, not academic citation format.
+
+### Editorial
+- Source — topic/list
+
+### Academic / Industry
+- Author/org — title or description
+
+### Community / Primary
+- Forum/community — topic
+```
+
+## Promotion Workflow
+
+Research documents follow the standard promotion path:
+
+1. Research is conducted in a chat session or external tool
+2. Findings are compiled into the body template above
+3. Human approves promotion
+4. Promote via:
+
+```bash
+npm run docs:promote -- \
+  --path docs/research/{topic-slug}-v1.md \
+  --content /path/to/draft.md \
+  --doc-id RES-{NAME}-V1 \
+  --doc-type research \
+  --project-id {PROJECT} \
+  --status active \
+  --summary "{one-line summary}" \
+  --systems {system1},{system2}
+```
+
+5. Run `npm run docs:registry` to update registry
+
+## When to Create a Research Document
+
+A research doc should be created when:
+
+- **External research was conducted** that produced findings relevant to product or system design
+- **A cross-cutting analysis** synthesized information from multiple sources into a coherent framework
+- **Signal vocabulary or taxonomy work** produced candidate terms, categories, or classification schemes
+- **Competitive or landscape analysis** produced reusable intelligence
+
+A research doc should NOT be created for:
+
+- One-off observations or opinions (keep in session notes)
+- Implementation decisions (use architecture docs)
+- Vocabulary definitions without supporting research (use domain specs)
+- Status updates or progress reports
+
+## Versioning
+
+Research documents version like all canonical docs. If new research significantly updates or contradicts a prior doc:
+
+1. Create `{topic}-v2.md` with updated findings
+2. Patch the v1 doc's status to `superseded` via `apply-doc-patch`
+3. Reference v1 in v2's `related_docs`
+
+---
+
 ## SKAI/RESEARCH-AI-KNOWLEDGE-ARCHITECTURE-V1
 
 | Field | Value |
@@ -2072,6 +2226,164 @@ ACTIVE
 
 ---
 
+## ARCH-COVERAGE-OPS-DASHBOARD-V1
+
+| Field | Value |
+|-------|-------|
+| **Type** | architecture |
+| **Status** | active |
+| **Project** | SAIKO |
+| **Path** | `docs/architecture/coverage-ops-dashboard-v1.md` |
+| **Last Updated** | 2026-03-15 |
+| **Summary** | 4-tab coverage operations dashboard spec — Overview, Tier Health, Enrichment Tools, Neighborhoods. Replaces prior 6-tab layout. |
+| **Systems** | coverage-operations, admin-tools |
+
+# Coverage Ops Dashboard v1
+
+## Purpose
+
+Operator dashboard for data quality triage and enrichment pipeline management. Located at `/admin/coverage`, server-rendered from raw SQL. Scoped to all non-permanently-closed entities.
+
+Replaces the prior 6-tab layout (Overview, Missing Fields, Neighborhoods, Red Flags, Field Breakdown, Tier 2 Visit Facts) with a consolidated 4-tab structure.
+
+## Route
+
+```
+/admin/coverage?view=overview|tiers|pipeline|neighborhoods
+```
+
+Default view: `overview`.
+
+## Tab Structure
+
+| Tab | Param | Purpose |
+|-----|-------|---------|
+| Overview | `overview` | High-level counts, tier progress, enrichment funnel |
+| Tier Health | `tiers` | Per-tier field completeness + ERA pipeline progress |
+| Enrichment Tools | `pipeline` | Tool inventory + recent enrichment runs |
+| Neighborhoods | `neighborhoods` | Scorecard grid by neighborhood |
+
+## Overview Tab
+
+### Summary Cards (row of 5)
+- Total entities
+- OPEN entities
+- CANDIDATE entities
+- Entities with GPID
+- Distinct neighborhoods
+
+### Tier Completion Bars
+Three horizontal bars showing completion percentage:
+- **Tier 1 Identity** — slug, name, latitude, google_place_id all non-null
+- **Tier 2 Operational** — hours, phone, website, price_level, menu_url, reservation_url all non-null
+- **Tier 3 Enrichment** — instagram, neighborhood, description all non-null
+
+### Enrichment Funnel
+Four-stage horizontal funnel:
+```
+Never Enriched → In Progress → Fully Enriched → Published
+```
+- Never Enriched: `enrichment_stage IS NULL`
+- In Progress: `enrichment_stage` between 1-6
+- Fully Enriched: `enrichment_stage = '7'`
+- Published: `status = 'OPEN'`
+
+## Tier Health Tab
+
+### Summary Strip
+Three cards at top showing all tiers at a glance — tier name, completion count, percentage, color-coded progress bar.
+
+### ERA Pipeline Progress
+Histogram showing entity count at each enrichment stage (NULL through 7). Gives operators a quick read on where entities are in the pipeline.
+
+### Per-Tier Field Breakdowns
+Three sections, one per tier. Each shows a table of fields with has/missing/total/coverage%.
+
+**Tier 1 — Identity**
+| Field | Description |
+|-------|-------------|
+| slug | URL-safe identifier |
+| name | Display name |
+| latitude | Geographic coordinate |
+| google_place_id | GPID anchor |
+
+**Tier 2 — Operational**
+| Field | Description |
+|-------|-------------|
+| hours | Operating hours JSON |
+| phone | Phone number |
+| website | Primary website URL |
+| price_level | Price tier (1-4) |
+| menu_url | Menu link |
+| reservation_url | Reservation link |
+
+**Tier 3 — Enrichment**
+| Field | Description |
+|-------|-------------|
+| instagram | Instagram handle |
+| neighborhood | Neighborhood assignment |
+| description | Entity description |
+
+Tier 1 includes an expandable drill-down showing individual entities with identity issues.
+
+## Enrichment Tools Tab
+
+### Tool Inventory
+Static table of all available enrichment tools. Each row shows: name, command (with copy-to-clipboard button), cost tier, and fields affected.
+
+| Tool | Cost | Provider | Fields |
+|------|------|----------|--------|
+| Social discovery | Free | OpenAI GPT-4.1-mini | instagram, tiktok, website |
+| Website fetch + parse | Free | — | menu, reservation, hours, phone |
+| Populate canonical | Free | — | Evidence to canonical promotion |
+| Website enrichment | Free | — | Website-derived fields |
+| Menu URL sync | Free | — | menu_url |
+| ERA pipeline (full) | Anthropic $ | Anthropic | All stages (identity signals, taglines) |
+| Coverage apply (Google) | Google $$ | Google Places API | hours, phone, latlng, photos, price_level |
+
+Commands use `node -r ./scripts/load-env.js ./node_modules/.bin/tsx` to load both `.env` and `.env.local`.
+
+### Recent Enrichment Runs
+Last 10 runs from `place_coverage_status`, showing entity name, slug, status, last attempt time, source, and missing field groups.
+
+## Neighborhoods Tab
+
+Scorecard grid by neighborhood. Each card shows entity count and field coverage stats for that neighborhood. Unchanged from prior dashboard version.
+
+## Data Sources
+
+### SQL Queries (`lib/admin/coverage/sql.ts`)
+| Query | Used by |
+|-------|---------|
+| `OVERVIEW_COUNTS_SQL` | Overview cards |
+| `TIER_COMPLETION_SQL` | Overview bars + Tier Health strip |
+| `ENRICHMENT_STAGE_SQL` | Overview funnel + Tier Health histogram |
+| `RECENT_RUNS_SQL` | Enrichment Tools recent runs |
+| `TIER_FIELD_STATS_SQL` | Tier Health field breakdowns |
+| `TIER1_ISSUES_SQL` | Tier Health Tier 1 drill-down |
+| `ALL_NEIGHBORHOOD_SCORECARD_SQL` | Neighborhoods tab |
+
+### Types (`lib/admin/coverage/types.ts`)
+- `OverviewCounts` — summary card data
+- `TierCompletion` — tier completion counts
+- `EnrichmentStage` — stage distribution
+- `RecentRun` — enrichment run record
+- `TierFieldStat` — per-field has/missing/total
+- `Tier1Issue` — entity with identity issues
+- `NeighborhoodScorecard` — neighborhood stats
+
+## Implementation Files
+
+| File | Role |
+|------|------|
+| `app/admin/coverage/page.tsx` | Page component, view routing, all view renderers |
+| `lib/admin/coverage/sql.ts` | Raw SQL queries |
+| `lib/admin/coverage/types.ts` | TypeScript interfaces for query results |
+| `lib/admin/coverage/run.ts` | `runOne` / `runMany` query helpers |
+| `app/admin/coverage/components/ActionButtons.tsx` | `CopyCommandButton`, `RedFlagActions` client components |
+
+---
+
 ## ARCH-COVERAGE-TIERS-V1
 
 | Field | Value |
@@ -2596,7 +2908,8 @@ Entities are considered publishable when they have sufficient identity confidenc
 
 - **Scoring function**: `lib/identity-enrichment.ts` → `computeConfidence()`
 - **Anchor extraction**: `lib/identity-enrichment.ts` → `AnchorSet` interface
-- **Name matching**: Jaro-Winkler similarity ≥ 0.85 for near-exact matches
+- **Name matching (identity scoring)**: Jaro-Winkler similarity ≥ 0.85 for near-exact matches
+- **Name matching (GPID backfill)**: When `backfill-google-places.ts` searches by name (no pre-existing GPID or address), it guards against linking the wrong place using: (1) Jaro-Winkler ≥ 0.55 OR (2) substring containment (entity name ⊂ Google name or vice versa). Both must fail to reject. Our curated entity name is never overwritten by Google's display name — Google provides GPID, coords, hours, and photos only.
 - **Coverage integration**: `lib/coverage/issue-scanner.ts` flags `unresolved_identity` only when GPID is missing — but this does NOT block publication if other anchors are sufficient
 
 ## Design Rationale
@@ -3922,6 +4235,275 @@ Existing specialized queues remain intact. GPID resolution queue is referenced b
 - **Editorial thinness detection**: Issue scanner should flag entities with zero or few editorial sources. Depends on media coverage storage.
 - **Auto-rescan after actions**: Bulk actions should trigger a re-scan automatically instead of requiring manual button click.
 - **Progress indicators**: Background actions (Stage 1, etc.) show "Queued" but no progress feedback. Need polling or SSE for real-time status.
+
+---
+
+## ENRICH-STRATEGY-V1
+
+| Field | Value |
+|-------|-------|
+| **Type** | architecture |
+| **Status** | active |
+| **Project** | SAIKO |
+| **Path** | `docs/architecture/enrichment-strategy-v1.md` |
+| **Last Updated** | 2026-03-16 |
+| **Summary** | Entity enrichment lifecycle (Intake→Identify→Enrich→Assess→Publish), phased execution (free before paid), evidence-vs-canonical architecture, editorial coverage pipeline, and hard rules for enrichment ordering. |
+| **Systems** | enrichment-pipeline, fields-data-layer |
+
+# Entity Enrichment Strategy v1
+
+## Entity Lifecycle
+
+```
+Intake (CANDIDATE) → Identify → Enrich → Assess → Publish
+```
+
+1. **Intake** — entity enters system as `CANDIDATE` via CSV import, single entry, or discovery
+2. **Identify** — confirm entity type (EAT, PARK, SHOP, etc.), deduplicate, anchor identity
+3. **Enrich** — fill fields using available data sources, cheapest first
+4. **Assess** — check field completeness against the entity type's playbook; human review if needed
+5. **Publish** — add to list, entity becomes reachable on maps
+
+## Enrichment Phases
+
+### Phase 1: Identity
+- Deduplicate against existing entities (GPID, website domain, Instagram handle, slug, fuzzy name)
+- Confirm entity type — determines which fields matter and which tools to run
+- Entity type drives the **field playbook** (a restaurant needs hours/menu/reservation; a park does not)
+
+### Phase 2: Free Enrichment (run all, order flexible)
+Run all free sources. Order within this phase is flexible — optimize for signal density per call.
+
+| Source | Cost | Signal Density (restaurants) | Fields |
+|--------|------|------------------------------|--------|
+| **Existing system data** | Free | Variable | Backfill from surfaces, scans, signals already in DB |
+| **Website** | Free (crawl) | High | Hours, menu, reservation URL, phone, address, about/story |
+| **Instagram API** | Free | Medium | Vibe, photos, identity signals, hours/menu in bio |
+| **TikTok API** | Free | Medium-Low | Energy/vibe signals, content |
+| **Editorial coverage** | Free (crawl) | High (subjective) | Chef, cuisine, awards, vibe quotes, neighborhood |
+| **Social discovery** | Free | Low | Find handles if not provided at intake |
+
+### Phase 3: AI Extraction
+- Parse fetched surfaces (websites, social content, editorial articles) using AI
+- Extract structured signals from unstructured content
+- Cost: mixed — OpenAI for social discovery (GPT-4.1-mini + web search), Anthropic for identity extraction + taglines
+
+### Phase 4: Paid API (gaps only)
+- **Google Places API** — only for fields still missing after free enrichment, or to confirm existing data
+- Run strategically, not by default
+- Fields: latLng, hours, phone, photos, price level, business status
+
+## Hard Rules
+1. **Free before paid** — never call Google API if free sources haven't been exhausted
+2. **Entity type drives playbook** — don't run restaurant tools on a park
+3. **Evidence before canonical** — enrichment writes to evidence tables first, not directly to canonical state
+4. **Pluggable architecture** — new data sources slot in as tools; the system doesn't hardcode a fixed pipeline order
+5. **Provenance always** — every field tracks where its data came from
+
+## Evidence vs Canonical
+
+Not all discovered data should immediately become canonical state.
+
+### Evidence Layer (where enrichment writes)
+Enrichment pipelines write **evidence** — raw observations with provenance:
+- `observed_claims` — structured field-level claims (e.g., "hours are X" from source Y)
+- `merchant_surface_scans` — crawled page snapshots
+- `merchant_signals` — extracted signals from surfaces
+- `menu_fetches` — menu content snapshots
+- `coverage_sources` — editorial links + extracted accolades
+
+### Canonical Layer (where product reads)
+- `canonical_entity_state` — the currently accepted truth, used by product surfaces
+
+### Promotion: Evidence → Canonical
+Evidence is promoted to canonical through sanctioning workflows:
+- Multiple sources agree → auto-promote with high confidence
+- Sources conflict → flag for human review
+- Single source, trusted → auto-promote with medium confidence
+- Uses `write-claim.ts` / Fields v2 sanctioning pattern
+
+### Why This Matters
+- A restaurant's website says hours are 11am-10pm. Google says 11am-9pm. Instagram bio says "open till 10." These are three pieces of **evidence**. The sanctioning step picks the winner and writes it to canonical.
+- An Eater article says "Japanese-Italian fusion." The restaurant's own website says "Italian." Both are evidence. Canonical gets the sanctioned answer.
+
+## Editorial Coverage Pipeline
+
+### Approved Source Registry
+Curated list of trusted publications, maintained by Bobby:
+- Eater LA
+- Michelin Guide
+- The Infatuation
+- LA Times Food
+- TimeOut LA
+- (expandable — more sources added over time)
+
+### Pipeline
+1. **Discovery** — for a given entity, search approved sources for mentions/articles/videos
+2. **Fetch content** — crawl article text, pull video transcripts/captions, grab metadata
+3. **AI extraction** — same pipeline for all text sources (article, transcript, caption). Extract structured signals.
+4. **Store with provenance** — full link, publication/channel name, publish date, title, extracted signals, source type
+5. **Surface on entity page** — accolades/awards badge visible to consumers
+
+### Extraction Signals (Restaurant / EAT)
+
+**Factual / Structured** → writes to evidence (`observed_claims`) → promoted to `canonical_entity_state`:
+- Chef/owner name
+- Cuisine type (Japanese, Mexican, New American)
+- Neighborhood confirmation
+- Price range indicators ("splurge-worthy," "$$$," "affordable")
+- Opening date / "new restaurant" mentions
+
+**Awards / Accolades** → writes to `coverage_sources` + entity page display:
+- Michelin stars/recommendations
+- List inclusions ("Eater 38," "Best New Restaurant 2025")
+- Awards ("James Beard semifinalist")
+
+**Subjective / Signal** → writes to evidence (`merchant_signals`) → promoted to `interpretation_cache`:
+- Vibe/atmosphere descriptions ("intimate," "buzzy," "casual counter-service")
+- Signature dishes mentioned by name
+- Who it's for ("date night," "group dinners," "solo counter dining")
+- Comparisons to other places
+- Pull-quote-worthy sentences (for display on entity page)
+
+**Meta** (stored on the source record):
+- Article/video type (review, list, news, vlog)
+- Author/creator name
+- Publish date
+- Sentiment (positive/negative/neutral)
+- View count (video sources)
+
+### Video Sources (YouTube, TikTok)
+
+Video content enters the same extraction pipeline as editorial articles.
+
+**Approach: Transcripts + metadata (cheapest path)**
+- YouTube: free transcripts via API + title, description, view count, channel
+- TikTok: captions come with content API + metadata
+- Feed transcript text through the same AI extraction pipeline used for articles
+- No vision/frame analysis needed (future option, not priority)
+
+**Why video matters:**
+- A food vlogger saying "best birria tacos in Silver Lake" is the same signal as an Eater article
+- View counts are a popularity/buzz signal (500K views = notable)
+- Comments are sentiment data ("I drove 2 hours for this" / "overrated")
+- Video content captures energy/vibe signals that text reviews may miss
+
+### Consumer-Facing Display
+Editorial coverage is not just internal enrichment — it surfaces on the entity page:
+- **Accolades section** — "Michelin Star," "Eater 38," "Infatuation Pick"
+- **Pull quotes** — notable excerpts from reviews with attribution
+- **Source links** — readers can click through to original articles
+
+### Existing Infrastructure
+- `coverage_sources` table — entity_id, source_name, url, article_title, published_at
+- `entities.editorial_sources` — JSON field
+- `operator_place_candidates.source_type` — can be `'editorial'`
+- Currently: stores links only, no crawl/parse/extract automation
+
+## Data Flow Architecture
+
+```
+Source → Fetch → Extract → Evidence → Sanction → Canonical → Product
+```
+
+### Layer Map
+
+| Layer | Tables | Role |
+|-------|--------|------|
+| **Routing shell** | `entities` | Identity anchors, routing keys (slug, status, primary_vertical, entity_type) |
+| **Evidence** | `observed_claims`, `merchant_signals`, `merchant_surface_scans`, `menu_fetches` | Raw observations from enrichment — multiple per field, with provenance |
+| **Editorial** | `coverage_sources` | Source links, accolades, extracted editorial signals |
+| **Canonical state** | `canonical_entity_state` | Sanctioned truth — one value per field, promoted from evidence |
+| **Interpretation** | `interpretation_cache` | AI-generated outputs promoted from evidence (tagline, vibe, pull quotes) |
+| **Coverage ops** | `place_coverage_status` | Enrichment progress tracking (last_enriched_at, needs_human_review) |
+
+### Current Misalignment
+- `coverage-apply.ts` writes hours, photos, attributes directly to `entities` — should write to evidence, then promote to `canonical_entity_state`
+- Dashboard queries check `entities` fields — should join `canonical_entity_state`
+- Enrichment score should measure `canonical_entity_state` completeness, not `entities` fields
+- No enrichment tools write to evidence tables — they skip straight to `entities`
+
+## Coverage Ops Dashboard
+
+Implemented at `/admin/coverage`. 4-tab layout, server-rendered from raw SQL (`lib/admin/coverage/sql.ts`). Scoped to all non-permanently-closed entities.
+
+### Tab Structure
+
+| Tab | Query param | Purpose |
+|-----|-------------|---------|
+| **Overview** | `?view=overview` | Summary cards, tier completion bars, enrichment funnel |
+| **Tier Health** | `?view=tiers` | Summary strip, ERA pipeline histogram, per-tier field breakdowns |
+| **Enrichment Tools** | `?view=pipeline` | Tool inventory with copy-to-clipboard + recent enrichment runs |
+| **Neighborhoods** | `?view=neighborhoods` | Scorecard grid by neighborhood |
+
+### Tool Inventory (accessible from Enrichment Tools tab)
+| Tool | Cost | Provider | Command |
+|------|------|----------|---------|
+| Social discovery | Free | OpenAI GPT-4.1-mini | `node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/discover-social.ts` |
+| Website fetch + parse | Free | — | `node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/scan-merchant-surfaces.ts` |
+| Populate canonical | Free | — | `node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/populate-canonical-state.ts` |
+| Website enrichment | Free | — | `npm run enrich:website` |
+| Menu URL sync | Free | — | `npm run signals:menu:sync:local` |
+| AI identity extraction | Anthropic $ | Anthropic | ERA stage 5 via `enrich-place.ts` |
+| AI tagline generation | Anthropic $ | Anthropic | ERA stage 7 via `enrich-place.ts` |
+| ERA pipeline (full) | Anthropic $ | Anthropic | `node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/enrich-place.ts --slug=SLUG` |
+| Coverage apply (Google) | Google $$ | Google Places API | `node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/coverage-apply.ts --apply` |
+| Editorial discovery | — | Not built | — |
+
+## Enrichment Score
+
+Each entity gets a composite enrichment score reflecting how "filled out" it is.
+
+### Inputs
+- **Field completeness** — % of playbook fields populated for this entity type
+- **Source diversity** — how many distinct sources contributed data (1 = fragile, 5+ = well-covered)
+- **Editorial coverage depth** — number of editorial mentions, weighted by source quality
+- **Signal quality** — not just "has value" but "has confident, multi-source-confirmed value"
+
+### Usage
+- Dashboard sorts/filters by enrichment score — work on the lowest-scored entities first
+- Score thresholds gate publication: e.g., "don't publish below 70%"
+- Per-entity detail view shows which fields are dragging the score down
+
+## Source Registry (by Entity Type)
+
+The approved source list is **typed by entity** — different entities need different sources.
+
+### Example: Restaurant (EAT)
+
+| Source | Type | Cost | Signals |
+|--------|------|------|---------|
+| Eater LA | Editorial | Free | Awards, chef, cuisine, vibe, neighborhood |
+| Michelin Guide | Editorial | Free | Stars, rating, cuisine |
+| The Infatuation | Editorial | Free | Vibe, recommendations, price |
+| LA Times Food | Editorial | Free | Reviews, chef, cuisine, awards |
+| TimeOut LA | Editorial | Free | Lists, recommendations |
+| Instagram | Social API | Free | Vibe, photos, identity, hours (bio) |
+| TikTok | Social API | Free | Energy, vibe, content |
+| Entity website | Crawl | Free | Hours, menu, reservation, phone, about |
+| Google Places | Paid API | $$ | Hours, phone, latLng, photos, price level |
+
+### Example: Park
+
+| Source | Type | Cost | Signals |
+|--------|------|------|---------|
+| AllTrails | Crawl | Free | Trails, difficulty, ratings |
+| LA Parks Dept | Crawl | Free | Hours, amenities, address |
+| TimeOut Outdoors | Editorial | Free | Recommendations, features |
+| Instagram | Social API | Free | Photos, vibe |
+| Google Places | Paid API | $$ | Hours, latLng, photos |
+
+### Registry Design
+- Bobby maintains the master source list — approves which sources are trusted
+- System auto-suggests sources based on entity type
+- Each source entry specifies: name, type (editorial/social/crawl/api), cost tier, entity types it serves, fields it can provide
+- New sources are added without rewriting pipeline code — just register and the orchestrator picks them up
+
+## Future: Pluggable Source Architecture
+- Support adding new APIs and data sources over time without rewriting the pipeline
+- Each source registers: what fields it can provide, what it costs, what entity types it serves
+- The enrichment orchestrator decides what to run based on what's missing and what's cheapest
+- Sources can be enabled/disabled per entity type or globally
 
 ---
 
@@ -5751,6 +6333,332 @@ ORDER BY places DESC
 LIMIT 50;
 "
 ```
+
+---
+
+## SKAI-DOC-FIELDS-GLOSSARY-001
+
+| Field | Value |
+|-------|-------|
+| **Type** | architecture |
+| **Status** | active |
+| **Project** | SAIKO |
+| **Path** | `docs/architecture/saiko-architecture-glossary-v1.md` |
+| **Last Updated** | Sun Mar 15 2026 17:00:00 GMT-0700 (Pacific Daylight Time) |
+| **Summary** | Canonical glossary of core Fields and TRACES architecture terms for shared system language. |
+| **Systems** | fields-data-layer, traces, knowledge-system |
+
+# Saiko Architecture Glossary
+
+**Document ID:** SKAI-DOC-FIELDS-GLOSSARY-001  
+**Layer:** Architecture  
+**Status:** Active
+
+---
+
+## Atomic Signal
+
+The smallest observable piece of structured information captured about a place.
+
+Examples:
+
+- `reservable = true`
+- `natural_wine = true`
+
+Atomic signals are non-interpretive.
+
+---
+
+## Derived Signal
+
+A computed signal generated from atomic signals.
+
+Examples:
+
+- dinner score
+- scene energy
+
+Derived signals remain structured data.
+
+---
+
+## Identity Signal
+
+A signal that helps determine whether two observations refer to the same place.
+
+Examples:
+
+- name
+- coordinates
+- address
+
+---
+
+## Identity Anchor
+
+A high-confidence identity signal.
+
+Examples:
+
+- GPID
+- Instagram handle
+- website domain
+
+---
+
+## Identity Resolution
+
+The process that groups signals into canonical entities.
+
+---
+
+## Canonical Entity
+
+The system's resolved representation of a real-world place.
+
+Also known as Place Identity.
+
+---
+
+## Canonical State
+
+The authoritative version of entity data used by downstream systems.
+
+---
+
+## Source Evidence
+
+Raw signals captured from external systems.
+
+Examples:
+
+- Google Places
+- social platforms
+
+---
+
+## Sanction
+
+A canonical decision applied to signals or entity state.
+
+---
+
+## Cultural Interpretation
+
+Human-readable meaning derived from structured signals.
+
+Produced by TRACES.
+
+---
+
+## Product API
+
+The stable interface through which consumer systems access Fields data.
+
+---
+
+## SKAI-DOC-FIELDS-SYSTEM-MAP-001
+
+| Field | Value |
+|-------|-------|
+| **Type** | architecture |
+| **Status** | active |
+| **Project** | SAIKO |
+| **Path** | `docs/architecture/fields-system-map-v1.md` |
+| **Last Updated** | Sun Mar 15 2026 17:00:00 GMT-0700 (Pacific Daylight Time) |
+| **Summary** | Top-level architecture map for Fields-to-TRACES flow from observations to cultural interpretation. |
+| **Systems** | fields-data-layer, traces |
+
+# SAIKO FIELDS
+
+## System Map - Signals to Interpretation
+
+**Document ID:** SKAI-DOC-FIELDS-SYSTEM-MAP-001  
+**System:** Fields / TRACES  
+**Layer:** Architecture  
+**Status:** Active  
+**Owner:** Saiko
+
+---
+
+## Purpose
+
+This document defines the high-level system architecture for Saiko Fields and its relationship to TRACES.
+
+It explains how the system moves from real-world observations to structured entities, derived understanding, and finally user-facing cultural interpretation.
+
+This is the top-level mental model for the Saiko platform.
+
+---
+
+## Core System Flow
+
+Real World  
+-> Source Systems / Observations  
+-> Atomic Cultural Signals  
+-> Identity Resolution  
+-> Canonical Entity  
+-> Derived Signals  
+-> Product API  
+-> TRACES Interpretation  
+-> User Experience
+
+---
+
+## Layer Definitions
+
+### Real World
+
+The real places, behaviors, offerings, and cultural conditions that exist outside the system.
+
+Examples:
+
+- a restaurant opening
+- a wine bar changing operators
+- a menu changing seasonally
+- a neighborhood becoming popular for late dinners
+
+### Source Systems / Observations
+
+Inputs that provide evidence about the real world.
+
+Examples:
+
+- Google Places
+- Instagram
+- websites
+- editorial submissions
+- operator input
+- ingestion feeds
+- manual research
+
+These are evidence sources, not truth authorities.
+
+### Atomic Cultural Signals
+
+Atomic signals are the smallest observable pieces of structured information captured about a place.
+
+Examples:
+
+- `primary_vertical = EAT`
+- `reservable = true`
+- `natural_wine = true`
+- `neighborhood = Silver Lake`
+
+Atomic signals are:
+
+- observable
+- structured
+- sourceable
+- durable
+- non-interpretive
+
+Fields stores and maintains atomic signals.
+
+### Identity Resolution
+
+Identity resolution determines whether signals refer to:
+
+- an existing entity
+- or a new entity
+
+Evidence used in identity resolution includes:
+
+- Google Place ID
+- Instagram handle
+- website
+- name similarity
+- coordinates
+- address
+- resolver rules
+
+Identity is resolved from evidence agreement, not defined by any single platform.
+
+### Canonical Entity
+
+The canonical entity is the system's stable representation of a real-world place.
+
+It is:
+
+- the resolved identity record
+- the anchor for enrichment
+- the owner of canonical state
+- the object consumed by downstream systems
+
+This entity is commonly referred to as Place Identity.
+
+### Derived Signals
+
+Derived signals are computed features produced from atomic signals and canonical state.
+
+Examples:
+
+- dinner destination score
+- scene energy
+- date-night probability
+- confidence levels
+- completeness flags
+
+Derived signals remain structured data, not narrative interpretation.
+
+### Product API
+
+The Product API provides stable, versioned access to Fields data.
+
+Consumer systems should read through these APIs or canonical views.
+
+Consumer systems should not read raw ingestion tables directly.
+
+### TRACES Interpretation
+
+TRACES transforms structured signals into human-readable cultural understanding.
+
+Examples:
+
+- identity language
+- scene descriptions
+- discovery logic
+- intent matching
+- cultural summaries
+
+Fields structures knowledge.  
+TRACES interprets it.
+
+---
+
+## Ownership Boundaries
+
+| Concern | Owner |
+|---|---|
+| Source ingestion | Fields |
+| Atomic signals | Fields |
+| Identity resolution | Fields |
+| Canonical entity | Fields |
+| Derived signals | Fields |
+| Product API | Fields |
+| Cultural interpretation | TRACES |
+| Interface language | TRACES |
+| User experience | TRACES |
+
+---
+
+## Architectural Rules
+
+1. Source systems do not define truth on their own.
+2. Identity is resolved from evidence.
+3. Fields stores signals and canonical state.
+4. Derived signals occur downstream of identity.
+5. TRACES interprets structured inputs.
+6. Consumer products should not read raw source tables directly.
+7. The data layer is a standalone system of record.
+
+---
+
+## Summary
+
+Saiko transforms observations into structured cultural understanding.
+
+Signals -> Resolver -> Entity -> Derived Signals -> Interpretation
 
 ---
 
@@ -8372,6 +9280,397 @@ https://saiko.com/templates
 
 ---
 
+## ENRICH-PLAYBOOK-V1
+
+| Field | Value |
+|-------|-------|
+| **Type** | runbook |
+| **Status** | active |
+| **Project** | SAIKO |
+| **Path** | `docs/architecture/enrichment-playbook-v1.md` |
+| **Last Updated** | 2026-03-16 |
+| **Summary** | Reusable, sequenced playbook for enriching 1,000+ entities at city-launch scale. Tool inventory, fully-enriched benchmark, gap analysis, 7-phase execution sequence (free→paid), cost model (~$5-10 per 1K entities), monitoring, and new-city checklist. |
+| **Systems** | enrichment-pipeline, fields-data-layer, coverage-operations |
+
+# City Launch Enrichment Playbook v1
+
+Reusable, sequenced playbook for enriching 1,000+ entities at city-launch
+scale. Designed to maximize coverage at minimum cost. Run the same steps for
+every new city.
+
+---
+
+## 1. Tool Inventory
+
+### Pipeline Stages (orchestrated by `npm run enrich:place`)
+
+| # | Stage | Script | Source | Writes To | Cost | Notes |
+|---|-------|--------|--------|-----------|------|-------|
+| 1 | Google Places identity | `backfill-google-places.ts` | Google Places API | `entities` (GPID, coords, address, hours, photos, neighborhood) | ~$0.007/entity (Places Detail) | Paid. Rate-limit 150ms. |
+| 2 | Surface discovery | `run-surface-discovery.ts` | Entity website (domain crawl) | `merchant_surfaces` (homepage, about, menu, contact URLs) | Free | Requires `entities.website` |
+| 3 | Surface fetch | `run-surface-fetch.ts` | Discovered URLs | `merchant_surfaces` (raw HTML/text) | Free | HTTP fetch, skips Instagram |
+| 4 | Surface parse | `run-surface-parse.ts` | Stored raw_html/raw_text | `merchant_surface_artifacts` (structured text_blocks) | Free | No network calls |
+| 5 | Identity signals (AI) | `extract-identity-signals.ts` | Parsed artifacts (menu, about, wine text) | `derived_signals` (cuisine_posture, service_model, price_tier, wine_program, personality, signature_dishes) | ~$0.001/entity (Claude Haiku) | Needs 50+ chars input |
+| 6 | Website enrichment | `run-website-enrichment.ts` | Website HTML | `merchant_signals` + `entities` (menu_url, reservation_url, category, cuisine) | ~$0.002-0.005/entity (Claude) | Also writes `merchant_enrichment_runs` |
+| 7 | Tagline generation (AI) | `generate-taglines-v2.ts` | Identity signals + entity data | `interpretation_cache` (TAGLINE, candidates) | ~$0.0008/entity (Claude) | Requires stage 5 output |
+
+**Total pipeline cost per entity: ~$0.012-0.020** (dominated by Google Places)
+
+### Standalone Tools
+
+| Tool | npm script | Source | Writes To | Cost |
+|------|-----------|--------|-----------|------|
+| Instagram ingestion | `ingest:instagram` | Meta Graph API | `instagram_accounts`, `instagram_media` | Free (rate-limited) |
+| Google Place ID backfill | `backfill:google-place-ids` | Google Places Text Search | `entities.googlePlaceId` | ~$0.007/entity |
+| Website backfill from Google | `backfill:websites` | Google Places Details | `entities.website` | ~$0.007/entity |
+| Address backfill | `backfill:entities-address` | Google Places Details | `entities.address` | ~$0.007/entity |
+| Neighborhood backfill | `backfill:neighborhood` | Google Places address_components | `entities.neighborhood` | ~$0.007/entity |
+| Google attrs backfill | `backfill:google-attrs` | Google Places API | `entities.googlePlacesAttributes` | ~$0.02/entity |
+| Instagram handle extraction | `backfill:instagram-handles` | Parsed merchant_surfaces | `entities.instagram` | Free |
+| Confidence scoring | `backfill:confidence` | Multi-source analysis | `entities.confidence` | Free |
+| Energy + tag engine | `backfill:energy-tag` | Existing signals | `energy_scores`, `place_tag_scores` | Free |
+| Issue scanner | (built into pipeline) | All entity fields | `entity_issues` | Free |
+
+### Admin API Endpoints
+
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/api/admin/enrich/[slug]` | POST | Trigger single-entity pipeline (background) |
+| `/api/admin/enrich/[slug]` | GET | Poll enrichment progress (stage 1-7, done flag) |
+| `/api/admin/tools/enrich-stage` | POST | Re-run specific stage or resume from stage |
+
+---
+
+## 2. Fully Enriched Entity — the Benchmark
+
+Definition of "done" varies by `primary_vertical`. A restaurant (EAT) is the
+most demanding. Other verticals (COFFEE, SHOP, STAY) require subsets.
+
+### EAT Entity — Complete Profile
+
+**Identity-critical** (required for publication):
+- `name` — sanctioned via Fields v2
+- `latitude`, `longitude` — from Google Places or intake CSV
+- `google_place_id` — optional but strongly preferred (taco carts may lack)
+- `address` — from Google Places or website
+
+**Operational** (expected for quality):
+- `neighborhood` — from Google Places address_components
+- `phone` — from Google Places or website
+- `website` — from intake or Google Places
+- `hours` — from Google Places or website
+- `instagram` — from website scrape or manual entry
+- `tiktok` — from website scrape or manual entry
+- `price_level` — from Google Places
+- `reservation_url` — from website enrichment (Stage 6)
+- `menu_url` — from website enrichment (Stage 6)
+- `category` + `cuisine_type` — from website enrichment (Stage 6)
+
+**Content** (differentiating):
+- `derived_signals.identity_signals` — from AI extraction (Stage 5)
+- `interpretation_cache.TAGLINE` — from AI generation (Stage 7)
+- `description` — from editorial source, website, or synthesis
+
+**Convenience / display**:
+- `google_photos` — from Google Places
+- `merchant_signals` — menu/reservation/ordering URLs + providers
+- `energy_scores` + `place_tag_scores` — computed from signals
+
+**Fully enriched** in pipeline terms = `interpretation_cache` has a `TAGLINE`
+row with `is_current=true`. The pipeline auto-clears `needs_human_review` when
+this exists.
+
+### Other Verticals — Reduced Playbooks
+
+| Vertical | Drops compared to EAT |
+|----------|----------------------|
+| COFFEE | No reservation_url, no menu_url usually, no cuisine_type |
+| SHOP | No menu_url, no reservation_url, no hours requirement relaxed |
+| STAY | No menu_url, reservation_url = booking link, no cuisine_type |
+| CULTURE | No menu_url, no reservation_url, no cuisine_type |
+
+---
+
+## 3. Common Gaps (ranked by frequency)
+
+Based on the issue scanner rules (`lib/coverage/issue-scanner.ts`) and the
+existing enrichment stats, the most frequent gaps for under-enriched entities:
+
+| Rank | Gap | Issue Type | Problem Class | Blocking? | Tool to Fix |
+|------|-----|-----------|---------------|-----------|-------------|
+| 1 | No enrichment run at all | `enrichment_incomplete` | identity | Yes | `enrich:batch` (stages 2-7) |
+| 2 | Missing neighborhood | `missing_neighborhood` | location | No | Stage 1 (Google) or `backfill:neighborhood` |
+| 3 | Missing hours | `missing_hours` | location | No | Stage 1 (Google Places) |
+| 4 | Missing phone | `missing_phone` | contact | No | Stage 1 (Google Places) |
+| 5 | Missing Instagram | `missing_instagram` | social | No | `backfill:instagram-handles` (from surfaces) or manual |
+| 6 | Missing TikTok | `missing_tiktok` | social | No | Manual or social discovery |
+| 7 | Missing price level | `missing_price_level` | location | No | Stage 1 (Google Places) or Stage 5 (AI inference) |
+| 8 | Missing GPID | `missing_gpid` | identity | No | `backfill:google-place-ids` |
+| 9 | Missing menu link | `missing_menu_link` | location | No | Stage 6 (website enrichment) |
+| 10 | Missing reservation link | `missing_reservations` | location | No | Stage 6 (website enrichment) |
+| 11 | Missing website | `missing_website` | contact | No | `backfill:websites` (from Google) or manual |
+| 12 | Missing coords | `missing_coords` | location | Yes | Stage 1 (Google Places) |
+| 13 | Unresolved identity | `unresolved_identity` | identity | Yes | Manual review |
+| 14 | Google says closed | `google_says_closed` | identity | Yes | Manual verification |
+
+### The Two Populations
+
+1. **Has website (~80% of entities)** — full pipeline (stages 2-7) can run
+   autonomously. Google Places (stage 1) is the only paid step and is optional
+   if coords/address already exist from intake.
+
+2. **No website (~20% of entities)** — parks, markets, street vendors, civic
+   venues. Need Google Places for identity, then social discovery or manual
+   enrichment. Pipeline stages 2-7 will skip (no website to crawl).
+
+---
+
+## 4. Execution Sequence — the Playbook
+
+### Pre-flight Checklist
+
+Before running enrichment on a new city:
+
+1. **Entities ingested** — all entities in `entities` table with at least
+   `name`, `slug`, `primary_vertical`. Ideally `website` and/or
+   `googlePlaceId` from intake CSVs.
+2. **Source registry populated** — `source_registry` has entries for all
+   sources you'll use (google_places, website_crawl, editorial_*, etc.)
+3. **Attribute registry populated** — `attribute_registry` has all attribute
+   keys with sanction thresholds
+4. **API keys set** — `GOOGLE_PLACES_API_KEY`, `ANTHROPIC_API_KEY`,
+   `INSTAGRAM_ACCESS_TOKEN` (if social enrichment needed)
+5. **Dry run** — run `npm run enrich:place -- --batch=5 --dry-run` to verify
+   pipeline connectivity
+
+### Phase 1: Free Website Enrichment (stages 2-7, no Google)
+
+**Scope:** All entities with `website != null` and `last_enriched_at = null`.
+**Cost:** ~$0.004/entity (AI stages only).
+**Expected coverage:** 70-80% of entities.
+
+```bash
+# Start small to validate
+npm run enrich:place -- --batch=10 --concurrency=3
+
+# Scale up
+npm run enrich:place -- --batch=50 --concurrency=5
+
+# Full run (all remaining with websites)
+npm run enrich:place -- --batch=500 --concurrency=5
+```
+
+The pipeline defaults to `--from=2` (skips Google Places). Each entity runs
+stages 2-7 sequentially. Idempotent — safe to re-run. Failed entities can be
+resumed with `--from=N`.
+
+**What this produces per entity:**
+- `merchant_surfaces` with discovered URLs
+- `merchant_surface_artifacts` with parsed text
+- `derived_signals.identity_signals` (cuisine, personality, service model)
+- `merchant_signals` (menu_url, reservation_url, category)
+- `interpretation_cache.TAGLINE` (if enough content for AI)
+
+**Post-phase check:**
+```bash
+npx tsx scripts/enrichment-stats.ts
+```
+
+### Phase 2: Instagram Handle Discovery (free)
+
+**Scope:** Entities where `instagram = null` but surfaces found Instagram links.
+**Cost:** Free.
+
+```bash
+npm run backfill:instagram-handles
+```
+
+This extracts Instagram handles from already-fetched website surfaces. No API
+calls — pure DB + string parsing.
+
+### Phase 3: Instagram Content Ingestion (free, rate-limited)
+
+**Scope:** Entities with `instagram != null` but no `instagram_accounts` row.
+**Cost:** Free (Meta rate limits apply).
+
+```bash
+npm run ingest:instagram -- --batch
+```
+
+Rate limited by Meta (~200-3000 calls/hour). Use `--batch` to process all
+entities with Instagram handles. Writes account metadata + recent media.
+
+### Phase 4: Google Places — Gap Fill (paid, targeted)
+
+**Scope:** Entities still missing critical fields (coords, address,
+neighborhood, hours, phone) after free enrichment.
+**Cost:** ~$0.007/entity.
+
+```bash
+# Only entities never cached
+npm run backfill:google -- --limit=100 --batch=25
+
+# Or within the pipeline
+npm run enrich:place -- --batch=50 --include-google --concurrency=3
+```
+
+**Strategic targeting** — don't run Google on everything. Target:
+1. Entities with `missing_coords` issues (blocking publication)
+2. Entities with `missing_neighborhood` (quality gap)
+3. Entities with `missing_hours` (quality gap)
+4. Entities with no website (Google is the only identity source)
+
+**Cost estimate for 1,000 entities:** ~$7-10 (not all need it; many already
+have coords from intake CSVs).
+
+### Phase 5: Confidence + Derived Scores (free, compute-only)
+
+**Scope:** All enriched entities.
+**Cost:** Free.
+
+```bash
+npm run backfill:confidence
+npm run backfill:energy-tag
+```
+
+Recomputes multi-source confidence scoring and energy/tag scores from
+existing signals. No API calls.
+
+### Phase 6: Issue Scan + Manual Triage
+
+**Scope:** Remaining open issues.
+**Cost:** Free (operator time).
+
+The enrichment pipeline auto-runs the issue scanner after each entity. After
+bulk enrichment, review the coverage ops dashboard at `/admin/coverage-ops`:
+
+1. **Blocking issues** — `unresolved_identity`, `missing_coords`,
+   `google_says_closed`. Must resolve before publication.
+2. **Quality issues** — `missing_neighborhood`, `missing_hours`, etc. Reduce
+   quality score but don't block.
+3. **Social gaps** — `missing_instagram`, `missing_tiktok`. May require
+   manual research.
+
+### Phase 7: Re-run Failed / Held Entities
+
+**Scope:** Entities where pipeline failed or content was too sparse for AI.
+**Cost:** Varies.
+
+```bash
+# Find entities stuck at a stage
+# enrichment_stage column shows last completed stage
+
+# Re-run from failure point
+npm run enrich:place -- --slug=<slug> --from=<failed_stage>
+
+# Force re-process (bypass skip checks)
+npm run enrich:place -- --slug=<slug> --force
+```
+
+---
+
+## 5. Cost Summary for 1,000 Entities
+
+| Phase | Entities | Cost/Entity | Total | Notes |
+|-------|----------|-------------|-------|-------|
+| 1. Website enrichment (AI stages) | ~800 | $0.004 | ~$3.20 | 80% have websites |
+| 2. Instagram handle extraction | ~800 | $0 | $0 | Free (parse surfaces) |
+| 3. Instagram content ingestion | ~400 | $0 | $0 | Free (rate-limited) |
+| 4. Google Places gap fill | ~500 | $0.007 | ~$3.50 | Targeted, not all |
+| 5. Confidence + energy | ~1000 | $0 | $0 | Free compute |
+| **Total** | | | **~$6.70** | |
+
+**Per-city launch cost: ~$5-10 for 1,000 entities.** The dominant cost is
+Google Places API, used only for gap-fill, not as default.
+
+---
+
+## 6. Monitoring & Observability
+
+### During Runs
+
+- **Logs:** `data/logs/enrich-<slug>-<timestamp>.log` per entity
+- **Progress:** `entities.enrichment_stage` (1-7), `entities.last_enriched_at`
+- **Admin API:** `GET /api/admin/enrich/<slug>` returns current stage + done flag
+- **Cost tracking:** `merchant_enrichment_runs.cost_usd` per extraction
+
+### After Runs
+
+```bash
+# Pipeline status breakdown
+npx tsx scripts/enrichment-stats.ts
+
+# Issue summary
+# → Coverage ops dashboard at /admin/coverage-ops
+```
+
+### Key Metrics to Track
+
+| Metric | Target | How to Check |
+|--------|--------|-------------|
+| Entities with TAGLINE | >70% of total | `interpretation_cache` count |
+| Entities with website | >80% | `entities.website IS NOT NULL` count |
+| Entities with GPID | >70% | `entities.googlePlaceId IS NOT NULL` count |
+| Entities with identity_signals | >60% | `derived_signals` count |
+| Blocking issues | 0 | `entity_issues` where `blocking_publish=true` |
+| Average entity cost | <$0.015 | `merchant_enrichment_runs` aggregate |
+
+---
+
+## 7. New City Checklist
+
+When launching a new city, run this checklist:
+
+- [ ] Intake CSVs ingested (`npm run intake`)
+- [ ] Entity types + verticals assigned
+- [ ] Dedup pass run (check for intake duplicates)
+- [ ] Source registry verified for city-specific sources
+- [ ] Run Phase 1: website enrichment batch
+- [ ] Run Phase 2: Instagram handle extraction
+- [ ] Run Phase 3: Instagram content ingestion
+- [ ] Check enrichment stats — identify remaining gaps
+- [ ] Run Phase 4: targeted Google Places for gaps
+- [ ] Run Phase 5: confidence + energy scoring
+- [ ] Review Phase 6: triage blocking issues
+- [ ] Run Phase 7: retry failed entities
+- [ ] Final enrichment stats — verify >70% TAGLINE coverage
+- [ ] Publish ready entities to maps
+
+---
+
+## 8. Known Limitations & Future Work
+
+### Current Limitations
+
+1. **No-website entities** — stages 2-7 require a website. ~20% of entities
+   (parks, markets, carts) need alternative enrichment paths (Google-only,
+   Instagram-only, or manual).
+
+2. **Tagline not wired to API** — `interpretation_cache.TAGLINE` exists but
+   the API route (`/api/places/[slug]`) still reads `entities.tagline`.
+   Needs migration to read from `interpretation_cache`.
+
+3. **TikTok ingestion** — field exists in schema but no automated ingestion
+   script yet (unlike Instagram).
+
+4. **Editorial coverage pipeline** — editorial sources (Eater, Michelin, etc.)
+   are tracked in `coverage_sources` and `editorialSources` but automated
+   crawl/extraction is not yet built.
+
+5. **Stage 5 sparse content** — entities with <50 chars of parseable text
+   from surfaces produce "hold"-tier confidence and skip signal extraction.
+
+### Future Enhancements
+
+- Batch resume from last failure (currently manual `--from=N`)
+- Parallel stage execution where safe (stages 5+6 could run concurrently)
+- TikTok API ingestion script (mirror Instagram pattern)
+- Editorial discovery + extraction pipeline
+- Auto-retry with exponential backoff for transient failures
+- Cost reporting dashboard in admin UI
+
+---
+
 ## OPS-STALE-DEPLOYMENTS
 
 | Field | Value |
@@ -9910,6 +11209,20 @@ LOCAL ONLY                DB ONLY                     SHARED (both)
 
 ---
 
+## ARCHITECTURE-FIELDS-INGESTION-PIPELINE-V1
+
+| Field | Value |
+|-------|-------|
+| **Type** | document |
+| **Status** | active |
+| **Project** | SAIKO |
+| **Path** | `docs/architecture/fields-ingestion-pipeline-v1.md` |
+| **Last Updated** | 2026-03-16 |
+
+
+
+---
+
 ## SAIKO-ADMIN-SPRING-CLEANING-2026-03
 
 | Field | Value |
@@ -10906,6 +12219,776 @@ Signal sets locked for v1:
 **Coffee / Tea:** `coffee_program`, `espresso_program`, `specialty_coffee_presence`, `tea_program`, `specialty_tea_presence`, `matcha_program`, `bubble_tea_program`, `bubble_tea_chain`, `tea_house_structure`, `afternoon_tea_service`, `arabic_coffee_program`
 
 Maturity scale locked: `none`, `incidental`, `considered`, `dedicated`, `unknown`
+
+---
+
+## SAIKO-FIELDS-IDENTITY-VERIFICATION-2026-03
+
+| Field | Value |
+|-------|-------|
+| **Type** | verification |
+| **Status** | active |
+| **Project** | SAIKO |
+| **Path** | `docs/architecture/place-identity-implementation-verification-2026-03.md` |
+| **Last Updated** | Sun Mar 15 2026 17:00:00 GMT-0700 (Pacific Daylight Time) |
+| **Summary** | Repository and Neon DB verification snapshot for place identity implementation state as of 2026-03. |
+| **Systems** | fields-data-layer, entity-resolution |
+
+# Place Identity - Implementation Verification
+
+**Document ID:** SAIKO-FIELDS-IDENTITY-VERIFICATION-2026-03  
+**Layer:** Architecture Verification  
+**Status:** Active  
+**Verified Against:** Repo + Neon DB
+
+---
+
+## Purpose
+
+This document records the current implementation state of Place Identity relative to the architecture documents.
+
+---
+
+## Confirmed Identity Fields in `entities`
+
+Core fields:
+
+- `id`
+- `slug`
+- `name`
+- `status`
+- `neighborhood`
+- `google_place_id`
+- `website`
+- `enrichment_stage`
+- `last_enriched_at`
+
+Identity-adjacent:
+
+- `address`
+- `latitude`
+- `longitude`
+- `instagram`
+- `tiktok`
+- `tagline`
+
+---
+
+## Fields Referenced in Architecture but Missing
+
+- `instagram_handle`
+- `website_domain`
+- `cuisine_posture`
+- `service_model`
+- `entity_tagline`
+- `successor_of`
+- `predecessor_of`
+- `identity_note`
+
+---
+
+## Naming Differences
+
+| Concept | Schema |
+|---|---|
+| instagram_handle | instagram |
+| googlePlaceId | google_place_id |
+| coordinates | latitude + longitude |
+| entity_tagline | tagline |
+
+---
+
+## Lifecycle Status Enum
+
+Schema enum:
+
+- OPEN
+- CLOSED
+- PERMANENTLY_CLOSED
+- CANDIDATE
+
+Current DB counts:
+
+- OPEN - 323
+- CANDIDATE - 288
+- CLOSED - 1
+
+Not implemented:
+
+- PUBLISHED
+- TEMP_CLOSED
+
+---
+
+## Identity Anchor Constraints
+
+Existing:
+
+- `google_place_id` unique
+- `slug` unique
+
+Missing:
+
+- `instagram` uniqueness
+- `website` uniqueness
+
+---
+
+## Resolver Thresholds in Code
+
+Active:
+
+- `NAME_SIMILARITY_THRESHOLD` ~= 0.85
+- `NEARBY_RADIUS` ~= 200m
+
+`90/70` thresholds appear only in a backup script.
+
+---
+
+## Canonical vs Source Separation
+
+Source tables:
+
+- `observed_claims`
+- `source_registry`
+
+Canonical tables:
+
+- `canonical_entity_state`
+- `canonical_sanctions`
+
+The `entities` table still contains mixed operational fields.
+
+---
+
+## SKAI-DOC-FIELDS-ATOMIC-SIGNALS-001
+
+| Field | Value |
+|-------|-------|
+| **Type** | architecture |
+| **Status** | active |
+| **Project** | saiko-fields |
+| **Path** | `docs/architecture/atomic-cultural-signals-v1.md` |
+| **Last Updated** | Sun Mar 15 2026 17:00:00 GMT-0700 (Pacific Daylight Time) |
+| **Summary** | Defines the atomic cultural signal model used to structure place data in Saiko Fields. |
+| **Systems** | Fields, TRACES |
+
+# Atomic Cultural Signals
+
+**Document ID:** SKAI-DOC-FIELDS-ATOMIC-SIGNALS-001  
+**System:** Fields / TRACES  
+**Layer:** Architecture  
+**Status:** Active  
+**Owner:** Bobby
+
+---
+
+## Purpose
+
+This document defines the Atomic Cultural Signal model used by Saiko Fields.
+
+Atomic Cultural Signals are the smallest structured observations about a place.
+They are the foundation of identity resolution, enrichment, and downstream interpretation.
+
+---
+
+## System Position
+
+Core architecture flow:
+
+Real world observations  
+-> Atomic Cultural Signals (Fields)  
+-> Identity Resolution (Fields)  
+-> Canonical Entity (Fields)  
+-> Derived Signals (Fields)  
+-> Cultural Interpretation (TRACES)
+
+Atomic signals sit between source observations and identity resolution.
+
+---
+
+## What Atomic Signals Are
+
+Atomic signals are:
+
+- **observable** - grounded in evidence
+- **structured** - represented in typed fields
+- **sourceable** - attributable to a source
+- **durable** - retained as data truth
+- **non-interpretive** - they describe what is observed, not what it means
+
+Examples:
+
+- `primary_vertical = EAT`
+- `neighborhood = Silver Lake`
+- `reservable = true`
+- `cuisine = Taiwanese`
+- `natural_wine = true`
+
+---
+
+## Structural Properties
+
+Atomic signals are designed to be:
+
+- composable across many sources
+- independently verifiable
+- stable under ingestion reruns
+- suitable for identity matching and confidence scoring
+
+Atomic signals are not narrative output and are not ranking artifacts.
+
+---
+
+## Atomic vs Derived vs Interpretation
+
+### Atomic Signals (Fields)
+
+Atomic signals are raw structured observations.
+
+### Derived Signals (Fields)
+
+Derived signals are computed from atomic signals and canonical entity state.
+They remain structured data.
+
+Examples:
+
+- confidence levels
+- completeness flags
+- feature scores
+
+### Cultural Interpretation (TRACES)
+
+Interpretation is human-readable cultural meaning generated from structured inputs.
+It is downstream of both atomic and derived signals.
+
+Examples:
+
+- identity language
+- scene summaries
+- intent-oriented discovery framing
+
+---
+
+## Fields vs TRACES Responsibilities
+
+| Concern | Owner |
+|---|---|
+| Source observation ingestion | Fields |
+| Atomic signal definition and storage | Fields |
+| Identity resolution | Fields |
+| Canonical entity state | Fields |
+| Derived signal computation | Fields |
+| Cultural interpretation output | TRACES |
+
+Fields structures and governs signals.  
+TRACES interprets structured signals.
+
+---
+
+## Non-Goals
+
+Atomic Cultural Signals are not:
+
+- external platform truth authority
+- direct user-facing narrative copy
+- model interpretation output
+- a replacement for canonical entity governance
+
+---
+
+## Summary
+
+Atomic Cultural Signals are the durable, sourceable, non-interpretive data layer
+that allows Saiko to move from observations to identity, then to interpretation.
+
+---
+
+## SKAI-DOC-FIELDS-DATA-LAYER-CONTRACT-001
+
+| Field | Value |
+|-------|-------|
+| **Type** | architecture |
+| **Status** | active |
+| **Project** | saiko-fields |
+| **Path** | `docs/architecture/data-layer-contract-v1.md` |
+| **Last Updated** | Sun Mar 15 2026 17:00:00 GMT-0700 (Pacific Daylight Time) |
+| **Summary** | Defines architectural boundaries and data access rules between the Saiko Data Layer, Fields platform, and TRACES consumer product. |
+| **Systems** | Fields, TRACES |
+
+# Data Layer Contract
+
+**Document ID:** SKAI-DOC-FIELDS-DATA-LAYER-CONTRACT-001  
+**System:** Fields / TRACES  
+**Layer:** Architecture  
+**Status:** Active  
+**Owner:** Bobby
+
+---
+
+## Overview
+
+This document defines strict architectural boundaries between the Saiko Data Layer,
+the Fields platform, and the TRACES product.
+
+Its purpose is to prevent coupling, preserve data truth contracts, and ensure
+interpretation logic stays in the correct system layer.
+
+---
+
+## System Layers
+
+### Data Layer
+
+The canonical system-of-record layer for observed signals, identity resolution outputs,
+canonical entity state, and governed data contracts.
+
+### Fields Platform
+
+The operational platform layer that manages ingestion, signal normalization, identity
+resolution, sanctioning, and derived signal production.
+
+### TRACES Product
+
+The consumer-facing interpretation layer that reads structured canonical outputs and
+produces user-facing cultural understanding.
+
+---
+
+## Responsibilities of Each Layer
+
+| Layer | Responsibilities |
+|---|---|
+| Data Layer | Store canonical signals and identity state; enforce data truth contracts; provide canonical access surfaces. |
+| Fields Platform | Ingest evidence; produce atomic and derived signals; resolve identity; maintain canonical state integrity. |
+| TRACES Product | Consume canonical data; perform interpretation services; render product experiences and language. |
+
+---
+
+## Data Ownership Rules
+
+1. Fields owns canonical signals and identity state.
+2. Fields is the system of record for signals and identity.
+3. TRACES does not own source signal truth; it owns interpretation outputs.
+4. Product-facing interpretations must be derived from canonical data contracts, not ad hoc raw source reads.
+
+---
+
+## Access Rules
+
+1. Products must not read raw ingestion tables.
+2. Products must read from canonical entity state or product APIs.
+3. Downstream consumers must treat product APIs and canonical views as the only supported interfaces.
+4. Any new consumer path must be contract-defined before adoption.
+
+---
+
+## Forbidden Patterns
+
+- Reading ingestion/raw evidence tables directly from product code.
+- Re-implementing identity resolution rules inside product services or UI.
+- Interpreting raw signals directly in UI components.
+- Embedding interpretation heuristics in frontend rendering logic.
+- Allowing TRACES to mutate canonical signal truth.
+
+---
+
+## Examples
+
+### Allowed
+
+- TRACES service reads canonical entity state and derived signals through approved data access surfaces.
+- Product API exposes stable fields consumed by product clients.
+- Fields pipeline writes normalized atomic/derived signals to canonical storage.
+
+### Not Allowed
+
+- UI code reads raw ingestion rows and decides whether a place is identity-complete.
+- Frontend computes narrative interpretation from low-level signal fragments.
+- Product service bypasses canonical contracts and queries raw source tables directly.
+
+---
+
+## Architectural Rules (Normative)
+
+1. Products must not read raw ingestion tables.
+2. Products must read from canonical entity state or product APIs.
+3. Signals must not be interpreted inside UI code.
+4. Interpretation logic belongs in TRACES services.
+5. Fields is the system of record for signals and identity.
+
+---
+
+## SKAI-DOC-FIELDS-DERIVED-SIGNALS-ENGINE-001
+
+| Field | Value |
+|-------|-------|
+| **Type** | architecture |
+| **Status** | active |
+| **Project** | saiko-fields |
+| **Path** | `docs/architecture/derived-signals-engine-v1.md` |
+| **Last Updated** | Sun Mar 15 2026 17:00:00 GMT-0700 (Pacific Daylight Time) |
+| **Summary** | Defines how derived signals are computed, governed, versioned, and exposed within the Saiko Fields system. |
+| **Systems** | Fields, TRACES |
+
+# Derived Signals Engine
+
+**Document ID:** SKAI-DOC-FIELDS-DERIVED-SIGNALS-ENGINE-001  
+**System:** Fields / TRACES  
+**Layer:** Architecture  
+**Status:** Active  
+**Owner:** Bobby
+
+---
+
+## Overview
+
+The Derived Signals Engine defines how Saiko Fields computes structured derived outputs
+from canonical data inputs.
+
+This document specifies computation contracts, ownership boundaries, explainability
+requirements, versioning expectations, and exposure rules for derived signals.
+
+---
+
+## What a Derived Signal Is
+
+A derived signal is a computed output, not a raw observation.
+
+Derived signals are produced by applying explicit derivation logic to one or more
+trusted inputs.
+
+Derived signals remain structured system data. They are not user-facing interpretation.
+
+---
+
+## Relationship to Atomic Signals
+
+Atomic signals are source-grounded, non-interpretive observations.
+
+Derived signals may consume atomic signals as core inputs and transform them into
+higher-order structured outputs used for ranking, routing, decision support, or
+interpretation inputs.
+
+Atomic signals remain canonical observation truth; derived signals are computed layers
+above that truth.
+
+---
+
+## Relationship to Canonical Entity State
+
+Derived signals may use:
+
+- atomic signals
+- canonical entity state
+- sanctioned canonical decisions
+
+Canonical entity state provides resolved, sanctioned context that allows derivation
+logic to run on consistent entity truth rather than raw or conflicting evidence.
+
+---
+
+## Computation Rules
+
+1. Every derived signal must define explicit derivation logic.
+2. Inputs must be contract-defined and traceable.
+3. Output type must be deterministic and registry-defined.
+4. Derivation logic must operate on canonicalized inputs, not uncontrolled raw ingestion reads.
+5. Computation should be stable under reruns for the same input state and version.
+
+---
+
+## Ownership and Layer Boundaries
+
+| Concern | Owner |
+|---|---|
+| Derived signal definition | Fields |
+| Derived signal computation | Fields |
+| Registry and governance for derived signals | Fields |
+| Interpretation consumption of derived signals | TRACES |
+
+Fields owns derived-signal truth contracts.
+TRACES may consume derived signals for interpretation, but does not define raw derived-signal truth.
+
+---
+
+## Versioning Rules
+
+Derived signals must be versionable when formulas materially change.
+
+Material change examples:
+
+- changed weighting model
+- changed required inputs
+- changed score normalization behavior
+- changed classification thresholds
+
+Version updates should preserve backward auditability and allow historical interpretation
+to be traced to the derivation version used at compute time.
+
+---
+
+## Explainability Rules
+
+Every derived signal must be explainable back to:
+
+- input signals/state used
+- derivation logic applied
+- output produced
+
+Explainability requirements:
+
+1. Inputs are named and contract-defined.
+2. Derivation logic is documented at a high level.
+3. Output semantics are explicit.
+4. Ownership is explicit.
+
+---
+
+## Exposure Rules
+
+1. Derived signals are exposed as structured data through canonical data surfaces.
+2. Consumer products should read derived signals through canonical entity state or product APIs.
+3. Derived signals should not be transformed into interpretation inside UI code.
+4. Interpretation logic remains a TRACES service concern.
+
+---
+
+## Example Derived Signals
+
+### `scene_energy`
+
+- `signal_id`: `scene_energy`
+- `input_signals`: temporal activity indicators, social/activity-related atomic signals, canonical context fields
+- `derivation_logic`: weighted aggregation of activity and context indicators into normalized energy score
+- `output_type`: `numeric (0.0-1.0)`
+- `owner_system`: `Fields`
+
+### `date_night_probability`
+
+- `signal_id`: `date_night_probability`
+- `input_signals`: ambiance-related atomic signals, reservation posture, canonical category/context fields
+- `derivation_logic`: model-based probability score from relevant romantic/occasion-oriented indicators
+- `output_type`: `numeric (0.0-1.0)`
+- `owner_system`: `Fields`
+
+### `wine_program_strength`
+
+- `signal_id`: `wine_program_strength`
+- `input_signals`: beverage-related atomic signals, menu/wine list indicators, canonical offering context
+- `derivation_logic`: weighted scoring of wine-focused indicators into strength band/score
+- `output_type`: `numeric or enum (contract-defined)`
+- `owner_system`: `Fields`
+
+---
+
+## Future Evolution
+
+The Derived Signals Engine is expected to evolve with:
+
+- stronger per-signal version metadata
+- richer lineage capture between inputs and outputs
+- expanded explainability artifacts for operator tooling
+- tighter contract integration with Signals Registry governance
+
+Future evolution must preserve the core contract:
+derived signals are structured, explainable, versionable computations owned by Fields,
+and consumed by TRACES for interpretation.
+
+---
+
+## SKAI-DOC-FIELDS-SIGNALS-REGISTRY-001
+
+| Field | Value |
+|-------|-------|
+| **Type** | architecture |
+| **Status** | active |
+| **Project** | saiko-fields |
+| **Path** | `docs/architecture/signals-registry-v1.md` |
+| **Last Updated** | Sun Mar 15 2026 17:00:00 GMT-0700 (Pacific Daylight Time) |
+| **Summary** | Defines how atomic and derived cultural signals are formally structured and governed within the Saiko Fields system. |
+| **Systems** | Fields, TRACES |
+
+# Signals Registry
+
+**Document ID:** SKAI-DOC-FIELDS-SIGNALS-REGISTRY-001  
+**System:** Fields / TRACES  
+**Layer:** Architecture  
+**Status:** Active  
+**Owner:** Bobby
+
+---
+
+## Overview
+
+The Signals Registry is the canonical specification layer for all formal signals in Saiko Fields.
+
+It defines how signals are named, typed, governed, and consumed across the system.
+This includes both atomic signals and derived signals.
+
+The registry operationalizes the signal model defined in `SKAI-DOC-FIELDS-ATOMIC-SIGNALS-001`.
+
+---
+
+## Why Signals Need a Registry
+
+Without a formal registry, signals drift across ingestion, identity, enrichment, and interpretation layers.
+Different teams can reuse the same signal name with conflicting meaning, or introduce duplicate signals
+with inconsistent structure.
+
+A registry is required to ensure:
+
+- shared signal semantics across Fields and TRACES
+- strict type and value consistency
+- stable ownership and governance
+- clear lineage from source observation to interpretation
+- safe evolution over time without architecture drift
+
+---
+
+## Signal Definition Structure
+
+Every registered signal must define the following fields:
+
+- `signal_id`
+- `signal_type` (`atomic` | `derived`)
+- `data_type` (`boolean`, `enum`, `numeric`, `text`, etc.)
+- `allowed_values`
+- `source_type` (`google`, `editorial`, `ingestion`, `derived`)
+- `derivation_logic` (required for derived signals)
+- `owner_system` (`Fields` | `TRACES`)
+- `created_at`
+- `last_updated`
+- `description`
+
+This structure is the minimum canonical contract for signal registration.
+
+---
+
+## Atomic vs Derived Signals
+
+### Atomic Signals
+
+Atomic signals are observable, sourceable, structured facts captured from evidence.
+They are non-interpretive and owned by Fields.
+
+Examples:
+
+- `reservable`
+- `serves_dinner`
+- `primary_vertical`
+
+### Derived Signals
+
+Derived signals are computed from atomic signals and canonical state.
+They remain structured, but include explicit derivation logic and lineage.
+
+Examples:
+
+- `scene_energy`
+- confidence/completeness flags
+- routing or scoring features
+
+Interpretation layers consume atomic and derived signals, but interpretation itself is not a signal type.
+
+---
+
+## Signal Ownership
+
+Ownership is set per signal definition and governs change authority.
+
+| Signal concern | Owner system |
+|---|---|
+| Atomic signal definition and structure | Fields |
+| Derived signal computation contract | Fields |
+| Interpretation usage and narrative rendering | TRACES |
+| Registry governance and canonical definitions | Fields (with TRACES alignment for interpretation-facing signals) |
+
+TRACES does not redefine atomic semantics.
+TRACES consumes registry-defined signals for interpretation outputs.
+
+---
+
+## Signal Lifecycle
+
+Signals move through controlled lifecycle states:
+
+1. **Proposed** - candidate definition drafted
+2. **Registered** - definition approved and entered in registry
+3. **Active** - used by system contracts
+4. **Deprecated** - retained for compatibility, no new dependencies
+5. **Archived** - removed from active use, preserved for history
+
+Lifecycle transitions require governance review and backward-compatibility checks.
+
+---
+
+## Signal Governance Rules
+
+1. Every active signal must have a unique `signal_id`.
+2. Every signal must declare `signal_type`, `data_type`, and `owner_system`.
+3. `allowed_values` must be explicit for enum-like or constrained signals.
+4. Derived signals must define `derivation_logic`.
+5. New signals cannot silently redefine an existing signal's meaning.
+6. Changes to active signal semantics require versioned change review.
+7. Interpretation layers may consume signals but cannot alter registry truth contracts.
+
+---
+
+## Example Signal Definitions
+
+### `serves_dinner`
+
+- `signal_id`: `serves_dinner`
+- `signal_type`: `atomic`
+- `data_type`: `boolean`
+- `allowed_values`: `true | false`
+- `source_type`: `ingestion`
+- `derivation_logic`: `null`
+- `owner_system`: `Fields`
+- `created_at`: `2026-03-16`
+- `last_updated`: `2026-03-16`
+- `description`: Indicates whether the place is observed to serve dinner.
+
+### `reservable`
+
+- `signal_id`: `reservable`
+- `signal_type`: `atomic`
+- `data_type`: `boolean`
+- `allowed_values`: `true | false`
+- `source_type`: `google`
+- `derivation_logic`: `null`
+- `owner_system`: `Fields`
+- `created_at`: `2026-03-16`
+- `last_updated`: `2026-03-16`
+- `description`: Indicates whether reservations are supported by the place.
+
+### `scene_energy`
+
+- `signal_id`: `scene_energy`
+- `signal_type`: `derived`
+- `data_type`: `numeric`
+- `allowed_values`: `0.0-1.0`
+- `source_type`: `derived`
+- `derivation_logic`: Computed from a weighted combination of atomic behavioral, temporal, and context signals.
+- `owner_system`: `Fields`
+- `created_at`: `2026-03-16`
+- `last_updated`: `2026-03-16`
+- `description`: Structured estimate of place energy level used by downstream interpretation and ranking layers.
+
+---
+
+## Future Evolution
+
+The Signals Registry is expected to evolve with:
+
+- typed validation policies per signal family
+- versioned registry snapshots
+- lineage references between derived and source signals
+- tighter contract links to identity and interpretation systems
+
+Future evolution must preserve the core principle:
+signal definitions are canonical data architecture contracts, not ad hoc feature-level metadata.
 
 ---
 
@@ -12225,12 +14308,226 @@ TRACES never stores signal data.
 
 ---
 
+## RES-CUISINE-TRADITIONS-V1
+
+| Field | Value |
+|-------|-------|
+| **Type** | research |
+| **Status** | active |
+| **Project** | TRACES |
+| **Path** | `docs/research/cuisine-traditions-signals-v1.md` |
+| **Last Updated** | 2026-03-16 |
+| **Summary** | Research synthesis on cuisine traditions as structured signals for the Offering Signals model |
+| **Systems** | offering-signals, scenesense |
+
+# Cuisine Traditions as Structured Signals
+
+## Overview
+
+The dominant paradigm for classifying restaurants — service level, price point, formality — is a Western fine dining framework. It describes one quadrant of the restaurant universe with precision and handles the rest poorly. For cuisines where restaurant identity is rooted in tradition, format, and cultural practice, this framework produces flat, uninformative outputs.
+
+This research synthesizes findings from editorial sources, academic restaurant taxonomy, industry classification systems, and food community discourse to propose a structured signal vocabulary for representing cuisine traditions in Saiko's Offering Signals model. The core proposal: four new signal types — `cuisine_tradition`, `food_format`, `restaurant_archetype`, and `regional_origin` — that encode what a place *is* from within its own cultural tradition, not from an external reference frame.
+
+## Findings
+
+### How Diners Actually Categorize Restaurants
+
+The restaurant industry's existing classification terms — "fast food," "fine dining," "casual upscale" — were developed without consideration for internal consistency, and new terms continue to emerge through consumer and trade media, creating ongoing confusion in restaurant taxonomy. Academic and industry systems alike tend to organize restaurants along two axes: service formality and price. This is useful for some things. It is not useful for explaining the difference between a tonkotsu ramen shop and a shoyu ramen counter, or between a Jalisco-style birrieria and a Sonoran taqueria, or between a Central Texas brisket pit and a Memphis rib joint.
+
+Real diners — as revealed by food communities, editorial coverage, and search behavior — categorize along entirely different axes:
+
+**By cooking technique or preparation tradition.** "Birria tacos" signals not just a dish but a whole production system: the consomme, the dipping ritual, the trompo or pot, the specific chile marriage. The preparation is the identity.
+
+**By regional origin.** Birria is not simply an ingredient — it is a preparation that can apply to multiple proteins, varying regionally across Jalisco, Michoacan, Zacatecas, and Colima. When someone says they want birria, they are invoking a regional school of cooking, not just a menu item. The same applies to Central Texas BBQ, Edomae sushi, and Neapolitan pizza — each phrase communicates a set of standards, methods, and expectations that no price tier or service style can convey.
+
+**By vessel and service format.** A ramen counter is not just "noodle soup." The counter, the single-item focus, the soup variants (tonkotsu, shoyu, miso, shio), the interaction style — these are definitional. Counter dining is one of the most traditional service styles in Japanese restaurants; guests sit directly in front of the chef and watch the food being prepared, and this format communicates culinary craftsmanship as much as the food itself.
+
+**By cultural practice embedded in the meal.** Omakase is a multi-course experience where the chef selects dishes from seasonal inspiration, the diner is usually seated at a counter directly in front of the chef, and the experience is deliberately paced to allow full appreciation of each course. This is not a service tier — it is a philosophical contract between diner and chef. Similarly, izakaya are informal gathering places that provide a relaxed atmosphere where diners share small dishes with drinks, an experience that is defined less by any single dish and more by its social role in Japanese culture.
+
+The key insight: for format-driven cuisines, the restaurant *is* the format. A birrieria is not a "casual Mexican restaurant that happens to serve birria." It is a birrieria. The format carries the identity.
+
+### Existing Taxonomy Systems and Their Gaps
+
+A review of how existing systems handle this reveals consistent limitations:
+
+**Yelp categories** flatten regional specificity into broad ethnic identifiers ("Mexican," "Japanese," "Chinese") with some secondary tags ("Ramen," "Sushi Bars," "Tacos"). They capture format when it maps neatly to a recognizable noun, but cannot distinguish between a Jalisco-style birrieria and a Sonoran taqueria, or between an Edomae sushi counter and a California roll sushi bar.
+
+**Michelin Guide** handles this in inverse fashion: it focuses on the top end of the tradition spectrum (kaiseki, omakase, Neapolitan-certified pizza, etc.) with richly nuanced language, but provides no structured vocabulary. Its intelligence lives in prose, not signals.
+
+**Wikipedia cuisine taxonomies** are the most structurally interesting reference. They organize along preparation method, region, and cultural context — much closer to how food communities actually think. The birria article, for example, distinguishes Jalisco-style vs. Tijuana beef birria vs. Michoacan lamb birria, and traces each variant's distinguishing characteristics.
+
+**OpenStreetMap** uses cuisine=* tags at a relatively coarse level (cuisine=ramen, cuisine=sushi, cuisine=bbq) that capture format when the food community has already codified it into a short noun.
+
+One scholar argues that all restaurants can be categorized along polar opposites — high or low, cheap or dear, familiar or exotic, formal or informal — and that any restaurant will be relatively high or low on each axis. This is elegant as a theoretical framework but operationally useless for distinguishing between restaurant types that share the same service tier, price range, and formality level but represent entirely different cultural traditions.
+
+The gap in all existing systems: none encodes *cuisine tradition* — the specific school of cooking, regional origin, preparation method, or cultural format that defines a restaurant's identity from the inside rather than the outside.
+
+### Cross-Cuisine Survey of Named Traditions
+
+**Japanese** — among the most format-codified cuisines in the world:
+- Ramen-ya: single-format noodle shop organized around broth style (tonkotsu, shoyu, shio, miso, tsukemen). The broth school is the primary identity signal.
+- Izakaya: Japanese pub format; shared small plates, strong drink program, late-night culture.
+- Sushi-ya / Edomae counter: chef-facing counter service, omakase-forward, rooted in Tokyo's Edo-period vinegar-fish tradition.
+- Yakitori-ya: charcoal skewer specialist; the grill is the whole identity.
+- Tempura-ya, tonkatsu-ya, soba-ya, udon-ya: each is a single-technique specialist with its own production grammar.
+- Kaiseki: multi-course seasonal haute cuisine. Formal, ritualized, seasonal sequencing.
+
+**Mexican** — highly regionalized, with dozens of named taco and preparation traditions:
+- Taqueria al pastor: defined by the trompo (vertical spit) and the specific Pueblan-Lebanese heritage of marinated pork.
+- Birrieria: Jalisco-origin slow-stewed meat (goat, beef) served with consomme; Tijuana beef variant is the US-dominant format with the consomme-dipping ritual.
+- Mariscos: Pacific coastal seafood program; aguachile, ceviche, seafood cocktails, pescado zarandeado. Nayarit and Sinaloa traditions.
+- Barbacoa (pit): weekend-only slow-pit beef head and cheek; South Texas tradition rooted in Mexican ranch food.
+- Taqueria de canasta: basket tacos; pre-steamed, low-price, street-portable.
+- Fonda regional: mom-and-pop regional restaurant defined by a specific state's cuisine (Oaxacan, Sinaloan, Jaliscan, Chilango).
+
+**American BBQ** — defined by primary protein, cooking method, fuel and wood, seasoning philosophy, sauce approach, and serving traditions:
+- Central Texas pit: brisket-forward, salt-and-pepper rub, post oak smoke, no sauce, butcher paper service, meat by the pound.
+- Carolina whole hog: vinegar-sauced pulled pork, wood pit, the whole hog as the statement.
+- Kansas City: wide protein range, thick molasses-tomato sauce, burnt ends as signature.
+- Memphis: pork ribs, wet vs. dry rub as the organizing debate, hickory smoke.
+
+**Chinese** — highly format-driven, organized by meal type and social format:
+- Dim sum house: cart or order-card service; shared small plates for groups; weekend morning ritual; specific vocabulary of dishes (har gow, siu mai, char siu bao, turnip cake).
+- Hot pot: communal cooking-at-the-table format; defined by broth base (Sichuan mala, clear broth, tomato) and ingredient array.
+- Peking duck house: specific to the roast duck ceremony, often with tableside carving.
+- Cantonese seafood restaurant: live tank selection, family-style large plates.
+
+**Italian** — regional school distinctions:
+- Neapolitan pizzeria: wood-fired, 00 flour, DOC tomatoes, certified by Associazione Verace Pizza Napoletana in the most serious cases.
+- Sicilian / Detroit / NY slice / Roman al taglio: each slice format carries its own tradition and production grammar.
+- Osteria vs. trattoria vs. ristorante: Italian restaurant taxonomy has a centuries-old internal classification that most US systems ignore.
+
+### Restaurant Archetypes (Cross-Cuisine)
+
+Separate from cuisine tradition, there is a layer of format archetypes that appear across cuisines and carry meaning independent of what's being cooked:
+
+**Counter specialist.** One technique, minimal menu, chef or cook in direct view. Ramen counter, sushi counter, yakitori stand, tamale counter. Identity defined by mastery of a single thing.
+
+**Street food stand / taqueria format.** Walk-up or window service, standing or minimal seating, high-volume, technique-focused. Taco stand, birrieria, mariscos truck, banh mi counter. Price and speed are part of the identity, not incidental.
+
+**Pit / smoke operation.** The physical smoker or pit is the visible heart of the place. Central Texas BBQ, Carolina whole hog house. The equipment is the brand.
+
+**Communal table / shared format.** Korean BBQ, hot pot, dim sum, Ethiopian injera spread. The sharing mechanism is not just practical — it is the social meaning of the meal.
+
+**Tasting-menu room.** Small, counter-facing or intimate, chef-driven sequence, prix fixe only. Kaiseki, omakase, creative tasting menu. Format signals total creative control by the kitchen.
+
+**Wine bar / small plates.** Natural wine-forward, snacks and small plates, counter or low-seating, grazing format. Now a recognizable archetype across European and American cities.
+
+### Cuisines Where Format Defines Identity
+
+Japanese is the most thoroughgoing example. Sushi-ya, ramen-ya, izakaya, soba-ya, udon-ya, and tempura-ya are each distinct restaurant types with specific service contracts and identity signals.
+
+Mexican is deeply format-driven at the street and casual level, and deeply regional at any level. "Mexican restaurant" is nearly meaningless as a signal — the meaningful identifiers are the regional tradition (Jaliscan, Sinaloan, Oaxacan, Chilango) and the format (taqueria, birrieria, mariscos, fonda).
+
+BBQ — in American, Korean, and Argentine forms — is organized almost entirely around cooking method and equipment. The pit, the smoke, and the wood species are the identity.
+
+Chinese at the specialty end — dim sum, hot pot, Peking duck — is organized around meal format and social ritual.
+
+## Signal / Design Implications
+
+### Proposed Signal Types
+
+**`cuisine_tradition`** — The specific named school, regional preparation style, or cultural format that defines a restaurant's identity from the inside. Distinct from cuisine category.
+
+Examples: `birria_tijuana_style`, `central_texas_bbq`, `tonkotsu_ramen`, `edomae_sushi`, `neapolitan_pizza`, `dim_sum_yum_cha`, `sichuan_hot_pot`, `al_pastor_taqueria`, `nayarit_mariscos`
+
+This is the highest-fidelity signal. It encodes not just what cuisine but which school of that cuisine. It requires editorial judgment to assign.
+
+**`food_format`** — The organizational logic of the food itself — how it's produced, assembled, and delivered to the diner.
+
+Examples: `trompo_roasted`, `pit_smoked`, `consomme_dip`, `omakase_sequence`, `cart_service`, `counter_specialist`, `standing_bar`, `communal_table`, `whole_animal`
+
+A strong complement to cuisine tradition. A tonkotsu ramen shop and a shoyu ramen shop share a food_format (counter specialist, single-bowl service) but have distinct cuisine_tradition values.
+
+**`restaurant_archetype`** — The social and operational format of the place — how it functions as a space, not just what it produces.
+
+Examples: `taqueria`, `izakaya`, `birrieria`, `barbecue_pit`, `sushi_counter`, `dim_sum_house`, `pizza_slice_shop`, `natural_wine_bar`, `yakitori_ya`, `mariscos_stand`
+
+These terms are borrowed from the cultural vocabulary that already exists. The signal work is standardization and confidence scoring, not invention.
+
+**`regional_origin`** — The specific geographic provenance of the tradition. Used to distinguish sub-traditions within a broader cuisine family.
+
+Examples: `jalisco_mx`, `tijuana_mx`, `central_texas`, `carolina_eastern`, `oaxaca_mx`, `kyoto_jp`, `edo_tokyo_jp`, `sichuan_cn`, `naples_it`
+
+Should be treated as a compositional signal — it modifies cuisine_tradition to produce specific readings like "Jalisco-style birria" vs. "Tijuana beef birria."
+
+### Taxonomy Diagram
+
+```
+                    ┌─────────────────────────────┐
+                    │      cuisine_tradition       │  ← Highest specificity
+                    │  (school / named tradition)  │
+                    │  e.g., tonkotsu_ramen,       │
+                    │        central_texas_bbq,    │
+                    │        birria_tijuana_style   │
+                    └──────────────┬──────────────┘
+                                   │
+                    ┌──────────────▼──────────────┐
+                    │        food_format           │  ← Production grammar
+                    │  (technique / delivery)      │
+                    │  e.g., pit_smoked,           │
+                    │        counter_specialist,   │
+                    │        consomme_dip           │
+                    └──────────────┬──────────────┘
+                                   │
+                    ┌──────────────▼──────────────┐
+                    │    restaurant_archetype      │  ← Venue type
+                    │  (social / operational)      │
+                    │  e.g., taqueria, izakaya,    │
+                    │        bbq_pit, dim_sum_house│
+                    └──────────────┬──────────────┘
+                                   │
+              ┌────────────────────┼────────────────────┐
+              │            regional_origin              │  ← Modifier (cross-cutting)
+              │  Composes with any layer above          │
+              │  e.g., jalisco_mx + birria = goat stew  │
+              │        tijuana_mx + birria = beef dip   │
+              └────────────────────────────────────────┘
+```
+
+## Recommendations
+
+1. **Adopt a three-layer model.** Cuisine signals should operate across three distinct layers: `cuisine_tradition` (the school), `food_format` (the production grammar), and `restaurant_archetype` (the venue type). These are not redundant — a place can have a clear archetype but a mixed or evolving tradition.
+
+2. **Borrow from native vocabulary.** The single most defensible source for `restaurant_archetype` values is the vocabulary food communities already use. "Birrieria," "izakaya," "yakitori-ya," "mariscos" — these terms are self-explanatory to people who know the cuisine and require only brief glosses for those who don't.
+
+3. **Treat cuisine tradition as an editorial signal, not an automated one.** `cuisine_tradition` is a high-specificity, high-confidence signal that requires human judgment to assign correctly. A restaurant can call itself a "ramen shop" and serve noodle soup in a broth that no Tokyo ramen community would recognize. The signal should reflect what the place actually is according to the tradition, not just what it claims.
+
+4. **Handle regional origin as a modifier, not a standalone.** `regional_origin` is most useful as a compositional qualifier on top of `cuisine_tradition`. "Birria" + `jalisco_mx` reads as traditional goat stew; "Birria" + `tijuana_mx` reads as beef consomme-dip taco format. The combination is what carries meaning.
+
+5. **Challenge the assumption that format-driven cuisines are lower-tier.** The signal model should be capable of representing the depth of a Central Texas brisket pit with exceptional smoke work and a 40-year legacy with the same fidelity as a tasting-menu restaurant. Both are high-craft cultural artifacts.
+
+## What This Changes for Saiko
+
+The practical implication: a birrieria in Boyle Heights, a tonkotsu counter in Little Tokyo, and a Central Texas-style pit in Culver City can all be described with precision — not just tagged as "Mexican," "Japanese," and "American BBQ." The signal vocabulary gives TRACES enough raw material to generate descriptions like "a Jalisco-tradition birria house doing consomme-dip tacos" or "a Hakata-school tonkotsu counter with an 18-hour bone broth" rather than falling back to generic editorial.
+
+The deeper structural point: these signals describe what a place is from within its own cultural tradition, not from outside looking in. That's consistent with Saiko's editorial positioning and with the Voice Engine's existing approach — describe the place on its own terms, not in comparison to a default Western reference frame.
+
+## Sources
+
+### Editorial
+- Eater LA — best-of maps (Venice, Arts District, Silver Lake, Downtown LA, burritos, breakfast burritos)
+- The Infatuation LA — restaurant reviews and guides
+- LA Times — 101 Best Restaurants list
+- LA Taco — breakfast burritos, best burritos coverage
+
+### Academic / Industry
+- Restaurant classification scholarship — polar-opposite categorization models (service formality, price tier, familiarity)
+- OpenStreetMap — cuisine=* tagging system
+- Associazione Verace Pizza Napoletana — Neapolitan pizza certification standards
+
+### Community / Primary
+- Wikipedia cuisine taxonomies — birria regional variants, Japanese restaurant formats, BBQ regional schools
+- Food community discourse — how diners self-organize around tradition, format, and regional origin rather than price/service tier
+
+---
+
 ## Registry Metadata
 
 | Field | Value |
 |-------|-------|
-| Registry generated | 2026-03-14T20:10:52.501Z |
-| Context generated | 2026-03-14T20:10:52.732Z |
-| Docs included | 66 |
+| Registry generated | 2026-03-17T00:45:00.000Z |
+| Context generated | 2026-03-17T00:26:46.178Z |
+| Docs included | 79 |
 | Docs missing on disk | 0 |
 | Filters applied | status=active |

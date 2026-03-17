@@ -1,0 +1,27 @@
+[2026-03-16T20:28:36.128Z] Running stage 1 (Google Places identity commit) only for gatsby-books
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+
+Enrich: Gatsby Books (gatsby-books)
+  ID:      3f240651-b291-4eed-8c0b-423a51c95c44
+  Website: http://www.gatsbybooks.com/
+  GPID:    ChIJKf_-UB0y3YARgrr-jMT9KMU
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 0 created, 0 resolved, 8 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Gatsby Books
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:28:38.652Z] Process exited with code: 0

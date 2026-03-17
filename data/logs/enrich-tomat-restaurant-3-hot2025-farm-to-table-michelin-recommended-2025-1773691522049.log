@@ -1,0 +1,28 @@
+[2026-03-16T20:05:22.049Z] Running stage 1 (Google Places identity commit) only for tomat-restaurant-3-hot2025-farm-to-table-michelin-recommended-2025
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  suppress all logs with { quiet: true }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
+
+Enrich: Tomat (tomat-restaurant-3-hot2025-farm-to-table-michelin-recommended-2025)
+  ID:      0ca1276f-8224-4da4-9a96-e661d89ef355
+  Website: http://www.tomat.la/
+  GPID:    ChIJDUyRuV2xwoARPXiy3q2yRLs
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+  ✓ needs_human_review cleared
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 5 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Tomat
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:05:24.064Z] Process exited with code: 0

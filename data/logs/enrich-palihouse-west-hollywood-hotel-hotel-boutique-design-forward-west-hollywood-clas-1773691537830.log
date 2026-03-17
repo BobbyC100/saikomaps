@@ -1,0 +1,27 @@
+[2026-03-16T20:05:37.830Z] Running stage 1 (Google Places identity commit) only for palihouse-west-hollywood-hotel-hotel-boutique-design-forward-west-hollywood-clas
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+
+Enrich: Palihouse West Hollywood (palihouse-west-hollywood-hotel-hotel-boutique-design-forward-west-hollywood-clas)
+  ID:      487d732b-ee68-4625-bfac-b44614d7d8ab
+  Website: https://www.palisociety.com/hotels/west-hollywood/
+  GPID:    ChIJ6VTz-ea5woARHVKKCrJaIVc
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 5 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Palihouse West Hollywood
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:05:39.936Z] Process exited with code: 0

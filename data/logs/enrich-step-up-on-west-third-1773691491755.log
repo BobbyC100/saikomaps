@@ -1,0 +1,27 @@
+[2026-03-16T20:04:51.756Z] Running stage 1 (Google Places identity commit) only for step-up-on-west-third
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  write to custom object with { processEnv: myObject }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+
+Enrich: Step Up on West Third (step-up-on-west-third)
+  ID:      30099b84-d36b-4d9a-a5d7-556341347221
+  Website: https://www.stepup.org/services/permanent-supportive-housing/
+  GPID:    ChIJGRrnFxvHwoARv2JGehKiBeo
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 6 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Step Up on West Third
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:04:54.535Z] Process exited with code: 0

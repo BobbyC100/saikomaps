@@ -1,0 +1,27 @@
+[2026-03-16T20:28:12.378Z] Running stage 1 (Google Places identity commit) only for canterbury-records
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  override existing env vars with { override: true }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+
+Enrich: Canterbury Records (canterbury-records)
+  ID:      1943caac-6b85-48c0-b6bd-c75ca8d25ba7
+  Website: http://canterburyrecords.com/
+  GPID:    ChIJbXxr2ULDwoAR3AnOtdH_VHw
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 6 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Canterbury Records
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:28:14.552Z] Process exited with code: 0

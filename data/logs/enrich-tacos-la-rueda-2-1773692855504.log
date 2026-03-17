@@ -1,0 +1,27 @@
+[2026-03-16T20:27:35.504Z] Running stage 1 (Google Places identity commit) only for tacos-la-rueda-2
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  write to custom object with { processEnv: myObject }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  override existing env vars with { override: true }
+
+Enrich: Tacos La Rueda (tacos-la-rueda-2)
+  ID:      8d62fcd8-3a86-4eec-a9d0-b71d30a36a3d
+  Website: NONE
+  GPID:    ChIJA_kmR5sz3YARAmh30EhUrFQ
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 3 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Tacos La Rueda
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:27:37.787Z] Process exited with code: 0

@@ -1,0 +1,27 @@
+[2026-03-16T21:23:23.846Z] Running stage 1 (Google Places identity commit) only for unknown-907f5f74
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔄 add secrets lifecycle management: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔄 add secrets lifecycle management: https://dotenvx.com/ops
+
+Enrich: Arcana: Books on the Arts (unknown-907f5f74)
+  ID:      907f5f74-2275-42cd-a8ed-f4cd69d4699d
+  Website: http://www.arcanabooks.com/
+  GPID:    ChIJbUsBG4O5woAR36lFBdtnk04
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 5 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Arcana: Books on the Arts
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T21:23:25.980Z] Process exited with code: 0

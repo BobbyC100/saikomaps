@@ -7,6 +7,7 @@
  *   npm run backfill:google -- --missing-meta  # places with null neighborhood or cuisineType
  *   npm run backfill:google -- --limit 20      # first 20 only
  *   npm run backfill:google -- --slug seco     # single place by slug
+ *   npm run backfill:google -- --batch 25       # process 25 at a time with pause between batches
  *   npm run backfill:google -- --dry-run       # preview without updating
  *   npm run backfill:google -- --force         # re-enrich all places
  *
@@ -24,11 +25,12 @@ import {
 import { getSaikoCategory, parseCuisineType } from "@/lib/categoryMapping";
 import { jaroWinklerSimilarity, normalizeName } from "@/lib/similarity";
 import { scanEntities } from "@/lib/coverage/issue-scanner";
+import { writeClaimAndSanction } from "@/lib/fields-v2/write-claim";
 
-// Minimum name-similarity between entity name and Google Places result name.
-// Only enforced when we searched by name (no pre-existing GPID) to avoid
-// clobbering an entity with a completely wrong place.
-const GPID_SEARCH_MIN_SIMILARITY = 0.60;
+// Minimum Jaro-Winkler similarity for strict check. If this fails, we also
+// try a substring check (does our name appear in Google's or vice versa).
+// Only enforced when we searched by name (no pre-existing GPID).
+const GPID_SEARCH_MIN_SIMILARITY = 0.55;
 
 const prisma = new PrismaClient();
 const RATE_LIMIT_MS = 150;
@@ -43,16 +45,18 @@ function parseArgs() {
   let dryRun = false;
   let force = false;
   let missingMeta = false;
+  let batchSize = 0; // 0 = no batching
 
   for (let i = 0; i < args.length; i++) {
     if (args[i] === "--limit") limit = parseInt(args[++i] || "0", 10) || Infinity;
     else if (args[i] === "--slug") slug = args[++i] || null;
+    else if (args[i] === "--batch") batchSize = parseInt(args[++i] || "0", 10) || 0;
     else if (args[i] === "--dry-run") dryRun = true;
     else if (args[i] === "--force") force = true;
     else if (args[i] === "--missing-meta") missingMeta = true;
   }
 
-  return { limit, slug, dryRun, force, missingMeta };
+  return { limit, slug, dryRun, force, missingMeta, batchSize };
 }
 
 function sleep(ms: number) {
@@ -77,7 +81,7 @@ function formatHoursForStore(
 }
 
 async function main() {
-  const { limit, slug, dryRun, force, missingMeta } = parseArgs();
+  const { limit, slug, dryRun, force, missingMeta, batchSize } = parseArgs();
 
   if (!process.env.GOOGLE_PLACES_API_KEY) {
     console.error("❌ GOOGLE_PLACES_API_KEY is not set. Add it to .env or .env.local");
@@ -106,6 +110,7 @@ async function main() {
   });
 
   console.log(`\nBackfill Google Places — ${places.length} place(s) to process`);
+  if (batchSize > 0) console.log(`  Batch size: ${batchSize} (pausing 2s between batches)`);
   if (dryRun) console.log("(dry run — no updates)\n");
   else console.log("");
 
@@ -159,22 +164,27 @@ async function main() {
       }
 
       // Guard: when we searched by name only (no address/GPID anchor), verify the
-      // Google result actually matches the entity name. A low-similarity result means
-      // the text search returned something unrelated (e.g. "Picnic" → "Grand Park").
+      // Google result actually matches the entity name. We use two checks:
+      // 1. Jaro-Winkler similarity (catches close matches)
+      // 2. Substring containment (catches "Tuk Tuk" ⊂ "Tuk Tuk Thai -- Thai Restaurant")
+      // Only reject if BOTH checks fail — we're just linking to get GPID/coords/hours,
+      // not overwriting our name.
       if (searchedByName && place.name && placeDetails.name) {
-        const similarity = jaroWinklerSimilarity(
-          normalizeName(place.name),
-          normalizeName(placeDetails.name)
-        );
-        if (similarity < GPID_SEARCH_MIN_SIMILARITY) {
+        const ourName = normalizeName(place.name);
+        const googleName = normalizeName(placeDetails.name);
+        const similarity = jaroWinklerSimilarity(ourName, googleName);
+        const substringMatch = googleName.includes(ourName) || ourName.includes(googleName);
+
+        if (similarity < GPID_SEARCH_MIN_SIMILARITY && !substringMatch) {
           failed++;
           console.log(
-            `  ❌ ${label}: Google result "${placeDetails.name}" name-similarity too low (${similarity.toFixed(2)} < ${GPID_SEARCH_MIN_SIMILARITY}) — skipping to avoid clobbering wrong place. Provide a GPID to proceed.`
+            `  ❌ ${label}: Google result "${placeDetails.name}" doesn't match (similarity=${similarity.toFixed(2)}, no substring match) — skipping. Provide a GPID or address to proceed.`
           );
           await sleep(RATE_LIMIT_MS);
           continue;
         }
-        console.log(`  ✓ name match: "${placeDetails.name}" (similarity ${similarity.toFixed(2)})`);
+        const matchMethod = substringMatch ? 'substring' : `similarity ${similarity.toFixed(2)}`;
+        console.log(`  ✓ name match: "${placeDetails.name}" (${matchMethod})`);
       }
 
       const lat =
@@ -194,37 +204,63 @@ async function main() {
 
       const cuisineType = parseCuisineType(placeDetails.types ?? []) ?? null;
 
-      const updateData = {
-        googlePlaceId: googlePlaceId ?? undefined,
-        name: placeDetails.name && !placeDetails.name.startsWith("http")
-          ? placeDetails.name
-          : place.name,
-        address:
-          placeDetails.formattedAddress && !placeDetails.formattedAddress.startsWith("http")
-            ? placeDetails.formattedAddress
-            : place.address,
-        latitude: !Number.isNaN(lat) ? lat : null,
-        longitude: !Number.isNaN(lng) ? lng : null,
-        phone: placeDetails.formattedPhoneNumber ?? place.phone,
-        website: placeDetails.website ?? place.website,
-        googleTypes: placeDetails.types ?? [],
-        priceLevel: placeDetails.priceLevel ?? place.priceLevel,
-        neighborhood: neighborhood ?? place.neighborhood,
-        cuisineType: cuisineType ?? place.cuisineType,
-        category:
-          place.category ??
-          getSaikoCategory(placeDetails.name, placeDetails.types ?? []),
-        googlePhotos: placeDetails.photos
-          ? JSON.parse(JSON.stringify(placeDetails.photos))
-          : undefined,
-        hours: formatHoursForStore(placeDetails.openingHours),
-        placesDataCachedAt: new Date(),
+      // ── Evidence-first: write observed_claims via writeClaimAndSanction ──
+      // Each field from Google Places becomes a claim that gets sanctioned
+      // into canonical_entity_state based on confidence thresholds.
+      const sourceUrl = `https://maps.googleapis.com/maps/api/place/details?place_id=${googlePlaceId}`;
+      const claimBase = {
+        entityId: place.id,
+        sourceId: 'google_places' as const,
+        sourceUrl,
+        extractionMethod: 'API' as const,
+        confidence: 0.95,
+        resolutionMethod: place.googlePlaceId ? 'GOOGLE_PLACE_ID_EXACT' as const : 'FUZZY_MATCH' as const,
       };
 
+      const claims: { attributeKey: string; rawValue: unknown }[] = [];
+
+      if (googlePlaceId) claims.push({ attributeKey: 'google_place_id', rawValue: googlePlaceId });
+      // Never overwrite our curated name — only fill if we had none
+      if (!place.name && placeDetails.name) claims.push({ attributeKey: 'name', rawValue: placeDetails.name });
+      if (placeDetails.formattedAddress && !placeDetails.formattedAddress.startsWith("http")) {
+        claims.push({ attributeKey: 'address', rawValue: placeDetails.formattedAddress });
+      }
+      if (!Number.isNaN(lat)) claims.push({ attributeKey: 'latitude', rawValue: lat });
+      if (!Number.isNaN(lng)) claims.push({ attributeKey: 'longitude', rawValue: lng });
+      if (placeDetails.formattedPhoneNumber) claims.push({ attributeKey: 'phone', rawValue: placeDetails.formattedPhoneNumber });
+      if (placeDetails.website) claims.push({ attributeKey: 'website', rawValue: placeDetails.website });
+      if (placeDetails.priceLevel != null) claims.push({ attributeKey: 'price_level', rawValue: placeDetails.priceLevel });
+      if (neighborhood) claims.push({ attributeKey: 'neighborhood', rawValue: neighborhood });
+      if (cuisineType) claims.push({ attributeKey: 'cuisine_type', rawValue: cuisineType });
+      const resolvedCategory = place.category ?? getSaikoCategory(placeDetails.name, placeDetails.types ?? []);
+      if (resolvedCategory) claims.push({ attributeKey: 'category', rawValue: resolvedCategory });
+      if (placeDetails.photos?.length) {
+        claims.push({ attributeKey: 'google_photos', rawValue: JSON.parse(JSON.stringify(placeDetails.photos)) });
+      }
+      const hours = formatHoursForStore(placeDetails.openingHours);
+      if (hours) claims.push({ attributeKey: 'hours', rawValue: hours });
+
       if (!dryRun) {
+        for (const claim of claims) {
+          try {
+            await writeClaimAndSanction(prisma, { ...claimBase, ...claim });
+          } catch (claimErr: any) {
+            // GPID unique constraint = two entities resolve to same Google Place.
+            // Log it as a potential duplicate but continue writing other fields.
+            if (claim.attributeKey === 'google_place_id' && claimErr?.code === 'P2002') {
+              console.log(`  ⚠️  ${label}: GPID already claimed by another entity (potential duplicate)`);
+            } else {
+              throw claimErr;
+            }
+          }
+        }
+        // Non-canonical metadata: googleTypes and cache timestamp stay on entities
         await prisma.entities.update({
           where: { id: place.id },
-          data: updateData,
+          data: {
+            googleTypes: placeDetails.types ?? [],
+            placesDataCachedAt: new Date(),
+          },
         });
       }
 
@@ -240,6 +276,14 @@ async function main() {
         `  ❌ ${label}: ${err instanceof Error ? err.message : String(err)}`
       );
       await sleep(RATE_LIMIT_MS);
+    }
+
+    // Batch pause: after every batchSize entities, pause and log progress
+    if (batchSize > 0 && (i + 1) % batchSize === 0 && i + 1 < places.length) {
+      const processed = i + 1;
+      const remaining = places.length - processed;
+      console.log(`\n  ⏸  Batch of ${batchSize} done (${processed}/${places.length}, ${remaining} remaining). Pausing 2s...\n`);
+      await sleep(2000);
     }
   }
 

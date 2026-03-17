@@ -1,0 +1,27 @@
+[2026-03-16T20:27:24.918Z] Running stage 1 (Google Places identity commit) only for bar-siesta
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  suppress all logs with { quiet: true }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔄 add secrets lifecycle management: https://dotenvx.com/ops
+
+Enrich: Bar Siesta (bar-siesta)
+  ID:      f1a96a2c-f82a-485d-96db-56d0eb5e91f9
+  Website: https://barsiesta.co/
+  GPID:    ChIJHY55ZcfHwoAR82z4nxOn0_Y
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 5 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Bar Siesta
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:27:27.295Z] Process exited with code: 0

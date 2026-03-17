@@ -1,0 +1,28 @@
+[2026-03-16T20:04:26.957Z] Running stage 1 (Google Places identity commit) only for redbird-downtown-los-angeles
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 📡 add observability to secrets: https://dotenvx.com/ops
+
+Enrich: Redbird (redbird-downtown-los-angeles)
+  ID:      place_redbird-downtown-los-angeles_1773195234760
+  Website: http://www.redbird.la/
+  GPID:    ChIJv4yVGknGwoARC_5zwy3zU5M
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+  ✓ needs_human_review cleared
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 3 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Redbird
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:04:29.773Z] Process exited with code: 0

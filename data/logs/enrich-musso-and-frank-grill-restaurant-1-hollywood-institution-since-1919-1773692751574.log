@@ -1,0 +1,28 @@
+[2026-03-16T20:25:51.574Z] Running stage 1 (Google Places identity commit) only for musso-and-frank-grill-restaurant-1-hollywood-institution-since-1919
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
+
+Enrich: Musso & Frank Grill (musso-and-frank-grill-restaurant-1-hollywood-institution-since-1919)
+  ID:      8ef6fda7-99f1-4547-9a4c-7b6ee55f1bd8
+  Website: http://www.mussoandfrank.com/
+  GPID:    ChIJaZ3OWSO_woARSF1VduqxGgY
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+  ✓ needs_human_review cleared
+
+Re-scanning issues...
+  Issues: 0 created, 0 resolved, 3 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Musso & Frank Grill
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:25:54.992Z] Process exited with code: 0

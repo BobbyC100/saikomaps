@@ -1,0 +1,27 @@
+[2026-03-16T20:27:58.563Z] Running stage 1 (Google Places identity commit) only for analogue-haven
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  write to custom object with { processEnv: myObject }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  write to custom object with { processEnv: myObject }
+
+Enrich: Analogue Haven (analogue-haven)
+  ID:      3e003c94-312b-4d81-a008-6c04ca94927d
+  Website: http://www.analoguehaven.com/
+  GPID:    ChIJ6WHSNc2kwoARjrWXA86tgkc
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 7 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Analogue Haven
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:28:01.306Z] Process exited with code: 0

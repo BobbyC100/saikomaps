@@ -1,0 +1,27 @@
+[2026-03-16T20:28:54.656Z] Running stage 1 (Google Places identity commit) only for run-out-groove-records
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+
+Enrich: Run Out Groove Records (run-out-groove-records)
+  ID:      60160728-ebad-48e4-b9cc-bf4d0445e4ef
+  Website: https://www.runoutgrooverecords.com/?utm_source=google&utm_medium=organic&utm_campaign=google_business_profile
+  GPID:    ChIJx72HI2qVwoAREIayeo6ZwP0
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 6 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Run Out Groove Records
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:28:58.009Z] Process exited with code: 0

@@ -1,0 +1,27 @@
+[2026-03-16T20:26:55.703Z] Running stage 1 (Google Places identity commit) only for 88-club-restaurant-3-hot2025-mei-lin-top-chef-winner
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  write to custom object with { processEnv: myObject }
+
+Enrich: 88 Club (88-club-restaurant-3-hot2025-mei-lin-top-chef-winner)
+  ID:      c1575ce5-87e5-40ce-a5ee-0a56123c4733
+  Website: https://www.88clubbh.com/
+  GPID:    ChIJi_R5HMm9woARv_qBcJatv_0
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 5 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: 88 Club
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:26:57.609Z] Process exited with code: 0

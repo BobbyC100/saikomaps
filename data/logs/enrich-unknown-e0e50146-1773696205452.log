@@ -1,0 +1,27 @@
+[2026-03-16T21:23:25.452Z] Running stage 1 (Google Places identity commit) only for unknown-e0e50146
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔄 add secrets lifecycle management: https://dotenvx.com/ops
+
+Enrich: Hammer Museum (unknown-e0e50146)
+  ID:      e0e50146-aed0-46f2-beef-b3ca7496bb7a
+  Website: https://hammer.ucla.edu/
+  GPID:    ChIJ9SNj34G8woARHOdEq52UX6k
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 4 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Hammer Museum
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T21:23:28.159Z] Process exited with code: 0

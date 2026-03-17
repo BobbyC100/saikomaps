@@ -1,0 +1,27 @@
+[2026-03-16T21:23:16.707Z] Running stage 1 (Google Places identity commit) only for the-hollywood-roosevelt-hotel-hotel-iconic-historic-hollywood-landmark-old-schoo
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+
+Enrich: The Hollywood Roosevelt (the-hollywood-roosevelt-hotel-hotel-iconic-historic-hollywood-landmark-old-schoo)
+  ID:      1df4f9bb-b905-4add-b7ed-941fd433ef9e
+  Website: https://www.thehollywoodroosevelt.com/?utm_source=google&utm_medium=organic&utm_campaign=gbp_listing
+  GPID:    ChIJazD_QyG_woARwKuHsRqY0nU
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 3 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: The Hollywood Roosevelt
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T21:23:19.517Z] Process exited with code: 0

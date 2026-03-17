@@ -1,0 +1,27 @@
+[2026-03-16T20:28:03.185Z] Running stage 1 (Google Places identity commit) only for going-underground-records
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  suppress all logs with { quiet: true }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+
+Enrich: Going Underground Records (going-underground-records)
+  ID:      9057fdc4-502d-4ca7-be10-21e0dec51202
+  Website: http://goingundergroundrecords.com/
+  GPID:    ChIJt9IbAT_HwoARyZ5heO4AGXE
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 6 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Going Underground Records
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:28:06.026Z] Process exited with code: 0

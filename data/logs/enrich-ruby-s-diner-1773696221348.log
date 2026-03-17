@@ -1,0 +1,28 @@
+[2026-03-16T21:23:41.348Z] Running stage 1 (Google Places identity commit) only for ruby-s-diner
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  enable debug logging with { debug: true }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
+
+Enrich: Ruby's Diner (ruby-s-diner)
+  ID:      47f37719-5964-45b9-b463-e454d8d6f8ab
+  Website: https://www.rubys.com/locations/city-of-commerce-citadel/
+  GPID:    ChIJhZyY5FLOwoARmWyxQxP6jX0
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+  ✓ needs_human_review cleared
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 2 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Ruby's Diner
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T21:23:44.172Z] Process exited with code: 0

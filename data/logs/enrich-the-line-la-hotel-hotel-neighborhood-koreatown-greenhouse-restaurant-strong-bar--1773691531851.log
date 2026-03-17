@@ -1,0 +1,28 @@
+[2026-03-16T20:05:31.851Z] Running stage 1 (Google Places identity commit) only for the-line-la-hotel-hotel-neighborhood-koreatown-greenhouse-restaurant-strong-bar-
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  suppress all logs with { quiet: true }
+
+Enrich: The LINE LA (the-line-la-hotel-hotel-neighborhood-koreatown-greenhouse-restaurant-strong-bar-)
+  ID:      2491a858-5422-4a01-aaab-25cc3e18dea6
+  Website: https://www.thelinehotel.com/los-angeles/
+  GPID:    ChIJEz1I84K4woARzSOwF86sb5c
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+  ✓ needs_human_review cleared
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 4 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: The LINE LA
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:05:33.986Z] Process exited with code: 0

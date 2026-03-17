@@ -1,0 +1,27 @@
+[2026-03-16T20:28:59.968Z] Running stage 1 (Google Places identity commit) only for wagyu-butcher
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  override existing env vars with { override: true }
+
+Enrich: Wagyu Butcher Japanese BBQ (wagyu-butcher)
+  ID:      083e03ac-b183-4dbe-929b-fed3396dbf0c
+  Website: http://www.exploretock.com/wagyu-butcher-torrance
+  GPID:    ChIJXYKAbN-1woAREE2yYfb5IdM
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 6 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Wagyu Butcher Japanese BBQ
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:29:02.906Z] Process exited with code: 0

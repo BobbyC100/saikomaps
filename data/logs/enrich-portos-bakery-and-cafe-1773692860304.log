@@ -1,0 +1,27 @@
+[2026-03-16T20:27:40.304Z] Running stage 1 (Google Places identity commit) only for portos-bakery-and-cafe
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+
+Enrich: Porto's Bakery and Cafe (portos-bakery-and-cafe)
+  ID:      cf3d048b-9c77-45d4-ada8-67fcb1093cf6
+  Website: https://www.portosbakery.com/?exp68=v1
+  GPID:    ChIJO-aaWPabwoARfPE00wLLtek
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 4 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Porto's Bakery and Cafe
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:27:42.947Z] Process exited with code: 0

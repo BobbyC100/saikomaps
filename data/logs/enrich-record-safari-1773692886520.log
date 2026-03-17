@@ -1,0 +1,27 @@
+[2026-03-16T20:28:06.520Z] Running stage 1 (Google Places identity commit) only for record-safari
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  enable debug logging with { debug: true }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  write to custom object with { processEnv: myObject }
+
+Enrich: Record Safari (record-safari)
+  ID:      9243e518-8542-42bf-932a-e80a87e42cf2
+  Website: https://recordsafarilosangeles.bigcartel.com/
+  GPID:    ChIJ6Zc3inTBwoARtoZWd0owgW4
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 6 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Record Safari
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:28:09.461Z] Process exited with code: 0

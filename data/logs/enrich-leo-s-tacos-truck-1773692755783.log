@@ -1,0 +1,28 @@
+[2026-03-16T20:25:55.783Z] Running stage 1 (Google Places identity commit) only for leo-s-tacos-truck
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  write to custom object with { processEnv: myObject }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  enable debug logging with { debug: true }
+
+Enrich: Leo's Tacos Truck (leo-s-tacos-truck)
+  ID:      9d15ef39-88a6-418f-9529-156e8ca038bc
+  Website: http://www.leostacostruck.com/
+  GPID:    ChIJdXWFXL7HwoARKe_whoFiTwM
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+  ✓ needs_human_review cleared
+
+Re-scanning issues...
+  Issues: 0 created, 0 resolved, 4 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Leo's Tacos Truck
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:25:57.755Z] Process exited with code: 0

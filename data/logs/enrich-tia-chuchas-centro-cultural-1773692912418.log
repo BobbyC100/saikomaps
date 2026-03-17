@@ -1,0 +1,27 @@
+[2026-03-16T20:28:32.419Z] Running stage 1 (Google Places identity commit) only for tia-chuchas-centro-cultural
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  override existing env vars with { override: true }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+
+Enrich: Tia Chucha's Centro Cultural (tia-chuchas-centro-cultural)
+  ID:      5786e165-c177-4853-a137-571b21a13737
+  Website: http://www.tiachucha.org/
+  GPID:    ChIJv7YEgSiOwoARKnOAMe6kycc
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 6 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Tia Chucha's Centro Cultural
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:28:34.847Z] Process exited with code: 0

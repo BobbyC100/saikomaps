@@ -1,0 +1,70 @@
+[2026-03-16T23:39:54.883Z] Starting enrichment for assi-plaza
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  override existing env vars with { override: true }
+
+Enrich: Assi Plaza (assi-plaza)
+  ID:      d464a4ef-bda2-4c19-9eaf-1f591f1f63a9
+  Website: —
+  GPID:    ChIJSdJpOYS4woAR3MKO-6J2DQc
+
+Stage 2: Surface discovery — skipped (no website)
+
+Stage 3: Surface fetch — skipped (no surfaces with fetch_status=discovered)
+
+Stage 4: Surface parse — skipped (no surfaces pending parse)
+
+────────────────────────────────────────────────────────────
+Stage 5: Identity signal extraction (AI)
+  node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/extract-identity-signals.ts --place=Assi Plaza
+────────────────────────────────────────────────────────────
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔄 add secrets lifecycle management: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
+
+🔮 Saiko Maps — Identity Signal Extraction
+==========================================
+🔸 Single place: "Assi Plaza"
+🔸 Concurrency: 5
+
+📍 Found 0 places to process
+   (0 in canonical scope · 0 unprocessed · 0 with extractable content)
+
+No records to process. Exiting.
+  ✓ enrichment_stage updated to 5
+
+Stage 6: Website enrichment — skipped (no website)
+
+────────────────────────────────────────────────────────────
+Stage 7: Tagline generation (AI)
+  node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/generate-taglines-v2.ts --place=Assi Plaza
+────────────────────────────────────────────────────────────
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 📡 add observability to secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+
+🎙️  Saiko Voice Engine v2.0 — Tagline Generator
+==========================================
+🔸 Single place: "Assi Plaza"
+🔸 Concurrency: 5
+
+📍 Fetching records with identity signals...
+📍 Found 0 places to process
+
+No records to process. Exiting.
+  ✓ enrichment_stage updated to 7
+  ✓ last_enriched_at updated
+
+Re-scanning issues...
+  Issues: 0 created, 1 resolved, 9 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Assi Plaza
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  ✓ Stage 5: Identity signal extraction (AI) (ran)
+  · Stage 6: Website enrichment (skipped)
+  ✓ Stage 7: Tagline generation (AI) (ran)
+
+
+[2026-03-16T23:40:06.616Z] Process exited with code: 0

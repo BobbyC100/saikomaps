@@ -1,0 +1,25 @@
+[2026-03-16T23:40:29.683Z] Running stage 1 (Google Places identity commit) only for the-voice-of-vintage
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+
+Enrich: The Voice of Vintage (the-voice-of-vintage)
+  ID:      413716ac-670a-413a-974f-c90b94d4daa0
+  Website: —
+  GPID:    NONE
+
+Re-scanning issues...
+  Issues: 0 created, 0 resolved, 10 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: The Voice of Vintage
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T23:40:31.846Z] Process exited with code: 0

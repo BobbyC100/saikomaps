@@ -1,0 +1,27 @@
+[2026-03-16T20:26:40.461Z] Running stage 1 (Google Places identity commit) only for sushi-masuyoshi-restaurant-3-hot2025-culver-city-omakase-infatuation-#4-$210-val
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 📡 add observability to secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  override existing env vars with { override: true }
+
+Enrich: Sushi Masuyoshi (sushi-masuyoshi-restaurant-3-hot2025-culver-city-omakase-infatuation-#4-$210-val)
+  ID:      0d3d5e94-88e2-4987-8cdb-85be659cc5c7
+  Website: https://www.facebook.com/profile.php?id=100040422199235
+  GPID:    ChIJPxfpSgC7woARjS3G6HQDYgI
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 0 created, 0 resolved, 5 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Sushi Masuyoshi
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:26:42.164Z] Process exited with code: 0

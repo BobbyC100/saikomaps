@@ -1,0 +1,27 @@
+[2026-03-16T20:28:02.400Z] Running stage 1 (Google Places identity commit) only for as-the-record-turns
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  write to custom object with { processEnv: myObject }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  write to custom object with { processEnv: myObject }
+
+Enrich: As The Record Turns (as-the-record-turns)
+  ID:      fd58431f-1be5-4d65-aadd-93d66f6966cd
+  Website: https://www.astherecordturnsla.com/
+  GPID:    ChIJEQxxcSO_woARuUlgcHw_8LY
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 6 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: As The Record Turns
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:28:05.242Z] Process exited with code: 0

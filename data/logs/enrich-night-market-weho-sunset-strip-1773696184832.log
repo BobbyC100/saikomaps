@@ -1,0 +1,27 @@
+[2026-03-16T21:23:04.832Z] Running stage 1 (Google Places identity commit) only for night-market-weho-sunset-strip
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  enable debug logging with { debug: true }
+
+Enrich: Night + Market Weho (night-market-weho-sunset-strip)
+  ID:      22c98e53-0a12-4ca8-b4cf-a5aaf7f47e74
+  Website: http://www.nightmarketsong.com/
+  GPID:    ChIJ93f0oKG-woAR1g08r2EtyRY
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 4 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Night + Market Weho
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T21:23:06.920Z] Process exited with code: 0

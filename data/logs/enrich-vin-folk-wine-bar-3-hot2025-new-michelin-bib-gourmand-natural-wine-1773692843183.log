@@ -1,0 +1,28 @@
+[2026-03-16T20:27:23.183Z] Running stage 1 (Google Places identity commit) only for vin-folk-wine-bar-3-hot2025-new-michelin-bib-gourmand-natural-wine
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔄 add secrets lifecycle management: https://dotenvx.com/ops
+
+Enrich: Vin Folk (vin-folk-wine-bar-3-hot2025-new-michelin-bib-gourmand-natural-wine)
+  ID:      4af76227-25f6-4b54-9d1d-761b20cfd0c1
+  Website: https://www.vin-folk.com/
+  GPID:    ChIJaQ7b8R-zwoARYMTDhwUoHWc
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+  ✓ needs_human_review cleared
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 4 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Vin Folk
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:27:25.832Z] Process exited with code: 0

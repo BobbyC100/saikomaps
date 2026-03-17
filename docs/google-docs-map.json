@@ -1,5 +1,5 @@
 {
-  "last_synced": "2026-03-14T19:08:03.806Z",
+  "last_synced": "2026-03-17T00:39:35.638Z",
   "root_folder_id": "1Dod-GaQff4n5TqRXuDroDxwct3Z-5R2T",
   "folders": {
     "SAIKO": "1a0JpEZjbLFKlIh4SxS_CFBnsvy-6plaH",
@@ -438,6 +438,18 @@
       "google_doc_url": "https://docs.google.com/document/d/1kUZhVu37dgAGf3RwgL939h-FZ79Um9kbbhWv_loB_4Q/",
       "last_synced": "2026-03-14T19:03:22.902Z",
       "content_hash": "991fa0529bdfb35e"
+    },
+    "ENRICH-PLAYBOOK-V1": {
+      "google_doc_id": "11pj6ZJzwupK5UFvAyM_jYWP_7ndifF_RyQfFPK9pPvs",
+      "google_doc_url": "https://docs.google.com/document/d/11pj6ZJzwupK5UFvAyM_jYWP_7ndifF_RyQfFPK9pPvs/",
+      "last_synced": "2026-03-17T00:39:35.635Z",
+      "content_hash": "0e249a33a0cbefe7"
+    },
+    "ENRICH-STRATEGY-V1": {
+      "google_doc_id": "1-I1U2s-G2i2mhdaCf--KhzuEo_4IIXa6WC545UL3xWs",
+      "google_doc_url": "https://docs.google.com/document/d/1-I1U2s-G2i2mhdaCf--KhzuEo_4IIXa6WC545UL3xWs/",
+      "last_synced": "2026-03-17T00:28:59.668Z",
+      "content_hash": "007aa12ebaa5ec28"
     }
   }
 }

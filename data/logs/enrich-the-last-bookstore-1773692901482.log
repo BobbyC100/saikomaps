@@ -1,0 +1,27 @@
+[2026-03-16T20:28:21.482Z] Running stage 1 (Google Places identity commit) only for the-last-bookstore
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  override existing env vars with { override: true }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  suppress all logs with { quiet: true }
+
+Enrich: The Last Bookstore (the-last-bookstore)
+  ID:      9562723c-6947-465c-a09f-0eb9f7d278ed
+  Website: https://www.lastbookstorela.com/
+  GPID:    ChIJ7YJ_IkrGwoARNak4CDihkYU
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 6 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: The Last Bookstore
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:28:23.877Z] Process exited with code: 0

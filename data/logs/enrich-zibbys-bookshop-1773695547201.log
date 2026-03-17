@@ -1,0 +1,100 @@
+[2026-03-16T21:12:27.201Z] Starting enrichment for zibbys-bookshop
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔄 add secrets lifecycle management: https://dotenvx.com/ops
+
+Enrich: Zibby's Bookshop (zibbys-bookshop)
+  ID:      5971ba29-9dd3-4cbc-ab2a-da90d35405c7
+  Website: https://zibbymedia.com/pages/indie-bookstore
+  GPID:    ChIJa9bt8TKlwoARArBoJG_z0Zw
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Stage 2: Surface discovery — skipped (surface rows already exist)
+
+────────────────────────────────────────────────────────────
+Stage 3: Surface fetch
+  node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/run-surface-fetch.ts --entity-id=5971ba29-9dd3-4cbc-ab2a-da90d35405c7 --limit=20
+────────────────────────────────────────────────────────────
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  override existing env vars with { override: true }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+📥 Merchant Surface Fetch Pass
+
+No discovered surfaces to fetch.
+  ✓ enrichment_stage updated to 3
+
+Stage 4: Surface parse — skipped (no surfaces pending parse)
+
+────────────────────────────────────────────────────────────
+Stage 5: Identity signal extraction (AI)
+  node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/extract-identity-signals.ts --place=Zibby's Bookshop
+────────────────────────────────────────────────────────────
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+
+🔮 Saiko Maps — Identity Signal Extraction
+==========================================
+🔸 Single place: "Zibby's Bookshop"
+
+📍 Found 0 places to process
+   (0 in canonical scope · 0 unprocessed · 0 with extractable content)
+
+No records to process. Exiting.
+  ✓ enrichment_stage updated to 5
+
+────────────────────────────────────────────────────────────
+Stage 6: Website enrichment
+  node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/run-website-enrichment.ts --slug=zibbys-bookshop
+────────────────────────────────────────────────────────────
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  suppress all logs with { quiet: true }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔄 add secrets lifecycle management: https://dotenvx.com/ops
+[34mprisma:query[39m SELECT "public"."entities"."id", "public"."entities"."website", "public"."entities"."name", "public"."entities"."category" FROM "public"."entities" WHERE ("public"."entities"."slug" = $1 AND "public"."entities"."website" IS NOT NULL) ORDER BY "public"."entities"."updated_at" DESC LIMIT $2 OFFSET $3
+Website enrichment: 1 places (mode=default, ignoreThrottle=false, dryRun=false)
+
+  Zibby's Bookshop FULL ERROR:
+SyntaxError: Invalid regular expression: /^/collections/.*+.*/: Nothing to repeat
+    at new RegExp (<anonymous>)
+    at isPathDisallowed [90m(/Users/bobbyciccaglione/code/saiko-maps/[39mlib/website-enrichment/fetch.ts:43:18[90m)[39m
+    at fetchWithLimits [90m(/Users/bobbyciccaglione/code/saiko-maps/[39mlib/website-enrichment/fetch.ts:68:11[90m)[39m
+[90m    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at async runEnrichmentForPlace [90m(/Users/bobbyciccaglione/code/saiko-maps/[39mlib/website-enrichment/pipeline.ts:57:22[90m)[39m
+    at async main [90m(/Users/bobbyciccaglione/code/saiko-maps/[39mscripts/run-website-enrichment.ts:111:23[90m)[39m
+Done.
+  ✓ enrichment_stage updated to 6
+
+────────────────────────────────────────────────────────────
+Stage 7: Tagline generation (AI)
+  node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/generate-taglines-v2.ts --place=Zibby's Bookshop
+────────────────────────────────────────────────────────────
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+
+🎙️  Saiko Voice Engine v2.0 — Tagline Generator
+==========================================
+🔸 Single place: "Zibby's Bookshop"
+🔸 Concurrency: 5
+
+📍 Fetching records with identity signals...
+📍 Found 0 places to process
+
+No records to process. Exiting.
+  ✓ enrichment_stage updated to 7
+  ✓ last_enriched_at updated
+
+Re-scanning issues...
+  Issues: 0 created, 1 resolved, 6 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Zibby's Bookshop
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  ✓ Stage 3: Surface fetch (ran)
+  · Stage 4: Surface parse (skipped)
+  ✓ Stage 5: Identity signal extraction (AI) (ran)
+  ✓ Stage 6: Website enrichment (ran)
+  ✓ Stage 7: Tagline generation (AI) (ran)
+
+
+[2026-03-16T21:12:48.241Z] Process exited with code: 0

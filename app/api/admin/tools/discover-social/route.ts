@@ -18,6 +18,7 @@ import { spawn } from 'child_process';
 import path from 'path';
 import fs from 'fs';
 import Anthropic from '@anthropic-ai/sdk';
+import { writeClaimAndSanction } from '@/lib/fields-v2/write-claim';
 
 // ---------------------------------------------------------------------------
 // Inline single-entity discovery (synchronous, ~5s)
@@ -125,11 +126,21 @@ Return JSON (no markdown fences): { "website_url": "https://..." or null, "confi
   const confidence = parsed.confidence ?? 'low';
   const reasoning = parsed.reasoning ?? '';
 
+  // Map confidence string to numeric value for sanctioning
+  const confidenceNum = confidence === 'high' ? 0.95 : confidence === 'medium' ? 0.80 : 0.50;
+  const claimBase = {
+    entityId: entity.id,
+    sourceId: 'operator_website' as const, // AI web search discovery
+    extractionMethod: 'AI_EXTRACT' as const,
+    confidence: confidenceNum,
+    resolutionMethod: 'SLUG_EXACT' as const,
+  };
+
   if (mode === 'instagram') {
     const handle = parsed.instagram_handle ? cleanHandle(parsed.instagram_handle) : null;
     if (!handle) return { discovered: null, confidence, reasoning: reasoning || 'No handle found', saved: false };
     if ((confidence === 'high' || confidence === 'medium') && !dryRun) {
-      await db.entities.update({ where: { id: entity.id }, data: { instagram: handle } });
+      await writeClaimAndSanction(db, { ...claimBase, attributeKey: 'instagram', rawValue: handle });
       return { discovered: handle, confidence, reasoning, saved: true };
     }
     return { discovered: handle, confidence, reasoning, saved: false };
@@ -137,7 +148,7 @@ Return JSON (no markdown fences): { "website_url": "https://..." or null, "confi
     const handle = parsed.tiktok_handle ? cleanTiktokHandle(parsed.tiktok_handle) : null;
     if (!handle) return { discovered: null, confidence, reasoning: reasoning || 'No handle found', saved: false };
     if ((confidence === 'high' || confidence === 'medium') && !dryRun) {
-      await db.entities.update({ where: { id: entity.id }, data: { tiktok: handle } });
+      await writeClaimAndSanction(db, { ...claimBase, attributeKey: 'tiktok', rawValue: handle });
       return { discovered: handle, confidence, reasoning, saved: true };
     }
     return { discovered: handle, confidence, reasoning, saved: false };
@@ -145,7 +156,7 @@ Return JSON (no markdown fences): { "website_url": "https://..." or null, "confi
     const url = parsed.website_url ? cleanUrl(parsed.website_url) : null;
     if (!url) return { discovered: null, confidence, reasoning: reasoning || 'No website found', saved: false };
     if ((confidence === 'high' || confidence === 'medium') && !dryRun) {
-      await db.entities.update({ where: { id: entity.id }, data: { website: url } });
+      await writeClaimAndSanction(db, { ...claimBase, attributeKey: 'website', rawValue: url });
       return { discovered: url, confidence, reasoning, saved: true };
     }
     return { discovered: url, confidence, reasoning, saved: false };

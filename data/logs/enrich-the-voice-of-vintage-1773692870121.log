@@ -1,0 +1,43 @@
+[2026-03-16T20:27:50.121Z] Running stage 1 (Google Places identity commit) only for the-voice-of-vintage
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+
+Enrich: The Voice of Vintage (the-voice-of-vintage)
+  ID:      413716ac-670a-413a-974f-c90b94d4daa0
+  Website: —
+  GPID:    NONE
+
+────────────────────────────────────────────────────────────
+Stage 1: Google Places identity commit
+  node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/backfill-google-places.ts --slug the-voice-of-vintage
+────────────────────────────────────────────────────────────
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 📡 add observability to secrets: https://dotenvx.com/ops
+
+Backfill Google Places — 1 place(s) to process
+
+  ⚠️  the-voice-of-vintage (The Voice of Vintage): getPlaceDetails failed, trying search...
+  ❌ the-voice-of-vintage (The Voice of Vintage): could not resolve via Google Places
+
+--- Backfill Complete ---
+Enriched: 0
+Failed: 1
+  ✓ enrichment_stage updated to 1
+  ✓ last_enriched_at updated
+
+Re-scanning issues...
+  Issues: 0 created, 0 resolved, 10 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: The Voice of Vintage
+════════════════════════════════════════════════════════════
+  ✓ Stage 1: Google Places identity commit (ran)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:28:00.461Z] Process exited with code: 0

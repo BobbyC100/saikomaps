@@ -1,0 +1,27 @@
+[2026-03-16T20:28:34.914Z] Running stage 1 (Google Places identity commit) only for underdog-bookstore
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  write to custom object with { processEnv: myObject }
+
+Enrich: Underdog Bookstore (underdog-bookstore)
+  ID:      8eef5775-8a13-4282-b570-bc886be7d2e4
+  Website: http://underdogbookstore.org/
+  GPID:    ChIJB6Hah_7ZwoARgnT8aTeifc4
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 6 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Underdog Bookstore
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:28:37.064Z] Process exited with code: 0

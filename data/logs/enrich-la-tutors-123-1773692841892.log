@@ -1,0 +1,27 @@
+[2026-03-16T20:27:21.892Z] Running stage 1 (Google Places identity commit) only for la-tutors-123
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
+
+Enrich: LA Tutors 123 (la-tutors-123)
+  ID:      62653c27-d8c2-4acd-8af4-2f0f46398ce4
+  Website: http://www.latutors123.com/
+  GPID:    ChIJde_lukXGwoARjOiamTABw2U
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 4 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: LA Tutors 123
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:27:23.778Z] Process exited with code: 0

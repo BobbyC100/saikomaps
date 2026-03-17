@@ -1,0 +1,27 @@
+[2026-03-16T21:23:56.403Z] Running stage 1 (Google Places identity commit) only for jeffrey-h-denham-md
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔄 add secrets lifecycle management: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔄 add secrets lifecycle management: https://dotenvx.com/ops
+
+Enrich: Jeffrey H Denham, MD (jeffrey-h-denham-md)
+  ID:      cacbae5c-1677-4275-8e09-b896fa82b7e3
+  Website: https://www.huntingtonhealth.org/physicians/jeffrey-h-denham-md/
+  GPID:    ChIJs07isn3DwoARrWr4ycpwBXQ
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 6 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Jeffrey H Denham, MD
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T21:23:59.599Z] Process exited with code: 0

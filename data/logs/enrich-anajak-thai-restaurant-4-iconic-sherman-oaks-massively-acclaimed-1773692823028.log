@@ -1,0 +1,28 @@
+[2026-03-16T20:27:03.029Z] Running stage 1 (Google Places identity commit) only for anajak-thai-restaurant-4-iconic-sherman-oaks-massively-acclaimed
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
+
+Enrich: Anajak Thai Cuisine (anajak-thai-restaurant-4-iconic-sherman-oaks-massively-acclaimed)
+  ID:      5c5e31f1-d750-45ec-a26c-999f365a6cb5
+  Website: http://www.anajakthai.com/
+  GPID:    ChIJn-ihusWXwoARE6yGp6tPoIM
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+  ✓ needs_human_review cleared
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 3 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Anajak Thai Cuisine
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:27:05.677Z] Process exited with code: 0

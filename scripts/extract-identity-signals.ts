@@ -13,10 +13,12 @@
  *   --verbose       Show detailed extraction info
  *   --place=NAME    Process single place by name
  *   --reprocess     Re-extract even if signals exist
- * 
+ *   --concurrency=N Parallel extraction (default: 5)
+ *
  * Examples:
  *   npx tsx scripts/extract-identity-signals.ts --dry-run --limit=20 --verbose
  *   npx tsx scripts/extract-identity-signals.ts --place="Langer's"
+ *   npx tsx scripts/extract-identity-signals.ts --limit=50 --concurrency=10
  */
 
 import Anthropic from '@anthropic-ai/sdk';
@@ -220,11 +222,12 @@ interface CliArgs {
   verbose: boolean;
   placeName: string | null;
   reprocess: boolean;
+  concurrency: number;
 }
 
 function parseArgs(): CliArgs {
   const args = process.argv.slice(2);
-  
+
   return {
     dryRun: args.includes('--dry-run'),
     limit: args.find(a => a.startsWith('--limit='))
@@ -235,6 +238,9 @@ function parseArgs(): CliArgs {
       ? args.find(a => a.startsWith('--place='))!.split('=')[1].replace(/"/g, '')
       : null,
     reprocess: args.includes('--reprocess'),
+    concurrency: args.find(a => a.startsWith('--concurrency='))
+      ? parseInt(args.find(a => a.startsWith('--concurrency='))!.split('=')[1])
+      : 5,
   };
 }
 
@@ -456,6 +462,7 @@ async function main() {
   if (args.placeName) console.log(`🔸 Single place: "${args.placeName}"`);
   if (args.reprocess) console.log('🔸 Reprocessing existing signals');
   if (args.verbose) console.log('🔸 Verbose mode enabled');
+  console.log(`🔸 Concurrency: ${args.concurrency}`);
   console.log('');
 
   // ── v2 Selection: drive from canonical_entity_state ──────────────────────────
@@ -594,45 +601,52 @@ async function main() {
     },
   };
 
-  // Process records
-  for (let i = 0; i < records.length; i++) {
-    const record = records[i] as GoldenRecordInput;
-    const prefix = `[${i + 1}/${records.length}]`;
-    console.log(`${prefix} ${record.name}`);
+  // Process records in concurrent batches
+  for (let i = 0; i < records.length; i += args.concurrency) {
+    const batch = records.slice(i, i + args.concurrency);
+    const batchNum = Math.floor(i / args.concurrency) + 1;
+    const totalBatches = Math.ceil(records.length / args.concurrency);
 
-    const { result, inputQuality } = await extractSignals(record, args.verbose);
-    
-    stats.processed++;
-    stats.byInputQuality[inputQuality.overallQuality]++;
-    
-    if (result) {
-      const tier = getConfidenceTier(result.confidence);
-      stats.byConfidenceTier[tier]++;
-      if (tier === 'hold') {
-        // Do not write hold-tier results to derived_signals: the blob would be
-        // mostly null, marking the entity as "done" and blocking future runs
-        // once real scraped content arrives.  Let the entity be retried.
-        console.log(`    Held (confidence ${result.confidence.toFixed(2)}) — write skipped, will retry when content improves`);
-        stats.held++;
-      } else {
-        await writeSignals(record.canonical_id, result, inputQuality, args.dryRun);
-        stats.extracted++;
+    console.log(`\n[Batch ${batchNum}/${totalBatches}] Processing ${batch.length} places...`);
+
+    const batchPromises = batch.map(async (record, batchIdx) => {
+      const globalIdx = i + batchIdx;
+      const prefix = `[${globalIdx + 1}/${records.length}]`;
+      console.log(`${prefix} ${record.name}`);
+
+      try {
+        const { result, inputQuality } = await extractSignals(record, args.verbose);
+
+        stats.processed++;
+        stats.byInputQuality[inputQuality.overallQuality]++;
+
+        if (result) {
+          const tier = getConfidenceTier(result.confidence);
+          stats.byConfidenceTier[tier]++;
+          if (tier === 'hold') {
+            console.log(`    Held (confidence ${result.confidence.toFixed(2)}) — write skipped, will retry when content improves`);
+            stats.held++;
+          } else {
+            await writeSignals(record.canonical_id, result, inputQuality, args.dryRun);
+            stats.extracted++;
+          }
+        } else if (inputQuality.overallQuality === 'none') {
+          stats.skipped++;
+        } else {
+          stats.failed++;
+        }
+      } catch (error) {
+        console.error(`${prefix} ❌ Error:`, error);
+        stats.failed++;
+        stats.processed++;
       }
-    } else if (inputQuality.overallQuality === 'none') {
-      stats.skipped++;
-    } else {
-      stats.failed++;
-    }
+    });
 
-    // Rate limiting
-    if (i < records.length - 1) {
-      await sleep(CONFIG.requestDelayMs);
-    }
-    
-    // Batch delay
-    if ((i + 1) % CONFIG.batchSize === 0 && i < records.length - 1) {
-      if (args.verbose) console.log(`    [Batch pause: ${CONFIG.batchDelayMs}ms]`);
-      await sleep(CONFIG.batchDelayMs);
+    await Promise.all(batchPromises);
+
+    // Small delay between batches
+    if (i + args.concurrency < records.length) {
+      await sleep(500);
     }
   }
 

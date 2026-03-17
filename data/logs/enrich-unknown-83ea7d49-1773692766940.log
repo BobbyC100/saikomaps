@@ -1,0 +1,27 @@
+[2026-03-16T20:26:06.941Z] Running stage 1 (Google Places identity commit) only for unknown-83ea7d49
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+
+Enrich: Los Angeles State Historic Park (unknown-83ea7d49)
+  ID:      83ea7d49-08af-4011-a7e0-fe5355153367
+  Website: https://lastatehistoricpark.org/
+  GPID:    ChIJgfk0NV7GwoAR4ja9LMYRY0s
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 5 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Los Angeles State Historic Park
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:26:09.591Z] Process exited with code: 0

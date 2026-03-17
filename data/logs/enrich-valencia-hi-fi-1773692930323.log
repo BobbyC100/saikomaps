@@ -1,0 +1,27 @@
+[2026-03-16T20:28:50.323Z] Running stage 1 (Google Places identity commit) only for valencia-hi-fi
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  write to custom object with { processEnv: myObject }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+
+Enrich: Valencia Hi-Fi (valencia-hi-fi)
+  ID:      4510e508-8202-4a2a-b1f7-89388d753619
+  Website: http://valenciahifi.com/
+  GPID:    ChIJ65IQxTt_woARH17ETYC3wNc
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 6 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Valencia Hi-Fi
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:28:53.857Z] Process exited with code: 0

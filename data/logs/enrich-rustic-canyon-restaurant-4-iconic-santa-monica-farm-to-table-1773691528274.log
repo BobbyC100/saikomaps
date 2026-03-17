@@ -1,0 +1,28 @@
+[2026-03-16T20:05:28.274Z] Running stage 1 (Google Places identity commit) only for rustic-canyon-restaurant-4-iconic-santa-monica-farm-to-table
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  write to custom object with { processEnv: myObject }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+
+Enrich: Rustic Canyon (rustic-canyon-restaurant-4-iconic-santa-monica-farm-to-table)
+  ID:      bf1e76e4-15cc-4a1a-afe7-59e9ffc5a50c
+  Website: https://rusticcanyonrestaurant.com/
+  GPID:    ChIJn7_uYGKjwoARLjGYQnczLhg
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+  ✓ needs_human_review cleared
+
+Re-scanning issues...
+  Issues: 0 created, 0 resolved, 7 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Rustic Canyon
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:05:30.284Z] Process exited with code: 0

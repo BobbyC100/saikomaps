@@ -1,0 +1,27 @@
+[2026-03-16T20:23:26.688Z] Running stage 1 (Google Places identity commit) only for dan-tanas
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  write to custom object with { processEnv: myObject }
+
+Enrich: Dan Tana's (dan-tanas)
+  ID:      5af44f91-e94d-41a8-a44f-b7d67d9a6fc8
+  Website: https://dantanasrestaurant.com/
+  GPID:    ChIJreK-k6i-woARSyd335Nkcr0
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 4 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Dan Tana's
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:23:28.999Z] Process exited with code: 0

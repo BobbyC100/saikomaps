@@ -1,0 +1,27 @@
+[2026-03-16T20:27:27.178Z] Running stage 1 (Google Places identity commit) only for cacao-mexicatessen-eagle-rock
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  suppress all logs with { quiet: true }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+
+Enrich: CaCao Mexicatessen (cacao-mexicatessen-eagle-rock)
+  ID:      64794072-0716-4079-8bf6-08d77747d47f
+  Website: http://www.cacaodeli.com/
+  GPID:    ChIJfSg8t-DDwoARSPpKkxtmem4
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 4 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: CaCao Mexicatessen
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:27:29.076Z] Process exited with code: 0

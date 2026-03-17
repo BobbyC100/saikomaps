@@ -1,0 +1,27 @@
+[2026-03-16T20:27:38.549Z] Running stage 1 (Google Places identity commit) only for langers-delicatessen
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  enable debug logging with { debug: true }
+
+Enrich: Langer's Delicatessen-Restaurant (langers-delicatessen)
+  ID:      e7f0d925-b9ae-4d06-9614-d5a2991c5f87
+  Website: https://www.langersdeli.com/
+  GPID:    ChIJP1rAZZ_HwoARAcX96y-BrjY
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 4 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Langer's Delicatessen-Restaurant
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:27:40.952Z] Process exited with code: 0

@@ -1,0 +1,148 @@
+[2026-03-16T21:18:55.791Z] Starting enrichment for chuys-tacos-dorados
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  override existing env vars with { override: true }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+
+Enrich: Chuy's Tacos Dorados (chuys-tacos-dorados)
+  ID:      e58fd4a4-3367-4fd2-919f-4c91c79ca146
+  Website: http://www.chuystacosdorados.com/
+  GPID:    ChIJj_5FxSLGwoAR8Jlbxey3fPo
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Stage 2: Surface discovery — skipped (surface rows already exist)
+
+────────────────────────────────────────────────────────────
+Stage 3: Surface fetch
+  node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/run-surface-fetch.ts --entity-id=e58fd4a4-3367-4fd2-919f-4c91c79ca146 --limit=20
+────────────────────────────────────────────────────────────
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  enable debug logging with { debug: true }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+📥 Merchant Surface Fetch Pass
+
+No discovered surfaces to fetch.
+  ✓ enrichment_stage updated to 3
+
+Stage 4: Surface parse — skipped (no surfaces pending parse)
+
+────────────────────────────────────────────────────────────
+Stage 5: Identity signal extraction (AI)
+  node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/extract-identity-signals.ts --place=Chuy's Tacos Dorados
+────────────────────────────────────────────────────────────
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  write to custom object with { processEnv: myObject }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+
+🔮 Saiko Maps — Identity Signal Extraction
+==========================================
+🔸 Single place: "Chuy's Tacos Dorados"
+
+📍 Found 1 places to process
+   (1 in canonical scope · 1 unprocessed · 1 with extractable content)
+
+[1/1] Chuy's Tacos Dorados
+
+==========================================
+📊 EXTRACTION SUMMARY
+==========================================
+Total processed:   1
+Extracted:         1
+Held (low conf):   0  ← not written, will retry
+Skipped (no data): 0
+Failed:            0
+
+By Confidence Tier:
+  Publish (≥0.7):  1
+  Review (0.4-0.7): 0
+  Hold (<0.4):     0
+
+By Input Quality:
+  Good (2+ sources): 0
+  Partial (1 source): 1
+  Minimal:          0
+  None:             0
+==========================================
+
+✅ Database updated
+  ✓ enrichment_stage updated to 5
+
+────────────────────────────────────────────────────────────
+Stage 6: Website enrichment
+  node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/run-website-enrichment.ts --slug=chuys-tacos-dorados
+────────────────────────────────────────────────────────────
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
+[34mprisma:query[39m SELECT "public"."entities"."id", "public"."entities"."website", "public"."entities"."name", "public"."entities"."category" FROM "public"."entities" WHERE ("public"."entities"."slug" = $1 AND "public"."entities"."website" IS NOT NULL) ORDER BY "public"."entities"."updated_at" DESC LIMIT $2 OFFSET $3
+Website enrichment: 1 places (mode=default, ignoreThrottle=false, dryRun=false)
+
+  Chuy's Tacos Dorados | 200 | conf=0.40 | cat=—
+[34mprisma:query[39m INSERT INTO "public"."merchant_enrichment_runs" ("id","entity_id","source_url","final_url","fetched_at","http_status","extraction_json","confidence","cost_usd","created_at") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING "public"."merchant_enrichment_runs"."id", "public"."merchant_enrichment_runs"."entity_id", "public"."merchant_enrichment_runs"."source_url", "public"."merchant_enrichment_runs"."final_url", "public"."merchant_enrichment_runs"."fetched_at", "public"."merchant_enrichment_runs"."http_status", "public"."merchant_enrichment_runs"."extraction_json", "public"."merchant_enrichment_runs"."confidence", "public"."merchant_enrichment_runs"."cost_usd", "public"."merchant_enrichment_runs"."created_at"
+[34mprisma:query[39m SELECT "public"."entities"."id", "public"."entities"."category" FROM "public"."entities" WHERE ("public"."entities"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+[34mprisma:query[39m UPDATE "public"."entities" SET "last_enriched_at" = $1, "needs_human_review" = $2, "updated_at" = $3 WHERE ("public"."entities"."id" = $4 AND 1=1) RETURNING "public"."entities"."id"
+Done.
+[34mprisma:query[39m INSERT INTO "public"."place_job_log" ("id","entity_id","entity_type","job_type","pages_fetched","ai_calls","duration_ms","estimated_cost","created_at") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING "public"."place_job_log"."id", "public"."place_job_log"."entity_id", "public"."place_job_log"."entity_type", "public"."place_job_log"."job_type", "public"."place_job_log"."pages_fetched", "public"."place_job_log"."ai_calls", "public"."place_job_log"."duration_ms", "public"."place_job_log"."estimated_cost", "public"."place_job_log"."created_at"
+  ✓ enrichment_stage updated to 6
+
+────────────────────────────────────────────────────────────
+Stage 7: Tagline generation (AI)
+  node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/generate-taglines-v2.ts --place=Chuy's Tacos Dorados
+────────────────────────────────────────────────────────────
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+
+🎙️  Saiko Voice Engine v2.0 — Tagline Generator
+==========================================
+🔸 Single place: "Chuy's Tacos Dorados"
+🔸 Concurrency: 5
+
+📍 Fetching records with identity signals...
+📍 Found 1 places to process
+
+
+[Batch 1/1] Processing 1 places...
+────────────────────────────────────────────────────────────────────────────────
+[1/1] Chuy's Tacos Dorados (excellent)
+
+==========================================
+📊 GENERATION SUMMARY
+==========================================
+Total processed:  1
+Generated:        1
+Skipped:          0
+Failed:           0
+
+By Pattern:
+  Food Forward:       1
+  Neighborhood Anchor: 0
+  Energy Check:       0
+  Local Authority:    0
+
+By Signal Quality:
+  Excellent: 1
+  Good:      0
+  Minimal:   0
+  Insufficient: 0
+==========================================
+
+
+✅ Successfully saved 1 taglines to database
+  ✓ enrichment_stage updated to 7
+  ✓ last_enriched_at updated
+  ✓ needs_human_review cleared
+
+Re-scanning issues...
+  Issues: 0 created, 1 resolved, 3 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Chuy's Tacos Dorados
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  ✓ Stage 3: Surface fetch (ran)
+  · Stage 4: Surface parse (skipped)
+  ✓ Stage 5: Identity signal extraction (AI) (ran)
+  ✓ Stage 6: Website enrichment (ran)
+  ✓ Stage 7: Tagline generation (AI) (ran)
+
+
+[2026-03-16T21:19:27.614Z] Process exited with code: 0

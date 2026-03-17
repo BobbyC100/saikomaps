@@ -1,0 +1,27 @@
+[2026-03-16T20:04:50.151Z] Running stage 1 (Google Places identity commit) only for unknown-1545fda3
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  override existing env vars with { override: true }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+
+Enrich: Hauser & Wirth (unknown-1545fda3)
+  ID:      1545fda3-5d3d-4101-8eb9-20c5bfdadf2b
+  Website: https://www.hauserwirth.com/
+  GPID:    ChIJ0yp3zD7GwoARoWoWU4X2g8g
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 5 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Hauser & Wirth
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:04:52.937Z] Process exited with code: 0

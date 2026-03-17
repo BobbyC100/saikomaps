@@ -29,6 +29,7 @@ if (!process.env.SAIKO_DB_FROM_WRAPPER) {
 }
 
 import { PrismaClient } from '@prisma/client';
+import { writeClaimAndSanction } from '@/lib/fields-v2/write-claim';
 
 const db = new PrismaClient();
 
@@ -200,9 +201,15 @@ async function main() {
 
   for (const r of toSet) {
     try {
-      await db.entities.update({
-        where: { id: r.entityId },
-        data: { instagram: r.extractedHandle },
+      await writeClaimAndSanction(db, {
+        entityId: r.entityId,
+        attributeKey: 'instagram',
+        rawValue: r.extractedHandle!,
+        sourceId: 'operator_website',
+        sourceUrl: r.surfaceUrl,
+        extractionMethod: 'SCRAPE',
+        confidence: 0.90,
+        resolutionMethod: 'SLUG_EXACT',
       });
       written++;
       console.log(`[IG Backfill] ✓ ${r.entityName} → @${r.extractedHandle}`);

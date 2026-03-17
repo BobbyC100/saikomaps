@@ -1,0 +1,27 @@
+[2026-03-16T20:27:25.903Z] Running stage 1 (Google Places identity commit) only for a-good-used-book
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
+
+Enrich: A Good Used Book (a-good-used-book)
+  ID:      8e330be2-4ec3-4112-be2a-49b5e7ab14bb
+  Website: https://agoodusedbook.com/
+  GPID:    ChIJDUcldI3HwoARsDuCRUCyXH4
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 4 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: A Good Used Book
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:27:27.813Z] Process exited with code: 0

@@ -1,0 +1,27 @@
+[2026-03-16T20:28:08.837Z] Running stage 1 (Google Places identity commit) only for the-artform-studio
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  write to custom object with { processEnv: myObject }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+
+Enrich: The Artform Studio (the-artform-studio)
+  ID:      0d4fcfaa-d5b6-4086-a9fb-81a9e5f8bc08
+  Website: http://www.theartformstudio.com/
+  GPID:    ChIJm4NsBjnGwoARzsQM-838Vzc
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 6 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: The Artform Studio
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:28:11.276Z] Process exited with code: 0

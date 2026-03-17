@@ -67,14 +67,14 @@ export async function POST(
       return NextResponse.json({ error: `Entity not found: ${slug}` }, { status: 404 });
     }
 
-    // Promote CANDIDATE → OPEN so the enrichment pipeline can locate it,
-    // and reset enrichment_stage + last_enriched_at so pipeline re-runs all stages
+    // Promote CANDIDATE → OPEN so the enrichment pipeline can locate it.
+    // Reset enrichment_stage for progress tracking, but preserve last_enriched_at
+    // so batch mode doesn't re-select entities that have already been through the pipeline.
     await db.entities.update({
       where: { slug },
       data: {
         ...(entity.status === 'CANDIDATE' ? { status: 'OPEN' } : {}),
         enrichment_stage: null,
-        last_enriched_at: null,
       },
     });
 

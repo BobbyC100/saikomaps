@@ -4,6 +4,8 @@ status: DRAFT
 owner: Bobby
 last_updated: 2026-03-16
 layer: Concept Doc (Layer 1)
+related_docs:
+  - SKAI-DOC-FIELDS-ATOMIC-SIGNALS-001
 ---
 
 # SAIKO FIELDS — Place Identity Concept Document

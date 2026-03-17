@@ -1,0 +1,27 @@
+[2026-03-16T20:26:16.343Z] Running stage 1 (Google Places identity commit) only for little-fish-echo-park
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  suppress all logs with { quiet: true }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+
+Enrich: Little Fish Echo Park (little-fish-echo-park)
+  ID:      2e340eaa-2fa7-4353-9f8c-91c20cf3f42d
+  Website: https://littlefishechopark.com/
+  GPID:    ChIJCWc7fhHHwoARXg2bZCd7D-8
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 1 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Little Fish Echo Park
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:26:18.688Z] Process exited with code: 0

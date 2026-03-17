@@ -1,0 +1,27 @@
+[2026-03-16T20:28:29.961Z] Running stage 1 (Google Places identity commit) only for the-daily-planet
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
+
+Enrich: Daily Planet Book Store (the-daily-planet)
+  ID:      041c6f2e-4161-45a0-865c-ffb04890c65b
+  Website: http://www.thedailyplanetbookstore.com/
+  GPID:    ChIJEygfzUa_woARgE_ZkZL6aXU
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 6 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Daily Planet Book Store
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:28:32.467Z] Process exited with code: 0

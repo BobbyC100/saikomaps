@@ -1,0 +1,124 @@
+[2026-03-16T21:16:44.928Z] Starting enrichment for a-good-used-book
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
+
+Enrich: A Good Used Book (a-good-used-book)
+  ID:      8e330be2-4ec3-4112-be2a-49b5e7ab14bb
+  Website: https://agoodusedbook.com/
+  GPID:    ChIJDUcldI3HwoARsDuCRUCyXH4
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Stage 2: Surface discovery — skipped (surface rows already exist)
+
+────────────────────────────────────────────────────────────
+Stage 3: Surface fetch
+  node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/run-surface-fetch.ts --entity-id=8e330be2-4ec3-4112-be2a-49b5e7ab14bb --limit=20
+────────────────────────────────────────────────────────────
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 📡 add observability to secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+📥 Merchant Surface Fetch Pass
+
+No discovered surfaces to fetch.
+  ✓ enrichment_stage updated to 3
+
+Stage 4: Surface parse — skipped (no surfaces pending parse)
+
+────────────────────────────────────────────────────────────
+Stage 5: Identity signal extraction (AI)
+  node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/extract-identity-signals.ts --place=A Good Used Book
+────────────────────────────────────────────────────────────
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+
+🔮 Saiko Maps — Identity Signal Extraction
+==========================================
+🔸 Single place: "A Good Used Book"
+
+📍 Found 1 places to process
+   (1 in canonical scope · 1 unprocessed · 1 with extractable content)
+
+[1/1] A Good Used Book
+    Held (confidence 0.10) — write skipped, will retry when content improves
+
+==========================================
+📊 EXTRACTION SUMMARY
+==========================================
+Total processed:   1
+Extracted:         0
+Held (low conf):   1  ← not written, will retry
+Skipped (no data): 0
+Failed:            0
+
+By Confidence Tier:
+  Publish (≥0.7):  0
+  Review (0.4-0.7): 0
+  Hold (<0.4):     1
+
+By Input Quality:
+  Good (2+ sources): 0
+  Partial (1 source): 1
+  Minimal:          0
+  None:             0
+==========================================
+
+✅ Database updated
+  ✓ enrichment_stage updated to 5
+
+────────────────────────────────────────────────────────────
+Stage 6: Website enrichment
+  node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/run-website-enrichment.ts --slug=a-good-used-book
+────────────────────────────────────────────────────────────
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  override existing env vars with { override: true }
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+[34mprisma:query[39m SELECT "public"."entities"."id", "public"."entities"."website", "public"."entities"."name", "public"."entities"."category" FROM "public"."entities" WHERE ("public"."entities"."slug" = $1 AND "public"."entities"."website" IS NOT NULL) ORDER BY "public"."entities"."updated_at" DESC LIMIT $2 OFFSET $3
+Website enrichment: 1 places (mode=default, ignoreThrottle=false, dryRun=false)
+
+  A Good Used Book FULL ERROR:
+SyntaxError: Invalid regular expression: /^/collections/.*+.*/: Nothing to repeat
+    at new RegExp (<anonymous>)
+    at isPathDisallowed [90m(/Users/bobbyciccaglione/code/saiko-maps/[39mlib/website-enrichment/fetch.ts:43:18[90m)[39m
+    at fetchWithLimits [90m(/Users/bobbyciccaglione/code/saiko-maps/[39mlib/website-enrichment/fetch.ts:68:11[90m)[39m
+[90m    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at async runEnrichmentForPlace [90m(/Users/bobbyciccaglione/code/saiko-maps/[39mlib/website-enrichment/pipeline.ts:57:22[90m)[39m
+    at async main [90m(/Users/bobbyciccaglione/code/saiko-maps/[39mscripts/run-website-enrichment.ts:111:23[90m)[39m
+Done.
+  ✓ enrichment_stage updated to 6
+
+────────────────────────────────────────────────────────────
+Stage 7: Tagline generation (AI)
+  node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/generate-taglines-v2.ts --place=A Good Used Book
+────────────────────────────────────────────────────────────
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔄 add secrets lifecycle management: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+
+🎙️  Saiko Voice Engine v2.0 — Tagline Generator
+==========================================
+🔸 Single place: "A Good Used Book"
+🔸 Concurrency: 5
+
+📍 Fetching records with identity signals...
+📍 Found 0 places to process
+
+No records to process. Exiting.
+  ✓ enrichment_stage updated to 7
+  ✓ last_enriched_at updated
+
+Re-scanning issues...
+  Issues: 0 created, 1 resolved, 4 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: A Good Used Book
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  ✓ Stage 3: Surface fetch (ran)
+  · Stage 4: Surface parse (skipped)
+  ✓ Stage 5: Identity signal extraction (AI) (ran)
+  ✓ Stage 6: Website enrichment (ran)
+  ✓ Stage 7: Tagline generation (AI) (ran)
+
+
+[2026-03-16T21:17:08.292Z] Process exited with code: 0

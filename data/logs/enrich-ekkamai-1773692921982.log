@@ -1,0 +1,27 @@
+[2026-03-16T20:28:41.982Z] Running stage 1 (Google Places identity commit) only for ekkamai
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
+
+Enrich: Ekkamai Thai Restaurant (ekkamai)
+  ID:      616c5c71-94e8-4282-9379-c18394c09ff4
+  Website: http://www.ekkamairestaurant.com/
+  GPID:    ChIJu4Y1Moq6woARzarhtfXjLBU
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 4 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Ekkamai Thai Restaurant
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:28:44.220Z] Process exited with code: 0

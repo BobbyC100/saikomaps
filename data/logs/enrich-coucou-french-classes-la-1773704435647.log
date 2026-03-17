@@ -1,0 +1,25 @@
+[2026-03-16T23:40:35.648Z] Running stage 1 (Google Places identity commit) only for coucou-french-classes-la
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  write to custom object with { processEnv: myObject }
+
+Enrich: Coucou French Classes LA (coucou-french-classes-la)
+  ID:      407fd6dc-1ca3-4b3d-a023-e302ef0e88b6
+  Website: http://coucoufrenchclasses.com/la
+  GPID:    ChIJc3Tj3zrBwoARyeBwjUdMKB4
+
+Re-scanning issues...
+  Issues: 0 created, 0 resolved, 3 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Coucou French Classes LA
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T23:40:37.455Z] Process exited with code: 0

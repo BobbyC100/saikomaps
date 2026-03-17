@@ -1,0 +1,27 @@
+[2026-03-16T20:29:02.618Z] Running stage 1 (Google Places identity commit) only for mystery-pier-books
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 📡 add observability to secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+
+Enrich: Mystery Pier (mystery-pier-books)
+  ID:      1e5aedf4-8366-4154-aade-5dcbe2d60b5f
+  Website: http://www.mysterypierbooks.com/
+  GPID:    ChIJ1Sh7C6O-woARQBeziMQLf_s
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 6 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Mystery Pier
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:29:05.914Z] Process exited with code: 0

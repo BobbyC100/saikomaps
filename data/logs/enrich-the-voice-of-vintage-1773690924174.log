@@ -1,0 +1,11 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 📡 add observability to secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+
+Backfill Google Places — 1 place(s) to process
+
+  ⚠️  the-voice-of-vintage (The Voice of Vintage): getPlaceDetails failed, trying search...
+  ❌ the-voice-of-vintage (The Voice of Vintage): could not resolve via Google Places
+
+--- Backfill Complete ---
+Enriched: 0
+Failed: 1

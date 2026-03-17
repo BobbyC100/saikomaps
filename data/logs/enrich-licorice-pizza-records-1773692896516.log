@@ -1,0 +1,27 @@
+[2026-03-16T20:28:16.516Z] Running stage 1 (Google Places identity commit) only for licorice-pizza-records
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 📡 add observability to secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (19) from .env.local -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+
+Enrich: Licorice Pizza Records (licorice-pizza-records)
+  ID:      3fff567c-6f2e-4f8b-963f-0b4edbf2b186
+  Website: https://www.licoricepizzastore.com/
+  GPID:    ChIJI5ZwvJ-9woARByMwZtB_sr0
+
+Stage 1: Google Places identity commit — skipped (Google Places data already cached (placesDataCachedAt set))
+
+Re-scanning issues...
+  Issues: 1 created, 0 resolved, 6 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Licorice Pizza Records
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-16T20:28:18.729Z] Process exited with code: 0
