@@ -49,7 +49,7 @@ async function main() {
       OR: [{ website: null }, { website: "" }],
     },
     select: { id: true, name: true, googlePlaceId: true, website: true },
-    take: limit,
+    ...(Number.isFinite(limit) ? { take: limit } : {}),
   });
 
   console.log(`Found ${placesNeedingWebsite.length} places needing website\n`);
