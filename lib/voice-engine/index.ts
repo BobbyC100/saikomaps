@@ -1,8 +1,11 @@
 /**
  * Saiko Voice Engine v1.1
  * Controlled vocabulary system for generating restaurant taglines
- * 
- * Main exports for tagline generation pipeline
+ *
+ * @deprecated — v2 (lib/voice-engine-v2) is the canonical voice engine.
+ * Do not add new features here. Some shared utilities (vocabulary, validation,
+ * ad-units) are still imported by v2 and remain stable; the rest of this
+ * module (orchestrator, generator, selector, signal-extraction) is superseded.
  */
 
 // Core orchestrator

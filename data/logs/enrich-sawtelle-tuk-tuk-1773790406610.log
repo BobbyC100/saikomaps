@@ -1,0 +1,25 @@
+[2026-03-17T23:33:26.613Z] Running stage 1 (Google Places identity commit) only for sawtelle-tuk-tuk
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  enable debug logging with { debug: true }
+[dotenv@17.2.3] injecting env (18) from .env.local -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+
+Enrich: Sawtelle Tuk Tuk (sawtelle-tuk-tuk)
+  ID:      3910c3c6-123e-4ea1-b322-f5e40bd5dbf4
+  Website: https://www.tuktukthailosangeles.com
+  GPID:    ChIJkdfntl25woAR38iYliqBLk
+
+Re-scanning issues...
+  Issues: 0 created, 0 resolved, 4 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Sawtelle Tuk Tuk
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-17T23:33:28.257Z] Process exited with code: 0

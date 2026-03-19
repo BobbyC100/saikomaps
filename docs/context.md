@@ -1,8 +1,8 @@
 # Saiko — Context Snapshot
 
-> Generated: 2026-03-17T00:26:46.159Z
+> Generated: 2026-03-18T00:17:57.110Z
 > Source: docs/registry.json (2026-03-17T00:45:00.000Z)
-> Documents: 79 included / 84 total
+> Documents: 80 included / 86 total
 > Filters: status=active
 
 ---
@@ -38,6 +38,7 @@ To regenerate: `npm run docs:context`
 - [ARCH-SYSTEM-CONTRACT](#arch-system-contract) — SYSTEM CONTRACT
 - [ARCHITECTURE-INSTAGRAM-API-INTEGRATION-V1](#architecture-instagram-api-integration-v1) — Instagram API Integration — Current State: Instagram Graph API integration state — Meta app config, permissions, verified endpoints, architectural models for media ingestion
 - [ARCHITECTURE-INSTAGRAM-IMPLEMENTATION-V1](#architecture-instagram-implementation-v1) — Instagram Integration — Implementation & Impact Doc: Instagram integration implementation plan and system impact — tables, sync rules, temporal signals, interpretation layer, photo strategy, attachment model. V0.2 adds current state assessment, implementation phases, and data review results.
+- [ARCHITECTURE-INSTAGRAM-INGESTION-V1](#architecture-instagram-ingestion-v1) — Instagram Ingestion — Field Spec v1: Instagram ingestion schema — 3 tables, field definitions, sync rules. Engineering handoff for migration + Prisma models.
 - [COVOPS-APPROACH-V1](#covops-approach-v1) — Coverage Operations — Architectural Position: Architectural position for Coverage Operations — introduces entity_issues as a unified operational layer over existing queue fragments, with tool readiness assessment and phased implementation plan.
 - [ENRICH-STRATEGY-V1](#enrich-strategy-v1) — Entity Enrichment Strategy: Entity enrichment lifecycle (Intake→Identify→Enrich→Assess→Publish), phased execution (free before paid), evidence-vs-canonical architecture, editorial coverage pipeline, and hard rules for enrichment ordering.
 - [FIELDS-ERA-OVERVIEW-V1](#fields-era-overview-v1) — Entity Record Awareness (ERA) — One-Pager: Defines Entity Record Awareness (ERA) — how Saiko becomes aware a place exists, separating awareness from canonical (Golden) status to prevent silent drift.
@@ -59,12 +60,12 @@ To regenerate: `npm run docs:context`
 - [SAIKO-FIELDS-V2-CUTOVER-SPEC](#saiko-fields-v2-cutover-spec) — Fields v2 — Cutover Spec
 - [SAIKO-FORMALITY-SCORE-SPEC](#saiko-formality-score-spec) — Formality Score — Specification (Locked)
 - [SYS-COVERAGE-OPS-ISSUE-CONTRACT-V1](#sys-coverage-ops-issue-contract-v1) — Coverage Ops Issue Contract (v1): Canonical issue contract for Coverage Ops v1 — issue types, severity, gating, and UI action mappings.
-- [SAIKO-DATA-PIPELINE-QUICK-START](#saiko-data-pipeline-quick-start) — Data Pipeline Quick Reference
+- [SAIKO-DATA-PIPELINE-QUICK-START](#saiko-data-pipeline-quick-start) — Data Pipeline — Quick Start: Quick-start guide for entity intake and enrichment. Start here if you have a list of place names to add.
 - [SAIKO-DATABASE-SCHEMA](#saiko-database-schema) — Saiko Maps - Database Schema
-- [SAIKO-DATABASE-SETUP](#saiko-database-setup) — Database Setup for Saiko Maps
-- [SAIKO-ENV-TEMPLATE](#saiko-env-template) — Environment Variables Setup
+- [SAIKO-DATABASE-SETUP](#saiko-database-setup) — Database Setup
+- [SAIKO-ENV-TEMPLATE](#saiko-env-template) — Environment Variables
 - [SAIKO-GOOGLE-PLACES-SETUP](#saiko-google-places-setup) — Google Places API — Unblock Legacy Text Search
-- [SAIKO-PIPELINE-COMMANDS](#saiko-pipeline-commands) — Saiko Maps — Pipeline Commands
+- [SAIKO-PIPELINE-COMMANDS](#saiko-pipeline-commands) — Pipeline Commands
 - [SAIKO-PROVENANCE-QUICK-REF](#saiko-provenance-quick-ref) — Provenance System - Quick Reference
 - [SAIKO-SITEMAP](#saiko-sitemap) — Saiko Maps - Sitemap
 - [ENRICH-PLAYBOOK-V1](#enrich-playbook-v1) — City Launch Enrichment Playbook: Reusable, sequenced playbook for enriching 1,000+ entities at city-launch scale. Tool inventory, fully-enriched benchmark, gap analysis, 7-phase execution sequence (free→paid), cost model (~$5-10 per 1K entities), monitoring, and new-city checklist.
@@ -1898,9 +1899,11 @@ Two-column layout from the top. No hero image.
 ┌─────────────────────────────────┬──────────────────────────┐
 │  {Name}            (lg serif)   │                          │
 │  {Identity Line}                │  (softened — right col   │
-│  {Open/Closed state}            │   starts below identity) │
+│  {Tagline}  (italic serif)      │   starts below identity) │
+│  {Open/Closed state}            │                          │
 │                                 │                          │
-│  Reserve ↗  Directions ↗        │                          │
+│  Reserve ↗  Website ↗           │                          │
+│  Instagram ↗  TikTok ↗          │                          │
 │  ───────────────────────────────│──────────────────────────│
 │                                 │  HOURS                   │
 │  ABOUT                          │  {formatted hours}       │
@@ -1948,7 +1951,7 @@ The place page combines up to three distinct narrative voices:
 |-------|---------|--------|---------|------|--------|
 | **Merchant** | ABOUT | Website about, IG bio, merchant text; synthesized if absent | "What is this place?" | Upbeat, descriptive, slightly enticing, neutral-to-positive | Implement now |
 | **External media** | COVERAGE NOTE | LA Times, Eater, Michelin, etc. (coverage_sources) | "Why is this place notable?" | Direct quote, attributed, 1-2 lines max | Implement now |
-| **Saiko** | (future) | AI editorial layers (interpretation_cache TAGLINE, etc.) | Saiko's own editorial voice | TBD | Not on page yet |
+| **Saiko** | Tagline | AI editorial layers (interpretation_cache TAGLINE via Voice Engine v2) | Saiko's own editorial voice | Confident, understated, cool | Tagline rendered below identity subline |
 
 These voices must never merge. ABOUT and Coverage Note are always separate sections.
 
@@ -1966,7 +1969,14 @@ These voices must never merge. ABOUT and Coverage Note are always separate secti
 
 **Visual treatment**: Most important text block — visually distinct. Drop-cap first letter, serif typography, slightly larger line height, inset spacing.
 
-**Current data**: entities.description has 5/143 (short one-liners, hand-seeded). Merchant surface text exists in merchant_surface_artifacts for enriched entities. Synthesis path needed for the rest.
+**Implementation**: VOICE_DESCRIPTOR pipeline (WO-ABOUT-001) implements a 3-tier generation hierarchy stored in interpretation_cache:
+- **Tier 1 (verbatim-v1)**: Extracted from merchant surface artifacts — coherence-filtered, quality-scored
+- **Tier 2 (about-synth-v1)**: AI-synthesized from merchant text blocks in the merchant's voice
+- **Tier 3 (about-compose-v1)**: AI-composed from structured signals when no merchant text exists
+
+**Read path**: API reads VOICE_DESCRIPTOR from interpretation_cache (is_current=true), falls back to entities.description. Page renders with descriptionSource label for provenance.
+
+**Current data**: entities.description has 5/143 (short one-liners, hand-seeded). Merchant surface text exists in merchant_surface_artifacts for enriched entities. VOICE_DESCRIPTOR pipeline ready for batch execution.
 
 ### 3.3 COVERAGE NOTE — External Media Voice (Cultural Validation)
 
@@ -1974,7 +1984,7 @@ These voices must never merge. ABOUT and Coverage Note are always separate secti
 
 **Source**: coverage_sources table (LA Times, Eater, Michelin, etc.) + pull quote fields.
 
-**Format**: One sentence (preferred), max two short lines. Direct quotes whenever possible. Always attributed.
+**Format**: One sentence (preferred), max two short lines. Direct quotes whenever possible. Always attributed. Source name links to pullQuoteUrl when available.
 
 **Example**: "The best tortillas in Los Angeles." — LA Times
 
@@ -2001,7 +2011,7 @@ These voices must never merge. ABOUT and Coverage Note are always separate secti
 
 ### 3.5 Reading Flow
 
-Name → Identity Line (structural) → ABOUT (identity/merchant voice) → Coverage Note (credibility)
+Name → Identity Line (structural) → Tagline (Saiko editorial voice) → ABOUT (identity/merchant voice) → Coverage Note (credibility)
 
 This moves the user from structure → identity → validation.
 
@@ -2009,8 +2019,10 @@ This moves the user from structure → identity → validation.
 
 | Section | Data Source | Collapse Rule |
 |---------|-----------|---------------|
+| Business status banner | entities.business_status | Hide if OPERATIONAL or null |
 | Identity (name, identity line, open state) | entities + evolved getIdentitySublineV2() | Name always shown |
-| Primary CTAs (Reserve, Directions) | merchant_signals.reservation_url, lat/lng | Hide if no data |
+| Tagline | interpretation_cache (TAGLINE) with entities.tagline fallback | Hide if null |
+| Primary CTAs (Reserve, Website, Instagram, TikTok) | reservation_url, website, instagram, tiktok | Hide if all null |
 | ABOUT | Merchant text (entities.description, merchant surfaces, or synthesized) | Hide if null |
 | Offering | derived_signals (identity_signals + offering_programs) | Hide if all null |
 | Coverage Note | coverage_sources + pull quote | Hide if empty |
@@ -2022,7 +2034,7 @@ This moves the user from structure → identity → validation.
 |---------|-----------|---------------|
 | Hours | entities.hours (parsed) | Hide if null |
 | Address | entities.address | Hide if null |
-| Links | entities.website, instagram, merchant_signals.menu_url | Hide if all null |
+| Links | entities.website, instagram, tiktok, merchant_signals.menu_url | Hide if all null |
 | Scene | scenesense.scene | Hide if PRL < 3 |
 | Atmosphere | scenesense.atmosphere | Hide if PRL < 3 |
 | Ambiance | scenesense.ambiance | Hide if PRL < 3 |
@@ -2039,24 +2051,45 @@ This moves the user from structure → identity → validation.
 
 | Data | Exists in DB | Wired to API? | Wired to Page? |
 |------|-------------|---------------|----------------|
-| Reservation URL | merchant_signals.reservation_url | ❌ (reads entities.reservationUrl) | Partially |
-| Beverage programs | derived_signals.offering_programs | ❌ | ❌ |
-| Place personality | derived_signals.identity_signals | ❌ | ❌ |
-| Signature dishes | derived_signals.identity_signals | ❌ | ❌ |
-| Language signals → SceneSense | derived_signals.identity_signals | ❌ (passed as null) | Indirectly |
-| Full identity signals (6 extra fields) | derived_signals.identity_signals | ❌ (only 4/10 read) | ❌ |
+| Reservation URL | merchant_signals.reservation_url | ✅ (merchant_signals → entities fallback) | ✅ |
+| Beverage programs | derived_signals.offering_programs | ✅ | ✅ (signal-aware composition) |
+| VOICE_DESCRIPTOR (ABOUT) | interpretation_cache | ✅ | ✅ (3-tier fallback) |
+| Business status | entities.business_status | ✅ | ✅ (banner for non-OPERATIONAL) |
+| Place personality | derived_signals.identity_signals | ✅ | ✅ (scene sidebar + identity) |
+| Signature dishes | derived_signals.identity_signals | ✅ | ✅ (Known For section) |
+| Key producers | derived_signals.identity_signals | ✅ | ✅ (Known For section) |
+| Origin story type | derived_signals.identity_signals | ✅ | ✅ (About accent line) |
+| Language signals → SceneSense | derived_signals.identity_signals | ✅ | ✅ (routes to SceneSense lenses) |
+| Identity signals (core 4) | derived_signals.identity_signals | ✅ | ✅ (offering signals: posture, service, price, wine intent) |
+| Confidence metadata | derived_signals.identity_signals | — | — (pipeline internal, not page-facing) |
 
 ## 5. Rendering Rules
 
-### 5.1 Offering Section
+### 5.1 Offering Section — Signal-Aware Composition
 
-Beverage programs use the locked maturity vocabulary (SKAI-DOC-TRACES-BEVERAGE-PROGRAM-VOCAB-001):
-- `dedicated` → "Dedicated wine program" (or beer/cocktail)
-- `considered` → "Considered wine selection"
-- `incidental` → "Wine available"
-- `none` / `unknown` → do not render
+Offering lines are composed from program maturity + program signals, not flat labels. The system uses static phrase assembly: structural signal names map to human-readable fragments and compose into natural sentences.
 
-Food line uses cuisine_posture phrases. Service + Price use existing phrase maps.
+**Architecture**: `resolveSignalPhrases(signals[], vocabulary) → fragments[] → composeSentence(lead, fragments, connector) → sentence`
+
+**Food**: Cuisine posture drives the lead phrase (e.g. "Seasonal, produce-driven kitchen"), food signals compose as detail fragments via `"built around"` connector. 16 signal phrases mapped (FOOD_SIGNAL_PHRASES). Falls back to maturity + cuisineType when posture is absent.
+
+**Wine**: Wine program intent drives the lead phrase (9 intents mapped in WINE_INTENT_LEADS, e.g. "Producer-driven natural wine list"). Wine signals (3 locked: natural_wine_focus, orange_wine_presence, pet_nat_presence) compose via `"with"` connector. Falls back to maturity label if no intent.
+
+**Cocktails**: Maturity drives the lead ("Dedicated cocktail program" / "Composed cocktail menu"), cocktail signals (locked v1: seasonal_menu) compose via `"featuring"`. Falls back to `servesCocktails` boolean.
+
+**Beer**: Maturity drives the lead ("Dedicated beer program" / "Considered beer selection"), beer signals (locked v1: craft_beer_focus) compose via `"with"`. Falls back to `servesBeer` boolean.
+
+**Non-Alcoholic**: Signal-first — if any of the 10 locked signals resolve (e.g. zero_proof_cocktails, house_soda_program, horchata_presence, na_spirits_presence), they drive the sentence via `"including"` connector. Maturity shapes the lead. Falls back to maturity-only label when no signals detected.
+
+**Coffee & Tea**: Signal-first — if any of the 11 locked signals resolve (e.g. espresso_program, matcha_program, specialty_tea_presence, afternoon_tea_service), they compose via `"featuring"`. Falls back to maturity-only label.
+
+**Service + Price**: Use existing phrase maps (SERVICE_MODEL_PHRASES, PRICE_PHRASES). No signal composition.
+
+**Cap**: Max 6 offering lines rendered (OFFERING_CAP). Signal fragments capped at 3 per program.
+
+**Collapse rule**: Programs with maturity `none` or `unknown` and no resolved signals do not render.
+
+All signal vocabularies are defined in the Beverage Program + Signal Vocabulary v1 spec (SKAI-DOC-TRACES-BEVERAGE-PROGRAM-VOCAB-001). Display phrase mappings live in page.tsx alongside the rendering logic.
 
 ### 5.2 SceneSense (SKAI-DOC-SS-001)
 
@@ -2094,6 +2127,10 @@ Incremental (data first):
 | lib/contracts/place-page.ts | Data contract |
 | lib/contracts/place-page.identity.ts | Identity line helpers |
 | scripts/assemble-offering-programs.ts | WO-006 beverage programs |
+| scripts/generate-descriptions-v1.ts | VOICE_DESCRIPTOR batch pipeline |
+| lib/voice-engine-v2/description-extraction.ts | Tier 1 extraction + coherence filter |
+| lib/voice-engine-v2/description-prompts.ts | Tier 2/3 prompt templates |
+| lib/voice-engine-v2/description-generator.ts | AI generation for Tier 2/3 |
 | lib/scenesense.ts | SceneSense assembly |
 
 ## 9. Showcase Entity
@@ -2107,11 +2144,11 @@ Incremental (data first):
 
 ## 10. Resolved Decisions
 
-1. **ABOUT vs Coverage Note vs Saiko Voice** — LOCKED. Three distinct voices, never merge. ABOUT = merchant voice (identity). Coverage Note = external media (validation). Saiko Voice = future, not on page yet. AI tagline from interpretation_cache is Saiko Voice — deferred.
+1. **ABOUT vs Coverage Note vs Saiko Voice** — LOCKED. Three distinct voices, never merge. ABOUT = merchant voice (identity). Coverage Note = external media (validation). Saiko Voice = tagline rendered below identity subline (Voice Engine v2 output from interpretation_cache).
 
 ## 11. Open Questions
 
-1. **ABOUT content sourcing**: Does every place get an ABOUT? If so, where does synthesized ABOUT text come from for places without merchant-authored text? (Only 5/143 have entities.description. Merchant surface artifacts have raw website text but no ABOUT extraction yet.)
+1. ~~**ABOUT content sourcing**~~: RESOLVED — VOICE_DESCRIPTOR pipeline (WO-ABOUT-001) implements 3-tier sourcing: verbatim merchant text → AI-synthesized from merchant blocks → AI-composed from signals. See about-description-spec-v1.md.
 2. **Coverage Note naming**: "Curator's Note" is misleading. Final name TBD (Coverage Note, Press Note, In the Press, What They Say).
 3. **Reference Ledger launch rule**: "No derived signals unless ≥1 ledger reference exists" — when does this gate activate?
 4. **Reference Confidence Model**: Not all references are equal (LA Times vs merchant site). Needs design.
@@ -2124,6 +2161,9 @@ Revision History
 | Version | Date | Changes | Author |
 |---|---|---|---|
 | 1.0 | 2026-03-11 | Initial design spec from planning session | Bobby / Claude |
+| 1.1 | 2026-03-16 | Tagline rendered on page (Saiko voice live). TikTok CTA added. Pull quote source linked via pullQuoteUrl. Wireframe and content model updated. | Bobby / Claude |
+| 1.2 | 2026-03-16 | VOICE_DESCRIPTOR pipeline built (3-tier description hierarchy). Offering section rewritten with signal-aware composition across all 7 programs. Business status banner added. Beverage signal display phrases mapped for all locked v1 vocabularies. Data gaps table updated. Open question 1 resolved. | Bobby / Claude |
+| 1.3 | 2026-03-17 | All data gaps closed. key_producers and origin_story_type wired through API → contract → page. Reservation URL confirmed wired (merchant_signals → entities fallback). Identity signals fully wired (7/10 page-facing, 3 confidence metadata internals). Data gaps table rewritten to reflect actual state. | Bobby / Claude |
 
 ---
 
@@ -3780,6 +3820,176 @@ These are capabilities the architecture should not close the door on. Engineerin
 |---------|------|---------|--------|
 | 0.1 | 2026-03-13 | Initial implementation doc from planning session | Bobby / Claude |
 | 0.2 | 2026-03-13 | Added current state (Section 3), implementation phases (Section 12), answered open questions from data review, renumbered sections | Bobby / Claude |
+
+---
+
+## ARCHITECTURE-INSTAGRAM-INGESTION-V1
+
+| Field | Value |
+|-------|-------|
+| **Type** | architecture |
+| **Status** | active |
+| **Project** | SAIKO |
+| **Path** | `docs/architecture/instagram-ingestion-field-spec-v1.md` |
+| **Last Updated** | 2026-03-13 |
+| **Summary** | Instagram ingestion schema — 3 tables, field definitions, sync rules. Engineering handoff for migration + Prisma models. |
+
+# Instagram Ingestion — Field Spec v1
+
+## Scope
+
+Ingest Instagram as a merchant-authored data source. Store account identity,
+media records, captions, activity/freshness signals, and insights snapshots.
+
+**Excluded from v1:** like_count, comments_count, location metadata.
+
+---
+
+## Tables
+
+### 1. `instagram_accounts`
+
+One row per connected Instagram account. Mutable — overwrite on each fetch.
+
+| Column | Type | Constraints | Notes |
+|--------|------|-------------|-------|
+| `id` | TEXT | PK, default uuid | Internal ID |
+| `entity_id` | TEXT | FK → entities.id CASCADE, NOT NULL | Links account to entity |
+| `instagram_user_id` | TEXT | UNIQUE, NOT NULL | IG API user ID |
+| `username` | TEXT | NOT NULL | Handle (no @) |
+| `account_type` | TEXT | | BUSINESS, CREATOR, PERSONAL |
+| `media_count` | INT | | From API |
+| `canonical_instagram_url` | TEXT | | `https://instagram.com/{username}` |
+| `last_fetched_at` | TIMESTAMPTZ | | Last fetch attempt |
+| `last_successful_fetch_at` | TIMESTAMPTZ | | Last 2xx fetch |
+| `source_status` | TEXT | NOT NULL, default 'active' | active, revoked, error |
+| `raw_payload` | JSONB | | Full API response |
+| `created_at` | TIMESTAMPTZ | default now() | |
+| `updated_at` | TIMESTAMPTZ | default now() | |
+
+**Indexes:**
+- `entity_id`
+- `instagram_user_id` (unique)
+- `username`
+
+**Derived (compute in app, not stored):**
+- `latest_post_at` — max(instagram_media.timestamp) for this account
+- `posting_cadence_30d` / `posting_cadence_90d` — count of posts in window
+- `is_active_recently` — post within last 30 days
+
+---
+
+### 2. `instagram_media`
+
+One row per post/media object. Upsert by `instagram_media_id`.
+
+| Column | Type | Constraints | Notes |
+|--------|------|-------------|-------|
+| `id` | TEXT | PK, default uuid | Internal ID |
+| `instagram_media_id` | TEXT | UNIQUE, NOT NULL | IG API media ID |
+| `instagram_user_id` | TEXT | NOT NULL | FK-like ref to account |
+| `media_type` | TEXT | NOT NULL | IMAGE, VIDEO, CAROUSEL_ALBUM |
+| `media_url` | TEXT | | CDN URL (expires) |
+| `thumbnail_url` | TEXT | | For VIDEO type |
+| `permalink` | TEXT | NOT NULL | Permanent IG URL |
+| `caption` | TEXT | | Full caption text |
+| `timestamp` | TIMESTAMPTZ | NOT NULL | Original post time (immutable) |
+| `fetched_at` | TIMESTAMPTZ | NOT NULL, default now() | When we fetched it |
+| `raw_payload` | JSONB | | Full API response |
+
+**Carousel fields (stored in raw_payload):**
+- `children.data[].id` — child media IDs
+- `children.data[].media_type`, `media_url` — child details
+
+**Indexes:**
+- `instagram_media_id` (unique)
+- `instagram_user_id`
+- `timestamp`
+- `(instagram_user_id, timestamp)` — activity queries
+
+**Derived (compute in app, not stored):**
+- `caption_present` — caption IS NOT NULL
+- `caption_length` — char_length(caption)
+- `posted_day_of_week` / `posted_hour_local` — from timestamp
+- `is_recent_post` — timestamp within 30 days
+
+---
+
+### 3. `instagram_insight_snapshots`
+
+Append-only. One row per metric observation. Never update or overwrite.
+
+| Column | Type | Constraints | Notes |
+|--------|------|-------------|-------|
+| `id` | TEXT | PK, default uuid | Internal ID |
+| `subject_type` | TEXT | NOT NULL | 'account' or 'media' |
+| `subject_id` | TEXT | NOT NULL | instagram_user_id or instagram_media_id |
+| `metric_name` | TEXT | NOT NULL | impressions, reach, engagement |
+| `metric_value` | DECIMAL(12,2) | NOT NULL | |
+| `observed_at` | TIMESTAMPTZ | NOT NULL, default now() | When snapshot taken |
+| `window_label` | TEXT | | 'day', 'week', 'days_28', 'lifetime' |
+| `raw_payload` | JSONB | | Full API response for this metric |
+
+**Indexes:**
+- `(subject_type, subject_id)`
+- `(subject_id, metric_name, observed_at)` — time series
+- `observed_at`
+
+---
+
+## Sync Rules
+
+### Accounts
+- **Overwrite** mutable fields on each fetch (username, media_count, account_type, source_status, raw_payload)
+- **Preserve** created_at
+- **Update** last_fetched_at on every attempt; last_successful_fetch_at on success only
+
+### Media
+- **Upsert** by `instagram_media_id`
+- **Never overwrite** `timestamp` (original post time is immutable)
+- **Refresh** mutable fields: media_url, thumbnail_url, caption, raw_payload, fetched_at
+
+### Insights
+- **Append only** — insert new row for each observation
+- **Never update** existing rows
+- Dedup logic: skip insert if (subject_id, metric_name, observed_at, window_label) already exists
+
+---
+
+## Source Registry Entry
+
+Add to `source_registry` (Fields v2):
+
+```
+id:              'instagram_api'
+display_name:    'Instagram API'
+source_type:     SOCIAL
+trust_tier:      3
+requires_human:  false
+base_domain:     'instagram.com'
+is_active:       true
+```
+
+---
+
+## Entity Linkage
+
+Instagram accounts attach to **entities** via `entity_id` FK.
+
+This is consistent with merchant_surfaces, merchant_surface_scans, and all
+Fields v2 tables. The account is a source record, not an identity record.
+
+---
+
+## Build Sequence
+
+1. Migration: create 3 tables + indexes
+2. Prisma schema: add 3 models
+3. Seed: add `instagram_api` to source_registry
+4. Ingest script: account + media fetch (stages 1–2)
+5. Ingest script: insights fetch (stage 3)
+6. Downstream: caption cue extraction (on top of media table)
+7. Downstream: visual analysis (future)
 
 ---
 
@@ -8052,85 +8262,95 @@ Suggested source order:
 | **Status** | active |
 | **Project** | SAIKO |
 | **Path** | `docs/DATA_PIPELINE_QUICK_START.md` |
-| **Last Updated** | 2026-03-10 |
+| **Last Updated** | 2026-03-17 |
+| **Summary** | Quick-start guide for entity intake and enrichment. Start here if you have a list of place names to add. |
 | **Systems** | data-pipeline |
 
-# Data Pipeline Quick Reference
+# Data Pipeline — Quick Start
 
-Copy this into your new chat: **"Session Starter: Data Pipeline for Saiko Maps - Review @DATA_PIPELINE_SESSION_STARTER.md"**
-
----
-
-## Current State
-
-✅ **Merchant Page v2** - Complete with bento grid, graceful degradation  
-✅ **Data audit scripts** - Can check any field for completeness  
-✅ **Manual update scripts** - Instagram & phone bulk updaters ready  
-
-🔴 **Critical gaps:** Instagram (99.7% missing), Pull Quotes (98% missing)  
-🟡 **Important gaps:** Vibe Tags (98% missing), Phone (10% missing)
+You have a list of restaurant/bar/cafe names. Here's how to get them into Saiko and enriched.
 
 ---
 
-## What We Built Today
+## Fastest path: Smart Enrich
 
-1. **ActionStrip.tsx** - Nav/Call/Insta buttons (text style, not woodcut)
-2. **audit-data.js** - Check completeness of any field
-3. **update-instagram.js** - Bulk Instagram handle updates
-4. **update-phone.js** - Bulk phone number updates
-
----
-
-## Files to Review
-
-- `DATA_PIPELINE_SESSION_STARTER.md` - Full context
-- `CRITICAL_DATA_UPDATES.md` - Manual workflow guide
-- `prisma/schema.prisma` - Database schema
-- `scripts/audit-data.js` - Audit tool
-- `scripts/update-instagram.js` - Instagram updater
-- `scripts/update-phone.js` - Phone updater
-- `lib/extractQuote.ts` - Quote extraction logic (could be background job)
-
----
-
-## Pipeline Goals
-
-1. **Automated backfill** - Instagram, phone, website from Google/web scraping
-2. **AI content generation** - Pull quotes (from sources), vibe tags (from reviews)
-3. **Refresh scheduling** - Hours daily, photos weekly, reviews monthly
-4. **Quality control** - Validation, approval queue, rollback
-
----
-
-## Quick Commands
+Give it names, it does the rest. Finds the website, Instagram, neighborhood, and coordinates — cheapest path first.
 
 ```bash
-# See full data audit
-node scripts/audit-data.js --summary
+# One name
+npm run enrich:smart -- --name="Bavel"
 
-# List missing Instagram (671)
-node scripts/update-instagram.js --list
+# A list
+npm run enrich:smart -- --names="Bavel,Bestia,Republique,Kismet,Sushi Park"
 
-# List missing phone (68)
-node scripts/update-phone.js --list
+# From a file (one name per line)
+npm run enrich:smart -- --file=data/new-places.txt
 
-# Check editorial coverage
-node scripts/audit-data.js --field sources
+# Cheap mode — just web search + scrape, no Google API (~$0.01/entity)
+npm run enrich:smart -- --file=data/new-places.txt --cheap
+```
+
+Smart enrich handles dedup (won't create duplicates), intake (creates CANDIDATE entities), discovery (finds website + IG via Haiku), surface scraping (free), and gap fill (Google Places only if needed).
+
+---
+
+## What it does per entity
+
+| Phase | Cost | What happens |
+|---|---|---|
+| 1. Discover | ~$0.01 | Claude Haiku + web search → finds website, Instagram, neighborhood |
+| 2. Scrape | FREE | Fetches the website, discovers menu/about/contact pages |
+| 3. Parse | FREE | Extracts structured data from scraped HTML |
+| 4. Gap fill | ~$0.03 | Google Places for coords/hours — only if still missing after scraping |
+
+Total: $0.01–0.04 per entity. At 100 entities: ~$1–4.
+
+---
+
+## If you need deep enrichment
+
+After smart enrich, entities have identity (website, IG, coords, GPID). For AI-generated signals and taglines, run the full pipeline:
+
+```bash
+# Full pipeline on entities that already exist
+npm run enrich:place -- --batch=50 --concurrency=5
+```
+
+This adds: AI identity signals (chef, cuisine, vibe), menu/reservation URL extraction, and generated taglines. Costs ~$0.06–0.08 more per entity (Claude Sonnet calls).
+
+---
+
+## Bulk intake from CSV
+
+For structured data (with columns like Google Place ID, website, neighborhood):
+
+```bash
+# Via API
+curl -X POST localhost:3000/api/admin/intake \
+  -F "file=@data/new-places.csv"
+```
+
+CSV columns: `Name, Google Place ID, Website, Instagram Handle, Neighborhood`
+
+The intake endpoint handles dedup automatically — GPID match, domain match, IG match, then fuzzy name match. Ambiguous matches go to the intake review queue.
+
+---
+
+## Check what needs work
+
+```bash
+# See all data quality issues
+curl "localhost:3000/api/admin/tools/scan-issues?detail=true" | jq '.issues | length'
+
+# Or use the Coverage Ops dashboard
+open http://localhost:3000/admin/coverage-ops
 ```
 
 ---
 
-## Test URLs
+## Full command reference
 
-```
-http://localhost:3000/place/seco           # Has coverage + curator
-http://localhost:3000/place/stir-crazy     # Has coverage, no curator
-http://localhost:3000/place/great-white-central-la  # Just added IG
-```
-
----
-
-**Ready for next session!** 🚀
+See `docs/PIPELINE_COMMANDS.md` for the complete operator reference.
 
 ---
 
@@ -8601,27 +8821,39 @@ Place now "enriched" and ready for display
 | **Status** | active |
 | **Project** | SAIKO |
 | **Path** | `docs/DATABASE_SETUP.md` |
-| **Last Updated** | 2026-03-10 |
+| **Last Updated** | 2026-03-17 |
 | **Systems** | database |
 
-# Database Setup for Saiko Maps
+# Database Setup
 
-## Error: "User was denied access on the database"
+## Production: Neon (PostgreSQL)
 
-This usually means PostgreSQL isn't running, or your `DATABASE_URL` has wrong credentials.
+Saiko uses **Neon** as its single production database with connection pooling.
+
+- **Provider:** Neon (PostgreSQL, managed)
+- **Region:** US-East-1 (AWS)
+- **Connection:** Pooler endpoint (`-pooler.` subdomain)
+- **ORM:** Prisma 6.0
+- **Schema:** 57 models, 63+ migrations
+
+The `DATABASE_URL` in `.env.local` should point to the Neon pooler endpoint:
+```
+DATABASE_URL="postgresql://neondb_owner:<password>@ep-<id>-pooler.<region>.neon.tech/neondb?sslmode=require&channel_binding=require"
+```
+
+Production `DATABASE_URL` is also set in Vercel Environment Variables (dashboard).
 
 ---
 
-## 1. Install & run PostgreSQL
+## Local Development: Postgres
+
+For local dev without hitting Neon:
 
 ### Option A: Postgres.app (easiest on Mac)
 
 1. Download [Postgres.app](https://postgresapp.com/)
-2. Open it and click "Initialize" to start the server
-3. Add to your PATH: `sudo mkdir -p /etc/paths.d && echo /Applications/Postgres.app/Contents/Versions/latest/bin | sudo tee /etc/paths.d/postgresapp`
-4. Restart your terminal
-
-**Default connection:** `postgresql://localhost:5432` (no username/password for local)
+2. Open it and click "Initialize"
+3. Add to PATH: `sudo mkdir -p /etc/paths.d && echo /Applications/Postgres.app/Contents/Versions/latest/bin | sudo tee /etc/paths.d/postgresapp`
 
 ### Option B: Homebrew
 
@@ -8630,55 +8862,54 @@ brew install postgresql@16
 brew services start postgresql@16
 ```
 
-**Default:** User = your Mac username, no password. Database = your username by default.
-
----
-
-## 2. Create the database
+### Create the database
 
 ```bash
-# With Postgres.app or Homebrew, create the DB:
 createdb saiko_maps
 ```
 
----
-
-## 3. Set DATABASE_URL in .env
-
-**Postgres.app (typical):**
-```
-DATABASE_URL="postgresql://localhost:5432/saiko_maps"
-```
-
-**Homebrew (use your Mac username):**
-```
-DATABASE_URL="postgresql://YOUR_MAC_USERNAME@localhost:5432/saiko_maps"
-```
-
-**With password (if you set one):**
-```
-DATABASE_URL="postgresql://username:yourpassword@localhost:5432/saiko_maps"
-```
-
-> ⚠️ Replace `user` and `password` with your **actual** PostgreSQL username and password. The template `postgresql://user:password@...` uses placeholders.
-
----
-
-## 4. Run migrations
+### Use local DB with dev server
 
 ```bash
-npx prisma migrate deploy
+npm run dev:local
+```
+
+This runs `scripts/db-local.sh`, which overrides `DATABASE_URL` to `postgresql://youruser@localhost:5432/saiko_maps`.
+
+---
+
+## Migrations
+
+```bash
+npx prisma migrate dev       # Dev: create + apply migrations
+npx prisma migrate deploy    # Prod: apply pending migrations only
+npx prisma generate          # Regenerate Prisma client after schema changes
+```
+
+Migrations live in `prisma/migrations/`. The codebase favors **additive migrations**. Destructive migrations (column drops, table drops) are deferred and require manual pre-flight checks — see `docs/DEFERRED_MIGRATION_GATES.md`.
+
+---
+
+## Verify Connection
+
+```bash
+npm run db:whoami             # Show which DB you're connected to
+curl localhost:3000/api/health  # Health check (dev server running)
+npx prisma db pull            # Pull schema from DB (confirms connection)
 ```
 
 ---
 
-## 5. Verify connection
+## Troubleshooting
 
-```bash
-npx prisma db pull
-```
+### "User was denied access on the database"
+- PostgreSQL isn't running, or `DATABASE_URL` has wrong credentials
+- Check: `psql $DATABASE_URL -c "SELECT 1"` — does it connect?
 
-If that succeeds, your connection works.
+### Wrong database
+- The dev server banner shows which DB classification (NEON / LOCAL) is in use
+- `npm run db:whoami` confirms the connection
+- If using wrapper scripts, `SAIKO_DB_FROM_WRAPPER=1` ensures the wrapper's URL wins
 
 ---
 
@@ -8690,49 +8921,97 @@ If that succeeds, your connection works.
 | **Status** | active |
 | **Project** | SAIKO |
 | **Path** | `docs/ENV_TEMPLATE.md` |
-| **Last Updated** | 2026-03-10 |
+| **Last Updated** | 2026-03-17 |
 
-# Environment Variables Setup
+# Environment Variables
 
-Create a `.env` file in the root directory with the following variables:
+Saiko uses three env files. No more.
+
+| File | Role | Gitignored |
+|---|---|---|
+| `.env` | Non-sensitive defaults and feature flags | Yes |
+| `.env.local` | All secrets (DB, API keys, tokens). Overrides `.env`. | Yes |
+| `.env.example` | Template with every variable name and comments. No values. | No |
+
+Production secrets live in **Vercel Environment Variables** (dashboard), not in files.
+
+---
+
+## Setup
 
 ```bash
-# Database
-DATABASE_URL="postgresql://user:password@localhost:5432/saikomaps?schema=public"
+# 1. Copy the template
+cp .env.example .env.local
 
-# Google Places API (server-side: search, place details, photos)
-GOOGLE_PLACES_API_KEY="your_google_places_api_key_here"
+# 2. Fill in your secrets (DATABASE_URL, API keys, etc.)
+#    See .env.example for the full list with comments.
 
-# Google Maps JavaScript API (client-side: map on /map/[slug])
-# Enable "Maps JavaScript API" in Google Cloud Console. Can be same key if both APIs are enabled.
-NEXT_PUBLIC_GOOGLE_MAPS_API_KEY="your_google_maps_api_key_here"
-
-# Anthropic (for AI-generated map descriptions)
-ANTHROPIC_API_KEY="your_anthropic_api_key_here"
-
-# AWS S3 (for image storage)
-AWS_S3_BUCKET="saikomaps-prod"
-AWS_ACCESS_KEY_ID="your_aws_access_key"
-AWS_SECRET_ACCESS_KEY="your_aws_secret_key"
-AWS_REGION="us-east-1"
-CLOUDFRONT_URL="https://your-cloudfront-url.cloudfront.net"
-
-# Authentication (NextAuth.js)
-NEXTAUTH_SECRET="generate_a_random_secret_here"
-NEXTAUTH_URL="http://localhost:3000"
-
-# Optional: Use Clerk instead
-# NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="your_clerk_key"
-# CLERK_SECRET_KEY="your_clerk_secret"
+# 3. Run
+npm run dev
 ```
 
-## Quick Setup for Development
+---
 
-For local development with Supabase:
-1. Sign up at https://supabase.com
-2. Create a new project
-3. Copy the `DATABASE_URL` from Settings > Database
-4. Add your Google Places API key from Google Cloud Console
+## Variable Reference
+
+### Database
+| Variable | Where | Notes |
+|---|---|---|
+| `DATABASE_URL` | `.env.local` | Neon pooler endpoint. `postgresql://...@...-pooler...neon.tech/neondb` |
+| `DB_ENV` | `.env.local` | `dev` or `prod` |
+
+### Auth
+| Variable | Where | Notes |
+|---|---|---|
+| `NEXTAUTH_SECRET` | `.env.local` | Generate: `openssl rand -base64 32` |
+| `NEXTAUTH_URL` | `.env` | `http://localhost:3000` (default) |
+| `ADMIN_EMAILS` | `.env.local` | Comma-separated admin allowlist |
+
+### AI
+| Variable | Where | Notes |
+|---|---|---|
+| `ANTHROPIC_API_KEY` | `.env.local` | Claude API key |
+
+### Rate Limiting
+| Variable | Where | Notes |
+|---|---|---|
+| `UPSTASH_REDIS_REST_URL` | `.env.local` | From Upstash dashboard |
+| `UPSTASH_REDIS_REST_TOKEN` | `.env.local` | From Upstash dashboard |
+
+### Storage (Cloudflare R2)
+| Variable | Where | Notes |
+|---|---|---|
+| `R2_ACCESS_KEY_ID` | `.env.local` | R2 auth |
+| `R2_SECRET_ACCESS_KEY` | `.env.local` | R2 auth |
+| `R2_ENDPOINT` | `.env.local` | `https://<account>.r2.cloudflarestorage.com` |
+| `R2_BUCKET_NAME` | `.env` | `saiko-assets` (not secret) |
+
+### Google
+| Variable | Where | Notes |
+|---|---|---|
+| `GOOGLE_PLACES_API_KEY` | `.env.local` | Backend Places API |
+| `GOOGLE_PLACES_ENABLED` | `.env` | `false` by default (cost control) |
+| `GOOGLE_OAUTH_CLIENT_ID` | `.env.local` | Google Docs sync |
+| `GOOGLE_OAUTH_CLIENT_SECRET` | `.env.local` | Google Docs sync |
+
+### Error Tracking (Sentry)
+| Variable | Where | Notes |
+|---|---|---|
+| `NEXT_PUBLIC_SENTRY_DSN` | `.env.local` | Client-side Sentry DSN |
+| `SENTRY_DSN` | `.env.local` | Server-side (same value) |
+
+### Feature Flags
+| Variable | Where | Notes |
+|---|---|---|
+| `GOOGLE_PLACES_ENABLED` | `.env` | `false` = no Places API calls |
+| `DEBUG_ROUTES_ENABLED` | `.env` | `false` = debug endpoints return 404 |
+| `AUTH_DEBUG` | `.env.local` | `true` = verbose auth logging (dev only) |
+
+---
+
+## Load Order
+
+Next.js loads `.env` first, then `.env.local` (overrides). The `scripts/load-env.js` loader follows the same pattern. Wrapper scripts (`db-neon.sh`, `db-local.sh`) set `DATABASE_URL` before loading, so their value wins.
 
 ---
 
@@ -8816,113 +9095,209 @@ Ensure the API key is in the **same project** where:
 | **Status** | active |
 | **Project** | SAIKO |
 | **Path** | `docs/PIPELINE_COMMANDS.md` |
-| **Last Updated** | 2026-03-10 |
+| **Last Updated** | 2026-03-17 |
 | **Systems** | data-pipeline |
 
-# Saiko Maps — Pipeline Commands
+# Pipeline Commands
 
-Quick reference for monitoring and managing the scraping/extraction pipeline.
+Operator reference for all enrichment and coverage tools. All commands assume you're in the project root with environment loaded.
 
 ---
 
-## 🔍 Check Progress (Quick Status)
+## Smart Enrich (recommended entry point)
+
+Cost-optimized pipeline. Discovers identity via cheap Haiku web search first, scrapes for free, only calls Google Places if gaps remain. ~$0.01–0.04/entity.
 
 ```bash
-npx tsx scripts/check-pipeline-progress.ts
+# Single entity
+npm run enrich:smart -- --name="Bavel"
+npm run enrich:smart -- --name="Bestia" --neighborhood="Arts District"
+
+# Batch (comma-separated)
+npm run enrich:smart -- --names="Bavel,Bestia,Republique,Kismet"
+
+# Batch from file (one name per line)
+npm run enrich:smart -- --file=data/new-places.txt
+
+# Cheap only (~$0.01/entity — skip Google Places)
+npm run enrich:smart -- --names="Bavel,Bestia" --cheap
+
+# Dry run (no writes)
+npm run enrich:smart -- --name="Bavel" --dry-run
 ```
 
-Shows:
-- Scraping progress (X/572 complete)
-- Content found (menus, wine lists, about pages)
-- Extraction progress
-- Estimated time remaining
-
-**Run this anytime to see current status.**
-
----
-
-## 📊 Monitor Logs
-
-### Scraper Log
+**API:**
 ```bash
-tail -f scrape-output.log
-```
+# Single
+curl -X POST localhost:3000/api/admin/smart-enrich \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Bavel"}'
 
-### Monitor Log
-```bash
-tail -f monitor-output.log
-```
-
----
-
-## 🎯 Current Status
-
-**What's Running:**
-- ✅ Phase 1: Website scraper (background, PID in scrape-output.log)
-- ✅ Auto-monitor: Watching for completion, will auto-start Phase 2
-
-**Expected Timeline:**
-- Phase 1: ~1.9 hours (scraping 572 websites)
-- Phase 2: ~60-90 minutes (AI extraction, auto-starts when Phase 1 done)
-- **Total: ~3-3.5 hours**
-
----
-
-## 📈 Manual Phase 2 (if needed)
-
-If you want to manually start extraction:
-
-```bash
-# Extract all ready places
-npx tsx scripts/extract-identity-signals.ts
-
-# Or test on subset first
-npx tsx scripts/extract-identity-signals.ts --limit=50 --verbose
+# Batch
+curl -X POST localhost:3000/api/admin/smart-enrich \
+  -H "Content-Type: application/json" \
+  -d '{"names": ["Bavel", "Bestia", "Republique"]}'
 ```
 
 ---
 
-## 🛑 Stop Everything
+## Full 7-Stage Pipeline
+
+When you need the full enrichment pipeline (Google Places + AI signals + taglines). ~$0.12/entity.
 
 ```bash
-# Find running processes
-ps aux | grep "scrape-menus\|monitor-and-extract"
+# Single entity (stages 2–7, website-first)
+npm run enrich:place -- --slug=republique
 
-# Kill specific process
-kill <PID>
+# Include Google Places (stage 1)
+npm run enrich:place -- --slug=republique --from=1
+
+# Resume from specific stage
+npm run enrich:place -- --slug=republique --from=3
+
+# Run only one stage
+npm run enrich:place -- --slug=republique --only=5
+
+# Batch (25 entities, website-first)
+npm run enrich:batch
+
+# Batch with concurrency
+npm run enrich:place -- --batch=50 --concurrency=5
+
+# Batch including Google Places
+npm run enrich:place -- --batch=50 --include-google
+```
+
+**Stages:**
+1. Google Places identity commit (GPID, coords, hours, photos)
+2. Surface discovery (find homepage/menu/about/contact URLs)
+3. Surface fetch (capture raw HTML)
+4. Surface parse (structure captured content into artifacts)
+5. Identity signal extraction (AI → derived_signals)
+6. Website enrichment (menu_url, reservation_url → Fields v2)
+7. Tagline generation (AI → interpretation_cache)
+
+---
+
+## GPID Resolution
+
+Find Google Place IDs for entities that don't have one.
+
+```bash
+# Single entity (via API)
+curl -X POST localhost:3000/api/admin/tools/seed-gpid-queue \
+  -H "Content-Type: application/json" \
+  -d '{"entityId": "entity-uuid-here"}'
+
+# Batch by entity IDs (single API call)
+curl -X POST localhost:3000/api/admin/tools/seed-gpid-queue \
+  -H "Content-Type: application/json" \
+  -d '{"entityIds": ["id1", "id2", "id3"]}'
+
+# Scan all entities without GPID (up to 200)
+curl -X POST localhost:3000/api/admin/tools/seed-gpid-queue \
+  -H "Content-Type: application/json" -d '{}'
+```
+
+High-confidence matches (≥0.85 similarity) are auto-applied. Ambiguous/no-match cases go to the GPID Queue at `/admin/gpid-queue` for human review.
+
+---
+
+## Social Discovery
+
+Find Instagram, TikTok, or website via Claude Haiku + web search. ~$0.01/call.
+
+```bash
+# Single entity (synchronous, ~5s)
+curl -X POST localhost:3000/api/admin/tools/discover-social \
+  -H "Content-Type: application/json" \
+  -d '{"mode": "instagram", "slug": "republique"}'
+
+# Modes: instagram | tiktok | website | both
+curl -X POST localhost:3000/api/admin/tools/discover-social \
+  -H "Content-Type: application/json" \
+  -d '{"mode": "both", "slug": "republique"}'
+
+# Batch (background)
+curl -X POST localhost:3000/api/admin/tools/discover-social \
+  -H "Content-Type: application/json" \
+  -d '{"mode": "instagram", "limit": 50}'
 ```
 
 ---
 
-## 📁 Output Files
+## Enrichment Stage Re-run
 
-- `scrape-output.log` - Scraping progress and results
-- `monitor-output.log` - Auto-monitor status checks
-- Database: `golden_records` table (Prisma)
+Run a specific enrichment stage without the full pipeline.
 
----
+```bash
+# Run stage 5 only (AI signal extraction)
+curl -X POST localhost:3000/api/admin/tools/enrich-stage \
+  -H "Content-Type: application/json" \
+  -d '{"slug": "republique", "stage": 5}'
 
-## 🔮 What Happens Next
-
-1. **Phase 1** runs for ~1.9 hours
-2. **Monitor** checks every 30 seconds for completion
-3. When Phase 1 done, **Phase 2 auto-starts**
-4. Phase 2 extracts identity signals (~60-90 min, ~$6)
-5. **Done!** You'll have 300-400 places with full identity signals
-
----
-
-## 💡 Tips
-
-- Check progress anytime with `npx tsx scripts/check-pipeline-progress.ts`
-- Monitor logs show real-time updates every 30 seconds
-- No need to watch - it runs fully automated
-- Safe to close terminal, processes run in background
-- Cost: $0 for scraping, ~$6 for AI extraction
+# Run stages 3–7
+curl -X POST localhost:3000/api/admin/tools/enrich-stage \
+  -H "Content-Type: application/json" \
+  -d '{"slug": "republique", "from": 3}'
+```
 
 ---
 
-**Last updated:** Feb 10, 2026
+## Issue Scanning
+
+Detect data quality issues across all entities.
+
+```bash
+# Full scan (all non-CANDIDATE entities)
+curl -X POST localhost:3000/api/admin/tools/scan-issues \
+  -H "Content-Type: application/json" \
+  -d '{"action": "scan"}'
+
+# Scan single entity
+curl -X POST localhost:3000/api/admin/tools/scan-issues \
+  -H "Content-Type: application/json" \
+  -d '{"action": "scan", "slug": "republique"}'
+
+# Get issue summary
+curl -X POST localhost:3000/api/admin/tools/scan-issues \
+  -H "Content-Type: application/json" \
+  -d '{"action": "summary"}'
+
+# Get detailed issues for triage board
+curl "localhost:3000/api/admin/tools/scan-issues?detail=true"
+```
+
+---
+
+## Coverage Dashboards
+
+| Page | URL | Purpose |
+|---|---|---|
+| Coverage | `/admin/coverage` | Diagnostic dashboard — resolution health, tier summary, neighborhoods, missing fields |
+| Coverage Ops | `/admin/coverage-ops` | Triage board — actionable issues with inline resolution tools |
+| GPID Queue | `/admin/gpid-queue` | Human review queue for ambiguous GPID matches |
+
+---
+
+## Health Check
+
+```bash
+curl localhost:3000/api/health
+# Returns: { "status": "ok", "db": "connected", "latency_ms": N }
+```
+
+---
+
+## Cost Reference
+
+| Tool | Cost/entity | When to use |
+|---|---|---|
+| Smart enrich (cheap) | ~$0.01 | New entity intake — find website + IG |
+| Smart enrich (full) | ~$0.01–0.04 | New entity + fill all gaps including coords |
+| Full pipeline (enrich:place) | ~$0.12 | Deep enrichment — AI signals + taglines |
+| Social discovery | ~$0.01 | Fill missing Instagram/TikTok/website |
+| GPID resolution | ~$0.03 | Find Google Place ID for coords/hours |
 
 ---
 
@@ -9295,49 +9670,158 @@ https://saiko.com/templates
 # City Launch Enrichment Playbook v1
 
 Reusable, sequenced playbook for enriching 1,000+ entities at city-launch
-scale. Designed to maximize coverage at minimum cost. Run the same steps for
-every new city.
+scale. Designed to maximize coverage at minimum cost. Free before paid.
+Evidence before canonical. Dry-run before writes.
 
 ---
 
 ## 1. Tool Inventory
 
-### Pipeline Stages (orchestrated by `npm run enrich:place`)
+### 1A. ERA Pipeline Stages (orchestrated by `npm run enrich:place`)
 
-| # | Stage | Script | Source | Writes To | Cost | Notes |
-|---|-------|--------|--------|-----------|------|-------|
-| 1 | Google Places identity | `backfill-google-places.ts` | Google Places API | `entities` (GPID, coords, address, hours, photos, neighborhood) | ~$0.007/entity (Places Detail) | Paid. Rate-limit 150ms. |
-| 2 | Surface discovery | `run-surface-discovery.ts` | Entity website (domain crawl) | `merchant_surfaces` (homepage, about, menu, contact URLs) | Free | Requires `entities.website` |
-| 3 | Surface fetch | `run-surface-fetch.ts` | Discovered URLs | `merchant_surfaces` (raw HTML/text) | Free | HTTP fetch, skips Instagram |
-| 4 | Surface parse | `run-surface-parse.ts` | Stored raw_html/raw_text | `merchant_surface_artifacts` (structured text_blocks) | Free | No network calls |
-| 5 | Identity signals (AI) | `extract-identity-signals.ts` | Parsed artifacts (menu, about, wine text) | `derived_signals` (cuisine_posture, service_model, price_tier, wine_program, personality, signature_dishes) | ~$0.001/entity (Claude Haiku) | Needs 50+ chars input |
-| 6 | Website enrichment | `run-website-enrichment.ts` | Website HTML | `merchant_signals` + `entities` (menu_url, reservation_url, category, cuisine) | ~$0.002-0.005/entity (Claude) | Also writes `merchant_enrichment_runs` |
-| 7 | Tagline generation (AI) | `generate-taglines-v2.ts` | Identity signals + entity data | `interpretation_cache` (TAGLINE, candidates) | ~$0.0008/entity (Claude) | Requires stage 5 output |
+| # | Stage | Script | Source | Writes To | Cost |
+|---|-------|--------|--------|-----------|------|
+| 1 | Google Places identity | `backfill-google-places.ts` | Google Places API | `entities` (GPID, coords, address, hours, photos, neighborhood) | **$$** ~$0.007/entity |
+| 2 | Surface discovery | `run-surface-discovery.ts` | Entity website (domain crawl) | `merchant_surfaces` (homepage, about, menu, contact URLs) | Free |
+| 3 | Surface fetch | `run-surface-fetch.ts` | Discovered surface URLs | `merchant_surfaces` (raw HTML/text, content_hash) | Free |
+| 4 | Surface parse | `run-surface-parse.ts` | Stored raw_html/raw_text | `merchant_surface_artifacts` (structured text_blocks) | Free |
+| 5 | Identity signals (AI) | `extract-identity-signals.ts` | Parsed artifacts (menu, about, wine copy) | `derived_signals` (cuisine_posture, service_model, price_tier, wine_program, personality, signature_dishes) | **$** ~$0.001/entity (Claude Haiku) |
+| 6 | Website enrichment | `run-website-enrichment.ts` | Website HTML | `merchant_signals` + `entities` (menu_url, reservation_url, category, cuisine); also `observed_claims` at confidence >= 0.75 | **$** ~$0.002-0.005/entity (Claude) |
+| 7 | Tagline generation (AI) | `generate-taglines-v2.ts` | Identity signals + entity data | `interpretation_cache` (TAGLINE, candidates, pattern) | **$** ~$0.0008/entity (Claude) |
 
-**Total pipeline cost per entity: ~$0.012-0.020** (dominated by Google Places)
+Pipeline defaults to `--from=2` (skips Google Places). Use `--include-google`
+to start from stage 1.
 
-### Standalone Tools
+### 1B. Social Discovery
+
+| Tool | Trigger | Source | Writes To | Cost |
+|------|---------|--------|-----------|------|
+| discover-social (Instagram) | `POST /api/admin/tools/discover-social` `{ mode: "instagram", slug }` | Claude Haiku + web_search | `entities.instagram` (medium/high confidence only) | **$** ~$0.001/entity |
+| discover-social (TikTok) | `POST /api/admin/tools/discover-social` `{ mode: "tiktok", slug }` | Claude Haiku + web_search | `entities.tiktok` (medium/high confidence only) | **$** ~$0.001/entity |
+| discover-social (website) | `POST /api/admin/tools/discover-social` `{ mode: "website", slug }` | Claude Haiku + web_search | `entities.website` (medium/high confidence only) | **$** ~$0.001/entity |
+| discover-social (batch) | `POST /api/admin/tools/discover-social` `{ mode: "both", limit: N }` | Claude Haiku + web_search | `entities.instagram` + `entities.website` | **$** ~$0.002/entity |
+
+**Note:** Batch mode spawns `scripts/discover-social.ts` as background process.
+This script does **not yet exist on disk** — the API route handles single-entity
+inline, but the batch script file is missing. Needs to be created before bulk
+social discovery runs.
+
+### 1C. Merchant Surface Scanner
+
+| Tool | Command | Source | Writes To | Cost |
+|------|---------|--------|-----------|------|
+| scan-merchant-surfaces | `npx tsx scripts/scan-merchant-surfaces.ts [--limit=N] [--slug=<slug>]` | Entity website homepage | `merchant_surface_scans` (platform, menu format/URL, reservation platform/URL, ordering platform/URL, Instagram URL, newsletter, gift cards, careers, private dining, sibling entities) | Free |
+
+This is a detection-only pass — append-only snapshots to
+`merchant_surface_scans`. Covers EAT entities in the LA bounding box with
+websites. Concurrency=6, timeout=12s.
+
+### 1D. Canonical Population
+
+| Tool | Command | Source | Writes To | Cost |
+|------|---------|--------|-----------|------|
+| populate-canonical-state | `npx tsx scripts/populate-canonical-state.ts [--dry-run] [--limit=N]` | `entities` + `golden_records` (fallback) | `canonical_entity_state`, `canonical_sanctions`, `observed_claims`, `derived_signals`, `interpretation_cache` | Free |
+
+Promotes existing entity data to the Fields v2 canonical layer. Creates
+`canonical_entity_state` rows with sanctions recording provenance. Also migrates
+taglines to `interpretation_cache` and identity signals to `derived_signals`.
+
+### 1E. Coverage Gap Fill (Google Places)
+
+| Tool | Command | Source | Writes To | Cost |
+|------|---------|--------|-----------|------|
+| coverage-apply | `npm run coverage:apply:neon -- --limit=20 --apply` | Google Places API (Details + Attributes) | `entities` (hours, googlePhotos, googlePlacesAttributes, businessStatus), `place_coverage_status` | **$$** ~$0.007-0.02/entity |
+
+Targets three specific gap groups: `NEED_GOOGLE_PHOTOS`, `NEED_HOURS`,
+`NEED_GOOGLE_ATTRS`. Requires `--apply` flag for writes (default is dry-run).
+Rate limit 250ms between calls. JSON report written to `data/coverage/`.
+
+### 1F. Instagram / Meta Toolchain
+
+Full Instagram pipeline — discovery, ingestion, and operator actions. Requires
+`INSTAGRAM_ACCESS_TOKEN` and `INSTAGRAM_USER_ID` in `.env.local`.
+
+**Discovery (find handles):**
+
+| Tool | Command | Source | Writes To | Cost |
+|------|---------|--------|-----------|------|
+| Handle extraction from surfaces | `npm run backfill:instagram-handles` | Parsed `merchant_surfaces` (Instagram URLs in HTML) | `entities.instagram` | Free |
+| Handle finder (web search) | `npm run find:instagram` | Web search for official IG handles | CSV output for review → merge | Free |
+| Handle finder (LA county) | `npm run find:instagram:la` | Web search, LA county scope | `data/instagram-la-suggestions.csv` | Free |
+| Handle finder (Tier 1+2) | `npm run find:instagram:tier12` | Web search, top-tier entities | `data/instagram-tier12-suggestions.csv` | Free |
+| Scrape from websites | `scripts/scrape-instagram-from-websites.ts` | Entity website HTML | `entities.instagram` | Free |
+| Merge to golden records | `npm run merge:instagram` | Suggestions CSV | `golden_records` | Free |
+
+**Ingestion (fetch media via Meta Graph API):**
+
+| Tool | Command | Source | Writes To | Cost |
+|------|---------|--------|-----------|------|
+| Single entity | `npm run ingest:instagram -- --username=<handle> --entity-id=<id>` | Instagram Business Discovery API | `instagram_accounts`, `instagram_media` | Free (rate-limited) |
+| Batch (all with handles) | `npm run ingest:instagram -- --batch` | Instagram Business Discovery API | `instagram_accounts`, `instagram_media` | Free (rate-limited) |
+| Hours from Instagram | `scripts/backfill-instagram-hours.ts` | Instagram business profile data | Entity hours | Free |
+
+**Admin API (operator actions):**
+
+| Action | Endpoint | What it does |
+|--------|----------|-------------|
+| `backfill` | `POST /api/admin/tools/instagram-discover` `{ action: "backfill" }` | Extract handles from `merchant_surfaces` → `entities.instagram` (background) |
+| `ingest` | `POST /api/admin/tools/instagram-discover` `{ action: "ingest", slug }` | Fetch media for one entity via Graph API (background) |
+| `ingest batch` | `POST /api/admin/tools/instagram-discover` `{ action: "ingest", batch: true }` | Fetch media for all entities with handles (background) |
+| `set` | `POST /api/admin/tools/instagram-discover` `{ action: "set", entityId, handle }` | Manually set handle (inline) |
+| `confirm none` | `POST /api/admin/tools/instagram-discover` `{ action: "set", entityId, none: true }` | Confirm entity has no Instagram (inline, sets `NONE`) |
+
+**Rate limits:** Meta Graph API — 200-3000 calls/hour depending on endpoint.
+Default inter-account delay: 3s. Media limit per account: 200 (configurable).
+
+**Export tools (for offline review):**
+
+| Tool | Command | Output |
+|------|---------|--------|
+| Export backfill list | `npm run export:instagram` | CSV of entities needing IG handles |
+| Export LA county | `npm run export:instagram:la` | CSV of LA county entities missing IG |
+| Export Tier 1+2 | `npm run export:instagram:tier12` | CSV of top-tier entities missing IG |
+
+### 1G. Standalone Backfill Tools
 
 | Tool | npm script | Source | Writes To | Cost |
 |------|-----------|--------|-----------|------|
-| Instagram ingestion | `ingest:instagram` | Meta Graph API | `instagram_accounts`, `instagram_media` | Free (rate-limited) |
-| Google Place ID backfill | `backfill:google-place-ids` | Google Places Text Search | `entities.googlePlaceId` | ~$0.007/entity |
-| Website backfill from Google | `backfill:websites` | Google Places Details | `entities.website` | ~$0.007/entity |
-| Address backfill | `backfill:entities-address` | Google Places Details | `entities.address` | ~$0.007/entity |
-| Neighborhood backfill | `backfill:neighborhood` | Google Places address_components | `entities.neighborhood` | ~$0.007/entity |
-| Google attrs backfill | `backfill:google-attrs` | Google Places API | `entities.googlePlacesAttributes` | ~$0.02/entity |
-| Instagram handle extraction | `backfill:instagram-handles` | Parsed merchant_surfaces | `entities.instagram` | Free |
+| Google Place ID backfill | `backfill:gpid:neon` | Google Places Text Search | `golden_records.google_place_id` | **$$** ~$0.007/entity |
+| Website from Google | `backfill:websites` | Google Places Details | `entities.website` | **$$** ~$0.007/entity |
+| Address backfill | `backfill:entities-address` | Google Places Details | `entities.address` | **$$** ~$0.007/entity |
+| Neighborhood backfill | `backfill:neighborhood` | Google Places address_components | `entities.neighborhood` | **$$** ~$0.007/entity |
+| Google attrs backfill | `backfill:google-attrs` | Google Places API | `entities.googlePlacesAttributes` | **$$** ~$0.02/entity |
 | Confidence scoring | `backfill:confidence` | Multi-source analysis | `entities.confidence` | Free |
-| Energy + tag engine | `backfill:energy-tag` | Existing signals | `energy_scores`, `place_tag_scores` | Free |
-| Issue scanner | (built into pipeline) | All entity fields | `entity_issues` | Free |
 
-### Admin API Endpoints
+### 1H. Admin API Endpoints
 
 | Endpoint | Method | Purpose |
 |----------|--------|---------|
-| `/api/admin/enrich/[slug]` | POST | Trigger single-entity pipeline (background) |
+| `/api/admin/enrich/[slug]` | POST | Trigger single-entity pipeline (background, stages 2-7) |
 | `/api/admin/enrich/[slug]` | GET | Poll enrichment progress (stage 1-7, done flag) |
 | `/api/admin/tools/enrich-stage` | POST | Re-run specific stage or resume from stage |
+| `/api/admin/tools/discover-social` | POST | Social handle/website discovery (Claude + web_search) |
+| `/api/admin/tools/scan-issues` | POST | Run issue scanner on entity |
+| `/api/admin/tools/derive-neighborhood` | POST | Derive neighborhood from coordinates |
+| `/api/admin/tools/instagram-discover` | POST | Instagram handle discovery |
+| `/api/admin/tools/seed-gpid-queue` | POST | Queue entities for GPID resolution |
+
+### 1I. Coverage Dashboard SQL (lib/admin/coverage/sql.ts)
+
+Cross-reference point. The Coverage Ops dashboard runs these audit queries:
+
+- `OVERVIEW_COUNTS_SQL` — total DB, addressable, reachable, dark inventory
+- `REACHABLE_MISSING_FIELDS_SQL` — per-field null counts for reachable entities
+  (slug, name, latlng, google_place_id, hours, phone, website, instagram, neighborhood)
+- `REACHABLE_NEIGHBORHOOD_SCORECARD_SQL` — per-neighborhood completion rates
+- `REACHABLE_REDFLAGS_SQL` — entities failing Tier-1 (missing slug/name/coords/GPID)
+- `FIELDS_BREAKDOWN_*_SQL` — field completion across reachable, addressable, total DB cohorts
+
+### 1J. Missing Tools (referenced in prompt but not yet built)
+
+| Tool | Gap | Status |
+|------|-----|--------|
+| `scripts/discover-social.ts` (batch CLI) | Batch social discovery spawned by API route | API route exists, batch script file does not |
+| `signals:menu:sync` npm script | Menu URL sync from merchant signals | No npm script or script file found |
 
 ---
 
@@ -9357,13 +9841,13 @@ most demanding. Other verticals (COFFEE, SHOP, STAY) require subsets.
 **Operational** (expected for quality):
 - `neighborhood` — from Google Places address_components
 - `phone` — from Google Places or website
-- `website` — from intake or Google Places
+- `website` — from intake, Google Places, or discover-social
 - `hours` — from Google Places or website
-- `instagram` — from website scrape or manual entry
-- `tiktok` — from website scrape or manual entry
+- `instagram` — from website scrape, discover-social, or manual
+- `tiktok` — from website scrape, discover-social, or manual
 - `price_level` — from Google Places
-- `reservation_url` — from website enrichment (Stage 6)
-- `menu_url` — from website enrichment (Stage 6)
+- `reservation_url` — from website enrichment (Stage 6) or scan-merchant-surfaces
+- `menu_url` — from website enrichment (Stage 6) or scan-merchant-surfaces
 - `category` + `cuisine_type` — from website enrichment (Stage 6)
 
 **Content** (differentiating):
@@ -9371,221 +9855,283 @@ most demanding. Other verticals (COFFEE, SHOP, STAY) require subsets.
 - `interpretation_cache.TAGLINE` — from AI generation (Stage 7)
 - `description` — from editorial source, website, or synthesis
 
+**Canonical layer** (Fields v2):
+- `canonical_entity_state` row populated with best values from evidence
+- `canonical_sanctions` audit trail for each sanctioned field
+- `observed_claims` backing each canonical value
+
 **Convenience / display**:
 - `google_photos` — from Google Places
 - `merchant_signals` — menu/reservation/ordering URLs + providers
-- `energy_scores` + `place_tag_scores` — computed from signals
+- `merchant_surface_scans` — homepage detection snapshot
 
 **Fully enriched** in pipeline terms = `interpretation_cache` has a `TAGLINE`
-row with `is_current=true`. The pipeline auto-clears `needs_human_review` when
-this exists.
+row with `is_current=true`.
 
 ### Other Verticals — Reduced Playbooks
 
 | Vertical | Drops compared to EAT |
 |----------|----------------------|
 | COFFEE | No reservation_url, no menu_url usually, no cuisine_type |
-| SHOP | No menu_url, no reservation_url, no hours requirement relaxed |
+| SHOP | No menu_url, no reservation_url, hours requirement relaxed |
 | STAY | No menu_url, reservation_url = booking link, no cuisine_type |
 | CULTURE | No menu_url, no reservation_url, no cuisine_type |
 
 ---
 
-## 3. Common Gaps (ranked by frequency)
+## 3. Coverage Gap Analysis
+
+### Gap Ranking (estimated, pre-query)
 
 Based on the issue scanner rules (`lib/coverage/issue-scanner.ts`) and the
-existing enrichment stats, the most frequent gaps for under-enriched entities:
+coverage dashboard SQL queries:
 
-| Rank | Gap | Issue Type | Problem Class | Blocking? | Tool to Fix |
-|------|-----|-----------|---------------|-----------|-------------|
-| 1 | No enrichment run at all | `enrichment_incomplete` | identity | Yes | `enrich:batch` (stages 2-7) |
-| 2 | Missing neighborhood | `missing_neighborhood` | location | No | Stage 1 (Google) or `backfill:neighborhood` |
-| 3 | Missing hours | `missing_hours` | location | No | Stage 1 (Google Places) |
-| 4 | Missing phone | `missing_phone` | contact | No | Stage 1 (Google Places) |
-| 5 | Missing Instagram | `missing_instagram` | social | No | `backfill:instagram-handles` (from surfaces) or manual |
-| 6 | Missing TikTok | `missing_tiktok` | social | No | Manual or social discovery |
-| 7 | Missing price level | `missing_price_level` | location | No | Stage 1 (Google Places) or Stage 5 (AI inference) |
-| 8 | Missing GPID | `missing_gpid` | identity | No | `backfill:google-place-ids` |
-| 9 | Missing menu link | `missing_menu_link` | location | No | Stage 6 (website enrichment) |
-| 10 | Missing reservation link | `missing_reservations` | location | No | Stage 6 (website enrichment) |
-| 11 | Missing website | `missing_website` | contact | No | `backfill:websites` (from Google) or manual |
-| 12 | Missing coords | `missing_coords` | location | Yes | Stage 1 (Google Places) |
-| 13 | Unresolved identity | `unresolved_identity` | identity | Yes | Manual review |
-| 14 | Google says closed | `google_says_closed` | identity | Yes | Manual verification |
+| Rank | Gap | Issue Type | Blocking? | Tool to Fix |
+|------|-----|-----------|-----------|-------------|
+| 1 | No enrichment run at all | `enrichment_incomplete` | Yes | ERA pipeline (stages 2-7) |
+| 2 | Missing website | `missing_website` | No | `discover-social` (mode=website) or `backfill:websites` (Google $$) |
+| 3 | Missing Instagram | `missing_instagram` | No | `backfill:instagram-handles` (free, from surfaces) then `discover-social` (mode=instagram, $) |
+| 4 | Missing neighborhood | `missing_neighborhood` | No | `derive-neighborhood` API or `backfill:neighborhood` (Google $$) |
+| 5 | Missing hours | `missing_hours` | No | `coverage:apply:neon --apply` (Google $$) |
+| 6 | Missing phone | `missing_phone` | No | Google Places (Stage 1 $$) |
+| 7 | Missing TikTok | `missing_tiktok` | No | `discover-social` (mode=tiktok, $) |
+| 8 | Missing price level | `missing_price_level` | No | Google Places or AI inference (Stage 5) |
+| 9 | Missing GPID | `missing_gpid` | No | `backfill:gpid:neon` (Google $$) |
+| 10 | Missing coords | `missing_coords` | Yes | Google Places (Stage 1 $$) |
+| 11 | Missing canonical_entity_state | N/A | No | `populate-canonical-state.ts` (free) |
+
+### Actual Counts (run before execution)
+
+Run these queries to get current numbers before starting:
+
+```bash
+# Overview counts (total, addressable, reachable, dark inventory)
+# Uses OVERVIEW_COUNTS_SQL from lib/admin/coverage/sql.ts
+
+# Missing fields for reachable entities
+# Uses REACHABLE_MISSING_FIELDS_SQL
+
+# Or use the Coverage Ops dashboard at /admin/coverage-ops
+```
 
 ### The Two Populations
 
-1. **Has website (~80% of entities)** — full pipeline (stages 2-7) can run
-   autonomously. Google Places (stage 1) is the only paid step and is optional
-   if coords/address already exist from intake.
+1. **Has website (~80%)** — full pipeline (stages 2-7) can run autonomously.
+   Google Places (stage 1) is optional if coords/address exist from intake.
 
-2. **No website (~20% of entities)** — parks, markets, street vendors, civic
-   venues. Need Google Places for identity, then social discovery or manual
-   enrichment. Pipeline stages 2-7 will skip (no website to crawl).
+2. **No website (~20%)** — parks, markets, street vendors, civic venues.
+   Need `discover-social` (website mode) first, then pipeline. If no website
+   found, need Google Places for identity + social discovery for handles.
 
 ---
 
-## 4. Execution Sequence — the Playbook
+## 4. Tool-to-Gap Mapping
+
+| Field Gap | Free Tool | Paid Tool (fallback) |
+|-----------|-----------|---------------------|
+| website | `discover-social` (mode=website, $0.001) | `backfill:websites` (Google, $0.007) |
+| instagram | `backfill:instagram-handles` (from surfaces) | `discover-social` (mode=instagram, $0.001) |
+| tiktok | (none free) | `discover-social` (mode=tiktok, $0.001) |
+| neighborhood | `derive-neighborhood` API (from existing coords) | `backfill:neighborhood` (Google, $0.007) |
+| hours | (none free) | `coverage:apply:neon` (Google, $0.007) |
+| phone | (none free) | Google Places Stage 1 ($0.007) |
+| coords | (none free) | Google Places Stage 1 ($0.007) |
+| price_level | Stage 5 AI inference (from menu text) | Google Places Stage 1 ($0.007) |
+| menu_url | Stage 6 or `scan-merchant-surfaces` (free) | (none needed) |
+| reservation_url | Stage 6 or `scan-merchant-surfaces` (free) | (none needed) |
+| google_place_id | (none free) | `backfill:gpid:neon` (Google, $0.007) |
+| identity_signals | Stage 5 (requires surfaces, $0.001) | (none) |
+| tagline | Stage 7 (requires Stage 5 output, $0.0008) | (none) |
+| canonical_entity_state | `populate-canonical-state.ts` (free) | (none needed) |
+| google_photos | (none free) | `coverage:apply:neon` (Google, $0.007) |
+
+### Gaps with NO existing tool:
+
+- **TikTok ingestion** — field exists in schema, `discover-social` can find
+  handles, but no automated content ingestion script (unlike Instagram)
+- **Editorial coverage crawl** — `coverage_sources` stores editorial links
+  but no automated discovery/extraction pipeline exists
+
+---
+
+## 5. Execution Sequence — the Playbook
 
 ### Pre-flight Checklist
 
-Before running enrichment on a new city:
-
-1. **Entities ingested** — all entities in `entities` table with at least
-   `name`, `slug`, `primary_vertical`. Ideally `website` and/or
-   `googlePlaceId` from intake CSVs.
-2. **Source registry populated** — `source_registry` has entries for all
-   sources you'll use (google_places, website_crawl, editorial_*, etc.)
-3. **Attribute registry populated** — `attribute_registry` has all attribute
-   keys with sanction thresholds
-4. **API keys set** — `GOOGLE_PLACES_API_KEY`, `ANTHROPIC_API_KEY`,
-   `INSTAGRAM_ACCESS_TOKEN` (if social enrichment needed)
-5. **Dry run** — run `npm run enrich:place -- --batch=5 --dry-run` to verify
+1. **Entities ingested** — `name`, `slug`, `primary_vertical` at minimum.
+   Ideally `website` and/or `googlePlaceId` from intake CSVs.
+2. **Source + attribute registries populated** — `source_registry`,
+   `attribute_registry` seeded with `seed-fields-v2-registries.ts`
+3. **API keys set** — `ANTHROPIC_API_KEY` (required), `GOOGLE_PLACES_API_KEY`
+   + `GOOGLE_PLACES_ENABLED=true` (Phase 5 only), `INSTAGRAM_ACCESS_TOKEN` (optional)
+4. **Dry run** — `npm run enrich:place -- --batch=5 --dry-run` to verify
    pipeline connectivity
 
-### Phase 1: Free Website Enrichment (stages 2-7, no Google)
+### Phase 1 — Surface Discovery (free to low cost)
 
-**Scope:** All entities with `website != null` and `last_enriched_at = null`.
-**Cost:** ~$0.004/entity (AI stages only).
-**Expected coverage:** 70-80% of entities.
+**Goal:** Fill `website` and `instagram` for entities that are missing them.
+Do not call Google Places API at this stage.
 
+**Step 1a — Extract IG handles from existing surfaces (free):**
 ```bash
-# Start small to validate
-npm run enrich:place -- --batch=10 --concurrency=3
-
-# Scale up
-npm run enrich:place -- --batch=50 --concurrency=5
-
-# Full run (all remaining with websites)
-npm run enrich:place -- --batch=500 --concurrency=5
-```
-
-The pipeline defaults to `--from=2` (skips Google Places). Each entity runs
-stages 2-7 sequentially. Idempotent — safe to re-run. Failed entities can be
-resumed with `--from=N`.
-
-**What this produces per entity:**
-- `merchant_surfaces` with discovered URLs
-- `merchant_surface_artifacts` with parsed text
-- `derived_signals.identity_signals` (cuisine, personality, service model)
-- `merchant_signals` (menu_url, reservation_url, category)
-- `interpretation_cache.TAGLINE` (if enough content for AI)
-
-**Post-phase check:**
-```bash
-npx tsx scripts/enrichment-stats.ts
-```
-
-### Phase 2: Instagram Handle Discovery (free)
-
-**Scope:** Entities where `instagram = null` but surfaces found Instagram links.
-**Cost:** Free.
-
-```bash
+npm run backfill:instagram-handles -- --dry-run
 npm run backfill:instagram-handles
 ```
+Parses already-fetched `merchant_surfaces` for Instagram links. Pure DB + string parsing.
 
-This extracts Instagram handles from already-fetched website surfaces. No API
-calls — pure DB + string parsing.
+**Step 1b — AI social discovery for remaining gaps (Anthropic $):**
+```bash
+# Single entity
+curl -X POST /api/admin/tools/discover-social \
+  -d '{ "mode": "both", "slug": "example-place", "dryRun": true }'
 
-### Phase 3: Instagram Content Ingestion (free, rate-limited)
+# Batch — NOTE: batch script doesn't exist yet, single-entity only via API
+# For now, loop over slugs from a missing-website query
+```
 
-**Scope:** Entities with `instagram != null` but no `instagram_accounts` row.
-**Cost:** Free (Meta rate limits apply).
+**Scope:** Entities where `website IS NULL` or `instagram IS NULL`.
+**Cost:** ~$0.001/entity (Claude Haiku + web_search).
+**Expected yield:** 40-60% of missing websites, 50-70% of missing IG handles.
 
+### Phase 2 — Free Enrichment (free)
+
+**Goal:** Run all free enrichment tools on entities that now have surfaces.
+
+**Step 2a — Merchant surface scan (free):**
+```bash
+npx tsx scripts/scan-merchant-surfaces.ts --limit=200 --dry-run
+npx tsx scripts/scan-merchant-surfaces.ts --limit=200
+```
+Detects platform, menu format/URL, reservation/ordering providers, Instagram
+URL, newsletter, sibling entities. Writes to `merchant_surface_scans`.
+
+**Step 2b — ERA pipeline stages 2-4 (free):**
+```bash
+# Surface discovery + fetch + parse
+npm run enrich:place -- --batch=50 --concurrency=5 --only=2
+npm run enrich:place -- --batch=50 --concurrency=5 --only=3
+npm run enrich:place -- --batch=50 --concurrency=5 --only=4
+```
+
+**Step 2c — Website enrichment (Anthropic $):**
+```bash
+npm run enrich:website -- --limit=50
+```
+Extracts menu_url, reservation_url, category, cuisine from website HTML.
+Writes to `merchant_signals` and `merchant_enrichment_runs`. Also writes
+`observed_claims` for high-confidence extractions (>= 0.75).
+
+**Step 2d — Instagram content ingestion (free, rate-limited):**
 ```bash
 npm run ingest:instagram -- --batch
 ```
+For entities with `instagram != null` but no `instagram_accounts` row.
+Rate limited by Meta (~200-3000 calls/hour).
 
-Rate limited by Meta (~200-3000 calls/hour). Use `--batch` to process all
-entities with Instagram handles. Writes account metadata + recent media.
+### Phase 3 — Canonical Population (free)
 
-### Phase 4: Google Places — Gap Fill (paid, targeted)
-
-**Scope:** Entities still missing critical fields (coords, address,
-neighborhood, hours, phone) after free enrichment.
-**Cost:** ~$0.007/entity.
+**Goal:** Promote evidence to `canonical_entity_state`. Check field
+completeness after this step before proceeding to paid phases.
 
 ```bash
-# Only entities never cached
-npm run backfill:google -- --limit=100 --batch=25
+npx tsx scripts/populate-canonical-state.ts --dry-run
+npx tsx scripts/populate-canonical-state.ts
+```
 
-# Or within the pipeline
+Creates `canonical_entity_state` rows, `canonical_sanctions` audit trail,
+migrates existing taglines to `interpretation_cache`, and identity signals
+to `derived_signals`.
+
+**Post-phase check:** Query `canonical_entity_state` for field completeness.
+Identify which entities still have gaps that require AI or Google.
+
+### Phase 4 — AI Extraction (Anthropic $)
+
+**Goal:** Run AI stages on entities that have surfaces but still lack
+identity signals and taglines.
+
+**Scope:** Entities with `merchant_surface_artifacts` (from Phase 2) but no
+`derived_signals.identity_signals`. Do NOT run AI on entities with no
+surfaces — there's nothing to extract from.
+
+```bash
+# Identity signal extraction (Stage 5)
+npm run enrich:place -- --batch=50 --concurrency=5 --only=5
+
+# Tagline generation (Stage 7) — requires Stage 5 output
+npm run enrich:place -- --batch=50 --concurrency=5 --only=7
+```
+
+**Prioritization:** Entities closest to publication threshold first (most
+fields already populated, just missing signals/tagline).
+
+**Cost:** ~$0.002/entity (Stage 5 + Stage 7 combined).
+
+### Phase 5 — Google Places (Google $$, gaps only)
+
+**Goal:** Fill remaining null fields that free methods couldn't resolve.
+Only for entities that still have gaps after all prior phases.
+
+**Step 5a — Coverage apply (targeted gap fill):**
+```bash
+npm run coverage:apply:neon -- --limit=20
+# Review the dry-run report, then:
+npm run coverage:apply:neon -- --limit=50 --apply
+```
+Targets `NEED_GOOGLE_PHOTOS`, `NEED_HOURS`, `NEED_GOOGLE_ATTRS` only.
+Requires GPID. Rate limit 250ms.
+
+**Step 5b — GPID resolution (for entities without one):**
+```bash
+npm run backfill:gpid:neon -- --limit=50
+```
+
+**Step 5c — Full Google enrichment (for entities with no surfaces at all):**
+```bash
 npm run enrich:place -- --batch=50 --include-google --concurrency=3
 ```
+Only for the ~20% of entities with no website and no surfaces.
 
-**Strategic targeting** — don't run Google on everything. Target:
-1. Entities with `missing_coords` issues (blocking publication)
-2. Entities with `missing_neighborhood` (quality gap)
-3. Entities with `missing_hours` (quality gap)
-4. Entities with no website (Google is the only identity source)
+**Hard rule:** Never call Google API if free sources haven't run first.
 
-**Cost estimate for 1,000 entities:** ~$7-10 (not all need it; many already
-have coords from intake CSVs).
-
-### Phase 5: Confidence + Derived Scores (free, compute-only)
-
-**Scope:** All enriched entities.
-**Cost:** Free.
-
-```bash
-npm run backfill:confidence
-npm run backfill:energy-tag
-```
-
-Recomputes multi-source confidence scoring and energy/tag scores from
-existing signals. No API calls.
-
-### Phase 6: Issue Scan + Manual Triage
-
-**Scope:** Remaining open issues.
-**Cost:** Free (operator time).
-
-The enrichment pipeline auto-runs the issue scanner after each entity. After
-bulk enrichment, review the coverage ops dashboard at `/admin/coverage-ops`:
-
-1. **Blocking issues** — `unresolved_identity`, `missing_coords`,
-   `google_says_closed`. Must resolve before publication.
-2. **Quality issues** — `missing_neighborhood`, `missing_hours`, etc. Reduce
-   quality score but don't block.
-3. **Social gaps** — `missing_instagram`, `missing_tiktok`. May require
-   manual research.
-
-### Phase 7: Re-run Failed / Held Entities
-
-**Scope:** Entities where pipeline failed or content was too sparse for AI.
-**Cost:** Varies.
-
-```bash
-# Find entities stuck at a stage
-# enrichment_stage column shows last completed stage
-
-# Re-run from failure point
-npm run enrich:place -- --slug=<slug> --from=<failed_stage>
-
-# Force re-process (bypass skip checks)
-npm run enrich:place -- --slug=<slug> --force
-```
+**Cost estimate for 1,000 entities:** ~$3-7 (not all need it; many already
+have coords and data from intake CSVs).
 
 ---
 
-## 5. Cost Summary for 1,000 Entities
+## 6. Hard Rules
+
+1. **Free before paid** — never call Google API if free sources haven't run
+2. **Evidence before canonical** — enrichment writes to evidence tables first,
+   not directly to `entities` or `canonical_entity_state`
+3. **Entity type drives playbook** — don't run restaurant tools on a park
+4. **Provenance always** — every field must track its source
+5. **No bulk writes without a dry-run report first** — show what will be
+   written before committing
+6. **Idempotent** — all tools check for existing data before writing; safe
+   to re-run
+
+---
+
+## 7. Cost Summary for 1,000 Entities
 
 | Phase | Entities | Cost/Entity | Total | Notes |
 |-------|----------|-------------|-------|-------|
-| 1. Website enrichment (AI stages) | ~800 | $0.004 | ~$3.20 | 80% have websites |
-| 2. Instagram handle extraction | ~800 | $0 | $0 | Free (parse surfaces) |
-| 3. Instagram content ingestion | ~400 | $0 | $0 | Free (rate-limited) |
-| 4. Google Places gap fill | ~500 | $0.007 | ~$3.50 | Targeted, not all |
-| 5. Confidence + energy | ~1000 | $0 | $0 | Free compute |
-| **Total** | | | **~$6.70** | |
+| 1. Surface discovery (IG handles) | ~800 | $0 | $0 | Free (parse surfaces) |
+| 1. Surface discovery (AI) | ~200 | $0.002 | ~$0.40 | Missing website + IG |
+| 2. Free enrichment (scan + pipeline 2-4) | ~800 | $0 | $0 | Free |
+| 2. Website enrichment (Claude) | ~800 | $0.003 | ~$2.40 | Anthropic $ |
+| 2. Instagram ingestion | ~400 | $0 | $0 | Free (rate-limited) |
+| 3. Canonical population | ~1000 | $0 | $0 | Free |
+| 4. AI extraction (stages 5+7) | ~600 | $0.002 | ~$1.20 | Anthropic $ |
+| 5. Google Places gap fill | ~300 | $0.007 | ~$2.10 | Targeted, not all |
+| **Total** | | | **~$6.10** | |
 
-**Per-city launch cost: ~$5-10 for 1,000 entities.** The dominant cost is
-Google Places API, used only for gap-fill, not as default.
+**Per-city launch cost: ~$5-10 for 1,000 entities.**
 
 ---
 
-## 6. Monitoring & Observability
+## 8. Monitoring & Observability
 
 ### During Runs
 
@@ -9596,13 +10142,10 @@ Google Places API, used only for gap-fill, not as default.
 
 ### After Runs
 
-```bash
-# Pipeline status breakdown
-npx tsx scripts/enrichment-stats.ts
-
-# Issue summary
-# → Coverage ops dashboard at /admin/coverage-ops
-```
+- Coverage Ops dashboard at `/admin/coverage-ops` (Overview, Missing Fields,
+  Neighborhoods, Red Flags tabs)
+- `REACHABLE_MISSING_FIELDS_SQL` for per-field gap counts
+- `FIELDS_BREAKDOWN_*_SQL` for cross-cohort comparison
 
 ### Key Metrics to Track
 
@@ -9612,62 +10155,64 @@ npx tsx scripts/enrichment-stats.ts
 | Entities with website | >80% | `entities.website IS NOT NULL` count |
 | Entities with GPID | >70% | `entities.googlePlaceId IS NOT NULL` count |
 | Entities with identity_signals | >60% | `derived_signals` count |
-| Blocking issues | 0 | `entity_issues` where `blocking_publish=true` |
-| Average entity cost | <$0.015 | `merchant_enrichment_runs` aggregate |
+| canonical_entity_state populated | >90% | `canonical_entity_state` count |
+| Blocking issues | 0 | `entity_issues WHERE blocking_publish=true` |
 
 ---
 
-## 7. New City Checklist
-
-When launching a new city, run this checklist:
+## 9. New City Checklist
 
 - [ ] Intake CSVs ingested (`npm run intake`)
 - [ ] Entity types + verticals assigned
 - [ ] Dedup pass run (check for intake duplicates)
-- [ ] Source registry verified for city-specific sources
-- [ ] Run Phase 1: website enrichment batch
-- [ ] Run Phase 2: Instagram handle extraction
-- [ ] Run Phase 3: Instagram content ingestion
+- [ ] Source + attribute registries seeded
+- [ ] **Phase 1:** Surface discovery (IG handles from surfaces, then AI discovery)
+- [ ] **Phase 2:** Free enrichment (scan surfaces, pipeline 2-4, website enrichment, IG ingestion)
+- [ ] **Phase 3:** Canonical population (populate-canonical-state)
 - [ ] Check enrichment stats — identify remaining gaps
-- [ ] Run Phase 4: targeted Google Places for gaps
-- [ ] Run Phase 5: confidence + energy scoring
-- [ ] Review Phase 6: triage blocking issues
-- [ ] Run Phase 7: retry failed entities
+- [ ] **Phase 4:** AI extraction (stages 5+7 for entities with surfaces)
+- [ ] **Phase 5:** Google Places gap fill (targeted, not blanket)
 - [ ] Final enrichment stats — verify >70% TAGLINE coverage
+- [ ] Triage blocking issues via `/admin/coverage-ops`
+- [ ] Retry failed entities
 - [ ] Publish ready entities to maps
 
 ---
 
-## 8. Known Limitations & Future Work
+## 10. Known Limitations & Deferred Entities
 
 ### Current Limitations
 
-1. **No-website entities** — stages 2-7 require a website. ~20% of entities
-   (parks, markets, carts) need alternative enrichment paths (Google-only,
-   Instagram-only, or manual).
+1. **Batch discover-social script missing** — `scripts/discover-social.ts`
+   is referenced by the API route for batch mode but does not exist on disk.
+   Single-entity discovery works via the API route. Batch requires a script
+   to be created.
 
-2. **Tagline not wired to API** — `interpretation_cache.TAGLINE` exists but
+2. **`signals:menu:sync` does not exist** — no npm script or script file
+   found. Menu URL syncing happens within Stage 6 (website enrichment) and
+   `scan-merchant-surfaces.ts` but there is no standalone sync tool.
+
+3. **No-website entities** — stages 2-7 require a website. ~20% of entities
+   (parks, markets, carts) need `discover-social` (website mode) first. If
+   no website found, they are deferred to Google-only + manual.
+
+4. **Tagline not wired to API** — `interpretation_cache.TAGLINE` exists but
    the API route (`/api/places/[slug]`) still reads `entities.tagline`.
-   Needs migration to read from `interpretation_cache`.
 
-3. **TikTok ingestion** — field exists in schema but no automated ingestion
-   script yet (unlike Instagram).
+5. **TikTok ingestion** — field and discovery exist but no automated content
+   ingestion script (unlike Instagram).
 
-4. **Editorial coverage pipeline** — editorial sources (Eater, Michelin, etc.)
-   are tracked in `coverage_sources` and `editorialSources` but automated
-   crawl/extraction is not yet built.
+6. **Editorial coverage pipeline** — `coverage_sources` stores links but
+   no automated discovery/extraction is built.
 
-5. **Stage 5 sparse content** — entities with <50 chars of parseable text
-   from surfaces produce "hold"-tier confidence and skip signal extraction.
+7. **Stage 5 sparse content** — entities with <50 chars of parseable text
+   from surfaces skip signal extraction.
 
-### Future Enhancements
+### Deferred Entities (will not be enriched by this playbook)
 
-- Batch resume from last failure (currently manual `--from=N`)
-- Parallel stage execution where safe (stages 5+6 could run concurrently)
-- TikTok API ingestion script (mirror Instagram pattern)
-- Editorial discovery + extraction pipeline
-- Auto-retry with exponential backoff for transient failures
-- Cost reporting dashboard in admin UI
+- Entities with `businessStatus = 'CLOSED_PERMANENTLY'`
+- Entities outside the LA bounding box (lat 33.6-34.5, lon -118.9 to -117.6)
+- Entities with no website AND no Google Place ID (need manual identity first)
 
 ---
 
@@ -9801,68 +10346,40 @@ To eliminate client-side staleness entirely, consider moving the fetch to a serv
 | **Status** | active |
 | **Project** | SAIKO |
 | **Path** | `docs/DATA_SYNC_RUNBOOK.md` |
-| **Last Updated** | 2026-03-10 |
+| **Last Updated** | 2026-03-17 |
 
 # Data Sync Runbook
 
-Copy-paste commands only. No branching instructions.
+Copy-paste commands only. Single database provider: **Neon (PostgreSQL)**.
 
 ---
 
-## 1. Identify source of truth (run on BOTH Neon and Supabase)
+## 1. Check production state
 
-Set the URL for the DB you are querying, then run the same block for the other DB.
-
-### Neon (production)
-
-Get your Neon URL from `.env` or `.env.vercel.prod` (the `DATABASE_URL` line). Then:
+Get your Neon URL from `.env.local` (the `DATABASE_URL` line). Then:
 
 ```bash
-export NEON_URL="postgresql://..."   # paste from .env or .env.vercel.prod
+export NEON_URL="postgresql://..."   # paste from .env.local
 
-psql "$NEON_URL" -c "SELECT count(*) AS places FROM public.places;"
+psql "$NEON_URL" -c "SELECT count(*) AS entities FROM public.entities;"
 psql "$NEON_URL" -c "SELECT count(*) AS lists FROM public.lists;"
 psql "$NEON_URL" -c "SELECT count(*) AS map_places FROM public.map_places;"
 psql "$NEON_URL" -c "SELECT count(*) AS place_coverage_status FROM public.place_coverage_status;"
 psql "$NEON_URL" -c "SELECT count(*) AS place_tag_scores FROM public.place_tag_scores;"
 psql "$NEON_URL" -c "SELECT count(*) AS energy_scores FROM public.energy_scores;"
-psql "$NEON_URL" -c "SELECT slug FROM public.places ORDER BY updated_at DESC NULLS LAST LIMIT 10;"
+psql "$NEON_URL" -c "SELECT slug FROM public.entities ORDER BY updated_at DESC NULLS LAST LIMIT 10;"
 ```
-
-### Supabase
-
-Get your Supabase URL from `.env.vercel` (the `DATABASE_URL` line). Then:
-
-```bash
-export SUPABASE_URL="postgresql://..."   # paste from .env.vercel
-
-psql "$SUPABASE_URL" -c "SELECT count(*) AS places FROM public.places;"
-psql "$SUPABASE_URL" -c "SELECT count(*) AS lists FROM public.lists;"
-psql "$SUPABASE_URL" -c "SELECT count(*) AS map_places FROM public.map_places;"
-psql "$SUPABASE_URL" -c "SELECT count(*) AS place_coverage_status FROM public.place_coverage_status;"
-psql "$SUPABASE_URL" -c "SELECT count(*) AS place_tag_scores FROM public.place_tag_scores;"
-psql "$SUPABASE_URL" -c "SELECT count(*) AS energy_scores FROM public.energy_scores;"
-psql "$SUPABASE_URL" -c "SELECT slug FROM public.places ORDER BY updated_at DESC NULLS LAST LIMIT 10;"
-```
-
-Compare counts and recency. The DB with more places and more recent updates is the source of truth. Production is Neon; typically Neon is the source of truth.
 
 ---
 
 ## 2. Sync source → production Neon
 
-Once you know SOURCE (e.g. Neon staging or Supabase) and TARGET (production Neon), run:
+Once you know SOURCE and TARGET URLs, run:
 
 ### Dry-run (counts only; no writes)
 
 ```bash
 npx tsx scripts/sync-db.ts --source "$SOURCE_URL" --target "$TARGET_URL"
-```
-
-Example with real URLs (replace with your values):
-
-```bash
-npx tsx scripts/sync-db.ts --source "postgresql://user:pass@source-host/db" --target "postgresql://user:pass@neon-host/neondb"
 ```
 
 ### Apply (upserts into target)
@@ -9871,23 +10388,29 @@ npx tsx scripts/sync-db.ts --source "postgresql://user:pass@source-host/db" --ta
 npx tsx scripts/sync-db.ts --source "$SOURCE_URL" --target "$TARGET_URL" --apply
 ```
 
-Sync order: `places` → `energy_scores` → `place_tag_scores` → `place_coverage_status`. All upserts; no schema changes, no drops.
+Sync order: `entities` → `energy_scores` → `place_tag_scores` → `place_coverage_status`. All upserts; no schema changes, no drops.
 
 ---
 
 ## 3. Dev: which DB the app uses
 
-- **Local DB (localhost):**
+- **Default (Neon):**
+  ```bash
+  npm run dev
+  ```
+  Uses `.env` then `.env.local`; `DATABASE_URL` from `.env.local` wins. Banner shows DB classification.
+
+- **Local DB:**
   ```bash
   npm run dev:local
   ```
-  Uses `.env` then `.env.local`; DATABASE_URL from `.env.local` wins. Banner shows CLASSIFICATION: LOCAL.
+  Uses `scripts/db-local.sh` to override `DATABASE_URL` with localhost.
 
-- **Neon DB:**
+- **Explicit Neon wrapper:**
   ```bash
-  npm run dev:neon
+  ./scripts/db-neon.sh node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/<your-script>.ts
   ```
-  Uses `.env` (and optionally `.env.vercel.prod` for DATABASE_URL). Banner shows CLASSIFICATION: NEON.
+  Reads `DATABASE_URL` from `.env.local`. Sets `SAIKO_DB_FROM_WRAPPER=1`.
 
 The startup banner always shows which DB is in use. No ambiguity.
 
@@ -9895,21 +10418,23 @@ The startup banner always shows which DB is in use. No ambiguity.
 
 ## 4. Sanity: dev-only DB identity endpoint
 
-With the dev server running (e.g. `npm run dev:neon`):
+With the dev server running:
 
 ```bash
 curl -sS http://localhost:3000/api/debug/db
 ```
 
-Returns JSON: `classification`, `host`, `database`, `places_count`. Only available when `NODE_ENV=development`; 404 in production.
+Returns JSON: `classification`, `host`, `database`, `places_count`. Only available when `DEBUG_ROUTES_ENABLED=true`; 404 otherwise.
 
 ---
 
-## 5. One-liner summary
+## 5. Health check (production)
 
-- **Counts (Neon vs Supabase):** Set `NEON_URL` or `SUPABASE_URL`, run the `psql ... -c "SELECT count(*) ..."` blocks above.
-- **Sync to prod Neon:** `npx tsx scripts/sync-db.ts --source <url> --target <prod-neon-url>` then add `--apply` to write.
-- **Dev DB choice:** `npm run dev:local` or `npm run dev:neon`; banner confirms which DB.
+```bash
+curl -sS https://yourdomain.com/api/health
+```
+
+Returns `{ "status": "ok", "db": "connected", "latency_ms": ... }` or 503 if DB is unreachable.
 
 ---
 
@@ -9921,11 +10446,11 @@ Returns JSON: `classification`, `host`, `database`, `places_count`. Only availab
 | **Status** | active |
 | **Project** | SAIKO |
 | **Path** | `docs/LOCAL_DEV.md` |
-| **Last Updated** | 2026-03-10 |
+| **Last Updated** | 2026-03-17 |
 
 # Local Development
 
-Saiko runs on Next.js + Prisma. Single data path, no branching.
+Saiko runs on Next.js 16 + Prisma + Neon (PostgreSQL).
 
 ---
 
@@ -9935,92 +10460,81 @@ Saiko runs on Next.js + Prisma. Single data path, no branching.
 # Install dependencies
 npm install
 
-# Set up environment variables
-cp .env.example .env
-# Add your DATABASE_URL
+# Copy env template and fill in your secrets
+cp .env.example .env.local
+# Edit .env.local — add DATABASE_URL, ANTHROPIC_API_KEY, NEXTAUTH_SECRET, etc.
+
+# Generate Prisma client
+npx prisma generate
+
+# Run migrations
+npx prisma migrate deploy
 ```
 
 ---
 
-## Database
+## Environment Files
 
-### Migrate
+| File | What goes here |
+|---|---|
+| `.env` | Non-sensitive defaults (already committed). Feature flags, app URL, bucket name. |
+| `.env.local` | **All secrets.** DB URL, API keys, tokens. See `.env.example` for the full list. |
 
-```bash
-npx prisma migrate dev
-```
-
-### Seed
-
-Populates database with test scenarios A, B, C:
-
-```bash
-npm run seed
-```
-
-### Reset
-
-```bash
-npx prisma migrate reset
-```
-
-### Studio
-
-```bash
-npx prisma studio
-```
+Production secrets live in Vercel Environment Variables, not in files.
 
 ---
 
 ## Run
 
 ```bash
-npm run dev
+npm run dev           # Start dev server (default: Neon DB from .env.local)
+npm run dev:local     # Start dev server against local Postgres
 ```
 
-Visit:
-- `/demo` — All 3 scenarios side-by-side
-- `/place/scenario-a` — Fully curated
-- `/place/scenario-b` — Editorial lite  
-- `/place/scenario-c` — Baseline
+The startup banner shows which DB is in use.
 
 ---
 
-## Environment Variables
+## Database
 
+```bash
+npx prisma migrate dev     # Create + apply migrations locally
+npx prisma migrate deploy  # Apply pending migrations (no generation)
+npx prisma studio          # Database GUI
+npm run db:whoami           # Check which DB you're connected to
 ```
-DATABASE_URL=postgresql://user:pass@localhost:5432/saikomaps
-NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_key
+
+### Wrapper scripts (for pipeline scripts)
+
+```bash
+./scripts/db-neon.sh <cmd>    # Run command against Neon (reads .env.local)
+./scripts/db-local.sh <cmd>   # Run command against localhost:5432
 ```
+
+These set `SAIKO_DB_FROM_WRAPPER=1`, which pipeline scripts check as a safety guard.
 
 ---
 
 ## Commands
 
 ```bash
-npm run dev          # Start dev server
-npm run build        # Build for production
-npm run type-check   # TypeScript check
-npm run seed         # Seed database
-npx prisma studio    # Database GUI
+npm run dev            # Start dev server
+npm run build          # prisma generate && next build
+npm run type-check     # TypeScript check (needs NODE_OPTIONS="--max-old-space-size=3072")
+npx prisma studio      # Database GUI
 ```
 
 ---
 
-## Merchant Page Testing
+## Health Check
 
-After seeding, test the tier hierarchy:
+Dev server running? Check the DB connection:
 
-1. Visit `/place/scenario-a`
-2. Open merchant-page-implementation-checklist.md
-3. Verify all 11 sections pass
-4. Check tier order (1-12)
-5. Confirm HoursCard always renders
-6. Verify hero excluded from collage
+```bash
+curl -sS http://localhost:3000/api/health
+```
 
----
-
-*That's it. No deployment docs, no multi-db branching.*
+Returns `{ "status": "ok", "db": "connected" }` or 503 if unreachable.
 
 ---
 
@@ -14527,7 +15041,7 @@ The deeper structural point: these signals describe what a place is from within 
 | Field | Value |
 |-------|-------|
 | Registry generated | 2026-03-17T00:45:00.000Z |
-| Context generated | 2026-03-17T00:26:46.178Z |
-| Docs included | 79 |
+| Context generated | 2026-03-18T00:17:57.122Z |
+| Docs included | 80 |
 | Docs missing on disk | 0 |
 | Filters applied | status=active |

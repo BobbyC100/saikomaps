@@ -130,6 +130,27 @@
 /* ---------------------------------------------------------------------------
    4. Main Column (left — identity + editorial)
    --------------------------------------------------------------------------- */
+/* Business status banner — shown above title for non-operational places */
+#business-status-banner {
+  display: inline-block;
+  margin: 0 0 0.5em;
+  padding: 0.25em 0.75em;
+  font-family: var(--pp-font-ui);
+  font-size: var(--pp-font-small);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  border-radius: 3px;
+}
+#business-status-banner.business-status-closed-permanently {
+  background: rgba(180, 60, 60, 0.1);
+  color: #8B3A3A;
+}
+#business-status-banner.business-status-closed-temporarily {
+  background: rgba(180, 140, 60, 0.1);
+  color: #8B6914;
+}
+
 #place-title {
   margin: 0 0 0.25em;
   font-family: var(--pp-font-display);
@@ -147,6 +168,16 @@
   opacity: 0.8;
   text-transform: uppercase;
   letter-spacing: 0.04em;
+}
+
+/* Tagline — editorial lede between subline and signals */
+#identity-tagline {
+  margin: 0.25em 0 0.5em;
+  font-family: var(--pp-font-serif);
+  font-size: var(--sk-type-body-size);
+  line-height: var(--sk-type-body-line-height);
+  color: var(--sk-color-text-primary);
+  font-style: italic;
 }
 
 #identity-signals {
@@ -254,6 +285,27 @@
   color: var(--pp-color-accent);
 }
 
+/* Key Producers */
+.key-producers-line {
+  font-family: var(--pp-font-sans);
+  font-size: var(--pp-font-micro);
+  color: var(--pp-color-text);
+  opacity: 0.65;
+  margin: 0.5em 0 0;
+  letter-spacing: 0.01em;
+}
+
+/* Origin Story accent */
+.origin-story-accent {
+  font-family: var(--pp-font-sans);
+  font-size: var(--pp-font-micro);
+  color: var(--pp-color-text);
+  opacity: 0.5;
+  margin: 0.75em 0 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
 /* Curator Note */
 #curator-note p {
   font-family: var(--pp-font-serif);
@@ -320,6 +372,16 @@
   font-style: normal;
   display: block;
   margin-top: 6px;
+}
+
+#pull-quote cite .pull-quote-link {
+  color: var(--pp-color-link);
+  text-decoration: none;
+}
+
+#pull-quote cite .pull-quote-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 /* Coverage (old main-column styles removed — coverage now in appendix) */

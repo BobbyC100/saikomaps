@@ -164,9 +164,88 @@ async function resolveEntity(
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json().catch(() => ({}));
-    const limit = (body as any).limit ?? 200;
-    const dryRun = (body as any).dryRun ?? false;
-    const singleEntityId = (body as any).entityId as string | undefined;
+    const limit = (body as Record<string, unknown>).limit as number ?? 200;
+    const dryRun = (body as Record<string, unknown>).dryRun as boolean ?? false;
+    const singleEntityId = (body as Record<string, unknown>).entityId as string | undefined;
+    const batchEntityIds = (body as Record<string, unknown>).entityIds as string[] | undefined;
+
+    // ── Batch entity IDs mode ─────────────────────────────────────────
+    // Accepts an array of entity IDs and processes them sequentially.
+    // Used by Coverage Ops bulk "Find GPID" action.
+    if (batchEntityIds && Array.isArray(batchEntityIds) && batchEntityIds.length > 0) {
+      const entities = await db.entities.findMany({
+        where: { id: { in: batchEntityIds } },
+        select: { id: true, name: true, slug: true, latitude: true, longitude: true, googlePlaceId: true },
+      });
+
+      const runId = `seed-batch-${Date.now()}`;
+      let matched = 0;
+      let queued = 0;
+      let skipped = 0;
+      let errors = 0;
+
+      for (const entity of entities) {
+        if (entity.googlePlaceId) {
+          skipped++;
+          continue;
+        }
+
+        const lat = entity.latitude ? Number(entity.latitude) : null;
+        const lng = entity.longitude ? Number(entity.longitude) : null;
+        const result = await resolveEntity(entity.name, lat, lng);
+
+        if (result.status === 'MATCH' && result.gpid) {
+          if (!dryRun) {
+            await db.entities.update({
+              where: { id: entity.id },
+              data: { googlePlaceId: result.gpid },
+            });
+          }
+          matched++;
+          continue;
+        }
+
+        // Check if already pending
+        const existing = await db.gpid_resolution_queue.findFirst({
+          where: { entityId: entity.id, human_status: 'PENDING' },
+        });
+        if (existing) {
+          skipped++;
+          continue;
+        }
+
+        if (!dryRun) {
+          await db.gpid_resolution_queue.create({
+            data: {
+              entityId: entity.id,
+              candidate_gpid: result.gpid ?? null,
+              resolver_status: result.status,
+              reason_code: result.reason,
+              similarity_score: result.similarity ?? null,
+              candidates_json: {
+                candidates: result.candidates,
+                num_candidates: result.candidates.length,
+              },
+              source_run_id: runId,
+            },
+          });
+        }
+
+        if (result.status === 'ERROR') errors++;
+        else queued++;
+      }
+
+      return NextResponse.json({
+        action: 'seed-gpid-queue',
+        dryRun,
+        total: entities.length,
+        matched,
+        queued,
+        skipped,
+        errors,
+        runId,
+      });
+    }
 
     // ── Single entity mode ────────────────────────────────────────────
     if (singleEntityId) {
@@ -273,13 +352,28 @@ export async function POST(request: NextRequest) {
 
       if (result.status === 'MATCH' && result.gpid) {
         if (!dryRun) {
-          await db.entities.update({
-            where: { id: entity.id },
-            data: { googlePlaceId: result.gpid },
-          });
+          try {
+            await db.entities.update({
+              where: { id: entity.id },
+              data: { googlePlaceId: result.gpid },
+            });
+            matched++;
+            continue;
+          } catch (e: unknown) {
+            // Unique constraint on google_place_id — another entity already has this GPID.
+            // Queue for human review as potential duplicate instead of crashing.
+            const msg = e instanceof Error ? e.message : String(e);
+            if (msg.includes('Unique constraint')) {
+              console.warn(`[Seed GPID] Duplicate GPID ${result.gpid} for ${entity.name} — queuing for review`);
+              // Fall through to queue logic below
+            } else {
+              throw e;
+            }
+          }
+        } else {
+          matched++;
+          continue;
         }
-        matched++;
-        continue;
       }
 
       // Queue for human review (AMBIGUOUS / NO_MATCH / ERROR)

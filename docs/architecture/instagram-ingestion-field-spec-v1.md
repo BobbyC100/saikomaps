@@ -1,10 +1,10 @@
 ---
 doc_id: ARCHITECTURE-INSTAGRAM-INGESTION-V1
 doc_type: architecture
-status: draft
+status: active
 owner: Bobby Ciccaglione
 created: '2026-03-13'
-last_updated: '2026-03-13'
+last_updated: '2026-03-17'
 project_id: SAIKO
 summary: >-
   Instagram ingestion schema — 3 tables, field definitions, sync rules.

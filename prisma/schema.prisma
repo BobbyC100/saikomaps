@@ -310,6 +310,9 @@ model entities {
   // Coverage Operations
   entity_issues         entity_issues[]
 
+  // Reservation Provider Validation
+  reservation_provider_matches reservation_provider_matches[]
+
   @@map("entities")
   @@index([category])
   @@index([categoryId])
@@ -1791,4 +1794,44 @@ model entity_issues {
   @@index([issue_type, status])
   @@index([severity, status])
   @@map("entity_issues")
+}
+
+// ---------------------------------------------------------------------------
+// Reservation Provider Matches — Validation layer for reservation providers
+// One row per (entity_id, provider). Stores match quality, confidence,
+// and provider-specific program signals. Additive on top of merchant_signals
+// extraction; does not replace existing reservation_url flow.
+// See docs/reservation-v1-architecture-review.md.
+// ---------------------------------------------------------------------------
+
+model reservation_provider_matches {
+  id                String    @id @default(uuid())
+  entity_id         String    @map("entity_id")
+  provider          String                          // opentable | resy | tock | sevenrooms | yelp
+  provider_venue_id String?   @map("provider_venue_id")
+  booking_url       String?   @map("booking_url")
+
+  match_status      String    @default("unverified") // matched | probable | ambiguous | no_match | unverified
+  match_score       Float?    @map("match_score")     // 0.0–1.0 composite quality
+  match_signals     Json?     @map("match_signals")   // { name_similarity, address_match, phone_match, domain_match, geo_proximity }
+
+  validation_source String    @map("validation_source") // website_link | widget_metadata | manual | directory_api
+  confidence_level  String    @default("weak")          // weak | strong_merchant | provider_verified
+
+  is_renderable     Boolean   @default(false) @map("is_renderable") // derived: match_status + confidence + booking_url
+  program_signals   Json?     @map("program_signals")   // provider-specific: { has_widget, has_notify, has_events, ... }
+
+  last_checked_at   DateTime  @default(now()) @map("last_checked_at")
+  last_verified_at  DateTime? @map("last_verified_at")
+  created_at        DateTime  @default(now()) @map("created_at")
+  updated_at        DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  entity entities @relation(fields: [entity_id], references: [id], onDelete: Cascade)
+
+  @@unique([entity_id, provider])
+  @@index([entity_id])
+  @@index([provider, match_status])
+  @@index([provider, is_renderable])
+  @@index([match_status, last_checked_at])
+  @@map("reservation_provider_matches")
 }

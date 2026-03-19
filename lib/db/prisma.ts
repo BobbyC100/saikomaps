@@ -1,16 +1,8 @@
 /**
- * Prisma Client — Single Source of Truth
- * No vendor branching. Saiko uses Prisma.
+ * Prisma Client — re-exports the canonical singleton from @/lib/db.
+ * Prefer importing { db } from '@/lib/db' directly in new code.
  */
 
-import { PrismaClient } from '@prisma/client';
+import { db } from '@/lib/db';
 
-const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined;
-};
-
-export const prisma = globalForPrisma.prisma ?? new PrismaClient();
-
-if (process.env.NODE_ENV !== 'production') {
-  globalForPrisma.prisma = prisma;
-}
+export const prisma = db;

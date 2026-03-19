@@ -1,6 +1,5 @@
-import { PrismaClient, OverlayType, Prisma } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { OverlayType, Prisma } from '@prisma/client';
+import { db as prisma } from '@/lib/db';
 
 interface ApproveSignalToOverlayParams {
   proposedSignalId: string;

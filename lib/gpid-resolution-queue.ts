@@ -4,9 +4,7 @@
  * First "identity queue" type — extensible for enrichment_queue, data_completion_queue.
  */
 
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { db as prisma } from '@/lib/db';
 
 export type GpidResolverStatus = 'MATCH' | 'AMBIGUOUS' | 'NO_MATCH' | 'ERROR';
 export type GpidHumanStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'NEEDS_MORE_INFO';

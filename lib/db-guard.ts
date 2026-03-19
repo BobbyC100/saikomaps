@@ -43,7 +43,7 @@ export function assertDbTargetAllowed(): void {
       console.error(
         '[DB] Blocked: DATABASE_URL points at localhost. Production scripts must run against Neon.\n' +
           '  To use Neon: run via db-neon.sh, e.g. ./scripts/db-neon.sh node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/sync-golden-to-places.ts\n' +
-          '  Or set DATABASE_URL to your Neon URL (e.g. in .env or .env.db.neon) and run with that env loaded.\n' +
+          '  Or set DATABASE_URL to your Neon URL in .env.local and run with that env loaded.\n' +
           '  To allow local anyway (e.g. for dev): ALLOW_LOCAL_DB=1 npm run <script>\n' +
           '  Sanity check target: npm run db:whoami   (ensure Prisma matches DB: npm run db:generate)\n'
       );

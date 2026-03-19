@@ -33,12 +33,14 @@ interface LocationData {
   phone: string | null;
   website: string | null;
   instagram: string | null;
+  tiktok: string | null;
   description: string | null;
   descriptionSource?: string | null;
   category: string | null;
   neighborhood: string | null;
   cuisineType?: string | null;
   priceLevel: number | null;
+  businessStatus?: string | null;
   photoUrl: string | null;
   photoUrls?: string[];
   hours: unknown;
@@ -64,6 +66,8 @@ interface LocationData {
   pullQuoteUrl?: string | null;
   pullQuoteType?: string | null;
   reservationUrl?: string | null;
+  reservationProvider?: string | null;
+  reservationProviderLabel?: string | null;
   menuUrl?: string | null;
   winelistUrl?: string | null;
   offeringSignals?: {
@@ -82,6 +86,8 @@ interface LocationData {
   primaryVertical?: string | null;
   placePersonality?: string | null;
   signatureDishes?: string[];
+  keyProducers?: string[];
+  originStoryType?: string | null;
   offeringPrograms?: {
     food_program: { maturity: string; signals: string[] };
     wine_program: { maturity: string; signals: string[] };
@@ -163,6 +169,9 @@ const DESCRIPTION_SOURCE_LABELS: Record<string, string> = {
   editorial: 'Saiko editorial',
   google_editorial: 'Google Places editorial',
   synthesis: 'AI synthesis',
+  'verbatim-v1': 'Restaurant website (verbatim)',
+  'about-synth-v1': 'Synthesized from merchant website',
+  'about-compose-v1': 'Composed from identity signals',
 };
 
 /** Build appendix reference groups keyed to page sections. */
@@ -199,6 +208,9 @@ function buildAppendixReferences(location: LocationData): AppendixRefGroup[] {
   }
   if (location.signatureDishes && location.signatureDishes.length > 0) {
     offeringEntries.push({ source: 'Enrichment pipeline — signature dishes' });
+  }
+  if (location.keyProducers && location.keyProducers.length > 0) {
+    offeringEntries.push({ source: 'Enrichment pipeline — key producers' });
   }
   if (location.cuisineType && !location.offeringPrograms) {
     offeringEntries.push({ source: 'Google Places — cuisine type' });
@@ -242,114 +254,322 @@ function buildAppendixReferences(location: LocationData): AppendixRefGroup[] {
   return groups;
 }
 
-const OFFERING_CAP = 4;
+const OFFERING_CAP = 6;
 
+// ---------------------------------------------------------------------------
+// Signal vocabulary — human-readable phrases for each structural signal
+// These compose into richer offering sentences.
+// ---------------------------------------------------------------------------
+
+/** Food program signal → descriptive fragment */
+const FOOD_SIGNAL_PHRASES: Record<string, string> = {
+  shared_plate_structure: 'shared plates',
+  large_format_mains: 'large-format mains',
+  vegetable_heavy: 'vegetable-forward cooking',
+  seafood_heavy: 'seafood-driven',
+  meat_forward: 'meat-forward',
+  fermentation_focus: 'fermentation as a focus',
+  pizza_program: 'a dedicated pizza program',
+  raw_bar: 'a raw bar',
+  bakery_program: 'house-baked bread and pastry',
+  pastry_program: 'a pastry program',
+  sandwich_program: 'a sandwich program',
+  rotisserie_program: 'rotisserie',
+  tasting_menu_present: 'tasting menu format',
+  prix_fixe_present: 'prix fixe option',
+  taco_program: 'a taco program',
+  street_food_program: 'street food',
+  tortilla_program: 'house-made tortillas',
+};
+
+/** Wine program signal → descriptive fragment (Locked v1: beverage-program-vocab-v1) */
+const WINE_SIGNAL_PHRASES: Record<string, string> = {
+  extensive_wine_list: 'an extensive list',
+  natural_wine_presence: 'natural wine focus',
+  aperitif_focus: 'aperitif-driven',
+};
+
+/** Beer program signal → descriptive fragment (Locked v1) */
+const BEER_SIGNAL_PHRASES: Record<string, string> = {
+  beer_program: 'beer on the menu',
+  // Future v2 signals (vocabulary locked, detection pending):
+  // craft_beer_presence: 'craft beer focus',
+  // draft_beer_focus: 'a draft selection',
+  // brewery_affiliation: 'brewery-affiliated',
+};
+
+/** Cocktail program signal → descriptive fragment (Locked v1) */
+const COCKTAIL_SIGNAL_PHRASES: Record<string, string> = {
+  cocktail_program: 'a cocktail program',
+  // Future v2 signals (vocabulary locked, detection pending):
+  // classic_cocktail_focus: 'classic cocktails',
+  // house_cocktail_focus: 'house cocktails',
+  // tiki_program: 'a tiki program',
+  // martini_focus: 'a martini focus',
+};
+
+/** Non-alcoholic program signal → descriptive fragment (Locked v1: 10 signals) */
+const NA_SIGNAL_PHRASES: Record<string, string> = {
+  basic_na_beverages: 'standard non-alcoholic options',
+  agua_fresca_program: 'aguas frescas',
+  horchata_presence: 'horchata',
+  house_soda_program: 'house-made sodas',
+  zero_proof_cocktails: 'zero-proof cocktails',
+  na_spirits_presence: 'NA spirits',
+  na_beer_wine_presence: 'NA beer and wine',
+  functional_beverage_presence: 'functional beverages',
+  fermented_beverage_presence: 'kombucha and fermented drinks',
+  cultural_soda_presence: 'Mexican Coke, Jarritos, and similar',
+};
+
+/** Coffee & tea program signal → descriptive fragment (Locked v1: 11 signals) */
+const COFFEE_TEA_SIGNAL_PHRASES: Record<string, string> = {
+  coffee_program: 'coffee',
+  espresso_program: 'espresso drinks',
+  specialty_coffee_presence: 'specialty coffee',
+  tea_program: 'tea',
+  specialty_tea_presence: 'a curated tea list',
+  matcha_program: 'matcha',
+  bubble_tea_program: 'boba',
+  bubble_tea_chain: 'boba',
+  tea_house_structure: 'tea house format',
+  afternoon_tea_service: 'afternoon tea service',
+  arabic_coffee_program: 'Arabic coffee',
+};
+
+/** Cuisine posture → lead phrase for the food sentence */
+const CUISINE_POSTURE_LEADS: Record<string, string> = {
+  'produce-driven': 'Seasonal, produce-driven kitchen',
+  'protein-centric': 'Protein-focused menu',
+  'carb-forward': 'Carb-forward comfort cooking',
+  'seafood-focused': 'Seafood-centered menu',
+  'balanced': 'Broadly composed menu',
+};
+
+/** Wine program intent → lead phrase for the wine sentence */
+const WINE_INTENT_LEADS: Record<string, string> = {
+  serious: 'Serious wine program',
+  dedicated: 'Dedicated wine program',
+  integrated: 'Wine integrated into the dining experience',
+  mediterranean_focused: 'Mediterranean-focused wine program',
+  california_leaning: 'California-leaning wine list',
+  classical: 'Classical wine program with regional depth',
+  natural_leaning: 'Producer-driven natural wine list',
+  eclectic: 'Eclectic, wide-ranging wine list',
+  light: 'Compact wine selection',
+};
+
+/** Service model → full sentence */
+const SERVICE_MODEL_PHRASES: Record<string, string> = {
+  'tasting-menu': 'Tasting menu format — the kitchen sets the pace',
+  'a-la-carte': 'À la carte ordering',
+  'small-plates': 'Small plates built for sharing',
+  'family-style': 'Family-style, served to the center of the table',
+  'counter': 'Counter service',
+};
+
+/** Origin story type → human-readable phrase */
+const ORIGIN_STORY_PHRASES: Record<string, string> = {
+  'chef-journey': 'A chef-driven project',
+  'family-legacy': 'Family legacy',
+  'neighborhood-love': 'Born from the neighborhood',
+  'concept-first': 'Concept-driven',
+  'partnership': 'A partnership project',
+};
+
+/** Price tier → full sentence */
 const PRICE_PHRASES: Record<string, string> = {
-  '$': 'Budget-friendly pricing',
+  '$': 'Budget-friendly',
   '$$': 'Moderate price range',
   '$$$': 'Higher-end pricing',
   '$$$$': 'Fine-dining price point',
 };
 
-const SERVICE_MODEL_PHRASES: Record<string, string> = {
-  'tasting-menu': 'Tasting menu format',
-  'a-la-carte': 'À la carte ordering',
-  'small-plates': 'Small plates and sharing format',
-  'family-style': 'Family-style service',
-  'counter': 'Counter service',
-};
+// ---------------------------------------------------------------------------
+// Sentence composition helpers
+// ---------------------------------------------------------------------------
 
-const WINE_INTENT_PHRASES: Record<string, string> = {
-  'natural': 'Producer-driven natural wine list',
-  'classic': 'Traditional wine program with regional depth',
-  'eclectic': 'Eclectic, wide-ranging wine list',
-  'minimal': 'Compact, curated wine selection',
-};
+/**
+ * Compose a natural sentence from a lead phrase + signal fragments.
+ * "Seasonal, produce-driven kitchen" + ["shared plates", "a raw bar"]
+ * → "Seasonal, produce-driven kitchen built around shared plates and a raw bar"
+ */
+function composeSentence(lead: string, fragments: string[], connector = 'with'): string {
+  if (fragments.length === 0) return lead;
+  if (fragments.length === 1) return `${lead} ${connector} ${fragments[0]}`;
+  const last = fragments[fragments.length - 1];
+  const rest = fragments.slice(0, -1).join(', ');
+  return `${lead} ${connector} ${rest} and ${last}`;
+}
 
-const CUISINE_POSTURE_PHRASES: Record<string, string> = {
-  'produce-driven': 'Seasonal, produce-driven kitchen',
-  'protein-centric': 'Protein-focused menu',
-  'carb-forward': 'Carb-forward comfort cooking',
-  'seafood-focused': 'Seafood-centered menu',
-  'balanced': 'Balanced, broadly composed menu',
-};
+/**
+ * Pick up to N signal phrases from a program's signals array.
+ * Returns human-readable fragments in the order they appear.
+ */
+function resolveSignalPhrases(
+  signals: string[],
+  vocabulary: Record<string, string>,
+  cap = 3,
+): string[] {
+  return signals
+    .map(s => vocabulary[s])
+    .filter((phrase): phrase is string => !!phrase)
+    .slice(0, cap);
+}
 
-/** Maturity → display label. 'none' and 'unknown' are suppressed. */
-const MATURITY_LABELS: Record<string, Record<string, string>> = {
-  wine_program: {
-    dedicated: 'Dedicated wine program',
-    considered: 'Considered wine selection',
-    incidental: 'Wine available',
-  },
-  beer_program: {
-    dedicated: 'Dedicated beer program',
-    considered: 'Considered beer selection',
-    incidental: 'Beer available',
-  },
-  cocktail_program: {
-    dedicated: 'Dedicated cocktail program',
-    considered: 'Considered cocktail menu',
-    incidental: 'Cocktails available',
-  },
-  food_program: {
-    dedicated: 'Dedicated food program',
-    considered: 'Considered food offering',
-    incidental: 'Food available',
-  },
-};
+// ---------------------------------------------------------------------------
+// Offering line builder — composes richer sentences from signals
+// ---------------------------------------------------------------------------
 
 function buildOfferingLines(location: LocationData): { label: string; sentence: string }[] {
   const lines: { label: string; sentence: string }[] = [];
   const os = location.offeringSignals;
   const op = location.offeringPrograms;
 
-  // Food line: offeringPrograms.food_program > cuisine_posture > cuisineType
+  // ── Food ─────────────────────────────────────────────────────────────
+  const foodSignals = op?.food_program?.signals ?? [];
   const foodMaturity = op?.food_program?.maturity;
-  if (foodMaturity && MATURITY_LABELS.food_program[foodMaturity]) {
-    // If we have cuisine_posture, prefer the richer phrase; maturity is the gate
-    if (os?.cuisinePosture && CUISINE_POSTURE_PHRASES[os.cuisinePosture]) {
-      lines.push({ label: 'Food', sentence: CUISINE_POSTURE_PHRASES[os.cuisinePosture] });
-    } else {
-      lines.push({ label: 'Food', sentence: MATURITY_LABELS.food_program[foodMaturity] });
+  const foodFragments = resolveSignalPhrases(foodSignals, FOOD_SIGNAL_PHRASES);
+
+  if (os?.cuisinePosture && CUISINE_POSTURE_LEADS[os.cuisinePosture]) {
+    // Rich case: cuisine posture as lead, signal fragments as detail
+    lines.push({
+      label: 'Food',
+      sentence: composeSentence(CUISINE_POSTURE_LEADS[os.cuisinePosture], foodFragments, 'built around'),
+    });
+  } else if (foodMaturity && foodMaturity !== 'none' && foodMaturity !== 'unknown') {
+    if (foodFragments.length > 0) {
+      // Signals without posture: let the signals speak
+      const lead = foodMaturity === 'dedicated' ? 'Dedicated kitchen' : 'Menu';
+      lines.push({ label: 'Food', sentence: composeSentence(lead, foodFragments, 'featuring') });
+    } else if (location.cuisineType) {
+      lines.push({ label: 'Food', sentence: `${location.cuisineType} kitchen` });
     }
-  } else if (os?.cuisinePosture && CUISINE_POSTURE_PHRASES[os.cuisinePosture]) {
-    lines.push({ label: 'Food', sentence: CUISINE_POSTURE_PHRASES[os.cuisinePosture] });
   } else if (location.cuisineType) {
     lines.push({ label: 'Food', sentence: `${location.cuisineType} kitchen` });
   }
 
-  // Wine line: offeringPrograms.wine_program > wineProgramIntent > Google drink signals
+  // ── Wine ─────────────────────────────────────────────────────────────
+  const wineSignals = op?.wine_program?.signals ?? [];
   const wineMaturity = op?.wine_program?.maturity;
-  if (wineMaturity && MATURITY_LABELS.wine_program[wineMaturity]) {
-    lines.push({ label: 'Wine', sentence: MATURITY_LABELS.wine_program[wineMaturity] });
-  } else if (os?.wineProgramIntent && os.wineProgramIntent !== 'none' && WINE_INTENT_PHRASES[os.wineProgramIntent]) {
-    lines.push({ label: 'Wine', sentence: WINE_INTENT_PHRASES[os.wineProgramIntent] });
+  const wineFragments = resolveSignalPhrases(wineSignals, WINE_SIGNAL_PHRASES);
+  const wineIntent = os?.wineProgramIntent;
+
+  if (wineIntent && wineIntent !== 'none' && WINE_INTENT_LEADS[wineIntent]) {
+    lines.push({
+      label: 'Wine',
+      sentence: composeSentence(WINE_INTENT_LEADS[wineIntent], wineFragments, 'with'),
+    });
+  } else if (wineMaturity && wineMaturity !== 'none' && wineMaturity !== 'unknown') {
+    if (wineFragments.length > 0) {
+      lines.push({
+        label: 'Wine',
+        sentence: composeSentence('Wine list', wineFragments, 'featuring'),
+      });
+    } else {
+      const label = wineMaturity === 'dedicated' ? 'Dedicated wine program'
+        : wineMaturity === 'considered' ? 'Considered wine selection'
+        : 'Wine available';
+      lines.push({ label: 'Wine', sentence: label });
+    }
   } else if (os?.servesWine === true) {
     lines.push({ label: 'Wine', sentence: 'Wine list available' });
   }
 
-  // Cocktail line: offeringPrograms.cocktail_program > skip
+  // ── Cocktails ────────────────────────────────────────────────────────
+  const cocktailSignals = op?.cocktail_program?.signals ?? [];
   const cocktailMaturity = op?.cocktail_program?.maturity;
-  if (cocktailMaturity && MATURITY_LABELS.cocktail_program[cocktailMaturity]) {
-    lines.push({ label: 'Cocktails', sentence: MATURITY_LABELS.cocktail_program[cocktailMaturity] });
+  const cocktailFragments = resolveSignalPhrases(cocktailSignals, COCKTAIL_SIGNAL_PHRASES);
+
+  if (cocktailMaturity && cocktailMaturity !== 'none' && cocktailMaturity !== 'unknown') {
+    const lead = cocktailMaturity === 'dedicated'
+      ? 'Dedicated cocktail program'
+      : cocktailMaturity === 'considered'
+        ? 'Composed cocktail menu'
+        : 'Cocktails';
+    lines.push({
+      label: 'Cocktails',
+      sentence: composeSentence(lead, cocktailFragments, 'featuring'),
+    });
   } else if (os?.servesCocktails === true) {
     lines.push({ label: 'Cocktails', sentence: 'Cocktails available' });
   }
 
-  // Beer line: offeringPrograms.beer_program > Google beer signal
+  // ── Beer ─────────────────────────────────────────────────────────────
+  const beerSignals = op?.beer_program?.signals ?? [];
   const beerMaturity = op?.beer_program?.maturity;
-  if (beerMaturity && MATURITY_LABELS.beer_program[beerMaturity]) {
-    lines.push({ label: 'Beer', sentence: MATURITY_LABELS.beer_program[beerMaturity] });
+  const beerFragments = resolveSignalPhrases(beerSignals, BEER_SIGNAL_PHRASES);
+
+  if (beerMaturity && beerMaturity !== 'none' && beerMaturity !== 'unknown') {
+    const lead = beerMaturity === 'dedicated'
+      ? 'Dedicated beer program'
+      : beerMaturity === 'considered'
+        ? 'Considered beer selection'
+        : 'Beer';
+    lines.push({
+      label: 'Beer',
+      sentence: composeSentence(lead, beerFragments, 'with'),
+    });
   } else if (os?.servesBeer === true) {
     lines.push({ label: 'Beer', sentence: 'Beer available' });
   }
 
-  // Service line: enriched service_model > skip if generic
+  // ── Non-Alcoholic ────────────────────────────────────────────────────
+  const naSignals = op?.non_alcoholic_program?.signals ?? [];
+  const naMaturity = op?.non_alcoholic_program?.maturity;
+  const naFragments = resolveSignalPhrases(naSignals, NA_SIGNAL_PHRASES);
+
+  if (naFragments.length > 0) {
+    // Signals are the story — lead with maturity context if available
+    const lead = naMaturity === 'dedicated'
+      ? 'Dedicated non-alcoholic program'
+      : naMaturity === 'considered'
+        ? 'Thoughtful non-alcoholic offerings'
+        : 'Non-alcoholic options';
+    lines.push({
+      label: 'Non-Alc',
+      sentence: composeSentence(lead, naFragments, 'including'),
+    });
+  } else if (naMaturity && naMaturity !== 'none' && naMaturity !== 'unknown') {
+    const sentence = naMaturity === 'dedicated'
+      ? 'Dedicated non-alcoholic program'
+      : naMaturity === 'considered'
+        ? 'Thoughtful non-alcoholic offerings'
+        : 'Non-alcoholic options available';
+    lines.push({ label: 'Non-Alc', sentence });
+  }
+
+  // ── Coffee & Tea ─────────────────────────────────────────────────────
+  const ctSignals = op?.coffee_tea_program?.signals ?? [];
+  const ctMaturity = op?.coffee_tea_program?.maturity;
+  const ctFragments = resolveSignalPhrases(ctSignals, COFFEE_TEA_SIGNAL_PHRASES);
+
+  if (ctFragments.length > 0) {
+    // Signals drive the sentence — maturity shapes the lead
+    const lead = ctMaturity === 'dedicated'
+      ? 'Dedicated coffee and tea program'
+      : ctMaturity === 'considered'
+        ? 'Considered coffee and tea selection'
+        : 'Coffee and tea';
+    lines.push({
+      label: 'Coffee & Tea',
+      sentence: composeSentence(lead, ctFragments, 'featuring'),
+    });
+  } else if (ctMaturity && ctMaturity !== 'none' && ctMaturity !== 'unknown') {
+    const sentence = ctMaturity === 'dedicated'
+      ? 'Dedicated coffee and tea program'
+      : ctMaturity === 'considered'
+        ? 'Considered coffee and tea selection'
+        : 'Coffee and tea available';
+    lines.push({ label: 'Coffee & Tea', sentence });
+  }
+
+  // ── Service ──────────────────────────────────────────────────────────
   if (os?.serviceModel && SERVICE_MODEL_PHRASES[os.serviceModel]) {
     lines.push({ label: 'Service', sentence: SERVICE_MODEL_PHRASES[os.serviceModel] });
   }
 
-  // Price line: enriched price_tier > entity priceLevel fallback
+  // ── Price ────────────────────────────────────────────────────────────
   if (os?.priceTier && PRICE_PHRASES[os.priceTier]) {
     lines.push({ label: 'Price', sentence: PRICE_PHRASES[os.priceTier] });
   } else if (location.priceLevel != null && location.priceLevel >= 1 && location.priceLevel <= 4) {
@@ -541,7 +761,7 @@ export default function PlacePage() {
   const hasEnergy = energyTags.length > 0;
 
   // Primary CTAs
-  const hasPrimaryCtas = !!(location.reservationUrl || location.website || location.instagram);
+  const hasPrimaryCtas = !!(location.reservationUrl || location.website || location.instagram || location.tiktok);
 
   // More Maps
   const moreMapsCards = appearsOn.slice(0, 3);
@@ -563,9 +783,18 @@ export default function PlacePage() {
 
               {/* ─── LEFT: MAIN COLUMN ─── */}
               <div id="main-column">
+                {location.businessStatus && location.businessStatus !== 'OPERATIONAL' && (
+                  <div id="business-status-banner" className={`business-status-${location.businessStatus.toLowerCase().replace(/_/g, '-')}`}>
+                    {location.businessStatus === 'CLOSED_PERMANENTLY' && 'Permanently closed'}
+                    {location.businessStatus === 'CLOSED_TEMPORARILY' && 'Temporarily closed'}
+                  </div>
+                )}
                 <h1 id="place-title" className="sk-display">{location.name}</h1>
                 {identitySubline && (
                   <p id="identity-subline" className="sk-identity">{identitySubline}</p>
+                )}
+                {location.tagline && (
+                  <p id="identity-tagline">{location.tagline}</p>
                 )}
                 {hasSignalsSentence && (
                   <p id="identity-signals" className="sk-identity">
@@ -578,13 +807,19 @@ export default function PlacePage() {
                 {hasPrimaryCtas && (
                   <div id="primary-ctas">
                     {location.reservationUrl && (
-                      <a href={location.reservationUrl} target="_blank" rel="noopener noreferrer">Reserve <span className="action-arrow">↗</span></a>
+                      <a href={location.reservationUrl} target="_blank" rel="noopener noreferrer">
+                        {location.reservationProviderLabel ?? 'Reserve'}{' '}
+                        <span className="action-arrow">↗</span>
+                      </a>
                     )}
                     {location.website && (
                       <a href={location.website} target="_blank" rel="noopener noreferrer">Website <span className="action-arrow">↗</span></a>
                     )}
                     {location.instagram && (
                       <a href={`https://instagram.com/${location.instagram.replace(/^@/, '')}`} target="_blank" rel="noopener noreferrer">Instagram <span className="action-arrow">↗</span></a>
+                    )}
+                    {location.tiktok && (
+                      <a href={`https://tiktok.com/@${location.tiktok.replace(/^@/, '')}`} target="_blank" rel="noopener noreferrer">TikTok <span className="action-arrow">↗</span></a>
                     )}
                   </div>
                 )}
@@ -594,6 +829,9 @@ export default function PlacePage() {
                     <div className="sk-section-header"><span>About</span></div>
                     <div id="identity-description">
                       <p>{location.description}</p>
+                      {location.originStoryType && ORIGIN_STORY_PHRASES[location.originStoryType] && (
+                        <p id="origin-story-type" className="origin-story-accent">{ORIGIN_STORY_PHRASES[location.originStoryType]}</p>
+                      )}
                     </div>
                   </>
                 )}
@@ -612,16 +850,23 @@ export default function PlacePage() {
                   </>
                 )}
 
-                {location.signatureDishes && location.signatureDishes.length > 0 && (
+                {(location.signatureDishes?.length || location.keyProducers?.length) ? (
                   <>
                     <div className="sk-section-header"><span>Known For</span></div>
-                    <ul id="signature-dishes-list">
-                      {location.signatureDishes.map((dish) => (
-                        <li key={dish}>{dish}</li>
-                      ))}
-                    </ul>
+                    {location.signatureDishes && location.signatureDishes.length > 0 && (
+                      <ul id="signature-dishes-list">
+                        {location.signatureDishes.map((dish) => (
+                          <li key={dish}>{dish}</li>
+                        ))}
+                      </ul>
+                    )}
+                    {location.keyProducers && location.keyProducers.length > 0 && (
+                      <p id="key-producers" className="key-producers-line">
+                        Producers: {location.keyProducers.join(', ')}
+                      </p>
+                    )}
                   </>
-                )}
+                ) : null}
 
                 {location.pullQuote && (
                   <>
@@ -629,7 +874,16 @@ export default function PlacePage() {
                     <blockquote id="pull-quote">
                       <p>&ldquo;{location.pullQuote}&rdquo;</p>
                       <cite>
-                        {[location.pullQuoteSource, location.pullQuoteAuthor].filter(Boolean).join(' — ')}
+                        {location.pullQuoteUrl ? (
+                          <>
+                            <a href={location.pullQuoteUrl} target="_blank" rel="noopener noreferrer" className="pull-quote-link">
+                              {location.pullQuoteSource || 'Source'}
+                            </a>
+                            {location.pullQuoteAuthor && ` — ${location.pullQuoteAuthor}`}
+                          </>
+                        ) : (
+                          [location.pullQuoteSource, location.pullQuoteAuthor].filter(Boolean).join(' — ')
+                        )}
                       </cite>
                     </blockquote>
                   </>

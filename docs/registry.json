@@ -1,6 +1,6 @@
 {
   "generated": "2026-03-17T00:45:00.000Z",
-  "doc_count": 84,
+  "doc_count": 86,
   "docs": [
     {
       "doc_id": "ARCH-AI-OPERATING-LAYER",
@@ -92,7 +92,7 @@
     {
       "doc_id": "ARCH-ENTITY-LIFECYCLE-CLOSURE-V1",
       "doc_type": "document",
-      "status": "DRAFT",
+      "status": "draft",
       "title": "Entity Lifecycle and Closure Specification",
       "path": "docs/architecture/entity-lifecycle-and-closure-v1.md",
       "owner": "Bobby",
@@ -102,6 +102,20 @@
       "summary": "",
       "systems": [],
       "related_docs": []
+    },
+    {
+      "doc_id": "ARCH-DATA-COMPLETENESS-PHILOSOPHY-V1",
+      "doc_type": "architecture",
+      "status": "active",
+      "title": "Data Completeness Philosophy",
+      "path": "docs/architecture/data-completeness-philosophy-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-18",
+      "last_updated": "2026-03-18",
+      "project_id": "SAIKO",
+      "summary": "Saiko's philosophy on data completeness — composite confidence over checklists, multiple paths to the same truth, and no single golden field.",
+      "systems": ["fields", "coverage-ops", "enrichment"],
+      "related_docs": ["ARCH-IDENTITY-SCORING-V1", "ARCH-COVERAGE-TIERS-V1", "ENRICH-STRATEGY-V1"]
     },
     {
       "doc_id": "ARCH-IDENTITY-SCORING-V1",
@@ -213,7 +227,7 @@
     {
       "doc_id": "ARCHITECTURE-INSTAGRAM-INGESTION-V1",
       "doc_type": "architecture",
-      "status": "draft",
+      "status": "active",
       "title": "Instagram Ingestion — Field Spec v1",
       "path": "docs/architecture/instagram-ingestion-field-spec-v1.md",
       "owner": "Bobby Ciccaglione",
@@ -486,7 +500,7 @@
     {
       "doc_id": "PI-CONCEPT-V1",
       "doc_type": "document",
-      "status": "DRAFT",
+      "status": "draft",
       "title": "SAIKO FIELDS — Place Identity Concept Document",
       "path": "docs/architecture/place-identity-concept-v1.md",
       "owner": "Bobby",
@@ -615,13 +629,13 @@
       "doc_id": "SAIKO-DATA-PIPELINE-QUICK-START",
       "doc_type": "reference",
       "status": "active",
-      "title": "Data Pipeline Quick Reference",
+      "title": "Data Pipeline — Quick Start",
       "path": "docs/DATA_PIPELINE_QUICK_START.md",
       "owner": "Bobby Ciccaglione",
       "created": "2026-03-10",
-      "last_updated": "2026-03-10",
+      "last_updated": "2026-03-17",
       "project_id": "SAIKO",
-      "summary": "",
+      "summary": "Quick-start guide for entity intake and enrichment. Start here if you have a list of place names to add.",
       "systems": [
         "data-pipeline"
       ],
@@ -635,7 +649,7 @@
       "path": "docs/DATA_SYNC_RUNBOOK.md",
       "owner": "Bobby Ciccaglione",
       "created": "2026-03-10",
-      "last_updated": "2026-03-10",
+      "last_updated": "2026-03-17",
       "project_id": "SAIKO",
       "summary": "",
       "systems": [],
@@ -661,11 +675,11 @@
       "doc_id": "SAIKO-DATABASE-SETUP",
       "doc_type": "reference",
       "status": "active",
-      "title": "Database Setup for Saiko Maps",
+      "title": "Database Setup",
       "path": "docs/DATABASE_SETUP.md",
       "owner": "Bobby Ciccaglione",
       "created": "2026-03-10",
-      "last_updated": "2026-03-10",
+      "last_updated": "2026-03-17",
       "project_id": "SAIKO",
       "summary": "",
       "systems": [
@@ -753,11 +767,11 @@
       "doc_id": "SAIKO-ENV-TEMPLATE",
       "doc_type": "reference",
       "status": "active",
-      "title": "Environment Variables Setup",
+      "title": "Environment Variables",
       "path": "docs/ENV_TEMPLATE.md",
       "owner": "Bobby Ciccaglione",
       "created": "2026-03-10",
-      "last_updated": "2026-03-10",
+      "last_updated": "2026-03-17",
       "project_id": "SAIKO",
       "summary": "",
       "systems": [],
@@ -860,7 +874,7 @@
       "path": "docs/LOCAL_DEV.md",
       "owner": "Bobby Ciccaglione",
       "created": "2026-03-10",
-      "last_updated": "2026-03-10",
+      "last_updated": "2026-03-17",
       "project_id": "SAIKO",
       "summary": "",
       "systems": [],
@@ -916,11 +930,11 @@
       "doc_id": "SAIKO-PIPELINE-COMMANDS",
       "doc_type": "reference",
       "status": "active",
-      "title": "Saiko Maps — Pipeline Commands",
+      "title": "Pipeline Commands",
       "path": "docs/PIPELINE_COMMANDS.md",
       "owner": "Bobby Ciccaglione",
       "created": "2026-03-10",
-      "last_updated": "2026-03-10",
+      "last_updated": "2026-03-17",
       "project_id": "SAIKO",
       "summary": "",
       "systems": [
@@ -1238,6 +1252,48 @@
         "SKAI-DOC-TRACES-BEVERAGE-PROGRAM-VOCAB-001",
         "SKAI-DOC-SS-001",
         "SKAI-DOC-TRACES-PLACE-PAGE-DATA-CONTRACT-001"
+      ]
+    },
+    {
+      "doc_id": "SKAI-DOC-TRACES-ABOUT-DESCRIPTION-001",
+      "doc_type": "traces",
+      "status": "draft",
+      "title": "About Description Spec v1",
+      "path": "docs/traces/about-description-spec-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-16",
+      "last_updated": "2026-03-16",
+      "project_id": "PLACE-PAGE",
+      "summary": "Spec for the About description on the place page — 3-tier sourcing hierarchy, VOICE_DESCRIPTOR generation, and rendering rules.",
+      "systems": [
+        "place-page",
+        "enrichment-pipeline",
+        "voice-engine"
+      ],
+      "related_docs": [
+        "SKAI-DOC-TRACES-PLACE-PAGE-DESIGN-001",
+        "docs/traces/WO-ABOUT-001-voice-descriptor-pipeline.md"
+      ]
+    },
+    {
+      "doc_id": "SKAI-DOC-TRACES-WO-ABOUT-001",
+      "doc_type": "work-order",
+      "status": "draft",
+      "title": "WO-ABOUT-001 — VOICE_DESCRIPTOR Generation Pipeline",
+      "path": "docs/traces/WO-ABOUT-001-voice-descriptor-pipeline.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-16",
+      "last_updated": "2026-03-16",
+      "project_id": "PLACE-PAGE",
+      "summary": "Execution work order for the VOICE_DESCRIPTOR generation pipeline — 3 checkpoints covering Tier 1 extraction, Tier 2/3 generation, and API read path + rendering.",
+      "systems": [
+        "enrichment-pipeline",
+        "voice-engine",
+        "place-page"
+      ],
+      "related_docs": [
+        "SKAI-DOC-TRACES-ABOUT-DESCRIPTION-001",
+        "SKAI-DOC-TRACES-PLACE-PAGE-DESIGN-001"
       ]
     },
     {

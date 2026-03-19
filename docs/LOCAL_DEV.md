@@ -4,13 +4,13 @@ doc_type: runbook
 status: active
 owner: Bobby Ciccaglione
 created: '2026-03-10'
-last_updated: '2026-03-10'
+last_updated: '2026-03-17'
 project_id: SAIKO
-summary: ''
+summary: 'Local development setup: install, configure, run.'
 ---
 # Local Development
 
-Saiko runs on Next.js + Prisma. Single data path, no branching.
+Saiko runs on Next.js 16 + Prisma + Neon (PostgreSQL).
 
 ---
 
@@ -20,89 +20,78 @@ Saiko runs on Next.js + Prisma. Single data path, no branching.
 # Install dependencies
 npm install
 
-# Set up environment variables
-cp .env.example .env
-# Add your DATABASE_URL
+# Copy env template and fill in your secrets
+cp .env.example .env.local
+# Edit .env.local — add DATABASE_URL, ANTHROPIC_API_KEY, NEXTAUTH_SECRET, etc.
+
+# Generate Prisma client
+npx prisma generate
+
+# Run migrations
+npx prisma migrate deploy
 ```
 
 ---
 
-## Database
+## Environment Files
 
-### Migrate
+| File | What goes here |
+|---|---|
+| `.env` | Non-sensitive defaults (already committed). Feature flags, app URL, bucket name. |
+| `.env.local` | **All secrets.** DB URL, API keys, tokens. See `.env.example` for the full list. |
 
-```bash
-npx prisma migrate dev
-```
-
-### Seed
-
-Populates database with test scenarios A, B, C:
-
-```bash
-npm run seed
-```
-
-### Reset
-
-```bash
-npx prisma migrate reset
-```
-
-### Studio
-
-```bash
-npx prisma studio
-```
+Production secrets live in Vercel Environment Variables, not in files.
 
 ---
 
 ## Run
 
 ```bash
-npm run dev
+npm run dev           # Start dev server (default: Neon DB from .env.local)
+npm run dev:local     # Start dev server against local Postgres
 ```
 
-Visit:
-- `/demo` — All 3 scenarios side-by-side
-- `/place/scenario-a` — Fully curated
-- `/place/scenario-b` — Editorial lite  
-- `/place/scenario-c` — Baseline
+The startup banner shows which DB is in use.
 
 ---
 
-## Environment Variables
+## Database
 
+```bash
+npx prisma migrate dev     # Create + apply migrations locally
+npx prisma migrate deploy  # Apply pending migrations (no generation)
+npx prisma studio          # Database GUI
+npm run db:whoami           # Check which DB you're connected to
 ```
-DATABASE_URL=postgresql://user:pass@localhost:5432/saikomaps
-NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_key
+
+### Wrapper scripts (for pipeline scripts)
+
+```bash
+./scripts/db-neon.sh <cmd>    # Run command against Neon (reads .env.local)
+./scripts/db-local.sh <cmd>   # Run command against localhost:5432
 ```
+
+These set `SAIKO_DB_FROM_WRAPPER=1`, which pipeline scripts check as a safety guard.
 
 ---
 
 ## Commands
 
 ```bash
-npm run dev          # Start dev server
-npm run build        # Build for production
-npm run type-check   # TypeScript check
-npm run seed         # Seed database
-npx prisma studio    # Database GUI
+npm run dev            # Start dev server
+npm run build          # prisma generate && next build
+npm run type-check     # TypeScript check (needs NODE_OPTIONS="--max-old-space-size=3072")
+npx prisma studio      # Database GUI
 ```
 
 ---
 
-## Merchant Page Testing
+## Health Check
 
-After seeding, test the tier hierarchy:
+Dev server running? Check the DB connection:
 
-1. Visit `/place/scenario-a`
-2. Open merchant-page-implementation-checklist.md
-3. Verify all 11 sections pass
-4. Check tier order (1-12)
-5. Confirm HoursCard always renders
-6. Verify hero excluded from collage
+```bash
+curl -sS http://localhost:3000/api/health
+```
 
----
-
-*That's it. No deployment docs, no multi-db branching.*
+Returns `{ "status": "ok", "db": "connected" }` or 503 if unreachable.

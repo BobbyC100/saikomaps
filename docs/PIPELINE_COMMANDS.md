@@ -4,113 +4,210 @@ doc_type: reference
 status: active
 owner: Bobby Ciccaglione
 created: '2026-03-10'
-last_updated: '2026-03-10'
+last_updated: '2026-03-17'
 project_id: SAIKO
 systems:
   - data-pipeline
-summary: ''
+  - coverage-operations
+summary: 'Operator command reference for entity enrichment, identity resolution, social discovery, and coverage operations.'
 ---
-# Saiko Maps — Pipeline Commands
+# Pipeline Commands
 
-Quick reference for monitoring and managing the scraping/extraction pipeline.
+Operator reference for all enrichment and coverage tools. All commands assume you're in the project root with environment loaded.
 
 ---
 
-## 🔍 Check Progress (Quick Status)
+## Smart Enrich (recommended entry point)
+
+Cost-optimized pipeline. Discovers identity via cheap Haiku web search first, scrapes for free, only calls Google Places if gaps remain. ~$0.01–0.04/entity.
 
 ```bash
-npx tsx scripts/check-pipeline-progress.ts
+# Single entity
+npm run enrich:smart -- --name="Bavel"
+npm run enrich:smart -- --name="Bestia" --neighborhood="Arts District"
+
+# Batch (comma-separated)
+npm run enrich:smart -- --names="Bavel,Bestia,Republique,Kismet"
+
+# Batch from file (one name per line)
+npm run enrich:smart -- --file=data/new-places.txt
+
+# Cheap only (~$0.01/entity — skip Google Places)
+npm run enrich:smart -- --names="Bavel,Bestia" --cheap
+
+# Dry run (no writes)
+npm run enrich:smart -- --name="Bavel" --dry-run
 ```
 
-Shows:
-- Scraping progress (X/572 complete)
-- Content found (menus, wine lists, about pages)
-- Extraction progress
-- Estimated time remaining
-
-**Run this anytime to see current status.**
-
----
-
-## 📊 Monitor Logs
-
-### Scraper Log
+**API:**
 ```bash
-tail -f scrape-output.log
-```
+# Single
+curl -X POST localhost:3000/api/admin/smart-enrich \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Bavel"}'
 
-### Monitor Log
-```bash
-tail -f monitor-output.log
-```
-
----
-
-## 🎯 Current Status
-
-**What's Running:**
-- ✅ Phase 1: Website scraper (background, PID in scrape-output.log)
-- ✅ Auto-monitor: Watching for completion, will auto-start Phase 2
-
-**Expected Timeline:**
-- Phase 1: ~1.9 hours (scraping 572 websites)
-- Phase 2: ~60-90 minutes (AI extraction, auto-starts when Phase 1 done)
-- **Total: ~3-3.5 hours**
-
----
-
-## 📈 Manual Phase 2 (if needed)
-
-If you want to manually start extraction:
-
-```bash
-# Extract all ready places
-npx tsx scripts/extract-identity-signals.ts
-
-# Or test on subset first
-npx tsx scripts/extract-identity-signals.ts --limit=50 --verbose
+# Batch
+curl -X POST localhost:3000/api/admin/smart-enrich \
+  -H "Content-Type: application/json" \
+  -d '{"names": ["Bavel", "Bestia", "Republique"]}'
 ```
 
 ---
 
-## 🛑 Stop Everything
+## Full 7-Stage Pipeline
+
+When you need the full enrichment pipeline (Google Places + AI signals + taglines). ~$0.12/entity.
 
 ```bash
-# Find running processes
-ps aux | grep "scrape-menus\|monitor-and-extract"
+# Single entity (stages 2–7, website-first)
+npm run enrich:place -- --slug=republique
 
-# Kill specific process
-kill <PID>
+# Include Google Places (stage 1)
+npm run enrich:place -- --slug=republique --from=1
+
+# Resume from specific stage
+npm run enrich:place -- --slug=republique --from=3
+
+# Run only one stage
+npm run enrich:place -- --slug=republique --only=5
+
+# Batch (25 entities, website-first)
+npm run enrich:batch
+
+# Batch with concurrency
+npm run enrich:place -- --batch=50 --concurrency=5
+
+# Batch including Google Places
+npm run enrich:place -- --batch=50 --include-google
+```
+
+**Stages:**
+1. Google Places identity commit (GPID, coords, hours, photos)
+2. Surface discovery (find homepage/menu/about/contact URLs)
+3. Surface fetch (capture raw HTML)
+4. Surface parse (structure captured content into artifacts)
+5. Identity signal extraction (AI → derived_signals)
+6. Website enrichment (menu_url, reservation_url → Fields v2)
+7. Tagline generation (AI → interpretation_cache)
+
+---
+
+## GPID Resolution
+
+Find Google Place IDs for entities that don't have one.
+
+```bash
+# Single entity (via API)
+curl -X POST localhost:3000/api/admin/tools/seed-gpid-queue \
+  -H "Content-Type: application/json" \
+  -d '{"entityId": "entity-uuid-here"}'
+
+# Batch by entity IDs (single API call)
+curl -X POST localhost:3000/api/admin/tools/seed-gpid-queue \
+  -H "Content-Type: application/json" \
+  -d '{"entityIds": ["id1", "id2", "id3"]}'
+
+# Scan all entities without GPID (up to 200)
+curl -X POST localhost:3000/api/admin/tools/seed-gpid-queue \
+  -H "Content-Type: application/json" -d '{}'
+```
+
+High-confidence matches (≥0.85 similarity) are auto-applied. Ambiguous/no-match cases go to the GPID Queue at `/admin/gpid-queue` for human review.
+
+---
+
+## Social Discovery
+
+Find Instagram, TikTok, or website via Claude Haiku + web search. ~$0.01/call.
+
+```bash
+# Single entity (synchronous, ~5s)
+curl -X POST localhost:3000/api/admin/tools/discover-social \
+  -H "Content-Type: application/json" \
+  -d '{"mode": "instagram", "slug": "republique"}'
+
+# Modes: instagram | tiktok | website | both
+curl -X POST localhost:3000/api/admin/tools/discover-social \
+  -H "Content-Type: application/json" \
+  -d '{"mode": "both", "slug": "republique"}'
+
+# Batch (background)
+curl -X POST localhost:3000/api/admin/tools/discover-social \
+  -H "Content-Type: application/json" \
+  -d '{"mode": "instagram", "limit": 50}'
 ```
 
 ---
 
-## 📁 Output Files
+## Enrichment Stage Re-run
 
-- `scrape-output.log` - Scraping progress and results
-- `monitor-output.log` - Auto-monitor status checks
-- Database: `golden_records` table (Prisma)
+Run a specific enrichment stage without the full pipeline.
 
----
+```bash
+# Run stage 5 only (AI signal extraction)
+curl -X POST localhost:3000/api/admin/tools/enrich-stage \
+  -H "Content-Type: application/json" \
+  -d '{"slug": "republique", "stage": 5}'
 
-## 🔮 What Happens Next
-
-1. **Phase 1** runs for ~1.9 hours
-2. **Monitor** checks every 30 seconds for completion
-3. When Phase 1 done, **Phase 2 auto-starts**
-4. Phase 2 extracts identity signals (~60-90 min, ~$6)
-5. **Done!** You'll have 300-400 places with full identity signals
-
----
-
-## 💡 Tips
-
-- Check progress anytime with `npx tsx scripts/check-pipeline-progress.ts`
-- Monitor logs show real-time updates every 30 seconds
-- No need to watch - it runs fully automated
-- Safe to close terminal, processes run in background
-- Cost: $0 for scraping, ~$6 for AI extraction
+# Run stages 3–7
+curl -X POST localhost:3000/api/admin/tools/enrich-stage \
+  -H "Content-Type: application/json" \
+  -d '{"slug": "republique", "from": 3}'
+```
 
 ---
 
-**Last updated:** Feb 10, 2026
+## Issue Scanning
+
+Detect data quality issues across all entities.
+
+```bash
+# Full scan (all non-CANDIDATE entities)
+curl -X POST localhost:3000/api/admin/tools/scan-issues \
+  -H "Content-Type: application/json" \
+  -d '{"action": "scan"}'
+
+# Scan single entity
+curl -X POST localhost:3000/api/admin/tools/scan-issues \
+  -H "Content-Type: application/json" \
+  -d '{"action": "scan", "slug": "republique"}'
+
+# Get issue summary
+curl -X POST localhost:3000/api/admin/tools/scan-issues \
+  -H "Content-Type: application/json" \
+  -d '{"action": "summary"}'
+
+# Get detailed issues for triage board
+curl "localhost:3000/api/admin/tools/scan-issues?detail=true"
+```
+
+---
+
+## Coverage Dashboards
+
+| Page | URL | Purpose |
+|---|---|---|
+| Coverage | `/admin/coverage` | Diagnostic dashboard — resolution health, tier summary, neighborhoods, missing fields |
+| Coverage Ops | `/admin/coverage-ops` | Triage board — actionable issues with inline resolution tools |
+| GPID Queue | `/admin/gpid-queue` | Human review queue for ambiguous GPID matches |
+
+---
+
+## Health Check
+
+```bash
+curl localhost:3000/api/health
+# Returns: { "status": "ok", "db": "connected", "latency_ms": N }
+```
+
+---
+
+## Cost Reference
+
+| Tool | Cost/entity | When to use |
+|---|---|---|
+| Smart enrich (cheap) | ~$0.01 | New entity intake — find website + IG |
+| Smart enrich (full) | ~$0.01–0.04 | New entity + fill all gaps including coords |
+| Full pipeline (enrich:place) | ~$0.12 | Deep enrichment — AI signals + taglines |
+| Social discovery | ~$0.01 | Fill missing Instagram/TikTok/website |
+| GPID resolution | ~$0.03 | Find Google Place ID for coords/hours |

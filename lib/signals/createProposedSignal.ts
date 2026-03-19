@@ -1,6 +1,5 @@
-import { PrismaClient, SignalSourceType, ProposedSignalType } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { SignalSourceType, ProposedSignalType } from '@prisma/client';
+import { db as prisma } from '@/lib/db';
 
 interface CreateProposedSignalParams {
   placeId: string;

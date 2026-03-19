@@ -4,7 +4,7 @@ doc_type: traces
 status: active
 owner: Bobby Ciccaglione
 created: 2026-03-11
-last_updated: 2026-03-11
+last_updated: 2026-03-17
 project_id: PLACE-PAGE
 systems:
   - place-page
@@ -13,7 +13,7 @@ systems:
 related_docs:
   - SKAI-DOC-TRACES-BEVERAGE-PROGRAM-VOCAB-001
   - SKAI-DOC-SS-001
-  - SKAI-DOC-TRACES-PLACE-PAGE-DATA-CONTRACT-001
+  - SKAI-DOC-TRACES-WO-ABOUT-001
 summary: Canonical design spec for the Saiko place profile page — wireframe, data sources, content model, and rendering rules.
 ---
 
@@ -41,9 +41,11 @@ Two-column layout from the top. No hero image.
 ┌─────────────────────────────────┬──────────────────────────┐
 │  {Name}            (lg serif)   │                          │
 │  {Identity Line}                │  (softened — right col   │
-│  {Open/Closed state}            │   starts below identity) │
+│  {Tagline}  (italic serif)      │   starts below identity) │
+│  {Open/Closed state}            │                          │
 │                                 │                          │
-│  Reserve ↗  Directions ↗        │                          │
+│  Reserve ↗  Website ↗           │                          │
+│  Instagram ↗  TikTok ↗          │                          │
 │  ───────────────────────────────│──────────────────────────│
 │                                 │  HOURS                   │
 │  ABOUT                          │  {formatted hours}       │
@@ -91,7 +93,7 @@ The place page combines up to three distinct narrative voices:
 |-------|---------|--------|---------|------|--------|
 | **Merchant** | ABOUT | Website about, IG bio, merchant text; synthesized if absent | "What is this place?" | Upbeat, descriptive, slightly enticing, neutral-to-positive | Implement now |
 | **External media** | COVERAGE NOTE | LA Times, Eater, Michelin, etc. (coverage_sources) | "Why is this place notable?" | Direct quote, attributed, 1-2 lines max | Implement now |
-| **Saiko** | (future) | AI editorial layers (interpretation_cache TAGLINE, etc.) | Saiko's own editorial voice | TBD | Not on page yet |
+| **Saiko** | Tagline | AI editorial layers (interpretation_cache TAGLINE via Voice Engine v2) | Saiko's own editorial voice | Confident, understated, cool | Tagline rendered below identity subline |
 
 These voices must never merge. ABOUT and Coverage Note are always separate sections.
 
@@ -109,7 +111,14 @@ These voices must never merge. ABOUT and Coverage Note are always separate secti
 
 **Visual treatment**: Most important text block — visually distinct. Drop-cap first letter, serif typography, slightly larger line height, inset spacing.
 
-**Current data**: entities.description has 5/143 (short one-liners, hand-seeded). Merchant surface text exists in merchant_surface_artifacts for enriched entities. Synthesis path needed for the rest.
+**Implementation**: VOICE_DESCRIPTOR pipeline (WO-ABOUT-001) implements a 3-tier generation hierarchy stored in interpretation_cache:
+- **Tier 1 (verbatim-v1)**: Extracted from merchant surface artifacts — coherence-filtered, quality-scored
+- **Tier 2 (about-synth-v1)**: AI-synthesized from merchant text blocks in the merchant's voice
+- **Tier 3 (about-compose-v1)**: AI-composed from structured signals when no merchant text exists
+
+**Read path**: API reads VOICE_DESCRIPTOR from interpretation_cache (is_current=true), falls back to entities.description. Page renders with descriptionSource label for provenance.
+
+**Current data**: entities.description has 5/143 (short one-liners, hand-seeded). Merchant surface text exists in merchant_surface_artifacts for enriched entities. VOICE_DESCRIPTOR pipeline ready for batch execution.
 
 ### 3.3 COVERAGE NOTE — External Media Voice (Cultural Validation)
 
@@ -117,7 +126,7 @@ These voices must never merge. ABOUT and Coverage Note are always separate secti
 
 **Source**: coverage_sources table (LA Times, Eater, Michelin, etc.) + pull quote fields.
 
-**Format**: One sentence (preferred), max two short lines. Direct quotes whenever possible. Always attributed.
+**Format**: One sentence (preferred), max two short lines. Direct quotes whenever possible. Always attributed. Source name links to pullQuoteUrl when available.
 
 **Example**: "The best tortillas in Los Angeles." — LA Times
 
@@ -144,7 +153,7 @@ These voices must never merge. ABOUT and Coverage Note are always separate secti
 
 ### 3.5 Reading Flow
 
-Name → Identity Line (structural) → ABOUT (identity/merchant voice) → Coverage Note (credibility)
+Name → Identity Line (structural) → Tagline (Saiko editorial voice) → ABOUT (identity/merchant voice) → Coverage Note (credibility)
 
 This moves the user from structure → identity → validation.
 
@@ -152,8 +161,10 @@ This moves the user from structure → identity → validation.
 
 | Section | Data Source | Collapse Rule |
 |---------|-----------|---------------|
+| Business status banner | entities.business_status | Hide if OPERATIONAL or null |
 | Identity (name, identity line, open state) | entities + evolved getIdentitySublineV2() | Name always shown |
-| Primary CTAs (Reserve, Directions) | merchant_signals.reservation_url, lat/lng | Hide if no data |
+| Tagline | interpretation_cache (TAGLINE) with entities.tagline fallback | Hide if null |
+| Primary CTAs (Reserve, Website, Instagram, TikTok) | reservation_url, website, instagram, tiktok | Hide if all null |
 | ABOUT | Merchant text (entities.description, merchant surfaces, or synthesized) | Hide if null |
 | Offering | derived_signals (identity_signals + offering_programs) | Hide if all null |
 | Coverage Note | coverage_sources + pull quote | Hide if empty |
@@ -165,7 +176,7 @@ This moves the user from structure → identity → validation.
 |---------|-----------|---------------|
 | Hours | entities.hours (parsed) | Hide if null |
 | Address | entities.address | Hide if null |
-| Links | entities.website, instagram, merchant_signals.menu_url | Hide if all null |
+| Links | entities.website, instagram, tiktok, merchant_signals.menu_url | Hide if all null |
 | Scene | scenesense.scene | Hide if PRL < 3 |
 | Atmosphere | scenesense.atmosphere | Hide if PRL < 3 |
 | Ambiance | scenesense.ambiance | Hide if PRL < 3 |
@@ -182,24 +193,45 @@ This moves the user from structure → identity → validation.
 
 | Data | Exists in DB | Wired to API? | Wired to Page? |
 |------|-------------|---------------|----------------|
-| Reservation URL | merchant_signals.reservation_url | ❌ (reads entities.reservationUrl) | Partially |
-| Beverage programs | derived_signals.offering_programs | ❌ | ❌ |
-| Place personality | derived_signals.identity_signals | ❌ | ❌ |
-| Signature dishes | derived_signals.identity_signals | ❌ | ❌ |
-| Language signals → SceneSense | derived_signals.identity_signals | ❌ (passed as null) | Indirectly |
-| Full identity signals (6 extra fields) | derived_signals.identity_signals | ❌ (only 4/10 read) | ❌ |
+| Reservation URL | merchant_signals.reservation_url | ✅ (merchant_signals → entities fallback) | ✅ |
+| Beverage programs | derived_signals.offering_programs | ✅ | ✅ (signal-aware composition) |
+| VOICE_DESCRIPTOR (ABOUT) | interpretation_cache | ✅ | ✅ (3-tier fallback) |
+| Business status | entities.business_status | ✅ | ✅ (banner for non-OPERATIONAL) |
+| Place personality | derived_signals.identity_signals | ✅ | ✅ (scene sidebar + identity) |
+| Signature dishes | derived_signals.identity_signals | ✅ | ✅ (Known For section) |
+| Key producers | derived_signals.identity_signals | ✅ | ✅ (Known For section) |
+| Origin story type | derived_signals.identity_signals | ✅ | ✅ (About accent line) |
+| Language signals → SceneSense | derived_signals.identity_signals | ✅ | ✅ (routes to SceneSense lenses) |
+| Identity signals (core 4) | derived_signals.identity_signals | ✅ | ✅ (offering signals: posture, service, price, wine intent) |
+| Confidence metadata | derived_signals.identity_signals | — | — (pipeline internal, not page-facing) |
 
 ## 5. Rendering Rules
 
-### 5.1 Offering Section
+### 5.1 Offering Section — Signal-Aware Composition
 
-Beverage programs use the locked maturity vocabulary (SKAI-DOC-TRACES-BEVERAGE-PROGRAM-VOCAB-001):
-- `dedicated` → "Dedicated wine program" (or beer/cocktail)
-- `considered` → "Considered wine selection"
-- `incidental` → "Wine available"
-- `none` / `unknown` → do not render
+Offering lines are composed from program maturity + program signals, not flat labels. The system uses static phrase assembly: structural signal names map to human-readable fragments and compose into natural sentences.
 
-Food line uses cuisine_posture phrases. Service + Price use existing phrase maps.
+**Architecture**: `resolveSignalPhrases(signals[], vocabulary) → fragments[] → composeSentence(lead, fragments, connector) → sentence`
+
+**Food**: Cuisine posture drives the lead phrase (e.g. "Seasonal, produce-driven kitchen"), food signals compose as detail fragments via `"built around"` connector. 16 signal phrases mapped (FOOD_SIGNAL_PHRASES). Falls back to maturity + cuisineType when posture is absent.
+
+**Wine**: Wine program intent drives the lead phrase (9 intents mapped in WINE_INTENT_LEADS, e.g. "Producer-driven natural wine list"). Wine signals (3 locked: natural_wine_focus, orange_wine_presence, pet_nat_presence) compose via `"with"` connector. Falls back to maturity label if no intent.
+
+**Cocktails**: Maturity drives the lead ("Dedicated cocktail program" / "Composed cocktail menu"), cocktail signals (locked v1: seasonal_menu) compose via `"featuring"`. Falls back to `servesCocktails` boolean.
+
+**Beer**: Maturity drives the lead ("Dedicated beer program" / "Considered beer selection"), beer signals (locked v1: craft_beer_focus) compose via `"with"`. Falls back to `servesBeer` boolean.
+
+**Non-Alcoholic**: Signal-first — if any of the 10 locked signals resolve (e.g. zero_proof_cocktails, house_soda_program, horchata_presence, na_spirits_presence), they drive the sentence via `"including"` connector. Maturity shapes the lead. Falls back to maturity-only label when no signals detected.
+
+**Coffee & Tea**: Signal-first — if any of the 11 locked signals resolve (e.g. espresso_program, matcha_program, specialty_tea_presence, afternoon_tea_service), they compose via `"featuring"`. Falls back to maturity-only label.
+
+**Service + Price**: Use existing phrase maps (SERVICE_MODEL_PHRASES, PRICE_PHRASES). No signal composition.
+
+**Cap**: Max 6 offering lines rendered (OFFERING_CAP). Signal fragments capped at 3 per program.
+
+**Collapse rule**: Programs with maturity `none` or `unknown` and no resolved signals do not render.
+
+All signal vocabularies are defined in the Beverage Program + Signal Vocabulary v1 spec (SKAI-DOC-TRACES-BEVERAGE-PROGRAM-VOCAB-001). Display phrase mappings live in page.tsx alongside the rendering logic.
 
 ### 5.2 SceneSense (SKAI-DOC-SS-001)
 
@@ -237,6 +269,10 @@ Incremental (data first):
 | lib/contracts/place-page.ts | Data contract |
 | lib/contracts/place-page.identity.ts | Identity line helpers |
 | scripts/assemble-offering-programs.ts | WO-006 beverage programs |
+| scripts/generate-descriptions-v1.ts | VOICE_DESCRIPTOR batch pipeline |
+| lib/voice-engine-v2/description-extraction.ts | Tier 1 extraction + coherence filter |
+| lib/voice-engine-v2/description-prompts.ts | Tier 2/3 prompt templates |
+| lib/voice-engine-v2/description-generator.ts | AI generation for Tier 2/3 |
 | lib/scenesense.ts | SceneSense assembly |
 
 ## 9. Showcase Entity
@@ -250,11 +286,11 @@ Incremental (data first):
 
 ## 10. Resolved Decisions
 
-1. **ABOUT vs Coverage Note vs Saiko Voice** — LOCKED. Three distinct voices, never merge. ABOUT = merchant voice (identity). Coverage Note = external media (validation). Saiko Voice = future, not on page yet. AI tagline from interpretation_cache is Saiko Voice — deferred.
+1. **ABOUT vs Coverage Note vs Saiko Voice** — LOCKED. Three distinct voices, never merge. ABOUT = merchant voice (identity). Coverage Note = external media (validation). Saiko Voice = tagline rendered below identity subline (Voice Engine v2 output from interpretation_cache).
 
 ## 11. Open Questions
 
-1. **ABOUT content sourcing**: Does every place get an ABOUT? If so, where does synthesized ABOUT text come from for places without merchant-authored text? (Only 5/143 have entities.description. Merchant surface artifacts have raw website text but no ABOUT extraction yet.)
+1. ~~**ABOUT content sourcing**~~: RESOLVED — VOICE_DESCRIPTOR pipeline (WO-ABOUT-001) implements 3-tier sourcing: verbatim merchant text → AI-synthesized from merchant blocks → AI-composed from signals. See about-description-spec-v1.md.
 2. **Coverage Note naming**: "Curator's Note" is misleading. Final name TBD (Coverage Note, Press Note, In the Press, What They Say).
 3. **Reference Ledger launch rule**: "No derived signals unless ≥1 ledger reference exists" — when does this gate activate?
 4. **Reference Confidence Model**: Not all references are equal (LA Times vs merchant site). Needs design.
@@ -267,3 +303,6 @@ Revision History
 | Version | Date | Changes | Author |
 |---|---|---|---|
 | 1.0 | 2026-03-11 | Initial design spec from planning session | Bobby / Claude |
+| 1.1 | 2026-03-16 | Tagline rendered on page (Saiko voice live). TikTok CTA added. Pull quote source linked via pullQuoteUrl. Wireframe and content model updated. | Bobby / Claude |
+| 1.2 | 2026-03-16 | VOICE_DESCRIPTOR pipeline built (3-tier description hierarchy). Offering section rewritten with signal-aware composition across all 7 programs. Business status banner added. Beverage signal display phrases mapped for all locked v1 vocabularies. Data gaps table updated. Open question 1 resolved. | Bobby / Claude |
+| 1.3 | 2026-03-17 | All data gaps closed. key_producers and origin_story_type wired through API → contract → page. Reservation URL confirmed wired (merchant_signals → entities fallback). Identity signals fully wired (7/10 page-facing, 3 confidence metadata internals). Data gaps table rewritten to reflect actual state. | Bobby / Claude |

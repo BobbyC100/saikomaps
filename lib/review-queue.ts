@@ -4,10 +4,9 @@
  * Handles creating, fetching, and resolving review queue items
  */
 
-import { PrismaClient, Prisma } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { haversineDistance } from './haversine';
-
-const prisma = new PrismaClient();
+import { db as prisma } from '@/lib/db';
 
 export interface EnrichmentRun {
   id: string;

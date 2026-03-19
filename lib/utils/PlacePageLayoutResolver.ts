@@ -34,7 +34,7 @@ export interface CardConfig {
   type: CardType;
   span: number;
   variant?: 'standard' | 'compact' | 'wide' | 'fixed';
-  data?: any;
+  data?: unknown;
 }
 
 export interface RowConfig {
@@ -43,9 +43,9 @@ export interface RowConfig {
 }
 
 export interface PlaceData {
-  // Tier A - Always present
-  hours: any;
-  details: any;
+  // Tier A - Always present (opaque to layout resolver; shaped by contracts)
+  hours: unknown;
+  details: unknown;
   
   // Tier B - Editorial
   coverage?: {

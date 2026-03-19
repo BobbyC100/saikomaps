@@ -131,7 +131,8 @@ export function TitleCard({ mapData, isOwner, template, onEdit, onDescriptionUpd
   };
 
   const handleInstagramShare = () => {
-    // TODO: Implement Instagram story image generation
+    // Instagram story image generation — not yet implemented.
+    // See instagram_media tables added in migration 20260313 for future integration.
     console.log('Share to Instagram');
   };
 

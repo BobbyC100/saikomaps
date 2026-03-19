@@ -1,23 +1,23 @@
 #!/usr/bin/env bash
 # Run a command against Neon DB. Usage: ./scripts/db-neon.sh <cmd> [args...]
 # Example: ./scripts/db-neon.sh psql -c "SELECT 1"
+# Reads DATABASE_URL from .env.local (the single source of dev secrets).
 set -euo pipefail
-ENV_FILE=".env.db.neon"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 cd "$ROOT"
-if [ ! -f "$ENV_FILE" ]; then
-  echo "Missing $ENV_FILE. Copy from .env.db.example and set DATABASE_URL to your Neon URL."
+if [ ! -f ".env.local" ]; then
+  echo "Missing .env.local. Copy from .env.example and set DATABASE_URL to your Neon URL."
   exit 1
 fi
 export SAIKO_DB_FROM_WRAPPER=1
-DATABASE_URL=$(grep '^DATABASE_URL=' "$ENV_FILE" 2>/dev/null | cut -d= -f2- | tr -d '"' | tr -d "'" || true)
+DATABASE_URL=$(grep '^DATABASE_URL=' ".env.local" 2>/dev/null | cut -d= -f2- | tr -d '"' | tr -d "'" || true)
 export DATABASE_URL
 if [ -z "${DATABASE_URL:-}" ]; then
-  echo "DATABASE_URL not set in $ENV_FILE. Add DATABASE_URL=postgresql://..."
+  echo "DATABASE_URL not set in .env.local. Add DATABASE_URL=postgresql://..."
   exit 1
 fi
-# Parse host, db, user for banner (postgresql://user:pass@host:port/db)
+# Parse host, db, user for banner
 BANNER=$(node -e "
   const u = process.env.DATABASE_URL || '';
   const m = u.match(/@([^\/]+)\/([^?]+)/);

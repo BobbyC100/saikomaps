@@ -12,10 +12,8 @@
  * targeted filtering, but the identity_signals row is the canonical read path.
  */
 
-import { PrismaClient } from '@prisma/client';
 import { IdentitySignals, PlaceContext, TaglineGenerationInputV2 } from './types';
-
-const prisma = new PrismaClient();
+import { db as prisma } from '@/lib/db';
 
 // ============================================
 // SIGNAL EXTRACTION

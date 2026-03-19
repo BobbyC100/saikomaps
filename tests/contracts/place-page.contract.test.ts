@@ -35,6 +35,7 @@ function makeLocation(overrides: Partial<PlacePageLocation> = {}): PlacePageLoca
     phone: '+1 213 555 0100',
     website: 'https://example.com',
     instagram: '@testplace',
+    tiktok: null,
     // Facts
     hours: null,
     priceLevel: 2,
@@ -42,6 +43,8 @@ function makeLocation(overrides: Partial<PlacePageLocation> = {}): PlacePageLoca
     cuisineType: 'Italian',
     googlePlaceId: 'ChIJ_abc',
     reservationUrl: null,
+    reservationProvider: null,
+    reservationProviderLabel: null,
     menuUrl: null,
     winelistUrl: null,
     // Editorial
@@ -67,6 +70,8 @@ function makeLocation(overrides: Partial<PlacePageLocation> = {}): PlacePageLoca
     // Identity Signals (enrichment)
     placePersonality: null,
     signatureDishes: [],
+    keyProducers: [],
+    originStoryType: null,
     // Coverage
     coverageSources: [],
     // Appearances

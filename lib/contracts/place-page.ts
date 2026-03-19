@@ -109,6 +109,8 @@ export type PlacePageLocation = {
   cuisineType: string | null;
   googlePlaceId: string | null;
   reservationUrl: string | null;
+  reservationProvider: string | null; // canonical slug: opentable, resy, tock, sevenrooms, yelp
+  reservationProviderLabel: string | null; // display name: "OpenTable", "Resy", etc.
   menuUrl: string | null;
   winelistUrl: string | null;
 
@@ -139,6 +141,8 @@ export type PlacePageLocation = {
   // Identity Signals (enrichment)
   placePersonality: string | null;
   signatureDishes: string[];
+  keyProducers: string[];
+  originStoryType: string | null;
 
   // Coverage
   coverageSources: PlacePageCoverageSource[];
@@ -185,6 +189,8 @@ export const PLACE_PAGE_LOCATION_KEYS: ReadonlyArray<keyof PlacePageLocation> = 
   'cuisineType',
   'googlePlaceId',
   'reservationUrl',
+  'reservationProvider',
+  'reservationProviderLabel',
   'menuUrl',
   'winelistUrl',
   // Editorial
@@ -210,6 +216,8 @@ export const PLACE_PAGE_LOCATION_KEYS: ReadonlyArray<keyof PlacePageLocation> = 
   // Identity Signals (enrichment)
   'placePersonality',
   'signatureDishes',
+  'keyProducers',
+  'originStoryType',
   // Coverage
   'coverageSources',
   // Appearances
@@ -264,6 +272,9 @@ export function assertPlacePageData(x: unknown): asserts x is PlacePageData {
   }
   if (!Array.isArray(loc.signatureDishes)) {
     throw new Error('PlacePageData.location.signatureDishes must be an array');
+  }
+  if (!Array.isArray(loc.keyProducers)) {
+    throw new Error('PlacePageData.location.keyProducers must be an array');
   }
   if (!Array.isArray(loc.coverageSources)) {
     throw new Error('PlacePageData.location.coverageSources must be an array');

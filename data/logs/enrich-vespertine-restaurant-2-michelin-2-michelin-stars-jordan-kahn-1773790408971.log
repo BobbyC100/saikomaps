@@ -1,0 +1,25 @@
+[2026-03-17T23:33:28.971Z] Running stage 1 (Google Places identity commit) only for vespertine-restaurant-2-michelin-2-michelin-stars-jordan-kahn
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+[dotenv@17.2.3] injecting env (18) from .env.local -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
+
+Enrich: Vespertine (vespertine-restaurant-2-michelin-2-michelin-stars-jordan-kahn)
+  ID:      6c7e44dd-07ba-4a78-8b72-51787b023b24
+  Website: https://vespertine.la/
+  GPID:    ChIJVd04SYW5woAROE52K0dXeYE
+
+Re-scanning issues...
+  Issues: 0 created, 0 resolved, 3 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Vespertine
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-17T23:33:30.456Z] Process exited with code: 0

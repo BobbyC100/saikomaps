@@ -4,30 +4,42 @@ doc_type: reference
 status: active
 owner: Bobby Ciccaglione
 created: '2026-03-10'
-last_updated: '2026-03-10'
+last_updated: '2026-03-17'
 project_id: SAIKO
 systems:
   - database
-summary: ''
+summary: 'Database setup: Neon (production), local Postgres (dev), Prisma ORM.'
 ---
-# Database Setup for Saiko Maps
+# Database Setup
 
-## Error: "User was denied access on the database"
+## Production: Neon (PostgreSQL)
 
-This usually means PostgreSQL isn't running, or your `DATABASE_URL` has wrong credentials.
+Saiko uses **Neon** as its single production database with connection pooling.
+
+- **Provider:** Neon (PostgreSQL, managed)
+- **Region:** US-East-1 (AWS)
+- **Connection:** Pooler endpoint (`-pooler.` subdomain)
+- **ORM:** Prisma 6.0
+- **Schema:** 57 models, 63+ migrations
+
+The `DATABASE_URL` in `.env.local` should point to the Neon pooler endpoint:
+```
+DATABASE_URL="postgresql://neondb_owner:<password>@ep-<id>-pooler.<region>.neon.tech/neondb?sslmode=require&channel_binding=require"
+```
+
+Production `DATABASE_URL` is also set in Vercel Environment Variables (dashboard).
 
 ---
 
-## 1. Install & run PostgreSQL
+## Local Development: Postgres
+
+For local dev without hitting Neon:
 
 ### Option A: Postgres.app (easiest on Mac)
 
 1. Download [Postgres.app](https://postgresapp.com/)
-2. Open it and click "Initialize" to start the server
-3. Add to your PATH: `sudo mkdir -p /etc/paths.d && echo /Applications/Postgres.app/Contents/Versions/latest/bin | sudo tee /etc/paths.d/postgresapp`
-4. Restart your terminal
-
-**Default connection:** `postgresql://localhost:5432` (no username/password for local)
+2. Open it and click "Initialize"
+3. Add to PATH: `sudo mkdir -p /etc/paths.d && echo /Applications/Postgres.app/Contents/Versions/latest/bin | sudo tee /etc/paths.d/postgresapp`
 
 ### Option B: Homebrew
 
@@ -36,52 +48,51 @@ brew install postgresql@16
 brew services start postgresql@16
 ```
 
-**Default:** User = your Mac username, no password. Database = your username by default.
-
----
-
-## 2. Create the database
+### Create the database
 
 ```bash
-# With Postgres.app or Homebrew, create the DB:
 createdb saiko_maps
 ```
 
----
-
-## 3. Set DATABASE_URL in .env
-
-**Postgres.app (typical):**
-```
-DATABASE_URL="postgresql://localhost:5432/saiko_maps"
-```
-
-**Homebrew (use your Mac username):**
-```
-DATABASE_URL="postgresql://YOUR_MAC_USERNAME@localhost:5432/saiko_maps"
-```
-
-**With password (if you set one):**
-```
-DATABASE_URL="postgresql://username:yourpassword@localhost:5432/saiko_maps"
-```
-
-> ⚠️ Replace `user` and `password` with your **actual** PostgreSQL username and password. The template `postgresql://user:password@...` uses placeholders.
-
----
-
-## 4. Run migrations
+### Use local DB with dev server
 
 ```bash
-npx prisma migrate deploy
+npm run dev:local
+```
+
+This runs `scripts/db-local.sh`, which overrides `DATABASE_URL` to `postgresql://youruser@localhost:5432/saiko_maps`.
+
+---
+
+## Migrations
+
+```bash
+npx prisma migrate dev       # Dev: create + apply migrations
+npx prisma migrate deploy    # Prod: apply pending migrations only
+npx prisma generate          # Regenerate Prisma client after schema changes
+```
+
+Migrations live in `prisma/migrations/`. The codebase favors **additive migrations**. Destructive migrations (column drops, table drops) are deferred and require manual pre-flight checks — see `docs/DEFERRED_MIGRATION_GATES.md`.
+
+---
+
+## Verify Connection
+
+```bash
+npm run db:whoami             # Show which DB you're connected to
+curl localhost:3000/api/health  # Health check (dev server running)
+npx prisma db pull            # Pull schema from DB (confirms connection)
 ```
 
 ---
 
-## 5. Verify connection
+## Troubleshooting
 
-```bash
-npx prisma db pull
-```
+### "User was denied access on the database"
+- PostgreSQL isn't running, or `DATABASE_URL` has wrong credentials
+- Check: `psql $DATABASE_URL -c "SELECT 1"` — does it connect?
 
-If that succeeds, your connection works.
+### Wrong database
+- The dev server banner shows which DB classification (NEON / LOCAL) is in use
+- `npm run db:whoami` confirms the connection
+- If using wrapper scripts, `SAIKO_DB_FROM_WRAPPER=1` ensures the wrapper's URL wins

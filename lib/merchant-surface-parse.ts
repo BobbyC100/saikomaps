@@ -22,9 +22,7 @@
  * All evidence columns remain permanently frozen.
  */
 
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { db as prisma } from '@/lib/db';
 
 // ---------------------------------------------------------------------------
 // Artifact constants
@@ -90,6 +88,8 @@ export interface ParseArtifactV1 {
     /** Social profiles detected */
     social: {
       instagram: string | null;
+      tiktok: string | null;
+      facebook: string | null;
     };
   };
 }
@@ -100,9 +100,14 @@ export interface ParseArtifactV1 {
 
 /** Reservation platforms — detected via any external link to these domains */
 const RESERVATION_LINK_PATTERNS: Array<{ platform: string; re: RegExp }> = [
-  { platform: 'resy',      re: /resy\.com/i },
-  { platform: 'opentable', re: /opentable\.com/i },
-  { platform: 'tock',      re: /(?:exploretock|tock)\.com/i },
+  { platform: 'resy',        re: /resy\.com/i },
+  { platform: 'opentable',   re: /opentable\.com/i },
+  { platform: 'tock',        re: /(?:exploretock|tock)\.com/i },
+  { platform: 'sevenrooms',  re: /sevenrooms\.com/i },
+  { platform: 'yelp',        re: /yelp\.com\/reservations/i },
+  { platform: 'reserve',     re: /reserve\.com/i },
+  { platform: 'tablein',     re: /tablein\.com/i },
+  { platform: 'bentobox',    re: /(?:getbento|bentobox)\.com.*reserv/i },
 ];
 
 /**
@@ -153,8 +158,8 @@ const WEBSITE_PLATFORM_DOMAIN_PATTERNS: Array<{ platform: string; re: RegExp }> 
 // Surface hint link patterns
 // ---------------------------------------------------------------------------
 
-const MENU_LINK_PATTERNS:        RegExp[] = [/\/menus?\b/i, /\/food\b/i, /\/drinks?\b/i, /\/wine\b/i, /\/cocktails?\b/i, /\/beverages?\b/i];
-const RESERVATION_LINK_URL_PATS: RegExp[] = [/resy\.com/i, /opentable\.com/i, /(?:exploretock|tock)\.com/i, /\/reservations?\b/i, /\/reserve\b/i, /\/book\b/i];
+const MENU_LINK_PATTERNS:        RegExp[] = [/\/menus?\b/i, /\/food\b/i, /\/drinks?\b/i, /\/wine\b/i, /\/cocktails?\b/i, /\/beverages?\b/i, /\/dinner\b/i, /\/lunch\b/i, /\/brunch\b/i, /popmenu\.com/i, /(?:getbento|bentobox)\.com.*\/menu/i, /toasttab\.com.*\/menu/i, /\.pdf$/i];
+const RESERVATION_LINK_URL_PATS: RegExp[] = [/resy\.com/i, /opentable\.com/i, /(?:exploretock|tock)\.com/i, /sevenrooms\.com/i, /yelp\.com\/reservations/i, /reserve\.com/i, /tablein\.com/i, /(?:getbento|bentobox)\.com.*reserv/i, /\/reservations?\b/i, /\/reserve\b/i, /\/book(?:ing)?\b/i];
 const ORDER_LINK_URL_PATS:       RegExp[] = [/doordash\.com/i, /ubereats\.com/i, /chownow\.com/i, /toasttab\.com/i, /clover\.com/i, /squareup\.com\/store/i, /square\.site/i, /\/order\b/i, /\/online-order/i];
 const SOCIAL_LINK_URL_PATS:      RegExp[] = [/instagram\.com/i, /facebook\.com/i, /twitter\.com/i, /x\.com/i, /tiktok\.com/i, /linkedin\.com/i, /youtube\.com/i];
 
@@ -376,6 +381,8 @@ function parsePlatformHints(
   const orderingSet:       Set<string> = new Set();
   const websitePlatformSet: Set<string> = new Set();
   let instagram: string | null = null;
+  let tiktok: string | null = null;
+  let facebook: string | null = null;
 
   // --- Reservation: scan all external links ---
   for (const link of externalLinks) {
@@ -391,10 +398,23 @@ function parsePlatformHints(
     }
     // Instagram handle detection from social links
     const igMatch = link.match(/instagram\.com\/([^/?#\s]+)/i);
-    if (igMatch && igMatch[1] !== 'p' && igMatch[1] !== 'reel') {
-      // Prefer the first instagram handle found; normalise to canonical URL
+    if (igMatch && igMatch[1] !== 'p' && igMatch[1] !== 'reel' && igMatch[1] !== 'explore') {
       if (!instagram) {
         instagram = `https://www.instagram.com/${igMatch[1]}/`;
+      }
+    }
+    // TikTok handle detection
+    const tkMatch = link.match(/tiktok\.com\/@?([a-zA-Z0-9._]+)/i);
+    if (tkMatch && tkMatch[1] !== 'embed') {
+      if (!tiktok) {
+        tiktok = `https://www.tiktok.com/@${tkMatch[1]}`;
+      }
+    }
+    // Facebook page detection
+    const fbMatch = link.match(/facebook\.com\/([^/?#\s]+)/i);
+    if (fbMatch && !['sharer', 'share', 'dialog', 'plugins', 'tr'].includes(fbMatch[1])) {
+      if (!facebook) {
+        facebook = `https://www.facebook.com/${fbMatch[1]}`;
       }
     }
   }
@@ -416,7 +436,7 @@ function parsePlatformHints(
     reservation:      [...reservationSet],
     ordering:         [...orderingSet],
     website_platform: [...websitePlatformSet],
-    social: { instagram },
+    social: { instagram, tiktok, facebook },
   };
 }
 

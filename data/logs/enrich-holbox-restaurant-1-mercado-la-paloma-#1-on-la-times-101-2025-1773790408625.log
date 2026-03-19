@@ -1,0 +1,25 @@
+[2026-03-17T23:33:28.625Z] Running stage 1 (Google Places identity commit) only for holbox-restaurant-1-mercado-la-paloma-#1-on-la-times-101-2025
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (18) from .env.local -- tip: 🔐 prevent building .env in docker: https://dotenvx.com/prebuild
+
+Enrich: Holbox (holbox-restaurant-1-mercado-la-paloma-#1-on-la-times-101-2025)
+  ID:      0a5864db-e933-4740-a91b-c1936ee33620
+  Website: http://www.holboxla.com/
+  GPID:    ChIJMc9-jgrIwoARvFaE32ZlJzA
+
+Re-scanning issues...
+  Issues: 0 created, 0 resolved, 4 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Holbox
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-17T23:33:30.083Z] Process exited with code: 0

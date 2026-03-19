@@ -1,0 +1,25 @@
+[2026-03-17T23:33:29.862Z] Running stage 1 (Google Places identity commit) only for alejandra-s-quesadilla-cart-de-oaxaca
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  override existing env vars with { override: true }
+[dotenv@17.2.3] injecting env (18) from .env.local -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+
+Enrich: Alejandra's Quesadilla Cart de Oaxaca (alejandra-s-quesadilla-cart-de-oaxaca)
+  ID:      571c08b9-10ee-49bb-bcbe-8402ab599679
+  Website: —
+  GPID:    ChIJaT4PZsXHwoARS-vewm09HHo
+
+Re-scanning issues...
+  Issues: 0 created, 0 resolved, 6 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Alejandra's Quesadilla Cart de Oaxaca
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-17T23:33:31.539Z] Process exited with code: 0

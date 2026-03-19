@@ -4,85 +4,94 @@ doc_type: reference
 status: active
 owner: Bobby Ciccaglione
 created: '2026-03-10'
-last_updated: '2026-03-10'
+last_updated: '2026-03-17'
 project_id: SAIKO
 systems:
   - data-pipeline
-summary: ''
+summary: 'Quick-start guide for entity intake and enrichment. Start here if you have a list of place names to add.'
 ---
-# Data Pipeline Quick Reference
+# Data Pipeline — Quick Start
 
-Copy this into your new chat: **"Session Starter: Data Pipeline for Saiko Maps - Review @DATA_PIPELINE_SESSION_STARTER.md"**
-
----
-
-## Current State
-
-✅ **Merchant Page v2** - Complete with bento grid, graceful degradation  
-✅ **Data audit scripts** - Can check any field for completeness  
-✅ **Manual update scripts** - Instagram & phone bulk updaters ready  
-
-🔴 **Critical gaps:** Instagram (99.7% missing), Pull Quotes (98% missing)  
-🟡 **Important gaps:** Vibe Tags (98% missing), Phone (10% missing)
+You have a list of restaurant/bar/cafe names. Here's how to get them into Saiko and enriched.
 
 ---
 
-## What We Built Today
+## Fastest path: Smart Enrich
 
-1. **ActionStrip.tsx** - Nav/Call/Insta buttons (text style, not woodcut)
-2. **audit-data.js** - Check completeness of any field
-3. **update-instagram.js** - Bulk Instagram handle updates
-4. **update-phone.js** - Bulk phone number updates
-
----
-
-## Files to Review
-
-- `DATA_PIPELINE_SESSION_STARTER.md` - Full context
-- `CRITICAL_DATA_UPDATES.md` - Manual workflow guide
-- `prisma/schema.prisma` - Database schema
-- `scripts/audit-data.js` - Audit tool
-- `scripts/update-instagram.js` - Instagram updater
-- `scripts/update-phone.js` - Phone updater
-- `lib/extractQuote.ts` - Quote extraction logic (could be background job)
-
----
-
-## Pipeline Goals
-
-1. **Automated backfill** - Instagram, phone, website from Google/web scraping
-2. **AI content generation** - Pull quotes (from sources), vibe tags (from reviews)
-3. **Refresh scheduling** - Hours daily, photos weekly, reviews monthly
-4. **Quality control** - Validation, approval queue, rollback
-
----
-
-## Quick Commands
+Give it names, it does the rest. Finds the website, Instagram, neighborhood, and coordinates — cheapest path first.
 
 ```bash
-# See full data audit
-node scripts/audit-data.js --summary
+# One name
+npm run enrich:smart -- --name="Bavel"
 
-# List missing Instagram (671)
-node scripts/update-instagram.js --list
+# A list
+npm run enrich:smart -- --names="Bavel,Bestia,Republique,Kismet,Sushi Park"
 
-# List missing phone (68)
-node scripts/update-phone.js --list
+# From a file (one name per line)
+npm run enrich:smart -- --file=data/new-places.txt
 
-# Check editorial coverage
-node scripts/audit-data.js --field sources
+# Cheap mode — just web search + scrape, no Google API (~$0.01/entity)
+npm run enrich:smart -- --file=data/new-places.txt --cheap
+```
+
+Smart enrich handles dedup (won't create duplicates), intake (creates CANDIDATE entities), discovery (finds website + IG via Haiku), surface scraping (free), and gap fill (Google Places only if needed).
+
+---
+
+## What it does per entity
+
+| Phase | Cost | What happens |
+|---|---|---|
+| 1. Discover | ~$0.01 | Claude Haiku + web search → finds website, Instagram, neighborhood |
+| 2. Scrape | FREE | Fetches the website, discovers menu/about/contact pages |
+| 3. Parse | FREE | Extracts structured data from scraped HTML |
+| 4. Gap fill | ~$0.03 | Google Places for coords/hours — only if still missing after scraping |
+
+Total: $0.01–0.04 per entity. At 100 entities: ~$1–4.
+
+---
+
+## If you need deep enrichment
+
+After smart enrich, entities have identity (website, IG, coords, GPID). For AI-generated signals and taglines, run the full pipeline:
+
+```bash
+# Full pipeline on entities that already exist
+npm run enrich:place -- --batch=50 --concurrency=5
+```
+
+This adds: AI identity signals (chef, cuisine, vibe), menu/reservation URL extraction, and generated taglines. Costs ~$0.06–0.08 more per entity (Claude Sonnet calls).
+
+---
+
+## Bulk intake from CSV
+
+For structured data (with columns like Google Place ID, website, neighborhood):
+
+```bash
+# Via API
+curl -X POST localhost:3000/api/admin/intake \
+  -F "file=@data/new-places.csv"
+```
+
+CSV columns: `Name, Google Place ID, Website, Instagram Handle, Neighborhood`
+
+The intake endpoint handles dedup automatically — GPID match, domain match, IG match, then fuzzy name match. Ambiguous matches go to the intake review queue.
+
+---
+
+## Check what needs work
+
+```bash
+# See all data quality issues
+curl "localhost:3000/api/admin/tools/scan-issues?detail=true" | jq '.issues | length'
+
+# Or use the Coverage Ops dashboard
+open http://localhost:3000/admin/coverage-ops
 ```
 
 ---
 
-## Test URLs
+## Full command reference
 
-```
-http://localhost:3000/place/seco           # Has coverage + curator
-http://localhost:3000/place/stir-crazy     # Has coverage, no curator
-http://localhost:3000/place/great-white-central-la  # Just added IG
-```
-
----
-
-**Ready for next session!** 🚀
+See `docs/PIPELINE_COMMANDS.md` for the complete operator reference.

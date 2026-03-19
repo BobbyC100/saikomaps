@@ -16,9 +16,8 @@
  * queue item is auto-resolved as 'sufficient' and the function returns early.
  */
 
-import { PrismaClient, Prisma } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { Prisma } from '@prisma/client';
+import { db as prisma } from '@/lib/db';
 
 // ---------------------------------------------------------------------------
 // Types

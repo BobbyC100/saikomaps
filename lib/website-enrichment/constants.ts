@@ -48,15 +48,52 @@ export const MENU_PATTERNS = [
   "brunch",
 ];
 
-/** Reservation provider domains */
+/** Reservation provider domains → canonical lowercase slug */
 export const RESERVATION_DOMAINS: Record<string, string> = {
-  "resy.com": "Resy",
-  "opentable.com": "OpenTable",
-  "exploretock.com": "Tock",
-  "tock.to": "Tock",
-  "sevenrooms.com": "SevenRooms",
-  "yelp.com": "Yelp",
+  "resy.com": "resy",
+  "opentable.com": "opentable",
+  "exploretock.com": "tock",
+  "tock.to": "tock",
+  "sevenrooms.com": "sevenrooms",
+  "yelp.com": "yelp",
+  "tables.toasttab.com": "toast",  // Toast reservation product (distinct from ordering)
 };
+
+/**
+ * Provider tier policy.
+ * Tier 1: first-class providers — UI shows "Reserve on [Provider]"
+ * Tier 2: fallback providers — UI shows generic "Reserve"
+ */
+export const TIER_1_PROVIDERS = new Set(["resy", "opentable", "tock", "sevenrooms"]);
+
+/** Full button labels for Tier 1 providers. Tier 2 always renders "Reserve". */
+export const RESERVATION_BUTTON_LABELS: Record<string, string> = {
+  resy: "Reserve on Resy",
+  opentable: "Reserve on OpenTable",
+  tock: "Reserve on Tock",
+  sevenrooms: "Reserve on SevenRooms",
+};
+
+/** Canonical display names (for non-button contexts) */
+export const RESERVATION_PROVIDER_LABELS: Record<string, string> = {
+  resy: "Resy",
+  opentable: "OpenTable",
+  tock: "Tock",
+  sevenrooms: "SevenRooms",
+  yelp: "Yelp",
+  toast: "Toast",
+};
+
+/**
+ * URL canonicalization: query params to strip from reservation URLs.
+ * Keep stable identifiers (restref, rid, slug). Strip session/tracking params.
+ */
+export const RESERVATION_URL_STRIP_PARAMS = new Set([
+  "date", "seats", "covers", "time", "party_size",
+  "source", "ot_source", "ot_campaign", "campaign",
+  "correlationId", "lang", "utm_source", "utm_medium", "utm_campaign",
+  "utm_content", "utm_term", "ref", "fbclid", "gclid",
+]);
 
 /** Ordering provider domains (optional v1) */
 export const ORDERING_DOMAINS: Record<string, string> = {

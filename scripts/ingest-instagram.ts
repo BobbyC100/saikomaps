@@ -104,15 +104,118 @@ interface BusinessDiscoveryResult {
 }
 
 // ---------------------------------------------------------------------------
+// Rate limiter — tracks API usage and enforces backoff
+// ---------------------------------------------------------------------------
+
+class RateLimiter {
+  private callTimestamps: number[] = [];
+  private consecutiveRateLimits = 0;
+  private readonly maxCallsPerWindow: number;
+  private readonly windowMs: number;
+
+  constructor(maxCallsPerWindow = 180, windowMs = 60 * 60 * 1000) {
+    // Meta Graph API: ~200 calls/hour; we target 180 for safety margin
+    this.maxCallsPerWindow = maxCallsPerWindow;
+    this.windowMs = windowMs;
+  }
+
+  /** Proactively wait if we're approaching the rate limit */
+  async throttle(): Promise<void> {
+    this.pruneOldTimestamps();
+    if (this.callTimestamps.length >= this.maxCallsPerWindow) {
+      const oldest = this.callTimestamps[0]!;
+      const waitMs = oldest + this.windowMs - Date.now() + 5000; // 5s buffer
+      if (waitMs > 0) {
+        const waitMin = Math.ceil(waitMs / 60000);
+        console.log(`[IG Ingest] ⏳ Proactive throttle: ${this.callTimestamps.length}/${this.maxCallsPerWindow} calls in window. Waiting ${waitMin}m...`);
+        await this.sleep(waitMs);
+      }
+    }
+    this.callTimestamps.push(Date.now());
+  }
+
+  /** Handle a rate limit response with exponential backoff */
+  async handleRateLimit(): Promise<void> {
+    this.consecutiveRateLimits++;
+    const backoffMs = Math.min(
+      30000 * Math.pow(2, this.consecutiveRateLimits - 1), // 30s, 60s, 120s, 240s...
+      10 * 60 * 1000 // cap at 10 minutes
+    );
+    const backoffSec = Math.round(backoffMs / 1000);
+    console.log(`[IG Ingest] ⏳ Rate limited (attempt ${this.consecutiveRateLimits}). Backing off ${backoffSec}s...`);
+    // Clear call history — we know the window is exhausted
+    this.callTimestamps = [];
+    await this.sleep(backoffMs);
+  }
+
+  /** Reset consecutive rate limit counter on success */
+  onSuccess(): void {
+    this.consecutiveRateLimits = 0;
+  }
+
+  get consecutiveFailures(): number {
+    return this.consecutiveRateLimits;
+  }
+
+  private pruneOldTimestamps(): void {
+    const cutoff = Date.now() - this.windowMs;
+    this.callTimestamps = this.callTimestamps.filter((t) => t > cutoff);
+  }
+
+  private sleep(ms: number): Promise<void> {
+    return new Promise((r) => setTimeout(r, ms));
+  }
+}
+
+const rateLimiter = new RateLimiter();
+
+// ---------------------------------------------------------------------------
+// Error classification
+// ---------------------------------------------------------------------------
+
+interface APIError {
+  type: 'rate_limit' | 'not_found' | 'transient' | 'permanent';
+  message: string;
+  statusCode: number;
+}
+
+function classifyError(status: number, body: string): APIError {
+  const msg = `IG API ${status}: ${body}`;
+
+  // Rate limit — code 4 or explicit message
+  if (status === 403 || body.includes('"code":4') || body.includes('Application request limit reached')) {
+    return { type: 'rate_limit', message: msg, statusCode: status };
+  }
+
+  // Not found — permanent, bad handle
+  if (body.includes('Cannot find User') || body.includes('error_subcode":2207013')) {
+    return { type: 'not_found', message: msg, statusCode: status };
+  }
+
+  // Server errors — transient
+  if (status >= 500) {
+    return { type: 'transient', message: msg, statusCode: status };
+  }
+
+  // Everything else — assume permanent
+  return { type: 'permanent', message: msg, statusCode: status };
+}
+
+// ---------------------------------------------------------------------------
 // API helpers
 // ---------------------------------------------------------------------------
 
 async function fetchJSON<T>(url: string): Promise<T> {
+  await rateLimiter.throttle();
   const res = await fetch(url);
   if (!res.ok) {
     const body = await res.text();
-    throw new Error(`IG API ${res.status}: ${body}`);
+    const err = classifyError(res.status, body);
+    const error = new Error(err.message) as Error & { apiError: APIError };
+    error.apiError = err;
+    throw error;
   }
+  rateLimiter.onSuccess();
   return res.json() as Promise<T>;
 }
 
@@ -351,8 +454,12 @@ async function ingestBatch() {
 
   let success = 0;
   let failed = 0;
+  let notFound = 0;
+  let rateLimited = 0;
+  const MAX_CONSECUTIVE_RATE_LIMITS = 5; // circuit breaker
 
-  for (const entity of targets) {
+  for (let i = 0; i < targets.length; i++) {
+    const entity = targets[i]!;
     const handle = cleanHandle(entity.instagram!);
     if (!handle) {
       console.warn(`[IG Ingest] Skipping ${entity.name}: invalid handle "${entity.instagram}"`);
@@ -361,44 +468,107 @@ async function ingestBatch() {
     }
 
     try {
-      console.log(`[IG Ingest] --- @${handle} (${entity.name}) ---`);
+      console.log(`[IG Ingest] [${i + 1}/${targets.length}] @${handle} (${entity.name})`);
       await ingestByUsername(handle, entity.id);
       success++;
       console.log('');
     } catch (err: any) {
-      console.error(`[IG Ingest] FAILED @${handle} (${entity.name}): ${err.message}`);
-      failed++;
+      const apiError: APIError | undefined = err.apiError;
+      const msg = err.message ?? '';
 
+      if (apiError?.type === 'rate_limit') {
+        // Rate limit — exponential backoff and retry
+        rateLimited++;
+        await rateLimiter.handleRateLimit();
 
-      // Mark account as errored if it exists
-      if (!isDryRun) {
+        // Circuit breaker: if we've hit N consecutive rate limits, abort
+        if (rateLimiter.consecutiveFailures >= MAX_CONSECUTIVE_RATE_LIMITS) {
+          console.error(`[IG Ingest] Circuit breaker: ${MAX_CONSECUTIVE_RATE_LIMITS} consecutive rate limits. Stopping batch.`);
+          console.log(`[IG Ingest] Resume later — the script will pick up where it left off (skips already-ingested).`);
+          break;
+        }
+
+        // Retry this entity after backoff
         try {
-          const existing = await db.instagram_accounts.findFirst({
-            where: { entity_id: entity.id },
-          });
-          if (existing) {
-            await db.instagram_accounts.update({
-              where: { id: existing.id },
-              data: {
-                last_fetched_at: new Date(),
-                source_status: 'error',
-              },
-            });
+          console.log(`[IG Ingest] Retrying @${handle}...`);
+          await ingestByUsername(handle, entity.id);
+          success++;
+          console.log(`[IG Ingest] ✓ Retry succeeded for @${handle}`);
+        } catch (retryErr: any) {
+          const retryApiError: APIError | undefined = (retryErr as any).apiError;
+          if (retryApiError?.type === 'rate_limit') {
+            // Still rate limited after backoff — push this entity to end and continue
+            console.warn(`[IG Ingest] Still rate limited after backoff. Will continue with next entity.`);
+            failed++;
+          } else {
+            console.error(`[IG Ingest] Retry failed @${handle}: ${retryErr.message}`);
+            failed++;
           }
-        } catch { /* ignore */ }
+        }
+        console.log('');
+        continue; // skip normal delay, we already waited during backoff
+
+      } else if (apiError?.type === 'not_found') {
+        // Permanent: bad handle — log and move on quickly
+        console.warn(`[IG Ingest] ✗ Not found: @${handle} (${entity.name}) — handle may be incorrect`);
+        notFound++;
+        // No delay needed for not-found — didn't cost a real API call
+        console.log('');
+        continue;
+
+      } else if (apiError?.type === 'transient') {
+        // Server error — quick retry once
+        console.warn(`[IG Ingest] Transient error for @${handle}, retrying in 10s...`);
+        await new Promise((r) => setTimeout(r, 10000));
+        try {
+          await ingestByUsername(handle, entity.id);
+          success++;
+        } catch {
+          console.error(`[IG Ingest] FAILED @${handle} (${entity.name}): ${msg}`);
+          failed++;
+        }
+        console.log('');
+        continue;
+
+      } else {
+        // Permanent error — log and mark
+        console.error(`[IG Ingest] FAILED @${handle} (${entity.name}): ${msg}`);
+        failed++;
+
+        if (!isDryRun) {
+          try {
+            const existing = await db.instagram_accounts.findFirst({
+              where: { entity_id: entity.id },
+            });
+            if (existing) {
+              await db.instagram_accounts.update({
+                where: { id: existing.id },
+                data: {
+                  last_fetched_at: new Date(),
+                  source_status: 'error',
+                },
+              });
+            }
+          } catch { /* ignore */ }
+        }
+        console.log('');
       }
-      console.log('');
     }
 
     // Delay between accounts to respect API rate limits
-    if (delayMs > 0 && targets.indexOf(entity) < targets.length - 1) {
+    if (delayMs > 0 && i < targets.length - 1) {
       await new Promise((r) => setTimeout(r, delayMs));
     }
   }
 
+  console.log('');
+  console.log('[IG Ingest] ═══════════════════════════════════');
   console.log('[IG Ingest] Batch complete:');
-  console.log(`  Success: ${success}`);
-  console.log(`  Failed:  ${failed}`);
+  console.log(`  Succeeded:    ${success}`);
+  console.log(`  Not found:    ${notFound} (bad handles)`);
+  console.log(`  Rate limited: ${rateLimited} (retried with backoff)`);
+  console.log(`  Other fails:  ${failed}`);
+  console.log(`  Total:        ${success + notFound + failed}/${targets.length}`);
 }
 
 // ---------------------------------------------------------------------------

@@ -1,23 +1,19 @@
 #!/usr/bin/env bash
 # Run a command against local Postgres. Usage: ./scripts/db-local.sh <cmd> [args...]
 # Example: ./scripts/db-local.sh psql -c "SELECT 1"
+# Override DATABASE_URL here for local dev. Falls back to .env.local if not set below.
 set -euo pipefail
-ENV_FILE=".env.db.local"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 cd "$ROOT"
-if [ ! -f "$ENV_FILE" ]; then
-  echo "Missing $ENV_FILE. Copy from .env.db.example and set DATABASE_URL to your local Postgres URL."
-  exit 1
-fi
+
+# Local override — change this to your local Postgres URL
+LOCAL_DB_URL="postgresql://bobbyciccaglione@localhost:5432/saiko_maps"
+
 export SAIKO_DB_FROM_WRAPPER=1
-DATABASE_URL=$(grep '^DATABASE_URL=' "$ENV_FILE" 2>/dev/null | cut -d= -f2- | tr -d '"' | tr -d "'" || true)
-export DATABASE_URL
-if [ -z "${DATABASE_URL:-}" ]; then
-  echo "DATABASE_URL not set in $ENV_FILE. Add DATABASE_URL=postgresql://..."
-  exit 1
-fi
-# Parse host, db, user for banner (postgresql://user:pass@host:port/db)
+export DATABASE_URL="$LOCAL_DB_URL"
+
+# Parse host, db, user for banner
 BANNER=$(node -e "
   const u = process.env.DATABASE_URL || '';
   const m = u.match(/@([^\/]+)\/([^?]+)/);

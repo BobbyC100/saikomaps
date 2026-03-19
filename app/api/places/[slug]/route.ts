@@ -106,6 +106,12 @@ export async function GET(
         merchant_signals: {
           select: { menu_url: true, winelist_url: true, reservation_url: true },
         },
+        reservation_provider_matches: {
+          where: { is_renderable: true },
+          select: { provider: true, booking_url: true, confidence_level: true },
+          take: 1,
+          orderBy: { match_score: 'desc' },
+        },
         map_places: {
           select: {
             descriptor: true,
@@ -189,7 +195,7 @@ export async function GET(
     const publishedMapPlaces = entity.map_places.filter((mp) => mp.lists && mp.lists.status === 'PUBLISHED');
     const mapIds = publishedMapPlaces.map(mp => mp.lists!.id);
 
-    const [activeOverlays, placeCounts, coverageSources, identitySignalsRow, offeringProgramsRow, taglineRow, pullQuoteRow] = await Promise.all([
+    const [activeOverlays, placeCounts, coverageSources, identitySignalsRow, offeringProgramsRow, taglineRow, pullQuoteRow, voiceDescriptorRow] = await Promise.all([
       getActiveOverlays({ placeId: entity.id, now: new Date() }).catch((err) => {
         console.error(`[Newsletter Overlay] Failed to fetch overlays for place ${entity.slug}:`, err);
         return [] as Awaited<ReturnType<typeof getActiveOverlays>>;
@@ -226,6 +232,12 @@ export async function GET(
       db.interpretation_cache.findFirst({
         where: { entity_id: entity.id, output_type: 'PULL_QUOTE', is_current: true },
         select: { content: true },
+        orderBy: { generated_at: 'desc' },
+      }).catch(() => null),
+      // VOICE_DESCRIPTOR from interpretation_cache (About description, Tiers 2-3)
+      db.interpretation_cache.findFirst({
+        where: { entity_id: entity.id, output_type: 'VOICE_DESCRIPTOR', is_current: true },
+        select: { content: true, prompt_version: true },
         orderBy: { generated_at: 'desc' },
       }).catch(() => null),
     ]);
@@ -284,6 +296,8 @@ export async function GET(
     const placePersonality = (sv?.place_personality as string | null) ?? null;
     const signatureDishes = Array.isArray(sv?.signature_dishes) ? (sv.signature_dishes as string[]) : [];
     const languageSignals = Array.isArray(sv?.language_signals) ? (sv.language_signals as string[]) : [];
+    const keyProducers = Array.isArray(sv?.key_producers) ? (sv.key_producers as string[]) : [];
+    const originStoryType = (sv?.origin_story_type as string | null) ?? null;
 
     // SceneSense
     const placeForPRL = await fetchPlaceForPRLBySlug(slug);
@@ -312,10 +326,30 @@ export async function GET(
 
     const menuUrl: string | null = entity.merchant_signals?.menu_url ?? null;
     const winelistUrl: string | null = entity.merchant_signals?.winelist_url ?? null;
+
+    // Reservation: prefer validated provider match, fall back to merchant_signals, then entities.
+    // Render policy: don't over-gate. If a URL exists, render. Validation upgrades the label, not the gate.
+    const providerMatch = entity.reservation_provider_matches?.[0] ?? null;
     const reservationUrl: string | null =
+      providerMatch?.booking_url ??
       (entity.merchant_signals as { reservation_url?: string } | null)?.reservation_url ??
       entity.reservationUrl ??
       null;
+
+    // Provider tier policy:
+    // Tier 1 (resy, opentable, tock, sevenrooms) → "Reserve on [Provider]"
+    // Tier 2 (yelp, toast, anything else) → generic "Reserve"
+    const TIER_1 = new Set(['resy', 'opentable', 'tock', 'sevenrooms']);
+    const BUTTON_LABELS: Record<string, string> = {
+      resy: 'Reserve on Resy',
+      opentable: 'Reserve on OpenTable',
+      tock: 'Reserve on Tock',
+      sevenrooms: 'Reserve on SevenRooms',
+    };
+    const provider = providerMatch?.provider ?? null;
+    const reservationProvider: string | null = provider;
+    const reservationProviderLabel: string | null =
+      provider && TIER_1.has(provider) ? (BUTTON_LABELS[provider] ?? null) : null;
 
     // Parse offering programs from derived_signals
     const opv = offeringProgramsRow?.signal_value as Record<string, unknown> | null ?? null;
@@ -361,10 +395,19 @@ export async function GET(
       cuisineType: entity.cuisineType ?? null,
       googlePlaceId: entity.googlePlaceId ?? null,
       reservationUrl,
+      reservationProvider,
+      reservationProviderLabel,
       menuUrl,
       winelistUrl,
-      description: entity.description ?? null,
-      descriptionSource: entity.description_source ?? null,
+      // Description: VOICE_DESCRIPTOR (interpretation_cache) → entities.description fallback
+      description: (() => {
+        const vd = voiceDescriptorRow?.content as { text?: string } | null;
+        return vd?.text ?? entity.description ?? null;
+      })(),
+      descriptionSource: (() => {
+        if (voiceDescriptorRow?.prompt_version) return voiceDescriptorRow.prompt_version;
+        return entity.description_source ?? null;
+      })(),
       // Tagline: interpretation_cache (ERA) → entities fallback
       tagline: (() => {
         const tc = taglineRow?.content as { text?: string } | null;
@@ -398,6 +441,8 @@ export async function GET(
       offeringPrograms: offeringPrograms as PlacePageLocation['offeringPrograms'],
       placePersonality,
       signatureDishes,
+      keyProducers,
+      originStoryType,
       coverageSources: coverageSources.map((src) => ({
         sourceName: src.source_name,
         url: src.url,

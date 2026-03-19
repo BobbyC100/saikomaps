@@ -326,10 +326,16 @@ Do not:
 - create schema shortcuts just to make one UI easier
 
 Before finishing schema work, verify:
+- run `node scripts/check-schema.js` — must pass with no issues
 - migration generated correctly
 - affected reads still work
 - types are updated
 - no obvious layer violation was introduced
+
+**Mandatory guardrail:**
+Before any Prisma migration or schema change, run `node scripts/check-schema.js`.
+This catches duplicate model definitions, duplicate enums, and conflicting @@map values.
+Do not proceed with migration if the check fails.
 
 ---
 

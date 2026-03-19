@@ -46,6 +46,29 @@ export {
   batchEnrichPlacesV2,
 } from './orchestrator';
 
+// Description Pipeline (About / VOICE_DESCRIPTOR)
+export type {
+  DescriptionTier,
+  DescriptionQuality,
+  Tier1ExtractionResult,
+  TierSelectionResult,
+  EntityDescriptionRecord,
+  SurfaceData,
+  SignalDensity,
+} from './description-extraction';
+
+export {
+  extractTier1,
+  selectTier,
+  computeQuality,
+  fetchRecordsForDescriptionGeneration,
+} from './description-extraction';
+
+export {
+  generateTier2Description,
+  generateTier3Description,
+} from './description-generator';
+
 // Re-export vocabulary and validation from v1.1 (unchanged)
 export { VOCABULARY } from '../voice-engine/vocabulary';
 export {

@@ -17,7 +17,7 @@ summary: ''
 **Title:** SceneSense Display Contract v1
 **System:** TRACES / SceneSense
 **Layer:** Product Interpretation / UI Rendering
-**Status:** Active
+**Status:** Superseded by display-contract-v2.md
 **Owner:** Saiko
 **Purpose:** Define the exact output shape SceneSense produces, how each surface is gated by PRL and mode, and what the UI is contractually required to render vs. what the engine may compute in future.
 

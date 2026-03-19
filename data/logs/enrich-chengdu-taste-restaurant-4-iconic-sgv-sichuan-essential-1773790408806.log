@@ -1,0 +1,25 @@
+[2026-03-17T23:33:28.806Z] Running stage 1 (Google Places identity commit) only for chengdu-taste-restaurant-4-iconic-sgv-sichuan-essential
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+[dotenv@17.2.3] injecting env (18) from .env.local -- tip: 📡 add observability to secrets: https://dotenvx.com/ops
+
+Enrich: Chengdu Taste (chengdu-taste-restaurant-4-iconic-sgv-sichuan-essential)
+  ID:      077bb2b8-3a0b-44b2-a9dd-4e5915809a5b
+  Website: https://www.fetail.com/storev2/shop?store_id=23
+  GPID:    ChIJfexi_j7FwoARBvFOjLFRM7I
+
+Re-scanning issues...
+  Issues: 0 created, 0 resolved, 4 unchanged
+
+════════════════════════════════════════════════════════════
+Enrichment summary: Chengdu Taste
+════════════════════════════════════════════════════════════
+  · Stage 1: Google Places identity commit (skipped)
+  · Stage 2: Surface discovery (skipped)
+  · Stage 3: Surface fetch (skipped)
+  · Stage 4: Surface parse (skipped)
+  · Stage 5: Identity signal extraction (AI) (skipped)
+  · Stage 6: Website enrichment (skipped)
+  · Stage 7: Tagline generation (AI) (skipped)
+
+
+[2026-03-17T23:33:30.249Z] Process exited with code: 0

@@ -3,6 +3,7 @@
  * Adds places from CSV to the existing SGV Eater LA Picks map
  */
 
+import { randomUUID } from 'crypto'
 import { db } from '@/lib/db'
 import { searchPlace, getPlaceDetails, getNeighborhoodFromPlaceDetails, getNeighborhoodFromCoords } from '@/lib/google-places'
 import { extractPlaceId } from '@/lib/utils/googleMapsParser'
@@ -192,7 +193,9 @@ async function main() {
 
       place = await db.entities.create({
         data: {
+          id: randomUUID(),
           slug: uniqueSlug,
+          primary_vertical: 'EAT',
           googlePlaceId: googlePlaceId ?? undefined,
           name: finalName,
           address: placeDetails?.formattedAddress ?? (input.address && !input.address.startsWith('http') ? input.address : null),
@@ -225,7 +228,7 @@ async function main() {
     } else {
       existing++
       // Update existing place with editorial sources if not already present
-      const existingSources = (place.sources as any[]) || []
+      const existingSources = ((place.editorialSources as any)?.sources as any[]) || []
       const newSource = input.sourceUrl ? {
         name: extractSourceName(input.sourceUrl),
         url: input.sourceUrl,
@@ -236,7 +239,7 @@ async function main() {
         place = await db.entities.update({
           where: { id: place.id },
           data: {
-            sources: [...existingSources, newSource],
+            editorialSources: { sources: [...existingSources, newSource] },
           },
         })
         console.log(`   ↻ Updated place with new source: ${place.name}`)
