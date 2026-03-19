@@ -23,11 +23,11 @@ Evidence before canonical. Dry-run before writes.
 | # | Stage | Script | Source | Writes To | Cost |
 |---|-------|--------|--------|-----------|------|
 | 1 | Google Places identity | `backfill-google-places.ts` | Google Places API | `entities` (GPID, coords, address, hours, photos, neighborhood) | **$$** ~$0.007/entity |
-| 2 | Surface discovery | `run-surface-discovery.ts` | Entity website (domain crawl) | `merchant_surfaces` (homepage, about, menu, contact URLs) | Free |
+| 2 | Surface discovery | `run-surface-discovery.ts` | Entity website (domain crawl) | `merchant_surfaces` (homepage, about, menu, contact, events URLs) | Free |
 | 3 | Surface fetch | `run-surface-fetch.ts` | Discovered surface URLs | `merchant_surfaces` (raw HTML/text, content_hash) | Free |
 | 4 | Surface parse | `run-surface-parse.ts` | Stored raw_html/raw_text | `merchant_surface_artifacts` (structured text_blocks) | Free |
 | 5 | Identity signals (AI) | `extract-identity-signals.ts` | Parsed artifacts (menu, about, wine copy) | `derived_signals` (cuisine_posture, service_model, price_tier, wine_program, personality, signature_dishes) | **$** ~$0.001/entity (Claude Haiku) |
-| 6 | Website enrichment | `run-website-enrichment.ts` | Website HTML | `merchant_signals` + `entities` (menu_url, reservation_url, category, cuisine); also `observed_claims` at confidence >= 0.75 | **$** ~$0.002-0.005/entity (Claude) |
+| 6 | Website enrichment | `run-website-enrichment.ts` | Website HTML | `merchant_signals` + `entities` (menu_url, reservation_url, events_url, catering_url, category, cuisine); also `observed_claims` at confidence >= 0.75 | **$** ~$0.002-0.005/entity (Claude) |
 | 7 | Tagline generation (AI) | `generate-taglines-v2.ts` | Identity signals + entity data | `interpretation_cache` (TAGLINE, candidates, pattern) | **$** ~$0.0008/entity (Claude) |
 
 Pipeline defaults to `--from=2` (skips Google Places). Use `--include-google`
@@ -190,9 +190,14 @@ most demanding. Other verticals (COFFEE, SHOP, STAY) require subsets.
 - `reservation_url` — from website enrichment (Stage 6) or scan-merchant-surfaces
 - `menu_url` — from website enrichment (Stage 6) or scan-merchant-surfaces
 - `category` + `cuisine_type` — from website enrichment (Stage 6)
+- `events_url` — from events surface discovery (Stage 2) + website enrichment (Stage 6)
+- `catering_url` — from events surface discovery (Stage 2) + website enrichment (Stage 6)
+- `event_inquiry_email` — from events surface parse (Stage 4)
+- `event_inquiry_form_url` — from events surface parse (Stage 4)
 
 **Content** (differentiating):
 - `derived_signals.identity_signals` — from AI extraction (Stage 5)
+- `derived_signals.offering_programs` — 10 program containers (food, wine, beer, cocktail, non_alcoholic, coffee_tea, service, private_dining, group_dining, catering) assembled from upstream signals
 - `interpretation_cache.TAGLINE` — from AI generation (Stage 7)
 - `description` — from editorial source, website, or synthesis
 

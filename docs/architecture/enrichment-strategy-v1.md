@@ -33,7 +33,7 @@ Run all free sources. Order within this phase is flexible — optimize for signa
 | Source | Cost | Signal Density (restaurants) | Fields |
 |--------|------|------------------------------|--------|
 | **Existing system data** | Free | Variable | Backfill from surfaces, scans, signals already in DB |
-| **Website** | Free (crawl) | High | Hours, menu, reservation URL, phone, address, about/story |
+| **Website** | Free (crawl) | High | Hours, menu, reservation URL, events URL, catering URL, phone, address, about/story |
 | **Instagram API** | Free | Medium | Vibe, photos, identity signals, hours/menu in bio |
 | **TikTok API** | Free | Medium-Low | Energy/vibe signals, content |
 | **Editorial coverage** | Free (crawl) | High (subjective) | Chef, cuisine, awards, vibe quotes, neighborhood |
@@ -63,7 +63,9 @@ Not all discovered data should immediately become canonical state.
 ### Evidence Layer (where enrichment writes)
 Enrichment pipelines write **evidence** — raw observations with provenance:
 - `observed_claims` — structured field-level claims (e.g., "hours are X" from source Y)
-- `merchant_surface_scans` — crawled page snapshots
+- `merchant_surfaces` — discovered and fetched page evidence (9 surface types: homepage, about, menu, drinks, instagram, reservation, ordering, contact, events)
+- `merchant_surface_artifacts` — parsed structured content from surfaces
+- `merchant_surface_scans` — crawled page snapshots (including `private_dining_present` boolean)
 - `merchant_signals` — extracted signals from surfaces
 - `menu_fetches` — menu content snapshots
 - `coverage_sources` — editorial links + extracted accolades

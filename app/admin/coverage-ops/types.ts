@@ -62,6 +62,20 @@ export interface EnrichProgress {
 
 export type ActionState = 'idle' | 'running' | 'done' | 'error';
 
+/** Need-oriented section for the Actions tab */
+export interface Section {
+  key: string;
+  label: string;
+  accent: string;
+  accentBg: string;
+  accentBorder: string;
+  issues: IssueRow[];
+  /** Issues grouped by type within this section */
+  byType: { issue_type: string; label: string; issues: IssueRow[]; summaryCount?: number }[];
+  /** Number of unique entities in this section */
+  entityCount: number;
+}
+
 /** Typed accessors for the polymorphic `detail` field per issue_type */
 export interface GoogleSaysClosedDetail {
   googleStatus?: string;

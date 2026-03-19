@@ -67,6 +67,11 @@ function makeLocation(overrides: Partial<PlacePageLocation> = {}): PlacePageLoca
     // Offering
     offeringSignals: null,
     offeringPrograms: null,
+    // Events / hospitality
+    eventsUrl: null,
+    cateringUrl: null,
+    eventInquiryEmail: null,
+    eventInquiryFormUrl: null,
     // Identity Signals (enrichment)
     placePersonality: null,
     signatureDishes: [],

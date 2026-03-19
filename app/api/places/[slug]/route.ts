@@ -112,6 +112,14 @@ export async function GET(
           take: 1,
           orderBy: { match_score: 'desc' },
         },
+        canonical_state: {
+          select: {
+            events_url: true,
+            catering_url: true,
+            event_inquiry_email: true,
+            event_inquiry_form_url: true,
+          },
+        },
         map_places: {
           select: {
             descriptor: true,
@@ -356,6 +364,7 @@ export async function GET(
     const PROGRAM_KEYS = [
       'food_program', 'wine_program', 'beer_program', 'cocktail_program',
       'non_alcoholic_program', 'coffee_tea_program', 'service_program',
+      'private_dining_program', 'group_dining_program', 'catering_program',
     ] as const;
     const DEFAULT_PROGRAM = { maturity: 'unknown' as const, signals: [] };
     const offeringPrograms = opv
@@ -439,6 +448,10 @@ export async function GET(
       scenesense: scenesenseResult.scenesense ?? null,
       offeringSignals,
       offeringPrograms: offeringPrograms as PlacePageLocation['offeringPrograms'],
+      eventsUrl: entity.canonical_state?.events_url ?? null,
+      cateringUrl: entity.canonical_state?.catering_url ?? null,
+      eventInquiryEmail: entity.canonical_state?.event_inquiry_email ?? null,
+      eventInquiryFormUrl: entity.canonical_state?.event_inquiry_form_url ?? null,
       placePersonality,
       signatureDishes,
       keyProducers,

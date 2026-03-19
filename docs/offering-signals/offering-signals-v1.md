@@ -30,7 +30,7 @@ TRACES consumes these signals to decide what to say about a place, at what depth
 
 ---
 
-## 3. Three-Layer Model
+## 3. Four-Layer Model
 
 ### Food Signals
 Facts about what a place serves and how it cooks: cuisine posture, cooking method, dish and ingredient focus, menu format, meal focus.
@@ -40,6 +40,9 @@ Facts about the drinks program: wine depth and style, cocktail program type, bee
 
 ### Service Signals
 Facts about how a place operates for guests: reservation model, walk-in policy, seating format, pacing, and sharing style.
+
+### Event Signals (added 2026-03-18)
+Facts about how a place can be used for private, group, and off-site experiences: private dining rooms, buyouts, group menus, catering capabilities, events coordination. Event signals feed three program containers (`private_dining_program`, `group_dining_program`, `catering_program`) using the same maturity model as beverage programs. See `ARCH-EVENTS-PROGRAM-V1` and the Signals Registry for full definitions.
 
 ---
 

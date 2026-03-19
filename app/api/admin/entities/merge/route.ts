@@ -212,6 +212,9 @@ export async function POST(request: NextRequest) {
         where: { entity_id: deleteId },
       });
 
+      // Compound-unique tables that need safe reassign (delete-then-skip pattern)
+      await safeReassign(tx.reservation_provider_matches, 'entity_id');
+
       // Simple FK tables: reassign
       await tx.menu_fetches.updateMany({
         where: { entity_id: deleteId },
@@ -278,7 +281,7 @@ export async function POST(request: NextRequest) {
         },
         data: { status: 'resolved', resolved_at: new Date(), resolved_by: 'merge' },
       });
-    });
+    }, { timeout: 30000 });
 
     return NextResponse.json({
       merged: true,
@@ -288,9 +291,10 @@ export async function POST(request: NextRequest) {
       deletedName: deleteEntity.name,
     });
   } catch (error: any) {
-    console.error('[Entity Merge] Error:', error);
+    console.error('[Entity Merge] Error merging', keepId, '←', deleteId, ':', error.message, error.code ?? '');
+    console.error('[Entity Merge] Stack:', error.stack?.split('\n').slice(0, 5).join('\n'));
     return NextResponse.json(
-      { error: 'Merge failed', message: error.message },
+      { error: 'Merge failed', message: error.message, code: error.code ?? null },
       { status: 500 },
     );
   }

@@ -1,6 +1,6 @@
 {
   "generated": "2026-03-17T00:45:00.000Z",
-  "doc_count": 86,
+  "doc_count": 87,
   "docs": [
     {
       "doc_id": "ARCH-AI-OPERATING-LAYER",
@@ -87,6 +87,26 @@
         "docs/architecture/vertical-taxonomy-v1.md",
         "docs/architecture/coverage-tiers-v1.md",
         "docs/FIELDS_V2_TARGET_ARCHITECTURE.md"
+      ]
+    },
+    {
+      "doc_id": "ARCH-EVENTS-PROGRAM-V1",
+      "doc_type": "architecture",
+      "status": "active",
+      "title": "Events Program — Architecture-Aligned Spec (V1)",
+      "path": "docs/architecture/events-program-v1.md",
+      "owner": "Bobby",
+      "created": "2026-03-18",
+      "last_updated": "2026-03-18",
+      "project_id": "SAIKO",
+      "summary": "Event capabilities (private dining, group dining, catering) extending offering_programs. Detect → Structure → Expose pipeline using existing Fields v2, ERA, and Coverage Ops infrastructure.",
+      "systems": ["fields", "enrichment", "coverage-ops", "traces"],
+      "related_docs": [
+        "docs/architecture/enrichment-strategy-v1.md",
+        "docs/architecture/enrichment-playbook-v1.md",
+        "docs/architecture/coverage-tiers-v1.md",
+        "docs/architecture/signals-registry-v1.md",
+        "docs/offering-signals/offering-signals-v1.md"
       ]
     },
     {

@@ -188,6 +188,53 @@ Lifecycle transitions require governance review and backward-compatibility check
 
 ---
 
+## Event Program Signals
+
+Added 2026-03-18 as part of Events Program V1 (`ARCH-EVENTS-PROGRAM-V1`).
+
+Event signals are derived from merchant surfaces (events pages, catering pages, private dining pages) and from existing `merchant_surface_scans.private_dining_present`. They feed into three new offering program containers: `private_dining_program`, `group_dining_program`, `catering_program`.
+
+All event signals follow the same maturity model as beverage programs: `none` | `incidental` | `considered` | `dedicated` | `unknown`.
+
+### Private Dining Signals
+
+| signal_id | signal_type | data_type | allowed_values | source_type | description |
+|---|---|---|---|---|---|
+| `private_room_available` | atomic | boolean | true \| false | ingestion | Place has a private or semi-private dining room. |
+| `full_buyout_available` | atomic | boolean | true \| false | ingestion | Place offers full-venue buyouts. |
+| `semi_private_available` | atomic | boolean | true \| false | ingestion | Place offers semi-private spaces (not fully enclosed). |
+| `events_coordinator` | atomic | boolean | true \| false | ingestion | Place has a named events coordinator or events team. |
+| `inquiry_form_present` | atomic | boolean | true \| false | ingestion | Events/private dining inquiry form detected on merchant website. |
+| `events_page_present` | atomic | boolean | true \| false | ingestion | Dedicated events or private dining page detected on merchant website. |
+
+### Group Dining Signals
+
+| signal_id | signal_type | data_type | allowed_values | source_type | description |
+|---|---|---|---|---|---|
+| `group_menu_available` | atomic | boolean | true \| false | ingestion | Place offers a dedicated group or banquet menu. |
+| `minimum_headcount` | atomic | boolean | true \| false | ingestion | Place specifies minimum guest counts for group bookings. |
+| `prix_fixe_group_menu` | atomic | boolean | true \| false | ingestion | Place offers prix fixe menus specifically for groups/events. |
+
+### Catering Signals
+
+| signal_id | signal_type | data_type | allowed_values | source_type | description |
+|---|---|---|---|---|---|
+| `catering_menu_present` | atomic | boolean | true \| false | ingestion | Dedicated catering menu detected on merchant website. |
+| `off_site_catering` | atomic | boolean | true \| false | ingestion | Place offers off-site/delivery catering services. |
+| `on_site_catering` | atomic | boolean | true \| false | ingestion | Place offers on-site catering for hosted events. |
+
+### Event Derived Signals
+
+Event program maturity is derived from atomic event signals + merchant surface evidence:
+
+| signal_id | signal_type | derivation_logic | owner_system |
+|---|---|---|---|
+| `private_dining_program.maturity` | derived | events_page + inquiry_form → dedicated; mention on about page → considered; private_dining_present boolean → incidental | Fields |
+| `group_dining_program.maturity` | derived | group signals + events_page → dedicated; group signals alone → considered | Fields |
+| `catering_program.maturity` | derived | catering signals + events_page → dedicated; catering signals alone → considered | Fields |
+
+---
+
 ## Future Evolution
 
 The Signals Registry is expected to evolve with:

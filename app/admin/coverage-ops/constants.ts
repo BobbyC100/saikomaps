@@ -43,6 +43,65 @@ export const LANE_META: Record<string, { icon: string; label: string; order: num
   editorial: { icon: '◈', label: 'Editorial', order: 4 },
 };
 
+/* ------------------------------------------------------------------ */
+/*  Need-oriented sections (Actions tab redesign)                      */
+/* ------------------------------------------------------------------ */
+
+export const SECTION_META = {
+  blocked: { label: 'Blocked from Publishing', order: 0, accent: '#991B1B', accentBg: '#FEE2E2', accentBorder: '#FCA5A5' },
+  review: { label: 'Needs Human Review', order: 1, accent: '#92400E', accentBg: '#FEF3C7', accentBorder: '#FCD34D' },
+  enrich: { label: 'Ready to Enrich', order: 2, accent: '#0F766E', accentBg: '#CCFBF1', accentBorder: '#5EEAD4' },
+  completeness: { label: 'Data Completeness', order: 3, accent: '#8B7355', accentBg: '#F5F0E1', accentBorder: '#C3B091' },
+} as const;
+
+export type SectionKey = keyof typeof SECTION_META;
+
+/** Maps each issue type to its need-oriented section */
+export const ISSUE_SECTION: Record<string, SectionKey> = {
+  // Blocked: cannot publish
+  unresolved_identity: 'blocked',
+  enrichment_incomplete: 'blocked',
+  missing_coords: 'blocked',
+  // Review: requires human judgment
+  potential_duplicate: 'review',
+  google_says_closed: 'review',
+  // Enrich: automatable gaps, medium+ severity
+  missing_gpid: 'enrich',
+  missing_website: 'enrich',
+  missing_hours: 'enrich',
+  missing_neighborhood: 'enrich',
+  operating_status_unknown: 'enrich',
+  // Completeness: low severity nice-to-haves
+  missing_menu_link: 'completeness',
+  missing_reservations: 'completeness',
+  missing_price_level: 'completeness',
+  missing_phone: 'completeness',
+  missing_instagram: 'completeness',
+  missing_tiktok: 'completeness',
+  missing_events_surface: 'completeness',
+};
+
+/** Problem-oriented descriptions (what's wrong, not what tool to run) */
+export const ISSUE_NEED_LABELS: Record<string, string> = {
+  unresolved_identity: 'Not enough identity signals to publish',
+  enrichment_incomplete: 'Has GPID but never enriched',
+  missing_coords: "Can\u2019t be placed on the map",
+  potential_duplicate: 'May be a duplicate of another entity',
+  google_says_closed: 'Google reports this place is closed',
+  missing_gpid: 'No Google Place ID (non-blocking)',
+  missing_website: 'No website discovered',
+  missing_hours: 'No opening hours',
+  missing_neighborhood: 'No neighborhood assigned',
+  operating_status_unknown: 'Operating status not confirmed',
+  missing_menu_link: 'No menu link',
+  missing_reservations: 'No reservation link',
+  missing_price_level: 'No price level',
+  missing_phone: 'No phone number',
+  missing_instagram: 'No Instagram handle',
+  missing_tiktok: 'No TikTok handle',
+  missing_events_surface: 'No events / private dining surface',
+};
+
 export const ISSUE_TYPE_LABELS: Record<string, string> = {
   unresolved_identity: 'Unresolved Identity (insufficient signals)',
   enrichment_incomplete: 'Never Enriched',
@@ -60,6 +119,7 @@ export const ISSUE_TYPE_LABELS: Record<string, string> = {
   missing_gpid: 'Missing GPID (not blocking)',
   google_says_closed: 'Google Says Closed',
   potential_duplicate: 'Potential Duplicate',
+  missing_events_surface: 'Missing Events / Private Dining Surface',
 };
 
 /** Maps issue types to the entity field that can be manually entered */
@@ -70,6 +130,7 @@ export const INLINE_EDITABLE: Record<string, { field: string; placeholder: strin
   missing_phone: { field: 'phone', placeholder: '(213) 555-1234' },
   missing_instagram: { field: 'instagram', placeholder: '@handle' },
   missing_tiktok: { field: 'tiktok', placeholder: '@handle' },
+  missing_events_surface: { field: 'events_url', placeholder: 'https://...' },
 };
 
 export const SUPPRESS_REASON = 'skipped';

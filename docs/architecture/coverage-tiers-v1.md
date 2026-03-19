@@ -187,6 +187,12 @@ Three-layer model (see `docs/offering-signals/offering-signals-v1.md`):
 - Each with maturity scale: `none` / `incidental` / `considered` / `dedicated` / `unknown`
 - 25+ locked signal vocabulary items across all programs
 
+**Event Signals** (added 2026-03-18, see `ARCH-EVENTS-PROGRAM-V1`):
+- 3 program containers: `private_dining_program`, `group_dining_program`, `catering_program`
+- Same maturity scale as beverage programs
+- 12 signal vocabulary items: `private_room_available`, `full_buyout_available`, `semi_private_available`, `events_coordinator`, `inquiry_form_present`, `events_page_present`, `catering_menu_present`, `off_site_catering`, `on_site_catering`, `group_menu_available`, `minimum_headcount`, `prix_fixe_group_menu`
+- Source evidence: `merchant_surfaces` (surface_type='events'), `merchant_surface_scans.private_dining_present`, `reservation_provider_matches.program_signals.has_events`
+
 **Service Signals:**
 - `reservation_model` — required, recommended, not taken
 - `walk_in_policy` — counter walk-in, bar only
@@ -202,8 +208,9 @@ Three-layer model (see `docs/offering-signals/offering-signals-v1.md`):
 **Stop-Early Rule:** If one Tier 1 signal at confidence >= 0.7 and one or two Tier 2 signals at confidence >= 0.6, stop crawling additional sources.
 
 **Scanner issue types (planned):** `missing_offering_identity`, `thin_offering_signals`, `offering_signals_stale`
+**Scanner issue types (implemented):** `missing_events_surface` (editorial, low, non-blocking)
 
-**Status:** Signal vocabulary locked. Extraction prompt exists (`saikoai-extraction-prompt-v2.1.md`). Programs exist in place-page contract but not yet materialized in DB storage. Phase 3 of Fields v2.
+**Status:** Signal vocabulary locked. Extraction prompt exists (`saikoai-extraction-prompt-v2.1.md`). Offering programs materialized in `derived_signals` table (signal_key='offering_programs', v1). 10 total program containers (7 beverage/service + 3 event). Event programs added 2026-03-18.
 
 ---
 

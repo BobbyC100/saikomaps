@@ -47,7 +47,8 @@ export type SurfaceType =
   | 'instagram'
   | 'reservation'
   | 'ordering'
-  | 'contact';
+  | 'contact'
+  | 'events';
 
 type FetchStatus = 'discovered' | 'fetch_success' | 'fetch_failed';
 type ParseStatus = 'parse_pending' | 'parse_success' | 'parse_failed';
@@ -81,6 +82,20 @@ const SURFACE_PATTERNS: Array<{ type: SurfaceType; patterns: RegExp[] }> = [
   {
     type: 'ordering',
     patterns: [/^\/order(?:\/|$|\?)/i, /^\/online-order/i],
+  },
+  {
+    type: 'events',
+    patterns: [
+      /^\/events?(?:\/|$|\?)/i,
+      /^\/private[_-]?dining/i,
+      /^\/private[_-]?events?/i,
+      /^\/group[_-]?dining/i,
+      /^\/catering/i,
+      /^\/host(?:\/|$|\?)/i,
+      /^\/buyout/i,
+      /^\/celebrations?/i,
+      /^\/parties/i,
+    ],
   },
   // instagram surfaces are discovered from href attributes pointing to instagram.com
   // handled separately in extractLinks

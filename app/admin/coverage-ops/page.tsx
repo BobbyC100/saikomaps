@@ -4,6 +4,9 @@
  * Coverage Operations — Triage Board
  * Phase 2 of Coverage Operations (COVOPS-APPROACH-V1).
  *
+ * Redesigned Actions tab: organized by NEED, not by tool.
+ * Four sections: Blocked → Review → Enrich → Completeness
+ *
  * State management: ./use-coverage-ops.ts
  * Tool wiring:      ./tool-actions.ts
  * Types:            ./types.ts
@@ -16,10 +19,10 @@ import { useCoverageOps } from './use-coverage-ops';
 import { TOOL_ACTIONS } from './tool-actions';
 import {
   C, SEVERITY_STYLES, ISSUE_TYPE_LABELS, INLINE_EDITABLE,
-  SUPPRESS_REASON, TOTAL_STAGES, STAGE_LABELS,
+  SUPPRESS_REASON, TOTAL_STAGES, STAGE_LABELS, ISSUE_NEED_LABELS,
 } from './constants';
 import type {
-  IssueRow, CompareEntity, EnrichProgress, ActionState,
+  IssueRow, Section, CompareEntity, EnrichProgress, ActionState,
   GoogleSaysClosedDetail, PotentialDuplicateDetail,
 } from './types';
 
@@ -58,23 +61,21 @@ export default function CoverageOpsPage() {
             Coverage Operations
           </h1>
           <p className="text-sm" style={{ color: C.muted }}>
-            Triage board &middot; {ops.summary?.total_active ?? ops.issues.length} active issues across {new Set(ops.issues.map((i) => i.entity_id)).size} entities
+            {ops.summary?.total_active ?? ops.issues.length} active issues across {new Set(ops.issues.map((i) => i.entity_id)).size} entities
           </p>
         </header>
 
         {/* Summary Stats */}
         <div className="rounded-xl p-5 shadow-sm mb-6" style={{ backgroundColor: C.cardBg }}>
-          <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
-            <StatCard label="Active" value={ops.summary?.total_active ?? ops.issues.length} />
-            <StatCard label="Blocking" value={ops.summary?.blocking_publish_entities ?? 0} color={C.red} />
-            <StatCard label="Critical" value={ops.severityCounts.critical} color={C.red} />
-            <StatCard label="High" value={ops.severityCounts.high} color={C.amber} />
-            <StatCard label="Medium" value={ops.severityCounts.medium} color={C.muted} />
-            <StatCard label="Low" value={ops.severityCounts.low} color="#A09078" />
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <StatCard label="Can't Publish" value={ops.summary?.blocking_publish_entities ?? 0} color={C.red} />
+            <StatCard label="Need Review" value={ops.sections.find(s => s.key === 'review')?.entityCount ?? 0} color={C.amber} />
+            <StatCard label="Enrichable" value={ops.sections.find(s => s.key === 'enrich')?.entityCount ?? 0} color="#0F766E" />
+            <StatCard label="Total Issues" value={ops.summary?.total_active ?? ops.issues.length} />
           </div>
         </div>
 
-        {/* Filter Bar */}
+        {/* Toolbar */}
         <div className="flex flex-wrap items-center gap-3 mb-6">
           <select
             value={ops.filterSeverity}
@@ -89,19 +90,6 @@ export default function CoverageOpsPage() {
             <option value="low">Low</option>
           </select>
 
-          <select
-            value={ops.filterStatus}
-            onChange={(e) => ops.setFilterStatus(e.target.value)}
-            className="text-sm border rounded px-2 py-1.5"
-            style={{ borderColor: C.border, color: C.text, backgroundColor: C.cardBg }}
-          >
-            <option value="">All Statuses</option>
-            <option value="open">Open</option>
-            <option value="needs_automation">Needs Automation</option>
-            <option value="processing">Processing</option>
-            <option value="needs_human">Needs Human</option>
-          </select>
-
           <label className="flex items-center gap-1.5 text-sm cursor-pointer" style={{ color: C.muted }}>
             <input
               type="checkbox"
@@ -114,24 +102,6 @@ export default function CoverageOpsPage() {
 
           <div className="flex-1" />
 
-          {/* Bulk Action Buttons */}
-          {ops.bulkActions.length > 0 && (
-            <div className="flex items-center gap-2">
-              <span className="text-xs" style={{ color: C.muted }}>Bulk:</span>
-              {ops.bulkActions.map((ba) => (
-                <button
-                  key={ba.label}
-                  onClick={() => ops.handleBulkAction(ba.issueTypes, ba.label)}
-                  disabled={ops.bulkRunning !== null}
-                  className="px-3 py-1.5 rounded text-xs font-semibold disabled:opacity-50 transition-colors"
-                  style={{ backgroundColor: C.accent, color: '#fff' }}
-                >
-                  {ops.bulkRunning === ba.label ? 'Running...' : `${ba.label} (${ba.count})`}
-                </button>
-              ))}
-            </div>
-          )}
-
           <button
             onClick={ops.handleRescan}
             disabled={ops.scanning}
@@ -142,50 +112,17 @@ export default function CoverageOpsPage() {
           </button>
         </div>
 
-        {/* Problem Lanes */}
-        {ops.lanes.map((lane) => (
-          <div
-            key={lane.cls}
-            className="rounded-xl shadow-sm mb-5 overflow-hidden"
-            style={{ backgroundColor: C.cardBg }}
-          >
-            <button
-              onClick={() => ops.toggleLane(lane.cls)}
-              className="w-full flex items-center justify-between px-5 py-3.5 text-left hover:bg-[#F5F0E1]/50 transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                <span className="text-lg leading-none">{lane.icon}</span>
-                <h2 className="text-base font-bold" style={{ color: C.text }}>{lane.label}</h2>
-                <span className="text-xs px-2 py-0.5 rounded-full font-medium" style={{ backgroundColor: C.bg, color: C.muted }}>
-                  {lane.issues.length}
-                </span>
-              </div>
-              <span style={{ color: C.muted }}>
-                {ops.collapsedLanes.has(lane.cls) ? '▸' : '▾'}
-              </span>
-            </button>
-
-            {!ops.collapsedLanes.has(lane.cls) && (
-              <div className="divide-y" style={{ borderColor: `${C.border}33` }}>
-                {lane.issues.map((issue) => (
-                  <IssueRowComponent
-                    key={issue.id}
-                    issue={issue}
-                    actionState={ops.actionStates[issue.id] ?? 'idle'}
-                    enrichProgress={ops.enrichProgress[issue.entity_slug] ?? null}
-                    onAction={() => ops.handleAction(issue)}
-                    onSuppress={(reason) => ops.handleSuppress(issue.id, reason)}
-                    onResolve={() => ops.handleResolve(issue.id)}
-                    onInlineSave={(field, value) => ops.handleInlineSave(issue, field, value)}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
+        {/* Need-oriented sections */}
+        {ops.sections.map((section) => (
+          <SectionCard
+            key={section.key}
+            section={section}
+            ops={ops}
+          />
         ))}
 
         {/* Empty state */}
-        {ops.lanes.length === 0 && !ops.loading && (
+        {ops.sections.length === 0 && !ops.loading && (
           <div className="rounded-xl p-12 text-center shadow-sm" style={{ backgroundColor: C.cardBg }}>
             <p className="text-lg font-medium" style={{ color: C.green }}>All clear</p>
             <p className="text-sm mt-1" style={{ color: C.muted }}>No active issues match the current filters.</p>
@@ -194,40 +131,7 @@ export default function CoverageOpsPage() {
 
         {/* Suppressed Section */}
         {ops.suppressed.length > 0 && (
-          <div className="rounded-xl shadow-sm mt-8 overflow-hidden" style={{ backgroundColor: C.cardBg, opacity: 0.7 }}>
-            <button
-              onClick={() => ops.setShowSuppressed(!ops.showSuppressed)}
-              className="w-full flex items-center justify-between px-5 py-3 text-left"
-            >
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium" style={{ color: C.muted }}>Suppressed</span>
-                <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: C.bg, color: C.muted }}>
-                  {ops.suppressed.length}
-                </span>
-              </div>
-              <span className="text-xs" style={{ color: C.muted }}>
-                {ops.showSuppressed ? '▾' : '▸'}
-              </span>
-            </button>
-            {ops.showSuppressed && (
-              <div className="divide-y" style={{ borderColor: `${C.border}33` }}>
-                {ops.suppressed.map((issue) => (
-                  <div key={issue.id} className="flex items-center gap-4 px-5 py-2.5">
-                    <SeverityPill severity={issue.severity} />
-                    <div className="flex-1 min-w-0">
-                      <span className="text-sm" style={{ color: C.muted }}>{issue.entity_name}</span>
-                      <span className="text-xs ml-2" style={{ color: '#A09078' }}>
-                        {ISSUE_TYPE_LABELS[issue.issue_type] ?? issue.issue_type}
-                      </span>
-                    </div>
-                    <span className="text-[10px] px-1.5 py-0.5 rounded" style={{ backgroundColor: C.bg, color: C.muted }}>
-                      {issue.suppressed_reason ?? 'suppressed'}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+          <SuppressedSection suppressed={ops.suppressed} showSuppressed={ops.showSuppressed} setShowSuppressed={ops.setShowSuppressed} />
         )}
       </div>
 
@@ -261,6 +165,179 @@ export default function CoverageOpsPage() {
 }
 
 /* ------------------------------------------------------------------ */
+/*  Section Card                                                       */
+/* ------------------------------------------------------------------ */
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function SectionCard({ section, ops }: { section: Section; ops: any }) {
+  const [collapsed, setCollapsed] = useState(false);
+  const [expandedTypes, setExpandedTypes] = useState<Set<string>>(new Set());
+  const isCompleteness = section.key === 'completeness';
+
+  const toggleType = (type: string) => {
+    setExpandedTypes((prev) => {
+      const next = new Set(prev);
+      if (next.has(type)) next.delete(type);
+      else next.add(type);
+      return next;
+    });
+  };
+
+  // Bulk action: collect all issue types in this section that have tools
+  const sectionBulkTypes = section.byType
+    .filter((g) => TOOL_ACTIONS[g.issue_type]?.invoke)
+    .map((g) => g.issue_type);
+  const sectionBulkCount = section.issues.filter(
+    (i) => TOOL_ACTIONS[i.issue_type]?.invoke,
+  ).length;
+
+  return (
+    <div
+      className="rounded-xl shadow-sm mb-5 overflow-hidden"
+      style={{ backgroundColor: C.cardBg, borderLeft: `4px solid ${section.accent}` }}
+    >
+      {/* Section header */}
+      <button
+        onClick={() => setCollapsed(!collapsed)}
+        className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-[#F5F0E1]/30 transition-colors"
+      >
+        <div className="flex items-center gap-3">
+          <div
+            className="w-2.5 h-2.5 rounded-full shrink-0"
+            style={{ backgroundColor: section.accent }}
+          />
+          <h2 className="text-base font-bold" style={{ color: C.text }}>
+            {section.label}
+          </h2>
+          <span
+            className="text-xs px-2 py-0.5 rounded-full font-semibold"
+            style={{ backgroundColor: section.accentBg, color: section.accent }}
+          >
+            {section.entityCount} {section.entityCount === 1 ? 'entity' : 'entities'}
+          </span>
+        </div>
+        <span style={{ color: C.muted }}>{collapsed ? '\u25B8' : '\u25BE'}</span>
+      </button>
+
+      {!collapsed && (
+        <div>
+          {/* Section bulk action */}
+          {sectionBulkTypes.length > 0 && sectionBulkCount > 1 && !isCompleteness && (
+            <div className="px-5 pb-3 flex items-center gap-2">
+              <button
+                onClick={() => ops.handleBulkAction(sectionBulkTypes, `${section.label} (all)`)}
+                disabled={ops.bulkRunning !== null}
+                className="px-3 py-1.5 rounded text-xs font-semibold disabled:opacity-50"
+                style={{ backgroundColor: section.accent, color: '#fff' }}
+              >
+                {ops.bulkRunning === `${section.label} (all)` ? 'Running...' : `Fix all ${sectionBulkCount}`}
+              </button>
+            </div>
+          )}
+
+          {/* Issue type groups */}
+          {section.byType.map((group) => (
+            <IssueTypeGroup
+              key={group.issue_type}
+              group={group}
+              section={section}
+              expanded={expandedTypes.has(group.issue_type)}
+              onToggle={() => toggleType(group.issue_type)}
+              compact={isCompleteness}
+              ops={ops}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Issue Type Group (within a section)                                */
+/* ------------------------------------------------------------------ */
+
+function IssueTypeGroup({
+  group, section, expanded, onToggle, compact, ops,
+}: {
+  group: { issue_type: string; label: string; issues: IssueRow[]; summaryCount?: number };
+  section: Section;
+  expanded: boolean;
+  onToggle: () => void;
+  compact: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ops: any;
+}) {
+  const tool = TOOL_ACTIONS[group.issue_type];
+  const issueTypes = [group.issue_type];
+  const entityCount = group.summaryCount ?? new Set(group.issues.map((i) => i.entity_id)).size;
+  const hasIndividualRows = group.issues.length > 0;
+
+  return (
+    <div className="border-t" style={{ borderColor: `${C.border}22` }}>
+      {/* Group header row */}
+      <div className="flex items-center gap-3 px-5 py-2.5 hover:bg-[#F5F0E1]/30 transition-colors">
+        {!compact && hasIndividualRows && (
+          <button
+            onClick={onToggle}
+            className="text-xs w-4 text-center shrink-0"
+            style={{ color: C.muted }}
+          >
+            {expanded ? '\u25BE' : '\u25B8'}
+          </button>
+        )}
+        {(compact || !hasIndividualRows) && (
+          <div className="w-4 shrink-0" />
+        )}
+
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-semibold" style={{ color: section.accent }}>
+              {entityCount}
+            </span>
+            <span className="text-sm" style={{ color: C.text }}>
+              {group.label}
+            </span>
+          </div>
+        </div>
+
+        {/* Bulk action for this type */}
+        {tool?.invoke && hasIndividualRows && group.issues.length > 1 && (
+          <button
+            onClick={() => ops.handleBulkAction(issueTypes, `${tool.label} (${group.issue_type})`)}
+            disabled={ops.bulkRunning !== null}
+            className="px-3 py-1 rounded text-xs font-semibold disabled:opacity-50 shrink-0"
+            style={{ backgroundColor: section.accent, color: '#fff' }}
+          >
+            {ops.bulkRunning === `${tool.label} (${group.issue_type})`
+              ? 'Running...'
+              : `${tool.label} (${entityCount})`}
+          </button>
+        )}
+      </div>
+
+      {/* Expanded: individual entity rows */}
+      {expanded && !compact && hasIndividualRows && (
+        <div className="pl-7" style={{ borderTop: `1px solid ${C.border}11` }}>
+          {group.issues.map((issue) => (
+            <IssueRowComponent
+              key={issue.id}
+              issue={issue}
+              actionState={ops.actionStates[issue.id] ?? 'idle'}
+              enrichProgress={ops.enrichProgress[issue.entity_slug] ?? null}
+              onAction={() => ops.handleAction(issue)}
+              onSuppress={(reason: string) => ops.handleSuppress(issue.id, reason)}
+              onResolve={() => ops.handleResolve(issue.id)}
+              onInlineSave={(field: string, value: string) => ops.handleInlineSave(issue, field, value)}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
 /*  Sub-components                                                     */
 /* ------------------------------------------------------------------ */
 
@@ -283,6 +360,12 @@ function SeverityPill({ severity }: { severity: string }) {
       {style.label}
     </span>
   );
+}
+
+/** Dynamic label for google_says_closed — shows "Mark Temp Closed" or "Mark Perm Closed" */
+function closedLabel(issue: IssueRow): string {
+  const d = issue.detail as GoogleSaysClosedDetail | null;
+  return d?.googleStatus === 'CLOSED_PERMANENTLY' ? 'Mark Perm Closed' : 'Mark Temp Closed';
 }
 
 function IssueRowComponent({
@@ -336,14 +419,14 @@ function IssueRowComponent({
 
   return (
     <div>
-      <div className="flex items-center gap-3 px-5 py-2.5 hover:bg-[#F5F0E1]/40 transition-colors">
+      <div className="flex items-center gap-3 px-5 py-2 hover:bg-[#F5F0E1]/40 transition-colors">
         <button
           onClick={() => setShowExtra(!showExtra)}
           className="text-xs shrink-0 w-4 text-center opacity-40 hover:opacity-100"
           style={{ color: C.muted }}
           title="Add extra info (coverage links, etc.)"
         >
-          {showExtra ? '−' : '+'}
+          {showExtra ? '\u2212' : '+'}
         </button>
 
         <SeverityPill severity={issue.severity} />
@@ -396,19 +479,19 @@ function IssueRowComponent({
           {enrichProgress && !enrichProgress.done && (
             <>
               <EnrichProgressBar progress={enrichProgress} />
-              <div className="text-[9px] mt-0.5" style={{ color: C.muted }}>Running in background…</div>
+              <div className="text-[9px] mt-0.5" style={{ color: C.muted }}>Running in background\u2026</div>
             </>
           )}
           {enrichProgress?.done && (
             <div className="flex items-center gap-1.5 mt-1">
               <span className="text-[10px] font-semibold" style={{ color: C.green }}>
-                ✓ Enrichment complete (stage {enrichProgress.stage}/{TOTAL_STAGES})
+                \u2713 Enrichment complete (stage {enrichProgress.stage}/{TOTAL_STAGES})
               </span>
             </div>
           )}
           {enrichProgress?.error && (
             <div className="flex items-center gap-1.5 mt-1">
-              <span className="text-[10px] font-semibold" style={{ color: C.red }}>✗ {enrichProgress.error}</span>
+              <span className="text-[10px] font-semibold" style={{ color: C.red }}>\u2717 {enrichProgress.error}</span>
             </div>
           )}
         </div>
@@ -478,7 +561,9 @@ function IssueRowComponent({
                 color: actionState === 'done' ? C.green : actionState === 'error' ? C.red : '#fff',
               }}
             >
-              {actionState === 'idle' ? tool.label : actionState === 'running' ? '...' : actionState === 'done' ? tool.queuedLabel : 'Retry'}
+              {actionState === 'idle'
+                ? (issue.issue_type === 'google_says_closed' ? closedLabel(issue) : tool.label)
+                : actionState === 'running' ? '...' : actionState === 'done' ? tool.queuedLabel : 'Retry'}
             </button>
           ) : null}
 
@@ -529,7 +614,7 @@ function IssueRowComponent({
 function EnrichProgressBar({ progress }: { progress: EnrichProgress }) {
   const currentStage = progress.stage ?? 0;
   const pct = Math.round((currentStage / TOTAL_STAGES) * 100);
-  const currentLabel = currentStage > 0 ? STAGE_LABELS[currentStage] ?? `Stage ${currentStage}` : 'Starting…';
+  const currentLabel = currentStage > 0 ? STAGE_LABELS[currentStage] ?? `Stage ${currentStage}` : 'Starting\u2026';
   const nextLabel = currentStage < TOTAL_STAGES ? STAGE_LABELS[currentStage + 1] ?? '' : '';
 
   return (
@@ -546,11 +631,56 @@ function EnrichProgressBar({ progress }: { progress: EnrichProgress }) {
       </div>
       <span className="text-[10px] font-medium whitespace-nowrap" style={{ color: C.accent }}>
         {currentStage > 0 ? (
-          <>{currentStage}/{TOTAL_STAGES}{' · '}{nextLabel ? `→ ${nextLabel}` : currentLabel}</>
+          <>{currentStage}/{TOTAL_STAGES}{' \u00B7 '}{nextLabel ? `\u2192 ${nextLabel}` : currentLabel}</>
         ) : (
-          <><span className="inline-block animate-pulse">●</span> {currentLabel}</>
+          <><span className="inline-block animate-pulse">\u25CF</span> {currentLabel}</>
         )}
       </span>
+    </div>
+  );
+}
+
+function SuppressedSection({
+  suppressed, showSuppressed, setShowSuppressed,
+}: {
+  suppressed: IssueRow[];
+  showSuppressed: boolean;
+  setShowSuppressed: (v: boolean) => void;
+}) {
+  return (
+    <div className="rounded-xl shadow-sm mt-8 overflow-hidden" style={{ backgroundColor: C.cardBg, opacity: 0.7 }}>
+      <button
+        onClick={() => setShowSuppressed(!showSuppressed)}
+        className="w-full flex items-center justify-between px-5 py-3 text-left"
+      >
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium" style={{ color: C.muted }}>Suppressed</span>
+          <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: C.bg, color: C.muted }}>
+            {suppressed.length}
+          </span>
+        </div>
+        <span className="text-xs" style={{ color: C.muted }}>
+          {showSuppressed ? '\u25BE' : '\u25B8'}
+        </span>
+      </button>
+      {showSuppressed && (
+        <div className="divide-y" style={{ borderColor: `${C.border}33` }}>
+          {suppressed.map((issue) => (
+            <div key={issue.id} className="flex items-center gap-4 px-5 py-2.5">
+              <SeverityPill severity={issue.severity} />
+              <div className="flex-1 min-w-0">
+                <span className="text-sm" style={{ color: C.muted }}>{issue.entity_name}</span>
+                <span className="text-xs ml-2" style={{ color: '#A09078' }}>
+                  {ISSUE_TYPE_LABELS[issue.issue_type] ?? issue.issue_type}
+                </span>
+              </div>
+              <span className="text-[10px] px-1.5 py-0.5 rounded" style={{ backgroundColor: C.bg, color: C.muted }}>
+                {issue.suppressed_reason ?? 'suppressed'}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

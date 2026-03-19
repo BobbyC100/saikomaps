@@ -69,6 +69,9 @@ export type PlacePageOfferingPrograms = {
   non_alcoholic_program: PlacePageProgramEntry;
   coffee_tea_program: PlacePageProgramEntry;
   service_program: PlacePageProgramEntry;
+  private_dining_program: PlacePageProgramEntry;
+  group_dining_program: PlacePageProgramEntry;
+  catering_program: PlacePageProgramEntry;
 };
 
 export type PlacePageAppearsOnItem = {
@@ -137,6 +140,12 @@ export type PlacePageLocation = {
   // Offering
   offeringSignals: PlacePageOfferingSignals | null;
   offeringPrograms: PlacePageOfferingPrograms | null;
+
+  // Events / hospitality
+  eventsUrl: string | null;
+  cateringUrl: string | null;
+  eventInquiryEmail: string | null;
+  eventInquiryFormUrl: string | null;
 
   // Identity Signals (enrichment)
   placePersonality: string | null;
@@ -213,6 +222,11 @@ export const PLACE_PAGE_LOCATION_KEYS: ReadonlyArray<keyof PlacePageLocation> = 
   // Offering
   'offeringSignals',
   'offeringPrograms',
+  // Events / hospitality
+  'eventsUrl',
+  'cateringUrl',
+  'eventInquiryEmail',
+  'eventInquiryFormUrl',
   // Identity Signals (enrichment)
   'placePersonality',
   'signatureDishes',

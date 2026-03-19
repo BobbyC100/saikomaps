@@ -57,17 +57,21 @@ interface ProgramEntry {
 }
 
 interface OfferingPrograms {
-  food_program:          ProgramEntry;
-  wine_program:          ProgramEntry;
-  beer_program:          ProgramEntry;
-  cocktail_program:      ProgramEntry;
-  non_alcoholic_program: ProgramEntry;
-  coffee_tea_program:    ProgramEntry;
-  service_program:       ProgramEntry;
+  food_program:            ProgramEntry;
+  wine_program:            ProgramEntry;
+  beer_program:            ProgramEntry;
+  cocktail_program:        ProgramEntry;
+  non_alcoholic_program:   ProgramEntry;
+  coffee_tea_program:      ProgramEntry;
+  service_program:         ProgramEntry;
+  private_dining_program:  ProgramEntry;
+  group_dining_program:    ProgramEntry;
+  catering_program:        ProgramEntry;
   source_coverage: {
-    menu_identity_present:    boolean;
-    menu_structure_present:   boolean;
-    identity_signals_present: boolean;
+    menu_identity_present:         boolean;
+    menu_structure_present:        boolean;
+    identity_signals_present:      boolean;
+    merchant_surface_scans_present: boolean;
   };
   source_timestamps: {
     menu_identity:    string | null;
@@ -115,10 +119,16 @@ interface IdentitySignalsPayload {
   extraction_confidence: number;
 }
 
+interface MerchantSurfaceScanHints {
+  private_dining_present: boolean;
+  events_surface_exists:  boolean;
+}
+
 interface SourceSignals {
   menuIdentity:    { payload: MenuIdentityPayload; computedAt: Date } | null;
   menuStructure:   { payload: MenuStructurePayload; computedAt: Date } | null;
   identitySignals: { payload: IdentitySignalsPayload; computedAt: Date } | null;
+  surfaceScanHints: MerchantSurfaceScanHints | null;
 }
 
 interface AssembleTarget {
@@ -162,6 +172,42 @@ const WINE_SIGNALS = new Set([
   "extensive_wine_list",
   "natural_wine_presence",
   "aperitif_focus",  // WO-008: moved from cocktail → wine
+]);
+
+const EVENT_SIGNALS = new Set([
+  "private_room_available",
+  "full_buyout_available",
+  "semi_private_available",
+  "events_coordinator",
+  "inquiry_form_present",
+  "events_page_present",
+  "catering_menu_present",
+  "off_site_catering",
+  "on_site_catering",
+  "group_menu_available",
+  "minimum_headcount",
+  "prix_fixe_group_menu",
+]);
+
+const PRIVATE_DINING_SIGNALS = new Set([
+  "private_room_available",
+  "full_buyout_available",
+  "semi_private_available",
+  "events_coordinator",
+  "inquiry_form_present",
+  "events_page_present",
+]);
+
+const GROUP_DINING_SIGNALS = new Set([
+  "group_menu_available",
+  "minimum_headcount",
+  "prix_fixe_group_menu",
+]);
+
+const CATERING_SIGNALS = new Set([
+  "catering_menu_present",
+  "off_site_catering",
+  "on_site_catering",
 ]);
 
 // wine_program_intent values that represent a strong, directional wine identity
@@ -338,6 +384,70 @@ function assemblePrograms(src: SourceSignals): OfferingPrograms {
   const serviceSignals  = serviceModel ? [serviceModel] : [];
   const serviceMaturity: ProgramMaturity = serviceModel ? "considered" : "unknown";
 
+  // ── private_dining_program ────────────────────────────────────────────────
+
+  const pdSignalNames = msSignalNames.filter((s) => PRIVATE_DINING_SIGNALS.has(s));
+  const scanHints     = src.surfaceScanHints;
+  const hasPrivateDiningPresent = scanHints?.private_dining_present ?? false;
+  const hasEventsSurface        = scanHints?.events_surface_exists ?? false;
+
+  let privateDiningMaturity: ProgramMaturity = "unknown";
+  if (hasEventsSurface && pdSignalNames.length > 0) {
+    // Dedicated events page + extracted signals → dedicated
+    privateDiningMaturity = "dedicated";
+  } else if (hasEventsSurface) {
+    // Events page exists but no parsed signals yet → considered
+    privateDiningMaturity = "considered";
+  } else if (hasPrivateDiningPresent) {
+    // merchant_surface_scans boolean flag only → incidental
+    privateDiningMaturity = "incidental";
+  } else if (pdSignalNames.length > 0) {
+    // Signals from other surfaces (about page, etc.) → considered
+    privateDiningMaturity = "considered";
+  }
+
+  const privateDiningProgram: ProgramEntry = {
+    maturity:   privateDiningMaturity,
+    signals:    hasPrivateDiningPresent && pdSignalNames.length === 0
+      ? ["private_room_available"] : pdSignalNames,
+    confidence: privateDiningMaturity === "unknown" ? 0 : hasEventsSurface ? 0.8 : 0.5,
+    evidence:   evidenceFor(PRIVATE_DINING_SIGNALS),
+  };
+
+  // ── group_dining_program ────────────────────────────────────────────────
+
+  const gdSignalNames = msSignalNames.filter((s) => GROUP_DINING_SIGNALS.has(s));
+  let groupDiningMaturity: ProgramMaturity = "unknown";
+  if (gdSignalNames.length > 0 && hasEventsSurface) {
+    groupDiningMaturity = "dedicated";
+  } else if (gdSignalNames.length > 0) {
+    groupDiningMaturity = "considered";
+  }
+
+  const groupDiningProgram: ProgramEntry = {
+    maturity:   groupDiningMaturity,
+    signals:    gdSignalNames,
+    confidence: groupDiningMaturity === "unknown" ? 0 : hasEventsSurface ? 0.8 : 0.5,
+    evidence:   evidenceFor(GROUP_DINING_SIGNALS),
+  };
+
+  // ── catering_program ────────────────────────────────────────────────────
+
+  const catSignalNames = msSignalNames.filter((s) => CATERING_SIGNALS.has(s));
+  let cateringMaturity: ProgramMaturity = "unknown";
+  if (catSignalNames.length > 0 && hasEventsSurface) {
+    cateringMaturity = "dedicated";
+  } else if (catSignalNames.length > 0) {
+    cateringMaturity = "considered";
+  }
+
+  const cateringProgram: ProgramEntry = {
+    maturity:   cateringMaturity,
+    signals:    catSignalNames,
+    confidence: cateringMaturity === "unknown" ? 0 : hasEventsSurface ? 0.8 : 0.5,
+    evidence:   evidenceFor(CATERING_SIGNALS),
+  };
+
   // ── source coverage / timestamps ──────────────────────────────────────────
 
   return {
@@ -363,10 +473,14 @@ function assemblePrograms(src: SourceSignals): OfferingPrograms {
       confidence: serviceConf,
       evidence:   serviceEvidence,
     },
+    private_dining_program:  privateDiningProgram,
+    group_dining_program:    groupDiningProgram,
+    catering_program:        cateringProgram,
     source_coverage: {
-      menu_identity_present:    src.menuIdentity    !== null,
-      menu_structure_present:   src.menuStructure   !== null,
-      identity_signals_present: src.identitySignals !== null,
+      menu_identity_present:          src.menuIdentity    !== null,
+      menu_structure_present:         src.menuStructure   !== null,
+      identity_signals_present:       src.identitySignals !== null,
+      merchant_surface_scans_present: src.surfaceScanHints !== null,
     },
     source_timestamps: {
       menu_identity:    src.menuIdentity?.computedAt.toISOString()    ?? null,
@@ -434,7 +548,7 @@ async function loadTargets(
 async function fetchSourceSignals(entityIds: string[]): Promise<Map<string, SourceSignals>> {
   const map = new Map<string, SourceSignals>();
   for (const id of entityIds) {
-    map.set(id, { menuIdentity: null, menuStructure: null, identitySignals: null });
+    map.set(id, { menuIdentity: null, menuStructure: null, identitySignals: null, surfaceScanHints: null });
   }
 
   if (entityIds.length === 0) return map;
@@ -475,6 +589,44 @@ async function fetchSourceSignals(entityIds: string[]): Promise<Map<string, Sour
     }
   }
 
+  // Fetch merchant_surface_scans for private_dining_present + events surface existence
+  const scanRows = await db.merchant_surface_scans.findMany({
+    where: { entity_id: { in: entityIds } },
+    select: { entity_id: true, private_dining_present: true },
+    orderBy: { fetched_at: "desc" },
+    distinct: ["entity_id"],
+  });
+
+  const eventsSurfaceRows = await db.merchant_surfaces.findMany({
+    where: {
+      entity_id: { in: entityIds },
+      surface_type: "events",
+    },
+    select: { entity_id: true },
+    distinct: ["entity_id"],
+  });
+  const eventsSurfaceSet = new Set(eventsSurfaceRows.map((r) => r.entity_id));
+
+  for (const scan of scanRows) {
+    const entry = map.get(scan.entity_id);
+    if (!entry) continue;
+    entry.surfaceScanHints = {
+      private_dining_present: scan.private_dining_present ?? false,
+      events_surface_exists:  eventsSurfaceSet.has(scan.entity_id),
+    };
+  }
+
+  // Also mark entities that have events surfaces but no scan row
+  for (const eid of eventsSurfaceSet) {
+    const entry = map.get(eid);
+    if (entry && !entry.surfaceScanHints) {
+      entry.surfaceScanHints = {
+        private_dining_present: false,
+        events_surface_exists:  true,
+      };
+    }
+  }
+
   return map;
 }
 
@@ -507,21 +659,22 @@ async function main() {
 
   // Header
   console.log(
-    `${"Name".padEnd(36)} ${"food".padEnd(12)} ${"wine".padEnd(12)} ${"beer".padEnd(12)} ${"cocktail".padEnd(12)} ${"service".padEnd(12)} src`,
+    `${"Name".padEnd(36)} ${"food".padEnd(12)} ${"wine".padEnd(12)} ${"beer".padEnd(12)} ${"cocktail".padEnd(12)} ${"service".padEnd(12)} ${"pvt-din".padEnd(12)} ${"group".padEnd(12)} ${"cater".padEnd(12)} src`,
   );
-  console.log("─".repeat(114));
+  console.log("─".repeat(150));
 
   let written = 0;
   let errored = 0;
 
   for (const target of targets) {
-    const src      = signalMap.get(target.entity_id) ?? { menuIdentity: null, menuStructure: null, identitySignals: null };
+    const src      = signalMap.get(target.entity_id) ?? { menuIdentity: null, menuStructure: null, identitySignals: null, surfaceScanHints: null };
     const programs = assemblePrograms(src);
 
     const srcTag = [
       src.menuIdentity    ? "MI" : "  ",
       src.menuStructure   ? "MS" : "  ",
       src.identitySignals ? "IS" : "  ",
+      src.surfaceScanHints ? "SC" : "  ",
     ].join(" ");
 
     console.log(
@@ -531,6 +684,9 @@ async function main() {
       `${programs.beer_program.maturity.padEnd(12)} ` +
       `${programs.cocktail_program.maturity.padEnd(12)} ` +
       `${programs.service_program.maturity.padEnd(12)} ` +
+      `${programs.private_dining_program.maturity.padEnd(12)} ` +
+      `${programs.group_dining_program.maturity.padEnd(12)} ` +
+      `${programs.catering_program.maturity.padEnd(12)} ` +
       `${srcTag}`,
     );
 
@@ -571,7 +727,7 @@ async function main() {
 
   // ── Summary ───────────────────────────────────────────────────────────────
 
-  console.log("\n" + "─".repeat(114));
+  console.log("\n" + "─".repeat(150));
   console.log(`\nSummary:`);
   console.log(`  entities assembled : ${written}`);
   if (errored > 0) console.log(`  errors             : ${errored}`);

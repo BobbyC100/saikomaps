@@ -408,13 +408,14 @@ All four "needs to be built" tools are now operational:
 - Scanner detects:
   - Tier 1 baseline: `unresolved_identity`, `missing_gpid`, `enrichment_incomplete`, `missing_coords`, `missing_neighborhood`, `missing_website`, `missing_phone`, `missing_instagram`, `missing_tiktok`, `potential_duplicate`
   - Tier 2 visit facts: `missing_hours`, `missing_price_level`, `missing_menu_link`, `missing_reservations`, `operating_status_unknown`, `google_says_closed`
+  - Editorial / events: `missing_events_surface` (added 2026-03-18 — flags EAT/DRINKS/WINE/COFFEE entities with website but no events surface discovered)
 - Issues have severity (CRITICAL/HIGH/MEDIUM/LOW), blocking_publish flag, problem_class grouping
 - Re-scan is triggered manually from the UI or via API
 
 **Phase 2 — Coverage Operations UI: COMPLETE (v1)**
 
 Triage board at `/admin/coverage-ops`:
-- Groups issues by problem_class (Identity, Location, Contact, Social)
+- Groups issues by problem_class (Identity, Location, Contact, Social, Editorial)
 - Severity pills (CRIT/HIGH/MED/LOW) with color coding
 - Per-issue inline actions:
   - `Find GPID` for identity gaps
@@ -424,7 +425,8 @@ Triage board at `/admin/coverage-ops`:
   - `Derive` for neighborhood backfill
   - `Mark Closed` / `Still Open` override for `google_says_closed`
 - Bulk actions: grouped by action label (for example `Run Stage 1 (N)` / `Run Stage 6 (N)`)
-- Inline editing: paste website URL, IG handle, TikTok handle, GPID directly
+  - `Run Stage 2` for `missing_events_surface` (re-discover surfaces)
+- Inline editing: paste website URL, IG handle, TikTok handle, GPID, events URL directly
 - "None" button for confirmed-no-value (taco carts without websites, etc.)
 - "Skip" button for won't-fix items
 - Google search link per entity row

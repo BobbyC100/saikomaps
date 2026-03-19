@@ -1128,6 +1128,11 @@ enum ActorRole {
   brand
   parent
   collective
+  chef
+  sommelier
+  pastry_chef
+  beverage_director
+  wine_director
 }
 
 /// Actors - canonical identity (Saiko Fields relationship layer).
@@ -1565,6 +1570,12 @@ model canonical_entity_state {
   reservation_url String?  @map("reservation_url")
   menu_url        String?  @map("menu_url")
   winelist_url    String?  @map("winelist_url")
+
+  // Events / hospitality programs (sanction_threshold 0.70)
+  events_url              String? @map("events_url")
+  catering_url            String? @map("catering_url")
+  event_inquiry_email     String? @map("event_inquiry_email")
+  event_inquiry_form_url  String? @map("event_inquiry_form_url")
 
   // Content (requires explicit sanction or human approval)
   description  String?

@@ -13,7 +13,8 @@ import type {
   EnrichProgress, ActionState, PotentialDuplicateDetail,
 } from './types';
 import { TOOL_ACTIONS } from './tool-actions';
-import { LANE_META, SUPPRESS_REASON } from './constants';
+import { LANE_META, SUPPRESS_REASON, SECTION_META, ISSUE_SECTION, ISSUE_NEED_LABELS } from './constants';
+import type { Section } from './types';
 
 export function useCoverageOps() {
   const [issues, setIssues] = useState<IssueRow[]>([]);
@@ -231,7 +232,20 @@ export function useCoverageOps() {
 
         setActionStates((prev) => ({ ...prev, [issue.id]: 'done' }));
 
-        if (wasSaved || gpidMatched) {
+        // Entity patch actions (e.g., google_says_closed → Mark Closed) return
+        // { entityId, field, value } — resolve the issue and re-scan.
+        const isEntityPatch = data?.entityId && data?.field;
+        if (isEntityPatch) {
+          await handleResolve(issue.id);
+          setToast({ message: `Updated ${issue.entity_name}`, type: 'success' });
+          if (issue.entity_id) {
+            fetch('/api/admin/tools/scan-issues', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ action: 'scan', entityId: issue.entity_id }),
+            }).then(() => fetchData());
+          }
+        } else if (wasSaved || gpidMatched) {
           await handleResolve(issue.id);
           if (gpidMatched) {
             setToast({ message: `GPID found for ${issue.entity_name}`, type: 'success' });
@@ -464,8 +478,9 @@ export function useCoverageOps() {
 
             const gpidMatched = data?.action === 'seed-gpid-queue' && (data?.matched ?? 0) > 0;
             const wasSaved = data?.status === 'completed' && Object.values(data?.results ?? {}).some((r: Record<string, unknown>) => r.saved);
+            const isEntityPatch = data?.entityId && data?.field;
 
-            if (gpidMatched || wasSaved) {
+            if (isEntityPatch || gpidMatched || wasSaved) {
               await handleResolve(issue.id);
               resolved++;
               if (issue.entity_id) entityIdsToRescan.add(issue.entity_id);
@@ -554,6 +569,68 @@ export function useCoverageOps() {
     }))
     .filter((lane) => lane.issues.length > 0);
 
+  // Need-oriented sections (Actions tab redesign)
+  // For completeness section: the detail API limits to 500 rows (high-severity first),
+  // so low-severity completeness issues may not be in `issues`. Use summary counts instead.
+  const completenessTypes = new Set(
+    Object.entries(ISSUE_SECTION).filter(([, s]) => s === 'completeness').map(([t]) => t),
+  );
+
+  const sections: Section[] = Object.entries(SECTION_META)
+    .sort(([, a], [, b]) => a.order - b.order)
+    .map(([key, meta]) => {
+      if (key === 'completeness' && summary?.by_type) {
+        // Build completeness section from summary counts (not individual rows)
+        const summaryGroups = summary.by_type
+          .filter((t) => completenessTypes.has(t.issue_type))
+          .sort((a, b) => b.count - a.count);
+        if (summaryGroups.length === 0) return null;
+        const totalCount = summaryGroups.reduce((s, g) => s + g.count, 0);
+        return {
+          key,
+          label: meta.label,
+          accent: meta.accent,
+          accentBg: meta.accentBg,
+          accentBorder: meta.accentBorder,
+          issues: [], // no individual rows for completeness
+          byType: summaryGroups.map((g) => ({
+            issue_type: g.issue_type,
+            label: ISSUE_NEED_LABELS[g.issue_type] ?? g.issue_type,
+            issues: [], // summary-only
+            summaryCount: g.count,
+          })),
+          entityCount: totalCount, // approximate (issues, not unique entities)
+        };
+      }
+
+      const sectionIssues = filteredIssues.filter(
+        (i) => (ISSUE_SECTION[i.issue_type] ?? 'completeness') === key,
+      );
+      const grouped: Record<string, IssueRow[]> = {};
+      for (const issue of sectionIssues) {
+        if (!grouped[issue.issue_type]) grouped[issue.issue_type] = [];
+        grouped[issue.issue_type].push(issue);
+      }
+      const entityIds = new Set(sectionIssues.map((i) => i.entity_id));
+      return {
+        key,
+        label: meta.label,
+        accent: meta.accent,
+        accentBg: meta.accentBg,
+        accentBorder: meta.accentBorder,
+        issues: sectionIssues,
+        byType: Object.entries(grouped)
+          .sort(([, a], [, b]) => b.length - a.length)
+          .map(([type, issues]) => ({
+            issue_type: type,
+            label: ISSUE_NEED_LABELS[type] ?? type,
+            issues,
+          })),
+        entityCount: entityIds.size,
+      };
+    })
+    .filter((s): s is NonNullable<typeof s> => s !== null && (s.issues.length > 0 || s.byType.length > 0)) as Section[];
+
   const severityCounts = { critical: 0, high: 0, medium: 0, low: 0 };
   for (const issue of issues) {
     if (issue.severity in severityCounts) {
@@ -580,6 +657,6 @@ export function useCoverageOps() {
     toggleLane,
 
     // Derived
-    filteredIssues, bulkActions, lanes, severityCounts,
+    filteredIssues, bulkActions, lanes, sections, severityCounts,
   };
 }

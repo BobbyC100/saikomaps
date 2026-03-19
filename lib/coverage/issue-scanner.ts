@@ -77,7 +77,10 @@ export interface ScanEntity {
   ces_instagram: string | null;
   ces_tiktok: string | null;
   ces_neighborhood: string | null;
+  ces_events_url: string | null;
   businessStatus: string | null;
+  // Surface scan hints
+  has_events_surface: boolean;
 }
 
 export interface ScanResult {
@@ -352,6 +355,25 @@ export const ISSUE_RULES: IssueRule[] = [
       return null;
     },
   },
+  // --- Editorial: event program gaps ---
+  {
+    issue_type: 'missing_events_surface',
+    problem_class: 'editorial',
+    severity: 'low',
+    blocking_publish: false,
+    recommended_tool: 'enrich_stage',
+    detect: (e) => {
+      // Only flag for food/drink verticals that are likely to have events
+      const EVENT_VERTICALS = new Set(['EAT', 'DRINKS', 'WINE', 'COFFEE']);
+      if (!e.primary_vertical || !EVENT_VERTICALS.has(e.primary_vertical)) return null;
+      // Must have a website (otherwise we can't discover surfaces)
+      const website = e.ces_website ?? e.website;
+      if (!website) return null;
+      // Skip if events surface already exists
+      if (e.has_events_surface) return null;
+      return { detected: true, detail: { recommended_stage: 2 } };
+    },
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -423,6 +445,7 @@ export async function scanEntities(
           instagram: true,
           tiktok: true,
           neighborhood: true,
+          events_url: true,
         },
       },
     },
@@ -437,6 +460,17 @@ export async function scanEntities(
     by_type: {},
     results: [],
   };
+
+  // Pre-fetch events surface existence for all entities in batch
+  const allEntityIds = entities.map((e) => e.id);
+  const eventsSurfaceRows = allEntityIds.length > 0
+    ? await prisma.merchant_surfaces.findMany({
+        where: { entity_id: { in: allEntityIds }, surface_type: 'events' },
+        select: { entity_id: true },
+        distinct: ['entity_id'],
+      })
+    : [];
+  const hasEventsSurfaceSet = new Set(eventsSurfaceRows.map((r) => r.entity_id));
 
   for (const raw of entities) {
     const entity: ScanEntity = {
@@ -468,6 +502,8 @@ export async function scanEntities(
       ces_instagram: raw.canonical_state?.instagram ?? null,
       ces_tiktok: raw.canonical_state?.tiktok ?? null,
       ces_neighborhood: raw.canonical_state?.neighborhood ?? null,
+      ces_events_url: raw.canonical_state?.events_url ?? null,
+      has_events_surface: hasEventsSurfaceSet.has(raw.id),
     };
 
     const result: ScanResult = {

@@ -171,6 +171,10 @@ const ATTRIBUTES = [
   { attribute_key: 'cuisine_type', display_name: 'Cuisine Type', attribute_class: 'CANONICAL', identity_critical: false, sanction_threshold: 0.70, decay_policy: 'NONE' },
   { attribute_key: 'category', display_name: 'Category', attribute_class: 'CANONICAL', identity_critical: false, sanction_threshold: 0.70, decay_policy: 'NONE' },
   { attribute_key: 'tips', display_name: 'Tips', attribute_class: 'CANONICAL', identity_critical: false, sanction_threshold: 0.70, decay_policy: 'NONE' },
+  { attribute_key: 'events_url', display_name: 'Events / Private Dining URL', attribute_class: 'CANONICAL', identity_critical: false, sanction_threshold: 0.70, decay_policy: 'SOURCE_UPDATED' },
+  { attribute_key: 'catering_url', display_name: 'Catering URL', attribute_class: 'CANONICAL', identity_critical: false, sanction_threshold: 0.70, decay_policy: 'SOURCE_UPDATED' },
+  { attribute_key: 'event_inquiry_email', display_name: 'Event Inquiry Email', attribute_class: 'CANONICAL', identity_critical: false, sanction_threshold: 0.70, decay_policy: 'SOURCE_UPDATED' },
+  { attribute_key: 'event_inquiry_form_url', display_name: 'Event Inquiry Form URL', attribute_class: 'CANONICAL', identity_critical: false, sanction_threshold: 0.70, decay_policy: 'SOURCE_UPDATED' },
   { attribute_key: 'google_photos', display_name: 'Google Photos', attribute_class: 'CANONICAL', identity_critical: false, sanction_threshold: 0.70, decay_policy: 'SOURCE_UPDATED' },
   { attribute_key: 'google_places_attributes', display_name: 'Google Places Attributes', attribute_class: 'CANONICAL', identity_critical: false, sanction_threshold: 0.70, decay_policy: 'SOURCE_UPDATED' },
 

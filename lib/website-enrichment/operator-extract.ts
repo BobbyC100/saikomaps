@@ -43,7 +43,7 @@ const INDEX_NAV_PATH_SEGMENTS = new Set([
   "privacy",
   "terms",
   "careers",
-  "events",
+  // "events" — intentionally NOT filtered; captured as events surface type for Event Program
   "reservations",
 ]);
 
