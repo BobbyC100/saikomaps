@@ -1,7 +1,39 @@
 {
-  "generated": "2026-03-17T00:45:00.000Z",
-  "doc_count": 87,
+  "generated": "2026-03-18T21:50:00.000Z",
+  "doc_count": 89,
   "docs": [
+    {
+      "doc_id": "ARCH-PERSON-ACTORS-V1",
+      "doc_type": "architecture",
+      "status": "active",
+      "title": "Person Actors — Chef & Sommelier Mapping v1",
+      "path": "docs/architecture/person-actors-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-18",
+      "last_updated": "2026-03-18",
+      "project_id": "SAIKO",
+      "summary": "Manual creation and linking of person actors (chefs, sommeliers, beverage directors) to venues. V1 is manual only; future extraction generates candidates for review.",
+      "systems": ["actors", "admin-tools"],
+      "related_docs": ["docs/architecture/instagram-ingestion-status-v1.md"]
+    },
+    {
+      "doc_id": "ARCH-INSTAGRAM-INGESTION-STATUS-V1",
+      "doc_type": "architecture",
+      "status": "active",
+      "title": "Instagram Ingestion — Operational Status v1",
+      "path": "docs/architecture/instagram-ingestion-status-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-18",
+      "last_updated": "2026-03-18",
+      "project_id": "SAIKO",
+      "summary": "Operational status of Instagram batch ingestion. 914 entities ingesting account profiles + recent media. CDN URL expiration and storage strategy pending.",
+      "systems": ["instagram", "enrichment"],
+      "related_docs": [
+        "docs/architecture/instagram-api-integration-v1.md",
+        "docs/architecture/instagram-implementation-v1.md",
+        "docs/architecture/instagram-ingestion-field-spec-v1.md"
+      ]
+    },
     {
       "doc_id": "ARCH-AI-OPERATING-LAYER",
       "doc_type": "architecture",
