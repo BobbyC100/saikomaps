@@ -61,18 +61,18 @@ export async function getGpidQueueItems(params: GetGpidQueueParams = {}): Promis
     sortBy = 'similarity_desc',
   } = params;
 
-  const where: Record<string, unknown> = { human_status: humanStatus };
-  if (resolverStatus) where.resolver_status = resolverStatus;
-  if (reasonCode) where.reason_code = reasonCode;
+  const where: Record<string, unknown> = { humanStatus: humanStatus };
+  if (resolverStatus) where.resolverStatus = resolverStatus;
+  if (reasonCode) where.reasonCode = reasonCode;
 
   const orderBy =
     sortBy === 'similarity_desc'
-      ? ([{ similarity_score: 'desc' as const }, { created_at: 'asc' as const }] as const)
+      ? ([{ similarityScore: 'desc' as const }, { createdAt: 'asc' as const }] as const)
       : sortBy === 'similarity_asc'
-        ? ([{ similarity_score: 'asc' as const }, { created_at: 'asc' as const }] as const)
+        ? ([{ similarityScore: 'asc' as const }, { createdAt: 'asc' as const }] as const)
         : sortBy === 'created_asc'
-          ? ([{ created_at: 'asc' as const }] as const)
-          : ([{ created_at: 'desc' as const }] as const);
+          ? ([{ createdAt: 'asc' as const }] as const)
+          : ([{ createdAt: 'desc' as const }] as const);
 
   const [items, total, pending, approved, rejected] = await Promise.all([
     prisma.gpid_resolution_queue.findMany({
@@ -95,9 +95,9 @@ export async function getGpidQueueItems(params: GetGpidQueueParams = {}): Promis
       },
     }),
     prisma.gpid_resolution_queue.count({ where }),
-    prisma.gpid_resolution_queue.count({ where: { human_status: 'PENDING' } }),
-    prisma.gpid_resolution_queue.count({ where: { human_status: 'APPROVED' } }),
-    prisma.gpid_resolution_queue.count({ where: { human_status: 'REJECTED' } }),
+    prisma.gpid_resolution_queue.count({ where: { humanStatus: 'PENDING' } }),
+    prisma.gpid_resolution_queue.count({ where: { humanStatus: 'APPROVED' } }),
+    prisma.gpid_resolution_queue.count({ where: { humanStatus: 'REJECTED' } }),
   ]);
 
   const hydrated = items.map((row) => ({
@@ -149,11 +149,11 @@ export async function approveGpidQueueItem(params: {
 
   const item = await prisma.gpid_resolution_queue.findUnique({ where: { id } });
   if (!item) return { success: false, error: 'Queue item not found' };
-  if (item.human_status !== 'PENDING') return { success: false, error: 'Item already resolved' };
+  if (item.humanStatus !== 'PENDING') return { success: false, error: 'Item already resolved' };
 
   // For MATCH we have a single candidate; for AMBIGUOUS we may have multiple (in candidates_json)
   const gpidToApply =
-    item.candidate_gpid === candidateGpid ? candidateGpid : candidateGpid; // use passed value as authoritative
+    item.candidateGpid === candidateGpid ? candidateGpid : candidateGpid; // use passed value as authoritative
   if (!gpidToApply || gpidToApply.length < 20) return { success: false, error: 'Invalid candidate GPID' };
 
   await prisma.$transaction([
@@ -164,12 +164,12 @@ export async function approveGpidQueueItem(params: {
     prisma.gpid_resolution_queue.update({
       where: { id },
       data: {
-        human_status: 'APPROVED',
-        human_decision: 'APPLY_GPID',
-        candidate_gpid: gpidToApply,
-        human_note: note ?? null,
-        reviewed_by: reviewedBy,
-        reviewed_at: new Date(),
+        humanStatus: 'APPROVED',
+        humanDecision: 'APPLY_GPID',
+        candidateGpid: gpidToApply,
+        humanNote: note ?? null,
+        reviewedBy: reviewedBy,
+        reviewedAt: new Date(),
       },
     }),
   ]);
@@ -187,16 +187,16 @@ export async function rejectGpidQueueItem(params: {
 
   const item = await prisma.gpid_resolution_queue.findUnique({ where: { id } });
   if (!item) return { success: false, error: 'Queue item not found' };
-  if (item.human_status !== 'PENDING') return { success: false, error: 'Item already resolved' };
+  if (item.humanStatus !== 'PENDING') return { success: false, error: 'Item already resolved' };
 
   await prisma.gpid_resolution_queue.update({
     where: { id },
     data: {
-      human_status: 'REJECTED',
-      human_decision: 'MARK_NO_MATCH',
-      human_note: note ?? null,
-      reviewed_by: reviewedBy,
-      reviewed_at: new Date(),
+      humanStatus: 'REJECTED',
+      humanDecision: 'MARK_NO_MATCH',
+      humanNote: note ?? null,
+      reviewedBy: reviewedBy,
+      reviewedAt: new Date(),
     },
   });
 
@@ -213,16 +213,16 @@ export async function markAmbiguousGpidQueueItem(params: {
 
   const item = await prisma.gpid_resolution_queue.findUnique({ where: { id } });
   if (!item) return { success: false, error: 'Queue item not found' };
-  if (item.human_status !== 'PENDING') return { success: false, error: 'Item already resolved' };
+  if (item.humanStatus !== 'PENDING') return { success: false, error: 'Item already resolved' };
 
   await prisma.gpid_resolution_queue.update({
     where: { id },
     data: {
-      human_status: 'REJECTED', // or APPROVED with decision MARK_AMBIGUOUS — we treat as resolved
-      human_decision: 'MARK_AMBIGUOUS',
-      human_note: note ?? null,
-      reviewed_by: reviewedBy,
-      reviewed_at: new Date(),
+      humanStatus: 'REJECTED', // or APPROVED with decision MARK_AMBIGUOUS — we treat as resolved
+      humanDecision: 'MARK_AMBIGUOUS',
+      humanNote: note ?? null,
+      reviewedBy: reviewedBy,
+      reviewedAt: new Date(),
     },
   });
 
@@ -233,7 +233,7 @@ export async function markAmbiguousGpidQueueItem(params: {
 export async function skipGpidQueueItem(id: string): Promise<{ success: boolean; error?: string }> {
   const item = await prisma.gpid_resolution_queue.findUnique({ where: { id } });
   if (!item) return { success: false, error: 'Queue item not found' };
-  if (item.human_status !== 'PENDING') return { success: false, error: 'Item already resolved' };
+  if (item.humanStatus !== 'PENDING') return { success: false, error: 'Item already resolved' };
   // No-op: leave pending. Future: add skip_audit table or skip_count.
   return { success: true };
 }

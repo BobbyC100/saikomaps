@@ -48,8 +48,10 @@ const SRC_IDENTITY_SIGNALS = { key: "identity_signals", version: "extract-identi
 // ---------------------------------------------------------------------------
 
 type ProgramMaturity = "none" | "incidental" | "considered" | "dedicated" | "unknown";
+type ProgramClass = "food" | "beverage" | "events" | "service";
 
 interface ProgramEntry {
+  programClass: ProgramClass;
   maturity:   ProgramMaturity;
   signals:    string[];
   confidence: number;
@@ -57,39 +59,44 @@ interface ProgramEntry {
 }
 
 interface OfferingPrograms {
-  food_program:            ProgramEntry;
-  wine_program:            ProgramEntry;
-  beer_program:            ProgramEntry;
-  cocktail_program:        ProgramEntry;
-  non_alcoholic_program:   ProgramEntry;
-  coffee_tea_program:      ProgramEntry;
-  service_program:         ProgramEntry;
-  private_dining_program:  ProgramEntry;
-  group_dining_program:    ProgramEntry;
-  catering_program:        ProgramEntry;
-  source_coverage: {
-    menu_identity_present:         boolean;
-    menu_structure_present:        boolean;
-    identity_signals_present:      boolean;
-    merchant_surface_scans_present: boolean;
+  foodProgram:              ProgramEntry;
+  wineProgram:              ProgramEntry;
+  beerProgram:              ProgramEntry;
+  cocktailProgram:          ProgramEntry;
+  nonAlcoholicProgram:     ProgramEntry;
+  coffeeTeaProgram:        ProgramEntry;
+  serviceProgram:           ProgramEntry;
+  privateDiningProgram:    ProgramEntry;
+  groupDiningProgram:      ProgramEntry;
+  cateringProgram:          ProgramEntry;
+  dumplingProgram:          ProgramEntry;
+  sushiRawFishProgram:    ProgramEntry;
+  ramenNoodleProgram:      ProgramEntry;
+  tacoProgram:              ProgramEntry;
+  pizzaProgram:             ProgramEntry;
+  sourceCoverage: {
+    menuIdentityPresent:         boolean;
+    menuStructurePresent:        boolean;
+    identitySignalsPresent:      boolean;
+    merchantSurfaceScansPresent: boolean;
   };
-  source_timestamps: {
-    menu_identity:    string | null;
-    menu_structure:   string | null;
-    identity_signals: string | null;
+  sourceTimestamps: {
+    menuIdentity:    string | null;
+    menuStructure:   string | null;
+    identitySignals: string | null;
   };
 }
 
 interface MenuIdentityPayload {
-  cuisine_posture:               string | null;
-  cuisine_posture_confidence:    number;
-  cuisine_posture_evidence:      string | null;
-  service_model:                 string | null;
-  service_model_confidence:      number;
-  service_model_evidence:        string | null;
-  wine_program_intent:           string | null;
-  wine_program_intent_confidence: number;
-  wine_program_intent_evidence:  string | null;
+  cuisinePosture:               string | null;
+  cuisinePostureConfidence:    number;
+  cuisinePostureEvidence:      string | null;
+  serviceModel:                 string | null;
+  serviceModelConfidence:      number;
+  serviceModelEvidence:        string | null;
+  wineProgramIntent:           string | null;
+  wineProgramIntentConfidence: number;
+  wineProgramIntentEvidence:  string | null;
 }
 
 // WO-008: signal-level evidence format
@@ -113,15 +120,15 @@ interface MenuStructurePayloadLegacy {
 type MenuStructurePayload = MenuStructurePayloadV2 | MenuStructurePayloadLegacy;
 
 interface IdentitySignalsPayload {
-  cuisine_posture:       string | null;
-  service_model:         string | null;
-  wine_program_intent:   string | null;
-  extraction_confidence: number;
+  cuisinePosture:       string | null;
+  serviceModel:         string | null;
+  wineProgramIntent:   string | null;
+  extractionConfidence: number;
 }
 
 interface MerchantSurfaceScanHints {
-  private_dining_present: boolean;
-  events_surface_exists:  boolean;
+  privateDiningPresent: boolean;
+  eventsSurfaceExists:  boolean;
 }
 
 interface SourceSignals {
@@ -132,8 +139,8 @@ interface SourceSignals {
 }
 
 interface AssembleTarget {
-  entity_id:   string;
-  entity_name: string;
+  entityId:   string;
+  entityName: string;
   slug:        string;
 }
 
@@ -166,6 +173,22 @@ const FOOD_SIGNALS = new Set([
 const STREET_FOOD_DEDICATED_SIGNALS = new Set([
   "taco_program",
   "street_food_program",
+]);
+
+const DUMPLING_SIGNALS = new Set([
+  "dumpling_program",
+  "dumpling_specialist",
+  "dumpling_house_made",
+  "xlb",              // xiao long bao
+  "jiaozi",           // Chinese potstickers
+  "mandu",            // Korean
+  "gyoza",            // Japanese
+  "momo",             // Himalayan
+  "khinkali",         // Georgian
+  "pierogi",          // Eastern European
+  "wontons",
+  "har_gow",          // shrimp dumpling (dim sum)
+  "siu_mai",          // pork dumpling (dim sum)
 ]);
 
 const WINE_SIGNALS = new Set([
@@ -208,6 +231,119 @@ const CATERING_SIGNALS = new Set([
   "catering_menu_present",
   "off_site_catering",
   "on_site_catering",
+]);
+
+const SUSHI_RAW_FISH_SIGNALS = new Set([
+  // Tier 1 — Identity (Program Trigger)
+  "sushi_presence",
+  "raw_fish_presence",
+  "nigiri_presence",
+  // Tier 2 — Distinctive (Depth + Specialization)
+  "omakase_service",
+  "sashimi_program",
+  "hand_roll_program",
+  "premium_fish_sourcing",
+  "seasonal_fish_rotation",
+  "rice_quality_signal",
+  // Tier 3 — Detail (Refinement)
+  "fish_origin_specificity",
+  "knife_work_emphasis",
+  "course_progression_structure",
+  "minimalist_presentation",
+]);
+
+const RAMEN_NOODLE_SIGNALS = new Set([
+  // Tier 1 — Identity (Program Trigger)
+  "ramen_presence",
+  "noodle_focus",
+  "ramen_ya_identity",
+  // Tier 2 — Broth System (Primary Axis)
+  "broth_type_defined",
+  "tonkotsu_presence",
+  "shoyu_presence",
+  "shio_presence",
+  "miso_presence",
+  // Tier 2b — Structural Execution (Depth + Specialization)
+  "house_made_noodles",
+  "tsukemen_presence",
+  "broth_depth_signal",
+  "tare_variation",
+  "noodle_texture_control",
+  "specialization_signal",
+  // Tier 3 — Refinement (Regional + Expression)
+  "regional_style_reference",
+  "broth_blend_signal",
+]);
+
+const TACO_SIGNALS = new Set([
+  // Tier 1 — Identity (Program Trigger)
+  "taco_presence",
+  "taco_focus",
+  "taqueria_identity",
+  // Tier 2 — Primary Differentiation (Subtype Signals)
+  "al_pastor_presence",
+  "birria_presence",
+  "carnitas_presence",
+  "carne_asada_presence",
+  "seafood_taco_presence",
+  "guisado_presence",
+  "barbacoa_presence",
+  "pollo_taco_presence",
+  "vegetarian_taco_presence",
+  // Tier 2b — Structural Execution (Tortilla + Cooking + Accompaniment)
+  "handmade_tortilla",
+  "corn_tortilla_presence",
+  "flour_tortilla_presence",
+  "nixtamal_presence",
+  "heirloom_corn_presence",
+  "trompo_presence",
+  "mesquite_or_charcoal_grill",
+  "braised_stewed_preparation",
+  "fried_taco_presence",
+  "salsa_program",
+  // Tier 3 — Refinement & Expression
+  "regional_style_reference",
+  "hybrid_taco_signal",
+  "chef_driven_taco_signal",
+  "tortilla_supplier_notability",
+]);
+
+const PIZZA_SIGNALS = new Set([
+  // Tier 1 — Identity (Program Trigger)
+  "pizza_presence",
+  "pizzeria_identity",
+  "slice_shop_identity",
+  // Tier 2 — Primary Differentiation (Style Signals)
+  "neapolitan_style",
+  "new_york_style",
+  "detroit_style",
+  "chicago_style",
+  "roman_style",
+  "sicilian_style",
+  "new_haven_style",
+  "california_style",
+  "hybrid_pizza_style",
+  // Tier 2b — Structural Execution (Dough + Oven)
+  "long_fermentation",
+  "sourdough_presence",
+  "high_hydration_dough",
+  "thin_crust",
+  "thick_crust",
+  "pan_dough",
+  "wood_fired_oven",
+  "deck_oven",
+  "coal_fired_oven",
+  "pan_baked",
+  "foldable_slice",
+  "crispy_edge_crust",
+  "soft_center",
+  "airy_structure",
+  // Tier 3 — Refinement & Expression
+  "ingredient_quality_signal",
+  "topping_creativity",
+  "seasonal_toppings",
+  "slice_vs_whole_pie_format",
+  "chef_driven_pizza_signal",
 ]);
 
 // wine_program_intent values that represent a strong, directional wine identity
@@ -277,12 +413,12 @@ function assemblePrograms(src: SourceSignals): OfferingPrograms {
 
   const foodSignalNames = msSignalNames.filter((s) => FOOD_SIGNALS.has(s));
   const foodEvidence    = [
-    mi?.cuisine_posture_evidence ?? null,
+    mi?.cuisinePostureEvidence ?? null,
     ...evidenceFor(FOOD_SIGNALS),
   ].filter((e): e is string => typeof e === "string" && e.length > 0);
 
   const foodConfPool: number[] = [];
-  if (mi && typeof mi.cuisine_posture_confidence === "number") foodConfPool.push(mi.cuisine_posture_confidence);
+  if (mi && typeof mi.cuisinePostureConfidence === "number") foodConfPool.push(mi.cuisinePostureConfidence);
   if (ms && typeof ms.confidence === "number")                  foodConfPool.push(ms.confidence);
   const foodConfidence = foodConfPool.length > 0
     ? round2(foodConfPool.reduce((a, b) => a + b, 0) / foodConfPool.length)
@@ -308,15 +444,15 @@ function assemblePrograms(src: SourceSignals): OfferingPrograms {
   // WO-008: aperitif_focus is now a wine signal (removed from cocktail)
 
   const wineSignalNames = msSignalNames.filter((s) => WINE_SIGNALS.has(s));
-  const wineIntent      = mi?.wine_program_intent ?? null;
+  const wineIntent      = mi?.wineProgramIntent ?? null;
   const wineEvidence    = [
-    mi?.wine_program_intent_evidence ?? null,
+    mi?.wineProgramIntentEvidence ?? null,
     ...evidenceFor(WINE_SIGNALS),
   ].filter((e): e is string => typeof e === "string" && e.length > 0);
 
   const wineConf: number =
-    typeof mi?.wine_program_intent_confidence === "number"
-      ? mi.wine_program_intent_confidence
+    typeof mi?.wineProgramIntentConfidence === "number"
+      ? mi.wineProgramIntentConfidence
       : wineSignalNames.length > 0 && typeof ms?.confidence === "number"
         ? ms.confidence
         : 0;
@@ -340,12 +476,13 @@ function assemblePrograms(src: SourceSignals): OfferingPrograms {
   const hasBeer       = msSignalNames.includes("beer_program");
   const beerProgram: ProgramEntry = hasBeer
     ? {
+        programClass: "beverage",
         maturity:   "considered",
         signals:    ["beer_program"],
         confidence: ms ? round2(ms.confidence) : 0,
         evidence:   evidenceFor(beerSignalSet),
       }
-    : { maturity: "unknown", signals: [], confidence: 0, evidence: [] };
+    : { program_class: "beverage", maturity: "unknown", signals: [], confidence: 0, evidence: [] };
 
   // ── cocktail_program ──────────────────────────────────────────────────────
   // WO-008: aperitif_focus removed — cocktail_program only
@@ -355,32 +492,33 @@ function assemblePrograms(src: SourceSignals): OfferingPrograms {
   const hasCocktail          = cocktailSignalNames.length > 0;
   const cocktailProgram: ProgramEntry = hasCocktail
     ? {
+        programClass: "beverage",
         maturity:   "considered",
         signals:    cocktailSignalNames,
         confidence: ms ? round2(ms.confidence) : 0,
         evidence:   evidenceFor(cocktailSignalSet),
       }
-    : { maturity: "unknown", signals: [], confidence: 0, evidence: [] };
+    : { program_class: "beverage", maturity: "unknown", signals: [], confidence: 0, evidence: [] };
 
   // ── non_alcoholic_program (no inference in v1) ────────────────────────────
 
   const nonAlcoholicProgram: ProgramEntry = {
-    maturity: "unknown", signals: [], confidence: 0, evidence: [],
+    program_class: "beverage", maturity: "unknown", signals: [], confidence: 0, evidence: [],
   };
 
   // ── coffee_tea_program (no inference in v1) ───────────────────────────────
 
   const coffeeTeaProgram: ProgramEntry = {
-    maturity: "unknown", signals: [], confidence: 0, evidence: [],
+    program_class: "beverage", maturity: "unknown", signals: [], confidence: 0, evidence: [],
   };
 
   // ── service_program ───────────────────────────────────────────────────────
 
-  const serviceModel    = mi?.service_model ?? null;
-  const serviceEvidence = [mi?.service_model_evidence ?? null]
+  const serviceModel    = mi?.serviceModel ?? null;
+  const serviceEvidence = [mi?.serviceModelEvidence ?? null]
     .filter((e): e is string => typeof e === "string" && e.length > 0);
   const serviceConf     =
-    typeof mi?.service_model_confidence === "number" ? round2(mi.service_model_confidence) : 0;
+    typeof mi?.serviceModelConfidence === "number" ? round2(mi.serviceModelConfidence) : 0;
   const serviceSignals  = serviceModel ? [serviceModel] : [];
   const serviceMaturity: ProgramMaturity = serviceModel ? "considered" : "unknown";
 
@@ -388,8 +526,8 @@ function assemblePrograms(src: SourceSignals): OfferingPrograms {
 
   const pdSignalNames = msSignalNames.filter((s) => PRIVATE_DINING_SIGNALS.has(s));
   const scanHints     = src.surfaceScanHints;
-  const hasPrivateDiningPresent = scanHints?.private_dining_present ?? false;
-  const hasEventsSurface        = scanHints?.events_surface_exists ?? false;
+  const hasPrivateDiningPresent = scanHints?.privateDiningPresent ?? false;
+  const hasEventsSurface        = scanHints?.eventsSurfaceExists ?? false;
 
   let privateDiningMaturity: ProgramMaturity = "unknown";
   if (hasEventsSurface && pdSignalNames.length > 0) {
@@ -407,6 +545,7 @@ function assemblePrograms(src: SourceSignals): OfferingPrograms {
   }
 
   const privateDiningProgram: ProgramEntry = {
+    programClass: "events",
     maturity:   privateDiningMaturity,
     signals:    hasPrivateDiningPresent && pdSignalNames.length === 0
       ? ["private_room_available"] : pdSignalNames,
@@ -425,6 +564,7 @@ function assemblePrograms(src: SourceSignals): OfferingPrograms {
   }
 
   const groupDiningProgram: ProgramEntry = {
+    programClass: "events",
     maturity:   groupDiningMaturity,
     signals:    gdSignalNames,
     confidence: groupDiningMaturity === "unknown" ? 0 : hasEventsSurface ? 0.8 : 0.5,
@@ -442,50 +582,214 @@ function assemblePrograms(src: SourceSignals): OfferingPrograms {
   }
 
   const cateringProgram: ProgramEntry = {
+    programClass: "events",
     maturity:   cateringMaturity,
     signals:    catSignalNames,
     confidence: cateringMaturity === "unknown" ? 0 : hasEventsSurface ? 0.8 : 0.5,
     evidence:   evidenceFor(CATERING_SIGNALS),
   };
 
+  // ── dumpling_program ──────────────────────────────────────────────────────
+
+  const dumplingSignalNames = msSignalNames.filter((s) => DUMPLING_SIGNALS.has(s));
+  const hasDumplingSpecialist = dumplingSignalNames.includes("dumpling_specialist");
+
+  let dumplingMaturity: ProgramMaturity = "unknown";
+  if (hasDumplingSpecialist || dumplingSignalNames.length >= 3) {
+    // Specialist signal or multiple dumpling type signals → dedicated
+    dumplingMaturity = "dedicated";
+  } else if (dumplingSignalNames.length > 0) {
+    // Some dumpling signals present → considered
+    dumplingMaturity = "considered";
+  }
+
+  const dumplingProgram: ProgramEntry = {
+    programClass: "food",
+    maturity:   dumplingMaturity,
+    signals:    dumplingSignalNames,
+    confidence: dumplingMaturity === "unknown" ? 0 : ms ? round2(ms.confidence) : 0.5,
+    evidence:   evidenceFor(DUMPLING_SIGNALS),
+  };
+
+  // ── sushi_raw_fish_program ────────────────────────────────────────────────
+
+  const sushiSignalNames = msSignalNames.filter((s) => SUSHI_RAW_FISH_SIGNALS.has(s));
+  const hasSushiIdentity = sushiSignalNames.some((s) => ['sushi_presence', 'raw_fish_presence', 'nigiri_presence'].includes(s));
+  const tier2SushiSignals = sushiSignalNames.filter((s) => [
+    'omakase_service', 'sashimi_program', 'hand_roll_program',
+    'premium_fish_sourcing', 'seasonal_fish_rotation', 'rice_quality_signal'
+  ].includes(s));
+
+  let sushiMaturity: ProgramMaturity = "unknown";
+  if (sushiSignalNames.includes("omakase_service") || tier2SushiSignals.length >= 3) {
+    // Omakase or 3+ distinctive signals → dedicated
+    sushiMaturity = "dedicated";
+  } else if (hasSushiIdentity || tier2SushiSignals.length > 0) {
+    // Identity signal or any distinctive signal → considered
+    sushiMaturity = "considered";
+  }
+
+  const sushiRawFishProgram: ProgramEntry = {
+    programClass: "food",
+    maturity:   sushiMaturity,
+    signals:    sushiSignalNames,
+    confidence: sushiMaturity === "unknown" ? 0 : 0.7,
+    evidence:   evidenceFor(SUSHI_RAW_FISH_SIGNALS),
+  };
+
+  // ── ramen_noodle_program ──────────────────────────────────────────────────
+
+  const ramenSignalNames = msSignalNames.filter((s) => RAMEN_NOODLE_SIGNALS.has(s));
+  const hasRamenIdentity = ramenSignalNames.some((s) => ['ramen_presence', 'noodle_focus', 'ramen_ya_identity'].includes(s));
+
+  // Broth system signals (primary axis)
+  const brothSignals = ramenSignalNames.filter((s) => [
+    'broth_type_defined', 'tonkotsu_presence', 'shoyu_presence', 'shio_presence', 'miso_presence', 'broth_blend_signal'
+  ].includes(s));
+
+  // Execution signals (supporting structure: noodles, tare, depth)
+  const ramenExecutionSignals = ramenSignalNames.filter((s) => [
+    'house_made_noodles', 'tsukemen_presence', 'broth_depth_signal',
+    'tare_variation', 'noodle_texture_control', 'specialization_signal'
+  ].includes(s));
+
+  let ramenMaturity: ProgramMaturity = "unknown";
+  if (brothSignals.length > 0 && ramenExecutionSignals.length >= 2) {
+    // Broth identity + 2+ execution signals → dedicated
+    ramenMaturity = "dedicated";
+  } else if (hasRamenIdentity || brothSignals.length > 0) {
+    // Identity signal or broth identity signal → considered
+    ramenMaturity = "considered";
+  }
+
+  const ramenNoodleProgram: ProgramEntry = {
+    programClass: "food",
+    maturity:   ramenMaturity,
+    signals:    ramenSignalNames,
+    confidence: ramenMaturity === "unknown" ? 0 : 0.7,
+    evidence:   evidenceFor(RAMEN_NOODLE_SIGNALS),
+  };
+
+  // ── taco_program ──────────────────────────────────────────────────────────
+
+  const tacoSignalNames = msSignalNames.filter((s) => TACO_SIGNALS.has(s));
+  const hasTacoIdentity = tacoSignalNames.some((s) => ['taco_presence', 'taco_focus', 'taqueria_identity'].includes(s));
+
+  // Tier 2 — Subtype signals (primary differentiator)
+  const tacoSubtypeSignals = tacoSignalNames.filter((s) => [
+    'al_pastor_presence', 'birria_presence', 'carnitas_presence', 'carne_asada_presence',
+    'seafood_taco_presence', 'guisado_presence', 'barbacoa_presence', 'pollo_taco_presence',
+    'vegetarian_taco_presence'
+  ].includes(s));
+
+  // Tier 2b — Structural execution signals (tortilla, cooking, accompaniment)
+  const tacoStructureSignals = tacoSignalNames.filter((s) => [
+    'handmade_tortilla', 'corn_tortilla_presence', 'flour_tortilla_presence',
+    'nixtamal_presence', 'heirloom_corn_presence', 'trompo_presence',
+    'mesquite_or_charcoal_grill', 'braised_stewed_preparation', 'fried_taco_presence',
+    'salsa_program'
+  ].includes(s));
+
+  let tacoMaturity: ProgramMaturity = "unknown";
+  if (tacoSignalNames.includes("taco_specialist") || (tacoSubtypeSignals.length >= 2 && tacoStructureSignals.length > 0)) {
+    // Specialist signal OR 2+ subtypes with supporting structure → dedicated
+    tacoMaturity = "dedicated";
+  } else if (hasTacoIdentity) {
+    // Any taco identity signal → considered
+    tacoMaturity = "considered";
+  }
+
+  const tacoProgram: ProgramEntry = {
+    programClass: "food",
+    maturity:   tacoMaturity,
+    signals:    tacoSignalNames,
+    confidence: tacoMaturity === "unknown" ? 0 : 0.7,
+    evidence:   evidenceFor(TACO_SIGNALS),
+  };
+
+  // ── pizza_program ─────────────────────────────────────────────────────────
+
+  const pizzaSignalNames = msSignalNames.filter((s) => PIZZA_SIGNALS.has(s));
+  const hasPizzaIdentity = pizzaSignalNames.some((s) => ['pizza_presence', 'pizzeria_identity', 'slice_shop_identity'].includes(s));
+
+  // Tier 2 — Style signals (primary differentiator: dough + bake system)
+  const pizzaStyleSignals = pizzaSignalNames.filter((s) => [
+    'neapolitan_style', 'new_york_style', 'detroit_style', 'chicago_style',
+    'roman_style', 'sicilian_style', 'new_haven_style', 'california_style',
+    'hybrid_pizza_style'
+  ].includes(s));
+
+  // Tier 2b — Structural execution signals (dough + oven + structure)
+  const pizzaStructureSignals = pizzaSignalNames.filter((s) => [
+    'long_fermentation', 'sourdough_presence', 'high_hydration_dough',
+    'thin_crust', 'thick_crust', 'pan_dough',
+    'wood_fired_oven', 'deck_oven', 'coal_fired_oven', 'pan_baked',
+    'foldable_slice', 'crispy_edge_crust', 'soft_center', 'airy_structure'
+  ].includes(s));
+
+  let pizzaMaturity: ProgramMaturity = "unknown";
+  if (pizzaSignalNames.includes("pizza_specialist") || (pizzaStyleSignals.length >= 1 && pizzaStructureSignals.length > 0)) {
+    // Specialist signal OR clear style with supporting structure → dedicated
+    pizzaMaturity = "dedicated";
+  } else if (hasPizzaIdentity) {
+    // Any pizza identity signal → considered
+    pizzaMaturity = "considered";
+  }
+
+  const pizzaProgram: ProgramEntry = {
+    programClass: "food",
+    maturity:   pizzaMaturity,
+    signals:    pizzaSignalNames,
+    confidence: pizzaMaturity === "unknown" ? 0 : 0.7,
+    evidence:   evidenceFor(PIZZA_SIGNALS),
+  };
+
   // ── source coverage / timestamps ──────────────────────────────────────────
 
   return {
-    food_program: {
+    foodProgram: {
+      programClass: "food",
       maturity:   foodMaturity,
       signals:    foodSignalNames,
       confidence: foodConfidence,
       evidence:   foodEvidence,
     },
-    wine_program: {
+    wineProgram: {
+      programClass: "beverage",
       maturity:   wineMaturity,
       signals:    wineSignalNames,
       confidence: round2(wineConf),
       evidence:   wineEvidence,
     },
-    beer_program:          beerProgram,
-    cocktail_program:      cocktailProgram,
-    non_alcoholic_program: nonAlcoholicProgram,
-    coffee_tea_program:    coffeeTeaProgram,
-    service_program: {
+    beerProgram:          beerProgram,
+    cocktailProgram:      cocktailProgram,
+    nonAlcoholicProgram: nonAlcoholicProgram,
+    coffeeTeaProgram:    coffeeTeaProgram,
+    serviceProgram: {
+      programClass: "service",
       maturity:   serviceMaturity,
       signals:    serviceSignals,
       confidence: serviceConf,
       evidence:   serviceEvidence,
     },
-    private_dining_program:  privateDiningProgram,
-    group_dining_program:    groupDiningProgram,
-    catering_program:        cateringProgram,
-    source_coverage: {
-      menu_identity_present:          src.menuIdentity    !== null,
-      menu_structure_present:         src.menuStructure   !== null,
-      identity_signals_present:       src.identitySignals !== null,
-      merchant_surface_scans_present: src.surfaceScanHints !== null,
+    privateDiningProgram:  privateDiningProgram,
+    groupDiningProgram:    groupDiningProgram,
+    cateringProgram:        cateringProgram,
+    dumplingProgram:        dumplingProgram,
+    sushiRawFishProgram:  sushiRawFishProgram,
+    ramenNoodleProgram:    ramenNoodleProgram,
+    tacoProgram:            tacoProgram,
+    pizzaProgram:           pizzaProgram,
+    sourceCoverage: {
+      menuIdentityPresent:          src.menuIdentity    !== null,
+      menuStructurePresent:         src.menuStructure   !== null,
+      identitySignalsPresent:       src.identitySignals !== null,
+      merchantSurfaceScansPresent: src.surfaceScanHints !== null,
     },
-    source_timestamps: {
-      menu_identity:    src.menuIdentity?.computedAt.toISOString()    ?? null,
-      menu_structure:   src.menuStructure?.computedAt.toISOString()   ?? null,
-      identity_signals: src.identitySignals?.computedAt.toISOString() ?? null,
+    sourceTimestamps: {
+      menuIdentity:    src.menuIdentity?.computedAt.toISOString()    ?? null,
+      menuStructure:   src.menuStructure?.computedAt.toISOString()   ?? null,
+      identitySignals: src.identitySignals?.computedAt.toISOString() ?? null,
     },
   };
 }
@@ -503,9 +807,9 @@ async function loadTargets(
   const candidates = await db.entities.findMany({
     where: {
       ...(slugArg ? { slug: slugArg } : {}),
-      derived_signals: {
+      derivedSignals: {
         some: {
-          signal_key: {
+          signalKey: {
             in: [
               SRC_MENU_IDENTITY.key,
               SRC_MENU_STRUCTURE.key,
@@ -525,20 +829,20 @@ async function loadTargets(
   // Check which already have offering_programs v1
   let existingIds = new Set<string>();
   if (!reprocess) {
-    const existing = await db.derived_signals.findMany({
+    const existing = await db.derivedSignals.findMany({
       where: {
-        entity_id:      { in: candidates.map((c) => c.id) },
-        signal_key:     SIGNAL_KEY,
-        signal_version: SIGNAL_VERSION,
+        entityId:      { in: candidates.map((c) => c.id) },
+        signalKey:     SIGNAL_KEY,
+        signalVersion: SIGNAL_VERSION,
       },
-      select: { entity_id: true },
+      select: { entityId: true },
     });
-    existingIds = new Set(existing.map((r) => r.entity_id));
+    existingIds = new Set(existing.map((r) => r.entityId));
   }
 
   return candidates
     .filter((c) => reprocess || !existingIds.has(c.id))
-    .map((c) => ({ entity_id: c.id, entity_name: c.name, slug: c.slug }));
+    .map((c) => ({ entityId: c.id, entityName: c.name, slug: c.slug }));
 }
 
 // ---------------------------------------------------------------------------
@@ -555,64 +859,64 @@ async function fetchSourceSignals(entityIds: string[]): Promise<Map<string, Sour
 
   const rows = await db.derived_signals.findMany({
     where: {
-      entity_id: { in: entityIds },
+      entityId: { in: entityIds },
       OR: [
-        { signal_key: SRC_MENU_IDENTITY.key,    signal_version: SRC_MENU_IDENTITY.version },
-        { signal_key: SRC_MENU_STRUCTURE.key,   signal_version: SRC_MENU_STRUCTURE.version },
-        { signal_key: SRC_IDENTITY_SIGNALS.key, signal_version: SRC_IDENTITY_SIGNALS.version },
+        { signalKey: SRC_MENU_IDENTITY.key,    signalVersion: SRC_MENU_IDENTITY.version },
+        { signalKey: SRC_MENU_STRUCTURE.key,   signalVersion: SRC_MENU_STRUCTURE.version },
+        { signalKey: SRC_IDENTITY_SIGNALS.key, signalVersion: SRC_IDENTITY_SIGNALS.version },
       ],
     },
-    orderBy: { computed_at: "desc" },
-    select: { entity_id: true, signal_key: true, signal_value: true, computed_at: true },
+    orderBy: { computedAt: "desc" },
+    select: { entityId: true, signalKey: true, signalValue: true, computedAt: true },
   });
 
   // Keep only the latest row per (entity_id, signal_key) — rows are ordered desc
   for (const row of rows) {
-    const entry = map.get(row.entity_id);
+    const entry = map.get(row.entityId);
     if (!entry) continue;
 
-    if (row.signal_key === SRC_MENU_IDENTITY.key && !entry.menuIdentity) {
+    if (row.signalKey === SRC_MENU_IDENTITY.key && !entry.menuIdentity) {
       entry.menuIdentity = {
-        payload:    row.signal_value as MenuIdentityPayload,
-        computedAt: row.computed_at,
+        payload:    row.signalValue as MenuIdentityPayload,
+        computedAt: row.computedAt,
       };
-    } else if (row.signal_key === SRC_MENU_STRUCTURE.key && !entry.menuStructure) {
+    } else if (row.signalKey === SRC_MENU_STRUCTURE.key && !entry.menuStructure) {
       entry.menuStructure = {
-        payload:    row.signal_value as MenuStructurePayload,
-        computedAt: row.computed_at,
+        payload:    row.signalValue as MenuStructurePayload,
+        computedAt: row.computedAt,
       };
-    } else if (row.signal_key === SRC_IDENTITY_SIGNALS.key && !entry.identitySignals) {
+    } else if (row.signalKey === SRC_IDENTITY_SIGNALS.key && !entry.identitySignals) {
       entry.identitySignals = {
-        payload:    row.signal_value as IdentitySignalsPayload,
-        computedAt: row.computed_at,
+        payload:    row.signalValue as IdentitySignalsPayload,
+        computedAt: row.computedAt,
       };
     }
   }
 
   // Fetch merchant_surface_scans for private_dining_present + events surface existence
-  const scanRows = await db.merchant_surface_scans.findMany({
-    where: { entity_id: { in: entityIds } },
-    select: { entity_id: true, private_dining_present: true },
-    orderBy: { fetched_at: "desc" },
-    distinct: ["entity_id"],
+  const scanRows = await db.merchantSurfaceScans.findMany({
+    where: { entityId: { in: entityIds } },
+    select: { entityId: true, privateDiningPresent: true },
+    orderBy: { fetchedAt: "desc" },
+    distinct: ["entityId"],
   });
 
-  const eventsSurfaceRows = await db.merchant_surfaces.findMany({
+  const eventsSurfaceRows = await db.merchantSurfaces.findMany({
     where: {
-      entity_id: { in: entityIds },
-      surface_type: "events",
+      entityId: { in: entityIds },
+      surfaceType: "events",
     },
-    select: { entity_id: true },
-    distinct: ["entity_id"],
+    select: { entityId: true },
+    distinct: ["entityId"],
   });
-  const eventsSurfaceSet = new Set(eventsSurfaceRows.map((r) => r.entity_id));
+  const eventsSurfaceSet = new Set(eventsSurfaceRows.map((r) => r.entityId));
 
   for (const scan of scanRows) {
-    const entry = map.get(scan.entity_id);
+    const entry = map.get(scan.entityId);
     if (!entry) continue;
     entry.surfaceScanHints = {
-      private_dining_present: scan.private_dining_present ?? false,
-      events_surface_exists:  eventsSurfaceSet.has(scan.entity_id),
+      privateDiningPresent: scan.privateDiningPresent ?? false,
+      eventsSurfaceExists:  eventsSurfaceSet.has(scan.entityId),
     };
   }
 
@@ -655,7 +959,7 @@ async function main() {
 
   console.log(`${targets.length} entities to assemble\n`);
 
-  const signalMap = await fetchSourceSignals(targets.map((t) => t.entity_id));
+  const signalMap = await fetchSourceSignals(targets.map((t) => t.entityId));
 
   // Header
   console.log(
@@ -667,7 +971,7 @@ async function main() {
   let errored = 0;
 
   for (const target of targets) {
-    const src      = signalMap.get(target.entity_id) ?? { menuIdentity: null, menuStructure: null, identitySignals: null, surfaceScanHints: null };
+    const src      = signalMap.get(target.entityId) ?? { menuIdentity: null, menuStructure: null, identitySignals: null, surfaceScanHints: null };
     const programs = assemblePrograms(src);
 
     const srcTag = [
@@ -678,46 +982,46 @@ async function main() {
     ].join(" ");
 
     console.log(
-      `  ${target.entity_name.slice(0, 34).padEnd(34)} ` +
-      `${programs.food_program.maturity.padEnd(12)} ` +
-      `${programs.wine_program.maturity.padEnd(12)} ` +
-      `${programs.beer_program.maturity.padEnd(12)} ` +
-      `${programs.cocktail_program.maturity.padEnd(12)} ` +
-      `${programs.service_program.maturity.padEnd(12)} ` +
-      `${programs.private_dining_program.maturity.padEnd(12)} ` +
-      `${programs.group_dining_program.maturity.padEnd(12)} ` +
-      `${programs.catering_program.maturity.padEnd(12)} ` +
+      `  ${target.entityName.slice(0, 34).padEnd(34)} ` +
+      `${programs.foodProgram.maturity.padEnd(12)} ` +
+      `${programs.wineProgram.maturity.padEnd(12)} ` +
+      `${programs.beerProgram.maturity.padEnd(12)} ` +
+      `${programs.cocktailProgram.maturity.padEnd(12)} ` +
+      `${programs.serviceProgram.maturity.padEnd(12)} ` +
+      `${programs.privateDiningProgram.maturity.padEnd(12)} ` +
+      `${programs.groupDiningProgram.maturity.padEnd(12)} ` +
+      `${programs.cateringProgram.maturity.padEnd(12)} ` +
       `${srcTag}`,
     );
 
     if (verbose) {
-      if (programs.food_program.signals.length > 0)
-        console.log(`    food signals: ${programs.food_program.signals.join(", ")}`);
-      if (programs.wine_program.signals.length > 0)
-        console.log(`    wine signals: ${programs.wine_program.signals.join(", ")}`);
-      if (programs.cocktail_program.signals.length > 0)
-        console.log(`    cocktail:     ${programs.cocktail_program.signals.join(", ")}`);
-      if (programs.beer_program.signals.length > 0)
-        console.log(`    beer:         ${programs.beer_program.signals.join(", ")}`);
-      if (programs.service_program.signals.length > 0)
-        console.log(`    service:      ${programs.service_program.signals.join(", ")}`);
-      if (programs.food_program.evidence.length > 0)
-        console.log(`    food evidence: "${programs.food_program.evidence[0]?.slice(0, 100)}"`);
-      if (programs.wine_program.evidence.length > 0)
-        console.log(`    wine evidence: "${programs.wine_program.evidence[0]?.slice(0, 100)}"`);
+      if (programs.foodProgram.signals.length > 0)
+        console.log(`    food signals: ${programs.foodProgram.signals.join(", ")}`);
+      if (programs.wineProgram.signals.length > 0)
+        console.log(`    wine signals: ${programs.wineProgram.signals.join(", ")}`);
+      if (programs.cocktailProgram.signals.length > 0)
+        console.log(`    cocktail:     ${programs.cocktailProgram.signals.join(", ")}`);
+      if (programs.beerProgram.signals.length > 0)
+        console.log(`    beer:         ${programs.beerProgram.signals.join(", ")}`);
+      if (programs.serviceProgram.signals.length > 0)
+        console.log(`    service:      ${programs.serviceProgram.signals.join(", ")}`);
+      if (programs.foodProgram.evidence.length > 0)
+        console.log(`    food evidence: "${programs.foodProgram.evidence[0]?.slice(0, 100)}"`);
+      if (programs.wineProgram.evidence.length > 0)
+        console.log(`    wine evidence: "${programs.wineProgram.evidence[0]?.slice(0, 100)}"`);
     }
 
     if (!dryRun) {
       try {
         await writeDerivedSignal(db, {
-          entityId:      target.entity_id,
+          entityId:      target.entityId,
           signalKey:     SIGNAL_KEY,
           signalVersion: SIGNAL_VERSION,
           signalValue:   programs,
         });
         written++;
       } catch (err) {
-        console.error(`    !! DB write failed for ${target.entity_name}:`, err);
+        console.error(`    !! DB write failed for ${target.entityName}:`, err);
         errored++;
       }
     } else {

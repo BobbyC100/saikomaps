@@ -102,12 +102,12 @@ export function normalizeFieldValue(field: ConfidenceV1Field, value: unknown): s
 
 // --- Types ---
 
-export type ConfidenceCandidate = { value: unknown; source_id: string };
+export type ConfidenceCandidate = { value: unknown; sourceId: string };
 
 export type FieldConfidenceEntry = {
   value: string;
   score: number;
-  sources: Array<{ source_id: string; value: string }>;
+  sources: Array<{ sourceId: string; value: string }>;
   winner: string;
   conflicts: string[];
 };
@@ -149,9 +149,9 @@ export function calculateFieldConfidence(
     if (n === '') continue;
     const existing = byNorm.get(n);
     if (existing) {
-      if (!existing.sourceIds.includes(c.source_id)) existing.sourceIds.push(c.source_id);
+      if (!existing.sourceIds.includes(c.sourceId)) existing.sourceIds.push(c.sourceId);
     } else {
-      byNorm.set(n, { raw: c.value, sourceIds: [c.source_id] });
+      byNorm.set(n, { raw: c.value, sourceIds: [c.sourceId] });
     }
   }
 
@@ -231,13 +231,13 @@ export function buildFieldConfidenceEntry(
   const displayValue =
     chosenRaw != null && chosenRaw !== ''
       ? String(chosenRaw)
-      : candidates.find((c) => supportingSourceIds.includes(c.source_id))?.value;
+      : candidates.find((c) => supportingSourceIds.includes(c.sourceId))?.value;
   const valueStr = displayValue != null ? String(displayValue) : '';
   if (!valueStr) return null;
 
   const sources = candidates
-    .filter((c) => supportingSourceIds.includes(c.source_id) || conflictSourceIds.includes(c.source_id))
-    .map((c) => ({ source_id: c.source_id, value: String(c.value) }));
+    .filter((c) => supportingSourceIds.includes(c.sourceId) || conflictSourceIds.includes(c.sourceId))
+    .map((c) => ({ sourceId: c.sourceId, value: String(c.value) }));
   if (sources.length === 0) return null;
 
   return {
@@ -308,7 +308,7 @@ export type GoldenSnapshotForConfidence = {
  * Build full confidence map and overall score for a place from golden + linked raw records.
  * Raw source_name is normalized to canonical sources.id before trust-tier lookup.
  * Only field entries with non-empty winner, sources.length >= 1, and score from a known tier are written.
- * If zero valid entries: confidence = {}, overall_confidence = 0.5.
+ * If zero valid entries: confidence = {}, overallConfidence = 0.5.
  *
  * When entity_links is empty (no raw records): treat the golden record as the sole source with
  * source_id = "manual_bobby" so we still write valid confidence (deterministic, explainable).
@@ -319,7 +319,7 @@ export function computePlaceConfidence(
   rawRecords: RawRecordForConfidence[],
   trustTiersBySource: Record<string, number>,
   config: CalculateFieldConfidenceConfig = CONFIDENCE_CONFIG
-): { confidence: ConfidenceMap; overall_confidence: number } {
+): { confidence: ConfidenceMap; overallConfidence: number } {
   const hasLatLng =
     golden.lat != null &&
     golden.lng != null &&
@@ -343,14 +343,14 @@ export function computePlaceConfidence(
     if (noLinkedRaw) {
       const val = chosenByField[field];
       if (val == null || val === '') continue;
-      candidates = [{ value: val, source_id: 'manual_bobby' }];
+      candidates = [{ value: val, sourceId: 'manual_bobby' }];
     } else {
       candidates = rawRecords
         .map((r) => ({
           value: getRawValue(r.raw_json, field),
-          source_id: normalizeSourceId(r.source_name),
+          sourceId: normalizeSourceId(r.source_name),
         }))
-        .filter((c) => c.value != null && c.value !== '' && c.source_id !== '');
+        .filter((c) => c.value != null && c.value !== '' && c.sourceId !== '');
     }
 
     const entry = buildFieldConfidenceEntry(
@@ -366,6 +366,6 @@ export function computePlaceConfidence(
     if (entry) confidence[field] = entry;
   }
 
-  const overall_confidence = calculateOverallConfidence(confidence);
-  return { confidence, overall_confidence };
+  const overallConfidence = calculateOverallConfidence(confidence);
+  return { confidence, overallConfidence };
 }

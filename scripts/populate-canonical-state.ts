@@ -151,7 +151,7 @@ async function main() {
         businessStatus: true,
         googlePlacesAttributes: true,
         merchant_signals: {
-          select: { menu_url: true, winelist_url: true },
+          select: { menuUrl: true, winelistUrl: true },
         },
       },
     });
@@ -193,8 +193,8 @@ async function main() {
         // --- Resolve best values (entity primary, golden fallback) ---
         const resolvedDescription = entity.description ?? golden?.description ?? null;
         const resolvedHours = entity.hours ?? golden?.hours_json ?? null;
-        const resolvedMenuUrl = entity.merchant_signals?.menu_url ?? golden?.menu_url ?? null;
-        const resolvedWinelistUrl = entity.merchant_signals?.winelist_url ?? golden?.winelist_url ?? null;
+        const resolvedMenuUrl = entity.merchant_signals?.menuUrl ?? golden?.menu_url ?? null;
+        const resolvedWinelistUrl = entity.merchant_signals?.winelistUrl ?? golden?.winelist_url ?? null;
         const resolvedGoogleAttrs = entity.googlePlacesAttributes ?? golden?.google_places_attributes ?? null;
 
         // --- Write canonical_entity_state row ---

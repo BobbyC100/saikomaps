@@ -30,13 +30,13 @@ export async function applyWriteRules(payload: EnrichmentPayload): Promise<void>
   await db.merchant_enrichment_runs.create({
     data: {
       entityId: place_id,
-      source_url,
-      final_url: final_url ?? undefined,
-      fetched_at: new Date(),
-      http_status: http_status ?? undefined,
-      extraction_json: extractionJson as object,
+      sourceUrl: source_url,
+      finalUrl: final_url ?? undefined,
+      fetchedAt: new Date(),
+      httpStatus: http_status ?? undefined,
+      extractionJson: extractionJson as object,
       confidence,
-      cost_usd: 0,
+      costUsd: 0,
     },
   });
 
@@ -45,26 +45,26 @@ export async function applyWriteRules(payload: EnrichmentPayload): Promise<void>
       where: { entityId: place_id },
       create: {
         entityId: place_id,
-        inferred_category: signals.inferred_category ?? undefined,
-        inferred_cuisine: signals.inferred_cuisine ?? undefined,
-        reservation_provider: signals.reservation_provider ?? undefined,
-        reservation_url: signals.reservation_url ?? undefined,
-        ordering_provider: signals.ordering_provider ?? undefined,
-        ordering_url: signals.ordering_url ?? undefined,
-        menu_url: signals.menu_url ?? undefined,
-        social_links: signals.social_links ?? undefined,
-        extraction_confidence: confidence,
+        inferredCategory: signals.inferred_category ?? undefined,
+        inferredCuisine: signals.inferred_cuisine ?? undefined,
+        reservationProvider: signals.reservation_provider ?? undefined,
+        reservationUrl: signals.reservation_url ?? undefined,
+        orderingProvider: signals.ordering_provider ?? undefined,
+        orderingUrl: signals.ordering_url ?? undefined,
+        menuUrl: signals.menu_url ?? undefined,
+        socialLinks: signals.social_links ?? undefined,
+        extractionConfidence: confidence,
       },
       update: {
-        inferred_category: signals.inferred_category ?? undefined,
-        inferred_cuisine: signals.inferred_cuisine ?? undefined,
-        reservation_provider: signals.reservation_provider ?? undefined,
-        reservation_url: signals.reservation_url ?? undefined,
-        ordering_provider: signals.ordering_provider ?? undefined,
-        ordering_url: signals.ordering_url ?? undefined,
-        menu_url: signals.menu_url ?? undefined,
-        social_links: signals.social_links ?? undefined,
-        extraction_confidence: confidence,
+        inferredCategory: signals.inferred_category ?? undefined,
+        inferredCuisine: signals.inferred_cuisine ?? undefined,
+        reservationProvider: signals.reservation_provider ?? undefined,
+        reservationUrl: signals.reservation_url ?? undefined,
+        orderingProvider: signals.ordering_provider ?? undefined,
+        orderingUrl: signals.ordering_url ?? undefined,
+        menuUrl: signals.menu_url ?? undefined,
+        socialLinks: signals.social_links ?? undefined,
+        extractionConfidence: confidence,
       },
     });
   }
@@ -109,8 +109,8 @@ export async function applyWriteRules(payload: EnrichmentPayload): Promise<void>
   await db.entities.update({
     where: { id: place_id },
     data: {
-      last_enriched_at: new Date(),
-      needs_human_review: needsReview,
+      lastEnrichedAt: new Date(),
+      needsHumanReview: needsReview,
       // enrichment_stage omitted: the DB column is an EnrichmentStage enum but
       // the Prisma schema maps it as String? — Prisma cannot round-trip the
       // native enum value on the return read (P2032). Legacy field, not used
@@ -161,7 +161,7 @@ export async function applyWriteRulesCategoryOnly(
 
   const place = await db.entities.findUnique({
     where: { id: place_id },
-    select: { category: true, primary_vertical: true },
+    select: { category: true, primaryVertical: true },
   });
 
   let reason: CategoryWriteReason;
@@ -173,7 +173,7 @@ export async function applyWriteRulesCategoryOnly(
     reason = "SKIP_NO_CATEGORY_PREDICTION";
   } else if (!CATEGORY_ALLOWLIST.has(predictedCategory)) {
     reason = "SKIP_NOT_ALLOWLIST";
-  } else if (place?.primary_vertical === "STAY") {
+  } else if (place?.primaryVertical === "STAY") {
     reason = "SKIP_VERTICAL_GUARD";
   } else if (!place || place.category?.trim()) {
     reason = "SKIP_CATEGORY_ALREADY_SET";
@@ -199,13 +199,13 @@ export async function applyWriteRulesCategoryOnly(
   await db.merchant_enrichment_runs.create({
     data: {
       entityId: place_id,
-      source_url,
-      final_url: final_url ?? undefined,
-      fetched_at: new Date(),
-      http_status: http_status ?? undefined,
-      extraction_json: extractionJson as object,
+      sourceUrl: source_url,
+      finalUrl: final_url ?? undefined,
+      fetchedAt: new Date(),
+      httpStatus: http_status ?? undefined,
+      extractionJson: extractionJson as object,
       confidence,
-      cost_usd: 0,
+      costUsd: 0,
     },
   });
 
@@ -214,26 +214,26 @@ export async function applyWriteRulesCategoryOnly(
       where: { entityId: place_id },
       create: {
         entityId: place_id,
-        inferred_category: signals.inferred_category ?? undefined,
-        inferred_cuisine: signals.inferred_cuisine ?? undefined,
-        reservation_provider: signals.reservation_provider ?? undefined,
-        reservation_url: signals.reservation_url ?? undefined,
-        ordering_provider: signals.ordering_provider ?? undefined,
-        ordering_url: signals.ordering_url ?? undefined,
-        menu_url: signals.menu_url ?? undefined,
-        social_links: signals.social_links ?? undefined,
-        extraction_confidence: confidence,
+        inferredCategory: signals.inferred_category ?? undefined,
+        inferredCuisine: signals.inferred_cuisine ?? undefined,
+        reservationProvider: signals.reservation_provider ?? undefined,
+        reservationUrl: signals.reservation_url ?? undefined,
+        orderingProvider: signals.ordering_provider ?? undefined,
+        orderingUrl: signals.ordering_url ?? undefined,
+        menuUrl: signals.menu_url ?? undefined,
+        socialLinks: signals.social_links ?? undefined,
+        extractionConfidence: confidence,
       },
       update: {
-        inferred_category: signals.inferred_category ?? undefined,
-        inferred_cuisine: signals.inferred_cuisine ?? undefined,
-        reservation_provider: signals.reservation_provider ?? undefined,
-        reservation_url: signals.reservation_url ?? undefined,
-        ordering_provider: signals.ordering_provider ?? undefined,
-        ordering_url: signals.ordering_url ?? undefined,
-        menu_url: signals.menu_url ?? undefined,
-        social_links: signals.social_links ?? undefined,
-        extraction_confidence: confidence,
+        inferredCategory: signals.inferred_category ?? undefined,
+        inferredCuisine: signals.inferred_cuisine ?? undefined,
+        reservationProvider: signals.reservation_provider ?? undefined,
+        reservationUrl: signals.reservation_url ?? undefined,
+        orderingProvider: signals.ordering_provider ?? undefined,
+        orderingUrl: signals.ordering_url ?? undefined,
+        menuUrl: signals.menu_url ?? undefined,
+        socialLinks: signals.social_links ?? undefined,
+        extractionConfidence: confidence,
       },
     });
   }
@@ -241,7 +241,7 @@ export async function applyWriteRulesCategoryOnly(
   await db.entities.update({
     where: { id: place_id },
     data: {
-      category_enrich_attempted_at: new Date(),
+      categoryEnrichAttemptedAt: new Date(),
       ...(shouldWriteCategory && predictedCategory
         ? { category: predictedCategory }
         : {}),

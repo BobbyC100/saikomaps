@@ -10,8 +10,16 @@
  * - Resolved issues are re-opened if the problem recurs
  * - One issue per (entity_id, issue_type) via upsert
  *
+ * Nomadic / pop-up entity handling:
+ *   Entities with place_appearances rows are treated as nomadic.
+ *   Nomadic entities have relaxed thresholds:
+ *   - Identity threshold lowered from 4 to 2 (name + Instagram = sufficient)
+ *   - missing_gpid, missing_coords, missing_neighborhood, missing_hours suppressed
+ *   - Location-dependent issues don't apply (location comes from appearances)
+ *
  * Issue types and detection rules:
- *   identity / unresolved_identity    — no GPID (critical, blocking)
+ *   identity / unresolved_identity    — insufficient identity anchors (critical, blocking)
+ *   identity / missing_gpid           — no GPID but identity sufficient (medium, non-blocking)
  *   identity / enrichment_incomplete  — has GPID but never enriched (high, blocking)
  *   location / missing_coords         — has GPID but no lat/lng (high, blocking)
  *   location / missing_neighborhood   — has coords but no neighborhood (medium)
@@ -34,11 +42,11 @@ import { PrismaClient, Prisma } from '@prisma/client';
 // ---------------------------------------------------------------------------
 
 export interface IssueRule {
-  issue_type: string;
-  problem_class: 'identity' | 'location' | 'contact' | 'social' | 'editorial';
+  issueType: string;
+  problemClass: 'identity' | 'location' | 'contact' | 'social' | 'editorial';
   severity: 'critical' | 'high' | 'medium' | 'low';
-  blocking_publish: boolean;
-  recommended_tool: string | null;
+  blockingPublish: boolean;
+  recommendedTool: string | null;
   /** Return true if this entity has the problem, or null/detail object with context */
   detect: (entity: ScanEntity) => IssueDetail | null;
 }
@@ -53,7 +61,7 @@ export interface ScanEntity {
   slug: string;
   name: string;
   status: string;
-  primary_vertical: string | null;
+  primaryVertical: string | null;
   googlePlaceId: string | null;
   latitude: unknown;
   longitude: unknown;
@@ -65,39 +73,41 @@ export interface ScanEntity {
   reservationUrl: string | null;
   instagram: string | null;
   tiktok: string | null;
-  enrichment_stage: string | null;
-  last_enriched_at: Date | null;
+  enrichmentStage: string | null;
+  lastEnrichedAt: Date | null;
   // CES fields (may be null if no CES row)
-  ces_website: string | null;
-  ces_phone: string | null;
-  ces_hours_json: unknown;
-  ces_price_level: number | null;
-  ces_reservation_url: string | null;
-  ces_menu_url: string | null;
-  ces_instagram: string | null;
-  ces_tiktok: string | null;
-  ces_neighborhood: string | null;
-  ces_events_url: string | null;
+  cesWebsite: string | null;
+  cesPhone: string | null;
+  cesHoursJson: unknown;
+  cesPriceLevel: number | null;
+  cesReservationUrl: string | null;
+  cesMenuUrl: string | null;
+  cesInstagram: string | null;
+  cesTiktok: string | null;
+  cesNeighborhood: string | null;
+  cesEventsUrl: string | null;
   businessStatus: string | null;
   // Surface scan hints
-  has_events_surface: boolean;
+  hasEventsSurface: boolean;
+  // Nomadic / pop-up — derived from place_appearances
+  isNomadic: boolean;
 }
 
 export interface ScanResult {
-  entity_id: string;
+  entityId: string;
   slug: string;
   name: string;
-  issues_created: number;
-  issues_resolved: number;
-  issues_unchanged: number;
+  issuesCreated: number;
+  issuesResolved: number;
+  issuesUnchanged: number;
 }
 
 export interface ScanSummary {
-  entities_scanned: number;
-  issues_created: number;
-  issues_resolved: number;
-  issues_unchanged: number;
-  by_type: Record<string, number>;
+  entitiesScanned: number;
+  issuesCreated: number;
+  issuesResolved: number;
+  issuesUnchanged: number;
+  byType: Record<string, number>;
   results: ScanResult[];
 }
 
@@ -107,11 +117,11 @@ export interface ScanSummary {
 
 export const ISSUE_RULES: IssueRule[] = [
   {
-    issue_type: 'unresolved_identity',
-    problem_class: 'identity',
+    issueType: 'unresolved_identity',
+    problemClass: 'identity',
     severity: 'critical',
-    blocking_publish: true,
-    recommended_tool: 'gpid_resolution',
+    blockingPublish: true,
+    recommendedTool: 'gpid_resolution',
     detect: (e) => {
       // Identity is "sufficient" if we have enough weighted anchors,
       // not just GPID. A taco cart with an IG handle + neighborhood is valid.
@@ -119,65 +129,69 @@ export const ISSUE_RULES: IssueRule[] = [
 
       // Weighted anchors (mirrors lib/identity-enrichment.ts ANCHOR_WEIGHTS)
       let score = 0;
-      if (e.website || e.ces_website) score += 3;
-      if (e.instagram || e.ces_instagram) score += 2;
-      if (e.tiktok || e.ces_tiktok) score += 2;
-      if (e.phone || e.ces_phone) score += 1;
-      if (e.neighborhood || e.ces_neighborhood) score += 1;
+      if (e.website || e.cesWebsite) score += 3;
+      if (e.instagram || e.cesInstagram) score += 2;
+      if (e.tiktok || e.cesTiktok) score += 2;
+      if (e.phone || e.cesPhone) score += 1;
+      if (e.neighborhood || e.cesNeighborhood) score += 1;
       if (e.latitude && e.longitude) score += 2;
 
-      // Threshold: need at least 4 points of identity signals to be "sufficient"
-      // e.g., Instagram (2) + coords (2) = 4 ✓
-      // e.g., Website (3) + neighborhood (1) = 4 ✓
-      // e.g., Just a name = 0 ✗
-      if (score >= 4) return null;
+      // Nomadic entities (pop-ups) have lower identity threshold.
+      // They don't need coords/GPID — name + Instagram or name + website is enough.
+      // Threshold: 2 (e.g., Instagram alone = 2 ✓)
+      // Fixed entities need at least 4 (e.g., Instagram + coords = 4 ✓)
+      const threshold = e.isNomadic ? 2 : 4;
+      if (score >= threshold) return null;
 
-      return { detected: true, detail: { identity_score: score, has_gpid: false } };
+      return { detected: true, detail: { identity_score: score, has_gpid: false, is_nomadic: e.isNomadic } };
     },
   },
   {
-    issue_type: 'missing_gpid',
-    problem_class: 'identity',
+    issueType: 'missing_gpid',
+    problemClass: 'identity',
     severity: 'medium',
-    blocking_publish: false,
-    recommended_tool: 'gpid_resolution',
+    blockingPublish: false,
+    recommendedTool: 'gpid_resolution',
     detect: (e) => {
       // Non-blocking: entity has sufficient identity but no GPID.
-      // Useful to track but doesn't prevent publication.
+      // Nomadic entities don't need GPID — skip entirely.
+      if (e.isNomadic) return null;
       if (e.googlePlaceId) return null;
       // Only flag if identity IS sufficient (otherwise unresolved_identity covers it)
       let score = 0;
-      if (e.website || e.ces_website) score += 3;
-      if (e.instagram || e.ces_instagram) score += 2;
-      if (e.tiktok || e.ces_tiktok) score += 2;
-      if (e.phone || e.ces_phone) score += 1;
-      if (e.neighborhood || e.ces_neighborhood) score += 1;
+      if (e.website || e.cesWebsite) score += 3;
+      if (e.instagram || e.cesInstagram) score += 2;
+      if (e.tiktok || e.cesTiktok) score += 2;
+      if (e.phone || e.cesPhone) score += 1;
+      if (e.neighborhood || e.cesNeighborhood) score += 1;
       if (e.latitude && e.longitude) score += 2;
       if (score < 4) return null; // covered by unresolved_identity
       return { detected: true };
     },
   },
   {
-    issue_type: 'enrichment_incomplete',
-    problem_class: 'identity',
+    issueType: 'enrichment_incomplete',
+    problemClass: 'identity',
     severity: 'high',
-    blocking_publish: true,
-    recommended_tool: 'enrich_full',
+    blockingPublish: true,
+    recommendedTool: 'enrich_full',
     detect: (e) => {
       // Only applies if entity has GPID but was never enriched
       if (!e.googlePlaceId) return null; // covered by unresolved_identity
-      if (e.enrichment_stage && e.enrichment_stage !== 'none') return null;
-      if (e.last_enriched_at) return null;
-      return { detected: true, detail: { enrichment_stage: e.enrichment_stage } };
+      if (e.enrichmentStage && e.enrichmentStage !== 'none') return null;
+      if (e.lastEnrichedAt) return null;
+      return { detected: true, detail: { enrichmentStage: e.enrichmentStage } };
     },
   },
   {
-    issue_type: 'missing_coords',
-    problem_class: 'location',
+    issueType: 'missing_coords',
+    problemClass: 'location',
     severity: 'high',
-    blocking_publish: true,
-    recommended_tool: 'enrich_stage',
+    blockingPublish: true,
+    recommendedTool: 'enrich_stage',
     detect: (e) => {
+      // Nomadic entities don't have a fixed location — coords come from appearances, not the entity itself
+      if (e.isNomadic) return null;
       if (!e.googlePlaceId) return null; // covered by unresolved_identity
       const lat = e.latitude !== null && e.latitude !== undefined;
       const lng = e.longitude !== null && e.longitude !== undefined;
@@ -188,29 +202,33 @@ export const ISSUE_RULES: IssueRule[] = [
     },
   },
   {
-    issue_type: 'missing_neighborhood',
-    problem_class: 'location',
+    issueType: 'missing_neighborhood',
+    problemClass: 'location',
     severity: 'medium',
-    blocking_publish: false,
-    recommended_tool: 'derive_neighborhood',
+    blockingPublish: false,
+    recommendedTool: 'derive_neighborhood',
     detect: (e) => {
+      // Nomadic entities derive neighborhood from their appearances, not the entity itself
+      if (e.isNomadic) return null;
       const lat = e.latitude !== null && e.latitude !== undefined;
       const lng = e.longitude !== null && e.longitude !== undefined;
       if (!lat || !lng) return null; // needs coords first
       // Check both entities.neighborhood and CES
-      const hasNeighborhood = e.neighborhood || e.ces_neighborhood;
+      const hasNeighborhood = e.neighborhood || e.cesNeighborhood;
       if (!hasNeighborhood) return { detected: true };
       return null;
     },
   },
   {
-    issue_type: 'missing_hours',
-    problem_class: 'location',
+    issueType: 'missing_hours',
+    problemClass: 'location',
     severity: 'medium',
-    blocking_publish: false,
-    recommended_tool: 'enrich_stage',
+    blockingPublish: false,
+    recommendedTool: 'enrich_stage',
     detect: (e) => {
-      const hasHours = (e.ces_hours_json ?? e.hours) !== null && (e.ces_hours_json ?? e.hours) !== undefined;
+      // Nomadic entities have schedules via appearances, not fixed hours
+      if (e.isNomadic) return null;
+      const hasHours = (e.cesHoursJson ?? e.hours) !== null && (e.cesHoursJson ?? e.hours) !== undefined;
       if (!hasHours) {
         return { detected: true, detail: { recommended_stage: 1 } };
       }
@@ -218,15 +236,15 @@ export const ISSUE_RULES: IssueRule[] = [
     },
   },
   {
-    issue_type: 'missing_price_level',
-    problem_class: 'location',
+    issueType: 'missing_price_level',
+    problemClass: 'location',
     severity: 'low',
-    blocking_publish: false,
-    recommended_tool: 'enrich_stage',
+    blockingPublish: false,
+    recommendedTool: 'enrich_stage',
     detect: (e) => {
       const FOOD_DRINK_VERTICALS = new Set(['EAT', 'COFFEE', 'WINE', 'DRINKS', 'BAKERY']);
-      if (!e.primary_vertical || !FOOD_DRINK_VERTICALS.has(e.primary_vertical)) return null;
-      const hasPriceLevel = (e.ces_price_level ?? e.priceLevel) !== null && (e.ces_price_level ?? e.priceLevel) !== undefined;
+      if (!e.primaryVertical || !FOOD_DRINK_VERTICALS.has(e.primaryVertical)) return null;
+      const hasPriceLevel = (e.cesPriceLevel ?? e.priceLevel) !== null && (e.cesPriceLevel ?? e.priceLevel) !== undefined;
       if (!hasPriceLevel) {
         return { detected: true, detail: { recommended_stage: 1 } };
       }
@@ -234,30 +252,30 @@ export const ISSUE_RULES: IssueRule[] = [
     },
   },
   {
-    issue_type: 'missing_menu_link',
-    problem_class: 'location',
+    issueType: 'missing_menu_link',
+    problemClass: 'location',
     severity: 'low',
-    blocking_publish: false,
-    recommended_tool: 'enrich_stage',
+    blockingPublish: false,
+    recommendedTool: 'enrich_stage',
     detect: (e) => {
       const FOOD_DRINK_VERTICALS = new Set(['EAT', 'COFFEE', 'WINE', 'DRINKS', 'BAKERY']);
-      if (!e.primary_vertical || !FOOD_DRINK_VERTICALS.has(e.primary_vertical)) return null;
-      if (!e.ces_menu_url) {
+      if (!e.primaryVertical || !FOOD_DRINK_VERTICALS.has(e.primaryVertical)) return null;
+      if (!e.cesMenuUrl) {
         return { detected: true, detail: { recommended_stage: 6 } };
       }
       return null;
     },
   },
   {
-    issue_type: 'missing_reservations',
-    problem_class: 'location',
+    issueType: 'missing_reservations',
+    problemClass: 'location',
     severity: 'low',
-    blocking_publish: false,
-    recommended_tool: 'enrich_stage',
+    blockingPublish: false,
+    recommendedTool: 'enrich_stage',
     detect: (e) => {
       const RESERVATION_VERTICALS = new Set(['EAT', 'DRINKS', 'WINE', 'STAY']);
-      if (!e.primary_vertical || !RESERVATION_VERTICALS.has(e.primary_vertical)) return null;
-      const hasReservationUrl = (e.ces_reservation_url ?? e.reservationUrl) !== null && (e.ces_reservation_url ?? e.reservationUrl) !== undefined;
+      if (!e.primaryVertical || !RESERVATION_VERTICALS.has(e.primaryVertical)) return null;
+      const hasReservationUrl = (e.cesReservationUrl ?? e.reservationUrl) !== null && (e.cesReservationUrl ?? e.reservationUrl) !== undefined;
       if (!hasReservationUrl) {
         return { detected: true, detail: { recommended_stage: 6 } };
       }
@@ -265,11 +283,11 @@ export const ISSUE_RULES: IssueRule[] = [
     },
   },
   {
-    issue_type: 'operating_status_unknown',
-    problem_class: 'location',
+    issueType: 'operating_status_unknown',
+    problemClass: 'location',
     severity: 'medium',
-    blocking_publish: false,
-    recommended_tool: 'enrich_stage',
+    blockingPublish: false,
+    recommendedTool: 'enrich_stage',
     detect: (e) => {
       // Only emit when GPID exists; otherwise status lookup cannot be automated.
       if (!e.googlePlaceId) return null;
@@ -280,14 +298,14 @@ export const ISSUE_RULES: IssueRule[] = [
     },
   },
   {
-    issue_type: 'missing_website',
-    problem_class: 'contact',
+    issueType: 'missing_website',
+    problemClass: 'contact',
     severity: 'medium',
-    blocking_publish: false,
-    recommended_tool: 'enrich_stage',
+    blockingPublish: false,
+    recommendedTool: 'enrich_stage',
     detect: (e) => {
       // Prefer CES if available, fall back to entities
-      const website = e.ces_website ?? e.website;
+      const website = e.cesWebsite ?? e.website;
       if (!website) {
         return { detected: true, detail: { recommended_stage: 6 } };
       }
@@ -295,13 +313,13 @@ export const ISSUE_RULES: IssueRule[] = [
     },
   },
   {
-    issue_type: 'missing_phone',
-    problem_class: 'contact',
+    issueType: 'missing_phone',
+    problemClass: 'contact',
     severity: 'low',
-    blocking_publish: false,
-    recommended_tool: 'enrich_stage',
+    blockingPublish: false,
+    recommendedTool: 'enrich_stage',
     detect: (e) => {
-      const phone = e.ces_phone ?? e.phone;
+      const phone = e.cesPhone ?? e.phone;
       if (!phone) {
         return { detected: true, detail: { recommended_stage: 1 } };
       }
@@ -309,13 +327,13 @@ export const ISSUE_RULES: IssueRule[] = [
     },
   },
   {
-    issue_type: 'missing_instagram',
-    problem_class: 'social',
+    issueType: 'missing_instagram',
+    problemClass: 'social',
     severity: 'low',
-    blocking_publish: false,
-    recommended_tool: 'instagram_discover',
+    blockingPublish: false,
+    recommendedTool: 'instagram_discover',
     detect: (e) => {
-      const instagram = e.ces_instagram ?? e.instagram;
+      const instagram = e.cesInstagram ?? e.instagram;
       // 'NONE' = confirmed no Instagram — not an issue
       if (!instagram) return { detected: true };
       if (instagram === 'NONE') return null;
@@ -323,13 +341,13 @@ export const ISSUE_RULES: IssueRule[] = [
     },
   },
   {
-    issue_type: 'missing_tiktok',
-    problem_class: 'social',
+    issueType: 'missing_tiktok',
+    problemClass: 'social',
     severity: 'low',
-    blocking_publish: false,
-    recommended_tool: 'tiktok_discover',
+    blockingPublish: false,
+    recommendedTool: 'tiktok_discover',
     detect: (e) => {
-      const tiktok = e.ces_tiktok ?? e.tiktok;
+      const tiktok = e.cesTiktok ?? e.tiktok;
       // 'NONE' = confirmed no TikTok — not an issue
       if (!tiktok) return { detected: true };
       if (tiktok === 'NONE') return null;
@@ -337,11 +355,11 @@ export const ISSUE_RULES: IssueRule[] = [
     },
   },
   {
-    issue_type: 'google_says_closed',
-    problem_class: 'identity',
+    issueType: 'google_says_closed',
+    problemClass: 'identity',
     severity: 'high',
-    blocking_publish: false,
-    recommended_tool: null,
+    blockingPublish: false,
+    recommendedTool: null,
     detect: (e) => {
       if (!e.businessStatus) return null;
       const bs = e.businessStatus.toUpperCase();
@@ -357,20 +375,20 @@ export const ISSUE_RULES: IssueRule[] = [
   },
   // --- Editorial: event program gaps ---
   {
-    issue_type: 'missing_events_surface',
-    problem_class: 'editorial',
+    issueType: 'missing_events_surface',
+    problemClass: 'editorial',
     severity: 'low',
-    blocking_publish: false,
-    recommended_tool: 'enrich_stage',
+    blockingPublish: false,
+    recommendedTool: 'enrich_stage',
     detect: (e) => {
       // Only flag for food/drink verticals that are likely to have events
       const EVENT_VERTICALS = new Set(['EAT', 'DRINKS', 'WINE', 'COFFEE']);
-      if (!e.primary_vertical || !EVENT_VERTICALS.has(e.primary_vertical)) return null;
+      if (!e.primaryVertical || !EVENT_VERTICALS.has(e.primaryVertical)) return null;
       // Must have a website (otherwise we can't discover surfaces)
-      const website = e.ces_website ?? e.website;
+      const website = e.cesWebsite ?? e.website;
       if (!website) return null;
       // Skip if events surface already exists
-      if (e.has_events_surface) return null;
+      if (e.hasEventsSurface) return null;
       return { detected: true, detail: { recommended_stage: 2 } };
     },
   },
@@ -419,7 +437,7 @@ export async function scanEntities(
       slug: true,
       name: true,
       status: true,
-      primary_vertical: true,
+      primaryVertical: true,
       googlePlaceId: true,
       latitude: true,
       longitude: true,
@@ -432,20 +450,20 @@ export async function scanEntities(
       instagram: true,
       tiktok: true,
       businessStatus: true,
-      enrichment_stage: true,
-      last_enriched_at: true,
+      enrichmentStage: true,
+      lastEnrichedAt: true,
       canonical_state: {
         select: {
           website: true,
           phone: true,
-          hours_json: true,
-          price_level: true,
-          reservation_url: true,
-          menu_url: true,
+          hoursJson: true,
+          priceLevel: true,
+          reservationUrl: true,
+          menuUrl: true,
           instagram: true,
           tiktok: true,
           neighborhood: true,
-          events_url: true,
+          eventsUrl: true,
         },
       },
     },
@@ -453,11 +471,11 @@ export async function scanEntities(
   });
 
   const summary: ScanSummary = {
-    entities_scanned: entities.length,
-    issues_created: 0,
-    issues_resolved: 0,
-    issues_unchanged: 0,
-    by_type: {},
+    entitiesScanned: entities.length,
+    issuesCreated: 0,
+    issuesResolved: 0,
+    issuesUnchanged: 0,
+    byType: {},
     results: [],
   };
 
@@ -465,12 +483,22 @@ export async function scanEntities(
   const allEntityIds = entities.map((e) => e.id);
   const eventsSurfaceRows = allEntityIds.length > 0
     ? await prisma.merchant_surfaces.findMany({
-        where: { entity_id: { in: allEntityIds }, surface_type: 'events' },
-        select: { entity_id: true },
-        distinct: ['entity_id'],
+        where: { entityId: { in: allEntityIds }, surfaceType: 'events' },
+        select: { entityId: true },
+        distinct: ['entityId'],
       })
     : [];
-  const hasEventsSurfaceSet = new Set(eventsSurfaceRows.map((r) => r.entity_id));
+  const hasEventsSurfaceSet = new Set(eventsSurfaceRows.map((r) => r.entityId));
+
+  // Pre-fetch nomadic status — entities with place_appearances are pop-ups/mobile
+  const nomadicRows = allEntityIds.length > 0
+    ? await prisma.place_appearances.findMany({
+        where: { subjectEntityId: { in: allEntityIds } },
+        select: { subjectEntityId: true },
+        distinct: ['subjectEntityId'],
+      })
+    : [];
+  const nomadicEntitySet = new Set(nomadicRows.map((r) => r.subjectEntityId));
 
   for (const raw of entities) {
     const entity: ScanEntity = {
@@ -478,7 +506,7 @@ export async function scanEntities(
       slug: raw.slug,
       name: raw.name,
       status: raw.status,
-      primary_vertical: raw.primary_vertical ?? null,
+      primaryVertical: raw.primaryVertical ?? null,
       googlePlaceId: raw.googlePlaceId,
       latitude: raw.latitude,
       longitude: raw.longitude,
@@ -490,51 +518,52 @@ export async function scanEntities(
       reservationUrl: raw.reservationUrl ?? null,
       instagram: raw.instagram,
       tiktok: raw.tiktok,
-      enrichment_stage: raw.enrichment_stage,
-      last_enriched_at: raw.last_enriched_at,
+      enrichmentStage: raw.enrichmentStage,
+      lastEnrichedAt: raw.lastEnrichedAt,
       businessStatus: raw.businessStatus ?? null,
-      ces_website: raw.canonical_state?.website ?? null,
-      ces_phone: raw.canonical_state?.phone ?? null,
-      ces_hours_json: raw.canonical_state?.hours_json ?? null,
-      ces_price_level: raw.canonical_state?.price_level ?? null,
-      ces_reservation_url: raw.canonical_state?.reservation_url ?? null,
-      ces_menu_url: raw.canonical_state?.menu_url ?? null,
-      ces_instagram: raw.canonical_state?.instagram ?? null,
-      ces_tiktok: raw.canonical_state?.tiktok ?? null,
-      ces_neighborhood: raw.canonical_state?.neighborhood ?? null,
-      ces_events_url: raw.canonical_state?.events_url ?? null,
-      has_events_surface: hasEventsSurfaceSet.has(raw.id),
+      cesWebsite: raw.canonical_state?.website ?? null,
+      cesPhone: raw.canonical_state?.phone ?? null,
+      cesHoursJson: raw.canonical_state?.hoursJson ?? null,
+      cesPriceLevel: raw.canonical_state?.priceLevel ?? null,
+      cesReservationUrl: raw.canonical_state?.reservationUrl ?? null,
+      cesMenuUrl: raw.canonical_state?.menuUrl ?? null,
+      cesInstagram: raw.canonical_state?.instagram ?? null,
+      cesTiktok: raw.canonical_state?.tiktok ?? null,
+      cesNeighborhood: raw.canonical_state?.neighborhood ?? null,
+      cesEventsUrl: raw.canonical_state?.eventsUrl ?? null,
+      hasEventsSurface: hasEventsSurfaceSet.has(raw.id),
+      isNomadic: nomadicEntitySet.has(raw.id),
     };
 
     const result: ScanResult = {
-      entity_id: entity.id,
+      entityId: entity.id,
       slug: entity.slug,
       name: entity.name,
-      issues_created: 0,
-      issues_resolved: 0,
-      issues_unchanged: 0,
+      issuesCreated: 0,
+      issuesResolved: 0,
+      issuesUnchanged: 0,
     };
 
     // Get existing issues for this entity (all statuses)
     const existingIssues = await prisma.entity_issues.findMany({
-      where: { entity_id: entity.id },
+      where: { entityId: entity.id },
     });
-    const issueMap = new Map(existingIssues.map((i) => [i.issue_type, i]));
+    const issueMap = new Map(existingIssues.map((i) => [i.issueType, i]));
 
     for (const rule of ISSUE_RULES) {
       const detection = rule.detect(entity);
-      const existing = issueMap.get(rule.issue_type);
+      const existing = issueMap.get(rule.issueType);
 
       if (detection) {
         // Problem detected
-        summary.by_type[rule.issue_type] = (summary.by_type[rule.issue_type] ?? 0) + 1;
+        summary.byType[rule.issueType] = (summary.byType[rule.issueType] ?? 0) + 1;
 
         if (existing) {
           if (existing.status === 'suppressed') {
             // Never touch suppressed issues
-            result.issues_unchanged++;
+            result.issuesUnchanged++;
             if (verbose) {
-              console.log(`  SKIP ${entity.slug}: ${rule.issue_type} (suppressed)`);
+              console.log(`  SKIP ${entity.slug}: ${rule.issueType} (suppressed)`);
             }
           } else if (existing.status === 'resolved') {
             // Re-open resolved issue — problem recurred
@@ -543,39 +572,39 @@ export async function scanEntities(
                 where: { id: existing.id },
                 data: {
                   status: 'open',
-                  resolved_at: null,
-                  resolved_by: null,
+                  resolvedAt: null,
+                  resolvedBy: null,
                   detail: (detection.detail ?? existing.detail ?? Prisma.JsonNull) as Prisma.InputJsonValue,
                 },
               });
             }
-            result.issues_created++;
+            result.issuesCreated++;
             if (verbose) {
-              console.log(`  REOPEN ${entity.slug}: ${rule.issue_type}`);
+              console.log(`  REOPEN ${entity.slug}: ${rule.issueType}`);
             }
           } else {
             // Active issue already exists — leave it
-            result.issues_unchanged++;
+            result.issuesUnchanged++;
           }
         } else {
           // New issue
           if (!dryRun) {
             await prisma.entity_issues.create({
               data: {
-                entity_id: entity.id,
-                problem_class: rule.problem_class,
-                issue_type: rule.issue_type,
+                entityId: entity.id,
+                problemClass: rule.problemClass,
+                issueType: rule.issueType,
                 status: 'open',
                 severity: rule.severity,
-                blocking_publish: rule.blocking_publish,
-                recommended_tool: rule.recommended_tool,
+                blockingPublish: rule.blockingPublish,
+                recommendedTool: rule.recommendedTool,
                 detail: detection.detail ? (detection.detail as Prisma.InputJsonValue) : undefined,
               },
             });
           }
-          result.issues_created++;
+          result.issuesCreated++;
           if (verbose) {
-            console.log(`  NEW  ${entity.slug}: ${rule.issue_type} [${rule.severity}]`);
+            console.log(`  NEW  ${entity.slug}: ${rule.issueType} [${rule.severity}]`);
           }
         }
       } else {
@@ -587,22 +616,22 @@ export async function scanEntities(
               where: { id: existing.id },
               data: {
                 status: 'resolved',
-                resolved_at: new Date(),
-                resolved_by: 'SCANNER',
+                resolvedAt: new Date(),
+                resolvedBy: 'SCANNER',
               },
             });
           }
-          result.issues_resolved++;
+          result.issuesResolved++;
           if (verbose) {
-            console.log(`  RESOLVED ${entity.slug}: ${rule.issue_type}`);
+            console.log(`  RESOLVED ${entity.slug}: ${rule.issueType}`);
           }
         }
       }
     }
 
-    summary.issues_created += result.issues_created;
-    summary.issues_resolved += result.issues_resolved;
-    summary.issues_unchanged += result.issues_unchanged;
+    summary.issuesCreated += result.issuesCreated;
+    summary.issuesResolved += result.issuesResolved;
+    summary.issuesUnchanged += result.issuesUnchanged;
     summary.results.push(result);
   }
 

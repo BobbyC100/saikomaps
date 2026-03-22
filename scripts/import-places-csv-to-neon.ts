@@ -134,7 +134,7 @@ function stripImmutable(payload: Record<string, unknown>): Record<string, unknow
   delete out.created_at;
   delete out.createdAt;
   delete out.slug;
-  delete out.primary_vertical;
+  delete out.primaryVertical;
   delete out.googlePlaceId;
   delete out.google_place_id;
   return out;
@@ -253,7 +253,7 @@ async function main() {
         }
         if (!payload.id) payload.id = randomUUID();
         if (!payload.createdAt) payload.createdAt = new Date();
-        if (!payload.primary_vertical) payload.primary_vertical = "EAT";
+        if (!payload.primaryVertical) payload.primaryVertical = "EAT";
         const createData = payload as Parameters<typeof db.entities.create>[0]["data"];
         await db.entities.create({ data: createData });
         upserted++;

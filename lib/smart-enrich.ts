@@ -144,7 +144,7 @@ async function phase2Scrape(entityId: string): Promise<{ surfaceCount: number }>
   if (!entity?.website) return { surfaceCount: 0 };
 
   // Check if surfaces already exist (idempotent)
-  const existing = await db.merchant_surfaces.count({ where: { entity_id: entityId } });
+  const existing = await db.merchant_surfaces.count({ where: { entityId } });
   if (existing > 0) return { surfaceCount: existing };
 
   try {
@@ -153,7 +153,7 @@ async function phase2Scrape(entityId: string): Promise<{ surfaceCount: number }>
     console.error(`[smart-enrich] Surface discovery failed for ${entityId}:`, e);
   }
 
-  const count = await db.merchant_surfaces.count({ where: { entity_id: entityId } });
+  const count = await db.merchant_surfaces.count({ where: { entityId } });
   return { surfaceCount: count };
 }
 
@@ -161,11 +161,11 @@ async function phase3Extract(entityId: string): Promise<{ artifactCount: number 
   // Find surfaces that need parsing
   const pending = await db.merchant_surfaces.findMany({
     where: {
-      entity_id: entityId,
-      fetch_status: 'fetch_success',
-      parse_status: 'parse_pending',
+      entityId,
+      fetchStatus: 'fetch_success',
+      parseStatus: 'parse_pending',
     },
-    select: { id: true, entity_id: true, surface_type: true, source_url: true, raw_html: true, raw_text: true },
+    select: { id: true, entityId: true, surfaceType: true, sourceUrl: true, rawHtml: true, rawText: true },
   });
 
   for (const surface of pending) {
@@ -177,7 +177,7 @@ async function phase3Extract(entityId: string): Promise<{ artifactCount: number 
   }
 
   const count = await db.merchant_surface_artifacts.count({
-    where: { merchant_surface: { entity_id: entityId } },
+    where: { merchant_surface: { entityId } },
   });
   return { artifactCount: count };
 }
@@ -537,7 +537,7 @@ export async function smartEnrich(input: SmartEnrichInput): Promise<SmartEnrichR
   if (!input.dryRun) {
     await db.entities.update({
       where: { id: entityId },
-      data: { last_enriched_at: new Date() },
+      data: { lastEnrichedAt: new Date() },
     }).catch(() => {});
 
     // Auto-rescan issues

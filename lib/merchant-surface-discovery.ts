@@ -278,18 +278,18 @@ async function writeSurface(params: {
 }): Promise<string> {
   const row = await prisma.merchant_surfaces.create({
     data: {
-      entity_id: params.entityId,
-      surface_type: params.surfaceType,
-      source_url: params.sourceUrl,
-      fetch_status: params.fetchStatus,
-      parse_status: params.parseStatus ?? null,
-      extraction_status: params.extractionStatus ?? 'not_attempted',
-      content_type: params.contentType ?? null,
-      content_hash: params.contentHash ?? null,
-      raw_text: params.rawText ?? null,
-      raw_html: params.rawHtml ?? null,
-      fetched_at: params.fetchedAt ?? null,
-      metadata_json: params.metadataJson
+      entityId: params.entityId,
+      surfaceType: params.surfaceType,
+      sourceUrl: params.sourceUrl,
+      fetchStatus: params.fetchStatus,
+      parseStatus: params.parseStatus ?? null,
+      extractionStatus: params.extractionStatus ?? 'not_attempted',
+      contentType: params.contentType ?? null,
+      contentHash: params.contentHash ?? null,
+      rawText: params.rawText ?? null,
+      rawHtml: params.rawHtml ?? null,
+      fetchedAt: params.fetchedAt ?? null,
+      metadataJson: params.metadataJson
         ? (params.metadataJson as any)
         : undefined,
     },
@@ -539,9 +539,9 @@ export async function fetchSurfaceUrl(url: string): Promise<SurfaceFetchResult> 
 
 export interface DiscoveredSurfaceRow {
   id: string;
-  entity_id: string;
-  surface_type: string;
-  source_url: string;
+  entityId: string;
+  surfaceType: string;
+  sourceUrl: string;
 }
 
 /**
@@ -558,15 +558,15 @@ export async function findDiscoveredSurfaces(params: {
 
   const rows = await prisma.merchant_surfaces.findMany({
     where: {
-      fetch_status: 'discovered',
-      surface_type: surfaceType
+      fetchStatus: 'discovered',
+      surfaceType: surfaceType
         ? surfaceType
         : { notIn: [...SKIP_FETCH_TYPES] },
-      ...(entityId ? { entity_id: entityId } : {}),
+      ...(entityId ? { entityId: entityId } : {}),
     },
-    select: { id: true, entity_id: true, surface_type: true, source_url: true },
+    select: { id: true, entityId: true, surfaceType: true, sourceUrl: true },
     take: limit,
-    orderBy: { discovered_at: 'asc' },
+    orderBy: { discoveredAt: 'asc' },
   });
 
   return rows;
@@ -582,13 +582,13 @@ export async function findDiscoveredSurfaces(params: {
 export async function fetchAndCaptureSurface(
   row: DiscoveredSurfaceRow,
 ): Promise<'written' | 'deduped' | 'failed'> {
-  const fetched = await fetchSurfaceUrl(row.source_url);
+  const fetched = await fetchSurfaceUrl(row.sourceUrl);
 
   if (!fetched.ok) {
     await writeSurface({
-      entityId: row.entity_id,
-      surfaceType: row.surface_type as SurfaceType,
-      sourceUrl: row.source_url,
+      entityId: row.entityId,
+      surfaceType: row.surfaceType as SurfaceType,
+      sourceUrl: row.sourceUrl,
       fetchStatus: 'fetch_failed',
       metadataJson: {
         error: fetched.error,
@@ -604,10 +604,10 @@ export async function fetchAndCaptureSurface(
   // Deduplication check: same evidence already captured for this entity + surface type?
   const existing = await prisma.merchant_surfaces.findFirst({
     where: {
-      entity_id: row.entity_id,
-      surface_type: row.surface_type,
-      content_hash: contentHash,
-      fetch_status: 'fetch_success',
+      entityId: row.entityId,
+      surfaceType: row.surfaceType,
+      contentHash: contentHash,
+      fetchStatus: 'fetch_success',
     },
     select: { id: true },
   });
@@ -617,8 +617,8 @@ export async function fetchAndCaptureSurface(
   }
 
   await writeSurface({
-    entityId: row.entity_id,
-    surfaceType: row.surface_type as SurfaceType,
+    entityId: row.entityId,
+    surfaceType: row.surfaceType as SurfaceType,
     sourceUrl: fetched.finalUrl,
     fetchStatus: 'fetch_success',
     parseStatus: 'parse_pending',
@@ -630,7 +630,7 @@ export async function fetchAndCaptureSurface(
     metadataJson: {
       http_status: fetched.httpStatus,
       final_url: fetched.finalUrl,
-      original_url: row.source_url,
+      original_url: row.sourceUrl,
       fetch_duration_ms: fetched.durationMs,
       truncated: fetched.truncated,
       discovered_surface_id: row.id,
@@ -652,11 +652,11 @@ export async function findEntitiesNeedingDiscovery(params: {
 
   // Entities that already have a homepage surface row
   const alreadyDiscovered = await prisma.merchant_surfaces.findMany({
-    where: { surface_type: 'homepage' },
-    select: { entity_id: true },
-    distinct: ['entity_id'],
+    where: { surfaceType: 'homepage' },
+    select: { entityId: true },
+    distinct: ['entityId'],
   });
-  const doneIds = new Set(alreadyDiscovered.map((r) => r.entity_id));
+  const doneIds = new Set(alreadyDiscovered.map((r) => r.entityId));
 
   const where: any = {
     website: { not: null },

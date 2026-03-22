@@ -16,7 +16,7 @@ interface SeedPlace {
   address: string;
   latitude: number;
   longitude: number;
-  primary_vertical: PrimaryVertical;
+  primaryVertical: PrimaryVertical;
   phone?: string;
   website?: string;
   instagram?: string;
@@ -114,7 +114,7 @@ async function seedPlace(place: SeedPlace) {
         address: place.address,
         latitude: place.latitude,
         longitude: place.longitude,
-        primary_vertical: place.primary_vertical,
+        primaryVertical: place.primaryVertical,
         phone: place.phone || null,
         website: place.website || null,
         instagram: place.instagram || null,
@@ -152,7 +152,7 @@ async function seedPlace(place: SeedPlace) {
         address: place.address,
         latitude: place.latitude,
         longitude: place.longitude,
-        primary_vertical: place.primary_vertical,
+        primaryVertical: place.primaryVertical,
         phone: place.phone || null,
         website: place.website || null,
         instagram: place.instagram || null,

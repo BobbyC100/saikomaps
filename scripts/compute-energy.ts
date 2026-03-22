@@ -31,17 +31,17 @@ async function fetchPlaceIdToGolden(placeIds: string[]): Promise<Map<string, Gol
   const placeIdToGolden = new Map<string, GoldenRow>();
   if (placeIds.length === 0) return placeIdToGolden;
 
-  const rows: { entity_id: string; slug: string; description: string | null; google_places_attributes: unknown; category: string | null }[] =
+  const rows: { entityId: string; slug: string; description: string | null; google_places_attributes: unknown; category: string | null }[] =
     await db.$queryRaw`
-      SELECT ces.entity_id, e.slug, ces.description, ces.google_places_attributes, ces.category
+      SELECT ces.entityId, e.slug, ces.description, ces.google_places_attributes, ces.category
       FROM canonical_entity_state ces
-      JOIN entities e ON e.id = ces.entity_id
-      WHERE ces.entity_id = ANY(${placeIds})
+      JOIN entities e ON e.id = ces.entityId
+      WHERE ces.entityId = ANY(${placeIds})
     `;
 
   for (const r of rows) {
-    placeIdToGolden.set(r.entity_id, {
-      canonical_id: r.entity_id,
+    placeIdToGolden.set(r.entityId, {
+      canonical_id: r.entityId,
       slug: r.slug,
       description: r.description,
       about_copy: null, // not tracked in CES; buildCoverageAboutText handles nulls
@@ -83,10 +83,10 @@ async function getPlaceIds(placeIdArg: string | null, laOnly: boolean, limitArg:
   }
 
   // --all: find all entities that have a canonical_entity_state row
-  const cesIds: { entity_id: string }[] = await db.$queryRaw`
+  const cesIds: { entityId: string }[] = await db.$queryRaw`
     SELECT entity_id FROM canonical_entity_state
   `;
-  const allIds = cesIds.map(r => r.entity_id);
+  const allIds = cesIds.map(r => r.entityId);
   const golden = await fetchPlaceIdToGolden(allIds);
   return { placeIds: allIds, placeIdToGolden: golden };
 }

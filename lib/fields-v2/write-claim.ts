@@ -76,22 +76,22 @@ async function determineSanctionMethod(
   }
 ): Promise<'AUTO_HIGH_CONFIDENCE' | 'AUTO_SOLE_SOURCE' | 'STORE_ONLY' | 'CONFLICT'> {
   const [source, attribute, existingSanction] = await Promise.all([
-    db.source_registry.findUnique({ where: { id: sourceId }, select: { trust_tier: true, requires_human_approval: true } }),
-    db.attribute_registry.findUnique({ where: { attribute_key: attributeKey }, select: { sanction_threshold: true, attribute_class: true } }),
+    db.source_registry.findUnique({ where: { id: sourceId }, select: { trustTier: true, requiresHumanApproval: true } }),
+    db.attribute_registry.findUnique({ where: { attributeKey: attributeKey }, select: { sanctionThreshold: true, attributeClass: true } }),
     db.canonical_sanctions.findFirst({
-      where: { entity_id: entityId, attribute_key: attributeKey, is_current: true },
-      select: { claim_id: true, sanction_id: true },
+      where: { entityId: entityId, attributeKey: attributeKey, isCurrent: true },
+      select: { claimId: true, sanctionId: true },
     }),
   ]);
 
   if (!source || !attribute) return 'STORE_ONLY';
-  if (source.requires_human_approval) return 'STORE_ONLY';
-  if (attribute.attribute_class !== 'CANONICAL') return 'STORE_ONLY';
+  if (source.requiresHumanApproval) return 'STORE_ONLY';
+  if (attribute.attributeClass !== 'CANONICAL') return 'STORE_ONLY';
 
-  const threshold = Number(attribute.sanction_threshold);
+  const threshold = Number(attribute.sanctionThreshold);
   const meetsThreshold = confidence == null || confidence >= threshold;
 
-  if (source.trust_tier > 2 || !meetsThreshold) return 'STORE_ONLY';
+  if (source.trustTier > 2 || !meetsThreshold) return 'STORE_ONLY';
   if (!existingSanction) return 'AUTO_SOLE_SOURCE';
   return 'AUTO_HIGH_CONFIDENCE';
 }
@@ -119,26 +119,26 @@ export async function writeClaimAndSanction(
     // Supersede the previous claim from same source if provided
     if (input.supersededClaimId) {
       await db.observed_claims.update({
-        where: { claim_id: input.supersededClaimId },
-        data: { is_active: false },
+        where: { claimId: input.supersededClaimId },
+        data: { isActive: false },
       });
     }
 
     await db.observed_claims.create({
       data: {
-        claim_id: claimId,
-        entity_id: input.entityId,
-        attribute_key: input.attributeKey,
-        raw_value: input.rawValue as never,
-        normalized_value: input.normalizedValue ?? null,
-        source_id: input.sourceId,
-        source_url: input.sourceUrl ?? null,
-        observed_at: input.observedAt ?? new Date(),
-        extraction_method: input.extractionMethod,
+        claimId: claimId,
+        entityId: input.entityId,
+        attributeKey: input.attributeKey,
+        rawValue: input.rawValue as never,
+        normalizedValue: input.normalizedValue ?? null,
+        sourceId: input.sourceId,
+        sourceUrl: input.sourceUrl ?? null,
+        observedAt: input.observedAt ?? new Date(),
+        extractionMethod: input.extractionMethod,
         confidence: input.confidence ?? null,
-        resolution_method: input.resolutionMethod ?? 'SLUG_EXACT',
-        supersedes_claim_id: input.supersededClaimId ?? null,
-        is_active: true,
+        resolutionMethod: input.resolutionMethod ?? 'SLUG_EXACT',
+        supersedesClaimId: input.supersededClaimId ?? null,
+        isActive: true,
       },
     });
   }
@@ -160,19 +160,19 @@ export async function writeClaimAndSanction(
     let conflictId: string | null = null;
     if (!dryRun) {
       const existing = await db.canonical_sanctions.findFirst({
-        where: { entity_id: input.entityId, attribute_key: input.attributeKey, is_current: true },
-        select: { claim_id: true },
+        where: { entityId: input.entityId, attributeKey: input.attributeKey, isCurrent: true },
+        select: { claimId: true },
       });
       const conflict = await db.sanction_conflicts.create({
         data: {
-          entity_id: input.entityId,
-          attribute_key: input.attributeKey,
-          claim_ids: [existing?.claim_id, claimId].filter(Boolean) as string[],
-          conflict_reason: 'SOURCE_DISAGREEMENT',
+          entityId: input.entityId,
+          attributeKey: input.attributeKey,
+          claimIds: [existing?.claimId, claimId].filter(Boolean) as string[],
+          conflictReason: 'SOURCE_DISAGREEMENT',
           status: 'OPEN',
         },
       });
-      conflictId = conflict.conflict_id;
+      conflictId = conflict.conflictId;
     }
     return { claimId, sanctioned: false, sanctionMethod: 'CONFLICT', conflict: true, conflictId };
   }
@@ -183,18 +183,18 @@ export async function writeClaimAndSanction(
     await applyToCanonicalState(db, input.entityId, input.attributeKey, input.rawValue);
 
     await db.canonical_sanctions.updateMany({
-      where: { entity_id: input.entityId, attribute_key: input.attributeKey, is_current: true },
-      data: { is_current: false },
+      where: { entityId: input.entityId, attributeKey: input.attributeKey, isCurrent: true },
+      data: { isCurrent: false },
     });
 
     await db.canonical_sanctions.create({
       data: {
-        entity_id: input.entityId,
-        attribute_key: input.attributeKey,
-        claim_id: claimId,
-        sanctioned_by: sanctionedBy,
-        sanction_method: sanctionMethod === 'AUTO_SOLE_SOURCE' ? 'AUTO_SOLE_SOURCE' : 'AUTO_HIGH_CONFIDENCE',
-        is_current: true,
+        entityId: input.entityId,
+        attributeKey: input.attributeKey,
+        claimId: claimId,
+        sanctionedBy: sanctionedBy,
+        sanctionMethod: sanctionMethod === 'AUTO_SOLE_SOURCE' ? 'AUTO_SOLE_SOURCE' : 'AUTO_HIGH_CONFIDENCE',
+        isCurrent: true,
       },
     });
   }
@@ -221,7 +221,7 @@ async function applyToCanonicalState(
   // Map attribute_key → canonical_entity_state column
   const fieldMap: Record<string, string> = {
     name: 'name',
-    google_place_id: 'google_place_id',
+    google_place_id: 'googlePlaceId',
     latitude: 'latitude',
     longitude: 'longitude',
     address: 'address',
@@ -230,34 +230,34 @@ async function applyToCanonicalState(
     website: 'website',
     instagram: 'instagram',
     tiktok: 'tiktok',
-    hours: 'hours_json',
-    price_level: 'price_level',
-    reservation_url: 'reservation_url',
-    menu_url: 'menu_url',
-    winelist_url: 'winelist_url',
+    hours: 'hoursJson',
+    price_level: 'priceLevel',
+    reservation_url: 'reservationUrl',
+    menu_url: 'menuUrl',
+    winelist_url: 'winelistUrl',
     description: 'description',
-    cuisine_type: 'cuisine_type',
+    cuisine_type: 'cuisineType',
     category: 'category',
     tips: 'tips',
-    google_photos: 'google_photos',
-    google_places_attributes: 'google_places_attributes',
+    google_photos: 'googlePhotos',
+    google_places_attributes: 'googlePlacesAttributes',
   };
 
   const column = fieldMap[attributeKey];
   if (!column) return; // DERIVED or INTERPRETATION attributes don't update canonical_entity_state
 
   await db.canonical_entity_state.upsert({
-    where: { entity_id: entityId },
+    where: { entityId: entityId },
     create: {
-      entity_id: entityId,
+      entityId: entityId,
       name: attributeKey === 'name' ? (value as string) : '(pending)',
       [column]: value,
-      last_sanctioned_at: new Date(),
-      sanctioned_by: 'SYSTEM',
+      lastSanctionedAt: new Date(),
+      sanctionedBy: 'SYSTEM',
     },
     update: {
       [column]: value,
-      last_sanctioned_at: new Date(),
+      lastSanctionedAt: new Date(),
     },
   });
 }
@@ -288,23 +288,23 @@ export async function writeDerivedSignal(
 
   await db.derived_signals.upsert({
     where: {
-      entity_id_signal_key_signal_version: {
-        entity_id: entityId,
-        signal_key: signalKey,
-        signal_version: signalVersion,
+      entityId_signalKey_signalVersion: {
+        entityId: entityId,
+        signalKey: signalKey,
+        signalVersion: signalVersion,
       },
     },
     create: {
-      entity_id: entityId,
-      signal_key: signalKey,
-      signal_value: signalValue as never,
-      signal_version: signalVersion,
-      input_claim_ids: inputClaimIds,
+      entityId: entityId,
+      signalKey: signalKey,
+      signalValue: signalValue as never,
+      signalVersion: signalVersion,
+      inputClaimIds: inputClaimIds,
     },
     update: {
-      signal_value: signalValue as never,
-      input_claim_ids: inputClaimIds,
-      computed_at: new Date(),
+      signalValue: signalValue as never,
+      inputClaimIds: inputClaimIds,
+      computedAt: new Date(),
     },
   });
 }
@@ -326,7 +326,7 @@ export async function writeInterpretationCache(
     dryRun = false,
   }: {
     entityId: string;
-    outputType: 'TAGLINE' | 'PULL_QUOTE' | 'SCENESENSE_PRL' | 'VOICE_DESCRIPTOR';
+    outputType: 'TAGLINE' | 'PULL_QUOTE' | 'SCENESENSE_PRL' | 'VOICE_DESCRIPTOR' | 'TIMEFOLD';
     content: unknown;
     promptVersion: string;
     modelVersion?: string;
@@ -339,35 +339,35 @@ export async function writeInterpretationCache(
 
   // Mark old entries for this (entity, outputType) as no longer current
   await db.interpretation_cache.updateMany({
-    where: { entity_id: entityId, output_type: outputType, is_current: true },
-    data: { is_current: false },
+    where: { entityId: entityId, outputType: outputType, isCurrent: true },
+    data: { isCurrent: false },
   });
 
   await db.interpretation_cache.upsert({
     where: {
-      entity_id_output_type_prompt_version: {
-        entity_id: entityId,
-        output_type: outputType,
-        prompt_version: promptVersion,
+      entityId_outputType_promptVersion: {
+        entityId: entityId,
+        outputType: outputType,
+        promptVersion: promptVersion,
       },
     },
     create: {
-      entity_id: entityId,
-      output_type: outputType,
+      entityId: entityId,
+      outputType: outputType,
       content: content as never,
-      prompt_version: promptVersion,
-      model_version: modelVersion ?? null,
-      input_signal_ids: inputSignalIds,
-      expires_at: expiresAt ?? null,
-      is_current: true,
+      promptVersion: promptVersion,
+      modelVersion: modelVersion ?? null,
+      inputSignalIds: inputSignalIds,
+      expiresAt: expiresAt ?? null,
+      isCurrent: true,
     },
     update: {
       content: content as never,
-      model_version: modelVersion ?? null,
-      input_signal_ids: inputSignalIds,
-      expires_at: expiresAt ?? null,
-      is_current: true,
-      generated_at: new Date(),
+      modelVersion: modelVersion ?? null,
+      inputSignalIds: inputSignalIds,
+      expiresAt: expiresAt ?? null,
+      isCurrent: true,
+      generatedAt: new Date(),
     },
   });
 }

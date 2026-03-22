@@ -64,6 +64,7 @@ export interface ParseArtifactV1 {
     menu_links:        string[];
     reservation_links: string[];
     order_links:       string[];
+    event_links:       string[];
     social_links:      string[];
   };
 
@@ -161,6 +162,7 @@ const WEBSITE_PLATFORM_DOMAIN_PATTERNS: Array<{ platform: string; re: RegExp }> 
 const MENU_LINK_PATTERNS:        RegExp[] = [/\/menus?\b/i, /\/food\b/i, /\/drinks?\b/i, /\/wine\b/i, /\/cocktails?\b/i, /\/beverages?\b/i, /\/dinner\b/i, /\/lunch\b/i, /\/brunch\b/i, /popmenu\.com/i, /(?:getbento|bentobox)\.com.*\/menu/i, /toasttab\.com.*\/menu/i, /\.pdf$/i];
 const RESERVATION_LINK_URL_PATS: RegExp[] = [/resy\.com/i, /opentable\.com/i, /(?:exploretock|tock)\.com/i, /sevenrooms\.com/i, /yelp\.com\/reservations/i, /reserve\.com/i, /tablein\.com/i, /(?:getbento|bentobox)\.com.*reserv/i, /\/reservations?\b/i, /\/reserve\b/i, /\/book(?:ing)?\b/i];
 const ORDER_LINK_URL_PATS:       RegExp[] = [/doordash\.com/i, /ubereats\.com/i, /chownow\.com/i, /toasttab\.com/i, /clover\.com/i, /squareup\.com\/store/i, /square\.site/i, /\/order\b/i, /\/online-order/i];
+const EVENT_LINK_URL_PATS:       RegExp[] = [/^\/events?(?:\/|$|\?)/i, /^\/private[_-]?dining/i, /^\/private[_-]?events?/i, /^\/group[_-]?dining/i, /^\/catering/i, /^\/host(?:\/|$|\?)/i, /^\/buyout/i, /^\/celebrations?/i, /^\/parties/i];
 const SOCIAL_LINK_URL_PATS:      RegExp[] = [/instagram\.com/i, /facebook\.com/i, /twitter\.com/i, /x\.com/i, /tiktok\.com/i, /linkedin\.com/i, /youtube\.com/i];
 
 // ---------------------------------------------------------------------------
@@ -329,12 +331,14 @@ function parseSurfaceHints(
   const menu        = new Set<string>();
   const reservation = new Set<string>();
   const order       = new Set<string>();
+  const event       = new Set<string>();
   const social      = new Set<string>();
 
   for (const link of allLinks) {
     if (MENU_LINK_PATTERNS.some((p)        => p.test(link))) menu.add(link);
     if (RESERVATION_LINK_URL_PATS.some((p) => p.test(link))) reservation.add(link);
     if (ORDER_LINK_URL_PATS.some((p)       => p.test(link))) order.add(link);
+    if (EVENT_LINK_URL_PATS.some((p)       => p.test(link))) event.add(link);
     if (SOCIAL_LINK_URL_PATS.some((p)      => p.test(link))) social.add(link);
   }
 
@@ -342,6 +346,7 @@ function parseSurfaceHints(
     menu_links:        [...menu],
     reservation_links: [...reservation],
     order_links:       [...order],
+    event_links:       [...event],
     social_links:      [...social],
   };
 }
@@ -506,11 +511,11 @@ export function parseSurfaceHtml(
 
 export interface SurfaceParseRow {
   id:          string;
-  entity_id:   string;
-  surface_type: string;
-  source_url:  string;
-  raw_html:    string | null;
-  raw_text:    string | null;
+  entityId:   string;
+  surfaceType: string;
+  sourceUrl:  string;
+  rawHtml:    string | null;
+  rawText:    string | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -532,21 +537,21 @@ export async function findSurfacesToParse(params: {
 
   const rows = await prisma.merchant_surfaces.findMany({
     where: {
-      fetch_status:  'fetch_success',
-      parse_status:  'parse_pending',
-      ...(surfaceType ? { surface_type: surfaceType } : {}),
-      ...(entityId    ? { entity_id:    entityId }    : {}),
+      fetchStatus:  'fetch_success',
+      parseStatus:  'parse_pending',
+      ...(surfaceType ? { surfaceType: surfaceType } : {}),
+      ...(entityId    ? { entityId:    entityId }    : {}),
     },
     select: {
       id:           true,
-      entity_id:    true,
-      surface_type: true,
-      source_url:   true,
-      raw_html:     true,
-      raw_text:     true,
+      entityId:    true,
+      surfaceType: true,
+      sourceUrl:   true,
+      rawHtml:     true,
+      rawText:     true,
     },
     take:     limit,
-    orderBy:  { discovered_at: 'asc' },
+    orderBy:  { discoveredAt: 'asc' },
   });
 
   return rows;
@@ -563,9 +568,9 @@ async function artifactExists(
 ): Promise<boolean> {
   const existing = await prisma.merchant_surface_artifacts.findFirst({
     where: {
-      merchant_surface_id: merchantSurfaceId,
-      artifact_type:       artifactType,
-      artifact_version:    artifactVersion,
+      merchantSurfaceId: merchantSurfaceId,
+      artifactType:       artifactType,
+      artifactVersion:    artifactVersion,
     },
     select: { id: true },
   });
@@ -582,10 +587,10 @@ async function writeArtifact(
 ): Promise<void> {
   await prisma.merchant_surface_artifacts.create({
     data: {
-      merchant_surface_id: merchantSurfaceId,
-      artifact_type:       ARTIFACT_TYPE,
-      artifact_version:    ARTIFACT_VERSION,
-      artifact_json:       artifact as object,
+      merchantSurfaceId: merchantSurfaceId,
+      artifactType:       ARTIFACT_TYPE,
+      artifactVersion:    ARTIFACT_VERSION,
+      artifactJson:       artifact as object,
     },
   });
 }
@@ -603,7 +608,7 @@ async function updateParseStatus(
 ): Promise<void> {
   await prisma.merchant_surfaces.update({
     where: { id: surfaceId },
-    data:  { parse_status: parseStatus },
+    data:  { parseStatus: parseStatus },
   });
 }
 
@@ -629,7 +634,7 @@ export async function parseAndCaptureSurface(
   row: SurfaceParseRow,
 ): Promise<ParseOutcome> {
   // Step 1: Resolve HTML source
-  const html = row.raw_html ?? row.raw_text ?? '';
+  const html = row.rawHtml ?? row.rawText ?? '';
 
   // Step 2: Deduplication — skip if artifact already exists for this surface
   const alreadyParsed = await artifactExists(row.id, ARTIFACT_TYPE, ARTIFACT_VERSION);
@@ -638,7 +643,7 @@ export async function parseAndCaptureSurface(
   }
 
   // Step 3: Parse
-  const result = parseSurfaceHtml(html, row.source_url);
+  const result = parseSurfaceHtml(html, row.sourceUrl);
 
   if (!result.ok) {
     await updateParseStatus(row.id, 'parse_failed');

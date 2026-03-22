@@ -505,9 +505,9 @@ async function main() {
   if (!args.reprocess) {
     const done = await prisma.derived_signals.findMany({
       where: { signal_key: 'identity_signals' },
-      select: { entity_id: true },
+      select: { entityId: true },
     });
-    processedIds = new Set(done.map(d => d.entity_id));
+    processedIds = new Set(done.map(d => d.entityId));
   }
 
   const unprocessed = candidates.filter(e => !processedIds.has(e.id));
@@ -517,21 +517,21 @@ async function main() {
   const entityIdsForArtifacts = unprocessed.map(e => e.id);
 
   type ArtifactRow = {
-    merchant_surface: { entity_id: string; surface_type: string };
+    merchant_surface: { entityId: string; surface_type: string };
     artifact_json: unknown;
   };
   const surfaceArtifacts: ArtifactRow[] = entityIdsForArtifacts.length
     ? await prisma.merchant_surface_artifacts.findMany({
         where: {
           merchant_surface: {
-            entity_id: { in: entityIdsForArtifacts },
+            entityId: { in: entityIdsForArtifacts },
             surface_type: { in: ['menu', 'about', 'homepage'] },
             parse_status: 'parse_success',
           },
         },
         select: {
           artifact_json: true,
-          merchant_surface: { select: { entity_id: true, surface_type: true } },
+          merchant_surface: { select: { entityId: true, surface_type: true } },
         },
       })
     : [];
@@ -545,7 +545,7 @@ async function main() {
 
   const surfaceTextByEntity = new Map<string, { menu_text: string; about_text: string }>();
   for (const row of surfaceArtifacts) {
-    const eid = row.merchant_surface.entity_id;
+    const eid = row.merchant_surface.entityId;
     const st  = row.merchant_surface.surface_type;
     if (!surfaceTextByEntity.has(eid)) surfaceTextByEntity.set(eid, { menu_text: '', about_text: '' });
     const entry = surfaceTextByEntity.get(eid)!;

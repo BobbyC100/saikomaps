@@ -3,7 +3,7 @@ const db = new PrismaClient();
 
 async function main() {
   const surfaceEntities = await db.merchant_surfaces.groupBy({ by: ['entity_id'], _count: { id: true } });
-  const surfaceEntityIds = new Set(surfaceEntities.map(r => r.entity_id));
+  const surfaceEntityIds = new Set(surfaceEntities.map(r => r.entityId));
 
   const laEntities = await db.entities.findMany({
     where: { googlePlaceId: { contains: 'woAR' } },
@@ -16,12 +16,12 @@ async function main() {
   const laNoSurfaceWeb   = laNoSurface.filter(e => !!e.website);
 
   const signalIds = new Set(
-    (await db.derived_signals.findMany({ where: { signal_key: 'identity_signals' }, select: { entity_id: true } }))
-      .map(r => r.entity_id)
+    (await db.derived_signals.findMany({ where: { signal_key: 'identity_signals' }, select: { entityId: true } }))
+      .map(r => r.entityId)
   );
   const taglineIds = new Set(
-    (await db.interpretation_cache.findMany({ where: { output_type: 'TAGLINE', is_current: true }, select: { entity_id: true } }))
-      .map(r => r.entity_id as string)
+    (await db.interpretation_cache.findMany({ where: { output_type: 'TAGLINE', is_current: true }, select: { entityId: true } }))
+      .map(r => r.entityId as string)
   );
 
   const laFullyEnriched    = laWithSurface.filter(e => taglineIds.has(e.id));

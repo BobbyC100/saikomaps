@@ -46,22 +46,22 @@ const r2 = R2_ENDPOINT && R2_KEY_ID && R2_SECRET
 // ---------------------------------------------------------------------------
 
 interface MenuTarget {
-  entity_id:   string;
-  entity_name: string;
+  entityId:   string;
+  entityName: string;
   slug:        string;
-  source_url:  string;   // final_url from the surface scan (resolved base for relative menu_url)
-  menu_url:    string;   // may be relative or absolute
+  sourceUrl:  string;   // final_url from the surface scan (resolved base for relative menu_url)
+  menuUrl:    string;   // may be relative or absolute
 }
 
 interface FetchOutcome {
   target:              MenuTarget;
-  resolved_url:        string;
-  final_url:           string | null;
-  http_status:         number | null;
-  fetch_duration_ms:   number | null;
-  raw_text:            string | null;
-  content_hash:        string | null;
-  raw_html_pointer:    string | null;
+  resolvedUrl:        string;
+  finalUrl:           string | null;
+  httpStatus:         number | null;
+  fetchDurationMs:   number | null;
+  rawText:            string | null;
+  contentHash:        string | null;
+  rawHtmlPointer:    string | null;
   error:               string | null;
 }
 
@@ -150,16 +150,16 @@ function resolveMenuUrl(menuUrl: string, baseUrl: string): string {
 // ---------------------------------------------------------------------------
 
 async function fetchMenu(target: MenuTarget): Promise<FetchOutcome> {
-  const resolvedUrl = resolveMenuUrl(target.menu_url, target.source_url);
+  const resolvedUrl = resolveMenuUrl(target.menuUrl, target.sourceUrl);
   const base: FetchOutcome = {
     target,
-    resolved_url:      resolvedUrl,
-    final_url:         null,
-    http_status:       null,
-    fetch_duration_ms: null,
-    raw_text:          null,
-    content_hash:      null,
-    raw_html_pointer:  null,
+    resolvedUrl:      resolvedUrl,
+    finalUrl:         null,
+    httpStatus:       null,
+    fetchDurationMs: null,
+    rawText:          null,
+    contentHash:      null,
+    rawHtmlPointer:  null,
     error:             null,
   };
 
@@ -179,9 +179,9 @@ async function fetchMenu(target: MenuTarget): Promise<FetchOutcome> {
       redirect: "follow",
     });
 
-    base.fetch_duration_ms = Date.now() - t0;
-    base.http_status = res.status;
-    base.final_url   = res.url;
+    base.fetchDurationMs = Date.now() - t0;
+    base.httpStatus = res.status;
+    base.finalUrl   = res.url;
 
     if (res.status >= 400) return base;
 
@@ -189,15 +189,15 @@ async function fetchMenu(target: MenuTarget): Promise<FetchOutcome> {
     const fetchedAt = new Date();
 
     // Extract visible text
-    base.raw_text     = extractText(html);
-    base.content_hash = createHash("sha256").update(base.raw_text).digest("hex");
+    base.rawText     = extractText(html);
+    base.contentHash = createHash("sha256").update(base.rawText).digest("hex");
 
     // Write HTML receipt to R2 (non-blocking best-effort)
-    base.raw_html_pointer = await writeToR2(target.entity_id, html, fetchedAt);
+    base.rawHtmlPointer = await writeToR2(target.entityId, html, fetchedAt);
 
     return base;
   } catch (err) {
-    base.fetch_duration_ms = Date.now() - t0;
+    base.fetchDurationMs = Date.now() - t0;
     base.error = err instanceof Error ? err.message : String(err);
     return base;
   } finally {
@@ -214,16 +214,16 @@ async function writeFetch(outcome: FetchOutcome, dryRun: boolean): Promise<void>
   await db.menu_fetches.create({
     data: {
       id:                    randomUUID(),
-      entity_id:             outcome.target.entity_id,
-      source_url:            outcome.resolved_url,
-      final_url:             outcome.final_url ?? undefined,
-      menu_format:           "html",
-      http_status:           outcome.http_status ?? undefined,
-      fetch_duration_ms:     outcome.fetch_duration_ms ?? undefined,
-      raw_text:              outcome.raw_text ?? undefined,
-      content_hash:          outcome.content_hash ?? undefined,
-      raw_html_pointer:      outcome.raw_html_pointer ?? undefined,
-      text_extraction_method: TEXT_METHOD,
+      entityId:             outcome.target.entityId,
+      sourceUrl:            outcome.resolvedUrl,
+      finalUrl:             outcome.finalUrl ?? undefined,
+      menuFormat:           "html",
+      httpStatus:           outcome.httpStatus ?? undefined,
+      fetchDurationMs:     outcome.fetchDurationMs ?? undefined,
+      rawText:              outcome.rawText ?? undefined,
+      contentHash:          outcome.contentHash ?? undefined,
+      rawHtmlPointer:      outcome.rawHtmlPointer ?? undefined,
+      textExtractionMethod: TEXT_METHOD,
     },
   });
 }
@@ -265,16 +265,16 @@ async function main() {
 
   // ----- Resolve targets from current-state surface scans ------------------
   // "Current state" = latest successful scan per entity (http_status < 400)
-  type RawTarget = { entity_id: string; entity_name: string; slug: string; source_url: string; menu_url: string };
+  type RawTarget = { entityId: string; entityName: string; slug: string; sourceUrl: string; menuUrl: string };
 
   const rawTargets = slugArg
     ? await db.$queryRaw<RawTarget[]>`
         SELECT DISTINCT ON (mss.entity_id)
-          e.id           AS entity_id,
-          e.name         AS entity_name,
+          e.id           AS "entityId",
+          e.name         AS "entityName",
           e.slug,
-          COALESCE(mss.final_url, mss.source_url) AS source_url,
-          mss.menu_url
+          COALESCE(mss.final_url, mss.source_url) AS "sourceUrl",
+          mss.menu_url   AS "menuUrl"
         FROM merchant_surface_scans mss
         JOIN entities e ON e.id = mss.entity_id
         WHERE mss.http_status < 400
@@ -286,11 +286,11 @@ async function main() {
         LIMIT ${limit}`
     : await db.$queryRaw<RawTarget[]>`
         SELECT DISTINCT ON (mss.entity_id)
-          e.id           AS entity_id,
-          e.name         AS entity_name,
+          e.id           AS "entityId",
+          e.name         AS "entityName",
           e.slug,
-          COALESCE(mss.final_url, mss.source_url) AS source_url,
-          mss.menu_url
+          COALESCE(mss.final_url, mss.source_url) AS "sourceUrl",
+          mss.menu_url   AS "menuUrl"
         FROM merchant_surface_scans mss
         JOIN entities e ON e.id = mss.entity_id
         WHERE mss.http_status < 400
@@ -301,11 +301,11 @@ async function main() {
         LIMIT ${limit}`;
 
   const targets: MenuTarget[] = rawTargets.map((r) => ({
-    entity_id:   r.entity_id,
-    entity_name: r.entity_name,
+    entityId:   r.entityId,
+    entityName: r.entityName,
     slug:        r.slug,
-    source_url:  r.source_url,
-    menu_url:    r.menu_url,
+    sourceUrl:  r.sourceUrl,
+    menuUrl:    r.menuUrl,
   }));
 
   console.log(`${targets.length} HTML menu targets from surface scans\n`);
@@ -320,24 +320,24 @@ async function main() {
       const outcome = await fetchMenu(target);
       outcomes[idx] = outcome;
 
-      const statusStr = outcome.http_status ? String(outcome.http_status) : outcome.error ? "ERR" : "?";
-      const textLen   = outcome.raw_text?.length ?? 0;
-      const hashShort = outcome.content_hash?.slice(0, 8) ?? "—";
-      const r2Str     = outcome.raw_html_pointer ? "r2=✓" : "r2=—";
+      const statusStr = outcome.httpStatus ? String(outcome.httpStatus) : outcome.error ? "ERR" : "?";
+      const textLen   = outcome.rawText?.length ?? 0;
+      const hashShort = outcome.contentHash?.slice(0, 8) ?? "—";
+      const r2Str     = outcome.rawHtmlPointer ? "r2=✓" : "r2=—";
 
       console.log(
-        `  [${String(idx + 1).padStart(2)}] ${target.entity_name.slice(0, 36).padEnd(36)} ` +
-        `http=${statusStr} ${String(outcome.fetch_duration_ms ?? 0).padStart(5)}ms ` +
+        `  [${String(idx + 1).padStart(2)}] ${target.entityName.slice(0, 36).padEnd(36)} ` +
+        `http=${statusStr} ${String(outcome.fetchDurationMs ?? 0).padStart(5)}ms ` +
         `text=${String(textLen).padStart(6)}c hash=${hashShort} ${r2Str}`,
       );
       if (outcome.error) console.log(`      error: ${outcome.error}`);
 
-      if (outcome.http_status && outcome.http_status < 400) {
+      if (outcome.httpStatus && outcome.httpStatus < 400) {
         try {
           await writeFetch(outcome, dryRun);
           if (!dryRun) written++;
         } catch (err) {
-          console.error(`    !! DB write failed for ${target.entity_name}:`, err);
+          console.error(`    !! DB write failed for ${target.entityName}:`, err);
           errors++;
         }
       }
@@ -349,11 +349,11 @@ async function main() {
   // Summary
   // ---------------------------------------------------------------------------
 
-  const ok       = outcomes.filter((o) => o?.http_status && o.http_status < 400);
-  const withText = ok.filter((o) => (o.raw_text?.length ?? 0) > 50);
-  const withR2   = ok.filter((o) => o.raw_html_pointer);
+  const ok       = outcomes.filter((o) => o?.httpStatus && o.httpStatus < 400);
+  const withText = ok.filter((o) => (o.rawText?.length ?? 0) > 50);
+  const withR2   = ok.filter((o) => o.rawHtmlPointer);
   const avgLen   = withText.length > 0
-    ? Math.round(withText.reduce((s, o) => s + (o.raw_text?.length ?? 0), 0) / withText.length)
+    ? Math.round(withText.reduce((s, o) => s + (o.rawText?.length ?? 0), 0) / withText.length)
     : 0;
 
   console.log(`\n${"═".repeat(60)}`);

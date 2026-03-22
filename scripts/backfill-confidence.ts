@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Backfill confidence for all existing places.
- * Recomputes confidence JSONB and overall_confidence from golden + linked raw records.
+ * Recomputes confidence JSONB and overallConfidence from golden + linked raw records.
  *
  * Usage (Neon): ./scripts/db-neon.sh node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/backfill-confidence.ts
  *       or:     npm run backfill:confidence   (blocks if DATABASE_URL is local unless ALLOW_LOCAL_DB=1)
@@ -93,8 +93,8 @@ async function main() {
         where: { id: place.id },
         data: {
           confidence: (Object.keys(confidence).length ? confidence : {}) as Prisma.InputJsonValue,
-          overall_confidence: overall_confidence >= 0 ? overall_confidence : 0.5,
-          confidence_updated_at: new Date(),
+          overallConfidence: overall_confidence >= 0 ? overall_confidence : 0.5,
+          confidenceUpdatedAt: new Date(),
         },
       });
       updated++;

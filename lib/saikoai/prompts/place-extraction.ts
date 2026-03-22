@@ -104,13 +104,13 @@ ${FIELDS_SECTION}
 Output JSON only. No preamble, no markdown fences.`;
 
 export function buildExtractionUserPrompt(input: ExtractionInput): string {
-  const { place, raw_values, sources } = input;
-  const rawJson = raw_values ? JSON.stringify(raw_values, null, 2) : 'null';
+  const { place, rawValues, sources } = input;
+  const rawJson = rawValues ? JSON.stringify(rawValues, null, 2) : 'null';
 
   const sourcesBlock = sources
     .map(
       (s) =>
-        `- ${s.source_id}: ${s.publication} — "${s.title}" (${s.published_at ?? 'no date'}, ${s.trust_level})\n  URL: ${s.url}\n  Content:\n${s.content}`
+        `- ${s.sourceId}: ${s.publication} — "${s.title}" (${s.publishedAt ?? 'no date'}, ${s.trustLevel})\n  URL: ${s.url}\n  Content:\n${s.content}`
     )
     .join('\n\n');
 

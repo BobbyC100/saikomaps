@@ -10,70 +10,70 @@ import { db as prisma } from '@/lib/db';
 
 export interface EnrichmentRun {
   id: string;
-  source_name: string;
-  searched_name: string | null;
-  searched_city: string | null;
-  result_json: any;
-  identity_confidence: number | null;
-  anchor_count: number;
-  decision_status: string;
-  created_at: Date;
+  sourceName: string;
+  searchedName: string | null;
+  searchedCity: string | null;
+  resultJson: any;
+  identityConfidence: number | null;
+  anchorCount: number;
+  decisionStatus: string;
+  createdAt: Date;
 }
 
 export interface HydratedReviewItem {
-  queue_id: string;
-  canonical_id: string | null;
-  raw_id_a: string;
-  raw_id_b: string | null;
-  conflict_type: string;
-  match_confidence: number | null;
-  conflicting_fields: any;
+  queueId: string;
+  canonicalId: string | null;
+  rawIdA: string;
+  rawIdB: string | null;
+  conflictType: string;
+  matchConfidence: number | null;
+  conflictingFields: any;
   priority: number;
   status: string;
-  created_at: Date;
+  createdAt: Date;
   recordA: HydratedRecord;
   recordB: HydratedRecord | null;
   existingCanonical?: {
-    canonical_id: string;
+    canonicalId: string;
     name: string;
     slug: string;
-    source_count: number;
+    sourceCount: number;
   };
   distanceMeters?: number;
   // Identity enrichment state (new_entity_review only; null on all other types)
-  identity_enrichment_status: string | null;
-  identity_anchor_count: number | null;
-  latest_identity_confidence: number | null;
+  identityEnrichmentStatus: string | null;
+  identityAnchorCount: number | null;
+  latestIdentityConfidence: number | null;
   enrichment_runs: EnrichmentRun[];
 }
 
 export interface HydratedRecord {
-  raw_id: string;
-  source_name: string;
-  source_url?: string;
+  rawId: string;
+  sourceName: string;
+  sourceUrl?: string;
   name: string;
-  name_normalized: string;
+  nameNormalized: string;
   lat: number;
   lng: number;
   address?: string;
   neighborhood?: string;
   category?: string;
   phone?: string;
-  observed_at: Date;
-  raw_json: any;
+  observedAt: Date;
+  rawJson: any;
 }
 
 /**
  * Hydrate a raw record for UI display
  */
 function hydrateRawRecord(raw: any): HydratedRecord {
-  const json = raw.raw_json as any;
+  const json = raw.rawJson as any;
   return {
-    raw_id: raw.raw_id,
-    source_name: raw.source_name,
-    source_url: json.source_url,
+    rawId: raw.rawId,
+    sourceName: raw.sourceName,
+    sourceUrl: json.source_url,
     name: json.name || 'Unknown',
-    name_normalized: raw.name_normalized || '',
+    nameNormalized: raw.nameNormalized || '',
     lat: raw.lat ? parseFloat(raw.lat.toString()) : 0,
     lng: raw.lng ? parseFloat(raw.lng.toString()) : 0,
     address: json.address_street
@@ -82,8 +82,8 @@ function hydrateRawRecord(raw: any): HydratedRecord {
     neighborhood: json.neighborhood,
     category: json.category,
     phone: json.phone,
-    observed_at: raw.observed_at,
-    raw_json: json,
+    observedAt: raw.observedAt,
+    rawJson: json,
   };
 }
 
@@ -103,83 +103,83 @@ export async function getReviewQueueItems(params: {
   stats: { pending: number; resolved: number };
 }> {
   const { status = 'pending', conflictType, limit = 20, offset = 0 } = params;
-  
+
   const where: any = { status };
-  if (conflictType) where.conflict_type = conflictType;
+  if (conflictType) where.conflictType = conflictType;
 
   // Suppress items still in machine enrichment — not ready for human adjudication
   where.NOT = {
-    identity_enrichment_status: { in: ['pending_enrichment', 'enriching'] },
+    identityEnrichmentStatus: { in: ['pending_enrichment', 'enriching'] },
   };
-  
+
   const [items, total] = await Promise.all([
     prisma.review_queue.findMany({
       where,
       take: limit,
       skip: offset,
-      orderBy: [{ priority: 'asc' }, { created_at: 'asc' }],
+      orderBy: [{ priority: 'asc' }, { createdAt: 'asc' }],
       include: {
         raw_record_a: true,
         raw_record_b: true,
         enrichment_runs: {
-          orderBy: { created_at: 'asc' },
+          orderBy: { createdAt: 'asc' },
         },
       },
     }),
     prisma.review_queue.count({ where }),
   ]);
-  
+
   // Hydrate items
   const hydratedItems: HydratedReviewItem[] = items.map((item) => {
     const recordA = hydrateRawRecord(item.raw_record_a);
     const recordB = item.raw_record_b ? hydrateRawRecord(item.raw_record_b) : null;
-    
+
     return {
-      queue_id: item.queue_id,
-      canonical_id: item.canonical_id,
-      raw_id_a: item.raw_id_a,
-      raw_id_b: item.raw_id_b,
-      conflict_type: item.conflict_type,
-      match_confidence: item.match_confidence
-        ? parseFloat(item.match_confidence.toString())
+      queueId: item.queueId,
+      canonicalId: item.canonicalId,
+      rawIdA: item.rawIdA,
+      rawIdB: item.rawIdB,
+      conflictType: item.conflictType,
+      matchConfidence: item.matchConfidence
+        ? parseFloat(item.matchConfidence.toString())
         : null,
-      conflicting_fields: item.conflicting_fields,
+      conflictingFields: item.conflictingFields,
       priority: item.priority,
       status: item.status,
-      created_at: item.created_at,
+      createdAt: item.createdAt,
       recordA,
       recordB,
       existingCanonical: undefined,
       distanceMeters: recordB
         ? haversineDistance(recordA.lat, recordA.lng, recordB.lat, recordB.lng)
         : undefined,
-      identity_enrichment_status: (item as any).identity_enrichment_status ?? null,
-      identity_anchor_count: (item as any).identity_anchor_count ?? null,
-      latest_identity_confidence: (item as any).latest_identity_confidence
-        ? parseFloat((item as any).latest_identity_confidence.toString())
+      identityEnrichmentStatus: (item as any).identityEnrichmentStatus ?? null,
+      identityAnchorCount: (item as any).identityAnchorCount ?? null,
+      latestIdentityConfidence: (item as any).latestIdentityConfidence
+        ? parseFloat((item as any).latestIdentityConfidence.toString())
         : null,
       enrichment_runs: ((item as any).enrichment_runs ?? []).map((r: any) => ({
         id: r.id,
-        source_name: r.source_name,
-        searched_name: r.searched_name,
-        searched_city: r.searched_city,
-        result_json: r.result_json,
-        identity_confidence: r.identity_confidence
-          ? parseFloat(r.identity_confidence.toString())
+        sourceName: r.sourceName,
+        searchedName: r.searchedName,
+        searchedCity: r.searchedCity,
+        resultJson: r.resultJson,
+        identityConfidence: r.identityConfidence
+          ? parseFloat(r.identityConfidence.toString())
           : null,
-        anchor_count: r.anchor_count,
-        decision_status: r.decision_status,
-        created_at: r.created_at,
+        anchorCount: r.anchorCount,
+        decisionStatus: r.decisionStatus,
+        createdAt: r.createdAt,
       })),
     };
   });
-  
+
   // Get stats
   const stats = await prisma.review_queue.groupBy({
     by: ['status'],
     _count: true,
   });
-  
+
   return {
     items: hydratedItems,
     pagination: { total, offset, limit },
@@ -208,51 +208,51 @@ export async function resolveReviewQueueItem(params: {
   const { queueId, resolution, resolutionNotes, resolvedBy, canonicalId } = params;
 
   const queueItem = await prisma.review_queue.findUnique({
-    where: { queue_id: queueId },
+    where: { queueId: queueId },
     include: { raw_record_a: true, raw_record_b: true },
   });
-  
+
   if (!queueItem) {
     throw new Error('Queue item not found');
   }
-  
+
   let entityLinksCreated = 0;
   let goldenRecordUpdated = false;
-  
+
   if (resolution === 'merged' || resolution === 'kept_separate') {
     // Mark both records as processed but don't link them
     await prisma.raw_records.updateMany({
       where: {
-        raw_id: { in: [queueItem.raw_id_a, queueItem.raw_id_b].filter(Boolean) as string[] },
+        rawId: { in: [queueItem.rawIdA, queueItem.rawIdB].filter(Boolean) as string[] },
       },
-      data: { is_processed: true },
+      data: { isProcessed: true },
     });
   }
-  
+
   // Update queue item
   await prisma.review_queue.update({
-    where: { queue_id: queueId },
+    where: { queueId: queueId },
     data: {
       status: 'resolved',
       resolution,
-      resolution_notes: resolutionNotes,
-      resolved_by: resolvedBy,
-      resolved_at: new Date(),
+      resolutionNotes: resolutionNotes,
+      resolvedBy: resolvedBy,
+      resolvedAt: new Date(),
     },
   });
-  
+
   // Get next item for seamless navigation
   const nextItem = await prisma.review_queue.findFirst({
     where: { status: 'pending' },
-    orderBy: [{ priority: 'asc' }, { created_at: 'asc' }],
-    select: { queue_id: true },
+    orderBy: [{ priority: 'asc' }, { createdAt: 'asc' }],
+    select: { queueId: true },
   });
-  
+
   return {
     success: true,
     entityLinksCreated,
     goldenRecordUpdated,
-    nextQueueId: nextItem?.queue_id || null,
+    nextQueueId: nextItem?.queueId || null,
   };
 }
 
@@ -265,29 +265,29 @@ export async function skipReviewQueueItem(params: {
   decreasePriority?: boolean;
 }): Promise<{ success: boolean }> {
   const { queueId, reason, decreasePriority = true } = params;
-  
+
   const updates: any = {
     status: 'deferred',
-    resolution_notes: reason,
+    resolutionNotes: reason,
   };
-  
+
   if (decreasePriority) {
     // Increase priority number (lower priority)
     const current = await prisma.review_queue.findUnique({
-      where: { queue_id: queueId },
+      where: { queueId: queueId },
       select: { priority: true },
     });
-    
+
     if (current) {
       updates.priority = Math.min(current.priority + 1, 10);
     }
   }
-  
+
   await prisma.review_queue.update({
-    where: { queue_id: queueId },
+    where: { queueId: queueId },
     data: updates,
   });
-  
+
   return { success: true };
 }
 
@@ -316,19 +316,19 @@ export async function createReviewQueueItem(params: {
     priority = 5,
     identityEnrichmentStatus = null,
   } = params;
-  
+
   const queueItem = await prisma.review_queue.create({
     data: {
-      canonical_id: canonicalId ?? undefined,
-      raw_id_a: rawIdA,
-      raw_id_b: rawIdB ?? undefined,
-      conflict_type: conflictType,
-      match_confidence: matchConfidence ? new Prisma.Decimal(matchConfidence) : null,
-      conflicting_fields: conflictingFields ? (conflictingFields as Prisma.InputJsonValue) : Prisma.JsonNull,
+      canonicalId: canonicalId ?? undefined,
+      rawIdA: rawIdA,
+      rawIdB: rawIdB ?? undefined,
+      conflictType: conflictType,
+      matchConfidence: matchConfidence ? new Prisma.Decimal(matchConfidence) : null,
+      conflictingFields: conflictingFields ? (conflictingFields as Prisma.InputJsonValue) : Prisma.JsonNull,
       priority,
-      identity_enrichment_status: identityEnrichmentStatus,
+      identityEnrichmentStatus: identityEnrichmentStatus,
     },
   });
-  
-  return queueItem.queue_id;
+
+  return queueItem.queueId;
 }

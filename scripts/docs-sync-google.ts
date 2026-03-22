@@ -289,7 +289,7 @@ async function main() {
     const currentHash = hashContent(rawContent);
     const existing = syncMap.docs[doc.doc_id];
 
-    if (!forceAll && existing?.content_hash === currentHash) {
+    if (!forceAll && existing?.contentHash === currentHash) {
       console.log(`  [unchanged] ${doc.doc_id}`);
       skipped++;
       continue;
@@ -305,7 +305,7 @@ async function main() {
         google_doc_id: result.id,
         google_doc_url: result.url,
         last_synced: new Date().toISOString(),
-        content_hash: currentHash,
+        contentHash: currentHash,
       };
       console.log(`  [${existing ? 'updated' : 'created'}] ${doc.doc_id}  →  ${result.url}`);
       synced++;

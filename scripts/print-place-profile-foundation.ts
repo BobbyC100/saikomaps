@@ -93,12 +93,12 @@ async function main() {
       // Signals
       merchant_signals: {
         select: {
-          menu_url: true,
-          winelist_url: true,
-          reservation_url: true,
-          ordering_url: true,
-          extraction_confidence: true,
-          last_updated_at: true,
+          menuUrl: true,
+          winelistUrl: true,
+          reservationUrl: true,
+          orderingUrl: true,
+          extractionConfidence: true,
+          lastUpdatedAt: true,
         },
       },
       coverage_sources: {
@@ -179,7 +179,7 @@ async function main() {
         address: entity.address,
         latitude: entity.latitude ? Number(entity.latitude) : null,
         longitude: entity.longitude ? Number(entity.longitude) : null,
-        primaryVertical: entity.primary_vertical,
+        primaryVertical: entity.primaryVertical,
         category: entity.category,
         cuisineType: entity.cuisineType,
         priceLevel: entity.priceLevel,
@@ -194,8 +194,8 @@ async function main() {
         phone: entity.phone,
         reservationUrl: entity.reservationUrl,
         hasLatLng: !!(entity.latitude && entity.longitude),
-        menuUrl: entity.merchant_signals?.menu_url ?? golden?.menu_url ?? null,
-        winelistUrl: entity.merchant_signals?.winelist_url ?? golden?.winelist_url ?? null,
+        menuUrl: entity.merchant_signals?.menuUrl ?? golden?.menu_url ?? null,
+        winelistUrl: entity.merchant_signals?.winelistUrl ?? golden?.winelist_url ?? null,
       },
 
       // 3. Hours
@@ -231,18 +231,18 @@ async function main() {
 
       // 5. Menu + Beverage
       menuBeverage: {
-        menuUrl_merchantSignals: entity.merchant_signals?.menu_url ?? null,
+        menuUrl_merchantSignals: entity.merchant_signals?.menuUrl ?? null,
         menuUrl_golden: golden?.menu_url ?? null,
-        winelistUrl_merchantSignals: entity.merchant_signals?.winelist_url ?? null,
+        winelistUrl_merchantSignals: entity.merchant_signals?.winelistUrl ?? null,
         winelistUrl_golden: golden?.winelist_url ?? null,
-        effectiveMenuUrl: entity.merchant_signals?.menu_url ?? golden?.menu_url ?? null,
-        effectiveWinelistUrl: entity.merchant_signals?.winelist_url ?? golden?.winelist_url ?? null,
+        effectiveMenuUrl: entity.merchant_signals?.menuUrl ?? golden?.menu_url ?? null,
+        effectiveWinelistUrl: entity.merchant_signals?.winelistUrl ?? golden?.winelist_url ?? null,
         menuSignalsRow: !!((golden as Record<string, unknown> | null)?.menu_signals),
         winelistSignalsRow: !!((golden as Record<string, unknown> | null)?.winelist_signals),
-        merchantSignalsConfidence: entity.merchant_signals?.extraction_confidence
-          ? Number(entity.merchant_signals.extraction_confidence)
+        merchantSignalsConfidence: entity.merchant_signals?.extractionConfidence
+          ? Number(entity.merchant_signals.extractionConfidence)
           : null,
-        merchantSignalsUpdatedAt: entity.merchant_signals?.last_updated_at?.toISOString() ?? null,
+        merchantSignalsUpdatedAt: entity.merchant_signals?.lastUpdatedAt?.toISOString() ?? null,
       },
 
       // 6. Coverage
@@ -288,7 +288,7 @@ async function main() {
       provenance: {
         goldenWinnerSources: golden?.winner_sources ?? null,
         goldenFieldConfidences: golden?.field_confidences ?? null,
-        merchantSignalsUpdatedAt: entity.merchant_signals?.last_updated_at?.toISOString() ?? null,
+        merchantSignalsUpdatedAt: entity.merchant_signals?.lastUpdatedAt?.toISOString() ?? null,
         googleAttrsSource: googleAttrs?.['_meta']
           ? (googleAttrs['_meta'] as Record<string, unknown>)['source']
           : null,

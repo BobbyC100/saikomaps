@@ -102,15 +102,14 @@ async function main() {
       where: { entityId_url: { entityId, url: link.url } },
       create: {
         entityId,
-        source_name: link.sourceName,
+        publicationName: link.sourceName,
         url: link.url,
-        excerpt: link.excerpt ?? null,
-        published_at: link.publishedAt ? new Date(link.publishedAt) : null,
+        publishedAt: link.publishedAt ? new Date(link.publishedAt) : null,
+        enrichmentStage: 'INGESTED',
       },
       update: {
-        source_name: link.sourceName,
-        excerpt: link.excerpt ?? null,
-        published_at: link.publishedAt ? new Date(link.publishedAt) : null,
+        publicationName: link.sourceName,
+        publishedAt: link.publishedAt ? new Date(link.publishedAt) : null,
       },
     });
     console.log(`  ✓ ${link.slug} — ${link.sourceName}`);

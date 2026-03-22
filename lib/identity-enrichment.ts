@@ -308,15 +308,15 @@ async function writeRun(params: {
 }): Promise<string> {
   const run = await prisma.identity_enrichment_runs.create({
     data: {
-      raw_id: params.rawId,
-      review_queue_id: params.reviewQueueId,
-      source_name: params.sourceName,
-      searched_name: params.searchedName,
-      searched_city: params.searchedCity,
-      result_json: params.resultJson as Prisma.InputJsonValue,
-      identity_confidence: new Prisma.Decimal(params.identityConfidence.toFixed(3)),
-      anchor_count: params.anchorCount,
-      decision_status: params.decisionStatus,
+      rawId: params.rawId,
+      reviewQueueId: params.reviewQueueId,
+      sourceName: params.sourceName,
+      searchedName: params.searchedName,
+      searchedCity: params.searchedCity,
+      resultJson: params.resultJson as Prisma.InputJsonValue,
+      identityConfidence: new Prisma.Decimal(params.identityConfidence.toFixed(3)),
+      anchorCount: params.anchorCount,
+      decisionStatus: params.decisionStatus,
     },
   });
   return run.id;
@@ -334,12 +334,12 @@ async function updateQueueEnrichmentState(params: {
   latestRunId: string;
 }) {
   await prisma.review_queue.update({
-    where: { queue_id: params.queueId },
+    where: { queueId: params.queueId },
     data: {
-      identity_enrichment_status: params.status,
-      identity_anchor_count: params.anchorCount,
-      latest_identity_confidence: new Prisma.Decimal(params.confidence.toFixed(3)),
-      latest_identity_run_id: params.latestRunId,
+      identityEnrichmentStatus: params.status,
+      identityAnchorCount: params.anchorCount,
+      latestIdentityConfidence: new Prisma.Decimal(params.confidence.toFixed(3)),
+      latestIdentityRunId: params.latestRunId,
     },
   });
 }
@@ -413,8 +413,8 @@ export async function runIdentityEnrichment(
 
   // Mark as enriching
   await prisma.review_queue.update({
-    where: { queue_id: queueId },
-    data: { identity_enrichment_status: 'enriching' },
+    where: { queueId: queueId },
+    data: { identityEnrichmentStatus: 'enriching' },
   });
 
   // -----------------------------------------------------------------------

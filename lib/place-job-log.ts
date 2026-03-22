@@ -24,13 +24,13 @@ export async function logPlaceJob(
   const db = client ?? (await import("@/lib/db")).db;
   await db.place_job_log.create({
     data: {
-      entity_id: input.entityId,
-      entity_type: input.entityType,
-      job_type: input.jobType,
-      pages_fetched: input.pagesFetched ?? 0,
-      ai_calls: input.aiCalls ?? 0,
-      duration_ms: input.durationMs ?? null,
-      estimated_cost: input.estimatedCost != null ? input.estimatedCost : null,
+      entityId: input.entityId,
+      entityType: input.entityType,
+      jobType: input.jobType,
+      pagesFetched: input.pagesFetched ?? 0,
+      aiCalls: input.aiCalls ?? 0,
+      durationMs: input.durationMs ?? null,
+      estimatedCost: input.estimatedCost != null ? input.estimatedCost : null,
     },
   });
 }

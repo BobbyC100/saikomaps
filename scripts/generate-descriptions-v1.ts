@@ -167,7 +167,7 @@ async function processEntity(
 
     if (!args.dryRun) {
       // Write to entities.description — only if current source is null or weaker
-      const currentSource = record.description_source;
+      const currentSource = record.descriptionSource;
       const shouldWrite = !currentSource || currentSource !== 'editorial';
 
       if (shouldWrite) {
@@ -175,7 +175,7 @@ async function processEntity(
           where: { id: record.id },
           data: {
             description: text,
-            description_source: 'website',
+            descriptionSource: 'website',
           },
         });
 

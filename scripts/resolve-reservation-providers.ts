@@ -207,19 +207,19 @@ async function main() {
 
   // Step 1: Find eligible entities with existing reservation signals
   const where: Record<string, unknown> = {
-    reservation_url: { not: null },
+    reservationUrl: { not: null },
   };
   if (providerFilter) {
-    where.reservation_provider = providerFilter;
+    where.reservationProvider = providerFilter;
   }
 
   const candidates = await db.merchant_signals.findMany({
     where: where as any,
     select: {
       entityId: true,
-      reservation_provider: true,
-      reservation_url: true,
-      extraction_confidence: true,
+      reservationProvider: true,
+      reservationUrl: true,
+      extractionConfidence: true,
       entities: {
         select: {
           name: true,
@@ -252,9 +252,9 @@ async function main() {
       address: c.entities.address,
       website: c.entities.website,
       phone: c.entities.phone,
-      reservationProvider: c.reservation_provider,
-      reservationUrl: c.reservation_url,
-      extractionConfidence: c.extraction_confidence
+      reservationProvider: c.reservationProvider,
+      reservationUrl: c.reservationUrl,
+      extractionConfidence: c.extractionConfidence
         ? Number(c.extraction_confidence)
         : null,
     };
