@@ -457,7 +457,7 @@ export async function GET(
       address: entity.address ?? null,
       latitude: entity.latitude ? Number(entity.latitude) : null,
       longitude: entity.longitude ? Number(entity.longitude) : null,
-      phone: entity.phone ?? null,
+      phone: entity.phone && entity.phone.toUpperCase() !== 'NONE' ? entity.phone : null,
       website: entity.website ?? null,
       instagram: entity.instagram ?? null,
       tiktok: entity.tiktok ?? null,

@@ -740,7 +740,9 @@ export default function PlacePage() {
   const mapRefUrl = buildMapRefUrl(location.googlePlaceId, location.latitude, location.longitude, location.address);
   const recognitions = (location.recognitions ?? []).slice(0, RECOGNITIONS_CAP);
   const appendixGroups = buildAppendixReferences(location);
-  const phoneUrl = location.phone ? `tel:${location.phone.replace(/\D/g, '')}` : null;
+  // Guard against sentinel values like "NONE" stored in DB instead of null
+  const rawPhone = location.phone && location.phone.toUpperCase() !== 'NONE' ? location.phone : null;
+  const phoneUrl = rawPhone ? `tel:${rawPhone.replace(/\D/g, '')}` : null;
 
   // Sidebar: Hours
   const fullWeekHours = parsedHours.fullWeek;
@@ -1065,12 +1067,12 @@ export default function PlacePage() {
                     </>
                   )}
 
-                  {phoneUrl && location.phone && (
+                  {phoneUrl && rawPhone && (
                     <>
                       <div className="sk-section-header"><span>Phone</span></div>
                       <div id="phone-block">
                         <a href={phoneUrl} className="phone-link">
-                          Call {location.phone} <span className="action-arrow">↗</span>
+                          Call {rawPhone} <span className="action-arrow">↗</span>
                         </a>
                       </div>
                     </>
