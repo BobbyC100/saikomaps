@@ -34,13 +34,13 @@ async function getEntityWithCounts(entityId: string) {
   if (!entity) return null;
 
   const [surfaceCount, artifactCount, issueCount] = await Promise.all([
-    db.merchant_surfaces.count({ where: { entity_id: entityId } }),
+    db.merchant_surfaces.count({ where: { entityId: entityId } }),
     db.$queryRaw<[{ count: bigint }]>`
       SELECT COUNT(*) as count FROM merchant_surface_artifacts msa
       JOIN merchant_surfaces ms ON msa.merchant_surface_id = ms.id
       WHERE ms.entity_id = ${entityId}
     `,
-    db.entity_issues.count({ where: { entity_id: entityId } }),
+    db.entity_issues.count({ where: { entityId: entityId } }),
   ]);
 
   return {

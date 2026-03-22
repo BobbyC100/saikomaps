@@ -56,8 +56,12 @@ interface LocationData {
   } | null;
   tips?: string[] | null;
   tagline?: string | null;
+  timefold?: { class: string; phrase: string; approvedBy: string | null } | null;
   transitAccessible?: boolean | null;
   thematicTags?: string[] | null;
+  amenities?: string[] | null;
+  parkFacilities?: { id: string; name: string; slug: string; category: string | null }[] | null;
+  parentPark?: { id: string; name: string; slug: string } | null;
   contextualConnection?: string | null;
   curatorAttribution?: string | null;
   pullQuote?: string | null;
@@ -796,6 +800,9 @@ export default function PlacePage() {
                 {location.tagline && (
                   <p id="identity-tagline">{location.tagline}</p>
                 )}
+                {location.timefold?.approvedBy && (
+                  <p id="timefold-signal" className="sk-meta">{location.timefold.phrase}</p>
+                )}
                 {hasSignalsSentence && (
                   <p id="identity-signals" className="sk-identity">
                     {openStateLabel && <em>{openStateLabel}</em>}
@@ -907,6 +914,47 @@ export default function PlacePage() {
                         <li key={i}>{tip}</li>
                       ))}
                     </ul>
+                  </>
+                )}
+
+                {/* Parks: Amenities */}
+                {location.amenities && location.amenities.length > 0 && (
+                  <>
+                    <div className="sk-section-header"><span>Amenities</span></div>
+                    <div className="amenity-chips">
+                      {location.amenities.map((amenity, i) => (
+                        <span key={i} className="amenity-chip">{amenity}</span>
+                      ))}
+                    </div>
+                  </>
+                )}
+
+                {/* Parks: Facilities within this park */}
+                {location.parkFacilities && location.parkFacilities.length > 0 && (
+                  <>
+                    <div className="sk-section-header"><span>Facilities</span></div>
+                    <ul className="park-facilities-list">
+                      {location.parkFacilities.map((fac) => (
+                        <li key={fac.id}>
+                          <Link href={`/place/${fac.slug}`}>
+                            {fac.name}
+                            {fac.category && <span className="facility-category"> · {fac.category}</span>}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                )}
+
+                {/* Parks: Parent park link */}
+                {location.parentPark && (
+                  <>
+                    <div className="sk-section-header"><span>Part of</span></div>
+                    <p className="parent-park-link">
+                      <Link href={`/place/${location.parentPark.slug}`}>
+                        {location.parentPark.name}
+                      </Link>
+                    </p>
                   </>
                 )}
               </div>

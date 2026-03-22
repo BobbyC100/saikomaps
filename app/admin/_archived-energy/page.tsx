@@ -13,12 +13,12 @@ export default async function AdminEnergyPage() {
     db.entities.count(),
     db.energy_scores.findMany({
       where: { version: 'energy_v1' },
-      select: { energy_score: true, energy_confidence: true },
+      select: { energyScore: true, energyConfidence: true },
     }),
     db.energy_scores.findFirst({
       where: { version: 'energy_v1' },
-      orderBy: { computed_at: 'desc' },
-      select: { computed_at: true },
+      orderBy: { computedAt: 'desc' },
+      select: { computedAt: true },
     }),
   ]);
 
@@ -27,16 +27,16 @@ export default async function AdminEnergyPage() {
   const avgConfidence =
     energyRows.length > 0
       ? Math.round(
-          (energyRows.reduce((s, r) => s + r.energy_confidence, 0) / energyRows.length) * 100
+          (energyRows.reduce((s, r) => s + r.energyConfidence, 0) / energyRows.length) * 100
         ) / 100
       : 0;
 
   const histogram: Record<string, number> = {};
   for (let b = 0; b < 100; b += 10) {
     const key = `${b}-${b + 9}`;
-    histogram[key] = energyRows.filter((r) => r.energy_score >= b && r.energy_score < b + 10).length;
+    histogram[key] = energyRows.filter((r) => r.energyScore >= b && r.energyScore < b + 10).length;
   }
-  histogram['100'] = energyRows.filter((r) => r.energy_score === 100).length;
+  histogram['100'] = energyRows.filter((r) => r.energyScore === 100).length;
 
   return (
     <div className="min-h-screen bg-[#F5F0E1] py-12 px-6">
@@ -61,8 +61,8 @@ export default async function AdminEnergyPage() {
           <div className="bg-white rounded-xl p-6 shadow-sm">
             <div className="text-sm text-[#8B7355] mb-2">Last compute</div>
             <div className="text-lg font-medium text-[#36454F]">
-              {lastCompute?.computed_at
-                ? new Date(lastCompute.computed_at).toLocaleString()
+              {lastCompute?.computedAt
+                ? new Date(lastCompute.computedAt).toLocaleString()
                 : 'Never'}
             </div>
           </div>

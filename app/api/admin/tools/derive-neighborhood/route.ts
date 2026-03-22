@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
 
     // Update canonical_entity_state if it exists (updateMany returns 0 if no row — no error)
     await db.canonical_entity_state.updateMany({
-      where: { entity_id: entityId },
+      where: { entityId: entityId },
       data: { neighborhood: result.neighborhood },
     });
 

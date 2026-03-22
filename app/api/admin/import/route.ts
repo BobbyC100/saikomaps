@@ -69,9 +69,9 @@ export async function POST(request: NextRequest) {
         // Check for existing record
         const existing = await prisma.raw_records.findUnique({
           where: {
-            source_name_external_id: {
-              source_name: sourceName,
-              external_id: externalId
+            sourceName_externalId: {
+              sourceName: sourceName,
+              externalId: externalId
             }
           }
         });
@@ -84,16 +84,16 @@ export async function POST(request: NextRequest) {
         // Create raw record
         await prisma.raw_records.create({
           data: {
-            source_name: sourceName,
-            external_id: externalId,
-            source_url: row.SourceURL || null,
-            name_normalized: normalizeName(row.Name),
+            sourceName: sourceName,
+            externalId: externalId,
+            sourceUrl: row.SourceURL || null,
+            nameNormalized: normalizeName(row.Name),
             // Coordinates will be filled by geocoding job
             lat: null,
             lng: null,
-            h3_index_r9: null,
-            h3_neighbors_r9: [],
-            raw_json: {
+            h3IndexR9: null,
+            h3NeighborsR9: [],
+            rawJson: {
               name: row.Name,
               neighborhood: row.Neighborhood,
               category: row.Category || null,
@@ -103,7 +103,7 @@ export async function POST(request: NextRequest) {
               phone: row.Phone || null,
               instagram_handle: row.Instagram || null,
             } as Prisma.InputJsonValue,
-            is_processed: false,
+            isProcessed: false,
           }
         });
         

@@ -1,11 +1,14 @@
 /**
- * Coverage Dashboard API
+ * Coverage Dashboard v2 API
  * GET /api/admin/coverage-dashboard
  *
- * Returns the unified data model for the coverage dashboard:
- * - Pipeline funnel (entity counts by stage)
- * - Action batches (grouped by what you can do about them)
- * - Neighborhood breakdown
+ * Returns data for three dashboard sections (coverage-dashboard-v2-spec.md):
+ *   1. Gaps & Recommended Actions — what needs attention, with enrichment strategy awareness
+ *   2. Neighborhood Overview — per-neighborhood completeness with bucket breakdowns
+ *   3. System Summary — counts by the three entity state axes + recent activity
+ *
+ * Uses the Entity State Model v1 fields (operatingStatus, enrichmentStatus, publicationStatus)
+ * alongside the existing three-bucket completeness model (Identity, Access, Offering).
  */
 
 import { NextResponse } from 'next/server';
@@ -17,105 +20,264 @@ export async function GET() {
   try {
     const [
       totalEntities,
-      statusCounts,
-      funnelData,
-      issueData,
+      // Entity State Model v1: counts by the three independent state axes
+      operatingStatusCounts,
+      enrichmentStatusCounts,
+      publicationStatusCounts,
+      // Neighborhood overview with bucket-level completeness
       neighborhoodData,
+      // Gaps data: missing fields with counts
+      gapsData,
+      // Recent activity (last 7 days)
       recentActivity,
     ] = await Promise.all([
-      // Total non-permanently-closed entities
-      db.entities.count({ where: { status: { not: 'PERMANENTLY_CLOSED' } } }),
+      // Total entities (all statuses, for header context)
+      db.$queryRaw<{ total: number; published: number; ingested: number }[]>`
+        SELECT
+          COUNT(*)::int AS total,
+          COUNT(CASE WHEN e.publication_status = 'PUBLISHED' THEN 1 END)::int AS published,
+          COUNT(CASE WHEN e.enrichment_status = 'INGESTED' THEN 1 END)::int AS ingested
+        FROM entities e
+        WHERE e.status != 'PERMANENTLY_CLOSED'
+      `,
 
-      // Counts by entity status
-      db.$queryRaw<{ status: string; count: number }[]>`
-        SELECT status::text, COUNT(*)::int AS count
+      // Operating status distribution
+      db.$queryRaw<{ status: string | null; count: number }[]>`
+        SELECT operating_status::text AS status, COUNT(*)::int AS count
         FROM entities
         WHERE status != 'PERMANENTLY_CLOSED'
-        GROUP BY status
+        GROUP BY operating_status
         ORDER BY count DESC
       `,
 
-      // Pipeline funnel — entity-level stage distribution
-      db.$queryRaw<{
-        has_website: number;
-        has_gpid: number;
-        has_coords: number;
-        has_surfaces: number;
-        has_tagline: number;
-        has_identity_signals: number;
-        total: number;
-      }[]>`
-        SELECT
-          COUNT(*)::int AS total,
-          COUNT(CASE WHEN e.website IS NOT NULL THEN 1 END)::int AS has_website,
-          COUNT(CASE WHEN e.google_place_id IS NOT NULL THEN 1 END)::int AS has_gpid,
-          COUNT(CASE WHEN e.latitude IS NOT NULL AND e.longitude IS NOT NULL THEN 1 END)::int AS has_coords,
-          COUNT(CASE WHEN EXISTS (
-            SELECT 1 FROM merchant_surfaces ms WHERE ms.entity_id = e.id
-          ) THEN 1 END)::int AS has_surfaces,
-          COUNT(CASE WHEN EXISTS (
-            SELECT 1 FROM derived_signals ds WHERE ds.entity_id = e.id AND ds.signal_key = 'identity_signals'
-          ) THEN 1 END)::int AS has_identity_signals,
-          COUNT(CASE WHEN EXISTS (
-            SELECT 1 FROM interpretation_cache ic WHERE ic.entity_id = e.id AND ic.output_type = 'TAGLINE' AND ic.is_current = true
-          ) THEN 1 END)::int AS has_tagline
-        FROM entities e
-        WHERE e.status != 'PERMANENTLY_CLOSED' AND e.status != 'CANDIDATE'
+      // Enrichment status distribution
+      db.$queryRaw<{ status: string | null; count: number }[]>`
+        SELECT enrichment_status::text AS status, COUNT(*)::int AS count
+        FROM entities
+        WHERE status != 'PERMANENTLY_CLOSED'
+        GROUP BY enrichment_status
+        ORDER BY count DESC
       `,
 
-      // Issue counts grouped by action type
-      db.$queryRaw<{ issue_type: string; severity: string; count: number; blocking: number }[]>`
-        SELECT
-          issue_type,
-          severity,
-          COUNT(*)::int AS count,
-          COUNT(CASE WHEN blocking_publish = true THEN 1 END)::int AS blocking
-        FROM entity_issues
-        WHERE status = 'open'
-        GROUP BY issue_type, severity
-        ORDER BY
-          CASE severity
-            WHEN 'critical' THEN 0
-            WHEN 'high' THEN 1
-            WHEN 'medium' THEN 2
-            WHEN 'low' THEN 3
-          END,
-          count DESC
+      // Publication status distribution
+      db.$queryRaw<{ status: string | null; count: number }[]>`
+        SELECT publication_status::text AS status, COUNT(*)::int AS count
+        FROM entities
+        WHERE status != 'PERMANENTLY_CLOSED'
+        GROUP BY publication_status
+        ORDER BY count DESC
       `,
 
-      // Neighborhood breakdown
+      // Neighborhood overview with bucket-level completeness and vertical distribution
+      // Uses the EXISTING identity/access/offering SQL logic from the v1 funnel query,
+      // but grouped per neighborhood instead of globally.
       db.$queryRaw<{
         neighborhood: string;
         total: number;
-        has_gpid: number;
-        has_website: number;
-        has_tagline: number;
-        avg_completion: number;
+        published: number;
+        identity_complete: number;
+        access_complete: number;
+        offering_complete: number;
+        verticals: string; // JSON object: { "EAT": 5, "COFFEE": 3, ... }
       }[]>`
+        WITH hood_entities AS (
+          SELECT e.*,
+            COALESCE(LOWER(TRIM(e.neighborhood)), 'unknown') AS hood
+          FROM entities e
+          WHERE e.status != 'PERMANENTLY_CLOSED' AND e.status != 'CANDIDATE'
+        ),
+        hood_verticals AS (
+          SELECT hood,
+            json_object_agg(COALESCE(primary_vertical::text, 'UNKNOWN'), cnt) AS verticals
+          FROM (
+            SELECT hood, primary_vertical, COUNT(*)::int AS cnt
+            FROM hood_entities
+            GROUP BY hood, primary_vertical
+          ) sub
+          GROUP BY hood
+        )
         SELECT
-          COALESCE(LOWER(TRIM(e.neighborhood)), 'unknown') AS neighborhood,
+          he.hood AS neighborhood,
           COUNT(*)::int AS total,
-          COUNT(CASE WHEN e.google_place_id IS NOT NULL THEN 1 END)::int AS has_gpid,
-          COUNT(CASE WHEN e.website IS NOT NULL THEN 1 END)::int AS has_website,
-          COUNT(CASE WHEN EXISTS (
-            SELECT 1 FROM interpretation_cache ic
-            WHERE ic.entity_id = e.id AND ic.output_type = 'TAGLINE' AND ic.is_current = true
-          ) THEN 1 END)::int AS has_tagline,
-          ROUND(
-            (
-              COUNT(CASE WHEN e.google_place_id IS NOT NULL THEN 1 END)::numeric +
-              COUNT(CASE WHEN e.website IS NOT NULL THEN 1 END)::numeric +
-              COUNT(CASE WHEN e.instagram IS NOT NULL THEN 1 END)::numeric +
-              COUNT(CASE WHEN e.phone IS NOT NULL THEN 1 END)::numeric +
-              COUNT(CASE WHEN e.latitude IS NOT NULL THEN 1 END)::numeric +
-              COUNT(CASE WHEN e.neighborhood IS NOT NULL THEN 1 END)::numeric
-            ) / (COUNT(*)::numeric * 6) * 100
-          , 1)::float8 AS avg_completion
-        FROM entities e
-        WHERE e.status != 'PERMANENTLY_CLOSED' AND e.status != 'CANDIDATE'
-        GROUP BY COALESCE(LOWER(TRIM(e.neighborhood)), 'unknown')
+          COUNT(CASE WHEN he.publication_status = 'PUBLISHED' THEN 1 END)::int AS published,
+
+          -- Identity: GPID OR weighted anchors >= 4
+          COUNT(CASE WHEN he.google_place_id IS NOT NULL
+            OR (
+              (CASE WHEN he.website IS NOT NULL THEN 3 ELSE 0 END) +
+              (CASE WHEN he.instagram IS NOT NULL THEN 2 ELSE 0 END) +
+              (CASE WHEN he.tiktok IS NOT NULL THEN 2 ELSE 0 END) +
+              (CASE WHEN he.phone IS NOT NULL THEN 1 ELSE 0 END) +
+              (CASE WHEN he.neighborhood IS NOT NULL THEN 1 ELSE 0 END) +
+              (CASE WHEN he.latitude IS NOT NULL AND he.longitude IS NOT NULL THEN 2 ELSE 0 END)
+            ) >= 4
+          THEN 1 END)::int AS identity_complete,
+
+          -- Access: vertical-aware (enrichment-model-v1.md section 4)
+          COUNT(CASE
+            WHEN he.primary_vertical IN ('EAT','DRINKS','BAKERY','COFFEE','WINE') AND
+              (he.website IS NOT NULL OR EXISTS (SELECT 1 FROM canonical_entity_state ces WHERE ces.entity_id = he.id AND ces.website IS NOT NULL)) AND
+              (he.phone IS NOT NULL OR EXISTS (SELECT 1 FROM canonical_entity_state ces WHERE ces.entity_id = he.id AND ces.phone IS NOT NULL)) AND
+              (he.hours IS NOT NULL OR EXISTS (SELECT 1 FROM canonical_entity_state ces WHERE ces.entity_id = he.id AND ces.hours_json IS NOT NULL)) AND
+              (he.instagram IS NOT NULL OR EXISTS (SELECT 1 FROM canonical_entity_state ces WHERE ces.entity_id = he.id AND ces.instagram IS NOT NULL)) AND
+              (he.reservation_url IS NOT NULL OR EXISTS (SELECT 1 FROM canonical_entity_state ces WHERE ces.entity_id = he.id AND ces.reservation_url IS NOT NULL))
+            THEN 1
+            WHEN he.primary_vertical = 'CULTURE' AND
+              (he.website IS NOT NULL OR EXISTS (SELECT 1 FROM canonical_entity_state ces WHERE ces.entity_id = he.id AND ces.website IS NOT NULL)) AND
+              (he.hours IS NOT NULL OR EXISTS (SELECT 1 FROM canonical_entity_state ces WHERE ces.entity_id = he.id AND ces.hours_json IS NOT NULL)) AND
+              (he.instagram IS NOT NULL OR EXISTS (SELECT 1 FROM canonical_entity_state ces WHERE ces.entity_id = he.id AND ces.instagram IS NOT NULL))
+            THEN 1
+            WHEN he.primary_vertical = 'SHOP' AND
+              (he.website IS NOT NULL OR EXISTS (SELECT 1 FROM canonical_entity_state ces WHERE ces.entity_id = he.id AND ces.website IS NOT NULL)) AND
+              (he.hours IS NOT NULL OR EXISTS (SELECT 1 FROM canonical_entity_state ces WHERE ces.entity_id = he.id AND ces.hours_json IS NOT NULL)) AND
+              (he.phone IS NOT NULL OR EXISTS (SELECT 1 FROM canonical_entity_state ces WHERE ces.entity_id = he.id AND ces.phone IS NOT NULL)) AND
+              (he.instagram IS NOT NULL OR EXISTS (SELECT 1 FROM canonical_entity_state ces WHERE ces.entity_id = he.id AND ces.instagram IS NOT NULL))
+            THEN 1
+            WHEN he.primary_vertical IN ('ACTIVITY','PARKS') AND
+              (he.website IS NOT NULL OR EXISTS (SELECT 1 FROM canonical_entity_state ces WHERE ces.entity_id = he.id AND ces.website IS NOT NULL))
+            THEN 1
+            WHEN he.primary_vertical = 'NATURE' THEN 1
+            WHEN he.primary_vertical IN ('STAY','WELLNESS','PURVEYORS') AND
+              (he.website IS NOT NULL OR EXISTS (SELECT 1 FROM canonical_entity_state ces WHERE ces.entity_id = he.id AND ces.website IS NOT NULL)) AND
+              (he.hours IS NOT NULL OR EXISTS (SELECT 1 FROM canonical_entity_state ces WHERE ces.entity_id = he.id AND ces.hours_json IS NOT NULL)) AND
+              (he.phone IS NOT NULL OR EXISTS (SELECT 1 FROM canonical_entity_state ces WHERE ces.entity_id = he.id AND ces.phone IS NOT NULL)) AND
+              (he.instagram IS NOT NULL OR EXISTS (SELECT 1 FROM canonical_entity_state ces WHERE ces.entity_id = he.id AND ces.instagram IS NOT NULL))
+            THEN 1
+          END)::int AS access_complete,
+
+          -- Offering: vertical-aware
+          COUNT(CASE
+            WHEN he.primary_vertical IN ('EAT','DRINKS','BAKERY','COFFEE','WINE') AND
+              EXISTS (SELECT 1 FROM canonical_entity_state ces WHERE ces.entity_id = he.id AND ces.menu_url IS NOT NULL) AND
+              EXISTS (SELECT 1 FROM derived_signals ds WHERE ds.entity_id = he.id AND ds.signal_key = 'offering_programs') AND
+              EXISTS (SELECT 1 FROM interpretation_cache ic WHERE ic.entity_id = he.id AND ic.output_type = 'SCENESENSE_PRL' AND ic.is_current = true) AND
+              EXISTS (SELECT 1 FROM coverage_sources cs WHERE cs.entity_id = he.id)
+            THEN 1
+            WHEN he.primary_vertical IN ('CULTURE','SHOP','ACTIVITY','PARKS') AND
+              EXISTS (SELECT 1 FROM interpretation_cache ic WHERE ic.entity_id = he.id AND ic.output_type = 'SCENESENSE_PRL' AND ic.is_current = true) AND
+              EXISTS (SELECT 1 FROM coverage_sources cs WHERE cs.entity_id = he.id)
+            THEN 1
+            WHEN he.primary_vertical = 'NATURE' AND
+              EXISTS (SELECT 1 FROM interpretation_cache ic WHERE ic.entity_id = he.id AND ic.output_type = 'SCENESENSE_PRL' AND ic.is_current = true)
+            THEN 1
+            WHEN he.primary_vertical IN ('STAY','WELLNESS','PURVEYORS') AND
+              EXISTS (SELECT 1 FROM interpretation_cache ic WHERE ic.entity_id = he.id AND ic.output_type = 'SCENESENSE_PRL' AND ic.is_current = true) AND
+              EXISTS (SELECT 1 FROM coverage_sources cs WHERE cs.entity_id = he.id)
+            THEN 1
+          END)::int AS offering_complete,
+
+          COALESCE(hv.verticals::text, '{}') AS verticals
+
+        FROM hood_entities he
+        LEFT JOIN hood_verticals hv ON hv.hood = he.hood
+        GROUP BY he.hood, hv.verticals
         HAVING COUNT(*) >= 2
-        ORDER BY total DESC
+        ORDER BY COUNT(*) DESC
+      `,
+
+      // Gaps: count entities missing key fields, annotated with enrichment strategy info
+      db.$queryRaw<{
+        gap_type: string;
+        bucket: string;
+        entity_count: number;
+        neighborhoods: string;
+      }[]>`
+        WITH active_entities AS (
+          SELECT e.*
+          FROM entities e
+          WHERE e.status != 'PERMANENTLY_CLOSED' AND e.status != 'CANDIDATE'
+        )
+        -- Identity bucket gaps
+        SELECT 'missing_gpid' AS gap_type, 'identity' AS bucket,
+          COUNT(*)::int AS entity_count,
+          COALESCE(json_agg(DISTINCT COALESCE(LOWER(TRIM(neighborhood)), 'unknown'))::text, '[]') AS neighborhoods
+        FROM active_entities WHERE google_place_id IS NULL
+
+        UNION ALL
+        SELECT 'missing_coords', 'identity',
+          COUNT(*)::int,
+          COALESCE(json_agg(DISTINCT COALESCE(LOWER(TRIM(neighborhood)), 'unknown'))::text, '[]')
+        FROM active_entities WHERE latitude IS NULL OR longitude IS NULL
+
+        UNION ALL
+        SELECT 'missing_website', 'identity',
+          COUNT(*)::int,
+          COALESCE(json_agg(DISTINCT COALESCE(LOWER(TRIM(neighborhood)), 'unknown'))::text, '[]')
+        FROM active_entities
+        WHERE website IS NULL
+          AND NOT EXISTS (SELECT 1 FROM canonical_entity_state ces WHERE ces.entity_id = active_entities.id AND ces.website IS NOT NULL)
+
+        UNION ALL
+        -- Access bucket gaps
+        SELECT 'missing_hours', 'access',
+          COUNT(*)::int,
+          COALESCE(json_agg(DISTINCT COALESCE(LOWER(TRIM(neighborhood)), 'unknown'))::text, '[]')
+        FROM active_entities
+        WHERE hours IS NULL
+          AND NOT EXISTS (SELECT 1 FROM canonical_entity_state ces WHERE ces.entity_id = active_entities.id AND ces.hours_json IS NOT NULL)
+          AND primary_vertical NOT IN ('NATURE')
+
+        UNION ALL
+        SELECT 'missing_phone', 'access',
+          COUNT(*)::int,
+          COALESCE(json_agg(DISTINCT COALESCE(LOWER(TRIM(neighborhood)), 'unknown'))::text, '[]')
+        FROM active_entities
+        WHERE phone IS NULL
+          AND NOT EXISTS (SELECT 1 FROM canonical_entity_state ces WHERE ces.entity_id = active_entities.id AND ces.phone IS NOT NULL)
+          AND primary_vertical IN ('EAT','DRINKS','BAKERY','COFFEE','WINE','SHOP','STAY','WELLNESS','PURVEYORS')
+
+        UNION ALL
+        SELECT 'missing_instagram', 'access',
+          COUNT(*)::int,
+          COALESCE(json_agg(DISTINCT COALESCE(LOWER(TRIM(neighborhood)), 'unknown'))::text, '[]')
+        FROM active_entities
+        WHERE instagram IS NULL
+          AND NOT EXISTS (SELECT 1 FROM canonical_entity_state ces WHERE ces.entity_id = active_entities.id AND ces.instagram IS NOT NULL)
+          AND primary_vertical NOT IN ('NATURE','ACTIVITY','PARKS')
+
+        UNION ALL
+        SELECT 'missing_reservation_url', 'access',
+          COUNT(*)::int,
+          COALESCE(json_agg(DISTINCT COALESCE(LOWER(TRIM(neighborhood)), 'unknown'))::text, '[]')
+        FROM active_entities
+        WHERE reservation_url IS NULL
+          AND NOT EXISTS (SELECT 1 FROM canonical_entity_state ces WHERE ces.entity_id = active_entities.id AND ces.reservation_url IS NOT NULL)
+          AND primary_vertical IN ('EAT','DRINKS','BAKERY','COFFEE','WINE')
+
+        UNION ALL
+        -- Offering bucket gaps
+        SELECT 'missing_menu', 'offering',
+          COUNT(*)::int,
+          COALESCE(json_agg(DISTINCT COALESCE(LOWER(TRIM(neighborhood)), 'unknown'))::text, '[]')
+        FROM active_entities
+        WHERE primary_vertical IN ('EAT','DRINKS','BAKERY','COFFEE','WINE')
+          AND NOT EXISTS (SELECT 1 FROM canonical_entity_state ces WHERE ces.entity_id = active_entities.id AND ces.menu_url IS NOT NULL)
+
+        UNION ALL
+        SELECT 'missing_scenesense', 'offering',
+          COUNT(*)::int,
+          COALESCE(json_agg(DISTINCT COALESCE(LOWER(TRIM(neighborhood)), 'unknown'))::text, '[]')
+        FROM active_entities
+        WHERE NOT EXISTS (
+          SELECT 1 FROM interpretation_cache ic
+          WHERE ic.entity_id = active_entities.id AND ic.output_type = 'SCENESENSE_PRL' AND ic.is_current = true
+        )
+
+        UNION ALL
+        SELECT 'missing_editorial', 'offering',
+          COUNT(*)::int,
+          COALESCE(json_agg(DISTINCT COALESCE(LOWER(TRIM(neighborhood)), 'unknown'))::text, '[]')
+        FROM active_entities
+        WHERE primary_vertical NOT IN ('NATURE')
+          AND NOT EXISTS (SELECT 1 FROM coverage_sources cs WHERE cs.entity_id = active_entities.id)
+
+        UNION ALL
+        SELECT 'missing_offering_programs', 'offering',
+          COUNT(*)::int,
+          COALESCE(json_agg(DISTINCT COALESCE(LOWER(TRIM(neighborhood)), 'unknown'))::text, '[]')
+        FROM active_entities
+        WHERE primary_vertical IN ('EAT','DRINKS','BAKERY','COFFEE','WINE')
+          AND NOT EXISTS (SELECT 1 FROM derived_signals ds WHERE ds.entity_id = active_entities.id AND ds.signal_key = 'offering_programs')
       `,
 
       // Recent enrichment activity (last 7 days)
@@ -155,86 +317,94 @@ export async function GET() {
         return out as T;
       });
 
-    // Build action batches from issues
-    const actionMap: Record<string, {
-      label: string;
-      description: string;
-      tool: string;
-      issueTypes: string[];
-      count: number;
-      blocking: number;
-      severity: string;
-    }> = {};
-
-    const toolMapping: Record<string, { label: string; description: string; tool: string }> = {
-      unresolved_identity: { label: 'Resolve Identity', description: 'Run Smart Enrich to find website + GPID', tool: 'smart-enrich' },
-      missing_gpid: { label: 'Find GPID', description: 'Batch GPID resolution via Google Places', tool: 'seed-gpid-queue' },
-      enrichment_incomplete: { label: 'Run Full Enrichment', description: 'Run the 7-stage pipeline', tool: 'enrich-place' },
-      missing_coords: { label: 'Run Google Places', description: 'Stage 1: fetch coords, hours, address', tool: 'enrich-stage-1' },
-      missing_hours: { label: 'Run Google Places', description: 'Stage 1: fetch coords, hours, address', tool: 'enrich-stage-1' },
-      missing_price_level: { label: 'Run Google Places', description: 'Stage 1: fetch coords, hours, address', tool: 'enrich-stage-1' },
-      operating_status_unknown: { label: 'Run Google Places', description: 'Stage 1: fetch coords, hours, address', tool: 'enrich-stage-1' },
-      missing_neighborhood: { label: 'Derive Neighborhood', description: 'Reverse geocode from existing coords', tool: 'derive-neighborhood' },
-      missing_website: { label: 'Discover Website', description: 'AI web search to find official site', tool: 'discover-social' },
-      missing_phone: { label: 'Run Google Places', description: 'Stage 1: fetch coords, hours, address', tool: 'enrich-stage-1' },
-      missing_instagram: { label: 'Discover Instagram', description: 'AI web search to find official IG', tool: 'discover-social' },
-      missing_tiktok: { label: 'Discover TikTok', description: 'AI web search to find TikTok', tool: 'discover-social' },
-      missing_menu_link: { label: 'Run Website Enrichment', description: 'Stage 6: extract menu/reservation links', tool: 'enrich-stage-6' },
-      missing_reservations: { label: 'Run Website Enrichment', description: 'Stage 6: extract menu/reservation links', tool: 'enrich-stage-6' },
-      google_says_closed: { label: 'Review Closures', description: 'Manual review: mark closed or override', tool: 'manual' },
-      potential_duplicate: { label: 'Review Duplicates', description: 'Manual review: merge or dismiss', tool: 'manual' },
+    // Enrichment strategy: map gap types to recommended sources and cost
+    // Per enrichment-strategy-v1.md: free before paid
+    const gapRecommendations: Record<string, { recommended_source: string; cost: string }> = {
+      missing_gpid: { recommended_source: 'google_places_api', cost: 'paid' },
+      missing_coords: { recommended_source: 'google_places_api', cost: 'paid' },
+      missing_website: { recommended_source: 'social_discovery_ai', cost: 'free' },
+      missing_hours: { recommended_source: 'website_crawl', cost: 'free' },
+      missing_phone: { recommended_source: 'website_crawl', cost: 'free' },
+      missing_instagram: { recommended_source: 'social_discovery_ai', cost: 'free' },
+      missing_reservation_url: { recommended_source: 'website_crawl', cost: 'free' },
+      missing_menu: { recommended_source: 'website_crawl', cost: 'free' },
+      missing_scenesense: { recommended_source: 'ai_extraction', cost: 'low' },
+      missing_editorial: { recommended_source: 'editorial_discovery', cost: 'free' },
+      missing_offering_programs: { recommended_source: 'ai_extraction', cost: 'low' },
     };
 
-    for (const row of serialize(issueData)) {
-      const mapping = toolMapping[row.issue_type];
-      if (!mapping) continue;
-
-      const key = mapping.tool;
-      if (!actionMap[key]) {
-        actionMap[key] = {
-          label: mapping.label,
-          description: mapping.description,
-          tool: mapping.tool,
-          issueTypes: [],
-          count: 0,
-          blocking: 0,
-          severity: row.severity,
+    const gaps = serialize(gapsData)
+      .filter((gap) => gap.entity_count > 0)
+      .map((gap) => {
+        const rec = gapRecommendations[gap.gap_type] ?? { recommended_source: 'manual', cost: 'free' };
+        let neighborhoods: string[] = [];
+        try {
+          neighborhoods = JSON.parse(gap.neighborhoods);
+        } catch {
+          neighborhoods = [];
+        }
+        return {
+          gap_type: gap.gap_type,
+          bucket: gap.bucket,
+          entity_count: gap.entity_count,
+          neighborhoods_affected: neighborhoods.filter((n: string) => n !== 'unknown').slice(0, 10),
+          recommended_source: rec.recommended_source,
+          cost: rec.cost,
+          already_attempted: 0, // Placeholder — would need enrichment_runs join for real data
         };
-      }
-      if (!actionMap[key].issueTypes.includes(row.issue_type)) {
-        actionMap[key].issueTypes.push(row.issue_type);
-      }
-      actionMap[key].count += row.count;
-      actionMap[key].blocking += row.blocking;
-      // Keep highest severity
-      const severityOrder = ['critical', 'high', 'medium', 'low'];
-      if (severityOrder.indexOf(row.severity) < severityOrder.indexOf(actionMap[key].severity)) {
-        actionMap[key].severity = row.severity;
-      }
-    }
+      })
+      .sort((a, b) => b.entity_count - a.entity_count);
 
-    const actions = Object.values(actionMap).sort((a, b) => {
-      const severityOrder = ['critical', 'high', 'medium', 'low'];
-      const diff = severityOrder.indexOf(a.severity) - severityOrder.indexOf(b.severity);
-      if (diff !== 0) return diff;
-      return b.count - a.count;
+    // Build neighborhood rows with parsed verticals and computed percentages
+    const neighborhoods = serialize(neighborhoodData).map((row) => {
+      let verticals: Record<string, number> = {};
+      try {
+        verticals = typeof row.verticals === 'string' ? JSON.parse(row.verticals) : (row.verticals as Record<string, number>);
+      } catch {
+        verticals = {};
+      }
+      return {
+        neighborhood: row.neighborhood,
+        total: row.total,
+        published: row.published,
+        identity_pct: row.total > 0 ? Math.round((row.identity_complete / row.total) * 100) : 0,
+        access_pct: row.total > 0 ? Math.round((row.access_complete / row.total) * 100) : 0,
+        offering_pct: row.total > 0 ? Math.round((row.offering_complete / row.total) * 100) : 0,
+        verticals,
+      };
     });
 
-    const funnel = serialize(funnelData)[0] ?? {
-      total: 0, has_website: 0, has_gpid: 0, has_coords: 0,
-      has_surfaces: 0, has_identity_signals: 0, has_tagline: 0,
-    };
+    const totals = serialize(totalEntities)[0] ?? { total: 0, published: 0, ingested: 0 };
 
     return NextResponse.json({
-      totalEntities,
-      statuses: serialize(statusCounts),
-      funnel,
-      actions,
-      neighborhoods: serialize(neighborhoodData),
+      // Header
+      totalEntities: totals.total,
+      publishedCount: totals.published,
+      ingestedCount: totals.ingested,
+      // System Summary: three state axes
+      systemSummary: {
+        operatingStatus: serialize(operatingStatusCounts).map((r) => ({
+          status: r.status ?? 'NULL',
+          count: r.count,
+        })),
+        enrichmentStatus: serialize(enrichmentStatusCounts).map((r) => ({
+          status: r.status ?? 'NULL',
+          count: r.count,
+        })),
+        publicationStatus: serialize(publicationStatusCounts).map((r) => ({
+          status: r.status ?? 'NULL',
+          count: r.count,
+        })),
+      },
+      // Neighborhood Overview
+      neighborhoods,
+      // Gaps & Recommended Actions
+      gaps,
+      // Recent Activity
       recentActivity: serialize(recentActivity),
     });
   } catch (error) {
-    console.error('[Coverage Dashboard API] Error:', error);
+    console.error('[Coverage Dashboard v2 API] Error:', error);
     return NextResponse.json(
       { error: 'Failed to load dashboard data', message: error instanceof Error ? error.message : String(error) },
       { status: 500 },

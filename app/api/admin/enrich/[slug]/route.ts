@@ -6,8 +6,8 @@
  * POST: Marks entity status OPEN (so enrich-place.ts can find it), then spawns
  * the enrichment pipeline in the background. Returns 202 immediately.
  *
- * GET: Returns current enrichment state from entities.enrichment_stage + last_enriched_at.
- * Enrichment is considered "done" when enrichment_stage is non-null (any stage was written).
+ * GET: Returns current enrichment state from entities.enrichmentStage + lastEnrichedAt.
+ * Enrichment is considered "done" when enrichmentStage is non-null (any stage was written).
  * The caller can track: idle → queued → stage:N → done.
  */
 
@@ -25,24 +25,24 @@ export async function GET(
   try {
     const entity = await db.entities.findUnique({
       where: { slug },
-      select: { slug: true, name: true, status: true, enrichment_stage: true, last_enriched_at: true },
+      select: { slug: true, name: true, status: true, enrichmentStage: true, lastEnrichedAt: true },
     });
 
     if (!entity) {
       return NextResponse.json({ error: `Entity not found: ${slug}` }, { status: 404 });
     }
 
-    const stageNum = entity.enrichment_stage ? parseInt(entity.enrichment_stage, 10) : null;
-    // "done" means stage 7 reached (enrichment_stage is the live progress tracker;
-    // last_enriched_at is historical and should NOT be used for done detection since
+    const stageNum = entity.enrichmentStage ? parseInt(entity.enrichmentStage, 10) : null;
+    // "done" means stage 7 reached (enrichmentStage is the live progress tracker;
+    // lastEnrichedAt is historical and should NOT be used for done detection since
     // it persists across re-runs)
     const done = stageNum === 7;
     return NextResponse.json({
       slug: entity.slug,
       name: entity.name,
       status: entity.status,
-      enrichment_stage: entity.enrichment_stage,
-      last_enriched_at: entity.last_enriched_at,
+      enrichmentStage: entity.enrichmentStage,
+      lastEnrichedAt: entity.lastEnrichedAt,
       done,
     });
   } catch (error: any) {
@@ -60,7 +60,7 @@ export async function POST(
   try {
     const entity = await db.entities.findUnique({
       where: { slug },
-      select: { id: true, slug: true, name: true, status: true, last_enriched_at: true },
+      select: { id: true, slug: true, name: true, status: true, lastEnrichedAt: true },
     });
 
     if (!entity) {
@@ -68,13 +68,13 @@ export async function POST(
     }
 
     // Promote CANDIDATE → OPEN so the enrichment pipeline can locate it.
-    // Reset enrichment_stage for progress tracking, but preserve last_enriched_at
+    // Reset enrichmentStage for progress tracking, but preserve lastEnrichedAt
     // so batch mode doesn't re-select entities that have already been through the pipeline.
     await db.entities.update({
       where: { slug },
       data: {
         ...(entity.status === 'CANDIDATE' ? { status: 'OPEN' } : {}),
-        enrichment_stage: null,
+        enrichmentStage: null,
       },
     });
 

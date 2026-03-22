@@ -107,14 +107,14 @@ export async function POST(request: NextRequest) {
         total_active: totalActive,
         blocking_publish_entities: blockingRows[0]?.count ?? 0,
         by_status: byStatus,
-        by_class: byClass,
-        by_type: byType,
-        available_rules: ISSUE_RULES.map((r) => ({
-          issue_type: r.issue_type,
-          problem_class: r.problem_class,
+        byClass: byClass,
+        byType: byType,
+        availableRules: ISSUE_RULES.map((r) => ({
+          issueType: r.issueType,
+          problemClass: r.problemClass,
           severity: r.severity,
-          blocking_publish: r.blocking_publish,
-          recommended_tool: r.recommended_tool,
+          blockingPublish: r.blockingPublish,
+          recommendedTool: r.recommendedTool,
         })),
       });
     }
@@ -139,12 +139,12 @@ export async function POST(request: NextRequest) {
         where: { id: issueId },
         data: {
           status: 'resolved',
-          resolved_at: new Date(),
-          resolved_by: 'HUMAN',
+          resolvedAt: new Date(),
+          resolvedBy: 'HUMAN',
         },
       });
 
-      return NextResponse.json({ issueId, issue_type: issue.issue_type, status: 'resolved' });
+      return NextResponse.json({ issueId, issueType: issue.issueType, status: 'resolved' });
     }
 
     // ── Suppress: mark issue as confirmed_none / not_applicable ──
@@ -169,15 +169,15 @@ export async function POST(request: NextRequest) {
         where: { id: issueId },
         data: {
           status: 'suppressed',
-          suppressed_reason: reason,
-          resolved_at: new Date(),
-          resolved_by: 'HUMAN',
+          suppressedReason: reason,
+          resolvedAt: new Date(),
+          resolvedBy: 'HUMAN',
         },
       });
 
       return NextResponse.json({
         issueId,
-        issue_type: issue.issue_type,
+        issueType: issue.issueType,
         status: 'suppressed',
         reason,
       });

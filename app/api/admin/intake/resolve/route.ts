@@ -183,7 +183,7 @@ export async function POST(request: NextRequest) {
         googlePlaceId: gpid,
         website: website || undefined,
         neighborhood: resolvedNeighborhood,
-        primary_vertical: 'EAT',
+        primaryVertical: 'EAT',
         status: 'CANDIDATE',
       },
       select: { id: true, slug: true, name: true, status: true, googlePlaceId: true },

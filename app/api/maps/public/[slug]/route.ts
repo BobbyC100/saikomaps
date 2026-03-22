@@ -52,22 +52,22 @@ export async function GET(
 
     const derivedRows = await db.derived_signals.findMany({
       where: {
-        entity_id: { in: entityIds },
-        signal_key: 'identity_signals',
+        entityId: { in: entityIds },
+        signalKey: 'identity_signals',
       },
       select: {
-        entity_id: true,
-        signal_value: true,
+        entityId: true,
+        signalValue: true,
       },
     });
 
-    // Build map of entity_id -> identity signals
-    const signalsMap = new Map<string, { place_personality: string | null; price_tier: string | null }>();
+    // Build map of entityId -> identity signals
+    const signalsMap = new Map<string, { placePersonality: string | null; priceTier: string | null }>();
     derivedRows.forEach(row => {
-      const sv = row.signal_value as Record<string, unknown> | null;
-      signalsMap.set(row.entity_id, {
-        place_personality: (sv?.place_personality as string) ?? null,
-        price_tier: (sv?.price_tier as string) ?? null,
+      const sv = row.signalValue as Record<string, unknown> | null;
+      signalsMap.set(row.entityId, {
+        placePersonality: (sv?.place_personality as string) ?? null,
+        priceTier: (sv?.price_tier as string) ?? null,
       });
     });
     
@@ -78,8 +78,8 @@ export async function GET(
         ...mp,
         places: {
           ...mp.entities,
-          place_personality: signals?.place_personality || null,
-          price_tier: signals?.price_tier || null,
+          placePersonality: signals?.placePersonality || null,
+          priceTier: signals?.priceTier || null,
         },
       };
     });

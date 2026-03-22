@@ -1,59 +1,65 @@
 'use client';
 
 /**
- * Unified Coverage Dashboard
+ * Coverage Dashboard v2
  *
- * Three views:
- *   1. Pipeline Funnel — where are entities in the enrichment pipeline?
- *   2. Action Queue — what can I do right now, grouped by tool?
- *   3. Neighborhoods — where do I have/lack coverage?
+ * Single scrollable layout (replaces three-tab structure):
+ *   1. Header — entity counts (total, published, ingested)
+ *   2. Gaps & Recommended Actions — what needs attention, grouped by bucket
+ *   3. Neighborhood Overview — per-neighborhood completeness with bucket breakdowns
+ *   4. System Summary — counts by the three entity state axes + recent activity
+ *
+ * See: docs/architecture/coverage-dashboard-v2-spec.md
  */
 
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 
 // ---------------------------------------------------------------------------
-// Types
+// Types (v2 API shape)
 // ---------------------------------------------------------------------------
 
 interface DashboardData {
   totalEntities: number;
-  statuses: { status: string; count: number }[];
-  funnel: {
-    total: number;
-    has_website: number;
-    has_gpid: number;
-    has_coords: number;
-    has_surfaces: number;
-    has_identity_signals: number;
-    has_tagline: number;
+  publishedCount: number;
+  ingestedCount: number;
+  systemSummary: {
+    operatingStatus: StatusCount[];
+    enrichmentStatus: StatusCount[];
+    publicationStatus: StatusCount[];
   };
-  actions: ActionBatch[];
   neighborhoods: NeighborhoodRow[];
+  gaps: GapItem[];
   recentActivity: { date: string; enriched: number; created: number }[];
 }
 
-interface ActionBatch {
-  label: string;
-  description: string;
-  tool: string;
-  issueTypes: string[];
+interface StatusCount {
+  status: string;
   count: number;
-  blocking: number;
-  severity: string;
 }
 
 interface NeighborhoodRow {
   neighborhood: string;
   total: number;
-  has_gpid: number;
-  has_website: number;
-  has_tagline: number;
-  avg_completion: number;
+  published: number;
+  identity_pct: number;
+  access_pct: number;
+  offering_pct: number;
+  verticals: Record<string, number>;
+}
+
+interface GapItem {
+  gap_type: string;
+  bucket: string;
+  entity_count: number;
+  neighborhoods_affected: string[];
+  recommended_source: string;
+  cost: string;
+  already_attempted: number;
 }
 
 // ---------------------------------------------------------------------------
-// Colors
+// Colors — preserving the existing warm cream/teal aesthetic
 // ---------------------------------------------------------------------------
 
 const C = {
@@ -63,15 +69,46 @@ const C = {
   muted: '#8B7355',
   accent: '#5BA7A7',
   border: '#C3B091',
-  green: '#166534',
-  greenBg: '#DCFCE7',
-  amber: '#92400E',
-  amberBg: '#FEF3C7',
-  red: '#991B1B',
-  redBg: '#FEE2E2',
+  green: '#4A7C59',
+  greenBg: '#E8F5E9',
+  amber: '#D4A574',
+  amberBg: '#FFF3E0',
+  red: '#C75050',
+  redBg: '#FFEBEE',
 } as const;
 
-type ViewTab = 'funnel' | 'actions' | 'neighborhoods';
+// ---------------------------------------------------------------------------
+// Human-readable labels for gap types and sources
+// ---------------------------------------------------------------------------
+
+const GAP_LABELS: Record<string, string> = {
+  missing_gpid: 'Missing Google Place ID',
+  missing_coords: 'Missing Coordinates',
+  missing_website: 'Missing Website',
+  missing_hours: 'Missing Hours',
+  missing_phone: 'Missing Phone',
+  missing_instagram: 'Missing Instagram',
+  missing_reservation_url: 'Missing Reservation URL',
+  missing_menu: 'Missing Menu URL',
+  missing_scenesense: 'Missing SceneSense',
+  missing_editorial: 'Missing Editorial Coverage',
+  missing_offering_programs: 'Missing Offering Programs',
+};
+
+const SOURCE_LABELS: Record<string, string> = {
+  google_places_api: 'Google Places API',
+  social_discovery_ai: 'AI Social Discovery',
+  website_crawl: 'Website Crawl',
+  ai_extraction: 'AI Extraction',
+  editorial_discovery: 'Editorial Discovery',
+  manual: 'Manual Review',
+};
+
+const BUCKET_LABELS: Record<string, string> = {
+  identity: 'Identity',
+  access: 'Access',
+  offering: 'Offering',
+};
 
 // ---------------------------------------------------------------------------
 // Page
@@ -80,9 +117,6 @@ type ViewTab = 'funnel' | 'actions' | 'neighborhoods';
 export default function CoverageDashboard() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [view, setView] = useState<ViewTab>('funnel');
-  const [runningAction, setRunningAction] = useState<string | null>(null);
-  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   const fetchData = useCallback(async () => {
     try {
@@ -97,13 +131,6 @@ export default function CoverageDashboard() {
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
-  useEffect(() => {
-    if (toast) {
-      const t = setTimeout(() => setToast(null), 4000);
-      return () => clearTimeout(t);
-    }
-  }, [toast]);
-
   if (loading || !data) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: C.bg }}>
@@ -112,72 +139,21 @@ export default function CoverageDashboard() {
     );
   }
 
-  const f = data.funnel;
-  const candidateCount = data.statuses.find(s => s.status === 'CANDIDATE')?.count ?? 0;
-  const openCount = data.statuses.find(s => s.status === 'OPEN')?.count ?? 0;
-
-  // Run an action batch
-  const runAction = async (action: ActionBatch) => {
-    setRunningAction(action.tool);
-    try {
-      let res: Response;
-      if (action.tool === 'smart-enrich') {
-        // Can't batch smart-enrich through the API without entity list — redirect to triage
-        setToast({ message: 'Use Coverage Ops triage board for individual entity actions', type: 'success' });
-        setRunningAction(null);
-        return;
-      } else if (action.tool === 'seed-gpid-queue') {
-        res = await fetch('/api/admin/tools/seed-gpid-queue', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ limit: 200 }),
-        });
-      } else if (action.tool.startsWith('enrich-stage-')) {
-        const stage = parseInt(action.tool.split('-').pop()!, 10);
-        // This is a bulk suggestion — redirect to triage
-        setToast({ message: `Run "npm run enrich:place -- --batch=50 --only=${stage}" for bulk Stage ${stage}`, type: 'success' });
-        setRunningAction(null);
-        return;
-      } else if (action.tool === 'discover-social') {
-        const mode = action.issueTypes.includes('missing_website') ? 'website'
-          : action.issueTypes.includes('missing_instagram') ? 'instagram'
-          : action.issueTypes.includes('missing_tiktok') ? 'tiktok' : 'both';
-        res = await fetch('/api/admin/tools/discover-social', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ mode, limit: 50 }),
-        });
-      } else {
-        setToast({ message: `Open Coverage Ops triage for "${action.label}" actions`, type: 'success' });
-        setRunningAction(null);
-        return;
-      }
-
-      if (res!.ok) {
-        const result = await res!.json();
-        const matched = result.matched ?? 0;
-        const queued = result.queued ?? 0;
-        setToast({
-          message: `${action.label}: ${matched} resolved, ${queued} queued`,
-          type: 'success',
-        });
-        // Refresh data
-        setTimeout(() => fetchData(), 2000);
-      } else {
-        setToast({ message: `${action.label} failed`, type: 'error' });
-      }
-    } catch {
-      setToast({ message: `${action.label} failed`, type: 'error' });
-    }
-    setRunningAction(null);
-  };
+  // Group gaps by bucket
+  const gapsByBucket: Record<string, GapItem[]> = {};
+  for (const gap of data.gaps) {
+    if (!gapsByBucket[gap.bucket]) gapsByBucket[gap.bucket] = [];
+    gapsByBucket[gap.bucket].push(gap);
+  }
 
   return (
     <div className="min-h-screen py-8 px-6" style={{ backgroundColor: C.bg }}>
       <div className="max-w-6xl mx-auto">
 
-        {/* Header */}
-        <header className="mb-6">
+        {/* ================================================================ */}
+        {/* 1. Page Header */}
+        {/* ================================================================ */}
+        <header className="mb-8">
           <nav className="flex items-center gap-2 text-sm mb-2" style={{ color: C.muted }}>
             <Link href="/admin" className="hover:underline">Admin</Link>
             <span>/</span>
@@ -185,172 +161,58 @@ export default function CoverageDashboard() {
           </nav>
           <h1 className="text-3xl font-bold" style={{ color: C.text }}>Coverage Dashboard</h1>
           <p className="text-sm mt-1" style={{ color: C.muted }}>
-            {data.totalEntities.toLocaleString()} entities &middot; {openCount} active &middot; {candidateCount} candidates
+            {data.totalEntities.toLocaleString()} entities &middot;{' '}
+            {data.publishedCount.toLocaleString()} published &middot;{' '}
+            {data.ingestedCount.toLocaleString()} ingested
           </p>
         </header>
 
-        {/* Tab Bar */}
-        <div className="flex gap-1 mb-6 rounded-lg p-1" style={{ backgroundColor: C.card }}>
-          {([
-            { key: 'funnel' as ViewTab, label: 'Pipeline' },
-            { key: 'actions' as ViewTab, label: 'Actions' },
-            { key: 'neighborhoods' as ViewTab, label: 'Neighborhoods' },
-          ]).map(tab => (
-            <button
-              key={tab.key}
-              onClick={() => setView(tab.key)}
-              className="flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors"
-              style={{
-                backgroundColor: view === tab.key ? C.accent : 'transparent',
-                color: view === tab.key ? '#fff' : C.muted,
-              }}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-
-        {/* View: Pipeline Funnel */}
-        {view === 'funnel' && (
-          <div>
-            {/* Funnel Cards */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-              <FunnelCard label="Active Entities" value={f.total} sub={`${candidateCount} candidates pending`} />
-              <FunnelCard label="Have Website" value={f.has_website} pct={f.total > 0 ? Math.round(f.has_website / f.total * 100) : 0} color={C.accent} />
-              <FunnelCard label="Have GPID" value={f.has_gpid} pct={f.total > 0 ? Math.round(f.has_gpid / f.total * 100) : 0} color={C.accent} />
-              <FunnelCard label="Have Coords" value={f.has_coords} pct={f.total > 0 ? Math.round(f.has_coords / f.total * 100) : 0} color={C.accent} />
-            </div>
-
-            {/* Enrichment Progress */}
-            <div className="rounded-xl p-6 shadow-sm mb-6" style={{ backgroundColor: C.card }}>
-              <h2 className="text-base font-bold mb-4" style={{ color: C.text }}>Enrichment Pipeline</h2>
-              <div className="space-y-3">
-                <FunnelBar label="Website discovered" value={f.has_website} total={f.total} color="#5BA7A7" />
-                <FunnelBar label="GPID resolved" value={f.has_gpid} total={f.total} color="#5BA7A7" />
-                <FunnelBar label="Coordinates" value={f.has_coords} total={f.total} color="#5BA7A7" />
-                <FunnelBar label="Surfaces scraped" value={f.has_surfaces} total={f.total} color="#E07A5F" />
-                <FunnelBar label="AI signals extracted" value={f.has_identity_signals} total={f.total} color="#E07A5F" />
-                <FunnelBar label="Tagline generated" value={f.has_tagline} total={f.total} color="#166534" />
-              </div>
-            </div>
-
-            {/* Recent Activity */}
-            {data.recentActivity.length > 0 && (
-              <div className="rounded-xl p-6 shadow-sm" style={{ backgroundColor: C.card }}>
-                <h2 className="text-base font-bold mb-4" style={{ color: C.text }}>Last 7 Days</h2>
-                <div className="flex gap-2 items-end h-24">
-                  {data.recentActivity.map((day) => {
-                    const max = Math.max(...data.recentActivity.map(d => d.enriched + d.created), 1);
-                    const h = Math.max(((day.enriched + day.created) / max) * 80, 2);
-                    const dayLabel = new Date(day.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short' });
-                    return (
-                      <div key={day.date} className="flex-1 flex flex-col items-center gap-1">
-                        <div className="w-full rounded-t" style={{ height: h, backgroundColor: C.accent, opacity: 0.8 }} />
-                        <span className="text-[10px]" style={{ color: C.muted }}>{dayLabel}</span>
-                        <span className="text-[10px] font-medium" style={{ color: C.text }}>
-                          {day.enriched + day.created > 0 ? day.enriched + day.created : ''}
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
+        {/* ================================================================ */}
+        {/* 2. Gaps & Recommended Actions */}
+        {/* ================================================================ */}
+        <section className="mb-8">
+          <div className="mb-4">
+            <h2 className="text-lg font-bold" style={{ color: C.text }}>Gaps & Recommended Actions</h2>
+            <p className="text-xs mt-0.5" style={{ color: C.muted }}>
+              What needs attention across the system, grouped by completeness bucket. Free actions first.
+            </p>
           </div>
-        )}
 
-        {/* View: Action Queue */}
-        {view === 'actions' && (
-          <div>
-            <div className="rounded-xl shadow-sm overflow-hidden mb-6" style={{ backgroundColor: C.card }}>
-              <div className="px-5 py-3 border-b" style={{ borderColor: `${C.border}33` }}>
-                <h2 className="text-base font-bold" style={{ color: C.text }}>What to do next</h2>
-                <p className="text-xs mt-0.5" style={{ color: C.muted }}>Grouped by tool. Click to run.</p>
-              </div>
-
-              <div className="divide-y" style={{ borderColor: `${C.border}22` }}>
-                {data.actions.map((action) => (
-                  <div key={action.tool} className="flex items-center gap-4 px-5 py-4 hover:bg-[#F5F0E1]/30 transition-colors">
-                    {/* Severity dot */}
-                    <div
-                      className="w-2.5 h-2.5 rounded-full shrink-0"
-                      style={{
-                        backgroundColor: action.severity === 'critical' ? C.red
-                          : action.severity === 'high' ? C.amber
-                          : action.severity === 'medium' ? C.accent
-                          : C.border,
-                      }}
-                    />
-
-                    {/* Info */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-semibold" style={{ color: C.text }}>
-                          {action.count.toLocaleString()} entities
-                        </span>
-                        <span className="text-sm" style={{ color: C.muted }}>
-                          need {action.label.toLowerCase()}
-                        </span>
-                        {action.blocking > 0 && (
-                          <span
-                            className="text-[10px] px-1.5 py-0.5 rounded font-medium"
-                            style={{ backgroundColor: C.redBg, color: C.red }}
-                          >
-                            {action.blocking} blocking
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-xs mt-0.5" style={{ color: C.muted }}>{action.description}</p>
+          {data.gaps.length === 0 ? (
+            <div className="rounded-xl p-8 shadow-sm text-center" style={{ backgroundColor: C.card }}>
+              <p className="text-sm font-medium" style={{ color: C.green }}>All clear — no gaps detected</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {(['identity', 'access', 'offering'] as const).map((bucket) => {
+                const bucketGaps = gapsByBucket[bucket] ?? [];
+                if (bucketGaps.length === 0) return null;
+                return (
+                  <div key={bucket} className="rounded-xl shadow-sm overflow-hidden" style={{ backgroundColor: C.card }}>
+                    <div className="px-5 py-3 border-b" style={{ borderColor: `${C.border}33` }}>
+                      <h3 className="text-xs font-bold uppercase tracking-wider" style={{ color: C.muted }}>
+                        {BUCKET_LABELS[bucket]}
+                      </h3>
                     </div>
-
-                    {/* Action button */}
-                    {action.tool === 'manual' ? (
-                      <Link
-                        href="/admin/coverage-ops"
-                        className="px-4 py-1.5 rounded text-xs font-semibold shrink-0"
-                        style={{ backgroundColor: C.bg, color: C.muted, border: `1px solid ${C.border}` }}
-                      >
-                        Review
-                      </Link>
-                    ) : (
-                      <button
-                        onClick={() => runAction(action)}
-                        disabled={runningAction !== null}
-                        className="px-4 py-1.5 rounded text-xs font-semibold shrink-0 disabled:opacity-50 transition-colors"
-                        style={{ backgroundColor: C.accent, color: '#fff' }}
-                      >
-                        {runningAction === action.tool ? 'Running...' : `Run (${action.count})`}
-                      </button>
-                    )}
+                    <div className="divide-y" style={{ borderColor: `${C.border}15` }}>
+                      {bucketGaps.map((gap) => (
+                        <GapCard key={gap.gap_type} gap={gap} />
+                      ))}
+                    </div>
                   </div>
-                ))}
-
-                {data.actions.length === 0 && (
-                  <div className="px-5 py-8 text-center">
-                    <p className="text-sm font-medium" style={{ color: C.green }}>All clear — no actions needed</p>
-                  </div>
-                )}
-              </div>
+                );
+              })}
             </div>
+          )}
+        </section>
 
-            {/* Link to full triage board */}
-            <div className="text-center">
-              <Link
-                href="/admin/coverage-ops"
-                className="text-sm hover:underline"
-                style={{ color: C.accent }}
-              >
-                Open full triage board for individual entity actions →
-              </Link>
-            </div>
-          </div>
-        )}
-
-        {/* View: Neighborhoods */}
-        {view === 'neighborhoods' && (
+        {/* ================================================================ */}
+        {/* 3. Neighborhood Overview */}
+        {/* ================================================================ */}
+        <section className="mb-8">
           <div className="rounded-xl shadow-sm overflow-hidden" style={{ backgroundColor: C.card }}>
             <div className="px-5 py-3 border-b" style={{ borderColor: `${C.border}33` }}>
-              <h2 className="text-base font-bold" style={{ color: C.text }}>Coverage by Neighborhood</h2>
+              <h2 className="text-base font-bold" style={{ color: C.text }}>Neighborhood Overview</h2>
               <p className="text-xs mt-0.5" style={{ color: C.muted }}>
                 Sorted by total entities. Neighborhoods with fewer than 2 entities are hidden.
               </p>
@@ -361,11 +223,12 @@ export default function CoverageDashboard() {
                 <thead>
                   <tr style={{ borderBottom: `1px solid ${C.border}33` }}>
                     <th className="text-left px-5 py-2.5 font-semibold text-[11px] uppercase tracking-wider" style={{ color: C.muted }}>Neighborhood</th>
-                    <th className="text-right px-3 py-2.5 font-semibold text-[11px] uppercase tracking-wider" style={{ color: C.muted }}>Total</th>
-                    <th className="text-right px-3 py-2.5 font-semibold text-[11px] uppercase tracking-wider" style={{ color: C.muted }}>GPID</th>
-                    <th className="text-right px-3 py-2.5 font-semibold text-[11px] uppercase tracking-wider" style={{ color: C.muted }}>Website</th>
-                    <th className="text-right px-3 py-2.5 font-semibold text-[11px] uppercase tracking-wider" style={{ color: C.muted }}>Tagline</th>
-                    <th className="px-5 py-2.5 font-semibold text-[11px] uppercase tracking-wider text-right" style={{ color: C.muted }}>Completion</th>
+                    <th className="text-right px-3 py-2.5 font-semibold text-[11px] uppercase tracking-wider" style={{ color: C.muted }}>Entities</th>
+                    <th className="text-right px-3 py-2.5 font-semibold text-[11px] uppercase tracking-wider" style={{ color: C.muted }}>Published</th>
+                    <th className="text-right px-3 py-2.5 font-semibold text-[11px] uppercase tracking-wider" style={{ color: C.muted }}>Identity %</th>
+                    <th className="text-right px-3 py-2.5 font-semibold text-[11px] uppercase tracking-wider" style={{ color: C.muted }}>Access %</th>
+                    <th className="text-right px-3 py-2.5 font-semibold text-[11px] uppercase tracking-wider" style={{ color: C.muted }}>Offering %</th>
+                    <th className="px-5 py-2.5 font-semibold text-[11px] uppercase tracking-wider" style={{ color: C.muted }}>Verticals</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -381,33 +244,23 @@ export default function CoverageDashboard() {
                       <td className="px-5 py-2.5 font-medium" style={{ color: C.text }}>
                         {hood.neighborhood}
                       </td>
-                      <td className="text-right px-3 py-2.5" style={{ color: C.text }}>{hood.total}</td>
-                      <td className="text-right px-3 py-2.5" style={{ color: hood.has_gpid === hood.total ? C.green : C.muted }}>
-                        {hood.has_gpid}
+                      <td className="text-right px-3 py-2.5" style={{ color: C.text }}>
+                        {hood.total}
                       </td>
-                      <td className="text-right px-3 py-2.5" style={{ color: hood.has_website === hood.total ? C.green : C.muted }}>
-                        {hood.has_website}
+                      <td className="text-right px-3 py-2.5" style={{ color: C.text }}>
+                        {hood.published}
                       </td>
-                      <td className="text-right px-3 py-2.5" style={{ color: hood.has_tagline === hood.total ? C.green : C.muted }}>
-                        {hood.has_tagline}
+                      <td className="text-right px-3 py-2.5">
+                        <PctCell value={hood.identity_pct} />
+                      </td>
+                      <td className="text-right px-3 py-2.5">
+                        <PctCell value={hood.access_pct} />
+                      </td>
+                      <td className="text-right px-3 py-2.5">
+                        <PctCell value={hood.offering_pct} />
                       </td>
                       <td className="px-5 py-2.5">
-                        <div className="flex items-center gap-2 justify-end">
-                          <div className="w-24 h-2 rounded-full overflow-hidden" style={{ backgroundColor: `${C.border}33` }}>
-                            <div
-                              className="h-full rounded-full"
-                              style={{
-                                width: `${hood.avg_completion}%`,
-                                backgroundColor: hood.avg_completion >= 70 ? C.green
-                                  : hood.avg_completion >= 40 ? C.accent
-                                  : C.amber,
-                              }}
-                            />
-                          </div>
-                          <span className="text-xs font-medium w-10 text-right" style={{ color: C.muted }}>
-                            {hood.avg_completion}%
-                          </span>
-                        </div>
+                        <VerticalTags verticals={hood.verticals} />
                       </td>
                     </tr>
                   ))}
@@ -415,22 +268,110 @@ export default function CoverageDashboard() {
               </table>
             </div>
           </div>
-        )}
-      </div>
+        </section>
 
-      {/* Toast */}
-      {toast && (
-        <div
-          className="fixed bottom-6 right-6 z-50 px-4 py-3 rounded-lg shadow-lg text-sm font-medium max-w-sm"
-          style={{
-            backgroundColor: toast.type === 'success' ? C.greenBg : C.redBg,
-            color: toast.type === 'success' ? C.green : C.red,
-            border: `1px solid ${toast.type === 'success' ? '#86EFAC' : '#FCA5A5'}`,
-          }}
-        >
-          {toast.message}
+        {/* ================================================================ */}
+        {/* 4. System Summary */}
+        {/* ================================================================ */}
+        <section className="mb-8">
+          <div className="mb-4">
+            <h2 className="text-lg font-bold" style={{ color: C.text }}>System Summary</h2>
+            <p className="text-xs mt-0.5" style={{ color: C.muted }}>
+              Entity state distribution across the three independent axes.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            {/* Operating Status */}
+            <StateCard
+              title="Operating Status"
+              items={data.systemSummary.operatingStatus}
+              colorMap={{
+                SOFT_OPEN: C.amberBg,
+                OPERATING: C.greenBg,
+                TEMPORARILY_CLOSED: C.amberBg,
+                PERMANENTLY_CLOSED: C.redBg,
+                NULL: '#F3F4F6',
+              }}
+              textColorMap={{
+                SOFT_OPEN: C.amber,
+                OPERATING: C.green,
+                TEMPORARILY_CLOSED: C.amber,
+                PERMANENTLY_CLOSED: C.red,
+                NULL: C.muted,
+              }}
+            />
+
+            {/* Enrichment Status */}
+            <StateCard
+              title="Enrichment Status"
+              items={data.systemSummary.enrichmentStatus}
+              colorMap={{
+                INGESTED: C.amberBg,
+                ENRICHING: '#DBEAFE',
+                ENRICHED: C.greenBg,
+                NULL: '#F3F4F6',
+              }}
+              textColorMap={{
+                INGESTED: C.amber,
+                ENRICHING: '#1E40AF',
+                ENRICHED: C.green,
+                NULL: C.muted,
+              }}
+            />
+
+            {/* Publication Status */}
+            <StateCard
+              title="Publication Status"
+              items={data.systemSummary.publicationStatus}
+              colorMap={{
+                PUBLISHED: C.greenBg,
+                UNPUBLISHED: C.amberBg,
+                NULL: '#F3F4F6',
+              }}
+              textColorMap={{
+                PUBLISHED: C.green,
+                UNPUBLISHED: C.amber,
+                NULL: C.muted,
+              }}
+            />
+          </div>
+
+          {/* Recent Activity */}
+          {data.recentActivity.length > 0 && (
+            <div className="rounded-xl p-6 shadow-sm" style={{ backgroundColor: C.card }}>
+              <h3 className="text-base font-bold mb-4" style={{ color: C.text }}>Last 7 Days</h3>
+              <div className="flex gap-2 items-end h-24">
+                {data.recentActivity.map((day) => {
+                  const max = Math.max(...data.recentActivity.map(d => d.enriched + d.created), 1);
+                  const h = Math.max(((day.enriched + day.created) / max) * 80, 2);
+                  const dayLabel = new Date(day.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short' });
+                  return (
+                    <div key={day.date} className="flex-1 flex flex-col items-center gap-1">
+                      <div className="w-full rounded-t" style={{ height: h, backgroundColor: C.accent, opacity: 0.8 }} />
+                      <span className="text-[10px]" style={{ color: C.muted }}>{dayLabel}</span>
+                      <span className="text-[10px] font-medium" style={{ color: C.text }}>
+                        {day.enriched + day.created > 0 ? day.enriched + day.created : ''}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </section>
+
+        {/* Link to full triage board */}
+        <div className="text-center pb-4">
+          <Link
+            href="/admin/coverage-ops"
+            className="text-sm hover:underline"
+            style={{ color: C.accent }}
+          >
+            Open full triage board for individual entity actions &rarr;
+          </Link>
         </div>
-      )}
+      </div>
     </div>
   );
 }
@@ -439,44 +380,140 @@ export default function CoverageDashboard() {
 // Sub-components
 // ---------------------------------------------------------------------------
 
-function FunnelCard({ label, value, pct, sub, color }: {
-  label: string; value: number; pct?: number; sub?: string; color?: string;
-}) {
+/** A single gap card within a bucket column */
+function GapCard({ gap }: { gap: GapItem }) {
+  const isFree = gap.cost === 'free';
+  const costColor = isFree ? C.green : gap.cost === 'low' ? C.amber : C.amber;
+  const costBg = isFree ? C.greenBg : C.amberBg;
+
   return (
-    <div className="rounded-xl p-4 shadow-sm" style={{ backgroundColor: '#FFFFFF' }}>
-      <div className="text-[11px] uppercase tracking-wider mb-1" style={{ color: '#8B7355' }}>{label}</div>
-      <div className="flex items-baseline gap-2">
-        <span className="text-2xl font-bold" style={{ color: color ?? '#36454F' }}>
-          {value.toLocaleString()}
+    <div className="px-5 py-3.5">
+      <div className="flex items-start justify-between gap-2 mb-1.5">
+        <span className="text-sm font-semibold" style={{ color: C.text }}>
+          {GAP_LABELS[gap.gap_type] ?? gap.gap_type}
         </span>
-        {pct !== undefined && (
-          <span className="text-xs font-medium" style={{ color: '#8B7355' }}>{pct}%</span>
-        )}
+        <span
+          className="text-[10px] px-1.5 py-0.5 rounded font-medium shrink-0"
+          style={{ backgroundColor: costBg, color: costColor }}
+        >
+          {gap.cost}
+        </span>
       </div>
-      {sub && <div className="text-xs mt-0.5" style={{ color: '#8B7355' }}>{sub}</div>}
+      <div className="text-xs mb-1.5" style={{ color: C.muted }}>
+        <span className="font-semibold" style={{ color: C.text }}>{gap.entity_count}</span> entities affected
+      </div>
+      {gap.neighborhoods_affected.length > 0 && (
+        <div className="text-[10px] mb-2" style={{ color: C.muted }}>
+          {gap.neighborhoods_affected.slice(0, 4).join(', ')}
+          {gap.neighborhoods_affected.length > 4 && ` +${gap.neighborhoods_affected.length - 4} more`}
+        </div>
+      )}
+      <div className="flex items-center justify-between">
+        <span className="text-[10px]" style={{ color: C.muted }}>
+          {SOURCE_LABELS[gap.recommended_source] ?? gap.recommended_source}
+        </span>
+        <button
+          className="px-3 py-1 rounded text-[10px] font-semibold opacity-50 cursor-not-allowed"
+          style={{
+            backgroundColor: isFree ? C.accent : C.bg,
+            color: isFree ? '#fff' : C.muted,
+            border: isFree ? 'none' : `1px solid ${C.border}`,
+          }}
+          disabled
+          title="Enrichment orchestration coming soon"
+        >
+          {isFree ? 'Run' : 'Run (paid)'}
+        </button>
+      </div>
     </div>
   );
 }
 
-function FunnelBar({ label, value, total, color }: {
-  label: string; value: number; total: number; color: string;
-}) {
-  const pct = total > 0 ? Math.round((value / total) * 100) : 0;
+/** Color-coded percentage cell for the neighborhood table */
+function PctCell({ value }: { value: number }) {
+  const color = value >= 70 ? C.green : value >= 40 ? C.amber : C.red;
+  const bg = value >= 70 ? C.greenBg : value >= 40 ? C.amberBg : C.redBg;
   return (
-    <div className="flex items-center gap-3">
-      <span className="text-xs w-40 shrink-0 text-right" style={{ color: '#8B7355' }}>{label}</span>
-      <div className="flex-1 h-5 rounded-full overflow-hidden" style={{ backgroundColor: '#C3B09122' }}>
-        <div
-          className="h-full rounded-full transition-all duration-500"
-          style={{ width: `${pct}%`, backgroundColor: color, minWidth: value > 0 ? 4 : 0 }}
-        />
+    <span
+      className="inline-block text-xs font-medium px-2 py-0.5 rounded"
+      style={{ color, backgroundColor: bg }}
+    >
+      {value}%
+    </span>
+  );
+}
+
+/** Compact vertical tag list for neighborhood table */
+function VerticalTags({ verticals }: { verticals: Record<string, number> }) {
+  const sorted = Object.entries(verticals)
+    .filter(([k]) => k !== 'UNKNOWN' && k !== 'null')
+    .sort(([, a], [, b]) => b - a);
+  const top = sorted.slice(0, 4);
+  const rest = sorted.length - top.length;
+
+  if (top.length === 0) return <span className="text-[10px]" style={{ color: C.muted }}>—</span>;
+
+  return (
+    <div className="flex flex-wrap gap-1">
+      {top.map(([vertical, count]) => (
+        <span
+          key={vertical}
+          className="text-[10px] px-1.5 py-0.5 rounded"
+          style={{ backgroundColor: `${C.border}22`, color: C.text }}
+        >
+          {vertical} {count}
+        </span>
+      ))}
+      {rest > 0 && (
+        <span className="text-[10px] px-1.5 py-0.5" style={{ color: C.muted }}>
+          +{rest}
+        </span>
+      )}
+    </div>
+  );
+}
+
+/** State axis card for system summary */
+function StateCard({ title, items, colorMap, textColorMap }: {
+  title: string;
+  items: StatusCount[];
+  colorMap: Record<string, string>;
+  textColorMap: Record<string, string>;
+}) {
+  const total = items.reduce((sum, item) => sum + item.count, 0);
+  return (
+    <div className="rounded-xl p-5 shadow-sm" style={{ backgroundColor: C.card }}>
+      <h3 className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: C.muted }}>{title}</h3>
+      <div className="space-y-2">
+        {items.map((item) => {
+          const pct = total > 0 ? Math.round((item.count / total) * 100) : 0;
+          const bgColor = colorMap[item.status] ?? '#F3F4F6';
+          const txtColor = textColorMap[item.status] ?? C.muted;
+          return (
+            <div key={item.status} className="flex items-center gap-3">
+              <div className="flex-1">
+                <div className="flex items-center justify-between mb-0.5">
+                  <span className="text-xs font-medium" style={{ color: C.text }}>
+                    {item.status === 'NULL' ? 'Not set' : item.status.replace(/_/g, ' ')}
+                  </span>
+                  <span className="text-xs font-semibold" style={{ color: txtColor }}>
+                    {item.count.toLocaleString()}
+                  </span>
+                </div>
+                <div className="w-full h-2 rounded-full overflow-hidden" style={{ backgroundColor: `${C.border}22` }}>
+                  <div
+                    className="h-full rounded-full transition-all duration-500"
+                    style={{ width: `${pct}%`, backgroundColor: bgColor, minWidth: item.count > 0 ? 4 : 0 }}
+                  />
+                </div>
+              </div>
+              <span className="text-[10px] font-medium w-8 text-right" style={{ color: C.muted }}>
+                {pct}%
+              </span>
+            </div>
+          );
+        })}
       </div>
-      <span className="text-xs font-semibold w-16 text-right" style={{ color: '#36454F' }}>
-        {value.toLocaleString()} <span style={{ color: '#8B7355', fontWeight: 400 }}>/ {total}</span>
-      </span>
-      <span className="text-xs w-10 text-right font-medium" style={{ color: pct >= 80 ? '#166534' : pct >= 50 ? '#5BA7A7' : '#92400E' }}>
-        {pct}%
-      </span>
     </div>
   );
 }

@@ -64,6 +64,8 @@ function makeLocation(overrides: Partial<PlacePageLocation> = {}): PlacePageLoca
     // SceneSense
     prl: 2,
     scenesense: null,
+    // TimeFOLD
+    timefold: null,
     // Offering
     offeringSignals: null,
     offeringPrograms: null,

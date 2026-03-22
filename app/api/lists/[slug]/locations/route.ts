@@ -94,7 +94,7 @@ export async function POST(
           neighborhood: neighborhood ?? null,
           cuisineType: parseCuisineType(placeDetails.types || []) ?? null,
           category: (category && ALL_CATEGORIES.includes(category as any)) ? category : getSaikoCategory(placeDetails.name, placeDetails.types || []),
-          primary_vertical: resolvePrimaryVertical(category, placeDetails.name, placeDetails.types || []),
+          primaryVertical: resolvePrimaryVertical(category, placeDetails.name, placeDetails.types || []),
           googlePhotos: placeDetails.photos
             ? JSON.parse(JSON.stringify(placeDetails.photos))
             : null,
