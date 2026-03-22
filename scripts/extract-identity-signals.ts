@@ -21,9 +21,16 @@
  *   npx tsx scripts/extract-identity-signals.ts --limit=50 --concurrency=10
  */
 
+import { config as loadEnv } from 'dotenv';
+loadEnv({ path: '.env' });
+if (!process.env.SAIKO_DB_FROM_WRAPPER) {
+  loadEnv({ path: '.env.local', override: true });
+}
+
 import Anthropic from '@anthropic-ai/sdk';
 import { PrismaClient, Prisma } from '@prisma/client';
 import { writeDerivedSignal } from '../lib/fields-v2/write-claim';
+import { materializeCoverageEvidence, type CoverageEvidence } from '../lib/coverage/normalize-evidence';
 
 // ============================================================================
 // TYPES
@@ -129,7 +136,8 @@ const LA_BBOX = {
 const EXTRACTION_PROMPT = `You are extracting identity signals for a restaurant.
 These signals describe WHO this place is, not WHAT they serve today.
 
-Given the following text from a restaurant's website, extract structured identity signals.
+Given the following text from a restaurant's website (and optional editorial coverage context), extract structured identity signals.
+The website text is the primary source. If a <coverage_context> block is present, use it to supplement and cross-validate — but do not let editorial interpretation override clear menu/website evidence.
 
 <menu_text>
 {menu_raw_text}
@@ -280,11 +288,119 @@ function assessInputQuality(record: GoldenRecordInput): InputQuality {
   };
 }
 
-function buildPrompt(record: GoldenRecordInput): string {
-  return EXTRACTION_PROMPT
+function buildPrompt(record: GoldenRecordInput, coverageEvidence?: CoverageEvidence | null): string {
+  let prompt = EXTRACTION_PROMPT
     .replace('{menu_raw_text}', record.menu_raw_text || '(not available)')
     .replace('{winelist_raw_text}', record.winelist_raw_text || '(not available)')
     .replace('{about_copy}', record.about_copy || '(not available)');
+
+  // Append coverage context if available
+  const coverageBlock = buildCoverageContext(coverageEvidence);
+  if (coverageBlock) {
+    prompt += '\n\n' + coverageBlock;
+  }
+
+  return prompt;
+}
+
+/**
+ * Build a coverage context block from normalized coverage evidence.
+ * This is labeled as editorial evidence so the AI treats it as
+ * supporting signal, not authoritative fact.
+ */
+function buildCoverageContext(evidence: CoverageEvidence | null | undefined): string | null {
+  if (!evidence || evidence.sourceCount === 0) return null;
+
+  const lines: string[] = [];
+  lines.push('<coverage_context>');
+  lines.push('The following is editorial evidence from published coverage sources.');
+  lines.push('Use it to SUPPLEMENT and CROSS-VALIDATE the menu/website signals above.');
+  lines.push('Coverage evidence is editorial interpretation — not authoritative fact.');
+  lines.push(`Source count: ${evidence.sourceCount} articles (${evidence.provenance.tier1Sources} tier-1, ${evidence.provenance.tier2Sources} tier-2)`);
+  lines.push('');
+
+  // People
+  const currentPeople = evidence.facts.people.filter(p => p.stalenessBand === 'current');
+  const agingPeople = evidence.facts.people.filter(p => p.stalenessBand === 'aging');
+  if (currentPeople.length > 0 || agingPeople.length > 0) {
+    lines.push('Named people (editorial):');
+    for (const p of currentPeople) {
+      lines.push(`  - ${p.name}, ${p.role} (${p.sourceCount} sources, current)`);
+    }
+    for (const p of agingPeople) {
+      lines.push(`  - ${p.name}, ${p.role} (${p.sourceCount} sources, aging — may be outdated)`);
+    }
+    lines.push('');
+  }
+
+  // Cuisine
+  if (evidence.interpretations.food.cuisinePosture) {
+    lines.push(`Cuisine posture (editorial): ${evidence.interpretations.food.cuisinePosture} (agreement: ${evidence.interpretations.food.cuisinePostureAgreement})`);
+  }
+  if (evidence.interpretations.food.cookingApproaches.length > 0) {
+    lines.push(`Cooking approaches: ${evidence.interpretations.food.cookingApproaches.join(', ')}`);
+  }
+  if (evidence.interpretations.food.menuFormats.length > 0) {
+    lines.push(`Menu formats: ${evidence.interpretations.food.menuFormats.join(', ')}`);
+  }
+
+  // Specialty signals
+  const activeSpecialties = Object.entries(evidence.interpretations.food.specialtySignals)
+    .filter(([, v]) => v)
+    .map(([k]) => k);
+  if (activeSpecialties.length > 0) {
+    lines.push(`Specialty signals: ${activeSpecialties.join(', ')}`);
+  }
+
+  // Beverage
+  const bev = evidence.interpretations.beverage;
+  const bevSignals: string[] = [];
+  if (bev.wine.mentioned) {
+    let wineDesc = 'wine program';
+    if (bev.wine.naturalFocus) wineDesc += ' (natural focus)';
+    if (bev.wine.listDepth) wineDesc += `, ${bev.wine.listDepth} list`;
+    if (bev.wine.sommelierMentioned) wineDesc += ', sommelier noted';
+    bevSignals.push(wineDesc);
+  }
+  if (bev.cocktail.mentioned) bevSignals.push(bev.cocktail.programExists ? 'cocktail program' : 'cocktails mentioned');
+  if (bev.beer.mentioned) bevSignals.push(bev.beer.craftSelection ? 'craft beer selection' : 'beer');
+  if (bev.nonAlcoholic.mentioned) bevSignals.push(bev.nonAlcoholic.zeroproof ? 'zero-proof program' : 'non-alcoholic options');
+  if (bev.coffeeTea.mentioned) bevSignals.push(bev.coffeeTea.specialtyProgram ? 'specialty coffee/tea' : 'coffee/tea');
+  if (bevSignals.length > 0) {
+    lines.push(`Beverage signals: ${bevSignals.join('; ')}`);
+  }
+
+  // Service
+  const svc = evidence.interpretations.service;
+  if (svc.serviceModel) lines.push(`Service model (editorial): ${svc.serviceModel}`);
+  if (svc.reservationPosture) lines.push(`Reservation posture: ${svc.reservationPosture}`);
+
+  // Atmosphere
+  const atm = evidence.interpretations.atmosphere;
+  if (atm.descriptors.length > 0) lines.push(`Atmosphere descriptors: ${atm.descriptors.join(', ')}`);
+  if (atm.energyLevel) lines.push(`Energy level: ${atm.energyLevel}`);
+  if (atm.formality) lines.push(`Formality: ${atm.formality}`);
+
+  // Origin story
+  if (evidence.facts.originStoryInterpretation?.archetype) {
+    lines.push(`Origin story archetype: ${evidence.facts.originStoryInterpretation.archetype} (consensus: ${evidence.facts.originStoryInterpretation.consensus})`);
+  }
+  if (evidence.facts.originStoryFacts?.foundingYear) {
+    lines.push(`Founding year: ${evidence.facts.originStoryFacts.foundingYear}`);
+  }
+
+  // Accolades (brief)
+  if (evidence.facts.accolades.length > 0) {
+    const top = evidence.facts.accolades.slice(0, 3);
+    lines.push(`Accolades: ${top.map(a => a.name + (a.year ? ` (${a.year})` : '')).join('; ')}`);
+  }
+
+  // Sentiment
+  lines.push(`Editorial sentiment: ${evidence.interpretations.sentiment.dominant}`);
+
+  lines.push('</coverage_context>');
+
+  return lines.join('\n');
 }
 
 function parseExtractionResult(text: string): ExtractionResult | null {
@@ -338,19 +454,29 @@ const anthropic = new Anthropic();
 
 async function extractSignals(
   record: GoldenRecordInput,
-  verbose: boolean
+  verbose: boolean,
+  coverageEvidence?: CoverageEvidence | null,
 ): Promise<{ result: ExtractionResult | null; inputQuality: InputQuality }> {
   const inputQuality = assessInputQuality(record);
-  
-  // Skip if no meaningful input
-  if (inputQuality.overallQuality === 'none') {
+
+  // Skip if no meaningful input AND no coverage evidence
+  if (inputQuality.overallQuality === 'none' && !coverageEvidence) {
     if (verbose) {
-      console.log(`    Skipping: No usable content`);
+      console.log(`    Skipping: No usable content and no coverage evidence`);
     }
     return { result: null, inputQuality };
   }
-  
-  const prompt = buildPrompt(record);
+
+  // If no merchant content but coverage exists, upgrade quality to 'partial'
+  // so we still run extraction with coverage as the signal source
+  if (inputQuality.overallQuality === 'none' && coverageEvidence) {
+    inputQuality.overallQuality = 'partial';
+    if (verbose) {
+      console.log(`    No merchant content — using coverage evidence as primary signal`);
+    }
+  }
+
+  const prompt = buildPrompt(record, coverageEvidence);
   
   try {
     const response = await anthropic.messages.create({
@@ -555,11 +681,21 @@ async function main() {
   }
 
   // 4. Build records — require at least one content field above the minimum
-  //    useful length. Content shorter than minContentChars is "minimal" quality:
-  //    the AI returns mostly-null fields with hold-tier confidence, wastes an
-  //    API call, and produces an empty derived_signal that blocks future runs.
+  //    useful length, OR coverage evidence (Phase 5 wiring: entities with
+  //    coverage can be extracted even without merchant surface content).
   //    Priority: merchant_surface_artifacts text first, then entities.description as last resort.
   const { minContentChars } = CONFIG;
+
+  // Batch-check which entities have current coverage extractions
+  const entitiesWithCoverage = new Set<string>();
+  if (entityIdsForArtifacts.length > 0) {
+    const coverageRows = await prisma.coverage_source_extractions.groupBy({
+      by: ['entityId'],
+      where: { entityId: { in: entityIdsForArtifacts }, isCurrent: true },
+    });
+    for (const row of coverageRows) entitiesWithCoverage.add(row.entityId);
+  }
+
   const allRecords: GoldenRecordInput[] = unprocessed.flatMap(e => {
     const sa  = surfaceTextByEntity.get(e.id);
     const menu_raw_text     = sa?.menu_text  || null;
@@ -567,7 +703,8 @@ async function main() {
     const about_copy        = (sa?.about_text || null) ?? e.description ?? null;
     const hasUsableMenu  = (menu_raw_text?.length  ?? 0) >= minContentChars;
     const hasUsableAbout = (about_copy?.length     ?? 0) >= minContentChars;
-    if (!hasUsableMenu && !hasUsableAbout) return [];
+    const hasCoverage    = entitiesWithCoverage.has(e.id);
+    if (!hasUsableMenu && !hasUsableAbout && !hasCoverage) return [];
     return [{ canonical_id: e.id, name: e.name, menu_raw_text, winelist_raw_text, about_copy }];
   });
 
@@ -615,7 +752,13 @@ async function main() {
       console.log(`${prefix} ${record.name}`);
 
       try {
-        const { result, inputQuality } = await extractSignals(record, args.verbose);
+        // Materialize coverage evidence for this entity (Phase 5 wiring)
+        const coverageEvidence = await materializeCoverageEvidence(record.canonical_id);
+        if (args.verbose && coverageEvidence) {
+          console.log(`    Coverage: ${coverageEvidence.sourceCount} sources (T1: ${coverageEvidence.provenance.tier1Sources})`);
+        }
+
+        const { result, inputQuality } = await extractSignals(record, args.verbose, coverageEvidence);
 
         stats.processed++;
         stats.byInputQuality[inputQuality.overallQuality]++;
