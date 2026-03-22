@@ -144,6 +144,20 @@ async function fetchPlaceForPRLBySlugFull(
   const hasCoverageSource =
     hasEditorialSources || hasPullQuote || hasPullQuoteSource || coverageSourcesCount > 0;
 
+  // Check for rich coverage extractions (identity-grade signal from press)
+  let hasIdentityFromCoverage = false;
+  if (coverageSourcesCount > 0) {
+    const extractionCount = await db.coverage_source_extractions.count({
+      where: {
+        coverageSource: {
+          entityId: place.id,
+        },
+        isCurrent: true,
+      },
+    });
+    hasIdentityFromCoverage = extractionCount > 0;
+  }
+
   let fieldsMembershipCount = 0;
   let hasLanguageSignals = false;
 
@@ -192,7 +206,7 @@ async function fetchPlaceForPRLBySlugFull(
     energyScore,
     hasTagSignals,
     hasFormality: false,
-    hasIdentitySignals: hasLanguageSignals,
+    hasIdentitySignals: hasLanguageSignals || hasIdentityFromCoverage,
     hasTemporalSignals: false,
     fieldsMembershipCount,
     appearsOnCount: mapPlacesPublished,
@@ -410,7 +424,7 @@ async function fetchPlaceForPRLBatchFull(args?: {
     );
   }
 
-  const [mapCounts, fieldsMembershipCounts] = await Promise.all([
+  const [mapCounts, fieldsMembershipCounts, coverageSourceCounts, coverageSourcesWithExtractions] = await Promise.all([
     db.map_places.groupBy({
       by: ['entityId'],
       where: {
@@ -426,6 +440,24 @@ async function fetchPlaceForPRLBatchFull(args?: {
           _count: { id: true },
         })
       : Promise.resolve([]),
+    // Coverage sources count per entity — fixes batch consistency with single-entity path
+    placeIds.length > 0
+      ? db.coverage_sources.groupBy({
+          by: ['entityId'],
+          where: { entityId: { in: placeIds } },
+          _count: { id: true },
+        })
+      : Promise.resolve([]),
+    // Coverage sources that have current extractions — presence implies identity-grade signals
+    placeIds.length > 0
+      ? db.coverage_sources.findMany({
+          where: {
+            entityId: { in: placeIds },
+            extractions: { some: { isCurrent: true } },
+          },
+          select: { entityId: true },
+        })
+      : Promise.resolve([]),
   ]);
 
   const mapCountByPlace = new Map(
@@ -433,6 +465,13 @@ async function fetchPlaceForPRLBatchFull(args?: {
   );
   const fieldsCountByEntityId = new Map(
     fieldsMembershipCounts.map((c) => [c.entityId, c._count.id])
+  );
+  const coverageSourceCountByEntity = new Map(
+    coverageSourceCounts.map((c) => [c.entityId, c._count.id])
+  );
+  // Entities that have at least one coverage source with current extractions
+  const entitiesWithCoverageExtractions = new Set(
+    coverageSourcesWithExtractions.map((s) => s.entityId)
   );
 
   const curatorNotes = await Promise.all(
@@ -469,8 +508,13 @@ async function fetchPlaceForPRLBatchFull(args?: {
     const hasEditorialSources = (editorialArr?.length ?? 0) > 0;
     const hasPullQuote = !!(place.pullQuote?.trim());
     const hasPullQuoteSource = !!(place.pullQuoteSource?.trim());
+    // Include coverage_sources table count (consistency with single-entity path)
+    const entityCoverageSourceCount: number = coverageSourceCountByEntity.get(place.id) ?? 0;
     const hasCoverageSource =
-      hasEditorialSources || hasPullQuote || hasPullQuoteSource;
+      hasEditorialSources || hasPullQuote || hasPullQuoteSource || entityCoverageSourceCount > 0;
+
+    // Coverage extractions with rich data upgrade identity signals flag
+    const hasIdentityFromCoverage = entitiesWithCoverageExtractions.has(place.id);
 
     const categoryDisplay =
       place.category ?? (place.category_rel?.slug as string | null) ?? null;
@@ -498,7 +542,7 @@ async function fetchPlaceForPRLBatchFull(args?: {
       energyScore,
       hasTagSignals,
       hasFormality: false,
-      hasIdentitySignals: hasLanguageSignalsBatch,
+      hasIdentitySignals: hasLanguageSignalsBatch || hasIdentityFromCoverage,
       hasTemporalSignals: false,
       fieldsMembershipCount: fieldsCountByEntityId.get(place.id) ?? 0,
       appearsOnCount: mapCountByPlace.get(place.id) ?? 0,
