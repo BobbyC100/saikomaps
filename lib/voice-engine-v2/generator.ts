@@ -34,7 +34,8 @@ export async function generateTaglineCandidatesV2(
   const userPrompt = buildTaglineGeneratorUserPromptV2(
     input.signals,
     input.context,
-    input.mapNeighborhood
+    input.mapNeighborhood,
+    input.coverageEvidence,
   );
   
   try {

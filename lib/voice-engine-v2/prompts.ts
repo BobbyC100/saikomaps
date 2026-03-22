@@ -4,6 +4,7 @@
  */
 
 import { IdentitySignals, PlaceContext } from './types';
+import type { CoverageEvidence } from '../coverage/normalize-evidence';
 
 // ============================================
 // TAGLINE GENERATION PROMPT (v2.0)
@@ -66,7 +67,8 @@ Return ONLY a JSON array of 4 strings. No commentary. No labels.`;
 export function buildTaglineGeneratorUserPromptV2(
   signals: IdentitySignals,
   context: PlaceContext,
-  mapNeighborhood?: string
+  mapNeighborhood?: string,
+  coverageEvidence?: CoverageEvidence,
 ): string {
   // Determine location reference
   const useStreet = mapNeighborhood && 
@@ -91,6 +93,54 @@ export function buildTaglineGeneratorUserPromptV2(
     ? signals.key_producers.join(', ')
     : 'none';
   
+  // Build coverage context if available
+  let coverageBlock = '';
+  if (coverageEvidence) {
+    const parts: string[] = [];
+    parts.push('');
+    parts.push('COVERAGE CONTEXT (from press — use for grounding, not quoting):');
+
+    // People — current only for taglines
+    const currentPeople = coverageEvidence.facts.people
+      .filter((p) => p.stalenessBand === 'current')
+      .slice(0, 3);
+    if (currentPeople.length > 0) {
+      parts.push(`Key People: ${currentPeople.map((p) => `${p.name} (${p.role})`).join(', ')}`);
+    }
+
+    // Dishes from coverage (supplement identity signal dishes)
+    const coverageDishes = coverageEvidence.facts.dishes.slice(0, 4);
+    if (coverageDishes.length > 0) {
+      parts.push(`Coverage Dishes: ${coverageDishes.map((d) => d.text).join(', ')}`);
+    }
+
+    // Accolades — top 2
+    const topAccolades = coverageEvidence.facts.accolades.slice(0, 2);
+    if (topAccolades.length > 0) {
+      parts.push(`Accolades: ${topAccolades.map((a) => `${a.name}${a.year ? ` (${a.year})` : ''}`).join(', ')}`);
+    }
+
+    // Origin story facts
+    const osf = coverageEvidence.facts.originStoryFacts;
+    if (osf) {
+      const originParts: string[] = [];
+      if (osf.foundingYear) originParts.push(`founded ${osf.foundingYear}`);
+      if (osf.founderNames.length > 0) originParts.push(`by ${osf.founderNames.join(' and ')}`);
+      if (osf.geographicOrigin) originParts.push(`roots: ${osf.geographicOrigin}`);
+      if (originParts.length > 0) {
+        parts.push(`Origin: ${originParts.join(', ')}`);
+      }
+    }
+
+    // Atmosphere — top 3 descriptors
+    const atm = coverageEvidence.interpretations.atmosphere;
+    if (atm.descriptors.length > 0) {
+      parts.push(`Atmosphere: ${atm.descriptors.slice(0, 3).join(', ')}`);
+    }
+
+    coverageBlock = parts.join('\n');
+  }
+
   return `Name: ${context.name}
 ${locationRef}
 
@@ -108,7 +158,7 @@ Key Producers: ${producersStr}
 
 SUPPLEMENTAL:
 Outdoor Seating: ${context.outdoor_seating ?? 'unknown'}
-Popularity: ${context.popularity_tier || 'unknown'}`;
+Popularity: ${context.popularity_tier || 'unknown'}${coverageBlock}`;
 }
 
 // ============================================

@@ -3,6 +3,8 @@
  * Identity signals from scraped content, not Google Places API
  */
 
+import type { CoverageEvidence } from '../coverage/normalize-evidence';
+
 // ============================================
 // IDENTITY SIGNALS (from golden_records)
 // ============================================
@@ -49,6 +51,7 @@ export interface TaglineGenerationInputV2 {
   signals: IdentitySignals;
   context: PlaceContext;
   mapNeighborhood?: string;                 // If map title already contains neighborhood, use street instead
+  coverageEvidence?: CoverageEvidence;      // Normalized coverage evidence for richer grounding
 }
 
 // ============================================
