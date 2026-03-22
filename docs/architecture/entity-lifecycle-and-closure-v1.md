@@ -1,6 +1,6 @@
 ---
 doc_id: ARCH-ENTITY-LIFECYCLE-CLOSURE-V1
-status: DRAFT
+status: SUPERSEDED
 owner: Bobby
 created: 2026-03-16
 last_updated: 2026-03-16
@@ -10,7 +10,9 @@ companion_to: PI-CONCEPT-V1
 
 # Entity Lifecycle and Closure Specification
 
-> **Status:** DRAFT — Not Canon. Pending verification items below.
+> **SUPERSEDED** by entity-state-model-v1.md (ARCH-ENTITY-STATE-MODEL-V1) as of 2026-03-20. The closure-as-a-claim model, status claims ledger, and Reference Confidence Model sections in this document remain valid as evidence-flow mechanisms. State definitions are now in entity-state-model-v1.md.
+
+> **Status:** SUPERSEDED — See entity-state-model-v1.md for current state definitions.
 > **Layer:** Concept Doc (Layer 1) — companion to Place Identity Concept Doc (PI-CONCEPT-V1).
 > **Scope:** Lifecycle state management, closure as a claim, Reference Confidence Model. Does not redefine Place Identity. For identity fields, anchors, resolution, and core principles see PI-CONCEPT-V1.
 

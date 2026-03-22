@@ -1,7 +1,7 @@
 ---
 doc_id: ARCH-COVERAGE-OPS-DASHBOARD-V1
 doc_type: architecture
-status: active
+status: superseded
 owner: Bobby Ciccaglione
 created: '2026-03-15'
 last_updated: '2026-03-15'
@@ -21,6 +21,8 @@ summary: >-
 ---
 
 # Coverage Ops Dashboard v1
+
+> **SUPERSEDED** — This spec is replaced by [Coverage Dashboard v2](coverage-dashboard-v2-spec.md) (ARCH-COVERAGE-DASHBOARD-V2). Retained for historical reference only.
 
 ## Purpose
 

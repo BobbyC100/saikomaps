@@ -4,6 +4,9 @@ title: Entity Enrichment Strategy
 status: draft
 owner: bobby
 created: 2026-03-15
+related_docs:
+  - docs/architecture/entity-classification-framework-v1.md
+  - docs/architecture/entity-type-problem-definition-v1.md
 ---
 
 # Entity Enrichment Strategy v1

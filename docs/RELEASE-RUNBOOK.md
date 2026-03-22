@@ -1,3 +1,22 @@
+---
+doc_id: OPS-RELEASE-RUNBOOK-V1
+doc_type: operations
+status: active
+title: "Saiko Release Runbook v1"
+owner: Bobby Ciccaglione
+created: "2026-03-01"
+last_updated: "2026-03-22"
+project_id: SAIKO
+systems:
+  - deployment
+  - ci-cd
+related_docs: []
+summary: >
+  Release runbook covering the deploy flow (branch → PR → build gate → preview →
+  merge → production), branch protection rules, incident response / rollback
+  procedures, database migration rules, and build gate checks.
+---
+
 # Saiko Release Runbook v1
 
 ## Release Flow

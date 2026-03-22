@@ -1,8 +1,30 @@
-# Events Program — Architecture-Aligned Spec (V1)
+---
+doc_id: ARCH-EVENTS-PROGRAM-V1
+doc_type: architecture
+status: draft
+title: "Events Program — Architecture-Aligned Spec (V1)"
+owner: Bobby Ciccaglione
+created: "2026-03-01"
+last_updated: "2026-03-22"
+project_id: SAIKO
+systems:
+  - enrichment
+  - derived-signals
+  - traces-place-page
+  - coverage-ops
+related_docs:
+  - docs/architecture/coverage-source-enrichment-v1.md
+  - docs/architecture/derived-signals-engine-v1.md
+  - docs/architecture/enrichment-evidence-model-v1.md
+summary: >
+  Defines how Saiko detects, structures, and exposes event capabilities
+  (private dining, group dining, catering) for places. Extends the existing
+  offering_programs model with three new program types, adds events surface
+  discovery, and wires through to the place page contract. V1 is detect →
+  structure → expose only — no marketplace, booking, or pricing.
+---
 
-**Status:** Draft
-**Owner:** Bobby
-**Date:** March 2026
+# Events Program — Architecture-Aligned Spec (V1)
 
 ---
 
