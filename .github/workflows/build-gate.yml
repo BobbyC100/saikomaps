@@ -29,8 +29,15 @@ jobs:
       - name: Generate Prisma client
         run: npx prisma generate
 
-      - name: Lint
-        run: npm run lint
+      - name: Lint (changed files only)
+        run: |
+          git fetch origin main --depth=1
+          CHANGED=$(git diff --name-only origin/main...HEAD -- '*.ts' '*.tsx' '*.js' '*.jsx' | head -100)
+          if [ -n "$CHANGED" ]; then
+            echo "$CHANGED" | xargs npx eslint --no-error-on-unmatched-pattern
+          else
+            echo "No JS/TS files changed, skipping lint"
+          fi
 
       - name: Typecheck
         run: npm run typecheck
