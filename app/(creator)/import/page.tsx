@@ -122,9 +122,9 @@ export default function ImportPage() {
                   <tbody className="divide-y divide-border-light">
                     {parseResult.locations.slice(0, 10).map((location, idx) => (
                       <tr key={idx} className="hover:bg-bg-tertiary/50">
-                        <td className="px-4 py-3 text-sm text-text-primary">{location.Title}</td>
-                        <td className="px-4 py-3 text-sm text-text-secondary">{location.Note || '—'}</td>
-                        <td className="px-4 py-3 text-sm text-text-tertiary truncate max-w-xs">{location.URL || '—'}</td>
+                        <td className="px-4 py-3 text-sm text-text-primary">{location.title}</td>
+                        <td className="px-4 py-3 text-sm text-text-secondary">{location.note || '—'}</td>
+                        <td className="px-4 py-3 text-sm text-text-tertiary truncate max-w-xs">{location.url || '—'}</td>
                       </tr>
                     ))}
                   </tbody>

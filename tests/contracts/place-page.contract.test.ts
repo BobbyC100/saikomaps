@@ -64,6 +64,8 @@ function makeLocation(overrides: Partial<PlacePageLocation> = {}): PlacePageLoca
     // SceneSense
     prl: 2,
     scenesense: null,
+    // TimeFOLD
+    timefold: null,
     // Offering
     offeringSignals: null,
     offeringPrograms: null,
@@ -183,14 +185,12 @@ describe('assertPlacePageData — missing required keys', () => {
 
   it('throws when a required location key is absent', () => {
     const loc = makeLocation();
-    // @ts-expect-error intentional deletion for test
     delete loc.tips;
     expect(() => assertPlacePageData(makeData({ location: loc }))).toThrow(/missing required key "tips"/);
   });
 
   it('throws when id is missing from location', () => {
     const loc = makeLocation();
-    // @ts-expect-error intentional deletion for test
     delete loc.id;
     expect(() => assertPlacePageData(makeData({ location: loc }))).toThrow(/missing required key "id"/);
   });
@@ -226,7 +226,6 @@ describe('assertPlacePageData — prl invariant', () => {
 
   it('throws when prl is missing', () => {
     const loc = makeLocation();
-    // @ts-expect-error intentional deletion for test
     delete loc.prl;
     expect(() => assertPlacePageData(makeData({ location: loc }))).toThrow(/missing required key "prl"/);
   });
