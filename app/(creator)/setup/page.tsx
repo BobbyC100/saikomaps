@@ -54,12 +54,12 @@ export default function SetupPage() {
       });
       
       // Transform locations to API format
-      const apiLocations = locations.map((loc: any) => ({
-        name: loc.Title || loc.Name || loc.name || 'Untitled Location',
-        address: loc.Address || loc.address,
-        url: loc.URL || loc.url,
-        comment: loc.Comment || loc.Note || loc.comment,
-      })).filter((loc: any) => loc.name && loc.name.trim() !== '');
+      const apiLocations = (locations as Record<string, unknown>[]).map((loc) => ({
+        name: (loc.Title || loc.Name || loc.name || 'Untitled Location') as string,
+        address: (loc.Address || loc.address) as string | undefined,
+        url: (loc.URL || loc.url) as string | undefined,
+        comment: (loc.Comment || loc.Note || loc.comment) as string | undefined,
+      })).filter((loc) => loc.name && loc.name.trim() !== '');
       
       console.log('[SETUP] Transformed locations for API:', {
         count: apiLocations.length,

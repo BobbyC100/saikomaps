@@ -71,12 +71,12 @@ export default function TemplatesPage() {
       const locations = JSON.parse(storedLocations);
       
       // Transform locations to API format
-      const apiLocations = locations.map((loc: any) => ({
-        name: loc.Title || loc.Name || loc.name || 'Untitled Location',
-        address: loc.Address || loc.address,
-        url: loc.URL || loc.url,
-        comment: loc.Comment || loc.Note || loc.comment,
-      })).filter((loc: any) => loc.name && loc.name.trim() !== '');
+      const apiLocations = (locations as Record<string, unknown>[]).map((loc) => ({
+        name: (loc.Title || loc.Name || loc.name || 'Untitled Location') as string,
+        address: (loc.Address || loc.address) as string | undefined,
+        url: (loc.URL || loc.url) as string | undefined,
+        comment: (loc.Comment || loc.Note || loc.comment) as string | undefined,
+      })).filter((loc) => loc.name && loc.name.trim() !== '');
 
       // Call API to create guide
       const response = await fetch('/api/import/process', {
@@ -192,7 +192,7 @@ export default function TemplatesPage() {
             <strong>Field Notes template</strong> is designed for clean, organized collections.
           </p>
           <p className={styles.bottomNoteSubtitle}>
-            You'll have full control over ordering, presentation, and customization of your guide.
+            You&apos;ll have full control over ordering, presentation, and customization of your guide.
           </p>
         </div>
       </div>

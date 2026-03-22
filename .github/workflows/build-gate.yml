@@ -1,0 +1,46 @@
+name: Build Gate
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    env:
+      # Prisma generate needs a DATABASE_URL at build time (not used for connections)
+      DATABASE_URL: "postgresql://placeholder:placeholder@localhost:5432/placeholder"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install --ignore-scripts
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Lint (changed files only)
+        run: |
+          git fetch origin main --depth=1
+          CHANGED=$(git diff --name-only origin/main...HEAD -- '*.ts' '*.tsx' '*.js' '*.jsx' | head -100)
+          if [ -n "$CHANGED" ]; then
+            echo "$CHANGED" | xargs npx eslint --no-error-on-unmatched-pattern
+          else
+            echo "No JS/TS files changed, skipping lint"
+          fi
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build

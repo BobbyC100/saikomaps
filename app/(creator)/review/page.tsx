@@ -24,19 +24,18 @@ export default function ReviewLocationsPage() {
 
   // Load locations from localStorage
   useEffect(() => {
-    setMounted(true);
     const stored = localStorage.getItem('importedLocations');
     if (stored) {
       try {
         const parsed = JSON.parse(stored);
-        const withIds = parsed.map((loc: any, index: number) => ({
-          ...loc,
-          id: loc.id || `loc-${index}-${Date.now()}`,
+        const withIds = (parsed as Record<string, string | undefined>[]).map((loc, index: number) => ({
+          id: (loc.id as string) || `loc-${index}-${Date.now()}`,
           name: loc.Title || loc.Name || loc.name || 'Untitled Location',
           address: loc.Address || loc.address,
           url: loc.URL || loc.url,
-          comment: loc.Comment || loc.Note || loc.comment || null,
+          comment: loc.Comment || loc.Note || loc.comment || undefined,
         }));
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- loading data from localStorage on mount
         setLocations(withIds);
       } catch (error) {
         console.error('Error loading locations:', error);
@@ -45,6 +44,7 @@ export default function ReviewLocationsPage() {
       // If no locations in localStorage, redirect to import
       router.push('/import');
     }
+    setMounted(true);
   }, [router]);
 
   const toggleSelection = (id: string) => {

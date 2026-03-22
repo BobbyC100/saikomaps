@@ -4,14 +4,14 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import DashboardLayout from '@/components/layouts/DashboardLayout';
 import CSVUpload from '@/components/forms/CSVUpload';
-import type { ImportStep, UploadCSVResponse } from '@/types/import';
+import type { ImportStep, UploadCSVResponse, CSVParseResult } from '@/types/import';
 
 
 export default function ImportPage() {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState<ImportStep>('UPLOAD');
   const [fileId, setFileId] = useState<string | null>(null);
-  const [parseResult, setParseResult] = useState<any>(null);
+  const [parseResult, setParseResult] = useState<CSVParseResult | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
 
   const handleUploadComplete = async (result: UploadCSVResponse) => {
@@ -120,11 +120,11 @@ export default function ImportPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border-light">
-                    {parseResult.locations.slice(0, 10).map((location: any, idx: number) => (
+                    {parseResult.locations.slice(0, 10).map((location, idx) => (
                       <tr key={idx} className="hover:bg-bg-tertiary/50">
-                        <td className="px-4 py-3 text-sm text-text-primary">{location.Title}</td>
-                        <td className="px-4 py-3 text-sm text-text-secondary">{location.Note || '—'}</td>
-                        <td className="px-4 py-3 text-sm text-text-tertiary truncate max-w-xs">{location.URL || '—'}</td>
+                        <td className="px-4 py-3 text-sm text-text-primary">{location.title}</td>
+                        <td className="px-4 py-3 text-sm text-text-secondary">{location.note || '—'}</td>
+                        <td className="px-4 py-3 text-sm text-text-tertiary truncate max-w-xs">{location.url || '—'}</td>
                       </tr>
                     ))}
                   </tbody>
