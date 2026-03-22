@@ -23,7 +23,8 @@ import {
   fetchPlaceForPRLBySlug,
   assembleSceneSenseFromMaterialized,
 } from '@/lib/scenesense';
-import type { PlacePageData, PlacePageLocation } from '@/lib/contracts/place-page';
+import type { PlacePageData, PlacePageLocation, PlacePageCoverageHighlights } from '@/lib/contracts/place-page';
+import { materializeCoverageEvidence } from '@/lib/coverage/normalize-evidence';
 
 const BUILD_ID =
   process.env.VERCEL_GIT_COMMIT_SHA ||
@@ -541,6 +542,37 @@ export async function GET(
           publishedAt: src.publishedAt ? src.publishedAt.toISOString() : null,
         };
       }),
+      coverageHighlights: await (async (): Promise<PlacePageCoverageHighlights | null> => {
+        try {
+          const evidence = await materializeCoverageEvidence(entity.id);
+          if (!evidence) return null;
+          return {
+            sourceCount: evidence.sourceCount,
+            tier1Count: evidence.provenance.tier1Sources,
+            tier2Count: evidence.provenance.tier2Sources,
+            people: evidence.facts.people
+              .filter((p) => p.stalenessBand === 'current' || p.stalenessBand === 'aging')
+              .slice(0, 5)
+              .map((p) => ({ name: p.name, role: p.role })),
+            accolades: evidence.facts.accolades
+              .slice(0, 5)
+              .map((a) => ({ name: a.name, year: a.year, type: a.type })),
+            dishes: evidence.facts.dishes.slice(0, 6).map((d) => d.text),
+            originStory: evidence.facts.originStoryFacts
+              ? {
+                  foundingYear: evidence.facts.originStoryFacts.foundingYear
+                    ? parseInt(evidence.facts.originStoryFacts.foundingYear, 10) || null
+                    : null,
+                  founderNames: evidence.facts.originStoryFacts.founderNames,
+                  geographicOrigin: evidence.facts.originStoryFacts.geographicOrigin,
+                }
+              : null,
+          };
+        } catch {
+          // Non-fatal: coverage highlights are supplementary
+          return null;
+        }
+      })(),
       // Parks-specific
       amenities: parkAmenities.length > 0 ? parkAmenities : undefined,
       parkFacilities: parkFacilities.length > 0 ? parkFacilities : undefined,

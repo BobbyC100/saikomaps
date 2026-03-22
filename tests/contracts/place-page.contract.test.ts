@@ -81,6 +81,7 @@ function makeLocation(overrides: Partial<PlacePageLocation> = {}): PlacePageLoca
     originStoryType: null,
     // Coverage
     coverageSources: [],
+    coverageHighlights: null,
     // Appearances
     appearancesAsSubject: [],
     appearancesAsHost: [],
