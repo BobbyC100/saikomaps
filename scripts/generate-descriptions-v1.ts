@@ -27,8 +27,15 @@
  * Work order: docs/traces/WO-ABOUT-001-voice-descriptor-pipeline.md
  */
 
+import { config } from 'dotenv';
+config({ path: '.env' });
+if (!process.env.SAIKO_DB_FROM_WRAPPER) {
+  config({ path: '.env.local', override: true });
+}
+
 import { PrismaClient } from '@prisma/client';
 import { writeInterpretationCache } from '../lib/fields-v2/write-claim';
+import { materializeCoverageEvidence, type CoverageEvidence } from '../lib/coverage/normalize-evidence';
 import {
   fetchRecordsForDescriptionGeneration,
   selectTier,
@@ -270,14 +277,28 @@ async function processEntity(
 
   // ── Tier 3: compose from signals ─────────────────────────────────────
   if (selection.tier === 3) {
+    // Materialize coverage evidence for richer grounding
+    let coverageEvidence: CoverageEvidence | null = null;
+    try {
+      coverageEvidence = await materializeCoverageEvidence(record.id);
+    } catch (err) {
+      // Non-fatal: coverage is supplementary
+      if (args.verbose) {
+        console.log(`  ⚠ Coverage evidence failed: ${err instanceof Error ? err.message : String(err)}`);
+      }
+    }
+
     const quality = computeQuality(3, {
       identitySignals: record.identitySignals,
-      hasCoverageSources: false, // Coverage sources fetched inside generator
+      hasCoverageSources: coverageEvidence !== null && coverageEvidence.sourceCount > 0,
     });
 
     if (args.verbose) {
       const signalCount = record.identitySignals ? Object.keys(record.identitySignals).length : 0;
       console.log(`  📥 Input: ${signalCount} identity signals, category=${record.category}, neighborhood=${record.neighborhood}`);
+      if (coverageEvidence) {
+        console.log(`  📥 Coverage: ${coverageEvidence.sourceCount} sources, ${coverageEvidence.facts.people.length} people, ${coverageEvidence.facts.dishes.length} dishes, ${coverageEvidence.facts.accolades.length} accolades`);
+      }
       console.log(`  📊 Quality: coverage=${quality.source_coverage_score}, density=${quality.signal_density}`);
     }
 
@@ -298,6 +319,7 @@ async function processEntity(
         category: record.category,
         neighborhood: record.neighborhood,
         identitySignals: record.identitySignals,
+        coverageEvidence: coverageEvidence ?? undefined,
       });
 
       if (args.verbose) {

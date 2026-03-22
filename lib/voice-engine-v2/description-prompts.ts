@@ -10,6 +10,8 @@
  * Spec: docs/traces/about-description-spec-v1.md (Sections 3.2 and 3.3)
  */
 
+import type { CoverageEvidence } from '../coverage/normalize-evidence';
+
 // ============================================================================
 // TIER 2 — SYNTHESIZE FROM MERCHANT COPY (about-synth-v1)
 // ============================================================================
@@ -98,6 +100,7 @@ export function buildAboutComposeUserPrompt(
   neighborhood: string | null,
   identitySignals: Record<string, unknown> | null,
   coverageSources?: Array<{ sourceName: string; excerpt: string | null }>,
+  coverageEvidence?: CoverageEvidence,
 ): string {
   const parts: string[] = [];
 
@@ -140,8 +143,79 @@ export function buildAboutComposeUserPrompt(
     parts.push('Identity signals: none available');
   }
 
-  // Coverage sources for factual grounding
-  if (coverageSources && coverageSources.length > 0) {
+  // ── Rich coverage evidence (preferred over thin coverageSources) ──
+  if (coverageEvidence) {
+    parts.push('');
+    parts.push('Coverage evidence (from press and critical sources — use for factual grounding):');
+
+    // People — current and aging only, most relevant for descriptions
+    const relevantPeople = coverageEvidence.facts.people
+      .filter((p) => p.stalenessBand === 'current' || p.stalenessBand === 'aging')
+      .slice(0, 4);
+    if (relevantPeople.length > 0) {
+      parts.push('  Key people:');
+      for (const p of relevantPeople) {
+        parts.push(`    ${p.name} — ${p.role} (${p.sourceCount} sources, ${p.stalenessBand})`);
+      }
+    }
+
+    // Dishes — top 5 by source count
+    const topDishes = coverageEvidence.facts.dishes.slice(0, 5);
+    if (topDishes.length > 0) {
+      parts.push(`  Notable dishes: ${topDishes.map((d) => d.text).join(', ')}`);
+    }
+
+    // Accolades
+    const topAccolades = coverageEvidence.facts.accolades.slice(0, 3);
+    if (topAccolades.length > 0) {
+      parts.push('  Accolades:');
+      for (const a of topAccolades) {
+        parts.push(`    ${a.name}${a.year ? ` (${a.year})` : ''} — ${a.type}`);
+      }
+    }
+
+    // Origin story facts
+    const osf = coverageEvidence.facts.originStoryFacts;
+    if (osf) {
+      const originParts: string[] = [];
+      if (osf.foundingYear) originParts.push(`founded ${osf.foundingYear}`);
+      if (osf.founderNames.length > 0) originParts.push(`by ${osf.founderNames.join(' and ')}`);
+      if (osf.geographicOrigin) originParts.push(`roots in ${osf.geographicOrigin}`);
+      if (osf.lineage) originParts.push(`lineage: ${osf.lineage}`);
+      if (originParts.length > 0) {
+        parts.push(`  Origin: ${originParts.join(', ')}`);
+      }
+    }
+
+    // Pull quotes — top 2 for texture
+    const topQuotes = coverageEvidence.facts.pullQuotes.slice(0, 2);
+    if (topQuotes.length > 0) {
+      parts.push('  Press excerpts (paraphrase, do not quote directly):');
+      for (const q of topQuotes) {
+        const excerpt = q.text.length > 150 ? q.text.slice(0, 150) + '…' : q.text;
+        parts.push(`    ${q.publication}: "${excerpt}"`);
+      }
+    }
+
+    // Food interpretations from coverage
+    const food = coverageEvidence.interpretations.food;
+    if (food.cuisinePosture && food.cuisinePostureAgreement >= 0.5) {
+      parts.push(`  Coverage cuisine read: ${food.cuisinePosture} (${Math.round(food.cuisinePostureAgreement * 100)}% agreement)`);
+    }
+    if (food.cookingApproaches.length > 0) {
+      parts.push(`  Cooking approaches: ${food.cookingApproaches.join(', ')}`);
+    }
+
+    // Atmosphere
+    const atm = coverageEvidence.interpretations.atmosphere;
+    if (atm.descriptors.length > 0) {
+      parts.push(`  Atmosphere: ${atm.descriptors.slice(0, 4).join(', ')}`);
+    }
+
+    // Provenance summary
+    parts.push(`  Based on ${coverageEvidence.provenance.totalSources} sources (${coverageEvidence.provenance.tier1Sources} Tier 1, ${coverageEvidence.provenance.tier2Sources} Tier 2)`);
+  } else if (coverageSources && coverageSources.length > 0) {
+    // Fallback: thin coverage sources format (backward compat)
     parts.push('');
     parts.push('Coverage sources (for factual grounding only):');
     for (const src of coverageSources.slice(0, 3)) {
