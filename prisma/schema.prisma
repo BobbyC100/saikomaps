@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-arm64-openssl-3.0.x"]
 }
 
 datasource db {
@@ -13,29 +14,29 @@ model activity_spots {
   slug        String?    @unique
   latitude    Float
   longitude   Float
-  layer_type  LayerType
+  layerType   LayerType  @map("layer_type")
   city        String?
   region      String?
   country     String     @default("US")
-  spot_type   String?
+  spotType    String?    @map("spot_type")
   tags        String[]
   surface     String?
-  skill_level String?
+  skillLevel  String?    @map("skill_level")
   exposure    String?
   description String?
   seasonality String?
-  is_public   Boolean    @default(true)
+  isPublic    Boolean    @default(true) @map("is_public")
   source      SpotSource
-  source_id   String?
-  source_url  String?
+  sourceId    String?    @map("source_id")
+  sourceUrl   String?    @map("source_url")
   verified    Boolean    @default(false)
   enabled     Boolean    @default(true)
-  created_at  DateTime   @default(now())
-  updated_at  DateTime
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @map("updated_at")
 
-  @@index([layer_type, city])
-  @@index([layer_type, latitude, longitude])
-  @@index([source, source_id])
+  @@index([layerType, city])
+  @@index([layerType, latitude, longitude])
+  @@index([source, sourceId])
 }
 
 model import_jobs {
@@ -155,7 +156,7 @@ model categories {
   id        String  @id @default(cuid())
   slug      String  @unique
   label     String
-  is_active Boolean @default(true)
+  isActive  Boolean @default(true) @map("is_active")
 
   entities entities[]
 }
@@ -167,36 +168,36 @@ model people {
   role                PersonRole
   visibility          Visibility
   bio                 String?
-  image_url           String?
+  imageUrl            String?            @map("image_url")
   sources             Json
-  restaurant_group_id String?
-  created_at          DateTime           @default(now())
-  updated_at          DateTime
-  restaurant_groups   restaurant_groups? @relation(fields: [restaurant_group_id], references: [id])
+  restaurantGroupId   String?            @map("restaurant_group_id")
+  createdAt           DateTime           @default(now()) @map("created_at")
+  updatedAt           DateTime           @map("updated_at")
+  restaurant_groups   restaurant_groups? @relation(fields: [restaurantGroupId], references: [id])
   person_places       person_places[]
 
-  @@index([restaurant_group_id])
+  @@index([restaurantGroupId])
   @@index([slug])
   @@index([visibility])
 }
 
 model person_places {
   id         String          @id
-  person_id  String
+  personId   String          @map("person_id")
   entityId   String          @map("entity_id")
   role       PersonPlaceRole
   current    Boolean         @default(true)
-  start_year Int?
-  end_year   Int?
+  startYear  Int?            @map("start_year")
+  endYear    Int?            @map("end_year")
   source     String
-  created_at DateTime        @default(now())
-  updated_at DateTime
-  people     people          @relation(fields: [person_id], references: [id], onDelete: Cascade)
+  createdAt  DateTime        @default(now()) @map("created_at")
+  updatedAt  DateTime        @map("updated_at")
+  people     people          @relation(fields: [personId], references: [id], onDelete: Cascade)
   entities   entities        @relation(fields: [entityId], references: [id], onDelete: Cascade)
 
-  @@unique([person_id, entityId, role])
+  @@unique([personId, entityId, role])
   @@index([current])
-  @@index([person_id])
+  @@index([personId])
   @@index([entityId])
 }
 
@@ -219,7 +220,7 @@ model entities {
   priceLevel             Int?               @map("price_level")
   neighborhood           String?
   category               String?
-  primary_vertical       PrimaryVertical     @map("primary_vertical")
+  primaryVertical        PrimaryVertical     @map("primary_vertical")
   placesDataCachedAt     DateTime?           @map("places_data_cached_at")
   createdAt              DateTime           @default(now()) @map("created_at")
   updatedAt              DateTime           @updatedAt @map("updated_at")
@@ -245,6 +246,10 @@ model entities {
   chefRecs               Json?              @map("chef_recs")
   restaurantGroupId      String?            @map("restaurant_group_id") // DEPRECATED: use place_actor_relationships. No new writes.
   status                 PlaceStatus        @default(OPEN)
+  // Entity State Model v1 — three independent axes (nullable during migration)
+  operatingStatus        OperatingStatus?   @map("operating_status")
+  enrichmentStatus       EnrichmentStatus?  @map("enrichment_status")
+  publicationStatus      PublicationStatus?  @map("publication_status")
   intentProfile          String?            @map("intent_profile")
   intentProfileOverride  Boolean            @default(false) @map("intent_profile_override")
   reservationUrl         String?            @map("reservation_url")
@@ -254,6 +259,12 @@ model entities {
   categoryId             String?            @map("category_id")
   parentId               String?            @map("parent_id")
   marketSchedule         Json?              @map("market_schedule")
+  // Entity Dimension Model v1 — four classification dimensions (ARCH-ENTITY-CLASSIFICATION-FRAMEWORK-V1)
+  // All nullable: null = unmigrated, not broken. Patterns are derived from dimension combinations.
+  locationType           LocationType?      @map("location_type")
+  scheduleType           ScheduleType?      @map("schedule_type")
+  identityAnchorType     IdentityAnchorType? @map("identity_anchor_type")
+  containmentType        ContainmentType?   @map("containment_type")
   prlOverride            Int?               @map("prl_override") // 1-4 manual override; display PRL = override ?? computed
   map_places             map_places[]
   person_places          person_places[]
@@ -269,30 +280,33 @@ model entities {
   place_coverage_status  place_coverage_status[]
   gpid_resolution_queue   gpid_resolution_queue[]
   place_actor_relationships PlaceActorRelationship[]
+  park_children  ParkFacilityRelationship[] @relation("park_parent")
+  park_parents   ParkFacilityRelationship[] @relation("park_child")
   operatorPlaceCandidates OperatorPlaceCandidate[]
   place_appearances_as_subject place_appearances[] @relation("AppearanceSubject")
   place_appearances_as_host    place_appearances[] @relation("AppearanceHost")
 
   // Confidence System v1: field-level JSONB, computed at sync (not at query time)
   confidence           Json?    // { field: { value, score, sources, winner, conflicts } }
-  overall_confidence   Float?   @default(0.5) @map("overall_confidence")
-  confidence_updated_at DateTime? @map("confidence_updated_at")
+  overallConfidence   Float?   @default(0.5) @map("overall_confidence")
+  confidenceUpdatedAt DateTime? @map("confidence_updated_at")
 
   // Description enrichment metadata
-  description_source     String?  @map("description_source")     // editorial | website | google_editorial | synthesis
-  description_confidence Float?   @map("description_confidence") // 0.0–1.0
-  description_reviewed   Boolean  @default(false) @map("description_reviewed")
+  descriptionSource     String?  @map("description_source")     // editorial | website | google_editorial | synthesis
+  descriptionConfidence Float?   @map("description_confidence") // 0.0–1.0
+  descriptionReviewed   Boolean  @default(false) @map("description_reviewed")
 
   // Website enrichment (SAIKO spec v1.1)
-  last_enriched_at   DateTime? @map("last_enriched_at")
-  enrichment_stage  String?   @map("enrichment_stage") // e.g. ENRICHED_WEBSITE
-  needs_human_review Boolean  @default(false) @map("needs_human_review")
-  category_enrich_attempted_at DateTime? @map("category_enrich_attempted_at") // throttle category-only re-enrich
+  lastEnrichedAt   DateTime? @map("last_enriched_at")
+  enrichmentStage  String?   @map("enrichment_stage") // e.g. ENRICHED_WEBSITE
+  needsHumanReview Boolean  @default(false) @map("needs_human_review")
+  categoryEnrichAttemptedAt DateTime? @map("category_enrich_attempted_at") // throttle category-only re-enrich
 
   merchant_enrichment_runs merchant_enrichment_runs[]
   merchant_signals         merchant_signals?
-  coverage_sources         coverage_sources[]
-  surface_scans            merchant_surface_scans[]
+  coverage_sources              coverage_sources[]
+  coverage_source_extractions   coverage_source_extractions[]
+  surface_scans                 merchant_surface_scans[]
   merchant_surfaces        merchant_surfaces[]
   menu_fetches             menu_fetches[]
 
@@ -318,61 +332,61 @@ model entities {
   @@index([categoryId])
   @@index([googlePlaceId])
   @@index([neighborhood])
-  @@index([primary_vertical])
+  @@index([primaryVertical])
   @@index([parentId])
   @@index([restaurantGroupId])
   @@index([status])
   @@index([businessStatus])
-  @@index([last_enriched_at])
-  @@index([needs_human_review])
+  @@index([lastEnrichedAt])
+  @@index([needsHumanReview])
 }
 
 /// Website enrichment runs — append-only audit (SAIKO spec v1.1)
 model merchant_enrichment_runs {
-  id             String    @id @default(uuid())
-  entityId       String    @map("entity_id")
-  source_url     String    @map("source_url")
-  final_url      String?   @map("final_url")
-  fetched_at     DateTime  @default(now()) @map("fetched_at")
-  http_status    Int?      @map("http_status")
-  extraction_json Json     @default("{}") @map("extraction_json")
-  confidence     Decimal?  @db.Decimal(4, 2)
-  cost_usd       Decimal   @default(0) @map("cost_usd") @db.Decimal(10, 6)
-  created_at     DateTime  @default(now()) @map("created_at")
+  id              String    @id @default(uuid())
+  entityId        String    @map("entity_id")
+  sourceUrl       String    @map("source_url")
+  finalUrl        String?   @map("final_url")
+  fetchedAt       DateTime  @default(now()) @map("fetched_at")
+  httpStatus      Int?      @map("http_status")
+  extractionJson  Json      @default("{}") @map("extraction_json")
+  confidence      Decimal?  @db.Decimal(4, 2)
+  costUsd         Decimal   @default(0) @map("cost_usd") @db.Decimal(10, 6)
+  createdAt       DateTime  @default(now()) @map("created_at")
 
   entities entities @relation(fields: [entityId], references: [id], onDelete: Cascade)
 
   @@index([entityId])
-  @@index([fetched_at])
+  @@index([fetchedAt])
 }
 
 /// Menu fetch records — append-only, one row per fetch attempt per entity.
 /// raw_text is stored directly. Full HTML is stored in R2 and referenced via raw_html_pointer.
 /// Current-state is derived as the latest successful fetch (http_status < 400) per entity.
 model menu_fetches {
-  id                     String   @id @default(uuid())
-  entity_id              String   @map("entity_id")
-  source_url             String   @map("source_url")
-  final_url              String?  @map("final_url")
-  menu_format            String   @default("html") @map("menu_format")       // html | pdf | external
-  http_status            Int?     @map("http_status")
-  content_type           String?  @map("content_type")                       // actual HTTP content-type of fetched response
-  fetch_duration_ms      Int?     @map("fetch_duration_ms")
-  fetched_at             DateTime @default(now()) @map("fetched_at")
-  raw_text               String?  @map("raw_text")
-  content_hash           String?  @map("content_hash")                       // sha256(raw_text)
-  raw_html_pointer       String?  @map("raw_html_pointer")                   // r2://bucket/...  (HTML or PDF receipt)
-  text_extraction_method String?  @map("text_extraction_method")             // node-html-parser-v1 | pdftotext
-  pdf_type               String?  @map("pdf_type")                           // text_based | image_based | unknown
-  extraction_quality     String?  @map("extraction_quality")                 // good | sparse | empty
-  created_at             DateTime @default(now()) @map("created_at")
+  id                    String   @id @default(uuid())
+  entityId              String   @map("entity_id")
+  sourceUrl             String   @map("source_url")
+  finalUrl              String?  @map("final_url")
+  menuFormat            String   @default("html") @map("menu_format")       // html | pdf | external
+  httpStatus            Int?     @map("http_status")
+  contentType           String?  @map("content_type")                       // actual HTTP content-type of fetched response
+  fetchDurationMs       Int?     @map("fetch_duration_ms")
+  fetchedAt             DateTime @default(now()) @map("fetched_at")
+  rawText               String?  @map("raw_text")
+  contentHash           String?  @map("content_hash")                       // sha256(raw_text)
+  rawHtmlPointer        String?  @map("raw_html_pointer")                   // r2://bucket/...  (HTML or PDF receipt)
+  textExtractionMethod  String?  @map("text_extraction_method")             // node-html-parser-v1 | pdftotext
+  pdfType               String?  @map("pdf_type")                           // text_based | image_based | unknown
+  extractionQuality     String?  @map("extraction_quality")                 // good | sparse | empty
+  createdAt             DateTime @default(now()) @map("created_at")
 
-  entity entities @relation(fields: [entity_id], references: [id], onDelete: Cascade)
+  entity entities @relation(fields: [entityId], references: [id], onDelete: Cascade)
 
-  @@index([entity_id])
-  @@index([fetched_at])
-  @@index([content_hash])
-  @@index([extraction_quality])
+  @@index([entityId])
+  @@index([fetchedAt])
+  @@index([contentHash])
+  @@index([extractionQuality])
   @@map("menu_fetches")
 }
 
@@ -390,36 +404,36 @@ model menu_fetches {
 /// Never call prisma.merchant_surfaces.update() — create new rows instead.
 model merchant_surfaces {
   id                String    @id @default(uuid())
-  entity_id         String    @map("entity_id")
+  entityId          String    @map("entity_id")
 
-  surface_type      String    @map("surface_type")
-  source_url        String    @map("source_url")
+  surfaceType       String    @map("surface_type")
+  sourceUrl         String    @map("source_url")
 
-  content_type      String?   @map("content_type")    // html | pdf | json | unknown
+  contentType       String?   @map("content_type")    // html | pdf | json | unknown
 
-  fetch_status      String    @map("fetch_status")     // discovered | fetch_success | fetch_failed
-  parse_status      String?   @map("parse_status")     // parse_pending | parse_success | parse_failed
-  extraction_status String    @default("not_attempted") @map("extraction_status") // not_attempted | extracted | no_signals
+  fetchStatus       String    @map("fetch_status")     // discovered | fetch_success | fetch_failed
+  parseStatus       String?   @map("parse_status")     // parse_pending | parse_success | parse_failed
+  extractionStatus  String    @default("not_attempted") @map("extraction_status") // not_attempted | extracted | no_signals
 
-  content_hash      String?   @map("content_hash")     // sha256(raw_text)
-  raw_text          String?   @map("raw_text")          // stripped text content
-  raw_html          String?   @map("raw_html")          // full HTML (large; future: R2 pointer)
+  contentHash       String?   @map("content_hash")     // sha256(raw_text)
+  rawText           String?   @map("raw_text")          // stripped text content
+  rawHtml           String?   @map("raw_html")          // full HTML (large; future: R2 pointer)
 
-  fetched_at        DateTime? @map("fetched_at")        // null for fetch_status='discovered'
-  discovered_at     DateTime  @default(now()) @map("discovered_at")
+  fetchedAt         DateTime? @map("fetched_at")        // null for fetch_status='discovered'
+  discoveredAt      DateTime  @default(now()) @map("discovered_at")
 
-  metadata_json     Json?     @map("metadata_json")     // http_status, final_url, fetch_duration_ms, discovered_from_id, link_text
+  metadataJson      Json?     @map("metadata_json")     // http_status, final_url, fetch_duration_ms, discovered_from_id, link_text
 
-  entity    entities                     @relation(fields: [entity_id], references: [id], onDelete: Cascade)
+  entity    entities                     @relation(fields: [entityId], references: [id], onDelete: Cascade)
   artifacts merchant_surface_artifacts[]
 
-  @@index([entity_id])
-  @@index([entity_id, surface_type])
-  @@index([surface_type, fetch_status])
-  @@index([fetch_status, parse_status])        // replay queries
-  @@index([surface_type, extraction_status])   // extraction targeting
-  @@index([content_hash])
-  @@index([discovered_at])
+  @@index([entityId])
+  @@index([entityId, surfaceType])
+  @@index([surfaceType, fetchStatus])
+  @@index([fetchStatus, parseStatus])        // replay queries
+  @@index([surfaceType, extractionStatus])   // extraction targeting
+  @@index([contentHash])
+  @@index([discoveredAt])
   @@map("merchant_surfaces")
 }
 
@@ -432,18 +446,18 @@ model merchant_surfaces {
 /// artifact_version: '1'
 model merchant_surface_artifacts {
   id                  String   @id @default(uuid())
-  merchant_surface_id String   @map("merchant_surface_id")
-  artifact_type       String   @map("artifact_type")
-  artifact_version    String   @map("artifact_version")
-  artifact_json       Json     @map("artifact_json")
-  created_at          DateTime @default(now()) @map("created_at")
+  merchantSurfaceId   String   @map("merchant_surface_id")
+  artifactType        String   @map("artifact_type")
+  artifactVersion     String   @map("artifact_version")
+  artifactJson        Json     @map("artifact_json")
+  createdAt           DateTime @default(now()) @map("created_at")
 
-  merchant_surface merchant_surfaces @relation(fields: [merchant_surface_id], references: [id], onDelete: Cascade)
+  merchant_surface merchant_surfaces @relation(fields: [merchantSurfaceId], references: [id], onDelete: Cascade)
 
-  @@unique([merchant_surface_id, artifact_type, artifact_version])
-  @@index([merchant_surface_id])
-  @@index([artifact_type, artifact_version])
-  @@index([created_at])
+  @@unique([merchantSurfaceId, artifactType, artifactVersion])
+  @@index([merchantSurfaceId])
+  @@index([artifactType, artifactVersion])
+  @@index([createdAt])
   @@map("merchant_surface_artifacts")
 }
 
@@ -451,80 +465,192 @@ model merchant_surface_artifacts {
 /// Current state is derived from the latest successful scan (http_status < 400).
 /// Do not update rows in place; always insert new scan snapshots.
 model merchant_surface_scans {
-  id         String   @id @default(cuid())
-  entity_id  String   @map("entity_id")
-  fetched_at DateTime @default(now()) @map("fetched_at")
-  source_url String   @map("source_url")
-  final_url  String?  @map("final_url")
-  http_status Int?    @map("http_status")
+  id                     String   @id @default(cuid())
+  entityId               String   @map("entity_id")
+  fetchedAt              DateTime @default(now()) @map("fetched_at")
+  sourceUrl              String   @map("source_url")
+  finalUrl               String?  @map("final_url")
+  httpStatus             Int?     @map("http_status")
 
-  website_platform         String?  @map("website_platform")
+  websitePlatform        String?  @map("website_platform")
 
-  menu_present             Boolean  @default(false) @map("menu_present")
-  menu_format              String?  @map("menu_format")   // html | pdf | external | none
-  menu_url                 String?  @map("menu_url")
-  menu_read_state          String?  @map("menu_read_state") // readable | unreadable_pdf | inaccessible | none
+  menuPresent            Boolean  @default(false) @map("menu_present")
+  menuFormat             String?  @map("menu_format")   // html | pdf | external | none
+  menuUrl                String?  @map("menu_url")
+  menuReadState          String?  @map("menu_read_state") // readable | unreadable_pdf | inaccessible | none
 
-  reservation_platform     String?  @map("reservation_platform") // resy | opentable | tock | sevenrooms | none
-  reservation_url          String?  @map("reservation_url")
+  reservationPlatform    String?  @map("reservation_platform") // resy | opentable | tock | sevenrooms | none
+  reservationUrl         String?  @map("reservation_url")
 
-  ordering_platform        String?  @map("ordering_platform") // toast | chownow | square | doordash | none
-  ordering_url             String?  @map("ordering_url")
+  orderingPlatform       String?  @map("ordering_platform") // toast | chownow | square | doordash | none
+  orderingUrl            String?  @map("ordering_url")
 
-  instagram_present        Boolean  @default(false) @map("instagram_present")
-  instagram_url            String?  @map("instagram_url")
+  instagramPresent       Boolean  @default(false) @map("instagram_present")
+  instagramUrl           String?  @map("instagram_url")
 
-  newsletter_present       Boolean  @default(false) @map("newsletter_present")
-  newsletter_platform      String?  @map("newsletter_platform") // mailchimp | klaviyo | substack | convertkit | unknown
+  newsletterPresent      Boolean  @default(false) @map("newsletter_present")
+  newsletterPlatform     String?  @map("newsletter_platform") // mailchimp | klaviyo | substack | convertkit | unknown
 
-  gift_cards_present       Boolean  @default(false) @map("gift_cards_present")
-  careers_present          Boolean  @default(false) @map("careers_present")
-  private_dining_present   Boolean  @default(false) @map("private_dining_present")
+  giftCardsPresent       Boolean  @default(false) @map("gift_cards_present")
+  careersPresent         Boolean  @default(false) @map("careers_present")
+  privateDiningPresent   Boolean  @default(false) @map("private_dining_present")
 
-  sibling_entities_present Boolean  @default(false) @map("sibling_entities_present")
-  sibling_entity_urls      Json?    @map("sibling_entity_urls")   // String[]
-  sibling_entity_labels    Json?    @map("sibling_entity_labels") // String[]
+  siblingEntitiesPresent Boolean  @default(false) @map("sibling_entities_present")
+  siblingEntityUrls      Json?    @map("sibling_entity_urls")   // String[]
+  siblingEntityLabels    Json?    @map("sibling_entity_labels") // String[]
 
-  entity entities @relation(fields: [entity_id], references: [id], onDelete: Cascade)
+  entity entities @relation(fields: [entityId], references: [id], onDelete: Cascade)
 
-  @@index([entity_id])
-  @@index([fetched_at])
+  @@index([entityId])
+  @@index([fetchedAt])
   @@map("merchant_surface_scans")
 }
 
 /// Merchant signals — current best per entity (upsert)
 model merchant_signals {
   entityId               String   @id @map("entity_id")
-  inferred_category      String?  @map("inferred_category")
-  inferred_cuisine       Json?    @map("inferred_cuisine")
-  reservation_provider   String?  @map("reservation_provider")
-  reservation_url        String?  @map("reservation_url")
-  ordering_provider      String?  @map("ordering_provider")
-  ordering_url           String?  @map("ordering_url")
-  menu_url               String?  @map("menu_url")
-  winelist_url           String?  @map("winelist_url")
-  social_links           Json?    @map("social_links")
-  extraction_confidence  Decimal?  @map("extraction_confidence") @db.Decimal(4, 2)
-  last_updated_at        DateTime @default(now()) @updatedAt @map("last_updated_at")
+  inferredCategory      String?  @map("inferred_category")
+  inferredCuisine       Json?    @map("inferred_cuisine")
+  reservationProvider   String?  @map("reservation_provider")
+  reservationUrl        String?  @map("reservation_url")
+  orderingProvider      String?  @map("ordering_provider")
+  orderingUrl           String?  @map("ordering_url")
+  menuUrl               String?  @map("menu_url")
+  winelistUrl           String?  @map("winelist_url")
+  socialLinks           Json?    @map("social_links")
+  extractionConfidence  Decimal?  @map("extraction_confidence") @db.Decimal(4, 2)
+  lastUpdatedAt         DateTime @default(now()) @updatedAt @map("last_updated_at")
 
   entities entities @relation(fields: [entityId], references: [id], onDelete: Cascade)
 }
 
-/// Coverage sources — editorial links per entity (v1: store + render, no crawl)
+/// Coverage sources — editorial references per entity (v2: full enrichment lifecycle)
+/// Each row is a durable citation: fetched, archived, extracted, and made available
+/// to every downstream interpretation tool. See coverage-source-enrichment-v1.md.
 model coverage_sources {
-  id           String    @id @default(uuid())
-  entityId     String    @map("entity_id")
-  source_name  String
-  url          String
-  excerpt      String?
-  published_at DateTime? @map("published_at")
-  created_at   DateTime  @default(now()) @map("created_at")
+  id                String                    @id @default(uuid())
+  entityId          String                    @map("entity_id")
+  url               String
 
-  entities entities @relation(fields: [entityId], references: [id], onDelete: Cascade)
+  // ── Citation metadata ──────────────────────────────────────────────────
+  sourceType        CoverageSourceType        @default(ARTICLE) @map("source_type")
+  publicationName   String                    @map("publication_name")
+  articleTitle      String?                   @map("article_title")
+  author            String?
+  publishedAt       DateTime?                 @map("published_at")
+
+  // ── Archived content ───────────────────────────────────────────────────
+  fetchedContent    String?                   @map("fetched_content")
+  contentHash       String?                   @map("content_hash")
+  wordCount         Int?                      @map("word_count")
+  fetchedAt         DateTime?                 @map("fetched_at")
+
+  // ── Link health ────────────────────────────────────────────────────────
+  httpStatus        Int?                      @map("http_status")
+  lastCheckedAt     DateTime?                 @map("last_checked_at")
+  isAlive           Boolean                   @default(true) @map("is_alive")
+
+  // ── Enrichment state ───────────────────────────────────────────────────
+  enrichmentStage   CoverageEnrichmentStage   @default(INGESTED) @map("enrichment_stage")
+  extractionVersion String?                   @map("extraction_version")
+  extractedAt       DateTime?                 @map("extracted_at")
+
+  // ── Timestamps ─────────────────────────────────────────────────────────
+  createdAt         DateTime                  @default(now()) @map("created_at")
+
+  // ── Relations ──────────────────────────────────────────────────────────
+  entity       entities                       @relation(fields: [entityId], references: [id], onDelete: Cascade)
+  extractions  coverage_source_extractions[]
 
   @@unique([entityId, url])
   @@index([entityId])
+  @@index([enrichmentStage])
+  @@index([isAlive])
+  @@index([entityId, sourceType])
   @@map("coverage_sources")
+}
+
+enum CoverageSourceType {
+  ARTICLE
+  REVIEW
+  LIST
+  VIDEO
+  SOCIAL_POST
+  GUIDE
+}
+
+enum CoverageEnrichmentStage {
+  INGESTED
+  FETCHED
+  EXTRACTED
+  FAILED
+}
+
+/// Coverage source extractions — structured data extracted from a coverage source by AI.
+/// Bridge between fetched article content and the interpretation layer.
+/// Versioned and re-runnable: when extraction prompts improve, re-run without touching
+/// the source record. See coverage-source-enrichment-v1.md §2.
+model coverage_source_extractions {
+  id                  String    @id @default(uuid())
+  coverageSourceId    String    @map("coverage_source_id")
+  entityId            String    @map("entity_id")
+
+  // ── Extraction metadata ────────────────────────────────────────────────
+  extractionVersion   String    @map("extraction_version")
+  extractedAt         DateTime  @default(now()) @map("extracted_at")
+  isCurrent           Boolean   @default(true) @map("is_current")
+
+  // ── Extracted signals (structured JSON) ────────────────────────────────
+  // People: [{name, role, context, isPrimary?}]
+  // Roles: chef, executive_chef, sous_chef, pastry_chef, sommelier,
+  //        beverage_director, wine_director, bartender, general_manager,
+  //        foh_director, foh_manager, owner, founder, partner, operator
+  people              Json?
+
+  // Food evidence: {cuisinePosture, cookingApproach[], dishes[], menuFormat[],
+  //   specialtySignals: {sushi?, ramen?, taco?, pizza?, dumpling?}, rawMentions[]}
+  // Feeds: food_program + specialty program assemblers, menu_identity, description gen
+  foodEvidence        Json?     @map("food_evidence")
+
+  // Beverage evidence: {wine: {listDepth?, naturalFocus?, byTheGlass?, sommelierMentioned?},
+  //   cocktail: {programExists?, seasonal?, spiritFocus?},
+  //   beer: {craftSelection?, tapList?}, nonAlcoholic: {zeroproof?, houseSodas?},
+  //   coffeeTea: {specialtyProgram?, sourcing?}, rawMentions[]}
+  // Feeds: wine_program, beer_program, cocktail_program, non_alcoholic_program, coffee_tea_program
+  beverageEvidence    Json?     @map("beverage_evidence")
+
+  // Service evidence: {serviceModel, reservationPosture, diningFormats[],
+  //   privateDining: {mentioned?, roomDescribed?}, groupDining: {mentioned?, minHeadcount?},
+  //   catering: {mentioned?, offSite?}, hospitalityNotes[], rawMentions[]}
+  // Feeds: service_program, private_dining_program, group_dining_program, catering_program
+  serviceEvidence     Json?     @map("service_evidence")
+
+  // Atmosphere: {descriptors[], energyLevel, formality}
+  // Feeds: derived signals (scene_energy, date_night_probability)
+  atmosphereSignals   Json?     @map("atmosphere_signals")
+
+  // Origin story: {type, narrative, foundingDate, backstory}
+  // Feeds: description generation, identity enrichment
+  originStory         Json?     @map("origin_story")
+
+  // Accolades: [{name, source, year, type}] — awards, list inclusions, recognition
+  accolades           Json?
+
+  // Pull quotes: [{text, context}] — quotable sentences from the article
+  pullQuotes          Json?     @map("pull_quotes")
+
+  sentiment           String?   // POSITIVE, NEGATIVE, NEUTRAL, MIXED
+  articleType         String?   @map("article_type")       // review, opening_coverage, list_inclusion, profile, news, closure_news
+  relevanceScore      Float?    @map("relevance_score")    // 0.0–1.0
+
+  // ── Relations ──────────────────────────────────────────────────────────
+  coverageSource coverage_sources @relation(fields: [coverageSourceId], references: [id], onDelete: Cascade)
+  entity         entities         @relation(fields: [entityId], references: [id], onDelete: Cascade)
+
+  @@index([entityId])
+  @@index([entityId, isCurrent])
+  @@index([coverageSourceId])
+  @@map("coverage_source_extractions")
 }
 
 /// Place appearances — subject (pop-up/mobile) appears at host place OR raw location (sidewalk)
@@ -563,12 +689,12 @@ model restaurant_groups {
   slug                    String     @unique
   visibility              Visibility
   description             String?
-  anchor_city             String?
+  anchorCity              String?    @map("anchor_city")
   website                 String?
-  location_count_estimate Int?
+  locationCountEstimate   Int?       @map("location_count_estimate")
   sources                 Json
-  created_at              DateTime   @default(now())
-  updated_at              DateTime
+  createdAt               DateTime   @default(now()) @map("created_at")
+  updatedAt               DateTime   @map("updated_at")
   people                  people[]
   entities                entities[]
 
@@ -643,18 +769,18 @@ model viewer_bookmarks {
 model place_photo_eval {
   id                    String             @id @default(cuid())
   entityId              String             @map("entity_id")
-  google_place_id       String             @map("google_place_id")
-  photo_ref             String             @map("photo_ref")
-  width_px              Int                @map("width_px")
-  height_px             Int                @map("height_px")
-  requested_max_width_px Int               @default(1600) @map("requested_max_width_px")
+  googlePlaceId         String             @map("google_place_id")
+  photoRef              String             @map("photo_ref")
+  widthPx               Int                @map("width_px")
+  heightPx              Int                @map("height_px")
+  requestedMaxWidthPx   Int                @default(1600) @map("requested_max_width_px")
   tier                  PlacePhotoEvalTier
   type                  PlacePhotoEvalType? @map("type")
-  created_at            DateTime           @default(now()) @map("created_at")
-  updated_at            DateTime           @updatedAt @map("updated_at")
+  createdAt             DateTime           @default(now()) @map("created_at")
+  updatedAt             DateTime           @updatedAt @map("updated_at")
   entities              entities           @relation(fields: [entityId], references: [id], onDelete: Cascade)
 
-  @@unique([entityId, photo_ref])
+  @@unique([entityId, photoRef])
   @@index([entityId])
 }
 
@@ -715,6 +841,25 @@ enum PlaceStatus {
   CANDIDATE  // intake entity, not yet enriched or published
 }
 
+// Entity State Model v1 — three independent axes (see entity-state-model-v1.md)
+enum OperatingStatus {
+  SOFT_OPEN
+  OPERATING
+  TEMPORARILY_CLOSED
+  PERMANENTLY_CLOSED
+}
+
+enum EnrichmentStatus {
+  INGESTED
+  ENRICHING
+  ENRICHED
+}
+
+enum PublicationStatus {
+  PUBLISHED
+  UNPUBLISHED
+}
+
 enum SpotSource {
   OSM
   CITY_DATA
@@ -746,6 +891,46 @@ enum PrimaryVertical {
   BAKERY
   PURVEYORS
   ACTIVITY
+  PARKS
+}
+
+// ============================================================================
+// ENTITY DIMENSION MODEL
+// Four-dimension classification system. See: ARCH-ENTITY-CLASSIFICATION-FRAMEWORK-V1
+// Dimensions are stored as discrete fields; entity patterns are derived, not hardcoded.
+// ============================================================================
+
+/// Where the entity actually operates (not where it is registered or warehoused).
+enum LocationType {
+  fixed
+  mobile
+  contained
+  civic
+}
+
+/// How the entity's availability works. Determines which scheduling data model applies.
+enum ScheduleType {
+  regular
+  market
+  route
+  open_access
+  date_bounded
+}
+
+/// The authoritative source that establishes this entity's identity with high confidence.
+enum IdentityAnchorType {
+  gpid
+  social
+  operator
+  parent
+  coordinates
+}
+
+/// Whether this entity exists inside or as part of another entity.
+enum ContainmentType {
+  independent
+  contained
+  host
 }
 
 // ============================================================================
@@ -755,35 +940,35 @@ enum PrimaryVertical {
 
 /// Raw records from all sources - never overwrite, always append
 model raw_records {
-  raw_id String @id @default(uuid())
+  rawId           String @id @default(uuid()) @map("raw_id")
 
   // Source identification
-  source_name String // 'google_places', 'editorial_eater', 'editorial_infatuation', 'foursquare', 'saiko_ai', 'saiko_seed'
-  external_id String? // ID from the source (e.g., Google Place ID)
-  source_url  String? // Original article/page URL for editorial
+  sourceName      String @map("source_name") // 'google_places', 'editorial_eater', 'editorial_infatuation', 'foursquare', 'saiko_ai', 'saiko_seed'
+  externalId      String? @map("external_id") // ID from the source (e.g., Google Place ID)
+  sourceUrl       String? @map("source_url") // Original article/page URL for editorial
 
   // Golden-first intake (Ken spec)
-  intake_batch_id String?   @map("intake_batch_id")
-  source_type     String?   @map("source_type") // e.g. 'editorial', 'csv', 'seed'
-  imported_at     DateTime? @map("imported_at")
+  intakeBatchId   String?   @map("intake_batch_id")
+  sourceType      String?   @map("source_type") // e.g. 'editorial', 'csv', 'seed'
+  importedAt      DateTime? @map("imported_at")
 
   // Standardized identifiers for blocking/matching
   placekey        String? // Placekey if available
-  h3_index_r9     BigInt? // H3 hexagon at resolution 9 (~0.1 km²)
-  h3_neighbors_r9 BigInt[] // K-ring neighbors for edge cases
+  h3IndexR9       BigInt? @map("h3_index_r9") // H3 hexagon at resolution 9 (~0.1 km²)
+  h3NeighborsR9   BigInt[] @map("h3_neighbors_r9") // K-ring neighbors for edge cases
 
   // The raw data
-  raw_json Json // Full blob exactly as received
+  rawJson         Json @map("raw_json") // Full blob exactly as received
 
   // Extracted fields for indexing (denormalized for query performance)
-  name_normalized String?
+  nameNormalized  String? @map("name_normalized")
   lat             Decimal? @db.Decimal(10, 7)
   lng             Decimal? @db.Decimal(11, 7)
 
   // Metadata
-  observed_at  DateTime?
-  ingested_at  DateTime  @default(now())
-  is_processed Boolean   @default(false)
+  observedAt      DateTime? @map("observed_at")
+  ingestedAt      DateTime  @default(now()) @map("ingested_at")
+  isProcessed     Boolean   @default(false) @map("is_processed")
 
   // Relations
   resolution_links         resolution_links[]
@@ -791,12 +976,12 @@ model raw_records {
   review_queue_b           review_queue[] @relation("ReviewQueueRecordB")
   identity_enrichment_runs identity_enrichment_runs[]
 
-  @@unique([source_name, external_id])
-  @@index([h3_index_r9])
+  @@unique([sourceName, externalId])
+  @@index([h3IndexR9])
   @@index([placekey])
-  @@index([is_processed])
-  @@index([name_normalized])
-  @@index([intake_batch_id])
+  @@index([isProcessed])
+  @@index([nameNormalized])
+  @@index([intakeBatchId])
 }
 
 /// Entity links - maps raw records to canonical entities
@@ -807,112 +992,112 @@ model raw_records {
 /// Resolution links - audit trail for raw → golden resolution (Ken spec)
 model resolution_links {
   id               String          @id @default(uuid())
-  raw_record_id    String          @map("raw_record_id")
-  golden_record_id String?         @map("golden_record_id") // null when resolution_type = ambiguous
-  resolution_type  ResolutionType  @map("resolution_type")
+  rawRecordId      String          @map("raw_record_id")
+  goldenRecordId   String?         @map("golden_record_id") // null when resolution_type = ambiguous
+  resolutionType   ResolutionType  @map("resolution_type")
   confidence       Float?
-  match_method     MatchMethod     @map("match_method")
-  resolver_version String?         @map("resolver_version")
-  created_at       DateTime        @default(now()) @map("created_at")
+  matchMethod      MatchMethod     @map("match_method")
+  resolverVersion  String?         @map("resolver_version")
+  createdAt        DateTime        @default(now()) @map("created_at")
 
-  raw_record    raw_records     @relation(fields: [raw_record_id], references: [raw_id])
+  raw_record    raw_records     @relation(fields: [rawRecordId], references: [rawId])
 
-  @@index([raw_record_id])
-  @@index([golden_record_id])
-  @@index([resolution_type])
+  @@index([rawRecordId])
+  @@index([goldenRecordId])
+  @@index([resolutionType])
 }
 
 /// Review queue - human-in-the-loop for ambiguous matches
 model review_queue {
-  queue_id String @id @default(uuid())
+  queueId          String @id @default(uuid()) @map("queue_id")
 
   // What's being reviewed
-  canonical_id String?
-  raw_id_a     String
-  raw_id_b     String?
+  canonicalId      String?
+  rawIdA           String @map("raw_id_a")
+  rawIdB           String? @map("raw_id_b")
 
   // Conflict details
-  conflict_type      String // 'low_confidence_match', 'attribute_mismatch', 'potential_duplicate', 'new_entity', 'new_entity_review'
-  match_confidence   Decimal? @db.Decimal(4, 3)
-  conflicting_fields Json?
+  conflictType     String @default("new_entity_review") @map("conflict_type") // 'low_confidence_match', 'attribute_mismatch', 'potential_duplicate', 'new_entity', 'new_entity_review'
+  matchConfidence  Decimal? @db.Decimal(4, 3) @map("match_confidence")
+  conflictingFields Json? @map("conflicting_fields")
 
   // Review workflow
   priority         Int     @default(5) // 1 (urgent) to 10 (low)
   status           String  @default("pending") // 'pending', 'in_progress', 'resolved', 'deferred', 'flagged'
   resolution       String? // 'merged', 'kept_separate', 'new_canonical', 'dismissed'
-  resolution_notes String?
+  resolutionNotes  String? @map("resolution_notes")
 
   // Pre-review machine enrichment state (new_entity_review only)
   // null on all low_confidence_match rows — gate only engages for new_entity_review
-  identity_enrichment_status  String?  @map("identity_enrichment_status") // 'pending_enrichment' | 'enriching' | 'sufficient' | 'needs_review' | 'unresolved'
-  identity_anchor_count       Int?     @map("identity_anchor_count")
-  latest_identity_confidence  Decimal? @map("latest_identity_confidence") @db.Decimal(4, 3)
-  latest_identity_run_id      String?  @map("latest_identity_run_id") // soft ref → identity_enrichment_runs.id
+  identityEnrichmentStatus  String?  @map("identity_enrichment_status") // 'pending_enrichment' | 'enriching' | 'sufficient' | 'needs_review' | 'unresolved'
+  identityAnchorCount       Int?     @map("identity_anchor_count")
+  latestIdentityConfidence  Decimal? @map("latest_identity_confidence") @db.Decimal(4, 3)
+  latestIdentityRunId       String?  @map("latest_identity_run_id") // soft ref → identity_enrichment_runs.id
 
   // Audit
-  created_at  DateTime  @default(now())
-  assigned_to String?
-  resolved_by String?
-  resolved_at DateTime?
+  createdAt        DateTime  @default(now()) @map("created_at")
+  assignedTo       String?   @map("assigned_to")
+  resolvedBy       String?   @map("resolved_by")
+  resolvedAt       DateTime? @map("resolved_at")
 
   // Relations
-  raw_record_a       raw_records              @relation("ReviewQueueRecordA", fields: [raw_id_a], references: [raw_id])
-  raw_record_b       raw_records?             @relation("ReviewQueueRecordB", fields: [raw_id_b], references: [raw_id])
+  raw_record_a       raw_records              @relation("ReviewQueueRecordA", fields: [rawIdA], references: [rawId])
+  raw_record_b       raw_records?             @relation("ReviewQueueRecordB", fields: [rawIdB], references: [rawId])
   audit_logs         review_audit_log[]
   enrichment_runs    identity_enrichment_runs[]
 
   @@index([status])
   @@index([priority, status])
-  @@index([canonical_id])
-  @@index([identity_enrichment_status])
+  @@index([canonicalId])
+  @@index([identityEnrichmentStatus])
 }
 
 /// Identity enrichment runs — append-only lookup attempt history for new_entity_review cases.
 /// One row per source per run. Never updated in place.
 model identity_enrichment_runs {
   id                  String   @id @default(uuid())
-  raw_id              String   @map("raw_id")
-  review_queue_id     String?  @map("review_queue_id")
+  rawId               String   @map("raw_id")
+  reviewQueueId       String?  @map("review_queue_id")
 
   // What was searched
-  source_name         String   @map("source_name")   // 'google_candidate_search' | 'gpid_detection' | 'website_discovery' | 'instagram_discovery' | 'corroboration'
-  searched_name       String?  @map("searched_name")
-  searched_city       String?  @map("searched_city")
+  sourceName          String   @map("source_name")   // 'google_candidate_search' | 'gpid_detection' | 'website_discovery' | 'instagram_discovery' | 'corroboration'
+  searchedName        String?  @map("searched_name")
+  searchedCity        String?  @map("searched_city")
 
   // What was found
-  result_json         Json     @map("result_json")    // raw candidates / signals from this step
+  resultJson          Json     @map("result_json")    // raw candidates / signals from this step
 
   // Computed outcome of this step
-  identity_confidence Decimal? @map("identity_confidence") @db.Decimal(4, 3)
-  anchor_count        Int      @default(0) @map("anchor_count")
-  decision_status     String   @map("decision_status") // 'sufficient' | 'needs_review' | 'unresolved'
+  identityConfidence  Decimal? @map("identity_confidence") @db.Decimal(4, 3)
+  anchorCount         Int      @default(0) @map("anchor_count")
+  decisionStatus      String   @map("decision_status") // 'sufficient' | 'needs_review' | 'unresolved'
 
-  created_at          DateTime @default(now()) @map("created_at")
+  createdAt           DateTime @default(now()) @map("created_at")
 
-  review_queue        review_queue? @relation(fields: [review_queue_id], references: [queue_id])
-  raw_record          raw_records   @relation(fields: [raw_id], references: [raw_id])
+  review_queue        review_queue? @relation(fields: [reviewQueueId], references: [queueId])
+  raw_record          raw_records   @relation(fields: [rawId], references: [rawId])
 
-  @@index([raw_id])
-  @@index([review_queue_id])
-  @@index([decision_status])
-  @@index([created_at])
+  @@index([rawId])
+  @@index([reviewQueueId])
+  @@index([decisionStatus])
+  @@index([createdAt])
   @@map("identity_enrichment_runs")
 }
 
 /// Audit trail for review decisions
 model review_audit_log {
-  log_id           String   @id @default(uuid())
-  queue_id         String
-  resolved_by      String
+  logId            String   @id @default(uuid()) @map("log_id")
+  queueId          String   @map("queue_id")
+  resolvedBy       String   @map("resolved_by")
   resolution       String
-  decision_time_ms Int?
-  resolved_at      DateTime @default(now())
+  decisionTimeMs   Int?     @map("decision_time_ms")
+  resolvedAt       DateTime @default(now()) @map("resolved_at")
 
   // Relations
-  review_queue review_queue @relation(fields: [queue_id], references: [queue_id])
+  review_queue review_queue @relation(fields: [queueId], references: [queueId])
 
-  @@index([queue_id])
-  @@index([resolved_at])
+  @@index([queueId])
+  @@index([resolvedAt])
 }
 
 // ============================================================================
@@ -923,11 +1108,11 @@ model review_audit_log {
 model sources {
   id         String   @id // e.g. 'google_places', 'michelin' — editable trust tiers
   name       String
-  trust_tier Float    @map("trust_tier") // 0–1, CHECK in DB
+  trustTier  Float    @map("trust_tier") // 0–1, CHECK in DB
   domain     String[] @default([]) // optional domains for validation
-  created_at DateTime @default(now()) @map("created_at")
+  createdAt  DateTime @default(now()) @map("created_at")
 
-  @@index([trust_tier])
+  @@index([trustTier])
 }
 
 // provenance model removed — was FK to golden_records (dropped)
@@ -1043,8 +1228,8 @@ model operational_overlays {
 model energy_versions {
   version      String          @id
   weights      Json?
-  lexicon_hash String?         @map("lexicon_hash")
-  created_at   DateTime        @default(now()) @map("created_at")
+  lexiconHash  String?         @map("lexicon_hash")
+  createdAt    DateTime        @default(now()) @map("created_at")
 
   energy_scores energy_scores[]
   tag_versions  tag_versions[]
@@ -1053,11 +1238,11 @@ model energy_versions {
 /// tag_versions — version metadata for tag scoring engine
 model tag_versions {
   version                  String @id
-  tag_weight_config        Json?  @map("tag_weight_config")
-  depends_on_energy_version String @map("depends_on_energy_version")
-  created_at               DateTime @default(now()) @map("created_at")
+  tagWeightConfig          Json?  @map("tag_weight_config")
+  dependsOnEnergyVersion   String @map("depends_on_energy_version")
+  createdAt                DateTime @default(now()) @map("created_at")
 
-  energy_version   energy_versions @relation(fields: [depends_on_energy_version], references: [version])
+  energy_version   energy_versions @relation(fields: [dependsOnEnergyVersion], references: [version])
   place_tag_scores place_tag_scores[]
 }
 
@@ -1065,18 +1250,18 @@ model tag_versions {
 model energy_scores {
   id                    String   @id @default(uuid())
   entityId              String   @map("entity_id")
-  energy_score          Int
-  energy_confidence     Float
-  popularity_component  Int?     @map("popularity_component")
-  language_component    Int?     @map("language_component")
-  flags_component       Int?     @map("flags_component")
-  sensory_component     Int?     @map("sensory_component")
-  has_popularity        Boolean  @default(false) @map("has_popularity")
-  has_language          Boolean  @default(false) @map("has_language")
-  has_flags             Boolean  @default(false) @map("has_flags")
-  has_sensory           Boolean  @default(false) @map("has_sensory")
+  energyScore           Int      @map("energy_score")
+  energyConfidence      Float    @map("energy_confidence")
+  popularityComponent   Int?     @map("popularity_component")
+  languageComponent     Int?     @map("language_component")
+  flagsComponent        Int?     @map("flags_component")
+  sensoryComponent      Int?     @map("sensory_component")
+  hasPopularity         Boolean  @default(false) @map("has_popularity")
+  hasLanguage           Boolean  @default(false) @map("has_language")
+  hasFlags              Boolean  @default(false) @map("has_flags")
+  hasSensory            Boolean  @default(false) @map("has_sensory")
   version               String
-  computed_at           DateTime @default(now()) @map("computed_at")
+  computedAt            DateTime @default(now()) @map("computed_at")
 
   entity  entities      @relation(fields: [entityId], references: [id], onDelete: Cascade)
   energy_version energy_versions @relation(fields: [version], references: [version])
@@ -1090,15 +1275,15 @@ model energy_scores {
 model place_tag_scores {
   id                       String   @id @default(uuid())
   entityId                 String   @map("entity_id")
-  cozy_score               Float
-  date_night_score         Float    @map("date_night_score")
-  late_night_score         Float    @map("late_night_score")
-  after_work_score         Float    @map("after_work_score")
-  scene_score              Float    @map("scene_score")
+  cozyScore                Float    @map("cozy_score")
+  dateNightScore           Float    @map("date_night_score")
+  lateNightScore           Float    @map("late_night_score")
+  afterWorkScore           Float    @map("after_work_score")
+  sceneScore               Float    @map("scene_score")
   confidence               Float?
   version                  String
-  depends_on_energy_version String   @map("depends_on_energy_version")
-  computed_at              DateTime @default(now()) @map("computed_at")
+  dependsOnEnergyVersion   String   @map("depends_on_energy_version")
+  computedAt               DateTime @default(now()) @map("computed_at")
 
   entity  entities     @relation(fields: [entityId], references: [id], onDelete: Cascade)
   tag_version tag_versions @relation(fields: [version], references: [version])
@@ -1248,6 +1433,34 @@ model PlaceActorRelationship {
   @@map("place_actor_relationships")
 }
 
+/// Spatial containment relationships (park → facility, zone → place, etc.)
+/// Deliberately separate from EntityActorRelationship (different domain).
+model ParkFacilityRelationship {
+  id                String                  @id @default(uuid())
+  parentEntityId    String                  @map("parent_entity_id")
+  childEntityId     String                  @map("child_entity_id")
+  relationshipType  SpatialRelationshipType @default(CONTAINS) @map("relationship_type")
+  confidence        Float?
+  source            String                  @default("auto_match")
+  createdAt         DateTime                @default(now()) @map("created_at")
+  updatedAt         DateTime                @updatedAt @map("updated_at")
+
+  parentEntity entities @relation("park_parent", fields: [parentEntityId], references: [id], onDelete: Cascade)
+  childEntity  entities @relation("park_child", fields: [childEntityId], references: [id], onDelete: Cascade)
+
+  @@unique([parentEntityId, childEntityId, relationshipType])
+  @@index([parentEntityId])
+  @@index([childEntityId])
+  @@map("park_facility_relationships")
+}
+
+enum SpatialRelationshipType {
+  CONTAINS
+  ZONE_OF
+  PART_OF
+  ADJACENT_TO
+}
+
 /// Fields membership - entities in the curated index (Saiko Fields)
 model FieldsMembership {
   id         String    @id @default(uuid())
@@ -1286,13 +1499,13 @@ model TraceSignalsCache {
 /// coverage_runs — metadata for each coverage audit/run
 model coverage_runs {
   id        String   @id @default(uuid())
-  created_at DateTime @default(now()) @map("created_at")
-  db_host   String   @map("db_host")
-  db_name   String   @map("db_name")
-  git_sha   String?  @map("git_sha")
-  limit_val Int?     @map("limit_val")
-  la_only   Boolean  @default(true) @map("la_only")
-  ttl_days  Int?     @map("ttl_days")
+  createdAt DateTime @default(now()) @map("created_at")
+  dbHost    String   @map("db_host")
+  dbName    String   @map("db_name")
+  gitSha    String?  @map("git_sha")
+  limitVal  Int?     @map("limit_val")
+  laOnly    Boolean  @default(true) @map("la_only")
+  ttlDays   Int?     @map("ttl_days")
 
   @@map("coverage_runs")
 }
@@ -1326,28 +1539,28 @@ enum GpidHumanDecision {
 model gpid_resolution_queue {
   id                 String            @id @default(uuid())
   entityId           String            @map("entity_id")
-  candidate_gpid     String?           @map("candidate_gpid") // best single candidate (for MATCH)
-  resolver_status    GpidResolverStatus @map("resolver_status")
-  reason_code        String?           @map("reason_code") // TEXT_LOW_SIM, TEXT_MULTI_RESULTS, etc.
-  similarity_score   Float?            @map("similarity_score") // 0-100
-  candidates_json    Json?             @map("candidates_json") // all candidates + meta
-  source_run_id      String?           @map("source_run_id")
-  created_at         DateTime          @default(now()) @map("created_at")
-  updated_at         DateTime          @updatedAt @map("updated_at")
+  candidateGpid      String?           @map("candidate_gpid") // best single candidate (for MATCH)
+  resolverStatus     GpidResolverStatus @map("resolver_status")
+  reasonCode         String?           @map("reason_code") // TEXT_LOW_SIM, TEXT_MULTI_RESULTS, etc.
+  similarityScore    Float?            @map("similarity_score") // 0-100
+  candidatesJson     Json?             @map("candidates_json") // all candidates + meta
+  sourceRunId        String?           @map("source_run_id")
+  createdAt          DateTime          @default(now()) @map("created_at")
+  updatedAt          DateTime          @updatedAt @map("updated_at")
 
   // Human review
-  human_status       GpidHumanStatus    @default(PENDING) @map("human_status")
-  human_decision     GpidHumanDecision? @map("human_decision")
-  human_note         String?            @map("human_note")
-  reviewed_by        String?            @map("reviewed_by")
-  reviewed_at        DateTime?          @map("reviewed_at")
+  humanStatus        GpidHumanStatus    @default(PENDING) @map("human_status")
+  humanDecision      GpidHumanDecision? @map("human_decision")
+  humanNote          String?            @map("human_note")
+  reviewedBy         String?            @map("reviewed_by")
+  reviewedAt         DateTime?          @map("reviewed_at")
 
   entities           entities          @relation(fields: [entityId], references: [id], onDelete: Cascade)
 
-  @@index([human_status])
-  @@index([resolver_status])
+  @@index([humanStatus])
+  @@index([resolverStatus])
   @@index([entityId])
-  @@index([reason_code])
+  @@index([reasonCode])
   @@map("gpid_resolution_queue")
 }
 
@@ -1355,20 +1568,20 @@ model gpid_resolution_queue {
 model place_coverage_status {
   id                  String   @id @default(cuid())
   entityId            String   @map("entity_id")
-  dedupe_key          String   @unique @map("dedupe_key") // google_place_id or entity_id
-  last_success_at     DateTime? @map("last_success_at")
-  last_attempt_at     DateTime? @map("last_attempt_at")
-  last_attempt_status String?  @map("last_attempt_status") // SUCCESS | FAIL | RUNNING
-  last_error_code     String?  @map("last_error_code")
-  last_error_message  String?  @map("last_error_message")
-  last_missing_groups Json?    @map("last_missing_groups") // string[]
+  dedupeKey           String   @unique @map("dedupe_key") // google_place_id or entity_id
+  lastSuccessAt       DateTime? @map("last_success_at")
+  lastAttemptAt       DateTime? @map("last_attempt_at")
+  lastAttemptStatus   String?  @map("last_attempt_status") // SUCCESS | FAIL | RUNNING
+  lastErrorCode       String?  @map("last_error_code")
+  lastErrorMessage    String?  @map("last_error_message")
+  lastMissingGroups   Json?    @map("last_missing_groups") // string[]
   source              String?  // GOOGLE_PLACES | SCRAPE | MANUAL
-  updated_at          DateTime @updatedAt @map("updated_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
 
   entities entities @relation(fields: [entityId], references: [id], onDelete: Cascade)
 
   @@index([entityId])
-  @@index([last_attempt_status])
+  @@index([lastAttemptStatus])
   @@map("place_coverage_status")
 }
 
@@ -1379,18 +1592,18 @@ model place_coverage_status {
 
 model place_job_log {
   id              String   @id @default(uuid())
-  entity_id       String   @map("entity_id")
-  entity_type     String   @map("entity_type") // 'place' | 'actor' | 'golden_record' | 'batch'
-  job_type        String   @map("job_type")    // 'IDENTITY' | 'OPERATOR_LINK' | 'SCAN'
-  pages_fetched   Int      @default(0) @map("pages_fetched")
-  ai_calls        Int      @default(0) @map("ai_calls")
-  duration_ms     Int?     @map("duration_ms")
-  estimated_cost  Decimal? @map("estimated_cost") @db.Decimal(10, 6)
-  created_at      DateTime @default(now()) @map("created_at")
+  entityId        String   @map("entity_id")
+  entityType      String   @map("entity_type") // 'place' | 'actor' | 'golden_record' | 'batch'
+  jobType         String   @map("job_type")    // 'IDENTITY' | 'OPERATOR_LINK' | 'SCAN'
+  pagesFetched    Int      @default(0) @map("pages_fetched")
+  aiCalls         Int      @default(0) @map("ai_calls")
+  durationMs      Int?     @map("duration_ms")
+  estimatedCost   Decimal? @map("estimated_cost") @db.Decimal(10, 6)
+  createdAt       DateTime @default(now()) @map("created_at")
 
-  @@index([entity_id])
-  @@index([job_type])
-  @@index([created_at])
+  @@index([entityId])
+  @@index([jobType])
+  @@index([createdAt])
   @@map("place_job_log")
 }
 
@@ -1461,6 +1674,7 @@ enum InterpretationType {
   PULL_QUOTE
   SCENESENSE_PRL
   VOICE_DESCRIPTOR
+  TIMEFOLD
 }
 
 // ---------------------------------------------------------------------------
@@ -1471,19 +1685,19 @@ enum InterpretationType {
 
 model source_registry {
   id                      String     @id // machine key: "google_places", "eater_la"
-  display_name            String
-  source_type             SourceType
-  trust_tier              Int        // 1 = highest, 5 = lowest
-  requires_human_approval Boolean    @default(false)
-  base_domain             String?
-  is_active               Boolean    @default(true)
-  created_at              DateTime   @default(now()) @map("created_at")
+  displayName             String     @map("display_name")
+  sourceType              SourceType @map("source_type")
+  trustTier               Int        @map("trust_tier") // 1 = highest, 5 = lowest
+  requiresHumanApproval   Boolean    @default(false) @map("requires_human_approval")
+  baseDomain              String?    @map("base_domain")
+  isActive                Boolean    @default(true) @map("is_active")
+  createdAt               DateTime   @default(now()) @map("created_at")
 
   claims observed_claims[]
 
   @@map("source_registry")
-  @@index([trust_tier])
-  @@index([is_active])
+  @@index([trustTier])
+  @@index([isActive])
 }
 
 // ---------------------------------------------------------------------------
@@ -1493,12 +1707,12 @@ model source_registry {
 // ---------------------------------------------------------------------------
 
 model attribute_registry {
-  attribute_key      String         @id
-  display_name       String
-  attribute_class    AttributeClass
-  identity_critical  Boolean        @default(false)
-  sanction_threshold Decimal        @default(0.70) @db.Decimal(3, 2)
-  decay_policy       DecayPolicy    @default(NONE)
+  attributeKey        String         @id @map("attribute_key")
+  displayName         String         @map("display_name")
+  attributeClass      AttributeClass @map("attribute_class")
+  identityCritical    Boolean        @default(false) @map("identity_critical")
+  sanctionThreshold   Decimal        @default(0.70) @db.Decimal(3, 2) @map("sanction_threshold")
+  decayPolicy         DecayPolicy    @default(NONE) @map("decay_policy")
 
   claims observed_claims[]
 
@@ -1512,34 +1726,34 @@ model attribute_registry {
 // ---------------------------------------------------------------------------
 
 model observed_claims {
-  claim_id              String               @id @default(uuid())
-  entity_id             String               @map("entity_id")
-  attribute_key         String               @map("attribute_key")
-  raw_value             Json                 @map("raw_value")
-  normalized_value      String?              @map("normalized_value")
-  source_id             String               @map("source_id")
-  source_url            String?              @map("source_url")
-  observed_at           DateTime             @map("observed_at")
-  extracted_at          DateTime             @default(now()) @map("extracted_at")
-  extraction_method     ExtractionMethod     @map("extraction_method")
-  confidence            Decimal?             @db.Decimal(4, 3) @map("confidence")
-  resolution_method     ClaimResolutionMethod @map("resolution_method")
-  resolution_confidence Decimal?             @db.Decimal(4, 3) @map("resolution_confidence")
-  supersedes_claim_id   String?              @map("supersedes_claim_id")
-  is_active             Boolean              @default(true) @map("is_active")
+  claimId             String               @id @default(uuid()) @map("claim_id")
+  entityId            String               @map("entity_id")
+  attributeKey        String               @map("attribute_key")
+  rawValue            Json                 @map("raw_value")
+  normalizedValue     String?              @map("normalized_value")
+  sourceId            String               @map("source_id")
+  sourceUrl           String?              @map("source_url")
+  observedAt          DateTime             @map("observed_at")
+  extractedAt         DateTime             @default(now()) @map("extracted_at")
+  extractionMethod    ExtractionMethod     @map("extraction_method")
+  confidence          Decimal?             @db.Decimal(4, 3) @map("confidence")
+  resolutionMethod    ClaimResolutionMethod @map("resolution_method")
+  resolutionConfidence Decimal?             @db.Decimal(4, 3) @map("resolution_confidence")
+  supersedesClaimId   String?              @map("supersedes_claim_id")
+  isActive            Boolean              @default(true) @map("is_active")
 
-  entity          entities          @relation(fields: [entity_id], references: [id], onDelete: Cascade)
-  source          source_registry   @relation(fields: [source_id], references: [id])
-  attribute       attribute_registry @relation(fields: [attribute_key], references: [attribute_key])
-  supersedes      observed_claims?  @relation("Supersession", fields: [supersedes_claim_id], references: [claim_id])
+  entity          entities          @relation(fields: [entityId], references: [id], onDelete: Cascade)
+  source          source_registry   @relation(fields: [sourceId], references: [id])
+  attribute       attribute_registry @relation(fields: [attributeKey], references: [attributeKey])
+  supersedes      observed_claims?  @relation("Supersession", fields: [supersedesClaimId], references: [claimId])
   superseded_by   observed_claims[] @relation("Supersession")
   sanctions       canonical_sanctions[]
 
   @@map("observed_claims")
-  @@index([entity_id, attribute_key])
-  @@index([entity_id, is_active])
-  @@index([source_id])
-  @@index([extracted_at])
+  @@index([entityId, attributeKey])
+  @@index([entityId, isActive])
+  @@index([sourceId])
+  @@index([extractedAt])
 }
 
 // ---------------------------------------------------------------------------
@@ -1550,52 +1764,52 @@ model observed_claims {
 // ---------------------------------------------------------------------------
 
 model canonical_entity_state {
-  entity_id String @id @map("entity_id")
+  entityId          String @id @map("entity_id")
 
   // Identity-critical (sanction_threshold 0.95)
-  name            String
-  google_place_id String? @unique @map("google_place_id")
-  latitude        Decimal? @db.Decimal(10, 7)
-  longitude       Decimal? @db.Decimal(11, 7)
+  name              String
+  googlePlaceId     String? @unique @map("google_place_id")
+  latitude          Decimal? @db.Decimal(10, 7)
+  longitude         Decimal? @db.Decimal(11, 7)
 
   // Operational (sanction_threshold 0.80)
-  address         String?
-  neighborhood    String?
-  phone           String?
-  website         String?
-  instagram       String?
-  tiktok          String?
-  hours_json      Json?    @map("hours_json")
-  price_level     Int?     @map("price_level")
-  reservation_url String?  @map("reservation_url")
-  menu_url        String?  @map("menu_url")
-  winelist_url    String?  @map("winelist_url")
+  address           String?
+  neighborhood      String?
+  phone             String?
+  website           String?
+  instagram         String?
+  tiktok            String?
+  hoursJson         Json?    @map("hours_json")
+  priceLevel        Int?     @map("price_level")
+  reservationUrl    String?  @map("reservation_url")
+  menuUrl           String?  @map("menu_url")
+  winelistUrl       String?  @map("winelist_url")
 
   // Events / hospitality programs (sanction_threshold 0.70)
-  events_url              String? @map("events_url")
-  catering_url            String? @map("catering_url")
-  event_inquiry_email     String? @map("event_inquiry_email")
-  event_inquiry_form_url  String? @map("event_inquiry_form_url")
+  eventsUrl         String? @map("events_url")
+  cateringUrl       String? @map("catering_url")
+  eventInquiryEmail String? @map("event_inquiry_email")
+  eventInquiryFormUrl String? @map("event_inquiry_form_url")
 
   // Content (requires explicit sanction or human approval)
-  description  String?
-  cuisine_type String? @map("cuisine_type")
-  category     String?
-  tips         String[] @default([])
+  description       String?
+  cuisineType       String? @map("cuisine_type")
+  category          String?
+  tips              String[] @default([])
 
   // Google Photos blob (observed from Google API, surfaced here for convenience)
-  google_photos           Json? @map("google_photos")
-  google_places_attributes Json? @map("google_places_attributes")
+  googlePhotos      Json? @map("google_photos")
+  googlePlacesAttributes Json? @map("google_places_attributes")
 
   // Sanctioning metadata
-  last_sanctioned_at DateTime? @map("last_sanctioned_at")
-  sanctioned_by      String?   @map("sanctioned_by") // "SYSTEM" or user_id
+  lastSanctionedAt  DateTime? @map("last_sanctioned_at")
+  sanctionedBy      String?   @map("sanctioned_by") // "SYSTEM" or user_id
 
-  entity    entities              @relation(fields: [entity_id], references: [id], onDelete: Cascade)
+  entity    entities              @relation(fields: [entityId], references: [id], onDelete: Cascade)
   sanctions canonical_sanctions[]
 
   @@map("canonical_entity_state")
-  @@index([google_place_id])
+  @@index([googlePlaceId])
   @@index([neighborhood])
 }
 
@@ -1608,22 +1822,22 @@ model canonical_entity_state {
 // ---------------------------------------------------------------------------
 
 model canonical_sanctions {
-  sanction_id     String         @id @default(uuid()) @map("sanction_id")
-  entity_id       String         @map("entity_id")
-  attribute_key   String         @map("attribute_key")
-  claim_id        String         @map("claim_id")
-  sanctioned_at   DateTime       @default(now()) @map("sanctioned_at")
-  sanctioned_by   String         @map("sanctioned_by") // "SYSTEM" or user_id
-  sanction_method SanctionMethod @map("sanction_method")
-  is_current      Boolean        @default(true) @map("is_current")
+  sanctionId      String         @id @default(uuid()) @map("sanction_id")
+  entityId        String         @map("entity_id")
+  attributeKey    String         @map("attribute_key")
+  claimId         String         @map("claim_id")
+  sanctionedAt    DateTime       @default(now()) @map("sanctioned_at")
+  sanctionedBy    String         @map("sanctioned_by") // "SYSTEM" or user_id
+  sanctionMethod  SanctionMethod @map("sanction_method")
+  isCurrent       Boolean        @default(true) @map("is_current")
 
-  claim          observed_claims        @relation(fields: [claim_id], references: [claim_id])
-  entity_state   canonical_entity_state @relation(fields: [entity_id], references: [entity_id], onDelete: Cascade)
+  claim          observed_claims        @relation(fields: [claimId], references: [claimId])
+  entity_state   canonical_entity_state @relation(fields: [entityId], references: [entityId], onDelete: Cascade)
 
   @@map("canonical_sanctions")
-  @@index([entity_id, attribute_key])
-  @@index([claim_id])
-  @@index([entity_id, attribute_key, is_current])
+  @@index([entityId, attributeKey])
+  @@index([claimId])
+  @@index([entityId, attributeKey, isCurrent])
 }
 
 // ---------------------------------------------------------------------------
@@ -1633,20 +1847,20 @@ model canonical_sanctions {
 // ---------------------------------------------------------------------------
 
 model sanction_conflicts {
-  conflict_id       String                 @id @default(uuid()) @map("conflict_id")
-  entity_id         String                 @map("entity_id")
-  attribute_key     String                 @map("attribute_key")
-  claim_ids         String[]               @map("claim_ids")
-  conflict_reason   String                 @map("conflict_reason")
+  conflictId        String                 @id @default(uuid()) @map("conflict_id")
+  entityId          String                 @map("entity_id")
+  attributeKey      String                 @map("attribute_key")
+  claimIds          String[]               @map("claim_ids")
+  conflictReason    String                 @map("conflict_reason")
   status            SanctionConflictStatus @default(OPEN)
-  resolved_claim_id String?                @map("resolved_claim_id")
-  resolved_by       String?                @map("resolved_by")
-  resolved_at       DateTime?              @map("resolved_at")
-  created_at        DateTime               @default(now()) @map("created_at")
+  resolvedClaimId   String?                @map("resolved_claim_id")
+  resolvedBy        String?                @map("resolved_by")
+  resolvedAt        DateTime?              @map("resolved_at")
+  createdAt         DateTime               @default(now()) @map("created_at")
 
   @@map("sanction_conflicts")
-  @@index([entity_id, status])
-  @@index([attribute_key, status])
+  @@index([entityId, status])
+  @@index([attributeKey, status])
   @@index([status])
 }
 
@@ -1658,20 +1872,20 @@ model sanction_conflicts {
 // ---------------------------------------------------------------------------
 
 model derived_signals {
-  signal_id       String   @id @default(uuid()) @map("signal_id")
-  entity_id       String   @map("entity_id")
-  signal_key      String   @map("signal_key")
-  signal_value    Json     @map("signal_value")
-  signal_version  String   @map("signal_version")
-  input_claim_ids String[] @map("input_claim_ids")
-  computed_at     DateTime @default(now()) @map("computed_at")
+  signalId        String   @id @default(uuid()) @map("signal_id")
+  entityId        String   @map("entity_id")
+  signalKey       String   @map("signal_key")
+  signalValue     Json     @map("signal_value")
+  signalVersion   String   @map("signal_version")
+  inputClaimIds   String[] @map("input_claim_ids")
+  computedAt      DateTime @default(now()) @map("computed_at")
 
-  entity entities @relation(fields: [entity_id], references: [id], onDelete: Cascade)
+  entity entities @relation(fields: [entityId], references: [id], onDelete: Cascade)
 
   @@map("derived_signals")
-  @@unique([entity_id, signal_key, signal_version])
-  @@index([entity_id])
-  @@index([signal_key])
+  @@unique([entityId, signalKey, signalVersion])
+  @@index([entityId])
+  @@index([signalKey])
 }
 
 // ---------------------------------------------------------------------------
@@ -1682,26 +1896,27 @@ model derived_signals {
 //   PULL_QUOTE: { text: string, author: string|null, source_name: string|null, source_url: string|null }
 //   SCENESENSE_PRL: { prl: number, atmosphere: string[], ambiance: string[], scene: string[] }
 //   VOICE_DESCRIPTOR: { text: string }
+//   TIMEFOLD: { class: 'STABILITY' | 'NEWNESS', phrase: string, proposed_by: 'system', approved_by: string | null }
 // ---------------------------------------------------------------------------
 
 model interpretation_cache {
-  cache_id         String             @id @default(uuid()) @map("cache_id")
-  entity_id        String             @map("entity_id")
-  output_type      InterpretationType @map("output_type")
+  cacheId          String             @id @default(uuid()) @map("cache_id")
+  entityId         String             @map("entity_id")
+  outputType       InterpretationType @map("output_type")
   content          Json               @map("content")
-  prompt_version   String             @map("prompt_version")
-  model_version    String?            @map("model_version")
-  generated_at     DateTime           @default(now()) @map("generated_at")
-  expires_at       DateTime?          @map("expires_at")
-  input_signal_ids String[]           @map("input_signal_ids")
-  is_current       Boolean            @default(true) @map("is_current")
+  promptVersion    String             @map("prompt_version")
+  modelVersion     String?            @map("model_version")
+  generatedAt      DateTime           @default(now()) @map("generated_at")
+  expiresAt        DateTime?          @map("expires_at")
+  inputSignalIds   String[]           @map("input_signal_ids")
+  isCurrent        Boolean            @default(true) @map("is_current")
 
-  entity entities @relation(fields: [entity_id], references: [id], onDelete: Cascade)
+  entity entities @relation(fields: [entityId], references: [id], onDelete: Cascade)
 
   @@map("interpretation_cache")
-  @@unique([entity_id, output_type, prompt_version])
-  @@index([entity_id])
-  @@index([entity_id, output_type, is_current])
+  @@unique([entityId, outputType, promptVersion])
+  @@index([entityId])
+  @@index([entityId, outputType, isCurrent])
 }
 
 // =============================================================================
@@ -1712,23 +1927,23 @@ model interpretation_cache {
 /// Linked to entities via entity_id FK.
 model instagram_accounts {
   id                       String    @id @default(uuid())
-  entity_id                String    @map("entity_id")
-  instagram_user_id        String    @unique @map("instagram_user_id")
+  entityId                 String    @map("entity_id")
+  instagramUserId          String    @unique @map("instagram_user_id")
   username                 String
-  account_type             String?   @map("account_type")     // BUSINESS | CREATOR | PERSONAL
-  media_count              Int?      @map("media_count")
-  canonical_instagram_url  String?   @map("canonical_instagram_url")
-  last_fetched_at          DateTime? @map("last_fetched_at")
-  last_successful_fetch_at DateTime? @map("last_successful_fetch_at")
-  source_status            String    @default("active") @map("source_status") // active | revoked | error
-  raw_payload              Json?     @map("raw_payload")
-  created_at               DateTime  @default(now()) @map("created_at")
-  updated_at               DateTime  @default(now()) @updatedAt @map("updated_at")
+  accountType              String?   @map("account_type")     // BUSINESS | CREATOR | PERSONAL
+  mediaCount               Int?      @map("media_count")
+  canonicalInstagramUrl    String?   @map("canonical_instagram_url")
+  lastFetchedAt            DateTime? @map("last_fetched_at")
+  lastSuccessfulFetchAt    DateTime? @map("last_successful_fetch_at")
+  sourceStatus             String    @default("active") @map("source_status") // active | revoked | error
+  rawPayload               Json?     @map("raw_payload")
+  createdAt                DateTime  @default(now()) @map("created_at")
+  updatedAt                DateTime  @default(now()) @updatedAt @map("updated_at")
 
-  entity entities @relation(fields: [entity_id], references: [id], onDelete: Cascade)
+  entity entities @relation(fields: [entityId], references: [id], onDelete: Cascade)
   media  instagram_media[]
 
-  @@index([entity_id])
+  @@index([entityId])
   @@index([username])
   @@map("instagram_accounts")
 }
@@ -1737,22 +1952,22 @@ model instagram_accounts {
 /// timestamp (original post time) is immutable; mutable fields refreshed on re-fetch.
 model instagram_media {
   id                 String   @id @default(uuid())
-  instagram_media_id String   @unique @map("instagram_media_id")
-  instagram_user_id  String   @map("instagram_user_id")
-  media_type         String   @map("media_type")        // IMAGE | VIDEO | CAROUSEL_ALBUM
-  media_url          String?  @map("media_url")          // CDN URL (expires)
-  thumbnail_url      String?  @map("thumbnail_url")      // for VIDEO type
+  instagramMediaId   String   @unique @map("instagram_media_id")
+  instagramUserId    String   @map("instagram_user_id")
+  mediaType          String   @map("media_type")        // IMAGE | VIDEO | CAROUSEL_ALBUM
+  mediaUrl           String?  @map("media_url")          // CDN URL (expires)
+  thumbnailUrl       String?  @map("thumbnail_url")      // for VIDEO type
   permalink          String   @map("permalink")           // permanent IG URL
   caption            String?
   timestamp          DateTime                             // original post time (immutable)
-  fetched_at         DateTime @default(now()) @map("fetched_at")
-  raw_payload        Json?    @map("raw_payload")
+  fetchedAt          DateTime @default(now()) @map("fetched_at")
+  rawPayload         Json?    @map("raw_payload")
 
-  account instagram_accounts @relation(fields: [instagram_user_id], references: [instagram_user_id], onDelete: Cascade)
+  account instagram_accounts @relation(fields: [instagramUserId], references: [instagramUserId], onDelete: Cascade)
 
-  @@index([instagram_user_id])
+  @@index([instagramUserId])
   @@index([timestamp])
-  @@index([instagram_user_id, timestamp])
+  @@index([instagramUserId, timestamp])
   @@map("instagram_media")
 }
 
@@ -1760,17 +1975,17 @@ model instagram_media {
 /// Never update or overwrite existing rows.
 model instagram_insight_snapshots {
   id           String   @id @default(uuid())
-  subject_type String   @map("subject_type")   // 'account' | 'media'
-  subject_id   String   @map("subject_id")     // instagram_user_id or instagram_media_id
-  metric_name  String   @map("metric_name")    // impressions | reach | engagement
-  metric_value Decimal  @map("metric_value") @db.Decimal(12, 2)
-  observed_at  DateTime @default(now()) @map("observed_at")
-  window_label String?  @map("window_label")   // day | week | days_28 | lifetime
-  raw_payload  Json?    @map("raw_payload")
+  subjectType  String   @map("subject_type")   // 'account' | 'media'
+  subjectId    String   @map("subject_id")     // instagram_user_id or instagram_media_id
+  metricName   String   @map("metric_name")    // impressions | reach | engagement
+  metricValue  Decimal  @map("metric_value") @db.Decimal(12, 2)
+  observedAt   DateTime @default(now()) @map("observed_at")
+  windowLabel  String?  @map("window_label")   // day | week | days_28 | lifetime
+  rawPayload   Json?    @map("raw_payload")
 
-  @@index([subject_type, subject_id])
-  @@index([subject_id, metric_name, observed_at])
-  @@index([observed_at])
+  @@index([subjectType, subjectId])
+  @@index([subjectId, metricName, observedAt])
+  @@index([observedAt])
   @@map("instagram_insight_snapshots")
 }
 
@@ -1783,26 +1998,26 @@ model instagram_insight_snapshots {
 
 model entity_issues {
   id               String    @id @default(uuid())
-  entity_id        String    @map("entity_id")
-  problem_class    String    @map("problem_class")     // identity | location | contact | social | editorial
-  issue_type       String    @map("issue_type")        // unresolved_identity | missing_neighborhood | etc.
+  entityId         String    @map("entity_id")
+  problemClass     String    @map("problem_class")     // identity | location | contact | social | editorial
+  issueType        String    @map("issue_type")        // unresolved_identity | missing_neighborhood | etc.
   status           String    @default("open")           // open | needs_automation | processing | needs_human | resolved | suppressed
   severity         String    @default("medium")         // critical | high | medium | low
-  blocking_publish Boolean   @default(false) @map("blocking_publish")
-  recommended_tool String?   @map("recommended_tool")  // derive_neighborhood | enrich_stage | instagram_discover | gpid_resolution
+  blockingPublish  Boolean   @default(false) @map("blocking_publish")
+  recommendedTool  String?   @map("recommended_tool")  // derive_neighborhood | enrich_stage | instagram_discover | gpid_resolution
   detail           Json?                                // arbitrary context: { missing_fields, enrichment_stage, etc. }
-  resolved_at      DateTime? @map("resolved_at")
-  resolved_by      String?   @map("resolved_by")       // SYSTEM | SCANNER | user_id
-  suppressed_reason String?  @map("suppressed_reason")  // confirmed_none | not_applicable | wont_fix
-  created_at       DateTime  @default(now()) @map("created_at")
-  updated_at       DateTime  @default(now()) @updatedAt @map("updated_at")
+  resolvedAt       DateTime? @map("resolved_at")
+  resolvedBy       String?   @map("resolved_by")       // SYSTEM | SCANNER | user_id
+  suppressedReason String?  @map("suppressed_reason")  // confirmed_none | not_applicable | wont_fix
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @default(now()) @updatedAt @map("updated_at")
 
-  entity entities @relation(fields: [entity_id], references: [id], onDelete: Cascade)
+  entity entities @relation(fields: [entityId], references: [id], onDelete: Cascade)
 
-  @@unique([entity_id, issue_type])
+  @@unique([entityId, issueType])
   @@index([status])
-  @@index([problem_class, status])
-  @@index([issue_type, status])
+  @@index([problemClass, status])
+  @@index([issueType, status])
   @@index([severity, status])
   @@map("entity_issues")
 }
@@ -1817,32 +2032,32 @@ model entity_issues {
 
 model reservation_provider_matches {
   id                String    @id @default(uuid())
-  entity_id         String    @map("entity_id")
+  entityId          String    @map("entity_id")
   provider          String                          // opentable | resy | tock | sevenrooms | yelp
-  provider_venue_id String?   @map("provider_venue_id")
-  booking_url       String?   @map("booking_url")
+  providerVenueId   String?   @map("provider_venue_id")
+  bookingUrl        String?   @map("booking_url")
 
-  match_status      String    @default("unverified") // matched | probable | ambiguous | no_match | unverified
-  match_score       Float?    @map("match_score")     // 0.0–1.0 composite quality
-  match_signals     Json?     @map("match_signals")   // { name_similarity, address_match, phone_match, domain_match, geo_proximity }
+  matchStatus       String    @default("unverified") @map("match_status") // matched | probable | ambiguous | no_match | unverified
+  matchScore        Float?    @map("match_score")     // 0.0–1.0 composite quality
+  matchSignals      Json?     @map("match_signals")   // { name_similarity, address_match, phone_match, domain_match, geo_proximity }
 
-  validation_source String    @map("validation_source") // website_link | widget_metadata | manual | directory_api
-  confidence_level  String    @default("weak")          // weak | strong_merchant | provider_verified
+  validationSource  String    @map("validation_source") // website_link | widget_metadata | manual | directory_api
+  confidenceLevel   String    @default("weak") @map("confidence_level") // weak | strong_merchant | provider_verified
 
-  is_renderable     Boolean   @default(false) @map("is_renderable") // derived: match_status + confidence + booking_url
-  program_signals   Json?     @map("program_signals")   // provider-specific: { has_widget, has_notify, has_events, ... }
+  isRenderable      Boolean   @default(false) @map("is_renderable") // derived: match_status + confidence + booking_url
+  programSignals    Json?     @map("program_signals")   // provider-specific: { has_widget, has_notify, has_events, ... }
 
-  last_checked_at   DateTime  @default(now()) @map("last_checked_at")
-  last_verified_at  DateTime? @map("last_verified_at")
-  created_at        DateTime  @default(now()) @map("created_at")
-  updated_at        DateTime  @default(now()) @updatedAt @map("updated_at")
+  lastCheckedAt     DateTime  @default(now()) @map("last_checked_at")
+  lastVerifiedAt    DateTime? @map("last_verified_at")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @default(now()) @updatedAt @map("updated_at")
 
-  entity entities @relation(fields: [entity_id], references: [id], onDelete: Cascade)
+  entity entities @relation(fields: [entityId], references: [id], onDelete: Cascade)
 
-  @@unique([entity_id, provider])
-  @@index([entity_id])
-  @@index([provider, match_status])
-  @@index([provider, is_renderable])
-  @@index([match_status, last_checked_at])
+  @@unique([entityId, provider])
+  @@index([entityId])
+  @@index([provider, matchStatus])
+  @@index([provider, isRenderable])
+  @@index([matchStatus, lastCheckedAt])
   @@map("reservation_provider_matches")
 }
