@@ -29,8 +29,15 @@
  *   • --reprocess forces reassembly even if a signal already exists
  */
 
+import { config as loadEnv } from 'dotenv';
+loadEnv({ path: '.env' });
+if (!process.env.SAIKO_DB_FROM_WRAPPER) {
+  loadEnv({ path: '.env.local', override: true });
+}
+
 import { db }              from "../lib/db";
 import { writeDerivedSignal } from "../lib/fields-v2/write-claim";
+import { materializeCoverageEvidence, type CoverageEvidence } from "../lib/coverage/normalize-evidence";
 
 // ---------------------------------------------------------------------------
 // Config
@@ -136,6 +143,7 @@ interface SourceSignals {
   menuStructure:   { payload: MenuStructurePayload; computedAt: Date } | null;
   identitySignals: { payload: IdentitySignalsPayload; computedAt: Date } | null;
   surfaceScanHints: MerchantSurfaceScanHints | null;
+  coverageEvidence: CoverageEvidence | null;
 }
 
 interface AssembleTarget {
@@ -744,6 +752,121 @@ function assemblePrograms(src: SourceSignals): OfferingPrograms {
     evidence:   evidenceFor(PIZZA_SIGNALS),
   };
 
+  // ── Phase 5: Coverage evidence supplements ────────────────────────────────
+  // Coverage evidence can upgrade "unknown" programs to "incidental" or
+  // "considered" when menu/merchant data is absent. It supplements but
+  // does not override existing menu-derived signals.
+
+  const cov = src.coverageEvidence;
+  if (cov) {
+    const covConf = 0.5; // baseline confidence for coverage-derived programs
+
+    // Specialty food programs: coverage specialtySignals
+    if (dumplingMaturity === "unknown" && cov.interpretations.food.specialtySignals.dumpling) {
+      dumplingProgram.maturity = "incidental";
+      dumplingProgram.signals.push("coverage:dumpling_mentioned");
+      dumplingProgram.confidence = covConf;
+    }
+    if (sushiMaturity === "unknown" && cov.interpretations.food.specialtySignals.sushi) {
+      sushiRawFishProgram.maturity = "incidental";
+      sushiRawFishProgram.signals.push("coverage:sushi_mentioned");
+      sushiRawFishProgram.confidence = covConf;
+    }
+    if (ramenMaturity === "unknown" && cov.interpretations.food.specialtySignals.ramen) {
+      ramenNoodleProgram.maturity = "incidental";
+      ramenNoodleProgram.signals.push("coverage:ramen_mentioned");
+      ramenNoodleProgram.confidence = covConf;
+    }
+    if (tacoMaturity === "unknown" && cov.interpretations.food.specialtySignals.taco) {
+      tacoProgram.maturity = "incidental";
+      tacoProgram.signals.push("coverage:taco_mentioned");
+      tacoProgram.confidence = covConf;
+    }
+    if (pizzaMaturity === "unknown" && cov.interpretations.food.specialtySignals.pizza) {
+      pizzaProgram.maturity = "incidental";
+      pizzaProgram.signals.push("coverage:pizza_mentioned");
+      pizzaProgram.confidence = covConf;
+    }
+
+    // Beverage programs: coverage beverage signals
+    const covBev = cov.interpretations.beverage;
+
+    if (wineMaturity === "unknown" && covBev.wine.mentioned) {
+      wineMaturity = "incidental";
+      wineSignalNames.push("coverage:wine_mentioned");
+      if (covBev.wine.naturalFocus) wineSignalNames.push("coverage:natural_wine_focus");
+      if (covBev.wine.sommelierMentioned) wineSignalNames.push("coverage:sommelier_noted");
+      // Sommelier/beverage director presence is a confidence boost
+      const hasBevPerson = cov.facts.people.some(
+        (p) => ["sommelier", "beverage_director", "wine_director"].includes(p.role) && p.stalenessBand !== "stale",
+      );
+      if (hasBevPerson) {
+        wineMaturity = "considered";
+      }
+    }
+
+    if (beerProgram.maturity === "unknown" && covBev.beer.mentioned) {
+      beerProgram.maturity = "incidental";
+      beerProgram.signals.push("coverage:beer_mentioned");
+      beerProgram.confidence = covConf;
+      if (covBev.beer.craftSelection) {
+        beerProgram.maturity = "considered";
+        beerProgram.signals.push("coverage:craft_beer_selection");
+      }
+    }
+
+    if (cocktailProgram.maturity === "unknown" && covBev.cocktail.mentioned) {
+      cocktailProgram.maturity = covBev.cocktail.programExists ? "considered" : "incidental";
+      cocktailProgram.signals.push("coverage:cocktail_mentioned");
+      cocktailProgram.confidence = covConf;
+    }
+
+    if (nonAlcoholicProgram.maturity === "unknown" && covBev.nonAlcoholic.mentioned) {
+      nonAlcoholicProgram.maturity = covBev.nonAlcoholic.zeroproof ? "considered" : "incidental";
+      nonAlcoholicProgram.signals.push("coverage:non_alcoholic_mentioned");
+      nonAlcoholicProgram.confidence = covConf;
+    }
+
+    if (coffeeTeaProgram.maturity === "unknown" && covBev.coffeeTea.mentioned) {
+      coffeeTeaProgram.maturity = covBev.coffeeTea.specialtyProgram ? "considered" : "incidental";
+      coffeeTeaProgram.signals.push("coverage:coffee_tea_mentioned");
+      coffeeTeaProgram.confidence = covConf;
+    }
+
+    // Event capabilities: direct fact evidence
+    if (privateDiningMaturity === "unknown" && cov.facts.eventCapabilities.privateDining.mentioned) {
+      privateDiningProgram.maturity = "incidental";
+      privateDiningProgram.signals.push("coverage:private_dining_mentioned");
+      privateDiningProgram.confidence = covConf;
+      privateDiningProgram.evidence.push(...cov.facts.eventCapabilities.privateDining.evidence.slice(0, 3));
+    }
+
+    if (groupDiningMaturity === "unknown" && cov.facts.eventCapabilities.groupDining.mentioned) {
+      groupDiningProgram.maturity = "incidental";
+      groupDiningProgram.signals.push("coverage:group_dining_mentioned");
+      groupDiningProgram.confidence = covConf;
+      groupDiningProgram.evidence.push(...cov.facts.eventCapabilities.groupDining.evidence.slice(0, 3));
+    }
+
+    if (cateringMaturity === "unknown" && cov.facts.eventCapabilities.catering.mentioned) {
+      cateringProgram.maturity = "incidental";
+      cateringProgram.signals.push("coverage:catering_mentioned");
+      cateringProgram.confidence = covConf;
+      cateringProgram.evidence.push(...cov.facts.eventCapabilities.catering.evidence.slice(0, 3));
+    }
+
+    // Service model: fill unknown from coverage
+    if (serviceMaturity === "unknown" && cov.interpretations.service.serviceModel) {
+      serviceSignals.push(`coverage:${cov.interpretations.service.serviceModel}`);
+    }
+
+    // Food program: coverage can supplement when menu data absent
+    if (foodMaturity === "unknown" && cov.interpretations.food.cuisinePosture) {
+      foodMaturity = "incidental";
+      foodSignalNames.push(`coverage:cuisine_${cov.interpretations.food.cuisinePosture.replace(/\s+/g, "_")}`);
+    }
+  }
+
   // ── source coverage / timestamps ──────────────────────────────────────────
 
   return {
@@ -785,6 +908,8 @@ function assemblePrograms(src: SourceSignals): OfferingPrograms {
       menuStructurePresent:         src.menuStructure   !== null,
       identitySignalsPresent:       src.identitySignals !== null,
       merchantSurfaceScansPresent: src.surfaceScanHints !== null,
+      coverageEvidencePresent:     src.coverageEvidence !== null,
+      coverageSourceCount:         src.coverageEvidence?.sourceCount ?? 0,
     },
     sourceTimestamps: {
       menuIdentity:    src.menuIdentity?.computedAt.toISOString()    ?? null,
@@ -852,7 +977,7 @@ async function loadTargets(
 async function fetchSourceSignals(entityIds: string[]): Promise<Map<string, SourceSignals>> {
   const map = new Map<string, SourceSignals>();
   for (const id of entityIds) {
-    map.set(id, { menuIdentity: null, menuStructure: null, identitySignals: null, surfaceScanHints: null });
+    map.set(id, { menuIdentity: null, menuStructure: null, identitySignals: null, surfaceScanHints: null, coverageEvidence: null });
   }
 
   if (entityIds.length === 0) return map;
@@ -931,6 +1056,18 @@ async function fetchSourceSignals(entityIds: string[]): Promise<Map<string, Sour
     }
   }
 
+  // Phase 5: Materialize coverage evidence for each entity
+  for (const id of entityIds) {
+    const entry = map.get(id);
+    if (!entry) continue;
+    try {
+      entry.coverageEvidence = await materializeCoverageEvidence(id);
+    } catch {
+      // Coverage failure should not block assembly
+      entry.coverageEvidence = null;
+    }
+  }
+
   return map;
 }
 
@@ -971,7 +1108,7 @@ async function main() {
   let errored = 0;
 
   for (const target of targets) {
-    const src      = signalMap.get(target.entityId) ?? { menuIdentity: null, menuStructure: null, identitySignals: null, surfaceScanHints: null };
+    const src      = signalMap.get(target.entityId) ?? { menuIdentity: null, menuStructure: null, identitySignals: null, surfaceScanHints: null, coverageEvidence: null };
     const programs = assemblePrograms(src);
 
     const srcTag = [
@@ -979,6 +1116,7 @@ async function main() {
       src.menuStructure   ? "MS" : "  ",
       src.identitySignals ? "IS" : "  ",
       src.surfaceScanHints ? "SC" : "  ",
+      src.coverageEvidence ? `CE(${src.coverageEvidence.sourceCount})` : "  ",
     ].join(" ");
 
     console.log(
