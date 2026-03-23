@@ -164,33 +164,41 @@ async function classifyEntityPhotos(entityId: string, entitySlug: string): Promi
     return;
   }
 
-  // Get 12 most recent unclassified photos
+  // Get 12 most recent photos (regardless of prior classification)
   const media = await db.instagram_media.findMany({
     where: {
       instagramUserId: account.instagramUserId,
       mediaType: 'IMAGE', // Only classify actual images, not videos
       mediaUrl: { not: null },
-      photoType: null, // Only unclassified
     },
     select: {
       id: true,
       mediaUrl: true,
+      photoType: true,
     },
     orderBy: { timestamp: 'desc' },
     take: 12,
   });
 
   if (media.length === 0) {
-    console.log(`  ✓ All photos already classified`);
+    console.log(`  ⚠️  No photos found`);
     return;
   }
 
-  console.log(`  Found ${media.length} unclassified photos from @${account.username}`);
+  const unclassifiedCount = media.filter((m) => !m.photoType).length;
+  console.log(`  Found ${media.length} photos from @${account.username} (${unclassifiedCount} unclassified, ${media.length - unclassifiedCount} already classified)`);
 
-  // Classify each photo
+  // Classify each photo (skip already-classified ones)
   const results: ClassificationResult[] = [];
   for (let i = 0; i < media.length; i++) {
     const m = media[i];
+
+    if (m.photoType) {
+      process.stdout.write(`  [${i + 1}/${media.length}] Already classified... `);
+      console.log(`✓ ${m.photoType}`);
+      continue;
+    }
+
     process.stdout.write(`  [${i + 1}/${media.length}] Classifying... `);
 
     const photoType = await classifySingleImage(m.mediaUrl!);

@@ -218,9 +218,10 @@ export async function GET(
           }
         }
       } catch (err) {
-        // Silently fall through to Google Photos if Instagram query fails
+        // Log error and fall through to Google Photos if Instagram query fails
+        console.error(`[places API] Instagram media query failed for ${entity.slug}:`, err instanceof Error ? err.message : err);
         if (process.env.DEBUG_INSTAGRAM === '1') {
-          console.error(`[places API] Instagram media query failed for ${entity.slug}:`, err);
+          console.error(`[places API] Full error:`, err);
         }
       }
     }
