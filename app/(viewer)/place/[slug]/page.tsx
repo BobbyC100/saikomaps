@@ -533,18 +533,18 @@ function buildOfferingLines(location: LocationData): { label: string; sentence: 
 
   if (os?.cuisinePosture && CUISINE_POSTURE_LEADS[os.cuisinePosture]) {
     const lead = CUISINE_POSTURE_LEADS[os.cuisinePosture];
+    const specialtyClause = activeSpecialtyPhrases.length > 0
+      ? `specialties like ${toSentenceList(activeSpecialtyPhrases.slice(0, 3))}`
+      : '';
     if (foodFragments.length === 0 && location.cuisineType) {
-      const specialtyClause = activeSpecialtyPhrases.length > 0
-        ? `specialties like ${toSentenceList(activeSpecialtyPhrases.slice(0, 3))}`
-        : '';
       lines.push({
         label: 'Food',
         sentence: appendClause(`${lead} with ${location.cuisineType} influences`, specialtyClause),
       });
+    } else if (foodFragments.length === 0 && !location.cuisineType && !specialtyClause) {
+      // Avoid rendering posture-only stubs like "Broadly composed menu".
+      // If we have no concrete support signals, skip the line entirely.
     } else {
-      const specialtyClause = activeSpecialtyPhrases.length > 0
-        ? `specialties like ${toSentenceList(activeSpecialtyPhrases.slice(0, 3))}`
-        : '';
       lines.push({
         label: 'Food',
         sentence: appendClause(composeSentence(lead, foodFragments, 'built around'), specialtyClause),
@@ -605,7 +605,7 @@ function buildOfferingLines(location: LocationData): { label: string; sentence: 
       const producerList = toSentenceList((location.keyProducers ?? []).slice(0, 3));
       lines.push({
         label: 'Wine',
-        sentence: wineIntent === 'natural_leaning'
+        sentence: (wineIntent === 'natural_leaning' || wineIntent === 'natural')
           ? `Considered wine selection with a natural, small-producer focus including ${producerList}`
           : `Considered wine selection with producers like ${producerList}`,
       });
@@ -1082,7 +1082,7 @@ export default function PlacePage() {
                     )}
                     {location.keyProducers && location.keyProducers.length > 0 && (
                       <p id="key-producers" className="known-for-line">
-                        {location.offeringSignals?.wineProgramIntent === 'natural_leaning'
+                        {(location.offeringSignals?.wineProgramIntent === 'natural_leaning' || location.offeringSignals?.wineProgramIntent === 'natural')
                           ? `Natural wine focus includes producers like ${toSentenceList(location.keyProducers.slice(0, 4))}.`
                           : `Wine focus includes producers like ${toSentenceList(location.keyProducers.slice(0, 4))}.`}
                       </p>
