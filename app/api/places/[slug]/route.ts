@@ -201,11 +201,12 @@ export async function GET(
               .filter((m) => m.mediaUrl)
               .map((m) => m.mediaUrl as string);
           } else {
-            // Fallback: get 6 most recent media with mediaUrl if no classified photos exist
-            console.log(`[places API] ${entity.slug}: No classified photos, falling back to recent media`);
+            // Fallback: get 6 most recent IMAGE-only media if no classified photos exist
+            console.log(`[places API] ${entity.slug}: No classified photos, falling back to recent images`);
             const recentMedia = await db.instagram_media.findMany({
               where: {
                 instagramUserId: instagramAccount.instagramUserId,
+                mediaType: 'IMAGE',
               },
               select: {
                 mediaUrl: true,
