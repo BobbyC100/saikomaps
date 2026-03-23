@@ -180,52 +180,24 @@ export async function GET(
         if (instagramAccount) {
           console.log(`[places API] ${entity.slug}: Found Instagram account (userId: ${instagramAccount.instagramUserId})`);
 
-          // Try to get 6 classified photos first
-          const classifiedMedia = await db.instagram_media.findMany({
+          // Get 6 most recent media with mediaUrl, any type
+          const media = await db.instagram_media.findMany({
             where: {
               instagramUserId: instagramAccount.instagramUserId,
-              photoType: { isNot: null },
             },
             select: {
               mediaUrl: true,
             },
             take: 6,
             orderBy: {
-              classifiedAt: 'desc',
+              timestamp: 'desc',
             },
           });
 
-          if (classifiedMedia.length > 0) {
-            console.log(`[places API] ${entity.slug}: Found ${classifiedMedia.length} classified photos`);
-            photoUrls = classifiedMedia
+          if (media.length > 0) {
+            photoUrls = media
               .filter((m) => m.mediaUrl)
               .map((m) => m.mediaUrl as string);
-          } else {
-            // Fallback: get 6 most recent IMAGE-only media if no classified photos exist
-            console.log(`[places API] ${entity.slug}: No classified photos, falling back to recent images`);
-            const recentMedia = await db.instagram_media.findMany({
-              where: {
-                instagramUserId: instagramAccount.instagramUserId,
-                mediaType: 'IMAGE',
-              },
-              select: {
-                mediaUrl: true,
-              },
-              take: 6,
-              orderBy: {
-                timestamp: 'desc',
-              },
-            });
-
-            if (recentMedia.length > 0) {
-              console.log(`[places API] ${entity.slug}: Found ${recentMedia.length} recent media items`);
-              photoUrls = recentMedia
-                .filter((m) => m.mediaUrl)
-                .map((m) => m.mediaUrl as string);
-              console.log(`[places API] ${entity.slug}: ${photoUrls.length} have mediaUrl`);
-            } else {
-              console.log(`[places API] ${entity.slug}: No media found at all`);
-            }
           }
           console.log(`[places API] ${entity.slug}: Set ${photoUrls.length} photo URLs`);
         } else {
