@@ -13,6 +13,8 @@ related_docs:
   - docs/FIELDS_V2_TARGET_ARCHITECTURE.md
   - docs/architecture/fields-era-overview-v1.md
   - docs/ENTITIES_CONTRACT_RECONCILIATION.md
+  - docs/architecture/entity-type-problem-definition-v1.md
+  - docs/architecture/entity-classification-framework-v1.md
 summary: High-level model of the stages through which an entity moves inside Saiko — from first contact (Awareness) through Identification to Enrichment. Mental model only; does not prescribe UI, schema, or workflow.
 ---
 

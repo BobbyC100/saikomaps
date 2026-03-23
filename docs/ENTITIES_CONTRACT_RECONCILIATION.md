@@ -13,6 +13,9 @@ related_docs:
   - docs/FIELDS_V2_TARGET_ARCHITECTURE.md
   - docs/DEFERRED_MIGRATION_GATES.md
   - docs/PLATFORM_DATA_LAYER.md
+  - docs/architecture/entity-type-problem-definition-v1.md
+  - docs/architecture/entity-classification-framework-v1.md
+  - docs/architecture/entity-type-taxonomy-v1.md
 summary: Field-level audit and decision log for the entities table — what belongs, what migrates, and what is retired as part of the Fields v2 architecture.
 ---
 

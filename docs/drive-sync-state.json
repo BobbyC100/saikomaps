@@ -1,0 +1,789 @@
+{
+  "last_synced": "2026-03-22T17:41:16.845Z",
+  "docs": {
+    "ARCH-AI-OPERATING-LAYER": {
+      "drive_file_id": "1dX4Lo3r0WdbYI4YkwAmdgcXDAXILbf5kq88J1P-9sL4",
+      "drive_url": "https://docs.google.com/document/d/1dX4Lo3r0WdbYI4YkwAmdgcXDAXILbf5kq88J1P-9sL4/",
+      "content_hash": "f6404b55ea2487b3",
+      "last_synced": "2026-03-19T14:58:31.012Z",
+      "subfolder": "ARCHITECTURE"
+    },
+    "ARCH-COVERAGE-OPS-DASHBOARD-V1": {
+      "drive_file_id": "1ZArwTkYck3bqOL59eivo2UWBKemgRW5WEo6pPjoVSyU",
+      "drive_url": "https://docs.google.com/document/d/1ZArwTkYck3bqOL59eivo2UWBKemgRW5WEo6pPjoVSyU/",
+      "content_hash": "4d54819b8686d3aa",
+      "last_synced": "2026-03-22T17:40:28.815Z",
+      "subfolder": "OPS"
+    },
+    "ARCH-COVERAGE-TIERS-V1": {
+      "drive_file_id": "1RcvtEzY5_M9r82o6zR4KIr1RGxOqJSZpKe5V4-FDJWU",
+      "drive_url": "https://docs.google.com/document/d/1RcvtEzY5_M9r82o6zR4KIr1RGxOqJSZpKe5V4-FDJWU/",
+      "content_hash": "1d8d0b13a33d2f89",
+      "last_synced": "2026-03-22T17:40:30.190Z",
+      "subfolder": "FIELDS"
+    },
+    "ARCH-DATA-COMPLETENESS-PHILOSOPHY-V1": {
+      "drive_file_id": "1Mm3sjZ2Kp7zDlXvYabYpBNUSNcnrY2C_67sKuXJHG8Y",
+      "drive_url": "https://docs.google.com/document/d/1Mm3sjZ2Kp7zDlXvYabYpBNUSNcnrY2C_67sKuXJHG8Y/",
+      "content_hash": "b25f0046547d6551",
+      "last_synced": "2026-03-19T14:58:38.653Z",
+      "subfolder": "FIELDS"
+    },
+    "ARCH-ENTITY-CLASSIFICATION-LAYERS-V1": {
+      "drive_file_id": "1iQBu5Xi6pNb95O0TyI0PmFvJKQS_HZowHxatlmKkQBA",
+      "drive_url": "https://docs.google.com/document/d/1iQBu5Xi6pNb95O0TyI0PmFvJKQS_HZowHxatlmKkQBA/",
+      "content_hash": "7815ca6a54a4b2ee",
+      "last_synced": "2026-03-22T17:40:35.062Z",
+      "subfolder": "PLACE-PAGE"
+    },
+    "ARCH-ENTITY-LIFECYCLE-CLOSURE-V1": {
+      "drive_file_id": "1xVjPbgGAkGTSF6wcZo-lqZR6ZNzv-S4CGdgu3QUih4U",
+      "drive_url": "https://docs.google.com/document/d/1xVjPbgGAkGTSF6wcZo-lqZR6ZNzv-S4CGdgu3QUih4U/",
+      "content_hash": "dbde22b20827a7ca",
+      "last_synced": "2026-03-22T17:40:37.341Z",
+      "subfolder": "ARCHITECTURE"
+    },
+    "ARCH-IDENTITY-SCORING-V1": {
+      "drive_file_id": "1-szNk41a7Roh3P1QnQkp3ZcdUVxsQwFMWHEZ47zD3Cs",
+      "drive_url": "https://docs.google.com/document/d/1-szNk41a7Roh3P1QnQkp3ZcdUVxsQwFMWHEZ47zD3Cs/",
+      "content_hash": "eb78ab2b5bc7c7b7",
+      "last_synced": "2026-03-22T17:40:43.708Z",
+      "subfolder": "ARCHITECTURE"
+    },
+    "ARCH-SOCIAL-FIELDS-V1": {
+      "drive_file_id": "1OCr2gU0WekqOUK6xhk7nf_fifCAptX4wJwWZBpNG5pw",
+      "drive_url": "https://docs.google.com/document/d/1OCr2gU0WekqOUK6xhk7nf_fifCAptX4wJwWZBpNG5pw/",
+      "content_hash": "4909496fe15c578a",
+      "last_synced": "2026-03-19T14:58:48.523Z",
+      "subfolder": "FIELDS"
+    },
+    "ARCH-SYSTEM-CONTRACT": {
+      "drive_file_id": "1pIIgHPLo-ggsIzVdfZFhxF4kLJPdNCyCcRHaA-n532I",
+      "drive_url": "https://docs.google.com/document/d/1pIIgHPLo-ggsIzVdfZFhxF4kLJPdNCyCcRHaA-n532I/",
+      "content_hash": "74110f3be6ebc209",
+      "last_synced": "2026-03-19T14:58:50.785Z",
+      "subfolder": "ARCHITECTURE"
+    },
+    "ARCHITECTURE-FIELDS-INGESTION-PIPELINE-V1": {
+      "drive_file_id": "1m1mcB57LpfuaJ2JceRaXMFL9-x2jn5OsRvG2riINfp0",
+      "drive_url": "https://docs.google.com/document/d/1m1mcB57LpfuaJ2JceRaXMFL9-x2jn5OsRvG2riINfp0/",
+      "content_hash": "f45eff749f9dd7ae",
+      "last_synced": "2026-03-19T14:58:52.805Z",
+      "subfolder": "FIELDS"
+    },
+    "ARCHITECTURE-INSTAGRAM-API-INTEGRATION-V1": {
+      "drive_file_id": "1Gm2aF3LTJrIyC_9tPb1-LEV_wESmYZcegyKxupaUzxE",
+      "drive_url": "https://docs.google.com/document/d/1Gm2aF3LTJrIyC_9tPb1-LEV_wESmYZcegyKxupaUzxE/",
+      "content_hash": "772be8b73be5e0dc",
+      "last_synced": "2026-03-19T14:58:55.564Z",
+      "subfolder": "ARCHITECTURE"
+    },
+    "ARCHITECTURE-INSTAGRAM-IMPLEMENTATION-V1": {
+      "drive_file_id": "1LKSR1ZJgOx2Piu_woDzGuNOZKXng0qfWIgPjfzyH24g",
+      "drive_url": "https://docs.google.com/document/d/1LKSR1ZJgOx2Piu_woDzGuNOZKXng0qfWIgPjfzyH24g/",
+      "content_hash": "ae1f04c7938d4749",
+      "last_synced": "2026-03-19T14:59:04.579Z",
+      "subfolder": "ARCHITECTURE"
+    },
+    "ARCHITECTURE-INSTAGRAM-INGESTION-V1": {
+      "drive_file_id": "1NrMHXIY0SMFCwW5BTApttbS1gXqacwJjAXjOcRrM6do",
+      "drive_url": "https://docs.google.com/document/d/1NrMHXIY0SMFCwW5BTApttbS1gXqacwJjAXjOcRrM6do/",
+      "content_hash": "eb19da83321f38f1",
+      "last_synced": "2026-03-19T14:59:06.827Z",
+      "subfolder": "ARCHITECTURE"
+    },
+    "COVOPS-APPROACH-V1": {
+      "drive_file_id": "1xQTh6OPdOsktXd6J7_AZbBBQLe-azAakoYGec_q8qFA",
+      "drive_url": "https://docs.google.com/document/d/1xQTh6OPdOsktXd6J7_AZbBBQLe-azAakoYGec_q8qFA/",
+      "content_hash": "932338681305751b",
+      "last_synced": "2026-03-19T14:59:09.893Z",
+      "subfolder": "FIELDS"
+    },
+    "DEC-002": {
+      "drive_file_id": "1YOQWgXwyGwhDRyLzR7bUtmjzJprDivzBzoQouNy2SK8",
+      "drive_url": "https://docs.google.com/document/d/1YOQWgXwyGwhDRyLzR7bUtmjzJprDivzBzoQouNy2SK8/",
+      "content_hash": "d001f111ffe9523d",
+      "last_synced": "2026-03-19T14:59:11.521Z",
+      "subfolder": "KNOWLEDGE-SYSTEM"
+    },
+    "ENRICH-PLAYBOOK-V1": {
+      "drive_file_id": "1knP7xmikTR8I2EKtubVwCsRdvh7pUxahQPlYuk6QQv4",
+      "drive_url": "https://docs.google.com/document/d/1knP7xmikTR8I2EKtubVwCsRdvh7pUxahQPlYuk6QQv4/",
+      "content_hash": "1b02a42b40704d9a",
+      "last_synced": "2026-03-19T14:59:14.705Z",
+      "subfolder": "ARCHITECTURE"
+    },
+    "ENRICH-STRATEGY-V1": {
+      "drive_file_id": "1Q35vso456CVqKZB_NvvSxmrInxBCDOBoxtj25CjXxJU",
+      "drive_url": "https://docs.google.com/document/d/1Q35vso456CVqKZB_NvvSxmrInxBCDOBoxtj25CjXxJU/",
+      "content_hash": "4a72ffb7eb530599",
+      "last_synced": "2026-03-22T17:40:50.397Z",
+      "subfolder": "ARCHITECTURE"
+    },
+    "FEAT-MARKETS-SPEC-V1-2": {
+      "drive_file_id": "1Dg-8R6VYJ5HAFHtL7QNADBlwDWwZoCIE5fPYQt3n4cA",
+      "drive_url": "https://docs.google.com/document/d/1Dg-8R6VYJ5HAFHtL7QNADBlwDWwZoCIE5fPYQt3n4cA/",
+      "content_hash": "67ef59fa3623ccbd",
+      "last_synced": "2026-03-22T17:40:51.466Z",
+      "subfolder": "PRODUCT"
+    },
+    "FIELDS-ENRICHMENT-OPS-INVENTORY-V1": {
+      "drive_file_id": "1zgrISZx2RVfdicC4rLCMVUwVAAB57YTIdsXmxsNw1s8",
+      "drive_url": "https://docs.google.com/document/d/1zgrISZx2RVfdicC4rLCMVUwVAAB57YTIdsXmxsNw1s8/",
+      "content_hash": "04d5862606121c0f",
+      "last_synced": "2026-03-22T17:40:52.401Z",
+      "subfolder": "FIELDS"
+    },
+    "FIELDS-ENTITY-AWARENESS-STAGE-V1": {
+      "drive_file_id": "1m2YEMhSa4xXQFZgGziaRWtEel45yYGenD12jgVitxxA",
+      "drive_url": "https://docs.google.com/document/d/1m2YEMhSa4xXQFZgGziaRWtEel45yYGenD12jgVitxxA/",
+      "content_hash": "993a414068faf216",
+      "last_synced": "2026-03-19T14:59:26.677Z",
+      "subfolder": "FIELDS"
+    },
+    "FIELDS-ENTITY-PIPELINE-OVERVIEW-V1": {
+      "drive_file_id": "1B78pHk3wFhq1eMmCBClJg7f09RYpTTqlVILfaD0aYIs",
+      "drive_url": "https://docs.google.com/document/d/1B78pHk3wFhq1eMmCBClJg7f09RYpTTqlVILfaD0aYIs/",
+      "content_hash": "7f34863410d42615",
+      "last_synced": "2026-03-22T17:40:53.266Z",
+      "subfolder": "FIELDS"
+    },
+    "FIELDS-ERA-OVERVIEW-V1": {
+      "drive_file_id": "1rL518nSMhmpStPxcWC0QZoZV5odG7K_Zr_EHsjm6VPE",
+      "drive_url": "https://docs.google.com/document/d/1rL518nSMhmpStPxcWC0QZoZV5odG7K_Zr_EHsjm6VPE/",
+      "content_hash": "60048453a6e4061d",
+      "last_synced": "2026-03-19T14:59:32.540Z",
+      "subfolder": "FIELDS"
+    },
+    "FIELDS-VERTICAL-TAXONOMY-V1": {
+      "drive_file_id": "1gIXvPVsi0c27f22iTNKEplpvE6Bl-Rw-UoDxkq_CRz0",
+      "drive_url": "https://docs.google.com/document/d/1gIXvPVsi0c27f22iTNKEplpvE6Bl-Rw-UoDxkq_CRz0/",
+      "content_hash": "e4e7b2dfee9edc74",
+      "last_synced": "2026-03-19T14:59:35.333Z",
+      "subfolder": "FIELDS"
+    },
+    "OPS-STALE-DEPLOYMENTS": {
+      "drive_file_id": "1E-FaUA1aA073H8Q-P7sZMPh16JuazLjREK2Qp1yo1XM",
+      "drive_url": "https://docs.google.com/document/d/1E-FaUA1aA073H8Q-P7sZMPh16JuazLjREK2Qp1yo1XM/",
+      "content_hash": "b244d1250772c5b0",
+      "last_synced": "2026-03-19T14:59:38.073Z",
+      "subfolder": "OPS"
+    },
+    "OS-BEVERAGE-PROGRAM-VOCAB-V1": {
+      "drive_file_id": "14_KfKp2ctz6ajryHepfDCJJACOlO26GJNL0koF44iQI",
+      "drive_url": "https://docs.google.com/document/d/14_KfKp2ctz6ajryHepfDCJJACOlO26GJNL0koF44iQI/",
+      "content_hash": "fc243224ed32797b",
+      "last_synced": "2026-03-19T14:59:41.432Z",
+      "subfolder": "FIELDS"
+    },
+    "OS-OFFERING-SIGNALS-V1": {
+      "drive_file_id": "15zkiWo6o_saxgPmV1u9ueUtO5IbckN8nuWWFOi3SG9c",
+      "drive_url": "https://docs.google.com/document/d/15zkiWo6o_saxgPmV1u9ueUtO5IbckN8nuWWFOi3SG9c/",
+      "content_hash": "6e2c88dff8ef575d",
+      "last_synced": "2026-03-19T14:59:43.369Z",
+      "subfolder": "TRACES"
+    },
+    "PI-CONCEPT-V1": {
+      "drive_file_id": "1V83jhv9IftFEImkKcGLtIBOdL4C05NZOD-nFT2UhO8A",
+      "drive_url": "https://docs.google.com/document/d/1V83jhv9IftFEImkKcGLtIBOdL4C05NZOD-nFT2UhO8A/",
+      "content_hash": "a9ac1cdb26706ab9",
+      "last_synced": "2026-03-19T14:59:45.538Z",
+      "subfolder": "PRODUCT"
+    },
+    "PIPE-CAPTURE-PROFILES-V1": {
+      "drive_file_id": "1m1mcB57LpfuaJ2JceRaXMFL9-x2jn5OsRvG2riINfp0",
+      "drive_url": "https://docs.google.com/document/d/1m1mcB57LpfuaJ2JceRaXMFL9-x2jn5OsRvG2riINfp0/",
+      "content_hash": "92a1eb469f73c45a",
+      "last_synced": "2026-03-19T14:59:46.972Z",
+      "subfolder": "FIELDS"
+    },
+    "PIPE-INSTAGRAM-WORKSTREAM-V1": {
+      "drive_file_id": "1a-pOpuI-Zc7zQ-xLC3cxHxuNtxllB7srw2g-S7B-NBs",
+      "drive_url": "https://docs.google.com/document/d/1a-pOpuI-Zc7zQ-xLC3cxHxuNtxllB7srw2g-S7B-NBs/",
+      "content_hash": "7c3b7253503afb25",
+      "last_synced": "2026-03-19T14:59:50.565Z",
+      "subfolder": "TRACES"
+    },
+    "RES-CUISINE-TRADITIONS-V1": {
+      "drive_file_id": "19TzP6N1WP7mOAg_ITvyNrC2ogPuLXs7rtJx4BWgOCZE",
+      "drive_url": "https://docs.google.com/document/d/19TzP6N1WP7mOAg_ITvyNrC2ogPuLXs7rtJx4BWgOCZE/",
+      "content_hash": "deae7b409e9fa44c",
+      "last_synced": "2026-03-19T14:59:54.333Z",
+      "subfolder": "TRACES"
+    },
+    "SAIKO-ADMIN-SPRING-CLEANING-2026-03": {
+      "drive_file_id": "15Xn4k5VmZxT9JZ6nLKEbVw3cQbkG7gNpfuI7GIPmhfk",
+      "drive_url": "https://docs.google.com/document/d/15Xn4k5VmZxT9JZ6nLKEbVw3cQbkG7gNpfuI7GIPmhfk/",
+      "content_hash": "08199b4ccc9b3e7a",
+      "last_synced": "2026-03-19T14:59:56.283Z",
+      "subfolder": "OPS"
+    },
+    "SAIKO-APP-OVERVIEW": {
+      "drive_file_id": "1ZyvXt5VQoweBon0wcFGWNEnhSpuh7TciQ_7ByTa7Xe4",
+      "drive_url": "https://docs.google.com/document/d/1ZyvXt5VQoweBon0wcFGWNEnhSpuh7TciQ_7ByTa7Xe4/",
+      "content_hash": "49136113470bf88a",
+      "last_synced": "2026-03-19T14:59:58.466Z",
+      "subfolder": "ARCHITECTURE"
+    },
+    "SAIKO-COVERAGE-DASHBOARD-DESIGN-V1": {
+      "drive_file_id": "1sBzIdwxAh-ZikmHtlY9f8v7Sw1PZvI02ygdKsgewqhU",
+      "drive_url": "https://docs.google.com/document/d/1sBzIdwxAh-ZikmHtlY9f8v7Sw1PZvI02ygdKsgewqhU/",
+      "content_hash": "2067a05c9988c09f",
+      "last_synced": "2026-03-19T15:00:00.846Z",
+      "subfolder": "ARCHITECTURE"
+    },
+    "SAIKO-DATA-PIPELINE-QUICK-START": {
+      "drive_file_id": "1JbuG7HbngxskCDQI7TgPOyGT6e6cIu3Vu_sjH1SnePM",
+      "drive_url": "https://docs.google.com/document/d/1JbuG7HbngxskCDQI7TgPOyGT6e6cIu3Vu_sjH1SnePM/",
+      "content_hash": "b89237567b355752",
+      "last_synced": "2026-03-19T15:00:02.984Z",
+      "subfolder": "OPS"
+    },
+    "SAIKO-DATA-SYNC-RUNBOOK": {
+      "drive_file_id": "14jZwoyBfsXlPFv7EYHXYOJ9nsKI154xvsz_XhgTKYTc",
+      "drive_url": "https://docs.google.com/document/d/14jZwoyBfsXlPFv7EYHXYOJ9nsKI154xvsz_XhgTKYTc/",
+      "content_hash": "10c74a06d72cc70b",
+      "last_synced": "2026-03-19T15:00:05.821Z",
+      "subfolder": "OPS"
+    },
+    "SAIKO-DATABASE-SCHEMA": {
+      "drive_file_id": "1-cJFzbSsmgZ0fptch8oQvixSl9SoIm_ht69JF6rB0LQ",
+      "drive_url": "https://docs.google.com/document/d/1-cJFzbSsmgZ0fptch8oQvixSl9SoIm_ht69JF6rB0LQ/",
+      "content_hash": "e4377b66ea295b37",
+      "last_synced": "2026-03-19T15:00:10.464Z",
+      "subfolder": "ARCHITECTURE"
+    },
+    "SAIKO-DATABASE-SETUP": {
+      "drive_file_id": "1Q0GAsLfZhyoFlccpK8fkQfPrGkGXazEA9mKz_Pmp3a0",
+      "drive_url": "https://docs.google.com/document/d/1Q0GAsLfZhyoFlccpK8fkQfPrGkGXazEA9mKz_Pmp3a0/",
+      "content_hash": "ba982074da88529d",
+      "last_synced": "2026-03-19T15:00:12.975Z",
+      "subfolder": "OPS"
+    },
+    "SAIKO-DEFERRED-MIGRATION-GATES": {
+      "drive_file_id": "1QnkE81F5xEaSfMglV3lXWmQ-DmBE38g_Rfx0wwan7SI",
+      "drive_url": "https://docs.google.com/document/d/1QnkE81F5xEaSfMglV3lXWmQ-DmBE38g_Rfx0wwan7SI/",
+      "content_hash": "3351b22f2fb8a010",
+      "last_synced": "2026-03-19T15:00:15.224Z",
+      "subfolder": "FIELDS"
+    },
+    "SAIKO-ENERGY-SCORE-SPEC": {
+      "drive_file_id": "1NImsE715Cda-2gooyNJcFdBD2OYNFXL1ce5ezfqxWuQ",
+      "drive_url": "https://docs.google.com/document/d/1NImsE715Cda-2gooyNJcFdBD2OYNFXL1ce5ezfqxWuQ/",
+      "content_hash": "22657d909ca9600c",
+      "last_synced": "2026-03-19T15:00:17.762Z",
+      "subfolder": "ARCHITECTURE"
+    },
+    "SAIKO-ENTITIES-CONTRACT-RECONCILIATION": {
+      "drive_file_id": "11BTnfeWTVarzRfsn_RqP7Qitdfn8QBAOQPYS_FVffdA",
+      "drive_url": "https://docs.google.com/document/d/11BTnfeWTVarzRfsn_RqP7Qitdfn8QBAOQPYS_FVffdA/",
+      "content_hash": "fbe0855ae30288ff",
+      "last_synced": "2026-03-22T17:40:54.115Z",
+      "subfolder": "FIELDS"
+    },
+    "SAIKO-ENTITY-PROFILE-SPEC-V1": {
+      "drive_file_id": "1j0oOkkiye4AduRWQmaGbV6LgzzBDjRHkzj6oxyf1tFE",
+      "drive_url": "https://docs.google.com/document/d/1j0oOkkiye4AduRWQmaGbV6LgzzBDjRHkzj6oxyf1tFE/",
+      "content_hash": "d15f7d43c943e79d",
+      "last_synced": "2026-03-19T15:00:22.860Z",
+      "subfolder": "ARCHITECTURE"
+    },
+    "SAIKO-ENV-TEMPLATE": {
+      "drive_file_id": "1_pdX7_ivLnAxZWxEr7VcnQlTWhQnY2ULTLTk6_8hO1w",
+      "drive_url": "https://docs.google.com/document/d/1_pdX7_ivLnAxZWxEr7VcnQlTWhQnY2ULTLTk6_8hO1w/",
+      "content_hash": "644785e372ac7c93",
+      "last_synced": "2026-03-19T15:00:25.711Z",
+      "subfolder": "OPS"
+    },
+    "SAIKO-FIELDS-IDENTITY-VERIFICATION-2026-03": {
+      "drive_file_id": "1Yn5aXQV73KzV-bJwnzpPhbxCIGIZI1UvheWiJ2zqfxU",
+      "drive_url": "https://docs.google.com/document/d/1Yn5aXQV73KzV-bJwnzpPhbxCIGIZI1UvheWiJ2zqfxU/",
+      "content_hash": "66673b9e51867f34",
+      "last_synced": "2026-03-19T15:00:28.526Z",
+      "subfolder": "FIELDS"
+    },
+    "SAIKO-FIELDS-V2-CUTOVER-SPEC": {
+      "drive_file_id": "1I1M0aEffO3XIhTb3zC7TEg8GY-JTvVU4H7dwCi4x3r0",
+      "drive_url": "https://docs.google.com/document/d/1I1M0aEffO3XIhTb3zC7TEg8GY-JTvVU4H7dwCi4x3r0/",
+      "content_hash": "373235880ff4ab14",
+      "last_synced": "2026-03-19T15:00:31.186Z",
+      "subfolder": "FIELDS"
+    },
+    "SAIKO-FIELDS-V2-TARGET-ARCHITECTURE": {
+      "drive_file_id": "1ZRx-MIcsygSrUSNo2BmbHl1YI3eQgdc7_isQ8hqGSGI",
+      "drive_url": "https://docs.google.com/document/d/1ZRx-MIcsygSrUSNo2BmbHl1YI3eQgdc7_isQ8hqGSGI/",
+      "content_hash": "a98d57631e078eb4",
+      "last_synced": "2026-03-19T15:00:34.171Z",
+      "subfolder": "FIELDS"
+    },
+    "SAIKO-FORMALITY-SCORE-SPEC": {
+      "drive_file_id": "1c-SaeYsFrAV4CqSP31pIemJeaJSPugM7rb1_0AH1Vxg",
+      "drive_url": "https://docs.google.com/document/d/1c-SaeYsFrAV4CqSP31pIemJeaJSPugM7rb1_0AH1Vxg/",
+      "content_hash": "7140f67585934427",
+      "last_synced": "2026-03-19T15:00:39.525Z",
+      "subfolder": "ARCHITECTURE"
+    },
+    "SAIKO-GOOGLE-PLACES-SETUP": {
+      "drive_file_id": "1pa_FZWoIwZFSEhAHLO8KFPmhH3ywSNag5gkLny_V1Rg",
+      "drive_url": "https://docs.google.com/document/d/1pa_FZWoIwZFSEhAHLO8KFPmhH3ywSNag5gkLny_V1Rg/",
+      "content_hash": "cad1c5ec1f12306d",
+      "last_synced": "2026-03-19T15:00:42.373Z",
+      "subfolder": "OPS"
+    },
+    "SAIKO-LOCAL-DEV": {
+      "drive_file_id": "12S0MDGh6eEyeS3qCbhqfyLaHAIj7ERZw9Iwilugo_Eo",
+      "drive_url": "https://docs.google.com/document/d/12S0MDGh6eEyeS3qCbhqfyLaHAIj7ERZw9Iwilugo_Eo/",
+      "content_hash": "373c28e469ee983a",
+      "last_synced": "2026-03-19T15:00:44.686Z",
+      "subfolder": "OPS"
+    },
+    "SAIKO-MERCHANT-DATA-HIERARCHY": {
+      "drive_file_id": "1JFGvqSgg5KJ9TQ_rQm7pI9s_4AvjXvjKzjONl6MxewQ",
+      "drive_url": "https://docs.google.com/document/d/1JFGvqSgg5KJ9TQ_rQm7pI9s_4AvjXvjKzjONl6MxewQ/",
+      "content_hash": "5bc54b124abf30bd",
+      "last_synced": "2026-03-19T15:00:47.246Z",
+      "subfolder": "ARCHITECTURE"
+    },
+    "SAIKO-MIGRATION-GUIDE": {
+      "drive_file_id": "1pGohLB4qz5GrMwSS-NDSxdgU3ycF2SAwVse9YhJ9w24",
+      "drive_url": "https://docs.google.com/document/d/1pGohLB4qz5GrMwSS-NDSxdgU3ycF2SAwVse9YhJ9w24/",
+      "content_hash": "b30be65596b02606",
+      "last_synced": "2026-03-19T15:00:49.354Z",
+      "subfolder": "OPS"
+    },
+    "SAIKO-MIGRATION-HISTORY-RECONCILIATION": {
+      "drive_file_id": "1_YMkzqRNq61IHKA9gFV_socQBsk6Y5v2vb90o9s_dZ4",
+      "drive_url": "https://docs.google.com/document/d/1_YMkzqRNq61IHKA9gFV_socQBsk6Y5v2vb90o9s_dZ4/",
+      "content_hash": "d248f114994f516e",
+      "last_synced": "2026-03-19T15:00:52.113Z",
+      "subfolder": "OPS"
+    },
+    "SAIKO-PIPELINE-COMMANDS": {
+      "drive_file_id": "15jryaiGSJqEqb81gJCVIQu1QZjaeyPHY4aMkZylERnI",
+      "drive_url": "https://docs.google.com/document/d/15jryaiGSJqEqb81gJCVIQu1QZjaeyPHY4aMkZylERnI/",
+      "content_hash": "e91a823e71babbc5",
+      "last_synced": "2026-03-22T17:40:54.984Z",
+      "subfolder": "OPS"
+    },
+    "SAIKO-PLATFORM-DATA-LAYER": {
+      "drive_file_id": "1S0R_RuzOqBLxcBqQbxDZb42mplMbEV9zfKi2dFyBzA4",
+      "drive_url": "https://docs.google.com/document/d/1S0R_RuzOqBLxcBqQbxDZb42mplMbEV9zfKi2dFyBzA4/",
+      "content_hash": "f9d48d855c4ca6e2",
+      "last_synced": "2026-03-19T15:00:57.148Z",
+      "subfolder": "ARCHITECTURE"
+    },
+    "SAIKO-PROD-MIGRATION-OPERATOR-RUNBOOK": {
+      "drive_file_id": "1tqwG0eBxhsBhr8fDivniDfDdwmJ_W9jWujiHZItVcLg",
+      "drive_url": "https://docs.google.com/document/d/1tqwG0eBxhsBhr8fDivniDfDdwmJ_W9jWujiHZItVcLg/",
+      "content_hash": "837685196cae1fba",
+      "last_synced": "2026-03-19T15:00:59.236Z",
+      "subfolder": "OPS"
+    },
+    "SAIKO-PROD-PLACE-FIX-RUNBOOK": {
+      "drive_file_id": "1wBVFYwCboFJMdnZ_Uq03DqZb6gneGaqUqNphzBAkBf0",
+      "drive_url": "https://docs.google.com/document/d/1wBVFYwCboFJMdnZ_Uq03DqZb6gneGaqUqNphzBAkBf0/",
+      "content_hash": "09145e29a3bf558f",
+      "last_synced": "2026-03-19T15:01:02.008Z",
+      "subfolder": "OPS"
+    },
+    "SAIKO-PROVENANCE-QUICK-REF": {
+      "drive_file_id": "1c6seHuGyiUa4QF7ykJwd6x5vEePfPU3JDnYj398RmDw",
+      "drive_url": "https://docs.google.com/document/d/1c6seHuGyiUa4QF7ykJwd6x5vEePfPU3JDnYj398RmDw/",
+      "content_hash": "61d26fa41f9dbfc7",
+      "last_synced": "2026-03-19T15:01:05.170Z",
+      "subfolder": "ARCHITECTURE"
+    },
+    "SAIKO-PROVENANCE-SYSTEM": {
+      "drive_file_id": "1L2oG_2c3G7opUGB46upS_pMNmeL4jmOLCTPEla16BGc",
+      "drive_url": "https://docs.google.com/document/d/1L2oG_2c3G7opUGB46upS_pMNmeL4jmOLCTPEla16BGc/",
+      "content_hash": "0bd71b11b099dbfa",
+      "last_synced": "2026-03-19T15:01:07.728Z",
+      "subfolder": "ARCHITECTURE"
+    },
+    "SAIKO-README": {
+      "drive_file_id": "135o4pkYREKPov7ZQkHWfKFJo9Do2WukgzcmtdStVRjM",
+      "drive_url": "https://docs.google.com/document/d/135o4pkYREKPov7ZQkHWfKFJo9Do2WukgzcmtdStVRjM/",
+      "content_hash": "b31577fc4eb3a550",
+      "last_synced": "2026-03-19T15:01:10.579Z",
+      "subfolder": "ARCHITECTURE"
+    },
+    "SAIKO-RESOLVER-AND-PLACES-DATA-FLOW": {
+      "drive_file_id": "1klOQqrNZ8KG18CvGg73BhNsEwK1_5qOSKjxFDP-H6dM",
+      "drive_url": "https://docs.google.com/document/d/1klOQqrNZ8KG18CvGg73BhNsEwK1_5qOSKjxFDP-H6dM/",
+      "content_hash": "0fb094419f5e6479",
+      "last_synced": "2026-03-19T15:01:13.322Z",
+      "subfolder": "ARCHITECTURE"
+    },
+    "SAIKO-SAIKOAI-EXTRACTION-PROMPT-V2-1": {
+      "drive_file_id": "1cycRT59qJLMKGqYE6MqE0BtdBfXPzq0CC9Dge1Wh32U",
+      "drive_url": "https://docs.google.com/document/d/1cycRT59qJLMKGqYE6MqE0BtdBfXPzq0CC9Dge1Wh32U/",
+      "content_hash": "d5d054a83c33ea2a",
+      "last_synced": "2026-03-19T15:01:16.161Z",
+      "subfolder": "ARCHITECTURE"
+    },
+    "SAIKO-SITEMAP": {
+      "drive_file_id": "1jfBpCOSjTe2aWOcQtuHRWWLcjO-ALhET9NHtaRHnqoQ",
+      "drive_url": "https://docs.google.com/document/d/1jfBpCOSjTe2aWOcQtuHRWWLcjO-ALhET9NHtaRHnqoQ/",
+      "content_hash": "b302d3cce79d0b3e",
+      "last_synced": "2026-03-19T15:01:18.627Z",
+      "subfolder": "OPS"
+    },
+    "SKAI-DOC-FIELDS-ATOMIC-SIGNALS-001": {
+      "drive_file_id": "1GZnr1757pyOx9Kv8FccWAoF7uiwCST4Kq6LZxIyW0GI",
+      "drive_url": "https://docs.google.com/document/d/1GZnr1757pyOx9Kv8FccWAoF7uiwCST4Kq6LZxIyW0GI/",
+      "content_hash": "f7c1e22d3f71c484",
+      "last_synced": "2026-03-19T15:01:22.029Z",
+      "subfolder": "TRACES"
+    },
+    "SKAI-DOC-FIELDS-DATA-LAYER-CONTRACT-001": {
+      "drive_file_id": "15aqlWdHzBRTegKoktNXQLfKTcCPImTl_B_wBqpgYaU8",
+      "drive_url": "https://docs.google.com/document/d/15aqlWdHzBRTegKoktNXQLfKTcCPImTl_B_wBqpgYaU8/",
+      "content_hash": "2eaa1d738f80b397",
+      "last_synced": "2026-03-19T15:01:25.562Z",
+      "subfolder": "TRACES"
+    },
+    "SKAI-DOC-FIELDS-DERIVED-SIGNALS-ENGINE-001": {
+      "drive_file_id": "1DB_ofgk9H6wEPjqYD3GN6feKosTgZZMo-ifPEAKkCzI",
+      "drive_url": "https://docs.google.com/document/d/1DB_ofgk9H6wEPjqYD3GN6feKosTgZZMo-ifPEAKkCzI/",
+      "content_hash": "edf7a32c86025006",
+      "last_synced": "2026-03-19T15:01:29.318Z",
+      "subfolder": "TRACES"
+    },
+    "SKAI-DOC-FIELDS-ENRICHMENT-MODEL-V1": {
+      "drive_file_id": "14Z7qzl0UjUcxv3GVvm9ZyZDI2IZ0oMhWOLcQWP9Baoc",
+      "drive_url": "https://docs.google.com/document/d/14Z7qzl0UjUcxv3GVvm9ZyZDI2IZ0oMhWOLcQWP9Baoc/",
+      "content_hash": "3364bef7413025d0",
+      "last_synced": "2026-03-22T17:40:56.374Z",
+      "subfolder": "FIELDS"
+    },
+    "SKAI-DOC-FIELDS-GLOSSARY-001": {
+      "drive_file_id": "1DyF_FIYKXCxbcXKE3caObspexmg7cActC91PAG_MEnk",
+      "drive_url": "https://docs.google.com/document/d/1DyF_FIYKXCxbcXKE3caObspexmg7cActC91PAG_MEnk/",
+      "content_hash": "a2dbf2a5701c376c",
+      "last_synced": "2026-03-19T15:01:35.615Z",
+      "subfolder": "KNOWLEDGE-SYSTEM"
+    },
+    "SKAI-DOC-FIELDS-IDENTITY-RESOLVER-001": {
+      "drive_file_id": "1UlMHFL8RsevBp8rikkk9mmZER2meqaArRITxzPYRgRM",
+      "drive_url": "https://docs.google.com/document/d/1UlMHFL8RsevBp8rikkk9mmZER2meqaArRITxzPYRgRM/",
+      "content_hash": "5910239ff8edbb5d",
+      "last_synced": "2026-03-19T15:01:37.841Z",
+      "subfolder": "FIELDS"
+    },
+    "SKAI-DOC-FIELDS-SIGNALS-REGISTRY-001": {
+      "drive_file_id": "1Uz9-XwrNb00Ih6ZpycKVUECTB6u6oTxBX1uxRFPxRm0",
+      "drive_url": "https://docs.google.com/document/d/1Uz9-XwrNb00Ih6ZpycKVUECTB6u6oTxBX1uxRFPxRm0/",
+      "content_hash": "f70312b19ef456ac",
+      "last_synced": "2026-03-19T15:01:44.135Z",
+      "subfolder": "TRACES"
+    },
+    "SKAI-DOC-FIELDS-SYSTEM-MAP-001": {
+      "drive_file_id": "1-7WeCw0qAZ8a4TN4QyIPpddQJ8KkQ6dXDp8ItL-CCjc",
+      "drive_url": "https://docs.google.com/document/d/1-7WeCw0qAZ8a4TN4QyIPpddQJ8KkQ6dXDp8ItL-CCjc/",
+      "content_hash": "110624b3770ff2d7",
+      "last_synced": "2026-03-19T15:01:47.790Z",
+      "subfolder": "TRACES"
+    },
+    "SKAI-DOC-PROGRAM-TEMPLATE-V1": {
+      "drive_file_id": "1JQLUe_emhppSI5AhqGCEetQbSzTchTgfBuOIi46AmRo",
+      "drive_url": "https://docs.google.com/document/d/1JQLUe_emhppSI5AhqGCEetQbSzTchTgfBuOIi46AmRo/",
+      "content_hash": "f7d0f29708a5402e",
+      "last_synced": "2026-03-19T15:01:50.557Z",
+      "subfolder": "FIELDS"
+    },
+    "SKAI-DOC-TRACES-ABOUT-DESCRIPTION-001": {
+      "drive_file_id": "1mSsNi5XrA3IL7kxaAUM7v4wczq3U4ztvKiT1e4INgn4",
+      "drive_url": "https://docs.google.com/document/d/1mSsNi5XrA3IL7kxaAUM7v4wczq3U4ztvKiT1e4INgn4/",
+      "content_hash": "862e28020daa1e64",
+      "last_synced": "2026-03-19T15:01:53.735Z",
+      "subfolder": "PLACE-PAGE"
+    },
+    "SKAI-DOC-TRACES-PLACE-PAGE-DESIGN-001": {
+      "drive_file_id": "19H_F9w46joVu80p8qYj9vemSHGCbT62y7ECgXLGM9IU",
+      "drive_url": "https://docs.google.com/document/d/19H_F9w46joVu80p8qYj9vemSHGCbT62y7ECgXLGM9IU/",
+      "content_hash": "0b37a05955bbd0c0",
+      "last_synced": "2026-03-19T15:01:56.584Z",
+      "subfolder": "PLACE-PAGE"
+    },
+    "SKAI-DOC-TRACES-WO-ABOUT-001": {
+      "drive_file_id": "16l-6liaFdBJXPfxjWJ1D0YUMxUlfuNWGQ5ytKdyH74s",
+      "drive_url": "https://docs.google.com/document/d/16l-6liaFdBJXPfxjWJ1D0YUMxUlfuNWGQ5ytKdyH74s/",
+      "content_hash": "1a741db29b611990",
+      "last_synced": "2026-03-19T15:01:59.885Z",
+      "subfolder": "PLACE-PAGE"
+    },
+    "SKAI/DECISION-INDEX-SPEC-V1": {
+      "drive_file_id": "1VzjuNsDF82vvxtiw33GKoSqpmPwI760mbmHsEH56pXc",
+      "drive_url": "https://docs.google.com/document/d/1VzjuNsDF82vvxtiw33GKoSqpmPwI760mbmHsEH56pXc/",
+      "content_hash": "c70cd52f7c5d00e4",
+      "last_synced": "2026-03-19T15:02:02.125Z",
+      "subfolder": "KNOWLEDGE-SYSTEM"
+    },
+    "SKAI/RESEARCH-AI-KNOWLEDGE-ARCHITECTURE-V1": {
+      "drive_file_id": "1ljx1j3c6IWNUVVO1k6fW7tKyRw1g1ANg87ece9B6MAE",
+      "drive_url": "https://docs.google.com/document/d/1ljx1j3c6IWNUVVO1k6fW7tKyRw1g1ANg87ece9B6MAE/",
+      "content_hash": "06ff1c4e80fd0869",
+      "last_synced": "2026-03-19T15:02:04.528Z",
+      "subfolder": "KNOWLEDGE-SYSTEM"
+    },
+    "SS-DISPLAY-CONTRACT-V1": {
+      "drive_file_id": "1Aa7V2ZzDZYaklAWOolNgu-u1fNJcuzrj6enxQRuiA1M",
+      "drive_url": "https://docs.google.com/document/d/1Aa7V2ZzDZYaklAWOolNgu-u1fNJcuzrj6enxQRuiA1M/",
+      "content_hash": "abf3d29af98dfb58",
+      "last_synced": "2026-03-19T15:02:11.580Z",
+      "subfolder": "TRACES"
+    },
+    "SS-DISPLAY-CONTRACT-V2": {
+      "drive_file_id": "1isDjpSYb1B_2uRQu2JRpqBfJ51SHsA6RZAOtMfznC80",
+      "drive_url": "https://docs.google.com/document/d/1isDjpSYb1B_2uRQu2JRpqBfJ51SHsA6RZAOtMfznC80/",
+      "content_hash": "7633264d61cee207",
+      "last_synced": "2026-03-19T15:02:13.540Z",
+      "subfolder": "TRACES"
+    },
+    "SS-FW-001": {
+      "drive_file_id": "1NshVtPdgPlARIk55zB-JFjZ2aMKrz3HUv_0RI8oJ0tc",
+      "drive_url": "https://docs.google.com/document/d/1NshVtPdgPlARIk55zB-JFjZ2aMKrz3HUv_0RI8oJ0tc/",
+      "content_hash": "e251ff2c3f7533b8",
+      "last_synced": "2026-03-19T15:02:15.449Z",
+      "subfolder": "TRACES"
+    },
+    "SS-FW-002": {
+      "drive_file_id": "1kqkzra6xHhrtkJTXnGwBHklXMOGNgfNuP_ZUAA270cY",
+      "drive_url": "https://docs.google.com/document/d/1kqkzra6xHhrtkJTXnGwBHklXMOGNgfNuP_ZUAA270cY/",
+      "content_hash": "cfc1ea9889ab3f5f",
+      "last_synced": "2026-03-19T15:02:17.108Z",
+      "subfolder": "TRACES"
+    },
+    "SS-FW-003": {
+      "drive_file_id": "11hb8Fe_Dm4IFPA8zPkgp8Pbx6SegrDVUpC7MNhRLqks",
+      "drive_url": "https://docs.google.com/document/d/11hb8Fe_Dm4IFPA8zPkgp8Pbx6SegrDVUpC7MNhRLqks/",
+      "content_hash": "0785043d40595d6f",
+      "last_synced": "2026-03-19T15:02:19.309Z",
+      "subfolder": "TRACES"
+    },
+    "SS-FW-004": {
+      "drive_file_id": "1-X5Ehfgb7k6putlagU2acaR211BZjL_52r0o1rCfPOI",
+      "drive_url": "https://docs.google.com/document/d/1-X5Ehfgb7k6putlagU2acaR211BZjL_52r0o1rCfPOI/",
+      "content_hash": "d0251904a3b2fa76",
+      "last_synced": "2026-03-19T15:02:21.058Z",
+      "subfolder": "TRACES"
+    },
+    "SS-GLO-001": {
+      "drive_file_id": "1Nqq83y2eB0ySJDbe38wTMYS7_sEo9__Ia8uuyo1-ZdI",
+      "drive_url": "https://docs.google.com/document/d/1Nqq83y2eB0ySJDbe38wTMYS7_sEo9__Ia8uuyo1-ZdI/",
+      "content_hash": "328f5be1f9599c43",
+      "last_synced": "2026-03-19T15:02:23.159Z",
+      "subfolder": "TRACES"
+    },
+    "SYS-BOOT-CONTEXT-INVENTORY": {
+      "drive_file_id": "1oM0ezGBQprYCxd-4017tzjQZPxba7DZlXaGezg1H10o",
+      "drive_url": "https://docs.google.com/document/d/1oM0ezGBQprYCxd-4017tzjQZPxba7DZlXaGezg1H10o/",
+      "content_hash": "11fcb76d998b0540",
+      "last_synced": "2026-03-19T15:02:25.092Z",
+      "subfolder": "KNOWLEDGE-SYSTEM"
+    },
+    "SYS-COVERAGE-DASHBOARD-DESIGN-V1": {
+      "drive_file_id": "12li-K-gI3Tn-BJ3TYR9zSs6tNGenL8VLeQ8MrFC5omc",
+      "drive_url": "https://docs.google.com/document/d/12li-K-gI3Tn-BJ3TYR9zSs6tNGenL8VLeQ8MrFC5omc/",
+      "content_hash": "06bbf315d86c58cd",
+      "last_synced": "2026-03-19T15:02:26.826Z",
+      "subfolder": "KNOWLEDGE-SYSTEM"
+    },
+    "SYS-COVERAGE-OPS-ISSUE-CONTRACT-V1": {
+      "drive_file_id": "13EwQqoc9G_Gc5WHx9eNox8_4BoCYHbP6TuIYpKmFUxQ",
+      "drive_url": "https://docs.google.com/document/d/13EwQqoc9G_Gc5WHx9eNox8_4BoCYHbP6TuIYpKmFUxQ/",
+      "content_hash": "1b33c208041b5879",
+      "last_synced": "2026-03-19T15:02:30.334Z",
+      "subfolder": "KNOWLEDGE-SYSTEM"
+    },
+    "SYS-DRAFT-TRIGGER-V1": {
+      "drive_file_id": "1gdL4VI-TaEMHiF1y0CJygrhIpSvRZNpq0iqB7EtYqM4",
+      "drive_url": "https://docs.google.com/document/d/1gdL4VI-TaEMHiF1y0CJygrhIpSvRZNpq0iqB7EtYqM4/",
+      "content_hash": "c9da847357e3c4f1",
+      "last_synced": "2026-03-19T15:02:32.187Z",
+      "subfolder": "KNOWLEDGE-SYSTEM"
+    },
+    "SYS-PROMOTION-FLOW-V1": {
+      "drive_file_id": "1WgjhNPNN_h1p3XxarOioArKCzGK1NzHiRO6ZEUoQKvg",
+      "drive_url": "https://docs.google.com/document/d/1WgjhNPNN_h1p3XxarOioArKCzGK1NzHiRO6ZEUoQKvg/",
+      "content_hash": "cce5c7a89b9e83b2",
+      "last_synced": "2026-03-19T15:02:34.620Z",
+      "subfolder": "KNOWLEDGE-SYSTEM"
+    },
+    "SYS-RESEARCH-FORMAT-V1": {
+      "drive_file_id": "1c1LUxX-Iv_Ywfmy7sMObNSAnOmjEcNZkCyKh7Z0Kvsk",
+      "drive_url": "https://docs.google.com/document/d/1c1LUxX-Iv_Ywfmy7sMObNSAnOmjEcNZkCyKh7Z0Kvsk/",
+      "content_hash": "fca144b058652a9e",
+      "last_synced": "2026-03-19T15:02:37.690Z",
+      "subfolder": "KNOWLEDGE-SYSTEM"
+    },
+    "VOICE-SAIKO-VOICE-LAYER": {
+      "drive_file_id": "1fLFRMmmXJ7Sb5JN9w-pwMnjyAfVk3XNT_uABmyP-j7k",
+      "drive_url": "https://docs.google.com/document/d/1fLFRMmmXJ7Sb5JN9w-pwMnjyAfVk3XNT_uABmyP-j7k/",
+      "content_hash": "a3387ef15004cd36",
+      "last_synced": "2026-03-19T15:02:39.599Z",
+      "subfolder": "TRACES"
+    },
+    "APPROVED-SOURCE-REGISTRY-V1": {
+      "drive_file_id": "1TjUEw64taBxB26HZhAAN8hhiFMhzhUmUPtgfMyycQpA",
+      "drive_url": "https://docs.google.com/document/d/1TjUEw64taBxB26HZhAAN8hhiFMhzhUmUPtgfMyycQpA/",
+      "content_hash": "26c6baa8b3323801",
+      "last_synced": "2026-03-22T17:40:26.355Z",
+      "subfolder": "FIELDS"
+    },
+    "ARCH-COVERAGE-DASHBOARD-V2": {
+      "drive_file_id": "1fU2TaeyRkODk-7feAXSo6CHe_W8FVIWD-Nj2qC292dk",
+      "drive_url": "https://docs.google.com/document/d/1fU2TaeyRkODk-7feAXSo6CHe_W8FVIWD-Nj2qC292dk/",
+      "content_hash": "a58bce3b02df29ef",
+      "last_synced": "2026-03-22T17:40:27.528Z",
+      "subfolder": "ARCHITECTURE"
+    },
+    "ARCH-ENRICHMENT-EFFECTIVENESS-V0": {
+      "drive_file_id": "1gXemVaoB_m0qv1TkyZbSF31Ft2XkOPVUwwfjHdM274E",
+      "drive_url": "https://docs.google.com/document/d/1gXemVaoB_m0qv1TkyZbSF31Ft2XkOPVUwwfjHdM274E/",
+      "content_hash": "89b0e9d639ae15c1",
+      "last_synced": "2026-03-22T17:40:31.395Z",
+      "subfolder": "ARCHITECTURE"
+    },
+    "ARCH-ENRICHMENT-EVIDENCE-MODEL-V1": {
+      "drive_file_id": "1rDZrtxNw7fAntSlwgNCY5IhmvHyCTVfXeG9iRhFe_h4",
+      "drive_url": "https://docs.google.com/document/d/1rDZrtxNw7fAntSlwgNCY5IhmvHyCTVfXeG9iRhFe_h4/",
+      "content_hash": "afd58055bea3f65e",
+      "last_synced": "2026-03-22T17:40:32.663Z",
+      "subfolder": "FIELDS"
+    },
+    "ARCH-ENTITY-CLASSIFICATION-FRAMEWORK-V1": {
+      "drive_file_id": "1YwzjTHS1rWdIEZXnsHAmerdM9Y75nmKEJlWBCCXUNnw",
+      "drive_url": "https://docs.google.com/document/d/1YwzjTHS1rWdIEZXnsHAmerdM9Y75nmKEJlWBCCXUNnw/",
+      "content_hash": "f6e7928613288e92",
+      "last_synced": "2026-03-22T17:40:34.024Z",
+      "subfolder": "FIELDS"
+    },
+    "ARCH-ENTITY-DIMENSION-IMPLEMENTATION-PLAN-V1": {
+      "drive_file_id": "1Fx0UUoQidOJ0Og9HRqCaTQxiCfLIAFFp7Q-FH0ODr4Y",
+      "drive_url": "https://docs.google.com/document/d/1Fx0UUoQidOJ0Og9HRqCaTQxiCfLIAFFp7Q-FH0ODr4Y/",
+      "content_hash": "0ce7810514d8163f",
+      "last_synced": "2026-03-22T17:40:36.326Z",
+      "subfolder": "FIELDS"
+    },
+    "ARCH-ENTITY-PAGE-CONTENT-SYSTEM-V0": {
+      "drive_file_id": "1Ot3uHP0eDe2UWctbS-WSD12nzbd7EgNIw9CsdIpLqCs",
+      "drive_url": "https://docs.google.com/document/d/1Ot3uHP0eDe2UWctbS-WSD12nzbd7EgNIw9CsdIpLqCs/",
+      "content_hash": "da366c4682ea6b17",
+      "last_synced": "2026-03-22T17:40:38.926Z",
+      "subfolder": "ARCHITECTURE"
+    },
+    "ARCH-ENTITY-STATE-MODEL-V1": {
+      "drive_file_id": "1AWmqxRRtpaP3RULNir94e9VpMFkOveZmT-S9VJzXaJY",
+      "drive_url": "https://docs.google.com/document/d/1AWmqxRRtpaP3RULNir94e9VpMFkOveZmT-S9VJzXaJY/",
+      "content_hash": "ae223a077f3a4888",
+      "last_synced": "2026-03-22T17:40:40.118Z",
+      "subfolder": "ARCHITECTURE"
+    },
+    "ARCH-ENTITY-TYPE-PROBLEM-DEFINITION-V1": {
+      "drive_file_id": "12qnNITA8HFmB7acDmnH8vRlyq_WEtHLrAhUJjeBCOe0",
+      "drive_url": "https://docs.google.com/document/d/12qnNITA8HFmB7acDmnH8vRlyq_WEtHLrAhUJjeBCOe0/",
+      "content_hash": "4ea3124dd75e9a02",
+      "last_synced": "2026-03-22T17:40:41.558Z",
+      "subfolder": "FIELDS"
+    },
+    "ARCH-ENTITY-TYPE-TAXONOMY-V1": {
+      "drive_file_id": "1bm9XLl2rjPfX0sOHQ2Bmib1Gncxc7Nq0ZJFPu8SaEoQ",
+      "drive_url": "https://docs.google.com/document/d/1bm9XLl2rjPfX0sOHQ2Bmib1Gncxc7Nq0ZJFPu8SaEoQ/",
+      "content_hash": "01f0460f7aff213d",
+      "last_synced": "2026-03-22T17:40:42.684Z",
+      "subfolder": "FIELDS"
+    },
+    "ARCH-NEIGHBORHOOD-COVERAGE-V0": {
+      "drive_file_id": "1U7c_lmyTIHchVrW8u5O-GLcDYpQqGutuyXP7WyvtMPc",
+      "drive_url": "https://docs.google.com/document/d/1U7c_lmyTIHchVrW8u5O-GLcDYpQqGutuyXP7WyvtMPc/",
+      "content_hash": "4433cdb119d7551a",
+      "last_synced": "2026-03-22T17:40:44.793Z",
+      "subfolder": "ARCHITECTURE"
+    },
+    "ARCH-VISIT-BUCKET-V0": {
+      "drive_file_id": "1o6rzc-XoOmwaGY-arMLFviDXUlgnvCBnnpP2KSmo-Ok",
+      "drive_url": "https://docs.google.com/document/d/1o6rzc-XoOmwaGY-arMLFviDXUlgnvCBnnpP2KSmo-Ok/",
+      "content_hash": "edbd048c068b7ab8",
+      "last_synced": "2026-03-22T17:40:46.046Z",
+      "subfolder": "ARCHITECTURE"
+    },
+    "AUDIT-TERMINOLOGY-MIGRATION-2026-03": {
+      "drive_file_id": "1m26ZYUCZJTV7EoJq8gprF4oU6Lzcus0DBVG4eRuu8AE",
+      "drive_url": "https://docs.google.com/document/d/1m26ZYUCZJTV7EoJq8gprF4oU6Lzcus0DBVG4eRuu8AE/",
+      "content_hash": "9f07403bed52dd15",
+      "last_synced": "2026-03-22T17:40:47.342Z",
+      "subfolder": "OPS"
+    },
+    "COVERAGE-SOURCE-ENRICHMENT-V1": {
+      "drive_file_id": "1O7Vjj32Ps_WAq2nUMJRluHVEMdx_5IHUtaziYulXh80",
+      "drive_url": "https://docs.google.com/document/d/1O7Vjj32Ps_WAq2nUMJRluHVEMdx_5IHUtaziYulXh80/",
+      "content_hash": "c42c8220356ce341",
+      "last_synced": "2026-03-22T17:40:49.054Z",
+      "subfolder": "TRACES"
+    },
+    "SKAI-DOC-LA-PLACES-PROGRAM-MAPPING-V1": {
+      "drive_file_id": "1tHaOMxrrB4MBBWAOz7_DQHD04jc6S42uInyzSqsFOz0",
+      "drive_url": "https://docs.google.com/document/d/1tHaOMxrrB4MBBWAOz7_DQHD04jc6S42uInyzSqsFOz0/",
+      "content_hash": "189f479d3ec783dd",
+      "last_synced": "2026-03-22T17:40:58.454Z",
+      "subfolder": "ARCHITECTURE"
+    },
+    "SKAI-DOC-LA-RAMEN-PROGRAM-VALIDATION-V1": {
+      "drive_file_id": "100AjXrdLLNgcYXpfGhBikrTIfq2KFFOYAB7mvxD06Zc",
+      "drive_url": "https://docs.google.com/document/d/100AjXrdLLNgcYXpfGhBikrTIfq2KFFOYAB7mvxD06Zc/",
+      "content_hash": "8088934b46dec683",
+      "last_synced": "2026-03-22T17:41:00.701Z",
+      "subfolder": "ARCHITECTURE"
+    },
+    "SKAI-DOC-LA-TACO-PROGRAM-VALIDATION-V1": {
+      "drive_file_id": "1Nu9W4pJRZ4WxgP4QeYuVBFVN7uzlW-0L4w597zIiFfg",
+      "drive_url": "https://docs.google.com/document/d/1Nu9W4pJRZ4WxgP4QeYuVBFVN7uzlW-0L4w597zIiFfg/",
+      "content_hash": "d80126fbf3dbd552",
+      "last_synced": "2026-03-22T17:41:02.940Z",
+      "subfolder": "ARCHITECTURE"
+    },
+    "SKAI-DOC-OFFERING-PROGRAMS-UNIFIED-V1": {
+      "drive_file_id": "1glSh8qetJyFGMdK5vj5lPXZ8UP2UwjsXm9OxAJDW5Zo",
+      "drive_url": "https://docs.google.com/document/d/1glSh8qetJyFGMdK5vj5lPXZ8UP2UwjsXm9OxAJDW5Zo/",
+      "content_hash": "945366c484c6b60a",
+      "last_synced": "2026-03-22T17:41:04.985Z",
+      "subfolder": "ARCHITECTURE"
+    },
+    "SKAI-DOC-RAMEN-PROGRAM-V2": {
+      "drive_file_id": "1vxlp3PYouMmxvXcmHDZT4Z7xtl81kSPe1nIBdA5J-DI",
+      "drive_url": "https://docs.google.com/document/d/1vxlp3PYouMmxvXcmHDZT4Z7xtl81kSPe1nIBdA5J-DI/",
+      "content_hash": "1a2d3a70c9835af2",
+      "last_synced": "2026-03-22T17:41:07.263Z",
+      "subfolder": "ARCHITECTURE"
+    },
+    "SKAI-DOC-TACO-PROGRAM-V1": {
+      "drive_file_id": "1gk9A7_JADY86glDzdtplkXsyRciYXaKo9hFHLJnP15I",
+      "drive_url": "https://docs.google.com/document/d/1gk9A7_JADY86glDzdtplkXsyRciYXaKo9hFHLJnP15I/",
+      "content_hash": "7fa10ae156ee39f8",
+      "last_synced": "2026-03-22T17:41:09.380Z",
+      "subfolder": "ARCHITECTURE"
+    },
+    "SOP-CHEATSHEET-V1": {
+      "drive_file_id": "1uGP9YMqgRRYzSFcaEHNkMMBmq3yY7B_r3WVqXuUp0ZQ",
+      "drive_url": "https://docs.google.com/document/d/1uGP9YMqgRRYzSFcaEHNkMMBmq3yY7B_r3WVqXuUp0ZQ/",
+      "content_hash": "de8283c38663b15d",
+      "last_synced": "2026-03-22T17:41:11.893Z",
+      "subfolder": "OPS"
+    },
+    "SOP-SESSION-RELEASE-V1": {
+      "drive_file_id": "1IDO4XNgdy6yej2szPw8_C6LCByLsLBvQuGIm-S0C6oU",
+      "drive_url": "https://docs.google.com/document/d/1IDO4XNgdy6yej2szPw8_C6LCByLsLBvQuGIm-S0C6oU/",
+      "content_hash": "dfa50087169dc6d9",
+      "last_synced": "2026-03-22T17:41:14.824Z",
+      "subfolder": "KNOWLEDGE-SYSTEM"
+    },
+    "SOURCE-INTEGRATION-V1": {
+      "drive_file_id": "1eubRX4n43brjOEp8rDYD7HXrd2oWLwvxhRmc0vw0W6g",
+      "drive_url": "https://docs.google.com/document/d/1eubRX4n43brjOEp8rDYD7HXrd2oWLwvxhRmc0vw0W6g/",
+      "content_hash": "ec268d7a30c5ea98",
+      "last_synced": "2026-03-22T17:41:16.841Z",
+      "subfolder": "ARCHITECTURE"
+    }
+  }
+}

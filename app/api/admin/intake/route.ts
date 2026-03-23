@@ -190,7 +190,7 @@ async function processOne(input: IntakeInput): Promise<IntakeResult> {
         website: website || undefined,
         instagram: instagram || undefined,
         neighborhood: neighborhood || undefined,
-        primary_vertical: 'EAT',
+        primaryVertical: 'EAT',
         status: 'CANDIDATE',
         editorialSources: source ? { sources: [source] } : undefined,
       },

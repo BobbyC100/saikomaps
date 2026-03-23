@@ -1,8 +1,29 @@
-# Instagram Ingestion — Operational Status (V1)
+---
+doc_id: ARCH-INSTAGRAM-INGESTION-STATUS-V1
+doc_type: architecture
+status: active
+title: "Instagram Ingestion — Operational Status (V1)"
+owner: Bobby Ciccaglione
+created: "2026-03-01"
+last_updated: "2026-03-22"
+project_id: SAIKO
+systems:
+  - enrichment
+  - instagram
+related_docs:
+  - docs/architecture/instagram-api-integration-v1.md
+  - docs/architecture/instagram-implementation-v1.md
+  - docs/architecture/instagram-ingestion-field-spec-v1.md
+  - docs/architecture/enrichment-evidence-model-v1.md
+summary: >
+  Operational status of the Instagram batch ingestion pipeline. Documents what
+  is being ingested (accounts + media via Business Discovery API), known
+  limitations (CDN URL expiration, account type requirements), and downstream
+  wiring priorities (caption signal extraction, photo pipeline, profile signals).
+  914 entities with Instagram handles as of 2026-03-18.
+---
 
-**Status:** Active
-**Owner:** Bobby
-**Date:** March 2026
+# Instagram Ingestion — Operational Status (V1)
 
 ---
 

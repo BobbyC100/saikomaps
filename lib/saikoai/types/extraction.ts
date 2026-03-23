@@ -8,38 +8,38 @@ export type ExtractionConfidence = 'strong' | 'medium' | 'weak' | 'empty';
 export type ExtractionMethod = 'search' | 'official' | 'manual' | 'import_only';
 
 export interface ExtractionSourceInput {
-  source_id: string;
+  sourceId: string;
   publication: string;
   title: string;
   url: string;
-  published_at?: string | null;
+  publishedAt?: string | null;
   content: string;
-  trust_level: ExtractionTrustLevel;
+  trustLevel: ExtractionTrustLevel;
 }
 
 export interface ExtractionSourceUsed {
-  source_id: string;
+  sourceId: string;
   publication: string;
   title: string;
   url: string;
-  published_at?: string | null;
-  trust_level: ExtractionTrustLevel;
+  publishedAt?: string | null;
+  trustLevel: ExtractionTrustLevel;
 }
 
 export interface ExtractionEvidence {
-  source_id: string;
+  sourceId: string;
   quote: string;
 }
 
 export interface ExtractionClaim {
-  field_key: string;
-  proposed_value: string | null;
-  raw_value: string | null;
+  fieldKey: string;
+  proposedValue: string | null;
+  rawValue: string | null;
   confidence: ExtractionConfidence;
-  confidence_reason: string;
+  confidenceReason: string;
   evidence: ExtractionEvidence[];
   method: ExtractionMethod;
-  notes_for_editor: string | null;
+  notesForEditor: string | null;
 }
 
 export interface ExtractionOutput {
@@ -48,7 +48,7 @@ export interface ExtractionOutput {
     city: string;
     category: string;
   };
-  sources_used?: ExtractionSourceUsed[];
+  sourcesUsed?: ExtractionSourceUsed[];
   claims: ExtractionClaim[];
 }
 
@@ -58,6 +58,6 @@ export interface ExtractionInput {
     city: string;
     category: string;
   };
-  raw_values?: Record<string, unknown> | null;
+  rawValues?: Record<string, unknown> | null;
   sources: ExtractionSourceInput[];
 }

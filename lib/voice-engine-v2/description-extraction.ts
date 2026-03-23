@@ -57,7 +57,7 @@ export interface EntityDescriptionRecord {
   category: string | null;
   neighborhood: string | null;
   description: string | null;
-  description_source: string | null;
+  descriptionSource: string | null;
   /** identity_signals JSON from derived_signals (null if none) */
   identitySignals: Record<string, unknown> | null;
   /** merchant surface artifacts grouped by surface_type, ordered by richness */
@@ -383,27 +383,27 @@ export async function fetchRecordsForDescriptionGeneration(
       category: true,
       neighborhood: true,
       description: true,
-      description_source: true,
+      descriptionSource: true,
       merchant_surfaces: {
         where: {
-          surface_type: { in: ['about', 'homepage', 'menu'] },
-          parse_status: 'parse_success',
+          surfaceType: { in: ['about', 'homepage', 'menu'] },
+          parseStatus: 'parse_success',
         },
         select: {
-          surface_type: true,
-          source_url: true,
+          surfaceType: true,
+          sourceUrl: true,
           artifacts: {
             where: {
-              artifact_type: 'parse_v1',
+              artifactType: 'parse_v1',
             },
             select: {
-              artifact_json: true,
+              artifactJson: true,
             },
             take: 1,
-            orderBy: { created_at: 'desc' },
+            orderBy: { createdAt: 'desc' },
           },
         },
-        orderBy: { discovered_at: 'desc' },
+        orderBy: { discoveredAt: 'desc' },
       },
     },
     take: options.limit ?? undefined,
@@ -415,7 +415,7 @@ export async function fetchRecordsForDescriptionGeneration(
     ? entities
     : entities.filter(e => {
         // Skip if description exists and came from a strong source
-        if (e.description && e.description_source === 'editorial') return false;
+        if (e.description && e.descriptionSource === 'editorial') return false;
         return true;
       });
 
@@ -423,27 +423,27 @@ export async function fetchRecordsForDescriptionGeneration(
   const entityIds = filtered.map(e => e.id);
   const signalRows = await db.derived_signals.findMany({
     where: {
-      entity_id: { in: entityIds },
-      signal_key: 'identity_signals',
+      entityId: { in: entityIds },
+      signalKey: 'identity_signals',
     },
     select: {
-      entity_id: true,
-      signal_value: true,
+      entityId: true,
+      signalValue: true,
     },
-    orderBy: { computed_at: 'desc' },
-    distinct: ['entity_id'],
+    orderBy: { computedAt: 'desc' },
+    distinct: ['entityId'],
   });
-  const signalMap = new Map(signalRows.map(r => [r.entity_id, r.signal_value as Record<string, unknown>]));
+  const signalMap = new Map(signalRows.map(r => [r.entityId, r.signalValue as Record<string, unknown>]));
 
   // Shape records
   return filtered.map(e => {
     const surfaces: SurfaceData[] = e.merchant_surfaces
       .filter(ms => ms.artifacts.length > 0)
       .map(ms => {
-        const artifact = ms.artifacts[0].artifact_json as { text_blocks?: string[] } | null;
+        const artifact = ms.artifacts[0].artifactJson as { text_blocks?: string[] } | null;
         return {
-          surfaceType: ms.surface_type,
-          sourceUrl: ms.source_url,
+          surfaceType: ms.surfaceType,
+          sourceUrl: ms.sourceUrl,
           textBlocks: artifact?.text_blocks ?? [],
         };
       });
@@ -454,7 +454,7 @@ export async function fetchRecordsForDescriptionGeneration(
       category: e.category,
       neighborhood: e.neighborhood,
       description: e.description,
-      description_source: e.description_source,
+      descriptionSource: e.descriptionSource,
       identitySignals: signalMap.get(e.id) ?? null,
       surfaces,
     };

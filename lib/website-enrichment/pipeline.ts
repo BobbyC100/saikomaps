@@ -18,7 +18,7 @@ import { MAX_REQUESTS_PER_PLACE, ABOUT_VISIBLE_TEXT_CAP } from "./constants";
 import type { EnrichmentPayload, EnrichmentSignals, EnrichmentRaw } from "./types";
 
 export interface RunEnrichmentInput {
-  place_id: string;
+  placeId: string;
   website: string;
 }
 
@@ -28,7 +28,7 @@ export async function runEnrichmentForPlace(
   const notes: string[] = [];
   const sourceUrl = normalizeUrl(input.website);
   const payload: EnrichmentPayload = {
-    place_id: input.place_id,
+    place_id: input.placeId,
     source_url: sourceUrl,
     final_url: null,
     http_status: null,

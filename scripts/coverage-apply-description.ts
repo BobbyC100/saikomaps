@@ -289,16 +289,33 @@ async function tryWebsiteDescription(
  * Tier 3a: Check coverage_sources for excerpts.
  */
 async function tryCoverageSourceExcerpt(placeId: string): Promise<string | null> {
+  // Check coverage_source_extractions for pull quotes from editorial articles
+  const extractions = await db.coverage_source_extractions.findMany({
+    where: { entityId: placeId, isCurrent: true },
+    select: { pullQuotes: true },
+  });
+
+  for (const ext of extractions) {
+    const quotes = ext.pullQuotes as { text: string }[] | null;
+    if (quotes && quotes.length > 0) {
+      const text = quotes[0].text?.trim();
+      if (text && text.length >= 30) {
+        return text.length > 300 ? text.slice(0, 300) : text;
+      }
+    }
+  }
+
+  // Fallback: check fetched content on coverage sources directly
   const sources = await db.coverage_sources.findMany({
-    where: { entityId: placeId },
-    select: { excerpt: true, source_name: true },
-    orderBy: { created_at: 'asc' },
+    where: { entityId: placeId, enrichmentStage: 'FETCHED' },
+    select: { fetchedContent: true, publicationName: true },
+    orderBy: { createdAt: 'asc' },
   });
 
   for (const src of sources) {
-    const excerpt = src.excerpt?.trim();
-    if (excerpt && excerpt.length >= 30) {
-      return excerpt.length > 300 ? excerpt.slice(0, 300) : excerpt;
+    const content = src.fetchedContent?.trim();
+    if (content && content.length >= 30) {
+      return content.length > 300 ? content.slice(0, 300) : content;
     }
   }
   return null;

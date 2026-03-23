@@ -26,7 +26,7 @@ type PlaceInputRow = {
   category: string | null;
   googlePlacesAttributes: unknown;
   about_copy: string | null;
-  energy_scores: { energy_score: number; energy_confidence: number }[];
+  energy_scores: { energyScore: number; energyConfidence: number }[];
 };
 
 /**
@@ -51,7 +51,7 @@ async function fetchPlaceIdToPlaceData(
       googlePlacesAttributes: true,
       energy_scores: {
         where: { version: energyVersion },
-        select: { energy_score: true, energy_confidence: true },
+        select: { energyScore: true, energyConfidence: true },
       },
     },
   });
@@ -171,8 +171,8 @@ async function main() {
         fail++;
         continue;
       }
-      const energy_score = es.energy_score;
-      const energy_confidence = es.energy_confidence;
+      const energy_score = es.energyScore;
+      const energy_confidence = es.energyConfidence;
 
       const coverageAboutText = buildCoverageAboutText({
         description: row.description,
@@ -224,25 +224,25 @@ async function main() {
         create: {
           id: randomUUID(),
           entityId: placeId,
-          cozy_score: result.cozy_score,
-          date_night_score: result.date_night_score,
-          late_night_score: result.late_night_score,
-          after_work_score: result.after_work_score,
-          scene_score: result.scene_score,
+          cozyScore: result.cozy_score,
+          dateNightScore: result.date_night_score,
+          lateNightScore: result.late_night_score,
+          afterWorkScore: result.after_work_score,
+          sceneScore: result.scene_score,
           confidence,
           version: tagVersion,
-          depends_on_energy_version: energyVersion,
-          computed_at: now,
+          dependsOnEnergyVersion: energyVersion,
+          computedAt: now,
         },
         update: {
-          cozy_score: result.cozy_score,
-          date_night_score: result.date_night_score,
-          late_night_score: result.late_night_score,
-          after_work_score: result.after_work_score,
-          scene_score: result.scene_score,
+          cozyScore: result.cozy_score,
+          dateNightScore: result.date_night_score,
+          lateNightScore: result.late_night_score,
+          afterWorkScore: result.after_work_score,
+          sceneScore: result.scene_score,
           confidence,
-          depends_on_energy_version: energyVersion,
-          computed_at: now,
+          dependsOnEnergyVersion: energyVersion,
+          computedAt: now,
         },
       });
       }

@@ -37,10 +37,10 @@ export async function POST(
     const decisionTimeMs = Date.now() - startTime;
     await prisma.review_audit_log.create({
       data: {
-        queue_id: id,
-        resolved_by: resolvedBy,
+        queueId: id,
+        resolvedBy: resolvedBy,
         resolution,
-        decision_time_ms: decisionTimeMs,
+        decisionTimeMs: decisionTimeMs,
       },
     });
     

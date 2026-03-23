@@ -29,8 +29,8 @@ const trustTiers: Record<string, number> = {
 describe('calculateFieldConfidence', () => {
   it('applies agreement boost when 2+ sources agree', () => {
     const candidates = [
-      { value: '123 Main St', source_id: 'google_places' },
-      { value: '123 Main St', source_id: 'michelin' },
+      { value: '123 Main St', sourceId: 'google_places' },
+      { value: '123 Main St', sourceId: 'michelin' },
     ];
     const result = calculateFieldConfidence(
       'address',
@@ -46,8 +46,8 @@ describe('calculateFieldConfidence', () => {
 
   it('applies conflict penalty when 2+ sources disagree', () => {
     const candidates = [
-      { value: '123 Main St', source_id: 'google_places' },
-      { value: '456 Other Ave', source_id: 'michelin' },
+      { value: '123 Main St', sourceId: 'google_places' },
+      { value: '456 Other Ave', sourceId: 'michelin' },
     ];
     const result = calculateFieldConfidence(
       'address',
@@ -63,8 +63,8 @@ describe('calculateFieldConfidence', () => {
 
   it('clamps score to [0, 1] — never below 0', () => {
     const candidates = [
-      { value: 'A', source_id: 'instagram_scraped' },
-      { value: 'B', source_id: 'instagram_scraped' },
+      { value: 'A', sourceId: 'instagram_scraped' },
+      { value: 'B', sourceId: 'instagram_scraped' },
     ];
     const config = { ...CONFIDENCE_CONFIG, conflict_penalty: 1 };
     const result = calculateFieldConfidence('name', candidates, trustTiers, config, {
@@ -76,9 +76,9 @@ describe('calculateFieldConfidence', () => {
 
   it('clamps score to [0, 1] — never above 1', () => {
     const candidates = [
-      { value: 'Same', source_id: 'google_places' },
-      { value: 'Same', source_id: 'michelin' },
-      { value: 'Same', source_id: 'manual_bobby' },
+      { value: 'Same', sourceId: 'google_places' },
+      { value: 'Same', sourceId: 'michelin' },
+      { value: 'Same', sourceId: 'manual_bobby' },
     ];
     const config = { ...CONFIDENCE_CONFIG, agreement_boost: 0.5 };
     const result = calculateFieldConfidence('name', candidates, trustTiers, config, {
@@ -89,7 +89,7 @@ describe('calculateFieldConfidence', () => {
   });
 
   it('applies geocode_boost for address when hasLatLng', () => {
-    const candidates = [{ value: '123 Main St', source_id: 'google_places' }];
+    const candidates = [{ value: '123 Main St', sourceId: 'google_places' }];
     const withoutGeo = calculateFieldConfidence(
       'address',
       candidates,
@@ -146,14 +146,14 @@ describe('unknown source id', () => {
       lat: 1,
       lng: 1,
     };
-    const { confidence, overall_confidence } = computePlaceConfidence(
+    const { confidence, overallConfidence } = computePlaceConfidence(
       golden,
       rawRecords,
       trustTiersOnlyKnown
     );
     expect(confidence.name).toBeUndefined();
     expect(confidence).toEqual({});
-    expect(overall_confidence).toBe(0.5);
+    expect(overallConfidence).toBe(0.5);
   });
 
   it('normalizeSourceId maps known raw names to canonical id', () => {
@@ -177,7 +177,7 @@ describe('empty entity_links fallback (manual_bobby)', () => {
       lat: 1,
       lng: 1,
     };
-    const { confidence, overall_confidence } = computePlaceConfidence(
+    const { confidence, overallConfidence } = computePlaceConfidence(
       golden,
       [],
       trustTiers
@@ -187,16 +187,16 @@ describe('empty entity_links fallback (manual_bobby)', () => {
     expect(confidence.name?.value).toBe('Foo Bar');
     expect(confidence.address?.winner).toBe('manual_bobby');
     expect(confidence.description?.winner).toBe('manual_bobby');
-    expect(overall_confidence).toBeGreaterThan(0.5);
-    expect(overall_confidence).toBeLessThanOrEqual(1);
+    expect(overallConfidence).toBeGreaterThan(0.5);
+    expect(overallConfidence).toBeLessThanOrEqual(1);
   });
 });
 
 describe('buildFieldConfidenceEntry', () => {
   it('returns entry with value, score, sources, winner, conflicts', () => {
     const candidates = [
-      { value: 'Café A', source_id: 'google_places' },
-      { value: 'Cafe A', source_id: 'michelin' },
+      { value: 'Café A', sourceId: 'google_places' },
+      { value: 'Cafe A', sourceId: 'michelin' },
     ];
     const entry = buildFieldConfidenceEntry(
       'name',

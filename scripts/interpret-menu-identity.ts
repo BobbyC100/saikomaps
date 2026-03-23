@@ -51,27 +51,27 @@ const SIGNAL_VERSION = "v1";
 // ---------------------------------------------------------------------------
 
 interface MenuIdentitySignal {
-  cuisine_posture:                  string | null;
-  cuisine_posture_confidence:       number;
-  cuisine_posture_evidence:         string | null;
+  cuisinePosture:                  string | null;
+  cuisinePostureConfidence:       number;
+  cuisinePostureEvidence:         string | null;
 
-  service_model:                    string | null;
-  service_model_confidence:         number;
-  service_model_evidence:           string | null;
+  serviceModel:                    string | null;
+  serviceModelConfidence:         number;
+  serviceModelEvidence:           string | null;
 
-  wine_program_intent:              string | null;
-  wine_program_intent_confidence:   number;
-  wine_program_intent_evidence:     string | null;
+  wineProgramIntent:              string | null;
+  wineProgramIntentConfidence:   number;
+  wineProgramIntentEvidence:     string | null;
 }
 
 interface InterpretTarget {
-  entity_id:     string;
-  entity_name:   string;
+  entityId:     string;
+  entityName:   string;
   slug:          string;
   description:   string | null;
-  menu_text:     string;
-  menu_format:   string;
-  menu_fetch_id: string;
+  menuText:     string;
+  menuFormat:   string;
+  menuFetchId: string;
 }
 
 interface InterpretOutcome {
@@ -90,17 +90,17 @@ const SYSTEM_PROMPT = `You are a restaurant identity analyst. Given the text con
 
 Return ONLY a valid JSON object matching this exact structure — no markdown, no commentary:
 {
-  "cuisine_posture": "<string or null>",
-  "cuisine_posture_confidence": <0.0–1.0>,
-  "cuisine_posture_evidence": "<direct excerpt or null>",
+  "cuisinePosture": "<string or null>",
+  "cuisinePostureConfidence": <0.0–1.0>,
+  "cuisinePostureEvidence": "<direct excerpt or null>",
 
-  "service_model": "<string or null>",
-  "service_model_confidence": <0.0–1.0>,
-  "service_model_evidence": "<direct excerpt or null>",
+  "serviceModel": "<string or null>",
+  "serviceModelConfidence": <0.0–1.0>,
+  "serviceModelEvidence": "<direct excerpt or null>",
 
-  "wine_program_intent": "<string or null>",
-  "wine_program_intent_confidence": <0.0–1.0>,
-  "wine_program_intent_evidence": "<direct excerpt or null>"
+  "wineProgramIntent": "<string or null>",
+  "wineProgramIntentConfidence": <0.0–1.0>,
+  "wineProgramIntentEvidence": "<direct excerpt or null>"
 }
 
 Field guidance:
@@ -136,16 +136,16 @@ Evidence rules:
   - Return null if the field value is null`;
 
 function buildUserMessage(target: InterpretTarget): string {
-  const textSnippet = target.menu_text.slice(0, MAX_TEXT_CHARS);
-  const truncated   = target.menu_text.length > MAX_TEXT_CHARS
+  const textSnippet = target.menuText.slice(0, MAX_TEXT_CHARS);
+  const truncated   = target.menuText.length > MAX_TEXT_CHARS
     ? `\n[...text truncated at ${MAX_TEXT_CHARS} chars]`
     : "";
 
-  let msg = `Place: ${target.entity_name}\n`;
+  let msg = `Place: ${target.entityName}\n`;
   if (target.description) {
     msg += `\nDescriptive context:\n${target.description.slice(0, 800)}\n`;
   }
-  msg += `\nMenu text (${target.menu_format} source, ${target.menu_text.length} chars total):\n`;
+  msg += `\nMenu text (${target.menuFormat} source, ${target.menuText.length} chars total):\n`;
   msg += `---\n${textSnippet}${truncated}\n---`;
   return msg;
 }
@@ -182,33 +182,33 @@ async function callClaude(client: Anthropic, target: InterpretTarget): Promise<M
 
 async function loadTargets(slugArg: string | undefined, limit: number, reprocess: boolean): Promise<InterpretTarget[]> {
   type RawRow = {
-    entity_id:     string;
-    entity_name:   string;
+    entityId:     string;
+    entityName:   string;
     slug:          string;
     description:   string | null;
-    menu_text:     string;
-    menu_format:   string;
-    menu_fetch_id: string;
-    has_signal:    boolean;
+    menuText:     string;
+    menuFormat:   string;
+    menuFetchId: string;
+    hasSignal:    boolean;
   };
 
   // Build the "already has signal?" exclusion inline
   const rows = slugArg
     ? await db.$queryRaw<RawRow[]>`
         SELECT DISTINCT ON (mf.entity_id)
-          e.id                          AS entity_id,
-          e.name                        AS entity_name,
+          e.id                          AS "entityId",
+          e.name                        AS "entityName",
           e.slug,
           e.description,
-          mf.raw_text                   AS menu_text,
-          mf.menu_format,
-          mf.id                         AS menu_fetch_id,
+          mf.raw_text                   AS "menuText",
+          mf.menu_format                AS "menuFormat",
+          mf.id                         AS "menuFetchId",
           EXISTS (
             SELECT 1 FROM derived_signals ds
             WHERE ds.entity_id  = e.id
               AND ds.signal_key = ${SIGNAL_KEY}
               AND ds.signal_version = ${SIGNAL_VERSION}
-          )                             AS has_signal
+          )                             AS "hasSignal"
         FROM menu_fetches mf
         JOIN entities e ON e.id = mf.entity_id
         WHERE mf.http_status < 400
@@ -219,19 +219,19 @@ async function loadTargets(slugArg: string | undefined, limit: number, reprocess
         LIMIT ${limit}`
     : await db.$queryRaw<RawRow[]>`
         SELECT DISTINCT ON (mf.entity_id)
-          e.id                          AS entity_id,
-          e.name                        AS entity_name,
+          e.id                          AS "entityId",
+          e.name                        AS "entityName",
           e.slug,
           e.description,
-          mf.raw_text                   AS menu_text,
-          mf.menu_format,
-          mf.id                         AS menu_fetch_id,
+          mf.raw_text                   AS "menuText",
+          mf.menu_format                AS "menuFormat",
+          mf.id                         AS "menuFetchId",
           EXISTS (
             SELECT 1 FROM derived_signals ds
             WHERE ds.entity_id  = e.id
               AND ds.signal_key = ${SIGNAL_KEY}
               AND ds.signal_version = ${SIGNAL_VERSION}
-          )                             AS has_signal
+          )                             AS "hasSignal"
         FROM menu_fetches mf
         JOIN entities e ON e.id = mf.entity_id
         WHERE mf.http_status < 400
@@ -241,15 +241,15 @@ async function loadTargets(slugArg: string | undefined, limit: number, reprocess
         LIMIT ${limit}`;
 
   return rows
-    .filter((r) => reprocess || !r.has_signal)
+    .filter((r) => reprocess || !r.hasSignal)
     .map((r) => ({
-      entity_id:     r.entity_id,
-      entity_name:   r.entity_name,
+      entityId:     r.entityId,
+      entityName:   r.entityName,
       slug:          r.slug,
       description:   r.description,
-      menu_text:     r.menu_text,
-      menu_format:   r.menu_format,
-      menu_fetch_id: r.menu_fetch_id,
+      menuText:     r.menuText,
+      menuFormat:   r.menuFormat,
+      menuFetchId: r.menuFetchId,
     }));
 }
 
@@ -330,19 +330,19 @@ async function main() {
       }
 
       // Log
-      const textLen  = target.menu_text.length;
-      const cp       = signal?.cuisine_posture           ?? "—";
-      const sm       = signal?.service_model             ?? "—";
-      const wi       = signal?.wine_program_intent       ?? "—";
+      const textLen  = target.menuText.length;
+      const cp       = signal?.cuisinePosture           ?? "—";
+      const sm       = signal?.serviceModel             ?? "—";
+      const wi       = signal?.wineProgramIntent       ?? "—";
       const conf     = signal ? Math.round(
-        ((signal.cuisine_posture_confidence ?? 0) +
-         (signal.service_model_confidence   ?? 0) +
-         (signal.wine_program_intent_confidence ?? 0)) / 3 * 100
+        ((signal.cuisinePostureConfidence ?? 0) +
+         (signal.serviceModelConfidence   ?? 0) +
+         (signal.wineProgramIntentConfidence ?? 0)) / 3 * 100
       ) : 0;
 
       console.log(
-        `  ${target.entity_name.slice(0, 34).padEnd(34)} ` +
-        `${target.menu_format.padEnd(5)} ${String(textLen).padStart(6)}c  ` +
+        `  ${target.entityName.slice(0, 34).padEnd(34)} ` +
+        `${target.menuFormat.padEnd(5)} ${String(textLen).padStart(6)}c  ` +
         `${cp.slice(0, 26).padEnd(28)} ${sm.slice(0, 18).padEnd(20)} ${wi.slice(0, 16).padEnd(18)} ` +
         `${String(conf).padStart(3)}%`,
       );
@@ -352,30 +352,30 @@ async function main() {
       }
 
       if (verbose && signal) {
-        if (signal.cuisine_posture_evidence)     console.log(`    cuisine evidence: "${signal.cuisine_posture_evidence.slice(0, 100)}"`);
-        if (signal.service_model_evidence)       console.log(`    service evidence: "${signal.service_model_evidence.slice(0, 100)}"`);
-        if (signal.wine_program_intent_evidence) console.log(`    wine evidence:    "${signal.wine_program_intent_evidence.slice(0, 100)}"`);
+        if (signal.cuisinePostureEvidence)     console.log(`    cuisine evidence: "${signal.cuisinePostureEvidence.slice(0, 100)}"`);
+        if (signal.serviceModelEvidence)       console.log(`    service evidence: "${signal.serviceModelEvidence.slice(0, 100)}"`);
+        if (signal.wineProgramIntentEvidence) console.log(`    wine evidence:    "${signal.wineProgramIntentEvidence.slice(0, 100)}"`);
       }
 
       // Write
       if (signal && !dryRun) {
         try {
           await writeDerivedSignal(db, {
-            entityId:      target.entity_id,
+            entityId:      target.entityId,
             signalKey:     SIGNAL_KEY,
             signalVersion: SIGNAL_VERSION,
             signalValue:   {
               ...signal,
               source:        "menu_fetches",
-              menu_fetch_id: target.menu_fetch_id,
-              menu_format:   target.menu_format,
-              menu_chars:    textLen,
-              interpreted_at: new Date().toISOString(),
+              menuFetchId: target.menuFetchId,
+              menuFormat:   target.menuFormat,
+              menuChars:    textLen,
+              interpretedAt: new Date().toISOString(),
             },
-            inputClaimIds: [target.menu_fetch_id],
+            inputClaimIds: [target.menuFetchId],
           });
         } catch (err) {
-          console.error(`    !! DB write failed for ${target.entity_name}:`, err);
+          console.error(`    !! DB write failed for ${target.entityName}:`, err);
           outcome.error = String(err);
         }
       }
@@ -393,28 +393,28 @@ async function main() {
   // ---------------------------------------------------------------------------
 
   const withSignal      = outcomes.filter((o) => o?.signal !== null);
-  const withCuisine     = withSignal.filter((o) => o.signal!.cuisine_posture !== null);
-  const withService     = withSignal.filter((o) => o.signal!.service_model !== null);
-  const withWine        = withSignal.filter((o) => o.signal!.wine_program_intent !== null);
+  const withCuisine     = withSignal.filter((o) => o.signal!.cuisinePosture !== null);
+  const withService     = withSignal.filter((o) => o.signal!.serviceModel !== null);
+  const withWine        = withSignal.filter((o) => o.signal!.wineProgramIntent !== null);
   const errored         = outcomes.filter((o) => o?.error);
 
   const avgCuisineConf  = withCuisine.length
-    ? withCuisine.reduce((s, o) => s + (o.signal!.cuisine_posture_confidence ?? 0), 0) / withCuisine.length
+    ? withCuisine.reduce((s, o) => s + (o.signal!.cuisinePostureConfidence ?? 0), 0) / withCuisine.length
     : 0;
   const avgServiceConf  = withService.length
-    ? withService.reduce((s, o) => s + (o.signal!.service_model_confidence ?? 0), 0) / withService.length
+    ? withService.reduce((s, o) => s + (o.signal!.serviceModelConfidence ?? 0), 0) / withService.length
     : 0;
   const avgWineConf     = withWine.length
-    ? withWine.reduce((s, o) => s + (o.signal!.wine_program_intent_confidence ?? 0), 0) / withWine.length
+    ? withWine.reduce((s, o) => s + (o.signal!.wineProgramIntentConfidence ?? 0), 0) / withWine.length
     : 0;
 
-  const htmlOutcomes = withSignal.filter((o) => o.target.menu_format === "html");
-  const pdfOutcomes  = withSignal.filter((o) => o.target.menu_format === "pdf");
+  const htmlOutcomes = withSignal.filter((o) => o.target.menuFormat === "html");
+  const pdfOutcomes  = withSignal.filter((o) => o.target.menuFormat === "pdf");
   const htmlAvgChars = htmlOutcomes.length
-    ? Math.round(htmlOutcomes.reduce((s, o) => s + o.target.menu_text.length, 0) / htmlOutcomes.length)
+    ? Math.round(htmlOutcomes.reduce((s, o) => s + o.target.menuText.length, 0) / htmlOutcomes.length)
     : 0;
   const pdfAvgChars  = pdfOutcomes.length
-    ? Math.round(pdfOutcomes.reduce((s, o) => s + o.target.menu_text.length, 0) / pdfOutcomes.length)
+    ? Math.round(pdfOutcomes.reduce((s, o) => s + o.target.menuText.length, 0) / pdfOutcomes.length)
     : 0;
 
   console.log(`\n${"═".repeat(70)}`);
@@ -429,7 +429,7 @@ async function main() {
   console.log(`  PDF  sources: ${pdfOutcomes.length}  avg menu text: ${pdfAvgChars.toLocaleString()} chars`);
   if (errored.length) {
     console.log(`\nErrors: ${errored.length}`);
-    errored.forEach((o) => console.log(`  • ${o.target.entity_name}: ${o.error}`));
+    errored.forEach((o) => console.log(`  • ${o.target.entityName}: ${o.error}`));
   }
 
   if (dryRun) console.log(`\n[dry-run] No rows written.`);

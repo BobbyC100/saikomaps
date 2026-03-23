@@ -213,7 +213,7 @@ async function main() {
       name: true,
       neighborhood: true,
       googlePlacesAttributes: true,
-      merchant_signals: { select: { entityId: true, menu_url: true, winelist_url: true } },
+      merchant_signals: { select: { entityId: true, menuUrl: true, winelistUrl: true } },
     },
   });
 
@@ -295,12 +295,12 @@ async function main() {
     where: { entityId: entity.id },
     create: {
       entityId: entity.id,
-      menu_url: menuUrl ?? undefined,
-      winelist_url: winelistUrl ?? undefined,
+      menuUrl: menuUrl ?? undefined,
+      winelistUrl: winelistUrl ?? undefined,
     },
     update: {
-      ...(menuUrl ? { menu_url: menuUrl } : {}),
-      ...(winelistUrl ? { winelist_url: winelistUrl } : {}),
+      ...(menuUrl ? { menuUrl: menuUrl } : {}),
+      ...(winelistUrl ? { winelistUrl: winelistUrl } : {}),
     },
   });
   console.log('\n✓ merchant_signals upserted');

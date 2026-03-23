@@ -92,22 +92,22 @@ export async function POST(request: NextRequest) {
 
       // 2. Reassign FK references from deleteId to keepId
 
-      // entity_issues has unique(entity_id, issue_type) — delete overlapping issues first
+      // entity_issues has unique(entityId, issueType) — delete overlapping issues first
       const keepIssues = await tx.entity_issues.findMany({
-        where: { entity_id: keepId },
-        select: { issue_type: true },
+        where: { entityId: keepId },
+        select: { issueType: true },
       });
-      const keepIssueTypes = new Set(keepIssues.map((i: { issue_type: string }) => i.issue_type));
+      const keepIssueTypes = new Set(keepIssues.map((i: { issueType: string }) => i.issueType));
       // Delete issues from the duplicate that already exist on the kept entity
       if (keepIssueTypes.size > 0) {
         await tx.entity_issues.deleteMany({
-          where: { entity_id: deleteId, issue_type: { in: [...keepIssueTypes] } },
+          where: { entityId: deleteId, issueType: { in: [...keepIssueTypes] } },
         });
       }
       // Reassign remaining issues
       await tx.entity_issues.updateMany({
-        where: { entity_id: deleteId },
-        data: { entity_id: keepId },
+        where: { entityId: deleteId },
+        data: { entityId: keepId },
       });
 
       // For tables with compound unique constraints, delete overlapping rows
@@ -125,8 +125,8 @@ export async function POST(request: NextRequest) {
       };
 
       // Compound-unique tables: delete duplicate's rows (kept entity's rows take precedence)
-      await safeReassign(tx.derived_signals, 'entity_id');
-      await safeReassign(tx.interpretation_cache, 'entity_id');
+      await safeReassign(tx.derived_signals, 'entityId');
+      await safeReassign(tx.interpretation_cache, 'entityId');
       await safeReassign(tx.energy_scores, 'entityId');
       await safeReassign(tx.place_tag_scores, 'entityId');
       await safeReassign(tx.place_photo_eval, 'entityId');
@@ -139,57 +139,57 @@ export async function POST(request: NextRequest) {
 
       // Singleton tables — just delete
       await tx.merchant_signals.deleteMany({ where: { entityId: deleteId } });
-      await tx.canonical_entity_state.deleteMany({ where: { entity_id: deleteId } });
+      await tx.canonical_entity_state.deleteMany({ where: { entityId: deleteId } });
       await tx.traceSignalsCache.deleteMany({ where: { entityId: deleteId } });
-      await tx.canonical_sanctions.deleteMany({ where: { entity_id: deleteId } });
-      await tx.sanction_conflicts.deleteMany({ where: { entity_id: deleteId } });
+      await tx.canonical_sanctions.deleteMany({ where: { entityId: deleteId } });
+      await tx.sanction_conflicts.deleteMany({ where: { entityId: deleteId } });
       await tx.place_coverage_status.deleteMany({ where: { entityId: deleteId } });
 
-      // Tables with immutability triggers — cannot update entity_id directly.
+      // Tables with immutability triggers — cannot update entityId directly.
       // Strategy: read surfaces + artifacts from delete entity, delete originals,
       // then recreate with new IDs pointing to keep entity.
-      // Skip surfaces that already exist on the keep entity (same surface_type + source_url).
+      // Skip surfaces that already exist on the keep entity (same surfaceType + sourceUrl).
       const deleteSurfaces = await tx.merchant_surfaces.findMany({
-        where: { entity_id: deleteId },
+        where: { entityId: deleteId },
         include: { artifacts: true },
       });
 
       const keepSurfaces = await tx.merchant_surfaces.findMany({
-        where: { entity_id: keepId },
-        select: { surface_type: true, source_url: true },
+        where: { entityId: keepId },
+        select: { surfaceType: true, sourceUrl: true },
       });
       const keepSurfaceKeys = new Set(
-        keepSurfaces.map((s: { surface_type: string; source_url: string }) => `${s.surface_type}||${s.source_url}`),
+        keepSurfaces.map((s: { surfaceType: string; sourceUrl: string }) => `${s.surfaceType}||${s.sourceUrl}`),
       );
 
       // Delete originals (artifacts cascade-delete via FK)
       await tx.merchant_surface_artifacts.deleteMany({
-        where: { merchant_surface: { entity_id: deleteId } },
+        where: { merchant_surface: { entityId: deleteId } },
       });
       await tx.merchant_surfaces.deleteMany({
-        where: { entity_id: deleteId },
+        where: { entityId: deleteId },
       });
 
       // Recreate unique surfaces under the kept entity
       for (const surface of deleteSurfaces) {
-        const key = `${surface.surface_type}||${surface.source_url}`;
+        const key = `${surface.surfaceType}||${surface.sourceUrl}`;
         if (keepSurfaceKeys.has(key)) continue; // skip duplicates
 
         const newSurface = await tx.merchant_surfaces.create({
           data: {
-            entity_id: keepId,
-            surface_type: surface.surface_type,
-            source_url: surface.source_url,
-            content_type: surface.content_type,
-            fetch_status: surface.fetch_status,
-            parse_status: surface.parse_status,
-            extraction_status: surface.extraction_status,
-            content_hash: surface.content_hash,
-            raw_text: surface.raw_text,
-            raw_html: surface.raw_html,
-            fetched_at: surface.fetched_at,
-            discovered_at: surface.discovered_at,
-            metadata_json: surface.metadata_json ?? undefined,
+            entityId: keepId,
+            surfaceType: surface.surfaceType,
+            sourceUrl: surface.sourceUrl,
+            contentType: surface.contentType,
+            fetchStatus: surface.fetchStatus,
+            parseStatus: surface.parseStatus,
+            extractionStatus: surface.extractionStatus,
+            contentHash: surface.contentHash,
+            rawText: surface.rawText,
+            rawHtml: surface.rawHtml,
+            fetchedAt: surface.fetchedAt,
+            discoveredAt: surface.discoveredAt,
+            metadataJson: surface.metadataJson ?? undefined,
           },
         });
 
@@ -197,11 +197,11 @@ export async function POST(request: NextRequest) {
         for (const artifact of surface.artifacts) {
           await tx.merchant_surface_artifacts.create({
             data: {
-              merchant_surface_id: newSurface.id,
-              artifact_type: artifact.artifact_type,
-              artifact_version: artifact.artifact_version,
-              artifact_json: artifact.artifact_json,
-              created_at: artifact.created_at,
+              merchantSurfaceId: newSurface.id,
+              artifactType: artifact.artifactType,
+              artifactVersion: artifact.artifactVersion,
+              artifactJson: artifact.artifactJson,
+              createdAt: artifact.createdAt,
             },
           });
         }
@@ -209,28 +209,28 @@ export async function POST(request: NextRequest) {
 
       // merchant_surface_scans — append-only, safe to delete (no unique constraint with entity)
       await tx.merchant_surface_scans.deleteMany({
-        where: { entity_id: deleteId },
+        where: { entityId: deleteId },
       });
 
       // Compound-unique tables that need safe reassign (delete-then-skip pattern)
-      await safeReassign(tx.reservation_provider_matches, 'entity_id');
+      await safeReassign(tx.reservation_provider_matches, 'entityId');
 
       // Simple FK tables: reassign
       await tx.menu_fetches.updateMany({
-        where: { entity_id: deleteId },
-        data: { entity_id: keepId },
+        where: { entityId: deleteId },
+        data: { entityId: keepId },
       });
       await tx.instagram_accounts.updateMany({
-        where: { entity_id: deleteId },
-        data: { entity_id: keepId },
+        where: { entityId: deleteId },
+        data: { entityId: keepId },
       });
       await tx.observed_claims.updateMany({
-        where: { entity_id: deleteId },
-        data: { entity_id: keepId },
+        where: { entityId: deleteId },
+        data: { entityId: keepId },
       });
       await tx.place_job_log.updateMany({
-        where: { entity_id: deleteId },
-        data: { entity_id: keepId },
+        where: { entityId: deleteId },
+        data: { entityId: keepId },
       });
       await tx.merchant_enrichment_runs.updateMany({
         where: { entityId: deleteId },
@@ -266,20 +266,20 @@ export async function POST(request: NextRequest) {
       // Resolve any potential_duplicate issues on OTHER entities that point to the deleted entity
       await tx.entity_issues.updateMany({
         where: {
-          issue_type: 'potential_duplicate',
+          issueType: 'potential_duplicate',
           status: 'open',
           detail: { path: ['duplicate_of_id'], equals: deleteId },
         },
-        data: { status: 'resolved', resolved_at: new Date(), resolved_by: 'merge' },
+        data: { status: 'resolved', resolvedAt: new Date(), resolvedBy: 'merge' },
       });
       // Also resolve any potential_duplicate issue on the kept entity (it was the duplicate pair)
       await tx.entity_issues.updateMany({
         where: {
-          entity_id: keepId,
-          issue_type: 'potential_duplicate',
+          entityId: keepId,
+          issueType: 'potential_duplicate',
           status: 'open',
         },
-        data: { status: 'resolved', resolved_at: new Date(), resolved_by: 'merge' },
+        data: { status: 'resolved', resolvedAt: new Date(), resolvedBy: 'merge' },
       });
     }, { timeout: 30000 });
 

@@ -237,8 +237,8 @@ async function syncGoldenToPlaces() {
         description: golden.description,
         googlePlaceId: resolvedGpid,
         confidence: (Object.keys(confidence).length ? confidence : {}) as Prisma.InputJsonValue,
-        overall_confidence: overall_confidence >= 0 ? overall_confidence : 0.5,
-        confidence_updated_at: now,
+        overallConfidence: overall_confidence >= 0 ? overall_confidence : 0.5,
+        confidenceUpdatedAt: now,
       };
 
       if (existingPlace) {

@@ -77,13 +77,13 @@ export function ReviewQueue() {
   // Optimistic updates - UI moves immediately, API syncs in background
   const handleMerge = useCallback(async () => {
     if (!currentItem) return;
-    
+
     const itemToResolve = currentItem;
     goNext();
     incrementStreak();
-    
+
     try {
-      await fetch(`/api/admin/review-queue/${itemToResolve.queue_id}/resolve`, {
+      await fetch(`/api/admin/review-queue/${itemToResolve.queueId}/resolve`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ resolution: 'merged' })
@@ -92,16 +92,16 @@ export function ReviewQueue() {
       console.error('Failed to save merge:', error);
     }
   }, [currentItem, currentIndex]);
-  
+
   const handleDifferent = useCallback(async () => {
     if (!currentItem) return;
-    
+
     const itemToResolve = currentItem;
     goNext();
     incrementStreak();
-    
+
     try {
-      await fetch(`/api/admin/review-queue/${itemToResolve.queue_id}/resolve`, {
+      await fetch(`/api/admin/review-queue/${itemToResolve.queueId}/resolve`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ resolution: 'kept_separate' })
@@ -110,30 +110,30 @@ export function ReviewQueue() {
       console.error('Failed to save:', error);
     }
   }, [currentItem, currentIndex]);
-  
+
   const handleSkip = useCallback(async () => {
     if (!currentItem) return;
-    
+
     const itemToSkip = currentItem;
     goNext();
-    
+
     try {
-      await fetch(`/api/admin/review-queue/${itemToSkip.queue_id}/skip`, {
+      await fetch(`/api/admin/review-queue/${itemToSkip.queueId}/skip`, {
         method: 'POST'
       });
     } catch (error) {
       console.error('Failed to skip:', error);
     }
   }, [currentItem, currentIndex]);
-  
+
   const handleFlag = useCallback(async () => {
     if (!currentItem) return;
-    
+
     const itemToFlag = currentItem;
     goNext();
-    
+
     try {
-      await fetch(`/api/admin/review-queue/${itemToFlag.queue_id}/resolve`, {
+      await fetch(`/api/admin/review-queue/${itemToFlag.queueId}/resolve`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ resolution: 'flagged' })
@@ -186,18 +186,18 @@ export function ReviewQueue() {
       
       <div className="flex-1 flex items-center justify-center p-8 overflow-auto">
         <div className="w-full max-w-4xl">
-          {currentItem.conflict_type === 'new_entity_review' ? (
+          {currentItem.conflictType === 'new_entity_review' ? (
             <IdentityEnrichmentPanel
-              key={currentItem.queue_id}
+              key={currentItem.queueId}
               item={currentItem}
             />
           ) : (
             <ComparisonCard
-              key={currentItem.queue_id}
+              key={currentItem.queueId}
               recordA={currentItem.recordA}
               recordB={currentItem.recordB!}
-              matchConfidence={currentItem.match_confidence || 0}
-              conflictingFields={currentItem.conflicting_fields || {}}
+              matchConfidence={currentItem.matchConfidence || 0}
+              conflictingFields={currentItem.conflictingFields || {}}
             />
           )}
         </div>

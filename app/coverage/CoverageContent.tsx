@@ -4,13 +4,13 @@
 
 import { db } from '@/lib/db'
 
-/** Normalize for display: empty/null neighborhood → "(none)", null primary_vertical → "(unmapped)" */
+/** Normalize for display: empty/null neighborhood → "(none)", null primaryVertical → "(unmapped)" */
 function normHood(neighborhood: string | null) {
   const t = neighborhood?.trim()
   return t === '' || t == null ? '(none)' : t
 }
-function normVertical(primary_vertical: string | null) {
-  return primary_vertical == null ? '(unmapped)' : primary_vertical
+function normVertical(primaryVertical: string | null) {
+  return primaryVertical == null ? '(unmapped)' : primaryVertical
 }
 
 export async function CoverageContent() {
@@ -33,7 +33,7 @@ export async function CoverageContent() {
       take: 20
     }),
     db.entities.groupBy({
-      by: ['neighborhood', 'primary_vertical'],
+      by: ['neighborhood', 'primaryVertical'],
       _count: true
     })
   ])
@@ -41,7 +41,7 @@ export async function CoverageContent() {
   const hoodVertical = hoodVerticalRows
     .map((r) => ({
       neighborhood: normHood(r.neighborhood),
-      primary_vertical: normVertical(r.primary_vertical),
+      primaryVertical: normVertical(r.primaryVertical),
       places: r._count
     }))
     .sort((a, b) => {
@@ -78,7 +78,7 @@ export async function CoverageContent() {
         </div>
 
         <div className="bg-white rounded-xl p-8 shadow-sm mt-8">
-          <h2 className="text-2xl font-bold text-[#36454F] mb-6">Places by neighborhood × primary_vertical</h2>
+          <h2 className="text-2xl font-bold text-[#36454F] mb-6">Places by neighborhood × primaryVertical</h2>
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
@@ -90,9 +90,9 @@ export async function CoverageContent() {
               </thead>
               <tbody>
                 {hoodVertical.map((r, i) => (
-                  <tr key={`${r.neighborhood}-${r.primary_vertical}-${i}`} className="border-b border-[#C3B091]/20">
+                  <tr key={`${r.neighborhood}-${r.primaryVertical}-${i}`} className="border-b border-[#C3B091]/20">
                     <td className="py-2 pr-4 text-[#36454F]">{r.neighborhood}</td>
-                    <td className="py-2 pr-4 text-[#36454F]">{r.primary_vertical}</td>
+                    <td className="py-2 pr-4 text-[#36454F]">{r.primaryVertical}</td>
                     <td className="py-2 text-[#8B7355] font-medium text-right">{r.places.toLocaleString()}</td>
                   </tr>
                 ))}

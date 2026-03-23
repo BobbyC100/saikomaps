@@ -1,37 +1,26 @@
 {
-  "generated": "2026-03-18T21:50:00.000Z",
-  "doc_count": 89,
+  "generated": "2026-03-22T20:07:30.122Z",
+  "doc_count": 119,
   "docs": [
     {
-      "doc_id": "ARCH-PERSON-ACTORS-V1",
-      "doc_type": "architecture",
+      "doc_id": "APPROVED-SOURCE-REGISTRY-V1",
+      "doc_type": "reference",
       "status": "active",
-      "title": "Person Actors — Chef & Sommelier Mapping v1",
-      "path": "docs/architecture/person-actors-v1.md",
+      "title": "Approved Editorial Source Registry",
+      "path": "docs/architecture/approved-source-registry-v1.md",
       "owner": "Bobby Ciccaglione",
-      "created": "2026-03-18",
-      "last_updated": "2026-03-18",
+      "created": "2026-03-22",
+      "last_updated": "2026-03-22",
       "project_id": "SAIKO",
-      "summary": "Manual creation and linking of person actors (chefs, sommeliers, beverage directors) to venues. V1 is manual only; future extraction generates candidates for review.",
-      "systems": ["actors", "admin-tools"],
-      "related_docs": ["docs/architecture/instagram-ingestion-status-v1.md"]
-    },
-    {
-      "doc_id": "ARCH-INSTAGRAM-INGESTION-STATUS-V1",
-      "doc_type": "architecture",
-      "status": "active",
-      "title": "Instagram Ingestion — Operational Status v1",
-      "path": "docs/architecture/instagram-ingestion-status-v1.md",
-      "owner": "Bobby Ciccaglione",
-      "created": "2026-03-18",
-      "last_updated": "2026-03-18",
-      "project_id": "SAIKO",
-      "summary": "Operational status of Instagram batch ingestion. 914 entities ingesting account profiles + recent media. CDN URL expiration and storage strategy pending.",
-      "systems": ["instagram", "enrichment"],
+      "summary": "Canonical reference for Saiko's curated list of approved editorial sources. Bobby maintains this list. A source enters only if it clearly improves cultural interpretation or factual coverage. This document mirrors the code-level registry in lib/source-registry.ts.\n",
+      "systems": [
+        "fields-data-layer",
+        "enrichment"
+      ],
       "related_docs": [
-        "docs/architecture/instagram-api-integration-v1.md",
-        "docs/architecture/instagram-implementation-v1.md",
-        "docs/architecture/instagram-ingestion-field-spec-v1.md"
+        "docs/architecture/coverage-source-enrichment-v1.md",
+        "docs/architecture/source-integration-policy-v1.md",
+        "docs/architecture/enrichment-strategy-v1.md"
       ]
     },
     {
@@ -51,9 +40,23 @@
       "related_docs": []
     },
     {
+      "doc_id": "ARCH-COVERAGE-DASHBOARD-V2",
+      "doc_type": "document",
+      "status": "DRAFT",
+      "title": "Coverage Dashboard v2 — Spec",
+      "path": "docs/architecture/coverage-dashboard-v2-spec.md",
+      "owner": "Bobby",
+      "created": "Thu Mar 19 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "last_updated": "Thu Mar 19 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "project_id": "",
+      "summary": "",
+      "systems": [],
+      "related_docs": []
+    },
+    {
       "doc_id": "ARCH-COVERAGE-OPS-DASHBOARD-V1",
       "doc_type": "architecture",
-      "status": "active",
+      "status": "superseded",
       "title": "Coverage Ops Dashboard v1",
       "path": "docs/architecture/coverage-ops-dashboard-v1.md",
       "owner": "Bobby Ciccaglione",
@@ -96,7 +99,125 @@
         "docs/scenesense/three-lenses-framework-v1.md",
         "docs/scenesense/display-contract-v2.md",
         "docs/saikoai-extraction-prompt-v2.1.md",
-        "docs/ENRICHMENT-OPERATIONS-INVENTORY.md"
+        "docs/ENRICHMENT-OPERATIONS-INVENTORY.md",
+        "docs/architecture/entity-classification-framework-v1.md",
+        "docs/architecture/entity-type-problem-definition-v1.md"
+      ]
+    },
+    {
+      "doc_id": "ARCH-DATA-COMPLETENESS-PHILOSOPHY-V1",
+      "doc_type": "architecture",
+      "status": "active",
+      "title": "Data Completeness Philosophy",
+      "path": "docs/architecture/data-completeness-philosophy-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "Tue Mar 17 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "last_updated": "Tue Mar 17 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "project_id": "",
+      "summary": "Saiko's philosophy on data completeness — composite confidence over checklists, multiple paths to the same truth, and no single golden field.\n",
+      "systems": [
+        "fields",
+        "coverage-ops",
+        "enrichment"
+      ],
+      "related_docs": [
+        "ARCH-IDENTITY-SCORING-V1",
+        "ARCH-COVERAGE-TIERS-V1",
+        "ENRICH-STRATEGY-V1"
+      ]
+    },
+    {
+      "doc_id": "ARCH-ENRICHMENT-EFFECTIVENESS-V0",
+      "doc_type": "document",
+      "status": "PROBLEM_FRAMING",
+      "title": "Enrichment Effectiveness — Problem Framing (v0)",
+      "path": "docs/architecture/enrichment-effectiveness-problem-framing-v0.md",
+      "owner": "Bobby",
+      "created": "Thu Mar 19 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "last_updated": "Thu Mar 19 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "project_id": "",
+      "summary": "",
+      "systems": [],
+      "related_docs": [
+        "docs/architecture/enrichment-strategy-v1.md",
+        "docs/architecture/enrichment-model-v1.md",
+        "docs/architecture/coverage-dashboard-v2-spec.md"
+      ]
+    },
+    {
+      "doc_id": "ARCH-ENRICHMENT-EVIDENCE-MODEL-V1",
+      "doc_type": "architecture",
+      "status": "draft",
+      "title": "Enrichment Evidence Model v1 — Presence, Absence, and Interpretation",
+      "path": "docs/architecture/enrichment-evidence-model-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-21",
+      "last_updated": "2026-03-21",
+      "project_id": "SAIKO",
+      "summary": "Establishes the principle that enrichment is the foundation of all downstream interpretation. Defines confirmed absence as a first-class signal, source-aware staleness cadence, and the rule that entity classification (dimensions) is derived from enrichment evidence, not heuristic guessing. Complements the existing Enrichment Strategy and Data Completeness Philosophy docs.\n",
+      "systems": [
+        "fields-data-layer",
+        "enrichment",
+        "entity-model"
+      ],
+      "related_docs": [
+        "docs/architecture/enrichment-strategy-v1.md",
+        "docs/architecture/data-completeness-philosophy-v1.md",
+        "docs/architecture/enrichment-model-v1.md",
+        "docs/architecture/entity-classification-framework-v1.md",
+        "docs/architecture/entity-dimension-implementation-plan-v1.md",
+        "docs/architecture/entity-awareness-stage-v1.md",
+        "docs/architecture/source-integration-policy-v1.md",
+        "docs/architecture/entity-maintenance-policy-v1.md",
+        "docs/architecture/enrichment-freshness-strategy-v1.md"
+      ]
+    },
+    {
+      "doc_id": "ARCH-ENRICHMENT-FRESHNESS-STRATEGY-V1",
+      "doc_type": "architecture",
+      "status": "active",
+      "title": "Enrichment Freshness Strategy v1",
+      "path": "docs/architecture/enrichment-freshness-strategy-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-22",
+      "last_updated": "2026-03-22",
+      "project_id": "SAIKO",
+      "summary": "Tactical companion to the Entity Maintenance Policy. Classifies every enrichment data point by stability class, sets conservative initial refresh cadences, and defines an observation framework that measures actual decay rates so cadences can be tightened or loosened with evidence over time. Built on top of the existing attribute_registry, observed_claims supersession chain, and source_registry infrastructure.\n",
+      "systems": [
+        "fields-data-layer",
+        "enrichment",
+        "entity-model"
+      ],
+      "related_docs": [
+        "docs/architecture/entity-maintenance-policy-v1.md",
+        "docs/architecture/enrichment-evidence-model-v1.md",
+        "docs/architecture/enrichment-strategy-v1.md",
+        "docs/architecture/coverage-source-enrichment-v1.md",
+        "docs/architecture/entity-state-model-v1.md",
+        "docs/architecture/enrichment-playbook-v1.md"
+      ]
+    },
+    {
+      "doc_id": "ARCH-ENTITY-CLASSIFICATION-FRAMEWORK-V1",
+      "doc_type": "architecture",
+      "status": "draft",
+      "title": "Entity Classification Framework v1 — Dimension-Based Model",
+      "path": "docs/architecture/entity-classification-framework-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-21",
+      "last_updated": "2026-03-21",
+      "project_id": "SAIKO",
+      "summary": "Defines the four-dimension classification model for entities: operating location, schedule type, identity anchor, and containment. Types are derived from stored dimensions, not hardcoded enums. Includes entity relationship rules and derived pattern table. Doc 2 of 3 in the Entity Type Taxonomy series.",
+      "systems": [
+        "fields-data-layer",
+        "enrichment",
+        "entity-model"
+      ],
+      "related_docs": [
+        "docs/architecture/entity-type-problem-definition-v1.md",
+        "docs/architecture/entity-type-taxonomy-v1.md",
+        "docs/PLATFORM_DATA_LAYER.md",
+        "docs/architecture/coverage-tiers-v1.md"
       ]
     },
     {
@@ -118,33 +239,44 @@
       "related_docs": [
         "docs/architecture/vertical-taxonomy-v1.md",
         "docs/architecture/coverage-tiers-v1.md",
-        "docs/FIELDS_V2_TARGET_ARCHITECTURE.md"
+        "docs/FIELDS_V2_TARGET_ARCHITECTURE.md",
+        "docs/architecture/entity-type-problem-definition-v1.md",
+        "docs/architecture/entity-classification-framework-v1.md",
+        "docs/architecture/entity-type-taxonomy-v1.md"
       ]
     },
     {
-      "doc_id": "ARCH-EVENTS-PROGRAM-V1",
+      "doc_id": "ARCH-ENTITY-DIMENSION-IMPLEMENTATION-PLAN-V1",
       "doc_type": "architecture",
-      "status": "active",
-      "title": "Events Program — Architecture-Aligned Spec (V1)",
-      "path": "docs/architecture/events-program-v1.md",
-      "owner": "Bobby",
-      "created": "2026-03-18",
-      "last_updated": "2026-03-18",
+      "status": "draft",
+      "title": "Entity Dimension Model — Implementation Plan v1",
+      "path": "docs/architecture/entity-dimension-implementation-plan-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-21",
+      "last_updated": "2026-03-21",
       "project_id": "SAIKO",
-      "summary": "Event capabilities (private dining, group dining, catering) extending offering_programs. Detect → Structure → Expose pipeline using existing Fields v2, ERA, and Coverage Ops infrastructure.",
-      "systems": ["fields", "enrichment", "coverage-ops", "traces"],
+      "summary": "Phased implementation plan for the four-dimension entity classification model. Covers schema migration, data backfill, enrichment routing, admin tooling, and page rendering changes. Three phases: Schema + Audit, Enrichment Routing, and Consumer Surface Updates.",
+      "systems": [
+        "fields-data-layer",
+        "enrichment",
+        "entity-model",
+        "data-pipeline"
+      ],
       "related_docs": [
+        "docs/architecture/entity-type-problem-definition-v1.md",
+        "docs/architecture/entity-classification-framework-v1.md",
+        "docs/architecture/entity-type-taxonomy-v1.md",
+        "docs/architecture/entity-classification-layers-v1.md",
+        "docs/architecture/identity-scoring-v1.md",
         "docs/architecture/enrichment-strategy-v1.md",
-        "docs/architecture/enrichment-playbook-v1.md",
-        "docs/architecture/coverage-tiers-v1.md",
-        "docs/architecture/signals-registry-v1.md",
-        "docs/offering-signals/offering-signals-v1.md"
+        "docs/ENTITIES_CONTRACT_RECONCILIATION.md",
+        "docs/features/markets/SPEC_v1.2.md"
       ]
     },
     {
       "doc_id": "ARCH-ENTITY-LIFECYCLE-CLOSURE-V1",
       "doc_type": "document",
-      "status": "draft",
+      "status": "SUPERSEDED",
       "title": "Entity Lifecycle and Closure Specification",
       "path": "docs/architecture/entity-lifecycle-and-closure-v1.md",
       "owner": "Bobby",
@@ -156,18 +288,129 @@
       "related_docs": []
     },
     {
-      "doc_id": "ARCH-DATA-COMPLETENESS-PHILOSOPHY-V1",
+      "doc_id": "ARCH-ENTITY-MAINTENANCE-POLICY-V1",
       "doc_type": "architecture",
       "status": "active",
-      "title": "Data Completeness Philosophy",
-      "path": "docs/architecture/data-completeness-philosophy-v1.md",
+      "title": "Entity Maintenance Policy v1",
+      "path": "docs/architecture/entity-maintenance-policy-v1.md",
       "owner": "Bobby Ciccaglione",
-      "created": "2026-03-18",
-      "last_updated": "2026-03-18",
+      "created": "2026-03-22",
+      "last_updated": "2026-03-22",
       "project_id": "SAIKO",
-      "summary": "Saiko's philosophy on data completeness — composite confidence over checklists, multiple paths to the same truth, and no single golden field.",
-      "systems": ["fields", "coverage-ops", "enrichment"],
-      "related_docs": ["ARCH-IDENTITY-SCORING-V1", "ARCH-COVERAGE-TIERS-V1", "ENRICH-STRATEGY-V1"]
+      "summary": "Defines how Saiko maintains entity data across the full lifecycle — from soft-open through permanent closure. Establishes maintenance postures by operating status, re-enrichment cadences by source and status, and rules for when entities enter and exit active maintenance. Unifies the source-aware staleness tiers (enrichment-evidence-model-v1), link health cadences (coverage-source-enrichment-v1), and closure recheck rules (entity-state-model-v1) into a single policy.\n",
+      "systems": [
+        "fields-data-layer",
+        "enrichment",
+        "entity-model"
+      ],
+      "related_docs": [
+        "docs/architecture/entity-state-model-v1.md",
+        "docs/architecture/enrichment-evidence-model-v1.md",
+        "docs/architecture/enrichment-strategy-v1.md",
+        "docs/architecture/coverage-source-enrichment-v1.md",
+        "docs/architecture/coverage-tiers-v1.md",
+        "docs/architecture/entity-lifecycle-and-closure-v1.md"
+      ]
+    },
+    {
+      "doc_id": "ARCH-ENTITY-PAGE-CONTENT-SYSTEM-V0",
+      "doc_type": "problem-framing",
+      "status": "DRAFT",
+      "title": "Entity Page Content System — Problem Framing v0",
+      "path": "docs/architecture/entity-page-content-system-v0.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "Thu Mar 19 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "last_updated": "Thu Mar 19 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "project_id": "",
+      "summary": "",
+      "systems": [],
+      "related_docs": []
+    },
+    {
+      "doc_id": "ARCH-ENTITY-STATE-MODEL-V1",
+      "doc_type": "document",
+      "status": "DRAFT",
+      "title": "Entity State Model",
+      "path": "docs/architecture/entity-state-model-v1.md",
+      "owner": "Bobby",
+      "created": "Thu Mar 19 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "last_updated": "Thu Mar 19 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "project_id": "",
+      "summary": "",
+      "systems": [],
+      "related_docs": [
+        "docs/architecture/entity-classification-framework-v1.md",
+        "docs/architecture/entity-type-problem-definition-v1.md",
+        "docs/architecture/entity-maintenance-policy-v1.md"
+      ]
+    },
+    {
+      "doc_id": "ARCH-ENTITY-TYPE-PROBLEM-DEFINITION-V1",
+      "doc_type": "architecture",
+      "status": "draft",
+      "title": "Entity Type Taxonomy — Problem Definition",
+      "path": "docs/architecture/entity-type-problem-definition-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-21",
+      "last_updated": "2026-03-21",
+      "project_id": "SAIKO",
+      "summary": "Problem definition for the entity type model. Documents why the current single-type (venue) assumption is breaking across mobile entities, park facilities, and dormant schema fields. Doc 1 of 3 in the Entity Type Taxonomy series.",
+      "systems": [
+        "fields-data-layer",
+        "enrichment",
+        "entity-model"
+      ],
+      "related_docs": [
+        "docs/architecture/entity-classification-framework-v1.md",
+        "docs/architecture/entity-type-taxonomy-v1.md",
+        "docs/PLATFORM_DATA_LAYER.md",
+        "docs/architecture/coverage-tiers-v1.md"
+      ]
+    },
+    {
+      "doc_id": "ARCH-ENTITY-TYPE-TAXONOMY-V1",
+      "doc_type": "architecture",
+      "status": "draft",
+      "title": "Entity Type Taxonomy — Early Problem Statement",
+      "path": "docs/architecture/entity-type-taxonomy-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-21",
+      "last_updated": "2026-03-21",
+      "project_id": "SAIKO",
+      "summary": "Early-stage problem statement for the entity type taxonomy. Identifies the four differentiating dimensions, candidate entity types, and open questions requiring team feedback before schema work. Precursor to the full Problem Definition (Doc 1) and Classification Framework (Doc 2).",
+      "systems": [
+        "fields-data-layer",
+        "enrichment",
+        "entity-model"
+      ],
+      "related_docs": [
+        "docs/architecture/entity-type-problem-definition-v1.md",
+        "docs/architecture/entity-classification-framework-v1.md",
+        "docs/PLATFORM_DATA_LAYER.md"
+      ]
+    },
+    {
+      "doc_id": "ARCH-EVENTS-PROGRAM-V1",
+      "doc_type": "architecture",
+      "status": "draft",
+      "title": "Events Program — Architecture-Aligned Spec (V1)",
+      "path": "docs/architecture/events-program-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-01",
+      "last_updated": "2026-03-22",
+      "project_id": "SAIKO",
+      "summary": "Defines how Saiko detects, structures, and exposes event capabilities (private dining, group dining, catering) for places. Extends the existing offering_programs model with three new program types, adds events surface discovery, and wires through to the place page contract. V1 is detect → structure → expose only — no marketplace, booking, or pricing.\n",
+      "systems": [
+        "enrichment",
+        "derived-signals",
+        "traces-place-page",
+        "coverage-ops"
+      ],
+      "related_docs": [
+        "docs/architecture/coverage-source-enrichment-v1.md",
+        "docs/architecture/derived-signals-engine-v1.md",
+        "docs/architecture/enrichment-evidence-model-v1.md"
+      ]
     },
     {
       "doc_id": "ARCH-IDENTITY-SCORING-V1",
@@ -186,7 +429,92 @@
       ],
       "related_docs": [
         "docs/architecture/coverage-ops-approach-v1.md",
-        "docs/architecture/fields-era-overview-v1.md"
+        "docs/architecture/fields-era-overview-v1.md",
+        "docs/architecture/entity-classification-framework-v1.md",
+        "docs/architecture/entity-type-problem-definition-v1.md"
+      ]
+    },
+    {
+      "doc_id": "ARCH-INSTAGRAM-INGESTION-STATUS-V1",
+      "doc_type": "architecture",
+      "status": "active",
+      "title": "Instagram Ingestion — Operational Status (V1)",
+      "path": "docs/architecture/instagram-ingestion-status-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-01",
+      "last_updated": "2026-03-22",
+      "project_id": "SAIKO",
+      "summary": "Operational status of the Instagram batch ingestion pipeline. Documents what is being ingested (accounts + media via Business Discovery API), known limitations (CDN URL expiration, account type requirements), and downstream wiring priorities (caption signal extraction, photo pipeline, profile signals). 914 entities with Instagram handles as of 2026-03-18.\n",
+      "systems": [
+        "enrichment",
+        "instagram"
+      ],
+      "related_docs": [
+        "docs/architecture/instagram-api-integration-v1.md",
+        "docs/architecture/instagram-implementation-v1.md",
+        "docs/architecture/instagram-ingestion-field-spec-v1.md",
+        "docs/architecture/enrichment-evidence-model-v1.md"
+      ]
+    },
+    {
+      "doc_id": "ARCH-NEIGHBORHOOD-COVERAGE-V0",
+      "doc_type": "document",
+      "status": "PROBLEM_FRAMING",
+      "title": "Neighborhood Coverage Model — Problem Framing (v0)",
+      "path": "docs/architecture/neighborhood-coverage-model-v0.md",
+      "owner": "Bobby",
+      "created": "Thu Mar 19 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "last_updated": "Thu Mar 19 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "project_id": "",
+      "summary": "",
+      "systems": [],
+      "related_docs": [
+        "docs/architecture/coverage-dashboard-v2-spec.md",
+        "docs/architecture/enrichment-model-v1.md",
+        "docs/architecture/vertical-taxonomy-v1.md",
+        "docs/architecture/visit-bucket-problem-framing-v0.md"
+      ]
+    },
+    {
+      "doc_id": "ARCH-PERSON-ACTORS-V1",
+      "doc_type": "architecture",
+      "status": "active",
+      "title": "Person Actors — Chef & Sommelier Mapping (V1)",
+      "path": "docs/architecture/person-actors-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-01",
+      "last_updated": "2026-03-22",
+      "project_id": "SAIKO",
+      "summary": "Maps chefs, sommeliers, and beverage professionals to venues as first-class person actors in the Saiko graph. Uses the existing Actor model with kind=person and five new ActorRole values. V1 is manual entry and linking only — no automated extraction. V1.5 adds candidate generation from website enrichment and coverage source extraction.\n",
+      "systems": [
+        "entity-model",
+        "actors",
+        "admin"
+      ],
+      "related_docs": [
+        "docs/architecture/coverage-source-enrichment-v1.md"
+      ]
+    },
+    {
+      "doc_id": "ARCH-RESERVATION-V1-REVIEW",
+      "doc_type": "architecture",
+      "status": "active",
+      "title": "Reservation Validation V1 — Architecture Review",
+      "path": "docs/reservation-v1-architecture-review.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-18",
+      "last_updated": "2026-03-22",
+      "project_id": "SAIKO",
+      "summary": "Architecture review of the reservation validation V1 proposal. Documents what exists today (merchant-evidence-only extraction, no provider API integration), recommends a separate reservation_provider_matches table with a three-tier confidence model (weak / strong_merchant / provider_verified), and defines provider-specific render behavior as an additive upgrade over the existing generic Reserve button. Includes backlog bucket analysis of 751 open missing_reservations issues.\n",
+      "systems": [
+        "enrichment",
+        "fields-data-layer",
+        "traces-place-page",
+        "coverage-ops"
+      ],
+      "related_docs": [
+        "docs/architecture/enrichment-evidence-model-v1.md",
+        "docs/architecture/coverage-source-enrichment-v1.md"
       ]
     },
     {
@@ -226,6 +554,23 @@
         "platform"
       ],
       "related_docs": []
+    },
+    {
+      "doc_id": "ARCH-VISIT-BUCKET-V0",
+      "doc_type": "document",
+      "status": "PROBLEM_FRAMING",
+      "title": "Entity Visit Information — Problem Framing (v0)",
+      "path": "docs/architecture/visit-bucket-problem-framing-v0.md",
+      "owner": "Bobby",
+      "created": "Thu Mar 19 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "last_updated": "Thu Mar 19 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "project_id": "",
+      "summary": "",
+      "systems": [],
+      "related_docs": [
+        "docs/architecture/enrichment-model-v1.md",
+        "docs/architecture/coverage-dashboard-v2-spec.md"
+      ]
     },
     {
       "doc_id": "ARCHITECTURE-FIELDS-INGESTION-PIPELINE-V1",
@@ -284,11 +629,53 @@
       "path": "docs/architecture/instagram-ingestion-field-spec-v1.md",
       "owner": "Bobby Ciccaglione",
       "created": "2026-03-13",
-      "last_updated": "2026-03-13",
+      "last_updated": "2026-03-17",
       "project_id": "SAIKO",
       "summary": "Instagram ingestion schema — 3 tables, field definitions, sync rules. Engineering handoff for migration + Prisma models.",
       "systems": [],
       "related_docs": []
+    },
+    {
+      "doc_id": "AUDIT-TERMINOLOGY-MIGRATION-2026-03",
+      "doc_type": "document",
+      "status": "ACTIVE",
+      "title": "Terminology Migration Audit — March 2026",
+      "path": "docs/architecture/terminology-migration-audit-2026-03.md",
+      "owner": "Bobby",
+      "created": "Thu Mar 19 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "last_updated": "Thu Mar 19 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "project_id": "",
+      "summary": "",
+      "systems": [],
+      "related_docs": []
+    },
+    {
+      "doc_id": "COVERAGE-SOURCE-ENRICHMENT-V1",
+      "doc_type": "architecture",
+      "status": "active",
+      "title": "Coverage Source Enrichment Pipeline v1",
+      "path": "docs/architecture/coverage-source-enrichment-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-22",
+      "last_updated": "2026-03-22",
+      "project_id": "SAIKO",
+      "summary": "Defines the schema, pipeline, and data flow for treating editorial coverage sources as fully enriched, durable references. Coverage sources are not just links — they are rich data artifacts that feed the interpretation layer, serve as citable references in the UI, and remain durable even if the original URL breaks.\n",
+      "systems": [
+        "fields-data-layer",
+        "enrichment",
+        "interpretation",
+        "traces"
+      ],
+      "related_docs": [
+        "docs/architecture/enrichment-strategy-v1.md",
+        "docs/architecture/enrichment-evidence-model-v1.md",
+        "docs/architecture/source-integration-policy-v1.md",
+        "docs/architecture/approved-source-registry-v1.md",
+        "docs/architecture/person-actors-v1.md",
+        "docs/architecture/program-template-v1.md",
+        "docs/architecture/entity-maintenance-policy-v1.md",
+        "docs/architecture/enrichment-freshness-strategy-v1.md"
+      ]
     },
     {
       "doc_id": "COVOPS-APPROACH-V1",
@@ -334,47 +721,34 @@
       ]
     },
     {
-      "doc_id": "ENRICH-STRATEGY-V1",
-      "doc_type": "architecture",
-      "status": "active",
-      "title": "Entity Enrichment Strategy",
-      "path": "docs/architecture/enrichment-strategy-v1.md",
-      "owner": "bobby",
-      "created": "2026-03-15",
-      "last_updated": "2026-03-16",
-      "project_id": "SAIKO",
-      "summary": "Entity enrichment lifecycle (Intake→Identify→Enrich→Assess→Publish), phased execution (free before paid), evidence-vs-canonical architecture, editorial coverage pipeline, and hard rules for enrichment ordering.",
-      "systems": [
-        "enrichment-pipeline",
-        "fields-data-layer"
-      ],
-      "related_docs": [
-        "docs/architecture/enrichment-playbook-v1.md",
-        "docs/architecture/coverage-tiers-v1.md",
-        "docs/architecture/identity-scoring-v1.md"
-      ]
-    },
-    {
       "doc_id": "ENRICH-PLAYBOOK-V1",
-      "doc_type": "runbook",
-      "status": "active",
+      "doc_type": "document",
+      "status": "draft",
       "title": "City Launch Enrichment Playbook",
       "path": "docs/architecture/enrichment-playbook-v1.md",
       "owner": "bobby",
-      "created": "2026-03-16",
-      "last_updated": "2026-03-16",
-      "project_id": "SAIKO",
-      "summary": "Reusable, sequenced playbook for enriching 1,000+ entities at city-launch scale. Tool inventory, fully-enriched benchmark, gap analysis, 7-phase execution sequence (free→paid), cost model (~$5-10 per 1K entities), monitoring, and new-city checklist.",
-      "systems": [
-        "enrichment-pipeline",
-        "fields-data-layer",
-        "coverage-operations"
-      ],
+      "created": "Sun Mar 15 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "last_updated": "",
+      "project_id": "",
+      "summary": "",
+      "systems": [],
+      "related_docs": []
+    },
+    {
+      "doc_id": "ENRICH-STRATEGY-V1",
+      "doc_type": "document",
+      "status": "draft",
+      "title": "Entity Enrichment Strategy",
+      "path": "docs/architecture/enrichment-strategy-v1.md",
+      "owner": "bobby",
+      "created": "Sat Mar 14 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "last_updated": "",
+      "project_id": "",
+      "summary": "",
+      "systems": [],
       "related_docs": [
-        "docs/architecture/enrichment-strategy-v1.md",
-        "docs/architecture/coverage-ops-approach-v1.md",
-        "docs/architecture/identity-scoring-v1.md",
-        "docs/architecture/social-fields-spec-v1.md"
+        "docs/architecture/entity-classification-framework-v1.md",
+        "docs/architecture/entity-type-problem-definition-v1.md"
       ]
     },
     {
@@ -389,7 +763,10 @@
       "project_id": "SAIKO",
       "summary": "",
       "systems": [],
-      "related_docs": []
+      "related_docs": [
+        "docs/architecture/entity-classification-framework-v1.md",
+        "docs/architecture/entity-type-problem-definition-v1.md"
+      ]
     },
     {
       "doc_id": "FIELDS-ENRICHMENT-OPS-INVENTORY-V1",
@@ -399,7 +776,7 @@
       "path": "docs/ENRICHMENT-OPERATIONS-INVENTORY.md",
       "owner": "Bobby Ciccaglione",
       "created": "Thu Mar 12 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
-      "last_updated": "Thu Mar 12 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "last_updated": "Sat Mar 21 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
       "project_id": "FIELDS",
       "summary": "Canonical inventory of all enrichment operations available on an entity record — automated (Google Places, neighborhood lookup), semi-automated (GPID, Instagram, Photos), and human-only (editorial fields). Coverage Dashboard and Entity Profile are designed from this inventory outward.",
       "systems": [
@@ -452,7 +829,9 @@
       "related_docs": [
         "docs/FIELDS_V2_TARGET_ARCHITECTURE.md",
         "docs/architecture/fields-era-overview-v1.md",
-        "docs/ENTITIES_CONTRACT_RECONCILIATION.md"
+        "docs/ENTITIES_CONTRACT_RECONCILIATION.md",
+        "docs/architecture/entity-type-problem-definition-v1.md",
+        "docs/architecture/entity-classification-framework-v1.md"
       ]
     },
     {
@@ -497,6 +876,23 @@
         "docs/architecture/fields-era-overview-v1.md",
         "docs/FIELDS_V2_TARGET_ARCHITECTURE.md"
       ]
+    },
+    {
+      "doc_id": "OPS-RELEASE-RUNBOOK-V1",
+      "doc_type": "operations",
+      "status": "active",
+      "title": "Saiko Release Runbook v1",
+      "path": "docs/RELEASE-RUNBOOK.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-01",
+      "last_updated": "2026-03-22",
+      "project_id": "SAIKO",
+      "summary": "Release runbook covering the deploy flow (branch → PR → build gate → preview → merge → production), branch protection rules, incident response / rollback procedures, database migration rules, and build gate checks.\n",
+      "systems": [
+        "deployment",
+        "ci-cd"
+      ],
+      "related_docs": []
     },
     {
       "doc_id": "OPS-STALE-DEPLOYMENTS",
@@ -552,7 +948,7 @@
     {
       "doc_id": "PI-CONCEPT-V1",
       "doc_type": "document",
-      "status": "draft",
+      "status": "DRAFT",
       "title": "SAIKO FIELDS — Place Identity Concept Document",
       "path": "docs/architecture/place-identity-concept-v1.md",
       "owner": "Bobby",
@@ -703,7 +1099,7 @@
       "created": "2026-03-10",
       "last_updated": "2026-03-17",
       "project_id": "SAIKO",
-      "summary": "",
+      "summary": "Copy-paste commands for verifying and syncing data across environments.",
       "systems": [],
       "related_docs": []
     },
@@ -733,7 +1129,7 @@
       "created": "2026-03-10",
       "last_updated": "2026-03-17",
       "project_id": "SAIKO",
-      "summary": "",
+      "summary": "Database setup: Neon (production), local Postgres (dev), Prisma ORM.",
       "systems": [
         "database"
       ],
@@ -791,7 +1187,10 @@
       "related_docs": [
         "docs/FIELDS_V2_TARGET_ARCHITECTURE.md",
         "docs/DEFERRED_MIGRATION_GATES.md",
-        "docs/PLATFORM_DATA_LAYER.md"
+        "docs/PLATFORM_DATA_LAYER.md",
+        "docs/architecture/entity-type-problem-definition-v1.md",
+        "docs/architecture/entity-classification-framework-v1.md",
+        "docs/architecture/entity-type-taxonomy-v1.md"
       ]
     },
     {
@@ -825,7 +1224,7 @@
       "created": "2026-03-10",
       "last_updated": "2026-03-17",
       "project_id": "SAIKO",
-      "summary": "",
+      "summary": "Environment variable reference. Three files: .env (defaults), .env.local (secrets), .env.example (template).",
       "systems": [],
       "related_docs": []
     },
@@ -928,7 +1327,7 @@
       "created": "2026-03-10",
       "last_updated": "2026-03-17",
       "project_id": "SAIKO",
-      "summary": "",
+      "summary": "Local development setup: install, configure, run.",
       "systems": [],
       "related_docs": []
     },
@@ -986,11 +1385,12 @@
       "path": "docs/PIPELINE_COMMANDS.md",
       "owner": "Bobby Ciccaglione",
       "created": "2026-03-10",
-      "last_updated": "2026-03-17",
+      "last_updated": "2026-03-22",
       "project_id": "SAIKO",
-      "summary": "",
+      "summary": "Operator command reference for entity enrichment, identity resolution, social discovery, and coverage operations.",
       "systems": [
-        "data-pipeline"
+        "data-pipeline",
+        "coverage-operations"
       ],
       "related_docs": []
     },
@@ -1195,6 +1595,28 @@
       ]
     },
     {
+      "doc_id": "SKAI-DOC-FIELDS-ENRICHMENT-MODEL-V1",
+      "doc_type": "architecture",
+      "status": "draft",
+      "title": "Enrichment Model V1 — Vertical-Aware Completeness",
+      "path": "docs/architecture/enrichment-model-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-19",
+      "last_updated": "2026-03-19",
+      "project_id": "SAIKO",
+      "summary": "Defines three-bucket enrichment model (Identity / Access / Offering) with vertical-aware completeness profiles. Replaces flat field checklist with context-relative scoring.",
+      "systems": [
+        "coverage",
+        "enrichment",
+        "dashboard"
+      ],
+      "related_docs": [
+        "docs/architecture/enrichment-strategy-v1.md",
+        "docs/architecture/coverage-ops-approach-v1.md",
+        "docs/architecture/coverage-tiers-v1.md"
+      ]
+    },
+    {
       "doc_id": "SKAI-DOC-FIELDS-GLOSSARY-001",
       "doc_type": "architecture",
       "status": "active",
@@ -1285,6 +1707,174 @@
       ]
     },
     {
+      "doc_id": "SKAI-DOC-LA-PLACES-PROGRAM-MAPPING-V1",
+      "doc_type": "validation",
+      "status": "active",
+      "title": "LA Places → Program Mapping (v1)",
+      "path": "docs/validation/la-places-program-mapping-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-19",
+      "last_updated": "",
+      "project_id": "SAIKO",
+      "summary": "Real-world validation of sushi/ramen/dumpling programs across 20 LA restaurants.",
+      "systems": [
+        "offering-programs",
+        "validation"
+      ],
+      "related_docs": [
+        "docs/architecture/program-template-v1.md",
+        "docs/architecture/enrichment-model-v1.md"
+      ]
+    },
+    {
+      "doc_id": "SKAI-DOC-LA-RAMEN-PROGRAM-VALIDATION-V1",
+      "doc_type": "validation",
+      "status": "active",
+      "title": "Ramen Program — LA Validation Mapping",
+      "path": "docs/validation/la-ramen-program-mapping-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-19",
+      "last_updated": "",
+      "project_id": "SAIKO",
+      "summary": "Real-world stress test of ramen program across specialty shops, multi-style bars, and legacy anchors in Los Angeles.",
+      "systems": [
+        "offering-programs",
+        "ramen-program",
+        "validation"
+      ],
+      "related_docs": [
+        "docs/architecture/ramen-program-v2.md",
+        "docs/validation/la-places-program-mapping-v1.md"
+      ]
+    },
+    {
+      "doc_id": "SKAI-DOC-LA-TACO-PROGRAM-VALIDATION-V1",
+      "doc_type": "validation",
+      "status": "active",
+      "title": "Taco Program — LA Validation Mapping",
+      "path": "docs/validation/la-taco-program-mapping-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-19",
+      "last_updated": "",
+      "project_id": "SAIKO",
+      "summary": "Real-world stress test of taco program across street tacos, taquerias, and contemporary concepts in Los Angeles.",
+      "systems": [
+        "offering-programs",
+        "taco-program",
+        "validation"
+      ],
+      "related_docs": [
+        "docs/architecture/taco-program-v1.md",
+        "docs/validation/la-places-program-mapping-v1.md"
+      ]
+    },
+    {
+      "doc_id": "SKAI-DOC-OFFERING-PROGRAMS-UNIFIED-V1",
+      "doc_type": "architecture",
+      "status": "active",
+      "title": "Offering Programs — Unified System Architecture v1",
+      "path": "docs/architecture/offering-programs-unified-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-19",
+      "last_updated": "",
+      "project_id": "SAIKO",
+      "summary": "Canonical architecture for format-based offering programs. Unifies dumpling, sushi, ramen, taco, and pizza under coherent signal + maturity system.",
+      "systems": [
+        "offering-programs",
+        "food-programs"
+      ],
+      "related_docs": [
+        "docs/architecture/program-template-v1.md",
+        "docs/architecture/enrichment-model-v1.md",
+        "docs/architecture/dumpling-program-v1.md",
+        "docs/architecture/sushi-program-v1.md",
+        "docs/architecture/ramen-program-v1.md",
+        "docs/architecture/taco-program-v1.md",
+        "docs/architecture/pizza-program-v1.md"
+      ]
+    },
+    {
+      "doc_id": "SKAI-DOC-PROGRAM-TEMPLATE-V1",
+      "doc_type": "architecture",
+      "status": "active",
+      "title": "Offering Program Template — How to Add a New Program",
+      "path": "docs/architecture/program-template-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-19",
+      "last_updated": "2026-03-19",
+      "project_id": "SAIKO",
+      "summary": "Step-by-step template for adding a new offering program. Covers signal definition, assembly logic, contract, API, and dashboard wiring.",
+      "systems": [
+        "enrichment",
+        "coverage"
+      ],
+      "related_docs": [
+        "docs/architecture/enrichment-model-v1.md",
+        "docs/architecture/enrichment-strategy-v1.md"
+      ]
+    },
+    {
+      "doc_id": "SKAI-DOC-RAMEN-PROGRAM-V2",
+      "doc_type": "architecture",
+      "status": "active",
+      "title": "Ramen Program — Broth-Driven System Architecture v2",
+      "path": "docs/architecture/ramen-program-v2.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-19",
+      "last_updated": "",
+      "project_id": "SAIKO",
+      "summary": "Broth-system-driven ramen program anchored in specialization and execution depth. Validated across 15 LA ramen shops spanning legacy, specialty, and modern categories.",
+      "systems": [
+        "offering-programs",
+        "ramen-program"
+      ],
+      "related_docs": [
+        "docs/architecture/offering-programs-unified-v1.md",
+        "docs/validation/la-ramen-program-mapping-v1.md"
+      ]
+    },
+    {
+      "doc_id": "SKAI-DOC-TACO-PROGRAM-V1",
+      "doc_type": "architecture",
+      "status": "active",
+      "title": "Taco Program — Format-Based Offering System v1",
+      "path": "docs/architecture/taco-program-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-19",
+      "last_updated": "2026-03-19",
+      "project_id": "SAIKO",
+      "summary": "Canonical specification for taco program. Format-based system anchored in subtype (filling + technique), with tortilla as co-equal structural component.",
+      "systems": [
+        "offering-programs",
+        "food-programs"
+      ],
+      "related_docs": [
+        "docs/architecture/program-template-v1.md",
+        "docs/architecture/enrichment-model-v1.md"
+      ]
+    },
+    {
+      "doc_id": "SKAI-DOC-TRACES-ABOUT-DESCRIPTION-001",
+      "doc_type": "traces",
+      "status": "draft",
+      "title": "About Description Spec v1",
+      "path": "docs/traces/about-description-spec-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "Sun Mar 15 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "last_updated": "Sun Mar 15 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "project_id": "PLACE-PAGE",
+      "summary": "Spec for the About description on the place page — 3-tier sourcing hierarchy, VOICE_DESCRIPTOR generation, and rendering rules.",
+      "systems": [
+        "place-page",
+        "enrichment-pipeline",
+        "voice-engine"
+      ],
+      "related_docs": [
+        "SKAI-DOC-TRACES-PLACE-PAGE-DESIGN-001",
+        "ENRICH-STRATEGY-V1"
+      ]
+    },
+    {
       "doc_id": "SKAI-DOC-TRACES-PLACE-PAGE-DESIGN-001",
       "doc_type": "traces",
       "status": "active",
@@ -1292,7 +1882,7 @@
       "path": "docs/traces/place-page-design-v1.md",
       "owner": "Bobby Ciccaglione",
       "created": "Tue Mar 10 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
-      "last_updated": "Tue Mar 10 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "last_updated": "Mon Mar 16 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
       "project_id": "PLACE-PAGE",
       "summary": "Canonical design spec for the Saiko place profile page — wireframe, data sources, content model, and rendering rules.",
       "systems": [
@@ -1303,28 +1893,7 @@
       "related_docs": [
         "SKAI-DOC-TRACES-BEVERAGE-PROGRAM-VOCAB-001",
         "SKAI-DOC-SS-001",
-        "SKAI-DOC-TRACES-PLACE-PAGE-DATA-CONTRACT-001"
-      ]
-    },
-    {
-      "doc_id": "SKAI-DOC-TRACES-ABOUT-DESCRIPTION-001",
-      "doc_type": "traces",
-      "status": "draft",
-      "title": "About Description Spec v1",
-      "path": "docs/traces/about-description-spec-v1.md",
-      "owner": "Bobby Ciccaglione",
-      "created": "2026-03-16",
-      "last_updated": "2026-03-16",
-      "project_id": "PLACE-PAGE",
-      "summary": "Spec for the About description on the place page — 3-tier sourcing hierarchy, VOICE_DESCRIPTOR generation, and rendering rules.",
-      "systems": [
-        "place-page",
-        "enrichment-pipeline",
-        "voice-engine"
-      ],
-      "related_docs": [
-        "SKAI-DOC-TRACES-PLACE-PAGE-DESIGN-001",
-        "docs/traces/WO-ABOUT-001-voice-descriptor-pipeline.md"
+        "SKAI-DOC-TRACES-WO-ABOUT-001"
       ]
     },
     {
@@ -1334,8 +1903,8 @@
       "title": "WO-ABOUT-001 — VOICE_DESCRIPTOR Generation Pipeline",
       "path": "docs/traces/WO-ABOUT-001-voice-descriptor-pipeline.md",
       "owner": "Bobby Ciccaglione",
-      "created": "2026-03-16",
-      "last_updated": "2026-03-16",
+      "created": "Sun Mar 15 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "last_updated": "Sun Mar 15 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
       "project_id": "PLACE-PAGE",
       "summary": "Execution work order for the VOICE_DESCRIPTOR generation pipeline — 3 checkpoints covering Tier 1 extraction, Tier 2/3 generation, and API read path + rendering.",
       "systems": [
@@ -1344,8 +1913,11 @@
         "place-page"
       ],
       "related_docs": [
-        "SKAI-DOC-TRACES-ABOUT-DESCRIPTION-001",
-        "SKAI-DOC-TRACES-PLACE-PAGE-DESIGN-001"
+        "docs/traces/about-description-spec-v1.md",
+        "docs/traces/place-page-design-v1.md",
+        "lib/fields-v2/write-claim.ts",
+        "lib/voice-engine-v2/signal-extraction.ts",
+        "scripts/generate-taglines-v2.ts"
       ]
     },
     {
@@ -1384,6 +1956,59 @@
       "related_docs": [
         "docs/skai/decision-index-spec-v1.md"
       ]
+    },
+    {
+      "doc_id": "SOP-CHEATSHEET-V1",
+      "doc_type": "sop",
+      "status": "active",
+      "title": "Saiko Operations Cheatsheet",
+      "path": "docs/CHEATSHEET.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "Sat Mar 21 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "last_updated": "Sat Mar 21 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "project_id": "SAIKO",
+      "summary": "",
+      "systems": [
+        "deployment",
+        "data-pipeline"
+      ],
+      "related_docs": [
+        "docs/architecture/session-release-workflow-v1.md",
+        "docs/RELEASE-RUNBOOK.md"
+      ]
+    },
+    {
+      "doc_id": "SOP-SESSION-RELEASE-V1",
+      "doc_type": "sop",
+      "status": "active",
+      "title": "Session Release Workflow v1",
+      "path": "docs/architecture/session-release-workflow-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "Sat Mar 21 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "last_updated": "Sat Mar 21 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "project_id": "SAIKO",
+      "summary": "",
+      "systems": [
+        "deployment",
+        "knowledge-management"
+      ],
+      "related_docs": [
+        "docs/RELEASE-RUNBOOK.md"
+      ]
+    },
+    {
+      "doc_id": "SOURCE-INTEGRATION-V1",
+      "doc_type": "document",
+      "status": "draft",
+      "title": "Source Integration Policy",
+      "path": "docs/architecture/source-integration-policy-v1.md",
+      "owner": "bobby",
+      "created": "Wed Mar 18 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "last_updated": "",
+      "project_id": "",
+      "summary": "",
+      "systems": [],
+      "related_docs": []
     },
     {
       "doc_id": "SS-DISPLAY-CONTRACT-V1",

@@ -71,25 +71,25 @@ type PdfType           = "text_based" | "image_based" | "unknown";
 type ExtractionQuality = "good" | "sparse" | "empty";
 
 interface PdfTarget {
-  entity_id:   string;
-  entity_name: string;
+  entityId:   string;
+  entityName: string;
   slug:        string;
-  source_url:  string;   // resolved base URL from the surface scan
-  menu_url:    string;   // may be relative or absolute
+  sourceUrl:  string;   // resolved base URL from the surface scan
+  menuUrl:    string;   // may be relative or absolute
 }
 
 interface PdfOutcome {
   target:               PdfTarget;
-  resolved_url:         string;
-  final_url:            string | null;
-  http_status:          number | null;
-  content_type:         string | null;     // actual HTTP content-type received
-  fetch_duration_ms:    number | null;
-  raw_text:             string | null;
-  content_hash:         string | null;
-  raw_html_pointer:     string | null;     // r2 receipt (PDF bytes)
-  pdf_type:             PdfType;
-  extraction_quality:   ExtractionQuality;
+  resolvedUrl:         string;
+  finalUrl:            string | null;
+  httpStatus:          number | null;
+  contentType:         string | null;     // actual HTTP content-type received
+  fetchDurationMs:    number | null;
+  rawText:             string | null;
+  contentHash:         string | null;
+  rawHtmlPointer:     string | null;     // r2 receipt (PDF bytes)
+  pdfType:             PdfType;
+  extractionQuality:   ExtractionQuality;
   error:                string | null;
 }
 
@@ -169,20 +169,20 @@ async function writePdfToR2(
 // ---------------------------------------------------------------------------
 
 async function fetchPdf(target: PdfTarget): Promise<PdfOutcome> {
-  const resolvedUrl = resolveUrl(target.menu_url, target.source_url);
+  const resolvedUrl = resolveUrl(target.menuUrl, target.sourceUrl);
 
   const base: PdfOutcome = {
     target,
-    resolved_url:       resolvedUrl,
-    final_url:          null,
-    http_status:        null,
-    content_type:       null,
-    fetch_duration_ms:  null,
-    raw_text:           null,
-    content_hash:       null,
-    raw_html_pointer:   null,
-    pdf_type:           "unknown",
-    extraction_quality: "empty",
+    resolvedUrl:       resolvedUrl,
+    finalUrl:          null,
+    httpStatus:        null,
+    contentType:       null,
+    fetchDurationMs:  null,
+    rawText:           null,
+    contentHash:       null,
+    rawHtmlPointer:   null,
+    pdfType:           "unknown",
+    extractionQuality: "empty",
     error:              null,
   };
 
@@ -202,10 +202,10 @@ async function fetchPdf(target: PdfTarget): Promise<PdfOutcome> {
       redirect: "follow",
     });
 
-    base.fetch_duration_ms = Date.now() - t0;
-    base.http_status       = res.status;
-    base.final_url         = res.url;
-    base.content_type      = res.headers.get("content-type");
+    base.fetchDurationMs = Date.now() - t0;
+    base.httpStatus       = res.status;
+    base.finalUrl         = res.url;
+    base.contentType      = res.headers.get("content-type");
 
     if (res.status >= 400) return base;
 
@@ -213,16 +213,16 @@ async function fetchPdf(target: PdfTarget): Promise<PdfOutcome> {
     const bodyBuffer = Buffer.from(await res.arrayBuffer());
 
     // Validate content-type before attempting extraction
-    const ct = (base.content_type ?? "").toLowerCase();
+    const ct = (base.contentType ?? "").toLowerCase();
     const isPdf = ct.includes("application/pdf") || ct.includes("application/octet-stream");
 
     if (!isPdf) {
       // Not a PDF (HTML redirect, login wall, etc.) — store what we got, no extraction
-      base.pdf_type           = "unknown";
-      base.extraction_quality = "empty";
+      base.pdfType           = "unknown";
+      base.extractionQuality = "empty";
       // Still upload receipt if it's not giant (useful for debugging)
       if (bodyBuffer.length < 2 * 1024 * 1024) {
-        base.raw_html_pointer = await writePdfToR2(target.entity_id, bodyBuffer, fetchedAt);
+        base.rawHtmlPointer = await writePdfToR2(target.entityId, bodyBuffer, fetchedAt);
       }
       return base;
     }
@@ -230,22 +230,22 @@ async function fetchPdf(target: PdfTarget): Promise<PdfOutcome> {
     // --- PDF confirmed ---
 
     // Upload raw PDF receipt to R2
-    base.raw_html_pointer = await writePdfToR2(target.entity_id, bodyBuffer, fetchedAt);
+    base.rawHtmlPointer = await writePdfToR2(target.entityId, bodyBuffer, fetchedAt);
 
     // Extract text with pdftotext
     const { text, success } = await runPdfToText(bodyBuffer);
 
-    base.raw_text           = text || null;
-    base.pdf_type           = classifyPdfType(text.length, success);
-    base.extraction_quality = classifyQuality(text.length);
+    base.rawText           = text || null;
+    base.pdfType           = classifyPdfType(text.length, success);
+    base.extractionQuality = classifyQuality(text.length);
 
     if (text.length > 0) {
-      base.content_hash = createHash("sha256").update(text).digest("hex");
+      base.contentHash = createHash("sha256").update(text).digest("hex");
     }
 
     return base;
   } catch (err) {
-    base.fetch_duration_ms = Date.now() - t0;
+    base.fetchDurationMs = Date.now() - t0;
     base.error = err instanceof Error ? err.message : String(err);
     return base;
   } finally {
@@ -262,19 +262,19 @@ async function writeFetch(outcome: PdfOutcome, dryRun: boolean): Promise<void> {
   await db.menu_fetches.create({
     data: {
       id:                    randomUUID(),
-      entity_id:             outcome.target.entity_id,
-      source_url:            outcome.resolved_url,
-      final_url:             outcome.final_url          ?? undefined,
-      menu_format:           "pdf",
-      http_status:           outcome.http_status        ?? undefined,
-      content_type:          outcome.content_type       ?? undefined,
-      fetch_duration_ms:     outcome.fetch_duration_ms  ?? undefined,
-      raw_text:              outcome.raw_text            ?? undefined,
-      content_hash:          outcome.content_hash        ?? undefined,
-      raw_html_pointer:      outcome.raw_html_pointer    ?? undefined,
-      text_extraction_method: TEXT_METHOD,
-      pdf_type:              outcome.pdf_type,
-      extraction_quality:    outcome.extraction_quality,
+      entityId:             outcome.target.entityId,
+      sourceUrl:            outcome.resolvedUrl,
+      finalUrl:             outcome.finalUrl          ?? undefined,
+      menuFormat:           "pdf",
+      httpStatus:           outcome.httpStatus        ?? undefined,
+      contentType:          outcome.contentType       ?? undefined,
+      fetchDurationMs:     outcome.fetchDurationMs  ?? undefined,
+      rawText:              outcome.rawText            ?? undefined,
+      contentHash:          outcome.contentHash        ?? undefined,
+      rawHtmlPointer:      outcome.rawHtmlPointer    ?? undefined,
+      textExtractionMethod: TEXT_METHOD,
+      pdfType:              outcome.pdfType,
+      extractionQuality:    outcome.extractionQuality,
     },
   });
 }
@@ -317,21 +317,21 @@ async function main() {
   // ----- Resolve targets from current-state surface scans ------------------
 
   type RawTarget = {
-    entity_id:   string;
-    entity_name: string;
+    entityId:   string;
+    entityName: string;
     slug:        string;
-    source_url:  string;
-    menu_url:    string;
+    sourceUrl:  string;
+    menuUrl:    string;
   };
 
   const rawTargets = slugArg
     ? await db.$queryRaw<RawTarget[]>`
         SELECT DISTINCT ON (mss.entity_id)
-          e.id           AS entity_id,
-          e.name         AS entity_name,
+          e.id           AS "entityId",
+          e.name         AS "entityName",
           e.slug,
-          COALESCE(mss.final_url, mss.source_url) AS source_url,
-          mss.menu_url
+          COALESCE(mss.final_url, mss.source_url) AS "sourceUrl",
+          mss.menu_url   AS "menuUrl"
         FROM merchant_surface_scans mss
         JOIN entities e ON e.id = mss.entity_id
         WHERE mss.http_status < 400
@@ -343,11 +343,11 @@ async function main() {
         LIMIT ${limit}`
     : await db.$queryRaw<RawTarget[]>`
         SELECT DISTINCT ON (mss.entity_id)
-          e.id           AS entity_id,
-          e.name         AS entity_name,
+          e.id           AS "entityId",
+          e.name         AS "entityName",
           e.slug,
-          COALESCE(mss.final_url, mss.source_url) AS source_url,
-          mss.menu_url
+          COALESCE(mss.final_url, mss.source_url) AS "sourceUrl",
+          mss.menu_url   AS "menuUrl"
         FROM merchant_surface_scans mss
         JOIN entities e ON e.id = mss.entity_id
         WHERE mss.http_status < 400
@@ -358,11 +358,11 @@ async function main() {
         LIMIT ${limit}`;
 
   const targets: PdfTarget[] = rawTargets.map((r) => ({
-    entity_id:   r.entity_id,
-    entity_name: r.entity_name,
+    entityId:   r.entityId,
+    entityName: r.entityName,
     slug:        r.slug,
-    source_url:  r.source_url,
-    menu_url:    r.menu_url,
+    sourceUrl:  r.sourceUrl,
+    menuUrl:    r.menuUrl,
   }));
 
   console.log(`${targets.length} PDF menu targets from surface scans\n`);
@@ -381,30 +381,30 @@ async function main() {
       const outcome = await fetchPdf(target);
       outcomes[idx] = outcome;
 
-      const statusStr = outcome.http_status ? String(outcome.http_status) : outcome.error ? "ERR" : "?";
-      const ctStr     = (outcome.content_type ?? "—").slice(0, 24);
-      const textLen   = outcome.raw_text?.length ?? 0;
-      const r2Str     = outcome.raw_html_pointer ? "r2=✓" : "r2=—";
+      const statusStr = outcome.httpStatus ? String(outcome.httpStatus) : outcome.error ? "ERR" : "?";
+      const ctStr     = (outcome.contentType ?? "—").slice(0, 24);
+      const textLen   = outcome.rawText?.length ?? 0;
+      const r2Str     = outcome.rawHtmlPointer ? "r2=✓" : "r2=—";
 
       console.log(
-        `  [${String(idx + 1).padStart(2)}] ${target.entity_name.slice(0, 34).padEnd(34)} ` +
-        `http=${statusStr.padEnd(3)} ${String(outcome.fetch_duration_ms ?? 0).padStart(5)}ms ` +
-        `type=${outcome.pdf_type.padEnd(11)} q=${outcome.extraction_quality.padEnd(6)} ` +
+        `  [${String(idx + 1).padStart(2)}] ${target.entityName.slice(0, 34).padEnd(34)} ` +
+        `http=${statusStr.padEnd(3)} ${String(outcome.fetchDurationMs ?? 0).padStart(5)}ms ` +
+        `type=${outcome.pdfType.padEnd(11)} q=${outcome.extractionQuality.padEnd(6)} ` +
         `text=${String(textLen).padStart(6)}c ${r2Str}`,
       );
       if (outcome.error)               console.log(`      error: ${outcome.error}`);
-      if (!outcome.content_type?.toLowerCase().includes("pdf") && outcome.http_status && outcome.http_status < 400) {
+      if (!outcome.contentType?.toLowerCase().includes("pdf") && outcome.httpStatus && outcome.httpStatus < 400) {
         console.log(`      ⚠  content-type mismatch: ${ctStr} — text extraction skipped`);
       }
 
       // Write a row for every attempt (success or content-type mismatch) so current-state is derivable
-      const shouldWrite = outcome.http_status !== null && !outcome.error;
+      const shouldWrite = outcome.httpStatus !== null && !outcome.error;
       if (shouldWrite) {
         try {
           await writeFetch(outcome, dryRun);
           if (!dryRun) written++;
         } catch (err) {
-          console.error(`    !! DB write failed for ${target.entity_name}:`, err);
+          console.error(`    !! DB write failed for ${target.entityName}:`, err);
           errors++;
         }
       }
@@ -416,13 +416,13 @@ async function main() {
   // Summary
   // ---------------------------------------------------------------------------
 
-  const ok           = outcomes.filter((o) => o?.http_status && o.http_status < 400);
-  const realPdfs     = ok.filter((o) => o.content_type?.toLowerCase().includes("pdf"));
-  const withGoodText = ok.filter((o) => o.extraction_quality === "good");
-  const withSparse   = ok.filter((o) => o.extraction_quality === "sparse");
-  const empty        = ok.filter((o) => o.extraction_quality === "empty");
-  const imageBased   = ok.filter((o) => o.pdf_type === "image_based");
-  const withR2       = ok.filter((o) => o.raw_html_pointer);
+  const ok           = outcomes.filter((o) => o?.httpStatus && o.httpStatus < 400);
+  const realPdfs     = ok.filter((o) => o.contentType?.toLowerCase().includes("pdf"));
+  const withGoodText = ok.filter((o) => o.extractionQuality === "good");
+  const withSparse   = ok.filter((o) => o.extractionQuality === "sparse");
+  const empty        = ok.filter((o) => o.extractionQuality === "empty");
+  const imageBased   = ok.filter((o) => o.pdfType === "image_based");
+  const withR2       = ok.filter((o) => o.rawHtmlPointer);
 
   console.log(`\n${"═".repeat(68)}`);
   console.log(`FETCH SUMMARY  (${ok.length} ok / ${targets.length} attempted / ${written} written)`);
@@ -438,7 +438,7 @@ async function main() {
 
   if (imageBased.length > 0) {
     console.log(`\nImage-based PDFs (OCR candidates):`);
-    imageBased.forEach((o) => console.log(`  • ${o.target.entity_name} — ${o.resolved_url}`));
+    imageBased.forEach((o) => console.log(`  • ${o.target.entityName} — ${o.resolvedUrl}`));
   }
 
   if (dryRun) console.log(`\n[dry-run] No rows written.`);

@@ -1,8 +1,27 @@
-# Person Actors — Chef & Sommelier Mapping (V1)
+---
+doc_id: ARCH-PERSON-ACTORS-V1
+doc_type: architecture
+status: active
+title: "Person Actors — Chef & Sommelier Mapping (V1)"
+owner: Bobby Ciccaglione
+created: "2026-03-01"
+last_updated: "2026-03-22"
+project_id: SAIKO
+systems:
+  - entity-model
+  - actors
+  - admin
+related_docs:
+  - docs/architecture/coverage-source-enrichment-v1.md
+summary: >
+  Maps chefs, sommeliers, and beverage professionals to venues as first-class
+  person actors in the Saiko graph. Uses the existing Actor model with
+  kind=person and five new ActorRole values. V1 is manual entry and linking
+  only — no automated extraction. V1.5 adds candidate generation from website
+  enrichment and coverage source extraction.
+---
 
-**Status:** Active
-**Owner:** Bobby
-**Date:** March 2026
+# Person Actors — Chef & Sommelier Mapping (V1)
 
 ---
 
@@ -117,13 +136,24 @@ After creation, shows confirmation with link to actor page.
 
 ### V1.5 — Extraction as candidate pipeline
 
-Website enrichment detects person-role patterns:
+Two extraction sources feed person-actor candidates:
+
+**Website enrichment** detects person-role patterns from venue websites:
 - "Executive Chef: John Smith"
 - "Our sommelier, Jane Doe"
 - "Wine Director: Alex Park"
 - "led by chef Maria Lopez"
 
-These generate **candidate observations**, not canonical actors. Candidates go through:
+**Coverage source extraction** detects person-role patterns from editorial
+articles (see COVERAGE-SOURCE-ENRICHMENT-V1). The `people` field in
+`coverage_source_extractions` captures: name, role, context, isPrimary.
+Coverage extraction uses an expanded role vocabulary including: chef,
+executive_chef, sous_chef, pastry_chef, sommelier, beverage_director,
+wine_director, bartender, general_manager, foh_director, foh_manager,
+owner, founder, partner, operator.
+
+Both sources generate **candidate observations**, not canonical actors.
+Candidates go through:
 1. Match against existing person actors
 2. If match found → propose relationship for review
 3. If no match → create review candidate (not auto-create actor)
@@ -137,11 +167,14 @@ Add `startDate` / `endDate` to `PlaceActorRelationship`:
 
 ### V2 — Additional roles
 
-Potential additions:
+Potential additions to the `ActorRole` enum (some already used in coverage
+extraction's person vocabulary but not yet in the schema enum):
 - `founding_chef`
 - `consulting_chef`
-- `bartender`
-- `general_manager`
+- `bartender` — already in coverage extraction vocabulary
+- `general_manager` — already in coverage extraction vocabulary
+- `foh_director` — already in coverage extraction vocabulary
+- `foh_manager` — already in coverage extraction vocabulary
 - `creative_director`
 
 ---

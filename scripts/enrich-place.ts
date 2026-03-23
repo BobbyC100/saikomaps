@@ -73,7 +73,7 @@ async function getEntity() {
       slug: true,
       website: true,
       googlePlaceId: true,
-      last_enriched_at: true,
+      lastEnrichedAt: true,
     },
   });
   if (!entity) {
@@ -98,7 +98,7 @@ async function shouldSkip(stage: number, entity: Awaited<ReturnType<typeof getEn
     }
     case 2: {
       const existing = await db.merchant_surfaces.findFirst({
-        where: { entity_id: entity.id },
+        where: { entityId: entity.id },
         select: { id: true },
       });
       if (existing) return { skip: true, reason: 'surface rows already exist' };
@@ -107,7 +107,7 @@ async function shouldSkip(stage: number, entity: Awaited<ReturnType<typeof getEn
     }
     case 3: {
       const pending = await db.merchant_surfaces.findFirst({
-        where: { entity_id: entity.id, fetch_status: 'discovered' },
+        where: { entityId: entity.id, fetch_status: 'discovered' },
         select: { id: true },
       });
       if (!pending) return { skip: true, reason: 'no surfaces with fetch_status=discovered' };
@@ -115,7 +115,7 @@ async function shouldSkip(stage: number, entity: Awaited<ReturnType<typeof getEn
     }
     case 4: {
       const pending = await db.merchant_surfaces.findFirst({
-        where: { entity_id: entity.id, fetch_status: 'fetch_success', parse_status: 'parse_pending' },
+        where: { entityId: entity.id, fetch_status: 'fetch_success', parse_status: 'parse_pending' },
         select: { id: true },
       });
       if (!pending) return { skip: true, reason: 'no surfaces pending parse' };
@@ -123,21 +123,21 @@ async function shouldSkip(stage: number, entity: Awaited<ReturnType<typeof getEn
     }
     case 5: {
       const existing = await db.derived_signals.findFirst({
-        where: { entity_id: entity.id, signal_key: 'identity_signals' },
-        select: { entity_id: true },
+        where: { entityId: entity.id, signal_key: 'identity_signals' },
+        select: { entityId: true },
       });
       if (existing) return { skip: true, reason: 'identity_signals already in derived_signals' };
       return { skip: false, reason: '' };
     }
     case 6: {
-      if (entity.last_enriched_at) return { skip: true, reason: 'last_enriched_at already set' };
+      if (entity.lastEnrichedAt) return { skip: true, reason: 'lastEnrichedAt already set' };
       if (!entity.website) return { skip: true, reason: 'no website' };
       return { skip: false, reason: '' };
     }
     case 7: {
       const existing = await db.interpretation_cache.findFirst({
-        where: { entity_id: entity.id, output_type: 'TAGLINE', is_current: true },
-        select: { entity_id: true },
+        where: { entityId: entity.id, output_type: 'TAGLINE', is_current: true },
+        select: { entityId: true },
       });
       if (existing) return { skip: true, reason: 'TAGLINE already in interpretation_cache' };
       return { skip: false, reason: '' };
@@ -193,11 +193,11 @@ async function run(stage: number, label: string, script: string, extraArgs: stri
     try {
       await db.entities.update({
         where: { id: entityId },
-        data: { enrichment_stage: String(stage) },
+        data: { enrichmentStage: String(stage) },
       });
-      console.log(`  ✓ enrichment_stage updated to ${stage}`);
+      console.log(`  ✓ enrichmentStage updated to ${stage}`);
     } catch (err: any) {
-      console.error(`  ✗ Failed to update enrichment_stage: ${err.message}`);
+      console.error(`  ✗ Failed to update enrichmentStage: ${err.message}`);
     }
   }
 
@@ -215,24 +215,24 @@ async function runBatch(n: number) {
 
   // Pick N unenriched LA-area entities.
   // Exclude entities that already have a TAGLINE (fully enriched)
-  // AND entities that already have last_enriched_at set (already ran pipeline
+  // AND entities that already have lastEnrichedAt set (already ran pipeline
   // but couldn't produce a tagline — re-running won't help).
   const enrichedIds = (await db.interpretation_cache.findMany({
     where: { output_type: 'TAGLINE', is_current: true },
-    select: { entity_id: true },
-  })).map((r) => r.entity_id).filter(Boolean) as string[];
+    select: { entityId: true },
+  })).map((r) => r.entityId).filter(Boolean) as string[];
 
   const whereClause: any = {
     id: { notIn: enrichedIds },
     website: { not: null },  // website-first: only need a website to enrich
   };
   if (!force) {
-    whereClause.last_enriched_at = null; // skip already-enriched entities
+    whereClause.lastEnrichedAt = null; // skip already-enriched entities
   }
 
   const candidates = await db.entities.findMany({
     where: whereClause,
-    select: { id: true, name: true, slug: true, website: true, googlePlaceId: true, last_enriched_at: true },
+    select: { id: true, name: true, slug: true, website: true, googlePlaceId: true, lastEnrichedAt: true },
     take: n * 3, // oversample for shuffle
   });
 
@@ -288,26 +288,26 @@ async function runBatch(n: number) {
       try {
         await db.entities.update({
           where: { id: entity.id },
-          data: { last_enriched_at: new Date() },
+          data: { lastEnrichedAt: new Date() },
         });
-        console.log(`  ✓ last_enriched_at updated`);
+        console.log(`  ✓ lastEnrichedAt updated`);
       } catch (err: any) {
-        console.error(`  ✗ Failed to update last_enriched_at: ${err.message}`);
+        console.error(`  ✗ Failed to update lastEnrichedAt: ${err.message}`);
       }
 
       const hasTagline = await db.interpretation_cache.findFirst({
-        where: { entity_id: entity.id, output_type: 'TAGLINE', is_current: true },
-        select: { entity_id: true },
+        where: { entityId: entity.id, output_type: 'TAGLINE', is_current: true },
+        select: { entityId: true },
       });
       if (hasTagline) {
         try {
           await db.entities.update({
             where: { id: entity.id },
-            data: { needs_human_review: false },
+            data: { needsHumanReview: false },
           });
-          console.log(`  ✓ needs_human_review cleared`);
+          console.log(`  ✓ needsHumanReview cleared`);
         } catch (err: any) {
-          console.error(`  ✗ Failed to clear needs_human_review: ${err.message}`);
+          console.error(`  ✗ Failed to clear needsHumanReview: ${err.message}`);
         }
       }
     }
@@ -440,27 +440,27 @@ async function main() {
       try {
         await db.entities.update({
           where: { id: entity.id },
-          data: { last_enriched_at: new Date() },
+          data: { lastEnrichedAt: new Date() },
         });
-        console.log(`  ✓ last_enriched_at updated`);
+        console.log(`  ✓ lastEnrichedAt updated`);
       } catch (err: any) {
-        console.error(`  ✗ Failed to update last_enriched_at: ${err.message}`);
+        console.error(`  ✗ Failed to update lastEnrichedAt: ${err.message}`);
       }
     }
 
     const hasTagline = await db.interpretation_cache.findFirst({
-      where: { entity_id: entity.id, output_type: 'TAGLINE', is_current: true },
-      select: { entity_id: true },
+      where: { entityId: entity.id, output_type: 'TAGLINE', is_current: true },
+      select: { entityId: true },
     });
     if (hasTagline) {
       try {
         await db.entities.update({
           where: { id: entity.id },
-          data: { needs_human_review: false },
+          data: { needsHumanReview: false },
         });
-        console.log(`  ✓ needs_human_review cleared`);
+        console.log(`  ✓ needsHumanReview cleared`);
       } catch (err: any) {
-        console.error(`  ✗ Failed to clear needs_human_review: ${err.message}`);
+        console.error(`  ✗ Failed to clear needsHumanReview: ${err.message}`);
       }
     }
   }

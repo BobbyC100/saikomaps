@@ -21,6 +21,8 @@ related_docs:
   - docs/scenesense/display-contract-v2.md
   - docs/saikoai-extraction-prompt-v2.1.md
   - docs/ENRICHMENT-OPERATIONS-INVENTORY.md
+  - docs/architecture/entity-classification-framework-v1.md
+  - docs/architecture/entity-type-problem-definition-v1.md
 summary: >-
   Defines the coverage tier model for entity enrichment. Six tiers from raw
   identity through experiential interpretation, with enrichment strategy

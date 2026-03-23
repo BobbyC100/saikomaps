@@ -22,6 +22,7 @@ export const PRIMARY_VERTICALS: PrismaPrimaryVertical[] = [
   'BAKERY',
   'PURVEYORS',
   'ACTIVITY',
+  'PARKS',
 ]
 
 /** UI display labels for primary_vertical enum values. */
@@ -38,6 +39,7 @@ export const VERTICAL_DISPLAY: Record<PrismaPrimaryVertical, string> = {
   BAKERY: 'Bakery',
   PURVEYORS: 'Purveyor',
   ACTIVITY: 'Activity',
+  PARKS: 'Park',
 }
 
 const CATEGORY_TO_VERTICAL: Record<string, PrismaPrimaryVertical> = {
@@ -56,6 +58,14 @@ const CATEGORY_TO_VERTICAL: Record<string, PrismaPrimaryVertical> = {
   bakery: 'BAKERY',
   purveyors: 'PURVEYORS',
   activity: 'ACTIVITY',
+  parks: 'PARKS',
+  park: 'PARKS',
+  'golf course': 'PARKS',
+  'swimming pool': 'PARKS',
+  'tennis courts': 'PARKS',
+  'dog park': 'PARKS',
+  'skate park': 'PARKS',
+  'recreation center': 'PARKS',
 }
 
 /**

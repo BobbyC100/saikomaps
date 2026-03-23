@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
     // Verify entity exists
     const entity = await db.entities.findUnique({
       where: { slug },
-      select: { id: true, slug: true, name: true, status: true, enrichment_stage: true },
+      select: { id: true, slug: true, name: true, status: true, enrichmentStage: true },
     });
 
     if (!entity) {
@@ -71,18 +71,18 @@ export async function POST(request: NextRequest) {
     }
 
     // Promote CANDIDATE → OPEN so enrich-place.ts can find it.
-    // Reset enrichment_stage for progress tracking, but preserve last_enriched_at
+    // Reset enrichmentStage for progress tracking, but preserve lastEnrichedAt
     // so batch mode doesn't re-select entities that have already been through the pipeline.
     await db.entities.update({
       where: { slug },
       data: {
         ...(entity.status === 'CANDIDATE' ? { status: 'OPEN' } : {}),
-        enrichment_stage: null,
+        enrichmentStage: null,
       },
     });
 
     // Build spawn args — all stages now go through enrich-place.ts which handles
-    // stage tracking (enrichment_stage updates) and skip logic.
+    // stage tracking (enrichmentStage updates) and skip logic.
     const projectRoot = path.resolve(process.cwd());
     let description: string;
 

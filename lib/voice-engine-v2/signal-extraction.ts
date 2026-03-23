@@ -98,22 +98,22 @@ export async function fetchRecordsForTaglineGeneration(options: {
   county?: string;
 }): Promise<any[]> {
   const derivedWhere: Record<string, unknown> = {
-    signal_key: 'identity_signals',
+    signalKey: 'identity_signals',
   };
   if (options.placeId) {
-    derivedWhere.entity_id = options.placeId;
+    derivedWhere.entityId = options.placeId;
   }
 
   // Query derived_signals joined to entities — one row per entity, latest signal
   const derivedRows = await prisma.derived_signals.findMany({
     where: derivedWhere as Parameters<typeof prisma.derived_signals.findMany>[0]['where'],
-    orderBy: [{ entity_id: 'asc' }, { computed_at: 'desc' }],
-    distinct: ['entity_id'],
+    orderBy: [{ entityId: 'asc' }, { computedAt: 'desc' }],
+    distinct: ['entityId'],
     take: options.limit,
     select: {
-      entity_id: true,
-      signal_value: true,
-      computed_at: true,
+      entityId: true,
+      signalValue: true,
+      computedAt: true,
       entity: {
         select: {
           id: true,
@@ -130,10 +130,10 @@ export async function fetchRecordsForTaglineGeneration(options: {
   return derivedRows
     .filter((d) => options.reprocess || !d.entity.tagline)
     .map((d) => {
-      const sv = d.signal_value as Record<string, unknown> | null;
+      const sv = d.signalValue as Record<string, unknown> | null;
       return {
         // canonical_id compatibility shim
-        canonical_id: d.entity_id,
+        canonical_id: d.entityId,
         name: d.entity.name,
         neighborhood: d.entity.neighborhood ?? null,
         address_street: d.entity.address ?? null,
@@ -145,7 +145,7 @@ export async function fetchRecordsForTaglineGeneration(options: {
         place_personality: (sv?.place_personality as string | null) ?? null,
         // identity_signals JSON (contains language_signals, signature_dishes, etc.)
         identity_signals: sv ?? null,
-        signals_generated_at: d.computed_at,
+        signals_generated_at: d.computedAt,
         // source_count and data_completeness are not on derived_signals; use safe defaults
         source_count: 1,
         data_completeness: null,

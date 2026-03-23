@@ -20,6 +20,12 @@
  *   npx tsx scripts/generate-taglines-v2.ts --limit=50 --concurrency=10
  */
 
+import { config } from 'dotenv';
+config({ path: '.env' });
+if (!process.env.SAIKO_DB_FROM_WRAPPER) {
+  config({ path: '.env.local', override: true });
+}
+
 import { PrismaClient } from '@prisma/client';
 import { writeInterpretationCache } from '../lib/fields-v2/write-claim';
 import {
@@ -28,6 +34,7 @@ import {
   enrichPlaceV2,
   assessSignalQuality,
 } from '../lib/voice-engine-v2';
+import { materializeCoverageEvidence } from '../lib/coverage/normalize-evidence';
 
 // ============================================================================
 // TYPES
@@ -168,13 +175,29 @@ async function main() {
       try {
         // Build input
         const input = buildTaglineInputFromGoldenRecord(record);
-        
+
+        // Materialize coverage evidence for richer grounding
+        try {
+          const entityId = record.canonical_id;
+          if (entityId) {
+            const evidence = await materializeCoverageEvidence(entityId);
+            if (evidence) {
+              input.coverageEvidence = evidence;
+            }
+          }
+        } catch {
+          // Non-fatal: coverage is supplementary
+        }
+
         // Assess signal quality
         const qualityAssessment = assessSignalQuality(input.signals);
         stats.byQuality[qualityAssessment.quality]++;
-        
+
         if (args.verbose) {
           console.log(`${prefix} ${record.name}`);
+          if (input.coverageEvidence) {
+            console.log(`  Coverage: ${input.coverageEvidence.sourceCount} sources`);
+          }
           console.log(`  Quality: ${qualityAssessment.quality} — ${qualityAssessment.reason}`);
         } else {
           console.log(`${prefix} ${record.name} (${qualityAssessment.quality})`);

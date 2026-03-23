@@ -62,7 +62,7 @@ async function main() {
 
   // Check the fetch failure details
   const failedSurfaces: any[] = await db.$queryRaw`
-    SELECT ms.entity_id, e.slug, ms.surface_type, ms.source_url, ms.metadata_json
+    SELECT ms.entity_id, e.slug, ms.surface_type, ms.source_url, ms.metadataJson
     FROM merchant_surfaces ms
     JOIN entities e ON e.id = ms.entity_id
     WHERE ms.fetch_status = 'fetch_failed'
@@ -70,9 +70,9 @@ async function main() {
   if (failedSurfaces.length > 0) {
     console.log('\n=== FETCH FAILURE DETAILS ===');
     failedSurfaces.forEach(r => {
-      const meta = r.metadata_json as any;
+      const meta = r.metadataJson as any;
       console.log('  ' + r.slug + ' | ' + r.surface_type + ' | ' + r.source_url);
-      if (meta) console.log('    status=' + (meta.http_status ?? 'n/a') + ' error=' + (meta.error || 'none'));
+      if (meta) console.log('    status=' + (meta.httpStatus ?? 'n/a') + ' error=' + (meta.error || 'none'));
     });
   }
 

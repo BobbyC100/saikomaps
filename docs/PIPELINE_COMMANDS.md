@@ -4,7 +4,7 @@ doc_type: reference
 status: active
 owner: Bobby Ciccaglione
 created: '2026-03-10'
-last_updated: '2026-03-17'
+last_updated: '2026-03-22'
 project_id: SAIKO
 systems:
   - data-pipeline
@@ -139,6 +139,102 @@ curl -X POST localhost:3000/api/admin/tools/discover-social \
 
 ---
 
+## Coverage Source Enrichment
+
+Four-stage pipeline for editorial coverage sources: backfill → discover → fetch → extract.
+
+### Backfill (one-time, from existing editorial URLs)
+
+```bash
+# Dry run — see what would be backfilled
+npx tsx scripts/backfill-coverage-from-editorial-sources.ts --dry-run
+
+# Run backfill (approved sources only)
+npx tsx scripts/backfill-coverage-from-editorial-sources.ts
+
+# Include non-approved sources
+npx tsx scripts/backfill-coverage-from-editorial-sources.ts --include-non-approved
+```
+
+### Discover (find editorial coverage for entities)
+
+```bash
+# Dry run — see which entities would be searched
+npx tsx scripts/discover-coverage-sources.ts --dry-run
+
+# Discover for a small test batch
+npx tsx scripts/discover-coverage-sources.ts --limit=5 --verbose
+
+# Discover for a single entity
+npx tsx scripts/discover-coverage-sources.ts --slug=republique --verbose
+
+# Discover for all EAT entities (default vertical)
+npx tsx scripts/discover-coverage-sources.ts
+
+# All verticals
+npx tsx scripts/discover-coverage-sources.ts --all-verticals
+
+# Skip entities that already have ≥3 coverage sources
+npx tsx scripts/discover-coverage-sources.ts --skip-covered
+```
+
+Uses Claude Haiku + web_search (~$0.01/entity). Searches discovery-enabled approved publications for articles about each entity. Found URLs are filtered against the approved source registry, deduplicated, and inserted as INGESTED.
+
+### Fetch (archive article content)
+
+```bash
+# Dry run — see what would be fetched
+npx tsx scripts/fetch-coverage-sources.ts --dry-run
+
+# Fetch a small test batch
+npx tsx scripts/fetch-coverage-sources.ts --limit=10
+
+# Fetch all INGESTED sources
+npx tsx scripts/fetch-coverage-sources.ts
+
+# Re-fetch FAILED sources
+npx tsx scripts/fetch-coverage-sources.ts --refetch
+```
+
+Rate limited at 1.5s between requests. Archives article text, title, author, published date. Advances stage: INGESTED → FETCHED or FAILED.
+
+### Extract (AI signal extraction from archived content)
+
+```bash
+# Dry run
+npx tsx scripts/extract-coverage-sources.ts --dry-run
+
+# Extract a test batch with verbose output
+npx tsx scripts/extract-coverage-sources.ts --limit=5 --verbose
+
+# Extract all FETCHED sources (≥50 words)
+npx tsx scripts/extract-coverage-sources.ts
+
+# Re-extract already-extracted sources (new prompt version)
+npx tsx scripts/extract-coverage-sources.ts --reprocess
+
+# Custom minimum word count
+npx tsx scripts/extract-coverage-sources.ts --min-words=100
+```
+
+Uses Claude Sonnet. Rate limited at 800ms. Extracts structured signals into `coverage_source_extractions` (people, food/beverage/service evidence, atmosphere, origin story, accolades, pull quotes, sentiment, article type, relevance). Versioned and re-runnable.
+
+### Add coverage source manually (via admin API)
+
+```bash
+curl -X POST localhost:3000/api/admin/entities/{entityId}/coverage \
+  -H "Content-Type: application/json" \
+  -d '{"url": "https://la.eater.com/article-about-place"}'
+```
+
+### Audit editorial coverage
+
+```bash
+npx tsx scripts/audit-editorial-coverage.ts
+```
+
+---
+
 ## Enrichment Stage Re-run
 
 Run a specific enrichment stage without the full pipeline.
@@ -210,4 +306,6 @@ curl localhost:3000/api/health
 | Smart enrich (full) | ~$0.01–0.04 | New entity + fill all gaps including coords |
 | Full pipeline (enrich:place) | ~$0.12 | Deep enrichment — AI signals + taglines |
 | Social discovery | ~$0.01 | Fill missing Instagram/TikTok/website |
+| Coverage discovery | ~$0.01 | Find editorial articles across approved sources |
+| Coverage extraction | ~$0.01 | AI signal extraction from archived articles |
 | GPID resolution | ~$0.03 | Find Google Place ID for coords/hours |

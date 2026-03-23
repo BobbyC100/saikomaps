@@ -1,8 +1,31 @@
-# Reservation Validation V1 — Architecture Review
+---
+doc_id: ARCH-RESERVATION-V1-REVIEW
+doc_type: architecture
+status: active
+title: "Reservation Validation V1 — Architecture Review"
+owner: Bobby Ciccaglione
+created: "2026-03-18"
+last_updated: "2026-03-22"
+project_id: SAIKO
+systems:
+  - enrichment
+  - fields-data-layer
+  - traces-place-page
+  - coverage-ops
+related_docs:
+  - docs/architecture/enrichment-evidence-model-v1.md
+  - docs/architecture/coverage-source-enrichment-v1.md
+summary: >
+  Architecture review of the reservation validation V1 proposal. Documents what
+  exists today (merchant-evidence-only extraction, no provider API integration),
+  recommends a separate reservation_provider_matches table with a three-tier
+  confidence model (weak / strong_merchant / provider_verified), and defines
+  provider-specific render behavior as an additive upgrade over the existing
+  generic Reserve button. Includes backlog bucket analysis of 751 open
+  missing_reservations issues.
+---
 
-**Mode:** Read-only review
-**Date:** March 18, 2026
-**Scope:** Assess proposed V1 additions for correctness, fit, and minimality
+# Reservation Validation V1 — Architecture Review
 
 ---
 

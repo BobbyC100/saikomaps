@@ -33,15 +33,15 @@ export async function POST(request: NextRequest) {
   for (const p of photos) {
     await prisma.place_photo_eval.upsert({
       where: {
-        entityId_photo_ref: { entityId: place_id, photo_ref: p.photo_ref },
+        entityId_photoRef: { entityId: place_id, photoRef: p.photo_ref },
       },
       create: {
         entityId: place_id,
-        google_place_id,
-        photo_ref: p.photo_ref,
-        width_px: p.width_px,
-        height_px: p.height_px,
-        requested_max_width_px: requested_max_width_px ?? 1600,
+        googlePlaceId: google_place_id,
+        photoRef: p.photo_ref,
+        widthPx: p.width_px,
+        heightPx: p.height_px,
+        requestedMaxWidthPx: requested_max_width_px ?? 1600,
         tier: p.tier,
         type: p.type ?? null,
       },

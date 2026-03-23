@@ -167,7 +167,7 @@ export async function POST(request: NextRequest) {
             neighborhood: neighborhood ?? null,
             cuisineType: placeDetails?.types ? parseCuisineType(placeDetails.types) ?? null : null,
             category: getSaikoCategory(finalName, placeDetails?.types ?? []),
-            primary_vertical: resolvePrimaryVertical(null, finalName, placeDetails?.types ?? []),
+            primaryVertical: resolvePrimaryVertical(null, finalName, placeDetails?.types ?? []),
             googlePhotos: placeDetails?.photos ? JSON.parse(JSON.stringify(placeDetails.photos)) : undefined,
             hours: placeDetails?.openingHours ? JSON.parse(JSON.stringify(placeDetails.openingHours)) : null,
             placesDataCachedAt: placeDetails ? new Date() : null,

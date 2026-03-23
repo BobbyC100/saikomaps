@@ -82,12 +82,12 @@ export function ComparisonCard({
       <div className="grid grid-cols-2 border-b border-gray-200">
         <div className="px-6 py-3 bg-gray-50">
           <span className="text-[10px] uppercase tracking-widest text-gray-500 font-semibold">
-            {(safeA.source_name ?? 'unknown').replace('_', ' ')}
+            {(safeA.sourceName ?? 'unknown').replace('_', ' ')}
           </span>
         </div>
         <div className="px-6 py-3 bg-gray-50 border-l border-gray-200">
           <span className="text-[10px] uppercase tracking-widest text-gray-500 font-semibold">
-            {(safeB.source_name ?? 'unknown').replace('_', ' ')}
+            {(safeB.sourceName ?? 'unknown').replace('_', ' ')}
           </span>
         </div>
       </div>
@@ -95,14 +95,14 @@ export function ComparisonCard({
       {/* Field comparisons */}
       <div className="divide-y divide-gray-100">
         {fields.map(field => (
-          <FieldRow 
+          <FieldRow
             key={field.label}
             label={field.label}
             valA={field.valA}
             valB={field.valB}
             prioritySource={field.prioritySource}
-            sourceA={safeA.source_name ?? 'unknown'}
-            sourceB={safeB.source_name ?? 'unknown'}
+            sourceA={safeA.sourceName ?? 'unknown'}
+            sourceB={safeB.sourceName ?? 'unknown'}
           />
         ))}
       </div>

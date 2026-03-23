@@ -103,27 +103,27 @@ export default async function AdminEnergyInspectPage({ searchParams }: Props) {
               <div className="space-y-2 text-[#36454F]">
                 <div className="flex justify-between">
                   <span className="text-[#8B7355]">Score</span>
-                  <span className="font-mono font-bold">{energy.energy_score}/100</span>
+                  <span className="font-mono font-bold">{energy.energyScore}/100</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-[#8B7355]">Confidence</span>
-                  <span className="font-mono">{energy.energy_confidence}</span>
+                  <span className="font-mono">{energy.energyConfidence}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-[#8B7355]">Popularity</span>
-                  <span className="font-mono">{energy.popularity_component ?? '—'} {energy.has_popularity && '✓'}</span>
+                  <span className="font-mono">{energy.popularityComponent ?? '—'} {energy.hasPopularity && '✓'}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-[#8B7355]">Language</span>
-                  <span className="font-mono">{energy.language_component ?? '—'} {energy.has_language && '✓'}</span>
+                  <span className="font-mono">{energy.languageComponent ?? '—'} {energy.hasLanguage && '✓'}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-[#8B7355]">Flags</span>
-                  <span className="font-mono">{energy.flags_component ?? '—'} {energy.has_flags && '✓'}</span>
+                  <span className="font-mono">{energy.flagsComponent ?? '—'} {energy.hasFlags && '✓'}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-[#8B7355]">Sensory</span>
-                  <span className="font-mono">{energy.sensory_component ?? '—'} {energy.has_sensory && '✓'}</span>
+                  <span className="font-mono">{energy.sensoryComponent ?? '—'} {energy.hasSensory && '✓'}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-[#8B7355]">Version</span>
@@ -131,7 +131,7 @@ export default async function AdminEnergyInspectPage({ searchParams }: Props) {
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-[#8B7355]">Computed at</span>
-                  <span>{new Date(energy.computed_at).toLocaleString()}</span>
+                  <span>{new Date(energy.computedAt).toLocaleString()}</span>
                 </div>
               </div>
             ) : (
@@ -145,23 +145,23 @@ export default async function AdminEnergyInspectPage({ searchParams }: Props) {
               <div className="space-y-2 text-[#36454F]">
                 <div className="flex justify-between">
                   <span className="text-[#8B7355]">Cozy</span>
-                  <span className="font-mono">{tags.cozy_score}</span>
+                  <span className="font-mono">{tags.cozyScore}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-[#8B7355]">Date night</span>
-                  <span className="font-mono">{tags.date_night_score}</span>
+                  <span className="font-mono">{tags.dateNightScore}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-[#8B7355]">Late night</span>
-                  <span className="font-mono">{tags.late_night_score}</span>
+                  <span className="font-mono">{tags.lateNightScore}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-[#8B7355]">After work</span>
-                  <span className="font-mono">{tags.after_work_score}</span>
+                  <span className="font-mono">{tags.afterWorkScore}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-[#8B7355]">Scene</span>
-                  <span className="font-mono">{tags.scene_score}</span>
+                  <span className="font-mono">{tags.sceneScore}</span>
                 </div>
                 <div className="flex justify-between text-sm mt-4">
                   <span className="text-[#8B7355]">Version</span>
@@ -169,7 +169,7 @@ export default async function AdminEnergyInspectPage({ searchParams }: Props) {
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-[#8B7355]">Depends on</span>
-                  <span>{tags.depends_on_energy_version}</span>
+                  <span>{tags.dependsOnEnergyVersion}</span>
                 </div>
               </div>
             ) : (

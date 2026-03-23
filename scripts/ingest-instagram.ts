@@ -262,37 +262,37 @@ async function ingestAccount(
 ): Promise<void> {
   if (isDryRun) {
     console.log('[IG Ingest] [DRY RUN] Would upsert account:', {
-      instagram_user_id: account.id,
+      instagramUserId: account.id,
       username: account.username,
-      media_count: account.media_count,
-      entity_id: resolvedEntityId,
+      mediaCount: account.media_count,
+      entityId: resolvedEntityId,
     });
     return;
   }
 
   await db.instagram_accounts.upsert({
-    where: { instagram_user_id: account.id },
+    where: { instagramUserId: account.id },
     create: {
-      entity_id: resolvedEntityId,
-      instagram_user_id: account.id,
+      entityId: resolvedEntityId,
+      instagramUserId: account.id,
       username: account.username,
-      account_type: account.account_type ?? null,
-      media_count: account.media_count ?? null,
-      canonical_instagram_url: `https://instagram.com/${account.username}`,
-      last_fetched_at: new Date(),
-      last_successful_fetch_at: new Date(),
-      source_status: 'active',
-      raw_payload: rawPayload,
+      accountType: account.account_type ?? null,
+      mediaCount: account.media_count ?? null,
+      canonicalInstagramUrl: `https://instagram.com/${account.username}`,
+      lastFetchedAt: new Date(),
+      lastSuccessfulFetchAt: new Date(),
+      sourceStatus: 'active',
+      rawPayload: rawPayload,
     },
     update: {
       username: account.username,
-      account_type: account.account_type ?? null,
-      media_count: account.media_count ?? null,
-      canonical_instagram_url: `https://instagram.com/${account.username}`,
-      last_fetched_at: new Date(),
-      last_successful_fetch_at: new Date(),
-      source_status: 'active',
-      raw_payload: rawPayload,
+      accountType: account.account_type ?? null,
+      mediaCount: account.media_count ?? null,
+      canonicalInstagramUrl: `https://instagram.com/${account.username}`,
+      lastFetchedAt: new Date(),
+      lastSuccessfulFetchAt: new Date(),
+      sourceStatus: 'active',
+      rawPayload: rawPayload,
     },
   });
 
@@ -308,34 +308,34 @@ async function writeMedia(
 
   for (const item of media) {
     const existing = await db.instagram_media.findUnique({
-      where: { instagram_media_id: item.id },
+      where: { instagramMediaId: item.id },
     });
 
     if (existing) {
       await db.instagram_media.update({
-        where: { instagram_media_id: item.id },
+        where: { instagramMediaId: item.id },
         data: {
-          media_url: item.media_url ?? null,
-          thumbnail_url: item.thumbnail_url ?? null,
+          mediaUrl: item.media_url ?? null,
+          thumbnailUrl: item.thumbnail_url ?? null,
           caption: item.caption ?? null,
-          fetched_at: new Date(),
-          raw_payload: item as any,
+          fetchedAt: new Date(),
+          rawPayload: item as any,
         },
       });
       updated++;
     } else {
       await db.instagram_media.create({
         data: {
-          instagram_media_id: item.id,
-          instagram_user_id: instagramUserId,
-          media_type: item.media_type,
-          media_url: item.media_url ?? null,
-          thumbnail_url: item.thumbnail_url ?? null,
+          instagramMediaId: item.id,
+          instagramUserId: instagramUserId,
+          mediaType: item.media_type,
+          mediaUrl: item.media_url ?? null,
+          thumbnailUrl: item.thumbnail_url ?? null,
           permalink: item.permalink,
           caption: item.caption ?? null,
           timestamp: new Date(item.timestamp),
-          fetched_at: new Date(),
-          raw_payload: item as any,
+          fetchedAt: new Date(),
+          rawPayload: item as any,
         },
       });
       inserted++;
@@ -430,8 +430,8 @@ async function ingestBatch() {
       id: true,
       name: true,
       instagram: true,
-      instagram_accounts: {
-        select: { instagram_user_id: true, last_fetched_at: true },
+      instagramAccounts: {
+        select: { instagramUserId: true, lastFetchedAt: true },
         take: 1,
       },
     },
@@ -443,9 +443,9 @@ async function ingestBatch() {
   const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
   const targets = entities.filter((e) => {
     if (!e.instagram || e.instagram === 'NONE') return false;
-    const existing = e.instagram_accounts[0];
+    const existing = e.instagramAccounts[0];
     if (!existing) return true; // never ingested
-    if (existing.last_fetched_at && existing.last_fetched_at < oneDayAgo) return true; // stale
+    if (existing.lastFetchedAt && existing.lastFetchedAt < oneDayAgo) return true; // stale
     return false;
   });
 
@@ -538,14 +538,14 @@ async function ingestBatch() {
         if (!isDryRun) {
           try {
             const existing = await db.instagram_accounts.findFirst({
-              where: { entity_id: entity.id },
+              where: { entityId: entity.id },
             });
             if (existing) {
               await db.instagram_accounts.update({
                 where: { id: existing.id },
                 data: {
-                  last_fetched_at: new Date(),
-                  source_status: 'error',
+                  lastFetchedAt: new Date(),
+                  sourceStatus: 'error',
                 },
               });
             }
@@ -589,9 +589,9 @@ async function ingestMe() {
     await ingestAccount(account, entityId, account);
   } else {
     console.log('[IG Ingest] [DRY RUN] Would upsert account:', {
-      instagram_user_id: account.id,
+      instagramUserId: account.id,
       username: account.username,
-      media_count: account.media_count,
+      mediaCount: account.media_count,
     });
   }
 

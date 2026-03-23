@@ -15,6 +15,7 @@ import {
   ABOUT_COMPOSE_SYSTEM_PROMPT,
   buildAboutComposeUserPrompt,
 } from './description-prompts';
+import type { CoverageEvidence } from '../coverage/normalize-evidence';
 
 const anthropic = new Anthropic();
 
@@ -110,6 +111,7 @@ export async function generateTier3Description(input: {
   neighborhood: string | null;
   identitySignals: Record<string, unknown> | null;
   coverageSources?: Array<{ sourceName: string; excerpt: string | null }>;
+  coverageEvidence?: CoverageEvidence;
 }): Promise<DescriptionGenerationResult> {
   const userPrompt = buildAboutComposeUserPrompt(
     input.entityName,
@@ -117,6 +119,7 @@ export async function generateTier3Description(input: {
     input.neighborhood,
     input.identitySignals,
     input.coverageSources,
+    input.coverageEvidence,
   );
 
   const response = await anthropic.messages.create({

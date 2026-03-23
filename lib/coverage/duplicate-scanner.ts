@@ -45,12 +45,12 @@ interface DuplicatePair {
 }
 
 export interface DuplicateScanSummary {
-  entities_compared: number;
-  pairs_found: number;
-  issues_created: number;
-  issues_resolved: number;
-  issues_unchanged: number;
-  pairs: { slug: string; duplicate_of_slug: string; reasons: string[] }[];
+  entitiesCompared: number;
+  pairsFound: number;
+  issuesCreated: number;
+  issuesResolved: number;
+  issuesUnchanged: number;
+  pairs: { slug: string; duplicateOfSlug: string; reasons: string[] }[];
 }
 
 // ---------------------------------------------------------------------------
@@ -317,26 +317,26 @@ export async function scanForDuplicates(
   // Now upsert entity_issues for each pair
   // First, get all existing potential_duplicate issues
   const existingDupIssues = await prisma.entity_issues.findMany({
-    where: { issue_type: 'potential_duplicate' },
+    where: { issueType: 'potential_duplicate' },
   });
 
   // Build a map: entity_id -> existing issue(s)
   const existingByEntity = new Map<string, typeof existingDupIssues>();
   for (const issue of existingDupIssues) {
-    const list = existingByEntity.get(issue.entity_id) ?? [];
+    const list = existingByEntity.get(issue.entityId) ?? [];
     list.push(issue);
-    existingByEntity.set(issue.entity_id, list);
+    existingByEntity.set(issue.entityId, list);
   }
 
   // Track which existing issues are still valid (to resolve stale ones)
   const stillValidIssueIds = new Set<string>();
 
   const summary: DuplicateScanSummary = {
-    entities_compared: entities.length,
-    pairs_found: pairs.length,
-    issues_created: 0,
-    issues_resolved: 0,
-    issues_unchanged: 0,
+    entitiesCompared: entities.length,
+    pairsFound: pairs.length,
+    issuesCreated: 0,
+    issuesResolved: 0,
+    issuesUnchanged: 0,
     pairs: [],
   };
 
@@ -358,16 +358,16 @@ export async function scanForDuplicates(
     if (matchingExisting) {
       stillValidIssueIds.add(matchingExisting.id);
       if (matchingExisting.status === 'suppressed') {
-        summary.issues_unchanged++;
+        summary.issuesUnchanged++;
       } else if (matchingExisting.status === 'resolved') {
         // Re-open if resolved but still detected
         if (!dryRun) {
           await prisma.entity_issues.update({
             where: { id: matchingExisting.id },
-            data: { status: 'open', resolved_at: null, resolved_by: null, detail },
+            data: { status: 'open', resolvedAt: null, resolvedBy: null, detail },
           });
         }
-        summary.issues_created++;
+        summary.issuesCreated++;
       } else {
         // Already open — update detail in case reasons changed
         if (!dryRun) {
@@ -376,7 +376,7 @@ export async function scanForDuplicates(
             data: { detail },
           });
         }
-        summary.issues_unchanged++;
+        summary.issuesUnchanged++;
       }
     } else {
       // New duplicate issue — use upsert since (entity_id, issue_type) is unique
@@ -385,30 +385,30 @@ export async function scanForDuplicates(
       if (!dryRun) {
         await prisma.entity_issues.upsert({
           where: {
-            entity_id_issue_type: {
-              entity_id: pair.entity.id,
-              issue_type: 'potential_duplicate',
+            entityId_issueType: {
+              entityId: pair.entity.id,
+              issueType: 'potential_duplicate',
             },
           },
           create: {
-            entity_id: pair.entity.id,
-            problem_class: 'identity',
-            issue_type: 'potential_duplicate',
+            entityId: pair.entity.id,
+            problemClass: 'identity',
+            issueType: 'potential_duplicate',
             status: 'open',
             severity: 'high',
-            blocking_publish: false,
-            recommended_tool: 'merge_entities',
+            blockingPublish: false,
+            recommendedTool: 'merge_entities',
             detail,
           },
           update: {
             status: 'open',
             detail,
-            resolved_at: null,
-            resolved_by: null,
+            resolvedAt: null,
+            resolvedBy: null,
           },
         });
       }
-      summary.issues_created++;
+      summary.issuesCreated++;
       if (verbose) {
         console.log(
           `  NEW  ${pair.entity.slug} ↔ ${pair.duplicateOf.slug}: ${pair.matchReasons.join(', ')}`,
@@ -418,7 +418,7 @@ export async function scanForDuplicates(
 
     summary.pairs.push({
       slug: pair.entity.slug,
-      duplicate_of_slug: pair.duplicateOf.slug,
+      duplicateOfSlug: pair.duplicateOf.slug,
       reasons: pair.matchReasons,
     });
   }
@@ -431,10 +431,10 @@ export async function scanForDuplicates(
     if (!dryRun) {
       await prisma.entity_issues.update({
         where: { id: issue.id },
-        data: { status: 'resolved', resolved_at: new Date(), resolved_by: 'SCANNER' },
+        data: { status: 'resolved', resolvedAt: new Date(), resolvedBy: 'SCANNER' },
       });
     }
-    summary.issues_resolved++;
+    summary.issuesResolved++;
     if (verbose) {
       console.log(`  RESOLVED stale duplicate issue ${issue.id}`);
     }

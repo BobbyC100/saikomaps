@@ -61,8 +61,8 @@ async function main() {
             : [
                 {
                   OR: [
-                    { category_enrich_attempted_at: null },
-                    { category_enrich_attempted_at: { lt: throttleCutoff } },
+                    { categoryEnrichAttemptedAt: null },
+                    { categoryEnrichAttemptedAt: { lt: throttleCutoff } },
                   ],
                 },
               ]),
@@ -71,7 +71,7 @@ async function main() {
     : refresh
       ? {
           website: { not: null },
-          last_enriched_at: {
+          lastEnrichedAt: {
             lt: new Date(
               Date.now() - REFRESH_STALENESS_DAYS * 24 * 60 * 60 * 1000
             ),
@@ -82,7 +82,7 @@ async function main() {
             { website: { not: null } },
             { NOT: { website: "" } },
             { OR: [{ category: null }, { category: "" }] },
-            { last_enriched_at: null },
+            { lastEnrichedAt: null },
           ],
         };
 

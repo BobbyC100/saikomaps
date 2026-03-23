@@ -207,7 +207,7 @@ export async function POST(request: NextRequest) {
 
         // Check if already pending
         const existing = await db.gpid_resolution_queue.findFirst({
-          where: { entityId: entity.id, human_status: 'PENDING' },
+          where: { entityId: entity.id, humanStatus: 'PENDING' },
         });
         if (existing) {
           skipped++;
@@ -218,15 +218,15 @@ export async function POST(request: NextRequest) {
           await db.gpid_resolution_queue.create({
             data: {
               entityId: entity.id,
-              candidate_gpid: result.gpid ?? null,
-              resolver_status: result.status,
-              reason_code: result.reason,
-              similarity_score: result.similarity ?? null,
-              candidates_json: {
+              candidateGpid: result.gpid ?? null,
+              resolverStatus: result.status,
+              reasonCode: result.reason,
+              similarityScore: result.similarity ?? null,
+              candidatesJson: {
                 candidates: result.candidates,
-                num_candidates: result.candidates.length,
+                numCandidates: result.candidates.length,
               },
-              source_run_id: runId,
+              sourceRunId: runId,
             },
           });
         }
@@ -284,7 +284,7 @@ export async function POST(request: NextRequest) {
 
       // Queue for human review
       const existing = await db.gpid_resolution_queue.findFirst({
-        where: { entityId: entity.id, human_status: 'PENDING' },
+        where: { entityId: entity.id, humanStatus: 'PENDING' },
       });
       if (existing) {
         return NextResponse.json({
@@ -297,15 +297,15 @@ export async function POST(request: NextRequest) {
         await db.gpid_resolution_queue.create({
           data: {
             entityId: entity.id,
-            candidate_gpid: result.gpid ?? null,
-            resolver_status: result.status,
-            reason_code: result.reason,
-            similarity_score: result.similarity ?? null,
-            candidates_json: {
+            candidateGpid: result.gpid ?? null,
+            resolverStatus: result.status,
+            reasonCode: result.reason,
+            similarityScore: result.similarity ?? null,
+            candidatesJson: {
               candidates: result.candidates,
-              num_candidates: result.candidates.length,
+              numCandidates: result.candidates.length,
             },
-            source_run_id: runId,
+            sourceRunId: runId,
           },
         });
       }
@@ -379,7 +379,7 @@ export async function POST(request: NextRequest) {
       // Queue for human review (AMBIGUOUS / NO_MATCH / ERROR)
       // Check if already pending
       const existing = await db.gpid_resolution_queue.findFirst({
-        where: { entityId: entity.id, human_status: 'PENDING' },
+        where: { entityId: entity.id, humanStatus: 'PENDING' },
       });
       if (existing) {
         skipped++;
@@ -390,15 +390,15 @@ export async function POST(request: NextRequest) {
         await db.gpid_resolution_queue.create({
           data: {
             entityId: entity.id,
-            candidate_gpid: result.gpid ?? null,
-            resolver_status: result.status,
-            reason_code: result.reason,
-            similarity_score: result.similarity ?? null,
-            candidates_json: {
+            candidateGpid: result.gpid ?? null,
+            resolverStatus: result.status,
+            reasonCode: result.reason,
+            similarityScore: result.similarity ?? null,
+            candidatesJson: {
               candidates: result.candidates,
-              num_candidates: result.candidates.length,
+              numCandidates: result.candidates.length,
             },
-            source_run_id: runId,
+            sourceRunId: runId,
           },
         });
       }

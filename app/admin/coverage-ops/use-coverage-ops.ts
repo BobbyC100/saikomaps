@@ -99,7 +99,7 @@ export function useCoverageOps() {
         const res = await fetch(`/api/admin/enrich/${slug}`);
         if (!res.ok) return;
         const data = await res.json();
-        const stageNum = data.enrichment_stage ? parseInt(data.enrichment_stage, 10) : null;
+        const stageNum = data.enrichmentStage ? parseInt(data.enrichmentStage, 10) : null;
 
         setEnrichProgress((prev) => ({
           ...prev,

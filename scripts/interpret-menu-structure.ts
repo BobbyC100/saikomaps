@@ -89,13 +89,13 @@ interface MenuStructureSignal {
 }
 
 interface StructureTarget {
-  entity_id:     string;
-  entity_name:   string;
+  entityId:     string;
+  entityName:   string;
   slug:          string;
   description:   string | null;
-  menu_text:     string;
-  menu_format:   string;
-  menu_fetch_id: string;
+  menuText:     string;
+  menuFormat:   string;
+  menuFetchId: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -168,16 +168,16 @@ evidence — per signal, quote 1–3 short excerpts directly from the text.
   • Use [] for a signal's evidence only if the text is too short to quote`;
 
 function buildUserMessage(target: StructureTarget): string {
-  const textSnippet = target.menu_text.slice(0, MAX_TEXT_CHARS);
-  const truncated   = target.menu_text.length > MAX_TEXT_CHARS
+  const textSnippet = target.menuText.slice(0, MAX_TEXT_CHARS);
+  const truncated   = target.menuText.length > MAX_TEXT_CHARS
     ? `\n[...truncated at ${MAX_TEXT_CHARS} chars]`
     : "";
 
-  let msg = `Place: ${target.entity_name}\n`;
+  let msg = `Place: ${target.entityName}\n`;
   if (target.description) {
     msg += `\nDescriptive context:\n${target.description.slice(0, 600)}\n`;
   }
-  msg += `\nMenu text (${target.menu_format} source, ${target.menu_text.length} chars total):\n`;
+  msg += `\nMenu text (${target.menuFormat} source, ${target.menuText.length} chars total):\n`;
   msg += `---\n${textSnippet}${truncated}\n---`;
   return msg;
 }
@@ -233,32 +233,32 @@ async function loadTargets(
   reprocess: boolean,
 ): Promise<StructureTarget[]> {
   type RawRow = {
-    entity_id:     string;
-    entity_name:   string;
+    entityId:     string;
+    entityName:   string;
     slug:          string;
     description:   string | null;
-    menu_text:     string;
-    menu_format:   string;
-    menu_fetch_id: string;
-    has_signal:    boolean;
+    menuText:     string;
+    menuFormat:   string;
+    menuFetchId: string;
+    hasSignal:    boolean;
   };
 
   const rows = slugArg
     ? await db.$queryRaw<RawRow[]>`
         SELECT DISTINCT ON (mf.entity_id)
-          e.id                          AS entity_id,
-          e.name                        AS entity_name,
+          e.id                          AS "entityId",
+          e.name                        AS "entityName",
           e.slug,
           e.description,
-          mf.raw_text                   AS menu_text,
-          mf.menu_format,
-          mf.id                         AS menu_fetch_id,
+          mf.raw_text                   AS "menuText",
+          mf.menu_format                AS "menuFormat",
+          mf.id                         AS "menuFetchId",
           EXISTS (
             SELECT 1 FROM derived_signals ds
             WHERE ds.entity_id    = e.id
               AND ds.signal_key   = ${SIGNAL_KEY}
               AND ds.signal_version = ${SIGNAL_VERSION}
-          )                             AS has_signal
+          )                             AS "hasSignal"
         FROM menu_fetches mf
         JOIN entities e ON e.id = mf.entity_id
         WHERE mf.http_status < 400
@@ -269,19 +269,19 @@ async function loadTargets(
         LIMIT ${limit}`
     : await db.$queryRaw<RawRow[]>`
         SELECT DISTINCT ON (mf.entity_id)
-          e.id                          AS entity_id,
-          e.name                        AS entity_name,
+          e.id                          AS "entityId",
+          e.name                        AS "entityName",
           e.slug,
           e.description,
-          mf.raw_text                   AS menu_text,
-          mf.menu_format,
-          mf.id                         AS menu_fetch_id,
+          mf.raw_text                   AS "menuText",
+          mf.menu_format                AS "menuFormat",
+          mf.id                         AS "menuFetchId",
           EXISTS (
             SELECT 1 FROM derived_signals ds
             WHERE ds.entity_id    = e.id
               AND ds.signal_key   = ${SIGNAL_KEY}
               AND ds.signal_version = ${SIGNAL_VERSION}
-          )                             AS has_signal
+          )                             AS "hasSignal"
         FROM menu_fetches mf
         JOIN entities e ON e.id = mf.entity_id
         WHERE mf.http_status < 400
@@ -291,15 +291,15 @@ async function loadTargets(
         LIMIT ${limit}`;
 
   return rows
-    .filter((r) => reprocess || !r.has_signal)
+    .filter((r) => reprocess || !r.hasSignal)
     .map((r) => ({
-      entity_id:     r.entity_id,
-      entity_name:   r.entity_name,
+      entityId:     r.entityId,
+      entityName:   r.entityName,
       slug:          r.slug,
       description:   r.description,
-      menu_text:     r.menu_text,
-      menu_format:   r.menu_format,
-      menu_fetch_id: r.menu_fetch_id,
+      menuText:     r.menuText,
+      menuFormat:   r.menuFormat,
+      menuFetchId: r.menuFetchId,
     }));
 }
 
@@ -379,8 +379,8 @@ async function main() {
       // Log one line per entity
       const signalStr = isEmpty ? "—" : entries.map((e) => e.signal).join(", ");
       console.log(
-        `  [${String(idx + 1).padStart(2)}] ${target.entity_name.slice(0, 34).padEnd(34)} ` +
-        `${target.menu_format.padEnd(4)} ${String(target.menu_text.length).padStart(6)}c  ` +
+        `  [${String(idx + 1).padStart(2)}] ${target.entityName.slice(0, 34).padEnd(34)} ` +
+        `${target.menuFormat.padEnd(4)} ${String(target.menuText.length).padStart(6)}c  ` +
         `conf=${String(conf).padStart(3)}%  ${signalStr.slice(0, 60)}`,
       );
 
@@ -403,23 +403,23 @@ async function main() {
       if (result && !dryRun) {
         try {
           await writeDerivedSignal(db, {
-            entityId:      target.entity_id,
+            entityId:      target.entityId,
             signalKey:     SIGNAL_KEY,
             signalVersion: SIGNAL_VERSION,
             signalValue:   {
               signals:        result.signals,
               confidence:     result.confidence,
               source:         "menu_fetches",
-              menu_fetch_id:  target.menu_fetch_id,
-              menu_format:    target.menu_format,
-              menu_chars:     target.menu_text.length,
-              interpreted_at: new Date().toISOString(),
+              menuFetchId:  target.menuFetchId,
+              menuFormat:    target.menuFormat,
+              menuChars:     target.menuText.length,
+              interpretedAt: new Date().toISOString(),
             },
-            inputClaimIds: [target.menu_fetch_id],
+            inputClaimIds: [target.menuFetchId],
           });
           totalWritten++;
         } catch (err) {
-          console.error(`    !! DB write failed for ${target.entity_name}:`, err);
+          console.error(`    !! DB write failed for ${target.entityName}:`, err);
           totalErrors++;
         }
       }

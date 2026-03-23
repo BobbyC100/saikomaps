@@ -14,6 +14,9 @@ related_docs:
   - docs/architecture/vertical-taxonomy-v1.md
   - docs/architecture/coverage-tiers-v1.md
   - docs/FIELDS_V2_TARGET_ARCHITECTURE.md
+  - docs/architecture/entity-type-problem-definition-v1.md
+  - docs/architecture/entity-classification-framework-v1.md
+  - docs/architecture/entity-type-taxonomy-v1.md
 summary: Plain-language explanation of entity classification layers in the current schema — entityType vs primary_vertical vs category vs cuisine_type — including operational authority and usage guidance.
 ---
 

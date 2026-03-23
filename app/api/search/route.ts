@@ -151,16 +151,16 @@ export async function GET(request: NextRequest) {
 
     const derivedRows = await prisma.derived_signals.findMany({
       where: {
-        entity_id: { in: entityIds },
-        signal_key: 'identity_signals',
+        entityId: { in: entityIds },
+        signalKey: 'identity_signals',
       },
       select: {
-        entity_id: true,
-        signal_value: true,
+        entityId: true,
+        signalValue: true,
       },
     });
 
-    // Build map of entity_id → identity data
+    // Build map of entityId → identity data
     const identityMap = new Map<string, {
       personality: string | null;
       languageSignals: string[];
@@ -170,9 +170,9 @@ export async function GET(request: NextRequest) {
       winelistPayload: any;
     }>();
     derivedRows.forEach(row => {
-      const sv = row.signal_value as Record<string, unknown> | null;
+      const sv = row.signalValue as Record<string, unknown> | null;
       const languageSignals = Array.isArray(sv?.language_signals) ? (sv!.language_signals as string[]) : [];
-      identityMap.set(row.entity_id, {
+      identityMap.set(row.entityId, {
         personality: (sv?.place_personality as string) ?? null,
         languageSignals,
         menuSignalsStatus: null, // future: wire from derived_signals

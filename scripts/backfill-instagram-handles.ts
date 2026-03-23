@@ -119,8 +119,8 @@ async function main() {
   const byEntity = new Map<string, typeof surfaces[0]>();
   for (const s of surfaces) {
     if (excludeNames.includes(s.entity.name)) continue;
-    if (!byEntity.has(s.entity_id)) {
-      byEntity.set(s.entity_id, s);
+    if (!byEntity.has(s.entityId)) {
+      byEntity.set(s.entityId, s);
     }
   }
 

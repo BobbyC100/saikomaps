@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
       // Resolved today
       prisma.review_audit_log.count({
         where: {
-          resolved_at: { gte: today }
+          resolvedAt: { gte: today }
         }
       }),
       
@@ -46,28 +46,28 @@ export async function GET(request: NextRequest) {
       
       // Unprocessed raw records
       prisma.raw_records.count({
-        where: { is_processed: false }
+        where: { isProcessed: false }
       }),
       
       // Average decision time (last 100 decisions)
       prisma.review_audit_log.aggregate({
-        _avg: { decision_time_ms: true },
+        _avg: { decisionTimeMs: true },
         where: {
-          decision_time_ms: { not: null }
+          decisionTimeMs: { not: null }
         },
         take: 100,
-        orderBy: { resolved_at: 'desc' }
+        orderBy: { resolvedAt: 'desc' }
       }),
       
       // Recent activity (last 10 resolutions)
       prisma.review_audit_log.findMany({
         take: 10,
-        orderBy: { resolved_at: 'desc' },
+        orderBy: { resolvedAt: 'desc' },
         include: {
           review_queue: {
             include: {
               raw_record_a: {
-                select: { raw_json: true }
+                select: { rawJson: true }
               }
             }
           }
@@ -92,21 +92,21 @@ export async function GET(request: NextRequest) {
     
     // Get queue breakdown by conflict type
     const queueByType = await prisma.review_queue.groupBy({
-      by: ['conflict_type'],
+      by: ['conflictType'],
       where: { status: 'pending' },
       _count: true
     });
     
     // Format recent activity
     const formattedActivity = recentActivity.map(log => {
-      const rawJson = log.review_queue?.raw_record_a?.raw_json as any;
+      const rawJson = log.review_queue?.raw_record_a?.rawJson as any;
       return {
-        id: log.log_id,
+        id: log.logId,
         resolution: log.resolution,
         placeName: rawJson?.name || 'Unknown',
-        decisionTimeMs: log.decision_time_ms,
-        resolvedAt: log.resolved_at,
-        resolvedBy: log.resolved_by
+        decisionTimeMs: log.decisionTimeMs,
+        resolvedAt: log.resolvedAt,
+        resolvedBy: log.resolvedBy
       };
     });
     
@@ -125,13 +125,13 @@ export async function GET(request: NextRequest) {
         : 0,
       
       // Performance
-      avgDecisionTimeMs: avgDecisionTime._avg.decision_time_ms 
-        ? Math.round(Number(avgDecisionTime._avg.decision_time_ms))
+      avgDecisionTimeMs: avgDecisionTime._avg.decisionTimeMs
+        ? Math.round(Number(avgDecisionTime._avg.decisionTimeMs))
         : null,
-      
+
       // Breakdowns
       queueByType: queueByType.reduce((acc, item) => {
-        acc[item.conflict_type] = item._count;
+        acc[item.conflictType] = item._count;
         return acc;
       }, {} as Record<string, number>),
       

@@ -93,9 +93,9 @@ async function fetchPlaceForPRLBySlugFull(
         select: { tier: true, type: true },
       },
       energy_scores: {
-        orderBy: { computed_at: 'desc' },
+        orderBy: { computedAt: 'desc' },
         take: 1,
-        select: { energy_score: true },
+        select: { energyScore: true },
       },
     },
   });
@@ -127,8 +127,8 @@ async function fetchPlaceForPRLBySlugFull(
   );
 
   const energyScore =
-    place.energy_scores[0]?.energy_score != null
-      ? place.energy_scores[0].energy_score
+    place.energy_scores[0]?.energyScore != null
+      ? place.energy_scores[0].energyScore
       : null;
 
   const hasTagScores = place._count.place_tag_scores > 0;
@@ -144,17 +144,31 @@ async function fetchPlaceForPRLBySlugFull(
   const hasCoverageSource =
     hasEditorialSources || hasPullQuote || hasPullQuoteSource || coverageSourcesCount > 0;
 
+  // Check for rich coverage extractions (identity-grade signal from press)
+  let hasIdentityFromCoverage = false;
+  if (coverageSourcesCount > 0) {
+    const extractionCount = await db.coverage_source_extractions.count({
+      where: {
+        coverageSource: {
+          entityId: place.id,
+        },
+        isCurrent: true,
+      },
+    });
+    hasIdentityFromCoverage = extractionCount > 0;
+  }
+
   let fieldsMembershipCount = 0;
   let hasLanguageSignals = false;
 
   // Primary: derived_signals (Fields v2 path) for language_signals detection
   const derivedIdentity = await db.derived_signals.findFirst({
-    where: { entity_id: place.id, signal_key: 'identity_signals' },
-    orderBy: { computed_at: 'desc' },
-    select: { signal_value: true },
+    where: { entityId: place.id, signalKey: 'identity_signals' },
+    orderBy: { computedAt: 'desc' },
+    select: { signalValue: true },
   });
   if (derivedIdentity) {
-    const sig = derivedIdentity.signal_value as Record<string, unknown> | null;
+    const sig = derivedIdentity.signalValue as Record<string, unknown> | null;
     hasLanguageSignals = Array.isArray(sig?.language_signals) && (sig!.language_signals as string[]).length > 0;
   }
 
@@ -192,7 +206,7 @@ async function fetchPlaceForPRLBySlugFull(
     energyScore,
     hasTagSignals,
     hasFormality: false,
-    hasIdentitySignals: hasLanguageSignals,
+    hasIdentitySignals: hasLanguageSignals || hasIdentityFromCoverage,
     hasTemporalSignals: false,
     fieldsMembershipCount,
     appearsOnCount: mapPlacesPublished,
@@ -232,12 +246,12 @@ async function fetchPlaceForPRLBySlugMinimal(
   let hasLanguageSignalsMinimal = false;
   try {
     const derivedIdentityMinimal = await db.derived_signals.findFirst({
-      where: { entity_id: place.id, signal_key: 'identity_signals' },
-      orderBy: { computed_at: 'desc' },
-      select: { signal_value: true },
+      where: { entityId: place.id, signalKey: 'identity_signals' },
+      orderBy: { computedAt: 'desc' },
+      select: { signalValue: true },
     });
     if (derivedIdentityMinimal) {
-      const sig = derivedIdentityMinimal.signal_value as Record<string, unknown> | null;
+      const sig = derivedIdentityMinimal.signalValue as Record<string, unknown> | null;
       hasLanguageSignalsMinimal = Array.isArray(sig?.language_signals) && (sig!.language_signals as string[]).length > 0;
     }
 
@@ -381,9 +395,9 @@ async function fetchPlaceForPRLBatchFull(args?: {
         select: { tier: true, type: true },
       },
       energy_scores: {
-        orderBy: { computed_at: 'desc' },
+        orderBy: { computedAt: 'desc' },
         take: 1,
-        select: { energy_score: true },
+        select: { energyScore: true },
       },
     },
   });
@@ -393,24 +407,24 @@ async function fetchPlaceForPRLBatchFull(args?: {
   // derived_signals for language_signals (Fields v2 path)
   const derivedSignalsBatch = placeIds.length > 0
     ? await db.derived_signals.findMany({
-        where: { entity_id: { in: placeIds }, signal_key: 'identity_signals' },
-        orderBy: { computed_at: 'desc' },
-        select: { entity_id: true, signal_value: true },
+        where: { entityId: { in: placeIds }, signalKey: 'identity_signals' },
+        orderBy: { computedAt: 'desc' },
+        select: { entityId: true, signalValue: true },
       })
     : [];
   const derivedLanguageByEntityId = new Map<string, boolean>();
   const seenEntityIdsBatch = new Set<string>();
   for (const d of derivedSignalsBatch) {
-    if (seenEntityIdsBatch.has(d.entity_id)) continue; // first = most recent (ordered desc)
-    seenEntityIdsBatch.add(d.entity_id);
-    const sig = d.signal_value as Record<string, unknown> | null;
+    if (seenEntityIdsBatch.has(d.entityId)) continue; // first = most recent (ordered desc)
+    seenEntityIdsBatch.add(d.entityId);
+    const sig = d.signalValue as Record<string, unknown> | null;
     derivedLanguageByEntityId.set(
-      d.entity_id,
+      d.entityId,
       Array.isArray(sig?.language_signals) && (sig!.language_signals as string[]).length > 0,
     );
   }
 
-  const [mapCounts, fieldsMembershipCounts] = await Promise.all([
+  const [mapCounts, fieldsMembershipCounts, coverageSourceCounts, coverageSourcesWithExtractions] = await Promise.all([
     db.map_places.groupBy({
       by: ['entityId'],
       where: {
@@ -426,6 +440,24 @@ async function fetchPlaceForPRLBatchFull(args?: {
           _count: { id: true },
         })
       : Promise.resolve([]),
+    // Coverage sources count per entity — fixes batch consistency with single-entity path
+    placeIds.length > 0
+      ? db.coverage_sources.groupBy({
+          by: ['entityId'],
+          where: { entityId: { in: placeIds } },
+          _count: { id: true },
+        })
+      : Promise.resolve([]),
+    // Coverage sources that have current extractions — presence implies identity-grade signals
+    placeIds.length > 0
+      ? db.coverage_sources.findMany({
+          where: {
+            entityId: { in: placeIds },
+            extractions: { some: { isCurrent: true } },
+          },
+          select: { entityId: true },
+        })
+      : Promise.resolve([]),
   ]);
 
   const mapCountByPlace = new Map(
@@ -433,6 +465,13 @@ async function fetchPlaceForPRLBatchFull(args?: {
   );
   const fieldsCountByEntityId = new Map(
     fieldsMembershipCounts.map((c) => [c.entityId, c._count.id])
+  );
+  const coverageSourceCountByEntity = new Map(
+    coverageSourceCounts.map((c) => [c.entityId, c._count.id])
+  );
+  // Entities that have at least one coverage source with current extractions
+  const entitiesWithCoverageExtractions = new Set(
+    coverageSourcesWithExtractions.map((s) => s.entityId)
   );
 
   const curatorNotes = await Promise.all(
@@ -456,8 +495,8 @@ async function fetchPlaceForPRLBatchFull(args?: {
     );
 
     const energyScore =
-      place.energy_scores[0]?.energy_score != null
-        ? place.energy_scores[0].energy_score
+      place.energy_scores[0]?.energyScore != null
+        ? place.energy_scores[0].energyScore
         : null;
 
     const hasTagScores = place._count.place_tag_scores > 0;
@@ -469,8 +508,13 @@ async function fetchPlaceForPRLBatchFull(args?: {
     const hasEditorialSources = (editorialArr?.length ?? 0) > 0;
     const hasPullQuote = !!(place.pullQuote?.trim());
     const hasPullQuoteSource = !!(place.pullQuoteSource?.trim());
+    // Include coverage_sources table count (consistency with single-entity path)
+    const entityCoverageSourceCount: number = coverageSourceCountByEntity.get(place.id) ?? 0;
     const hasCoverageSource =
-      hasEditorialSources || hasPullQuote || hasPullQuoteSource;
+      hasEditorialSources || hasPullQuote || hasPullQuoteSource || entityCoverageSourceCount > 0;
+
+    // Coverage extractions with rich data upgrade identity signals flag
+    const hasIdentityFromCoverage = entitiesWithCoverageExtractions.has(place.id);
 
     const categoryDisplay =
       place.category ?? (place.category_rel?.slug as string | null) ?? null;
@@ -498,7 +542,7 @@ async function fetchPlaceForPRLBatchFull(args?: {
       energyScore,
       hasTagSignals,
       hasFormality: false,
-      hasIdentitySignals: hasLanguageSignalsBatch,
+      hasIdentitySignals: hasLanguageSignalsBatch || hasIdentityFromCoverage,
       hasTemporalSignals: false,
       fieldsMembershipCount: fieldsCountByEntityId.get(place.id) ?? 0,
       appearsOnCount: mapCountByPlace.get(place.id) ?? 0,
@@ -538,19 +582,19 @@ async function fetchPlaceForPRLBatchMinimal(args?: {
     // Primary: derived_signals for language_signals
     const derivedSignalsMinimal = placeIds.length > 0
       ? await db.derived_signals.findMany({
-          where: { entity_id: { in: placeIds }, signal_key: 'identity_signals' },
-          orderBy: { computed_at: 'desc' },
-          select: { entity_id: true, signal_value: true },
+          where: { entityId: { in: placeIds }, signalKey: 'identity_signals' },
+          orderBy: { computedAt: 'desc' },
+          select: { entityId: true, signalValue: true },
         })
       : [];
     const seenMinimal = new Set<string>();
     const derivedLangTemp = new Map<string, boolean>();
     for (const d of derivedSignalsMinimal) {
-      if (seenMinimal.has(d.entity_id)) continue;
-      seenMinimal.add(d.entity_id);
-      const sig = d.signal_value as Record<string, unknown> | null;
+      if (seenMinimal.has(d.entityId)) continue;
+      seenMinimal.add(d.entityId);
+      const sig = d.signalValue as Record<string, unknown> | null;
       derivedLangTemp.set(
-        d.entity_id,
+        d.entityId,
         Array.isArray(sig?.language_signals) && (sig!.language_signals as string[]).length > 0,
       );
     }

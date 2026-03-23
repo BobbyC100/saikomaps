@@ -12,6 +12,8 @@ systems:
 related_docs:
   - docs/architecture/coverage-ops-approach-v1.md
   - docs/architecture/fields-era-overview-v1.md
+  - docs/architecture/entity-classification-framework-v1.md
+  - docs/architecture/entity-type-problem-definition-v1.md
 summary: >-
   Weighted anchor scoring model for entity identity confidence. GPID is not
   required — entities reach publication threshold through any combination of

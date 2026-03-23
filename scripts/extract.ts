@@ -154,7 +154,7 @@ function parseAiJson(text: string, place: PlaceInput): ExtractionOutput {
       return {
         field_key,
         proposed_value: proposed ?? null,
-        raw_value: null,
+        rawValue: null,
         confidence: (typeof v === 'object' && v?.confidence) || 'medium',
         confidence_reason: typeof v === 'object' && v?.confidence ? `confidence: ${v.confidence}` : 'transformed from alternate format',
         evidence: (typeof v === 'object' && v?.evidence) || [],
@@ -177,7 +177,7 @@ async function extractPlace(place: PlaceInput, sources: ExtractionSourceInput[])
 
   const input: ExtractionInput = {
     place: { name: place.name, city: place.city, category: place.category },
-    raw_values: place.raw_values ?? null,
+    raw_values: place.rawValues ?? null,
     sources,
   };
 

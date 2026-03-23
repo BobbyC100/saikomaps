@@ -4,7 +4,7 @@ doc_type: reference
 status: active
 owner: Bobby Ciccaglione
 created: 2026-03-13
-last_updated: 2026-03-13
+last_updated: 2026-03-22
 project_id: FIELDS
 systems:
   - fields-data-layer
@@ -52,6 +52,17 @@ Photo Fetch and Eval
 - Human tags and approves by tier (Default vs Editorial)
 - Tool: /admin/photo-eval
 
+Coverage Source Enrichment (4-stage pipeline)
+- Stage 0 — Backfill: migrates editorial URLs from `entities.editorialSources` into `coverage_sources`, filtering to approved sources only
+- Stage 1 — Discover: Claude Haiku + web_search finds editorial articles across approved publications per entity (~$0.01/entity)
+- Stage 2 — Fetch: HTTP GET + cheerio extraction of article text, title, author, published date. Archives content. Detects dead links.
+- Stage 3 — Extract: Claude Sonnet reads archived content, outputs structured signals to `coverage_source_extractions` (people, food/beverage/service evidence, atmosphere, origin story, accolades, pull quotes). v2 prompt includes entity scoping (no list-article bleed), person affiliation gate, and calibrated relevance scoring.
+- Requires: entity exists in system (discovery finds coverage automatically)
+- Fills: coverage_sources, coverage_source_extractions
+- Feeds: description generator, offering programs, actor candidates, place page
+- Tool: CLI scripts (`discover-coverage-sources.ts`, `fetch-coverage-sources.ts`, `extract-coverage-sources.ts`, `backfill-coverage-from-editorial-sources.ts`)
+- Notes: approved source list maintained by Bobby in `lib/source-registry.ts` (21 sources across 3 trust tiers)
+
 ## Human Only
 
 Editorial fields:
@@ -70,5 +81,7 @@ Always run automated operations first. Human work is reserved for what the syste
 - Has coords but no neighborhood → can reverse lookup neighborhood
 - Has no GPID and no coords → needs human to resolve GPID first, then enrich
 - Missing Instagram → semi-automated finder, human confirms
-- Missing description → human only
+- Has editorial URLs → can run coverage source enrichment (fetch + extract)
+- Any EAT entity → can run coverage discovery to find new editorial URLs across approved sources
+- Missing description → human only (but coverage extractions provide pull quotes and context)
 - Missing TimeFOLD signal → human only, after factual fields are complete

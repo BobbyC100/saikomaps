@@ -30,3 +30,16 @@ tsconfig.tsbuildinfo
 
 # DB dumps (local restore artifacts)
 data/neon-restore.dump
+
+# Google Drive sync token
+.google-drive-token.json
+
+# Enrichment logs
+data/logs/
+
+# Generated cleanup scripts
+commit-cleanup.sh
+
+# Session loop state
+SESSION.md
+.last-session

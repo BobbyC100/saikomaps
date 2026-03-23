@@ -7,6 +7,9 @@ created: '2026-03-10'
 last_updated: '2026-03-10'
 project_id: SAIKO
 summary: ''
+related_docs:
+  - docs/architecture/entity-classification-framework-v1.md
+  - docs/architecture/entity-type-problem-definition-v1.md
 ---
 # Markets Integration — SPEC v1.2
 

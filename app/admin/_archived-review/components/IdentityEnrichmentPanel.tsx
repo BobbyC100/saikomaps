@@ -85,14 +85,14 @@ function extractTopCandidate(runs: EnrichmentRun[]): TopCandidate {
   };
 
   for (const run of runs) {
-    const j = run.result_json ?? {};
+    const j = run.resultJson ?? {};
 
-    if (run.source_name === 'google_candidate_search') {
+    if (run.sourceName === 'google_candidate_search') {
       out.name = j.best_candidate_name ?? out.name;
       out.similarity = j.best_score ?? out.similarity;
     }
 
-    if (run.source_name === 'gpid_detection') {
+    if (run.sourceName === 'gpid_detection') {
       out.gpid = j.gpid_found ?? out.gpid;
       if (j.place_details) {
         out.website = j.place_details.website ?? out.website;
@@ -103,17 +103,17 @@ function extractTopCandidate(runs: EnrichmentRun[]): TopCandidate {
       out.ruleFired = j.sufficiency_check?.ruleFired ?? out.ruleFired;
     }
 
-    if (run.source_name === 'website_discovery') {
+    if (run.sourceName === 'website_discovery') {
       out.website = j.website_found ?? out.website;
       out.ruleFired = j.sufficiency_check?.ruleFired ?? out.ruleFired;
     }
 
-    if (run.source_name === 'instagram_discovery') {
+    if (run.sourceName === 'instagram_discovery') {
       out.instagram = j.instagram_found ?? out.instagram;
       out.ruleFired = j.sufficiency_check?.ruleFired ?? out.ruleFired;
     }
 
-    if (run.source_name === 'corroboration') {
+    if (run.sourceName === 'corroboration') {
       // Prefer final anchors for completeness
       const anchors = j.final_anchors ?? {};
       out.gpid = anchors.gpid ?? out.gpid;
@@ -148,9 +148,9 @@ function RunHistoryRow({ run }: { run: EnrichmentRun }) {
   const [open, setOpen] = useState(false);
 
   const statusDot =
-    run.decision_status === 'sufficient'
+    run.decisionStatus === 'sufficient'
       ? 'bg-green-500'
-      : run.decision_status === 'needs_review'
+      : run.decisionStatus === 'needs_review'
         ? 'bg-amber-400'
         : 'bg-gray-300';
 
@@ -162,16 +162,16 @@ function RunHistoryRow({ run }: { run: EnrichmentRun }) {
       >
         <span className={`w-2 h-2 rounded-full shrink-0 ${statusDot}`} />
         <span className="text-sm font-medium text-gray-700 flex-1">
-          {SOURCE_LABELS[run.source_name] ?? run.source_name}
+          {SOURCE_LABELS[run.sourceName] ?? run.sourceName}
         </span>
-        {run.searched_name && (
+        {run.searchedName && (
           <span className="text-xs text-gray-400 truncate max-w-[160px]">
-            "{run.searched_name}"
-            {run.searched_city ? ` · ${run.searched_city}` : ''}
+            "{run.searchedName}"
+            {run.searchedCity ? ` · ${run.searchedCity}` : ''}
           </span>
         )}
         <span className="text-xs text-gray-500 shrink-0">
-          {confidencePct(run.identity_confidence)} · {run.anchor_count} anchors
+          {confidencePct(run.identityConfidence)} · {run.anchorCount} anchors
         </span>
         <span className="text-gray-300 ml-1">{open ? '▲' : '▼'}</span>
       </button>
@@ -179,7 +179,7 @@ function RunHistoryRow({ run }: { run: EnrichmentRun }) {
       {open && (
         <div className="border-t border-gray-100 bg-gray-50 px-4 py-3">
           <pre className="text-[11px] text-gray-600 whitespace-pre-wrap break-all leading-relaxed font-mono">
-            {JSON.stringify(run.result_json, null, 2)}
+            {JSON.stringify(run.resultJson, null, 2)}
           </pre>
         </div>
       )}
@@ -193,11 +193,11 @@ function RunHistoryRow({ run }: { run: EnrichmentRun }) {
 
 interface IdentityEnrichmentPanelProps {
   item: {
-    queue_id: string;
-    conflict_type: string;
-    identity_enrichment_status: string | null;
-    identity_anchor_count: number | null;
-    latest_identity_confidence: number | null;
+    queueId: string;
+    conflictType: string;
+    identityEnrichmentStatus: string | null;
+    identityAnchorCount: number | null;
+    latestIdentityConfidence: number | null;
     enrichment_runs: EnrichmentRun[];
     recordA: HydratedRecord;
   };
@@ -206,7 +206,7 @@ interface IdentityEnrichmentPanelProps {
 export function IdentityEnrichmentPanel({ item }: IdentityEnrichmentPanelProps) {
   const [historyOpen, setHistoryOpen] = useState(false);
 
-  const status = item.identity_enrichment_status;
+  const status = item.identityEnrichmentStatus;
   const candidate = extractTopCandidate(item.enrichment_runs);
   const record = item.recordA;
 
@@ -228,11 +228,11 @@ export function IdentityEnrichmentPanel({ item }: IdentityEnrichmentPanelProps) 
         <div className="flex items-center gap-4 text-xs font-mono">
           <span>
             confidence{' '}
-            <strong>{confidencePct(item.latest_identity_confidence)}</strong>
+            <strong>{confidencePct(item.latestIdentityConfidence)}</strong>
           </span>
           <span>
             anchors{' '}
-            <strong>{item.identity_anchor_count ?? '—'}</strong>
+            <strong>{item.identityAnchorCount ?? '—'}</strong>
           </span>
         </div>
       </div>
@@ -242,17 +242,17 @@ export function IdentityEnrichmentPanel({ item }: IdentityEnrichmentPanelProps) 
         {/* Left: intake record */}
         <div className="px-6 py-5">
           <p className="text-[10px] uppercase tracking-widest text-gray-400 font-semibold mb-3">
-            Intake record · {record.source_name.replace(/_/g, ' ')}
+            Intake record · {record.sourceName.replace(/_/g, ' ')}
           </p>
           <p className="text-lg font-semibold text-gray-900 mb-3">{record.name}</p>
           <div className="space-y-0">
             <AnchorPill label="Address" value={record.address ?? null} />
-            <AnchorPill label="City" value={record.raw_json?.address_city ?? null} />
+            <AnchorPill label="City" value={record.rawJson?.address_city ?? null} />
             <AnchorPill label="Neighborhood" value={record.neighborhood ?? null} />
             <AnchorPill label="Category" value={record.category ?? null} />
             <AnchorPill label="Phone" value={record.phone ?? null} />
-            <AnchorPill label="Website" value={record.raw_json?.website ?? null} />
-            <AnchorPill label="Instagram" value={record.raw_json?.instagram ?? null} />
+            <AnchorPill label="Website" value={record.rawJson?.website ?? null} />
+            <AnchorPill label="Instagram" value={record.rawJson?.instagram ?? null} />
           </div>
         </div>
 

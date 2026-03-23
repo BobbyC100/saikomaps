@@ -94,8 +94,8 @@ async function runEnrichment(slug: string): Promise<void> {
     where: { id: entityId },
     select: {
       slug: true,
-      enrichment_stage: true,
-      last_enriched_at: true,
+      enrichmentStage: true,
+      lastEnrichedAt: true,
       status: true,
     },
   });
@@ -108,8 +108,8 @@ async function runEnrichment(slug: string): Promise<void> {
   console.log('Entity state:');
   console.log(`  Slug:               ${entity.slug}`);
   console.log(`  Status:             ${entity.status}`);
-  console.log(`  Enrichment stage:   ${entity.enrichment_stage ?? 'null'}`);
-  console.log(`  Last enriched at:   ${entity.last_enriched_at ? new Date(entity.last_enriched_at).toISOString() : 'null'}`);
+  console.log(`  Enrichment stage:   ${entity.enrichmentStage ?? 'null'}`);
+  console.log(`  Last enriched at:   ${entity.lastEnrichedAt ? new Date(entity.lastEnrichedAt).toISOString() : 'null'}`);
 
   // ==========================================
   // Verify stage-specific data
@@ -150,12 +150,12 @@ async function runEnrichment(slug: string): Promise<void> {
   // Final verdict
   // ==========================================
   console.log('\n' + '═'.repeat(60));
-  if (entity.enrichment_stage === '7' && entity.last_enriched_at) {
+  if (entity.enrichmentStage === '7' && entity.lastEnrichedAt) {
     console.log('✅ ENRICHMENT SUCCESSFUL');
     console.log('   All stages completed and data written to database');
   } else {
     console.log('⚠️  ENRICHMENT INCOMPLETE');
-    console.log(`   Last stage: ${entity.enrichment_stage ?? 'none'}`);
+    console.log(`   Last stage: ${entity.enrichmentStage ?? 'none'}`);
   }
   console.log('═'.repeat(60) + '\n');
 

@@ -37,6 +37,20 @@ export type PlacePageCoverageSource = {
   publishedAt: string | null;
 };
 
+export type PlacePageCoverageHighlights = {
+  sourceCount: number;
+  tier1Count: number;
+  tier2Count: number;
+  people: Array<{ name: string; role: string }>;
+  accolades: Array<{ name: string; year: number | null; type: string }>;
+  dishes: string[];
+  originStory: {
+    foundingYear: number | null;
+    founderNames: string[];
+    geographicOrigin: string | null;
+  } | null;
+};
+
 export type PlacePageAppearanceAsSubject = {
   id: string;
   hostPlaceId: string | null;
@@ -56,7 +70,10 @@ export type PlacePageAppearanceAsHost = {
   status: string;
 };
 
+export type PlacePageProgramClass = 'food' | 'beverage' | 'events' | 'service';
+
 export type PlacePageProgramEntry = {
+  program_class: PlacePageProgramClass;
   maturity: 'none' | 'incidental' | 'considered' | 'dedicated' | 'unknown';
   signals: string[];
 };
@@ -72,6 +89,17 @@ export type PlacePageOfferingPrograms = {
   private_dining_program: PlacePageProgramEntry;
   group_dining_program: PlacePageProgramEntry;
   catering_program: PlacePageProgramEntry;
+  dumpling_program: PlacePageProgramEntry;
+  sushi_raw_fish_program: PlacePageProgramEntry;
+  ramen_noodle_program: PlacePageProgramEntry;
+  taco_program: PlacePageProgramEntry;
+  pizza_program: PlacePageProgramEntry;
+};
+
+export type PlacePageTimeFold = {
+  class: 'STABILITY' | 'NEWNESS';
+  phrase: string;
+  approvedBy: string | null;
 };
 
 export type PlacePageAppearsOnItem = {
@@ -137,6 +165,9 @@ export type PlacePageLocation = {
   prl: number;
   scenesense: PlacePageSceneSense | null;
 
+  // TimeFOLD (temporal signal)
+  timefold: PlacePageTimeFold | null;
+
   // Offering
   offeringSignals: PlacePageOfferingSignals | null;
   offeringPrograms: PlacePageOfferingPrograms | null;
@@ -155,6 +186,12 @@ export type PlacePageLocation = {
 
   // Coverage
   coverageSources: PlacePageCoverageSource[];
+  coverageHighlights: PlacePageCoverageHighlights | null;
+
+  // Parks-specific (only present when primaryVertical === 'PARKS')
+  amenities?: string[];
+  parkFacilities?: { id: string; name: string; slug: string; category: string | null }[];
+  parentPark?: { id: string; name: string; slug: string };
 
   // Appearances
   appearancesAsSubject: PlacePageAppearanceAsSubject[];
@@ -219,6 +256,8 @@ export const PLACE_PAGE_LOCATION_KEYS: ReadonlyArray<keyof PlacePageLocation> = 
   // SceneSense
   'prl',
   'scenesense',
+  // TimeFOLD
+  'timefold',
   // Offering
   'offeringSignals',
   'offeringPrograms',
@@ -234,6 +273,7 @@ export const PLACE_PAGE_LOCATION_KEYS: ReadonlyArray<keyof PlacePageLocation> = 
   'originStoryType',
   // Coverage
   'coverageSources',
+  'coverageHighlights',
   // Appearances
   'appearancesAsSubject',
   'appearancesAsHost',

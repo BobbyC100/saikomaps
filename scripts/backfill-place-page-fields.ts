@@ -106,7 +106,7 @@ type PlaceWithSources = {
   slug: string;
   googlePlaceId: string | null;
   neighborhood: string | null;
-  primary_vertical: string;
+  primaryVertical: string;
   tagline: string | null;
   description: string | null;
   thematicTags: string[];
@@ -151,7 +151,7 @@ function deriveContextualConnection(
   placePersonality: string | null
 ): string | null {
   const hood = p.neighborhood?.trim() || 'LA';
-  const vert = VERTICAL_LABELS[p.primary_vertical] || p.primary_vertical.toLowerCase();
+  const vert = VERTICAL_LABELS[p.primaryVertical] || p.primaryVertical.toLowerCase();
   const personality = placePersonality?.replace(/-/g, ' ') ?? 'local favorite';
   const tail = p.tagline?.trim() || p.description?.trim().slice(0, 80) || '';
   const base = `${hood} ${vert} — ${personality}`;
@@ -295,7 +295,7 @@ async function main(): Promise<void> {
       slug: true,
       googlePlaceId: true,
       neighborhood: true,
-      primary_vertical: true,
+      primaryVertical: true,
       tagline: true,
       description: true,
       thematicTags: true,
