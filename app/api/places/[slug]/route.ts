@@ -195,11 +195,11 @@ export async function GET(
               .filter((m) => m.mediaUrl)
               .map((m) => m.mediaUrl as string);
           } else {
-            // Fall back to 12 most recent media if none are classified yet
+            // Fall back to 6 most recent media if none are classified yet (any type with URL)
             const recentMedia = await db.instagram_media.findMany({
               where: {
                 instagramUserId: instagramAccount.instagramUserId,
-                mediaType: 'IMAGE', // Only images, not videos
+                mediaUrl: { not: null },
               },
               select: {
                 mediaUrl: true,

@@ -164,16 +164,16 @@ async function classifyEntityPhotos(entityId: string, entitySlug: string): Promi
     return;
   }
 
-  // Get 12 most recent photos (regardless of prior classification)
+  // Get 12 most recent media items with URLs (all types: images, videos, carousels)
   const media = await db.instagram_media.findMany({
     where: {
       instagramUserId: account.instagramUserId,
-      mediaType: 'IMAGE', // Only classify actual images, not videos
       mediaUrl: { not: null },
     },
     select: {
       id: true,
       mediaUrl: true,
+      mediaType: true,
       photoType: true,
     },
     orderBy: { timestamp: 'desc' },
