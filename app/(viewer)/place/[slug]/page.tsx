@@ -9,7 +9,7 @@ import { GalleryLightbox } from '@/components/merchant/GalleryLightbox';
 import { parseHours } from './lib/parseHours';
 import { getOpenStateLabelV2 } from '@/lib/utils/get-open-state-label';
 import { renderLocation } from '@/lib/voice/saiko';
-import { getIdentitySublineV2 } from '@/lib/contracts/place-page.identity';
+import { getIdentitySublineV2 } from '@/lib/contracts/entity-page.identity';
 import './place.css';
 
 interface EditorialSource {

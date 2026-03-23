@@ -3,7 +3,7 @@ export { CoverMapGoogle } from './CoverMapGoogle';
 export { CoverBlock } from './CoverBlock';
 export { FieldNotesMapView } from './FieldNotesMapView';
 export { SectionDivider } from './SectionDivider';
-export { PlaceCard, CardMetaRow, type PlaceCardData } from './PlaceCard';
+export { PlaceCard, CardMetaRow, type EntityCardData } from './EntityCard';
 export { FeaturedCard } from './FeaturedCard';
 export { MapToggle } from './MapToggle';
 export { FieldNotesNavBar } from './FieldNotesNavBar';

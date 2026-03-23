@@ -5,7 +5,7 @@
 
 import { db } from '@/lib/db'
 import { searchPlace, getPlaceDetails, getNeighborhoodFromPlaceDetails, getNeighborhoodFromCoords } from '@/lib/google-places'
-import { generatePlaceSlug, ensureUniqueSlug } from '@/lib/place-slug'
+import { generatePlaceSlug, ensureUniqueSlug } from '@/lib/entity-slug'
 import { getSaikoCategory, parseCuisineType } from '@/lib/categoryMapping'
 
 const USER_ID = 'demo-user-id'

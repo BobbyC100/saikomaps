@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 
-export interface PlaceCardData {
+export interface EntityCardData {
   id: string;
   placeSlug?: string;
   name: string;
@@ -23,7 +23,7 @@ export interface PlaceCardData {
 }
 
 interface PlaceCardProps {
-  place: PlaceCardData;
+  place: EntityCardData;
   span: 2 | 3 | 4 | 6;
   theme: 'light' | 'dark';
 }
@@ -34,7 +34,7 @@ export function CardMetaRow({
   dark,
   fontSize = 10,
 }: {
-  place: PlaceCardData;
+  place: EntityCardData;
   dark: boolean;
   fontSize?: number;
 }) {

@@ -1,11 +1,11 @@
 /**
  * Data transformation utilities for HorizontalBentoCard
  * 
- * Transforms Prisma Place model data into PlaceCardData format
+ * Transforms Prisma Place model data into EntityCardData format
  * for use with the HorizontalBentoCard component.
  */
 
-import { PlaceCardData, Signal, SignalType, SignalStatus } from '@/components/search-results/types';
+import { EntityCardData, Signal, SignalType, SignalStatus } from '@/components/search-results/types';
 
 // Prisma Place type (partial - only fields we need for cards)
 interface PrismaPlace {
@@ -204,15 +204,15 @@ function calculateDistance(
 }
 
 /**
- * Transform Prisma Place to PlaceCardData
+ * Transform Prisma Place to EntityCardData
  * 
  * @param place - Place from Prisma query
  * @param userLocation - Optional user coordinates for distance calculation
  */
-export function transformPlaceToCardData(
+export function transformEntityToCardData(
   place: PrismaPlace,
   userLocation?: { lat: number; lon: number }
-): PlaceCardData {
+): EntityCardData {
   const { isOpen, closesAt, opensAt } = parseOpenStatus(place.hours);
   const { coverageQuote, coverageSource } = extractCoverageQuote(place.sources);
   
@@ -264,9 +264,9 @@ export function transformPlaceToCardData(
 /**
  * Batch transform multiple places
  */
-export function transformPlacesToCardData(
+export function transformEntitiesToCardData(
   places: PrismaPlace[],
   userLocation?: { lat: number; lon: number }
-): PlaceCardData[] {
-  return places.map(place => transformPlaceToCardData(place, userLocation));
+): EntityCardData[] {
+  return places.map(place => transformEntityToCardData(place, userLocation));
 }

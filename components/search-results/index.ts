@@ -3,11 +3,11 @@
 export { BentoGrid } from './BentoGrid';
 export type { LayoutMode } from './BentoGrid';
 
-// Place Cards
-export { PlaceCard1x1 } from './PlaceCard1x1';
-export { PlaceCard1x2 } from './PlaceCard1x2';
-export { PlaceCard2x1 } from './PlaceCard2x1';
-export { PlaceCard2x2 } from './PlaceCard2x2';
+// Entity Cards
+export { EntityCard1x1 } from './EntityCard1x1';
+export { EntityCard1x2 } from './EntityCard1x2';
+export { EntityCard2x1 } from './EntityCard2x1';
+export { EntityCard2x2 } from './EntityCard2x2';
 
 // Spotlight Cards
 export { SpotlightCard1x2 } from './SpotlightCard1x2';
@@ -20,6 +20,6 @@ export { QuietCard1x2 } from './QuietCard1x2';
 export { QuietCard2x1 } from './QuietCard2x1';
 
 // Types
-export type { PlaceCardData, Signal, SignalType } from './types';
+export type { EntityCardData, Signal, SignalType } from './types';
 export type { SpotlightCardData } from './spotlightTypes';
 export type { QuietCardData } from './quietTypes';

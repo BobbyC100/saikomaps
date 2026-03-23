@@ -1,11 +1,11 @@
 /**
- * Identity helper — derives display-ready strings from PlacePageLocation.
+ * Identity helper — derives display-ready strings from EntityPageLocation.
  *
  * Pure function: no DB access, no side effects.
  * Caller is responsible for passing open-state (parsed from hours) if needed.
  */
 
-import type { PlacePageLocation } from './place-page';
+import type { EntityPageLocation } from './entity-page';
 
 export type IdentityBlockInputs = {
   /** "{neighborhood} {category}" subline, e.g. "Silver Lake restaurant". Null if both absent. */
@@ -24,11 +24,11 @@ export type IdentityBlockInputs = {
  * @deprecated Use getIdentitySublineV2() for the canonical identity line.
  * Returns the three display-ready strings the identity block needs.
  *
- * @param place   - PlacePageLocation (from contract)
+ * @param place   - EntityPageLocation (from contract)
  * @param openStateLabel - Pre-derived open/closed label, or null
  */
 export function getIdentityBlockInputs(
-  place: Pick<PlacePageLocation, 'neighborhood' | 'category' | 'cuisineType' | 'offeringSignals'>,
+  place: Pick<EntityPageLocation, 'neighborhood' | 'category' | 'cuisineType' | 'offeringSignals'>,
   openStateLabel: string | null = null
 ): IdentityBlockInputs {
   // Identity line: "{neighborhood} {category}"
@@ -84,7 +84,7 @@ function toTitleCase(str: string): string {
  * Pure function — no DB access.
  */
 export function getProfileIdentityLine(
-  place: Pick<PlacePageLocation, 'neighborhood' | 'cuisineType' | 'offeringSignals'>
+  place: Pick<EntityPageLocation, 'neighborhood' | 'cuisineType' | 'offeringSignals'>
 ): string | null {
   const segments: string[] = [];
   const os = place.offeringSignals;
@@ -165,7 +165,7 @@ const WINE_QUALIFIER: Record<string, string> = {
  */
 export function getIdentitySublineV2(
   place: Pick<
-    PlacePageLocation,
+    EntityPageLocation,
     'neighborhood' | 'primaryVertical' | 'cuisineType' | 'offeringSignals'
   >
 ): string | null {

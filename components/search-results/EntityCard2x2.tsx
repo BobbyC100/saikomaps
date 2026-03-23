@@ -1,13 +1,13 @@
 'use client';
 
 import Link from 'next/link';
-import { PlaceCardData, Signal, getPersonalityLabel, computeInternalBadges } from './types';
+import { EntityCardData, getPersonalityLabel, computeInternalBadges } from './types';
 
-interface PlaceCard2x1Props {
-  place: PlaceCardData;
+interface EntityCard2x2Props {
+  place: EntityCardData;
 }
 
-export function PlaceCard2x1({ place }: PlaceCard2x1Props) {
+export function EntityCard2x2({ place }: EntityCard2x2Props) {
   const {
     slug,
     name,
@@ -21,6 +21,7 @@ export function PlaceCard2x1({ place }: PlaceCard2x1Props) {
     opensAt,
     signals = [],
     coverageQuote,
+    coverageSource,
     distanceMiles,
     placePersonality,
   } = place;
@@ -38,29 +39,28 @@ export function PlaceCard2x1({ place }: PlaceCard2x1Props) {
   return (
     <Link
       href={`/place/${slug}`}
-      className="card-place-2x1"
+      className="card-place-2x2"
       style={{
         gridColumn: 'span 2',
-        gridRow: 'span 1',
+        gridRow: 'span 2',
         background: '#FFFDF7',
         borderRadius: 8,
         overflow: 'hidden',
         display: 'flex',
-        flexDirection: 'row',
+        flexDirection: 'column',
         textDecoration: 'none',
         color: 'inherit',
         transition: 'transform 0.2s, box-shadow 0.2s',
       }}
     >
-      {/* Photo (40% width) */}
+      {/* Photo (55% height) */}
       <div
         style={{
-          width: '40%',
+          height: '55%',
           backgroundImage: photoUrl ? `url(${photoUrl})` : placeholderGradient,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           position: 'relative',
-          flexShrink: 0,
         }}
       >
         {/* Signal badges */}
@@ -98,22 +98,21 @@ export function PlaceCard2x1({ place }: PlaceCard2x1Props) {
         )}
       </div>
 
-      {/* Info (60% width) */}
+      {/* Info (45% height) */}
       <div
         style={{
           flex: 1,
-          padding: 12,
+          padding: 14,
           display: 'flex',
           flexDirection: 'column',
-          gap: 6,
-          minWidth: 0,
+          gap: 8,
         }}
       >
         {/* Name */}
         <h3
           style={{
             fontFamily: '"Libre Baskerville", Georgia, serif',
-            fontSize: 14,
+            fontSize: 16,
             fontStyle: 'italic',
             color: '#36454F',
             lineHeight: 1.2,
@@ -126,9 +125,9 @@ export function PlaceCard2x1({ place }: PlaceCard2x1Props) {
         {/* Meta row */}
         <div
           style={{
-            fontSize: 10,
+            fontSize: 11,
             textTransform: 'uppercase',
-            letterSpacing: '1px',
+            letterSpacing: '1.2px',
             color: '#C3B091',
             opacity: 0.85,
           }}
@@ -142,24 +141,39 @@ export function PlaceCard2x1({ place }: PlaceCard2x1Props) {
 
         {/* Coverage quote */}
         {coverageQuote && (
-          <div
-            style={{
-              fontFamily: '"Libre Baskerville", Georgia, serif',
-              fontSize: 11,
-              fontStyle: 'italic',
-              color: '#36454F',
-              opacity: 0.65,
-              lineHeight: 1.4,
-              borderLeft: '2px solid #C3B091',
-              paddingLeft: 8,
-              display: '-webkit-box',
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: 'vertical',
-              overflow: 'hidden',
-            }}
-          >
-            {coverageQuote}
-          </div>
+          <>
+            <div
+              style={{
+                fontFamily: '"Libre Baskerville", Georgia, serif',
+                fontSize: 12,
+                fontStyle: 'italic',
+                color: '#36454F',
+                opacity: 0.7,
+                lineHeight: 1.5,
+                borderLeft: '2px solid #C3B091',
+                paddingLeft: 10,
+                display: '-webkit-box',
+                WebkitLineClamp: 3,
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden',
+              }}
+            >
+              {coverageQuote}
+            </div>
+            {coverageSource && (
+              <div
+                style={{
+                  fontSize: 10,
+                  textTransform: 'uppercase',
+                  letterSpacing: '1px',
+                  color: '#8B7355',
+                  opacity: 0.85,
+                }}
+              >
+                — {coverageSource}
+              </div>
+            )}
+          </>
         )}
 
         {/* Footer */}

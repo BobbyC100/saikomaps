@@ -1,26 +1,26 @@
 /**
- * Place Page Data Contract — Drift Test
+ * Entity Page Data Contract — Drift Test
  *
  * Fails if the payload shape returned by the API route diverges from
- * the canonical PlacePageData contract in lib/contracts/place-page.ts.
+ * the canonical EntityPageData contract in lib/contracts/entity-page.ts.
  *
  * This test does NOT hit the DB. It validates structure only.
  */
 
 import { describe, it, expect } from 'vitest';
 import {
-  PLACE_PAGE_LOCATION_KEYS,
-  PLACE_PAGE_DATA_KEYS,
-  assertPlacePageData,
-  type PlacePageData,
-  type PlacePageLocation,
-} from '../../lib/contracts/place-page';
+  ENTITY_PAGE_LOCATION_KEYS,
+  ENTITY_PAGE_DATA_KEYS,
+  assertEntityPageData,
+  type EntityPageData,
+  type EntityPageLocation,
+} from '../../lib/contracts/entity-page';
 
 // ---------------------------------------------------------------------------
 // Minimal valid fixture — represents the minimum the API must return
 // ---------------------------------------------------------------------------
 
-function makeLocation(overrides: Partial<PlacePageLocation> = {}): PlacePageLocation {
+function makeLocation(overrides: Partial<EntityPageLocation> = {}): EntityPageLocation {
   return {
     // Identity
     id: 'abc123',
@@ -89,7 +89,7 @@ function makeLocation(overrides: Partial<PlacePageLocation> = {}): PlacePageLoca
   };
 }
 
-function makeData(overrides: Partial<PlacePageData> = {}): PlacePageData {
+function makeData(overrides: Partial<EntityPageData> = {}): EntityPageData {
   return {
     location: makeLocation(),
     guide: null,
@@ -103,41 +103,41 @@ function makeData(overrides: Partial<PlacePageData> = {}): PlacePageData {
 // Key completeness
 // ---------------------------------------------------------------------------
 
-describe('PLACE_PAGE_LOCATION_KEYS completeness', () => {
-  it('covers all keys in PlacePageLocation fixture', () => {
+describe('ENTITY_PAGE_LOCATION_KEYS completeness', () => {
+  it('covers all keys in EntityPageLocation fixture', () => {
     const fixture = makeLocation();
     const fixtureKeys = Object.keys(fixture).sort();
-    const contractKeys = [...PLACE_PAGE_LOCATION_KEYS].sort();
+    const contractKeys = [...ENTITY_PAGE_LOCATION_KEYS].sort();
     expect(contractKeys).toEqual(fixtureKeys);
   });
 
   it('has no duplicate keys', () => {
-    const unique = new Set(PLACE_PAGE_LOCATION_KEYS);
-    expect(unique.size).toBe(PLACE_PAGE_LOCATION_KEYS.length);
+    const unique = new Set(ENTITY_PAGE_LOCATION_KEYS);
+    expect(unique.size).toBe(ENTITY_PAGE_LOCATION_KEYS.length);
   });
 });
 
-describe('PLACE_PAGE_DATA_KEYS completeness', () => {
-  it('covers all keys in PlacePageData fixture', () => {
+describe('ENTITY_PAGE_DATA_KEYS completeness', () => {
+  it('covers all keys in EntityPageData fixture', () => {
     const fixture = makeData();
     const fixtureKeys = Object.keys(fixture).sort();
-    const contractKeys = [...PLACE_PAGE_DATA_KEYS].sort();
+    const contractKeys = [...ENTITY_PAGE_DATA_KEYS].sort();
     expect(contractKeys).toEqual(fixtureKeys);
   });
 });
 
 // ---------------------------------------------------------------------------
-// assertPlacePageData — happy path
+// assertEntityPageData — happy path
 // ---------------------------------------------------------------------------
 
-describe('assertPlacePageData — valid data', () => {
+describe('assertEntityPageData — valid data', () => {
   it('does not throw for a fully valid payload', () => {
-    expect(() => assertPlacePageData(makeData())).not.toThrow();
+    expect(() => assertEntityPageData(makeData())).not.toThrow();
   });
 
   it('accepts scenesense: null (PRL < 3)', () => {
     expect(() =>
-      assertPlacePageData(makeData({ location: makeLocation({ scenesense: null, prl: 2 }) }))
+      assertEntityPageData(makeData({ location: makeLocation({ scenesense: null, prl: 2 }) }))
     ).not.toThrow();
   });
 
@@ -146,7 +146,7 @@ describe('assertPlacePageData — valid data', () => {
       prl: 3,
       scenesense: { atmosphere: ['Dim'], energy: ['Lively'], scene: ['Neighborhood crowd'] },
     });
-    expect(() => assertPlacePageData(makeData({ location: loc }))).not.toThrow();
+    expect(() => assertEntityPageData(makeData({ location: loc }))).not.toThrow();
   });
 
   it('accepts non-empty tips and appearsOn', () => {
@@ -165,70 +165,70 @@ describe('assertPlacePageData — valid data', () => {
         },
       ],
     });
-    expect(() => assertPlacePageData(d)).not.toThrow();
+    expect(() => assertEntityPageData(d)).not.toThrow();
   });
 });
 
 // ---------------------------------------------------------------------------
-// assertPlacePageData — invariant enforcement
+// assertEntityPageData — invariant enforcement
 // ---------------------------------------------------------------------------
 
-describe('assertPlacePageData — missing required keys', () => {
+describe('assertEntityPageData — missing required keys', () => {
   it('throws when location is missing', () => {
     const bad = { guide: null, appearsOn: [], isOwner: false };
-    expect(() => assertPlacePageData(bad)).toThrow(/missing required key "location"/);
+    expect(() => assertEntityPageData(bad)).toThrow(/missing required key "location"/);
   });
 
   it('throws when appearsOn is missing from top-level', () => {
     const bad = { location: makeLocation(), guide: null, isOwner: false };
-    expect(() => assertPlacePageData(bad)).toThrow(/missing required key "appearsOn"/);
+    expect(() => assertEntityPageData(bad)).toThrow(/missing required key "appearsOn"/);
   });
 
   it('throws when a required location key is absent', () => {
     const loc = makeLocation();
     delete loc.tips;
-    expect(() => assertPlacePageData(makeData({ location: loc }))).toThrow(/missing required key "tips"/);
+    expect(() => assertEntityPageData(makeData({ location: loc }))).toThrow(/missing required key "tips"/);
   });
 
   it('throws when id is missing from location', () => {
     const loc = makeLocation();
     delete loc.id;
-    expect(() => assertPlacePageData(makeData({ location: loc }))).toThrow(/missing required key "id"/);
+    expect(() => assertEntityPageData(makeData({ location: loc }))).toThrow(/missing required key "id"/);
   });
 });
 
-describe('assertPlacePageData — array invariants', () => {
+describe('assertEntityPageData — array invariants', () => {
   it('throws when tips is not an array', () => {
     const loc = makeLocation({ tips: null as unknown as string[] });
-    expect(() => assertPlacePageData(makeData({ location: loc }))).toThrow(/tips must be an array/);
+    expect(() => assertEntityPageData(makeData({ location: loc }))).toThrow(/tips must be an array/);
   });
 
   it('throws when photoUrls is not an array', () => {
     const loc = makeLocation({ photoUrls: null as unknown as string[] });
-    expect(() => assertPlacePageData(makeData({ location: loc }))).toThrow(/photoUrls must be an array/);
+    expect(() => assertEntityPageData(makeData({ location: loc }))).toThrow(/photoUrls must be an array/);
   });
 
   it('throws when coverageSources is not an array', () => {
     const loc = makeLocation({ coverageSources: null as unknown as [] });
-    expect(() => assertPlacePageData(makeData({ location: loc }))).toThrow(/coverageSources must be an array/);
+    expect(() => assertEntityPageData(makeData({ location: loc }))).toThrow(/coverageSources must be an array/);
   });
 
   it('throws when appearsOn is not an array', () => {
     const bad = { ...makeData(), appearsOn: null };
-    expect(() => assertPlacePageData(bad)).toThrow(/appearsOn must be an array/);
+    expect(() => assertEntityPageData(bad)).toThrow(/appearsOn must be an array/);
   });
 });
 
-describe('assertPlacePageData — prl invariant', () => {
+describe('assertEntityPageData — prl invariant', () => {
   it('throws when prl is a string', () => {
     const loc = makeLocation({ prl: '3' as unknown as number });
-    expect(() => assertPlacePageData(makeData({ location: loc }))).toThrow(/prl must be a number/);
+    expect(() => assertEntityPageData(makeData({ location: loc }))).toThrow(/prl must be a number/);
   });
 
   it('throws when prl is missing', () => {
     const loc = makeLocation();
     delete loc.prl;
-    expect(() => assertPlacePageData(makeData({ location: loc }))).toThrow(/missing required key "prl"/);
+    expect(() => assertEntityPageData(makeData({ location: loc }))).toThrow(/missing required key "prl"/);
   });
 });
 
@@ -238,19 +238,19 @@ describe('assertPlacePageData — prl invariant', () => {
 
 describe('Contract drift guard', () => {
   it('API payload must not contain extra location keys', () => {
-    const contractKeySet = new Set<string>(PLACE_PAGE_LOCATION_KEYS);
+    const contractKeySet = new Set<string>(ENTITY_PAGE_LOCATION_KEYS);
     const apiPayload = makeData();
     const actualKeys = Object.keys(apiPayload.location);
     const extraKeys = actualKeys.filter((k) => !contractKeySet.has(k));
     // If this fails, a key was added to the API response without updating the contract.
-    // Remove it from the API or add it to PLACE_PAGE_LOCATION_KEYS + PlacePageLocation.
+    // Remove it from the API or add it to ENTITY_PAGE_LOCATION_KEYS + EntityPageLocation.
     expect(extraKeys).toEqual([]);
   });
 
   it('injecting vibeTags into the payload IS caught by this guard (self-check)', () => {
     // This test verifies the drift guard actually works — it must fail when extra keys appear.
-    const contractKeySet = new Set<string>(PLACE_PAGE_LOCATION_KEYS);
-    const loc = makeLocation() as PlacePageLocation & { vibeTags?: string[] };
+    const contractKeySet = new Set<string>(ENTITY_PAGE_LOCATION_KEYS);
+    const loc = makeLocation() as EntityPageLocation & { vibeTags?: string[] };
     (loc as Record<string, unknown>)['vibeTags'] = ['cozy'];
     const extraKeys = Object.keys(loc).filter((k) => !contractKeySet.has(k));
     expect(extraKeys).toEqual(['vibeTags']); // guard catches the leak
@@ -260,7 +260,7 @@ describe('Contract drift guard', () => {
     const apiPayload = makeData();
     const actualKeys = new Set(Object.keys(apiPayload.location));
 
-    const missingKeys = PLACE_PAGE_LOCATION_KEYS.filter((k) => !actualKeys.has(k));
+    const missingKeys = ENTITY_PAGE_LOCATION_KEYS.filter((k) => !actualKeys.has(k));
     expect(missingKeys).toEqual([]);
   });
 

@@ -2,10 +2,10 @@
 
 import Link from 'next/link';
 import React from 'react';
-import { PlaceCardData, Signal, SignalType, computeInternalBadges } from './types';
+import { EntityCardData, Signal, SignalType, computeInternalBadges } from './types';
 
 interface HorizontalBentoCardProps {
-  place: PlaceCardData;
+  place: EntityCardData;
 }
 
 export function HorizontalBentoCard({ place }: HorizontalBentoCardProps) {

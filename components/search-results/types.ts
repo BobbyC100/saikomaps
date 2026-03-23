@@ -25,7 +25,7 @@ export type PlacePersonality =
   | 'scene' 
   | 'hidden_gem';
 
-export interface PlaceCardData {
+export interface EntityCardData {
   // Required
   slug: string;
   name: string;
@@ -89,7 +89,7 @@ export function getPersonalityLabel(personality?: PlacePersonality): string | nu
  * - Max 2 internal badges
  * - Silence > weak signal
  */
-export function computeInternalBadges(place: PlaceCardData): Signal[] {
+export function computeInternalBadges(place: EntityCardData): Signal[] {
   const badges: Signal[] = [];
   
   // Menu badge logic

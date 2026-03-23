@@ -10,7 +10,7 @@ import {
   validateLayout,
   debugLayout,
   type RowConfig,
-} from './PlacePageLayoutResolver';
+} from './EntityPageLayoutResolver';
 
 console.log('='.repeat(60));
 console.log('SANITY CHECK: Intentional Bad Card Injection');

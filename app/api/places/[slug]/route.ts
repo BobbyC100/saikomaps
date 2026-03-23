@@ -1,7 +1,7 @@
 /**
  * API Route: Place Details by Slug
  * GET /api/places/[slug]
- * Returns canonical PlacePageData — shape is locked by lib/contracts/place-page.ts.
+ * Returns canonical EntityPageData — shape is locked by lib/contracts/entity-page.ts.
  * Drift is caught by tests/contracts/place-page.contract.test.ts.
  *
  * Read strategy (hybrid — entities + evidence layer):
@@ -17,13 +17,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getGooglePhotoUrl, getPhotoRefFromStored } from '@/lib/google-places';
 import { getActiveOverlays } from '@/lib/overlays/getActiveOverlays';
-import { buildPlaceServiceFacts } from '@/lib/place-payload';
+import { buildEntityServiceFacts } from '@/lib/entity-payload';
 import { VERTICAL_DISPLAY } from '@/lib/primaryVertical';
 import {
   fetchPlaceForPRLBySlug,
   assembleSceneSenseFromMaterialized,
 } from '@/lib/scenesense';
-import type { PlacePageData, PlacePageLocation, PlacePageCoverageHighlights } from '@/lib/contracts/place-page';
+import type { EntityPageData, EntityPageLocation, EntityPageCoverageHighlights } from '@/lib/contracts/entity-page';
 import { materializeCoverageEvidence } from '@/lib/coverage/normalize-evidence';
 
 const BUILD_ID =
@@ -342,7 +342,7 @@ export async function GET(
     let facts: { service: Partial<Record<string, boolean | null>> };
     let conflicts: { service: Partial<Record<string, { sources: string[]; values: Record<string, boolean> }>> };
     try {
-      const out = buildPlaceServiceFacts({
+      const out = buildEntityServiceFacts({
         googleAttrs: undefined,
         scrapeAttrs: null,
         manualOverrides: null,
@@ -517,7 +517,7 @@ export async function GET(
       }
     }
 
-    const location: PlacePageLocation = {
+    const location: EntityPageLocation = {
       id: entity.id,
       slug: entity.slug,
       name: entity.name,
@@ -590,7 +590,7 @@ export async function GET(
         };
       })(),
       offeringSignals,
-      offeringPrograms: offeringPrograms as unknown as PlacePageLocation['offeringPrograms'],
+      offeringPrograms: offeringPrograms as unknown as EntityPageLocation['offeringPrograms'],
       eventsUrl: entity.canonical_state?.eventsUrl ?? null,
       cateringUrl: entity.canonical_state?.cateringUrl ?? null,
       eventInquiryEmail: entity.canonical_state?.eventInquiryEmail ?? null,
@@ -611,7 +611,7 @@ export async function GET(
           publishedAt: src.publishedAt ? src.publishedAt.toISOString() : null,
         };
       }),
-      coverageHighlights: await (async (): Promise<PlacePageCoverageHighlights | null> => {
+      coverageHighlights: await (async (): Promise<EntityPageCoverageHighlights | null> => {
         try {
           const evidence = await materializeCoverageEvidence(entity.id);
           if (!evidence) return null;
@@ -650,7 +650,7 @@ export async function GET(
       appearancesAsHost: [],
     };
 
-    const responseData: PlacePageData = {
+    const responseData: EntityPageData = {
       location,
       guide: appearsOn[0]
         ? {

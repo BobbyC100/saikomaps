@@ -9,7 +9,7 @@ import {
   debugLayout,
   type PlaceData,
   type RowConfig,
-} from './PlacePageLayoutResolver';
+} from './EntityPageLayoutResolver';
 
 console.log('='.repeat(60));
 console.log('BULLETPROOF VALIDATION TESTS');

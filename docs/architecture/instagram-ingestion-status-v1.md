@@ -5,7 +5,7 @@ status: active
 title: "Instagram Ingestion — Operational Status (V1)"
 owner: Bobby Ciccaglione
 created: "2026-03-01"
-last_updated: "2026-03-22"
+last_updated: "2026-03-23"
 project_id: SAIKO
 systems:
   - enrichment
@@ -29,7 +29,9 @@ summary: >
 
 ## 1. Current State
 
-Instagram batch ingestion is operational. As of 2026-03-18, the system is ingesting account data and recent media for 914 entities with Instagram handles.
+Instagram batch ingestion is operational and verified working in production. Instagram photos are now successfully ingested and displayed on entity pages. The workflow fetches 12 most recent media per entity, ranks by photo type preference, and displays the top 6 photos.
+
+As of 2026-03-18, the system ingests account data and recent media for 914 entities with Instagram handles. Production verification completed on Buvons (verified 2026-03-23).
 
 ### What is being ingested
 
@@ -83,15 +85,17 @@ Up to N rows per account (default 200, current batch uses 10).
 
 ## 3. Known Limitations
 
-### CDN URL expiration
+### CDN URL expiration and fallback strategy (RESOLVED)
 
-`media_url` and `thumbnail_url` are temporary Instagram CDN links. They expire after an unknown period (hours to days). This means:
+`media_url` and `thumbnail_url` are temporary Instagram CDN links that expire after an unknown period (hours to days).
 
-- Images cannot be served directly from stored URLs long-term
-- A storage strategy is needed before the photo pipeline can use these images on place pages
-- Permalinks are permanent but require oEmbed or scraping to display
+**Solution implemented (2026-03-23):** The API route `app/api/places/[slug]/route.ts` now implements a fallback strategy:
+- Attempts to fetch top 6 photos from most recent 12 Instagram media items
+- If `mediaUrl` (CDN) is expired, falls back to `permalink` (permanent Instagram post URL)
+- Photo ranking preference: INTERIOR (0) → FOOD (1) → BAR_DRINKS (3) → CROWD_ENERGY (4) → DETAIL (5) → EXTERIOR (6)
+- This ensures photos remain accessible even when CDN URLs expire
 
-**Decision pending:** Storage approach (S3/Supabase download, re-fetch on demand, or permalinks-only). Cost implications need research. Target decision date: 2026-03-20.
+Production verified working on Buvons (2026-03-23).
 
 ### Account type requirements
 
@@ -103,11 +107,19 @@ The current Business Discovery fields do not include `biography`. Adding this fi
 
 ---
 
-## 4. Downstream Wiring (Not Yet Built)
+## 4. Downstream Wiring (Partially Built)
 
-Once ingestion completes, the data needs to flow into interpretation layers:
+### Priority 1 — Photo pipeline (IMPLEMENTED)
 
-### Priority 1 — Caption signal extraction
+Instagram images are now surfaced through place page contracts. Current workflow (2026-03-23):
+
+1. API route fetches 12 most recent Instagram media items per entity
+2. Photos ranked by type preference: INTERIOR → FOOD → BAR_DRINKS → CROWD_ENERGY → DETAIL → EXTERIOR
+3. Top 6 photos returned as `photoUrls` in entity page contract
+4. CDN URLs with fallback to permalinks implemented
+5. Verified working in production on Buvons and other EAT/HOSPITALITY entities
+
+### Priority 2 — Caption signal extraction
 
 Instagram captions are rich text from the operator's own voice. They feed the same extraction pipelines as website text blocks:
 
@@ -118,23 +130,18 @@ Instagram captions are rich text from the operator's own voice. They feed the sa
 
 **Approach:** Register Instagram as a `merchant_surface` source type so existing extraction code reads caption text blocks without a separate pipeline.
 
-### Priority 2 — Photo candidate pipeline
-
-Instagram images are primary photo candidates for place pages. Requires:
-
-1. Resolve CDN URL expiration (storage decision)
-2. Score images for quality/relevance
-3. Rank against other photo sources (Google Photos, website images)
-4. Surface winners through place page contract
+Status: Not yet implemented. Requires merchant_surface registration.
 
 ### Priority 3 — Profile signals
 
-| Signal | Source | Use |
+| Signal | Source | Status |
 |---|---|---|
-| Follower count | `instagram_accounts.raw_payload` | Popularity proxy, confidence boost |
-| Post frequency | Derived from `instagram_media.timestamp` | Activity/freshness indicator |
-| Media count | `instagram_accounts.media_count` | Content volume signal |
-| Account type | `instagram_accounts.account_type` | Business sophistication signal |
+| Follower count | `instagram_accounts.raw_payload` | Available (not yet surfaced) |
+| Post frequency | Derived from `instagram_media.timestamp` | Available (not yet surfaced) |
+| Media count | `instagram_accounts.media_count` | Available (not yet surfaced) |
+| Account type | `instagram_accounts.account_type` | Available (not yet surfaced) |
+
+These signals are captured in the raw data but not yet wired into entity page contracts or scoring pipelines.
 
 ### Priority 4 — Temporal signals
 
@@ -142,6 +149,8 @@ Not yet in schema. Would require `instagram_temporal_signals` table for:
 - Closure/reopening events detected from captions
 - Seasonal patterns
 - Event announcements
+
+Status: Not yet implemented.
 
 ---
 
