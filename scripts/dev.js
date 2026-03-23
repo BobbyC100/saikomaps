@@ -15,9 +15,29 @@ if (process.env.NODE_OPTIONS) {
   delete process.env.NODE_OPTIONS;
 }
 
-const { spawn } = require('node:child_process');
+const { spawn, execSync } = require('node:child_process');
 const net = require('node:net');
 const path = require('path');
+
+// ---------------------------------------------------------------------------
+// PORT CLEANUP — kill stale processes on dev port before starting
+// ---------------------------------------------------------------------------
+async function killPort(port) {
+  try {
+    const result = execSync(`lsof -ti:${port}`, { encoding: 'utf8' }).trim();
+    if (result) {
+      const pids = result.split('\n').filter(Boolean);
+      for (const pid of pids) {
+        try { execSync(`kill -9 ${pid}`); } catch (_) {}
+      }
+      console.log(`[dev.js] Killed stale process(es) on port ${port}: ${pids.join(', ')}`);
+      // Brief pause for OS to release the port
+      await new Promise(r => setTimeout(r, 500));
+    }
+  } catch (_) {
+    // lsof returns non-zero if nothing found — that's fine
+  }
+}
 
 // ---------------------------------------------------------------------------
 // STARTUP DATABASE BANNER (runs once)
@@ -96,30 +116,30 @@ async function runProbes() {
   try {
     const schemaRows = await prisma.$queryRawUnsafe(`
       SELECT
-        to_regclass('public.places') IS NOT NULL AS has_places,
+        to_regclass('public.entities') IS NOT NULL AS has_entities,
         EXISTS(
           SELECT 1 FROM information_schema.columns
           WHERE table_schema='public'
-            AND table_name='places'
+            AND table_name='entities'
             AND column_name='business_status'
         ) AS has_business_status,
         EXISTS(
           SELECT 1 FROM information_schema.columns
           WHERE table_schema='public'
-            AND table_name='places'
+            AND table_name='entities'
             AND column_name='google_places_attributes'
         ) AS has_google_places_attributes
     `);
     const s = Array.isArray(schemaRows) && schemaRows[0] ? schemaRows[0] : {};
     console.log(
-      'DB PROBE schema: places=' + !!s.has_places + ' business_status=' + !!s.has_business_status + ' google_places_attributes=' + !!s.has_google_places_attributes
+      'DB PROBE schema: entities=' + !!s.has_entities + ' business_status=' + !!s.has_business_status + ' google_places_attributes=' + !!s.has_google_places_attributes
     );
 
-    const countRows = await prisma.$queryRawUnsafe('SELECT COUNT(*)::int AS places_count FROM public.places');
-    const placesCount = Array.isArray(countRows) && countRows[0] && typeof countRows[0].places_count === 'number' ? countRows[0].places_count : 0;
-    console.log('DB PROBE data: places_count=' + placesCount);
+    const countRows = await prisma.$queryRawUnsafe('SELECT COUNT(*)::int AS entity_count FROM public.entities');
+    const entityCount = Array.isArray(countRows) && countRows[0] && typeof countRows[0].entity_count === 'number' ? countRows[0].entity_count : 0;
+    console.log('DB PROBE data: entity_count=' + entityCount);
 
-    if (classification === 'LOCAL' && placesCount < 100) {
+    if (classification === 'LOCAL' && entityCount < 100) {
       console.log('  WARNING: LOCAL DB HAS LOW DATA — EXPECT 404s');
     }
   } catch (err) {
@@ -261,6 +281,9 @@ function runNextDev(nextBinPath, args) {
   } catch (e) {
     console.error('[dev.js] Probe error:', e);
   }
+
+  // Kill any stale process on our dev port before starting
+  await killPort(DEV_PORT);
 
   const nextArgs = process.argv.slice(2);
   const exitCode = await runNextDev(nextBin, nextArgs);

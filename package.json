@@ -25,6 +25,8 @@
     "dev:local": "SAIKO_DB=local node ./scripts/dev.js",
     "dev:neon": "SAIKO_DB=neon node ./scripts/dev.js",
     "dev:clean": "rm -rf .next && node ./scripts/dev.js",
+    "dev:safe": "rm -rf .next && node ./scripts/dev.js",
+    "dev:reset": "npx kill-port 3000 && rm -rf .next && node ./scripts/dev.js",
     "build": "prisma generate && next build",
     "start": "next start -p 3000",
     "postinstall": "prisma generate",
