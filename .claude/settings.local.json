@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run docs:promote -- --path docs/system/promotion-flow-v1.md --content /tmp/test-promote-draft.md --dry-run)",
+      "Bash(echo \"exit: $?\")",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(npx tsx -e \":*)",
+      "Bash(curl -s -X POST http://localhost:3000/api/admin/tools/derive-neighborhood -H 'Content-Type: application/json' -d '{\"\"entityId\"\":\"\"place_republique_1773195234833\"\"}')",
+      "Bash(python3 -m json.tool)",
+      "Bash(npx tsx:*)",
+      "Bash(NODE_OPTIONS=\"--max-old-space-size=4096\" npx tsc --noEmit)",
+      "Bash(npx tsc:*)",
+      "Bash(git add:*)",
+      "Bash(git push:*)",
+      "Bash(ls -la /Users/bobbyciccaglione/code/saiko-maps/data/logs/batch-*.sh)",
+      "WebSearch",
+      "Bash(npm run:*)",
+      "Bash(node -e \"require\\(''marked''\\)\")",
+      "Bash(grep -l \"dotenv\\\\|load.*env\\\\|DATABASE_URL\" scripts/*.ts)",
+      "Bash(node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/intake-pizza-places.ts 'data/intake/Untitled 4.csv')"
+    ]
+  }
+}

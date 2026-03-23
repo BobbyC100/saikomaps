@@ -1961,6 +1961,8 @@ model instagram_media {
   caption            String?
   timestamp          DateTime                             // original post time (immutable)
   fetchedAt          DateTime @default(now()) @map("fetched_at")
+  photoType          String?  @map("photo_type")         // INTERIOR | FOOD | BAR_DRINKS | CROWD_ENERGY | DETAIL | EXTERIOR (from vision classification)
+  classifiedAt       DateTime? @map("classified_at")      // When this photo was classified by Claude Haiku
   rawPayload         Json?    @map("raw_payload")
 
   account instagram_accounts @relation(fields: [instagramUserId], references: [instagramUserId], onDelete: Cascade)
@@ -1968,6 +1970,7 @@ model instagram_media {
   @@index([instagramUserId])
   @@index([timestamp])
   @@index([instagramUserId, timestamp])
+  @@index([photoType])
   @@map("instagram_media")
 }
 

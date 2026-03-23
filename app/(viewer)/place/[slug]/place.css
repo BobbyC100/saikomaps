@@ -297,22 +297,21 @@
 
 /* Key Producers */
 .key-producers-line {
-  font-family: var(--pp-font-sans);
-  font-size: var(--pp-font-micro);
+  font-family: var(--pp-font-ui);
+  font-size: 13px;
   color: var(--pp-color-text);
-  opacity: 0.65;
+  opacity: 0.85;
   margin: 0.5em 0 0;
   letter-spacing: 0.01em;
 }
 
 /* Origin Story accent */
 .origin-story-accent {
-  font-family: var(--pp-font-sans);
-  font-size: var(--pp-font-micro);
+  font-family: var(--pp-font-ui);
+  font-size: 13px;
   color: var(--pp-color-text);
-  opacity: 0.5;
+  opacity: 0.75;
   margin: 0.75em 0 0;
-  text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 

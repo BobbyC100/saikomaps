@@ -161,9 +161,72 @@ export async function GET(
       );
     }
 
-    // Get photo URLs: sort by quality (largest area first), take top 6
-    const photoUrls: string[] = [];
-    if (entity.googlePhotos && Array.isArray(entity.googlePhotos as unknown[])) {
+    // Get photo URLs: prioritize Instagram media (if EAT/HOSPITALITY), fall back to Google Photos
+    let photoUrls: string[] = [];
+
+    // Try Instagram media first for EAT and HOSPITALITY verticals
+    const instagramEligibleVerticals = ['EAT', 'HOSPITALITY'];
+    if (instagramEligibleVerticals.includes(entity.primaryVertical || '')) {
+      try {
+        // First, check if entity has an instagram_accounts record
+        const instagramAccount = await db.instagram_accounts.findFirst({
+          where: { entityId: entity.id },
+          select: { id: true, instagramUserId: true, username: true },
+        });
+
+        if (instagramAccount) {
+          // First try to get 6 classified photos (best 6 curated by vision model)
+          const classifiedMedia = await db.instagram_media.findMany({
+            where: {
+              instagramUserId: instagramAccount.instagramUserId,
+              photoType: { not: null }, // Only photos that have been classified
+            },
+            select: {
+              mediaUrl: true,
+            },
+            take: 6,
+            orderBy: {
+              classifiedAt: 'desc',
+            },
+          });
+
+          if (classifiedMedia.length > 0) {
+            photoUrls = classifiedMedia
+              .filter((m) => m.mediaUrl)
+              .map((m) => m.mediaUrl as string);
+          } else {
+            // Fall back to 12 most recent media if none are classified yet
+            const recentMedia = await db.instagram_media.findMany({
+              where: {
+                instagramUserId: instagramAccount.instagramUserId,
+                mediaType: 'IMAGE', // Only images, not videos
+              },
+              select: {
+                mediaUrl: true,
+              },
+              take: 6,
+              orderBy: {
+                timestamp: 'desc',
+              },
+            });
+
+            if (recentMedia.length > 0) {
+              photoUrls = recentMedia
+                .filter((m) => m.mediaUrl)
+                .map((m) => m.mediaUrl as string);
+            }
+          }
+        }
+      } catch (err) {
+        // Silently fall through to Google Photos if Instagram query fails
+        if (process.env.DEBUG_INSTAGRAM === '1') {
+          console.error(`[places API] Instagram media query failed for ${entity.slug}:`, err);
+        }
+      }
+    }
+
+    // Fall back to Google Photos if no Instagram media found
+    if (photoUrls.length === 0 && entity.googlePhotos && Array.isArray(entity.googlePhotos as unknown[])) {
       const photosWithArea = (entity.googlePhotos as unknown[])
         .map((p) => {
           const obj = p as { width?: number; height?: number; photo_reference?: string; photoReference?: string; name?: string };
