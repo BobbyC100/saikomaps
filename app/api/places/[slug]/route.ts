@@ -58,7 +58,9 @@ export async function GET(
   const bypassCache = request.nextUrl.searchParams.get('__nocache') === '1';
 
   try {
-    const { slug } = await params;
+    const { slug: rawSlug } = await params;
+    // Normalize slug to lowercase for case-insensitive matching
+    const slug = rawSlug?.toLowerCase() || '';
 
     if (process.env.DEBUG_HEADERS === '1') {
       console.log('[places API]', { slug, buildId: BUILD_ID, env: ENV, bypassCache });
