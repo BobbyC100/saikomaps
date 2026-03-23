@@ -175,46 +175,24 @@ export async function GET(
         });
 
         if (instagramAccount) {
-          // First try to get 6 classified photos (best 6 curated by vision model)
-          const classifiedMedia = await db.instagram_media.findMany({
+          // Get 6 most recent Instagram photos (any with mediaUrl)
+          const media = await db.instagram_media.findMany({
             where: {
               instagramUserId: instagramAccount.instagramUserId,
-              photoType: { isNot: null }, // Only photos that have been classified
             },
             select: {
               mediaUrl: true,
             },
             take: 6,
             orderBy: {
-              classifiedAt: 'desc',
+              timestamp: 'desc',
             },
           });
 
-          if (classifiedMedia.length > 0) {
-            photoUrls = classifiedMedia
+          if (media.length > 0) {
+            photoUrls = media
               .filter((m) => m.mediaUrl)
               .map((m) => m.mediaUrl as string);
-          } else {
-            // Fall back to 6 most recent media if none are classified yet (any type with URL)
-            const recentMedia = await db.instagram_media.findMany({
-              where: {
-                instagramUserId: instagramAccount.instagramUserId,
-                mediaUrl: { not: null },
-              },
-              select: {
-                mediaUrl: true,
-              },
-              take: 6,
-              orderBy: {
-                timestamp: 'desc',
-              },
-            });
-
-            if (recentMedia.length > 0) {
-              photoUrls = recentMedia
-                .filter((m) => m.mediaUrl)
-                .map((m) => m.mediaUrl as string);
-            }
           }
         }
       } catch (err) {
