@@ -169,6 +169,7 @@ export async function GET(
     // Try Instagram media first for EAT and HOSPITALITY verticals
     const instagramEligibleVerticals = ['EAT', 'HOSPITALITY'];
     if (instagramEligibleVerticals.includes(entity.primaryVertical || '')) {
+      console.log(`[places API] ${entity.slug}: Checking Instagram (vertical: ${entity.primaryVertical})`);
       try {
         // First, check if entity has an instagram_accounts record
         const instagramAccount = await db.instagram_accounts.findFirst({
@@ -177,6 +178,7 @@ export async function GET(
         });
 
         if (instagramAccount) {
+          console.log(`[places API] ${entity.slug}: Found Instagram account (userId: ${instagramAccount.instagramUserId})`);
           // Fetch media with photoType for future ranking support
           const media = await db.instagram_media.findMany({
             where: {
@@ -193,15 +195,22 @@ export async function GET(
             take: 20,
           });
 
+          console.log(`[places API] ${entity.slug}: Fetched ${media.length} total media items`);
           if (media.length > 0) {
             // Filter for items with mediaUrl and take 6 most recent
             // TODO: Implement photoType-based ranking (INTERIOR, FOOD, FOOD, BAR_DRINKS, CROWD_ENERGY, DETAIL)
             // once sufficient classified data is available
-            photoUrls = media
-              .filter((m) => m.mediaUrl)
+            const withUrl = media.filter((m) => m.mediaUrl);
+            console.log(`[places API] ${entity.slug}: ${withUrl.length} items have mediaUrl, taking 6`);
+            photoUrls = withUrl
               .slice(0, 6)
               .map((m) => m.mediaUrl as string);
+            console.log(`[places API] ${entity.slug}: Set ${photoUrls.length} photo URLs`);
+          } else {
+            console.log(`[places API] ${entity.slug}: No media found for this Instagram account`);
           }
+        } else {
+          console.log(`[places API] ${entity.slug}: No Instagram account found`);
         }
       } catch (err) {
         // Log error and fall through to Google Photos if Instagram query fails
@@ -210,6 +219,8 @@ export async function GET(
           console.error(`[places API] Full error:`, err);
         }
       }
+    } else {
+      console.log(`[places API] ${entity.slug}: Not eligible for Instagram (vertical: ${entity.primaryVertical})`);
     }
 
     // Fall back to Google Photos if no Instagram media found
