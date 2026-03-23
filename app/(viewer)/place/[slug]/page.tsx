@@ -366,19 +366,10 @@ const WINE_INTENT_LEADS: Record<string, string> = {
 /** Service model → full sentence */
 const SERVICE_MODEL_PHRASES: Record<string, string> = {
   'tasting-menu': 'Tasting menu format — the kitchen sets the pace',
-  'a-la-carte': 'À la carte ordering',
-  'small-plates': 'Small plates built for sharing',
+  'a-la-carte': 'À la carte ordering — dishes arrive as they are prepared',
+  'small-plates': 'Small plates built for sharing across the table',
   'family-style': 'Family-style, served to the center of the table',
   'counter': 'Counter service',
-};
-
-/** Origin story type → human-readable phrase */
-const ORIGIN_STORY_PHRASES: Record<string, string> = {
-  'chef-journey': 'A chef-driven project',
-  'family-legacy': 'Family legacy',
-  'neighborhood-love': 'Born from the neighborhood',
-  'concept-first': 'Concept-driven',
-  'partnership': 'A partnership project',
 };
 
 /** Price tier → full sentence */
@@ -421,6 +412,45 @@ function resolveSignalPhrases(
     .slice(0, cap);
 }
 
+function toSentenceList(items: string[]): string {
+  if (items.length <= 1) return items[0] ?? '';
+  if (items.length === 2) return `${items[0]} and ${items[1]}`;
+  const head = items.slice(0, -1).join(', ');
+  return `${head}, and ${items[items.length - 1]}`;
+}
+
+function normalizeTextToken(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function dedupeTaglineNeighborhood(tagline: string | null | undefined, neighborhood: string | null | undefined): string | null {
+  if (!tagline) return null;
+  if (!neighborhood) return tagline;
+  const trimmed = tagline.trim();
+  if (!trimmed) return null;
+
+  const canonicalNeighborhood = normalizeTextToken(neighborhood);
+  if (!canonicalNeighborhood) return trimmed;
+
+  const trailingLocationPattern = new RegExp(
+    `(?:[\\s,;:\\-–—]+)?(?:in\\s+)?${escapeRegExp(neighborhood)}(?:,\\s*ca(?:lifornia)?)?[.!?\\s]*$`,
+    'i'
+  );
+  const stripped = trimmed.replace(trailingLocationPattern, '').replace(/[\s,;:\-–—]+$/, '').trim();
+
+  if (!stripped) return trimmed;
+  if (normalizeTextToken(stripped) === canonicalNeighborhood) return trimmed;
+  return stripped;
+}
+
 // ---------------------------------------------------------------------------
 // Offering line builder — composes richer sentences from signals
 // ---------------------------------------------------------------------------
@@ -436,18 +466,30 @@ function buildOfferingLines(location: LocationData): { label: string; sentence: 
   const foodFragments = resolveSignalPhrases(foodSignals, FOOD_SIGNAL_PHRASES);
 
   if (os?.cuisinePosture && CUISINE_POSTURE_LEADS[os.cuisinePosture]) {
-    // Rich case: cuisine posture as lead, signal fragments as detail
-    lines.push({
-      label: 'Food',
-      sentence: composeSentence(CUISINE_POSTURE_LEADS[os.cuisinePosture], foodFragments, 'built around'),
-    });
+    const lead = CUISINE_POSTURE_LEADS[os.cuisinePosture];
+    if (foodFragments.length === 0 && location.cuisineType) {
+      lines.push({
+        label: 'Food',
+        sentence: `${lead} with ${location.cuisineType} influences`,
+      });
+    } else {
+      lines.push({
+        label: 'Food',
+        sentence: composeSentence(lead, foodFragments, 'built around'),
+      });
+    }
   } else if (foodMaturity && foodMaturity !== 'none' && foodMaturity !== 'unknown') {
     if (foodFragments.length > 0) {
       // Signals without posture: let the signals speak
       const lead = foodMaturity === 'dedicated' ? 'Dedicated kitchen' : 'Menu';
       lines.push({ label: 'Food', sentence: composeSentence(lead, foodFragments, 'featuring') });
     } else if (location.cuisineType) {
-      lines.push({ label: 'Food', sentence: `${location.cuisineType} kitchen` });
+      lines.push({
+        label: 'Food',
+        sentence: foodMaturity === 'dedicated'
+          ? `${location.cuisineType} kitchen with a dedicated program`
+          : `Broadly composed ${location.cuisineType} menu with seasonal plates`,
+      });
     }
   } else if (location.cuisineType) {
     lines.push({ label: 'Food', sentence: `${location.cuisineType} kitchen` });
@@ -470,11 +512,20 @@ function buildOfferingLines(location: LocationData): { label: string; sentence: 
         label: 'Wine',
         sentence: composeSentence('Wine list', wineFragments, 'featuring'),
       });
+    } else if ((location.keyProducers?.length ?? 0) > 0) {
+      lines.push({
+        label: 'Wine',
+        sentence: `Considered wine selection with producers like ${toSentenceList((location.keyProducers ?? []).slice(0, 3))}`,
+      });
     } else {
-      const label = wineMaturity === 'dedicated' ? 'Dedicated wine program'
-        : wineMaturity === 'considered' ? 'Considered wine selection'
-        : 'Wine available';
-      lines.push({ label: 'Wine', sentence: label });
+      lines.push({
+        label: 'Wine',
+        sentence: wineMaturity === 'dedicated'
+          ? 'Dedicated wine program with producer-driven focus'
+          : wineMaturity === 'considered'
+            ? 'Considered wine selection with a curated producer mix'
+            : 'Wine available',
+      });
     }
   } else if (os?.servesWine === true) {
     lines.push({ label: 'Wine', sentence: 'Wine list available' });
@@ -736,6 +787,7 @@ export default function PlacePage() {
     }) ?? renderLocation({ neighborhood: location.neighborhood, category: location.category });
 
   const energyPhrase = location.scenesense?.atmosphere?.[0] ?? null;
+  const displayTagline = dedupeTaglineNeighborhood(location.tagline, location.neighborhood);
   const hasSignalsSentence = !!(openStateLabel || energyPhrase);
   const mapRefUrl = buildMapRefUrl(location.googlePlaceId, location.latitude, location.longitude, location.address);
   const recognitions = (location.recognitions ?? []).slice(0, RECOGNITIONS_CAP);
@@ -824,8 +876,8 @@ export default function PlacePage() {
                 {identitySubline && (
                   <p id="identity-subline" className="sk-identity">{identitySubline}</p>
                 )}
-                {location.tagline && (
-                  <p id="identity-tagline">{location.tagline}</p>
+                {displayTagline && (
+                  <p id="identity-tagline">{displayTagline}</p>
                 )}
                 {location.timefold?.approvedBy && (
                   <p id="timefold-signal" className="sk-meta">{location.timefold.phrase}</p>
@@ -898,9 +950,6 @@ export default function PlacePage() {
                     <div className="sk-section-header"><span>About</span></div>
                     <div id="identity-description">
                       <p>{location.description}</p>
-                      {location.originStoryType && ORIGIN_STORY_PHRASES[location.originStoryType] && (
-                        <p id="origin-story-type" className="origin-story-accent">{ORIGIN_STORY_PHRASES[location.originStoryType]}</p>
-                      )}
                     </div>
                   </>
                 )}
@@ -923,15 +972,13 @@ export default function PlacePage() {
                   <>
                     <div className="sk-section-header"><span>Known For</span></div>
                     {location.signatureDishes && location.signatureDishes.length > 0 && (
-                      <ul id="signature-dishes-list">
-                        {location.signatureDishes.map((dish) => (
-                          <li key={dish}>{dish}</li>
-                        ))}
-                      </ul>
+                      <p className="known-for-line">
+                        Signature dishes include {toSentenceList(location.signatureDishes.slice(0, 4))}.
+                      </p>
                     )}
                     {location.keyProducers && location.keyProducers.length > 0 && (
-                      <p id="key-producers" className="key-producers-line">
-                        Producers: {location.keyProducers.join(', ')}
+                      <p id="key-producers" className="known-for-line">
+                        Wine focus includes producers like {toSentenceList(location.keyProducers.slice(0, 4))}.
                       </p>
                     )}
                   </>
@@ -1065,14 +1112,13 @@ export default function PlacePage() {
                   </>
                 )}
 
-                {(hasScene || priceText) && (
+                {hasScene && (
                   <>
                     <div className="sk-section-header"><span>Scene</span></div>
                     <div className="sidebar-tag-block">
                       {sceneTags.length > 0 && (
                         <p className="tag-line">{sceneTags.join(' · ')}</p>
                       )}
-                      {priceText && <p>{priceText}</p>}
                     </div>
                   </>
                 )}

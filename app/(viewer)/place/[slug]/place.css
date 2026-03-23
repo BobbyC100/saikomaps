@@ -338,6 +338,13 @@
   letter-spacing: 0.01em;
 }
 
+.known-for-line {
+  margin: 0 0 0.5em;
+  font-size: var(--pp-font-small);
+  line-height: var(--pp-lh-list);
+  color: var(--pp-color-text);
+}
+
 /* Origin Story accent */
 .origin-story-accent {
   font-family: var(--pp-font-ui);
