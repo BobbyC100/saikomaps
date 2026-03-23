@@ -776,6 +776,30 @@ export default function PlacePage() {
   // Offering (Price row is surfaced in Scene instead)
   const offeringRows = buildOfferingLines(location);
   const priceText = offeringRows.find(r => r.label === 'Price')?.sentence ?? null;
+  const hasOfferingSection = offeringRows.some(r => r.label !== 'Price');
+
+  // B-lite fallback: treat low-density entities as "thin" and collapse to single column.
+  const hasAboutSignal = !!location.description?.trim();
+  const hasSceneSenseSignal = Boolean(
+    (location.scenesense?.atmosphere?.length ?? 0) > 0 ||
+    (location.scenesense?.energy?.length ?? 0) > 0 ||
+    (location.scenesense?.scene?.length ?? 0) > 0
+  );
+  const hasCoverageSignal = Boolean(
+    location.pullQuote ||
+    (location.coverageSources?.length ?? 0) > 0
+  );
+  const hasTaglineSignal = !!location.tagline?.trim();
+  const contentDensityScore = [
+    hasAboutSignal,
+    hasOfferingSection,
+    hasSceneSenseSignal,
+    hasCoverageSignal,
+    hasTaglineSignal,
+  ].filter(Boolean).length;
+  const isThinEntity = contentDensityScore < 2;
+  const shouldShowSidebar = !isThinEntity;
+  const todayHours = fullWeekHours.find((row) => row.day === todayDayName) ?? null;
 
   return (
     <div style={{ background: '#F5F0E1', minHeight: '100vh' }}>
@@ -786,7 +810,7 @@ export default function PlacePage() {
           <div id="page-canvas">
 
             {/* ═══ TWO-COLUMN BODY ═══ */}
-            <div id="two-column-body">
+            <div id="two-column-body" className={isThinEntity ? 'thin-layout' : undefined}>
 
               {/* ─── LEFT: MAIN COLUMN ─── */}
               <div id="main-column">
@@ -837,6 +861,38 @@ export default function PlacePage() {
                   </div>
                 )}
 
+                {isThinEntity && (hasHours || location.address || phoneUrl) && (
+                  <>
+                    <div className="sk-section-header"><span>Details</span></div>
+                    <div id="thin-details-block">
+                      {hasHours && (
+                        <p>
+                          <strong>Hours:</strong>{' '}
+                          {todayHours ? `${todayHours.day}: ${todayHours.hours}` : 'See current weekly schedule below.'}
+                        </p>
+                      )}
+                      {location.address && (
+                        <p>
+                          <strong>Address:</strong> {location.address}
+                          {mapRefUrl && (
+                            <>
+                              {' '}
+                              <a href={mapRefUrl} target="_blank" rel="noopener noreferrer">
+                                Map <span className="action-arrow">↗</span>
+                              </a>
+                            </>
+                          )}
+                        </p>
+                      )}
+                      {phoneUrl && rawPhone && (
+                        <p>
+                          <a href={phoneUrl}>Call {rawPhone} <span className="action-arrow">↗</span></a>
+                        </p>
+                      )}
+                    </div>
+                  </>
+                )}
+
                 {location.description && (
                   <>
                     <div className="sk-section-header"><span>About</span></div>
@@ -849,7 +905,7 @@ export default function PlacePage() {
                   </>
                 )}
 
-                {offeringRows.length > 0 && (
+                {hasOfferingSection && (
                   <>
                     <div className="sk-section-header"><span>Offering</span></div>
                     <div id="offering-signals-rows">
@@ -966,8 +1022,9 @@ export default function PlacePage() {
               </div>
 
               {/* ─── RIGHT: SIDEBAR COLUMN ─── */}
-              <aside id="sidebar-column">
-                <div className="sidebar-spacer" aria-hidden="true" />
+              {shouldShowSidebar && (
+                <aside id="sidebar-column">
+                  <div className="sidebar-spacer" aria-hidden="true" />
 
                 {hasAtmosphere && (
                   <>
@@ -1019,7 +1076,8 @@ export default function PlacePage() {
                     </div>
                   </>
                 )}
-              </aside>
+                </aside>
+              )}
             </div>
 
             {/* ═══ FULL-WIDTH SECTIONS ═══ */}

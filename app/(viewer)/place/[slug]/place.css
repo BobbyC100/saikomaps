@@ -127,6 +127,10 @@
   margin-top: var(--pp-hero-gap);
 }
 
+#two-column-body.thin-layout {
+  grid-template-columns: 1fr;
+}
+
 /* ---------------------------------------------------------------------------
    4. Main Column (left — identity + editorial)
    --------------------------------------------------------------------------- */
@@ -242,6 +246,35 @@
 #identity-description p::first-letter {
   font-size: 1.18em;
   font-weight: 500;
+}
+
+#thin-details-block {
+  font-family: var(--pp-font-ui);
+  font-size: var(--pp-font-small);
+  line-height: 1.6;
+  color: var(--pp-color-text);
+}
+
+#thin-details-block p {
+  margin: 0 0 6px;
+}
+
+#thin-details-block p:last-child {
+  margin-bottom: 0;
+}
+
+#thin-details-block strong {
+  font-weight: 600;
+}
+
+#thin-details-block a {
+  color: var(--pp-color-link);
+  text-decoration: none;
+}
+
+#thin-details-block a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 /* Offering rows */
