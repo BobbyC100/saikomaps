@@ -100,6 +100,14 @@ interface LocationData {
     non_alcoholic_program: { maturity: string; signals: string[] };
     coffee_tea_program: { maturity: string; signals: string[] };
     service_program: { maturity: string; signals: string[] };
+    private_dining_program: { maturity: string; signals: string[] };
+    group_dining_program: { maturity: string; signals: string[] };
+    catering_program: { maturity: string; signals: string[] };
+    dumpling_program: { maturity: string; signals: string[] };
+    sushi_raw_fish_program: { maturity: string; signals: string[] };
+    ramen_noodle_program: { maturity: string; signals: string[] };
+    taco_program: { maturity: string; signals: string[] };
+    pizza_program: { maturity: string; signals: string[] };
   } | null;
   primaryOperator?: { actorId: string; name: string; slug: string; website?: string } | null;
   placeType?: 'venue' | 'activity' | 'public';
@@ -258,7 +266,7 @@ function buildAppendixReferences(location: LocationData): AppendixRefGroup[] {
   return groups;
 }
 
-const OFFERING_CAP = 6;
+const OFFERING_CAP = 8;
 
 // ---------------------------------------------------------------------------
 // Signal vocabulary — human-readable phrases for each structural signal
@@ -397,6 +405,12 @@ function composeSentence(lead: string, fragments: string[], connector = 'with'):
   return `${lead} ${connector} ${rest} and ${last}`;
 }
 
+function appendClause(base: string, clause: string): string {
+  const trimmed = clause.trim();
+  if (!trimmed) return base;
+  return `${base} with ${trimmed}`;
+}
+
 /**
  * Pick up to N signal phrases from a program's signals array.
  * Returns human-readable fragments in the order they appear.
@@ -496,6 +510,22 @@ function buildOfferingLines(location: LocationData): { label: string; sentence: 
   const os = location.offeringSignals;
   const op = location.offeringPrograms;
 
+  const hasActiveProgram = (program: { maturity: string; signals: string[] } | undefined): boolean => {
+    if (!program) return false;
+    return ['incidental', 'considered', 'dedicated'].includes(program.maturity) || (program.signals?.length ?? 0) > 0;
+  };
+
+  const specialtyPrograms: Array<{ key: string; phrase: string; program: { maturity: string; signals: string[] } | undefined }> = [
+    { key: 'taco_program', phrase: 'tacos', program: op?.taco_program },
+    { key: 'pizza_program', phrase: 'pizza', program: op?.pizza_program },
+    { key: 'dumpling_program', phrase: 'dumplings', program: op?.dumpling_program },
+    { key: 'sushi_raw_fish_program', phrase: 'sushi and raw fish', program: op?.sushi_raw_fish_program },
+    { key: 'ramen_noodle_program', phrase: 'ramen and noodles', program: op?.ramen_noodle_program },
+  ];
+  const activeSpecialtyPhrases = specialtyPrograms
+    .filter((p) => hasActiveProgram(p.program))
+    .map((p) => p.phrase);
+
   // ── Food ─────────────────────────────────────────────────────────────
   const foodSignals = op?.food_program?.signals ?? [];
   const foodMaturity = op?.food_program?.maturity;
@@ -504,31 +534,54 @@ function buildOfferingLines(location: LocationData): { label: string; sentence: 
   if (os?.cuisinePosture && CUISINE_POSTURE_LEADS[os.cuisinePosture]) {
     const lead = CUISINE_POSTURE_LEADS[os.cuisinePosture];
     if (foodFragments.length === 0 && location.cuisineType) {
+      const specialtyClause = activeSpecialtyPhrases.length > 0
+        ? `specialties like ${toSentenceList(activeSpecialtyPhrases.slice(0, 3))}`
+        : '';
       lines.push({
         label: 'Food',
-        sentence: `${lead} with ${location.cuisineType} influences`,
+        sentence: appendClause(`${lead} with ${location.cuisineType} influences`, specialtyClause),
       });
     } else {
+      const specialtyClause = activeSpecialtyPhrases.length > 0
+        ? `specialties like ${toSentenceList(activeSpecialtyPhrases.slice(0, 3))}`
+        : '';
       lines.push({
         label: 'Food',
-        sentence: composeSentence(lead, foodFragments, 'built around'),
+        sentence: appendClause(composeSentence(lead, foodFragments, 'built around'), specialtyClause),
       });
     }
   } else if (foodMaturity && foodMaturity !== 'none' && foodMaturity !== 'unknown') {
     if (foodFragments.length > 0) {
       // Signals without posture: let the signals speak
       const lead = foodMaturity === 'dedicated' ? 'Dedicated kitchen' : 'Menu';
+      const specialtyClause = activeSpecialtyPhrases.length > 0
+        ? `specialties like ${toSentenceList(activeSpecialtyPhrases.slice(0, 3))}`
+        : '';
       lines.push({ label: 'Food', sentence: composeSentence(lead, foodFragments, 'featuring') });
+      if (specialtyClause) {
+        lines[lines.length - 1].sentence = appendClause(lines[lines.length - 1].sentence, specialtyClause);
+      }
     } else if (location.cuisineType) {
+      const specialtyClause = activeSpecialtyPhrases.length > 0
+        ? `specialties like ${toSentenceList(activeSpecialtyPhrases.slice(0, 3))}`
+        : '';
       lines.push({
         label: 'Food',
-        sentence: foodMaturity === 'dedicated'
+        sentence: appendClause(foodMaturity === 'dedicated'
           ? `${location.cuisineType} kitchen with a dedicated program`
-          : `Broadly composed ${location.cuisineType} menu with seasonal plates`,
+          : `Broadly composed ${location.cuisineType} menu with seasonal plates`, specialtyClause),
       });
     }
   } else if (location.cuisineType) {
-    lines.push({ label: 'Food', sentence: `${location.cuisineType} kitchen` });
+    const specialtyClause = activeSpecialtyPhrases.length > 0
+      ? `specialties like ${toSentenceList(activeSpecialtyPhrases.slice(0, 3))}`
+      : '';
+    lines.push({ label: 'Food', sentence: appendClause(`${location.cuisineType} kitchen`, specialtyClause) });
+  } else if (activeSpecialtyPhrases.length > 0) {
+    lines.push({
+      label: 'Food',
+      sentence: `Focused on specialties like ${toSentenceList(activeSpecialtyPhrases.slice(0, 3))}`,
+    });
   }
 
   // ── Wine ─────────────────────────────────────────────────────────────
@@ -661,6 +714,18 @@ function buildOfferingLines(location: LocationData): { label: string; sentence: 
   // ── Service ──────────────────────────────────────────────────────────
   if (os?.serviceModel && SERVICE_MODEL_PHRASES[os.serviceModel]) {
     lines.push({ label: 'Service', sentence: SERVICE_MODEL_PHRASES[os.serviceModel] });
+  }
+
+  // ── Hospitality / Events ──────────────────────────────────────────────
+  const hospitalityModes: string[] = [];
+  if (hasActiveProgram(op?.private_dining_program)) hospitalityModes.push('private dining');
+  if (hasActiveProgram(op?.group_dining_program)) hospitalityModes.push('group dining');
+  if (hasActiveProgram(op?.catering_program)) hospitalityModes.push('catering');
+  if (hospitalityModes.length > 0) {
+    lines.push({
+      label: 'Hospitality',
+      sentence: `Supports ${toSentenceList(hospitalityModes)}`,
+    });
   }
 
   // ── Price ────────────────────────────────────────────────────────────
