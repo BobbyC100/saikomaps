@@ -230,7 +230,7 @@ async function processEntity(
     // Dry run: skip AI call, just report what would happen
     if (args.dryRun) {
       if (args.verbose) {
-        console.log(`  🔸 Would call AI (about-synth-v1) — skipped in dry run`);
+        console.log(`  🔸 Would call AI (about-synth-v2) — skipped in dry run`);
       }
       stats.generated++;
       stats.byTier.tier2++;
@@ -256,13 +256,13 @@ async function processEntity(
           text: result.text,
           description_quality: quality,
         },
-        promptVersion: 'about-synth-v1',
+        promptVersion: 'about-synth-v2',
         modelVersion: result.model,
         dryRun: false,
       });
 
       if (args.verbose) {
-        console.log(`  💾 Saved to interpretation_cache (VOICE_DESCRIPTOR, about-synth-v1)`);
+        console.log(`  💾 Saved to interpretation_cache (VOICE_DESCRIPTOR, about-synth-v2)`);
       }
 
       stats.generated++;
@@ -305,7 +305,7 @@ async function processEntity(
     // Dry run: skip AI call, just report what would happen
     if (args.dryRun) {
       if (args.verbose) {
-        console.log(`  🔸 Would call AI (about-compose-v1) — skipped in dry run`);
+        console.log(`  🔸 Would call AI (about-compose-v2) — skipped in dry run`);
       }
       stats.generated++;
       stats.byTier.tier3++;
@@ -333,13 +333,13 @@ async function processEntity(
           text: result.text,
           description_quality: quality,
         },
-        promptVersion: 'about-compose-v1',
+        promptVersion: 'about-compose-v2',
         modelVersion: result.model,
         dryRun: false,
       });
 
       if (args.verbose) {
-        console.log(`  💾 Saved to interpretation_cache (VOICE_DESCRIPTOR, about-compose-v1)`);
+        console.log(`  💾 Saved to interpretation_cache (VOICE_DESCRIPTOR, about-compose-v2)`);
       }
 
       stats.generated++;

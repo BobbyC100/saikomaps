@@ -1,8 +1,8 @@
 /**
  * Saiko Voice Engine v2.0 — Description Prompts
  *
- * Tier 2 (about-synth-v1): Synthesize a description from merchant website copy.
- * Tier 3 (about-compose-v1): Compose a description from identity signals.
+ * Tier 2 (about-synth-v2): Synthesize a description from merchant website copy.
+ * Tier 3 (about-compose-v2): Compose a description from identity signals.
  *
  * These prompts are versioned via prompt_version in interpretation_cache.
  * Iteration on prompt text → new prompt_version → re-run affected entities.
@@ -13,7 +13,7 @@
 import type { CoverageEvidence } from '../coverage/normalize-evidence';
 
 // ============================================================================
-// TIER 2 — SYNTHESIZE FROM MERCHANT COPY (about-synth-v1)
+// TIER 2 — SYNTHESIZE FROM MERCHANT COPY (about-synth-v2)
 // ============================================================================
 
 export const ABOUT_SYNTH_SYSTEM_PROMPT = `You are writing a short About description for a restaurant or place, using text from their own website.
@@ -28,6 +28,7 @@ RULES:
 - 40-80 words. Compact. Every sentence earns its place.
 - Do NOT introduce facts that aren't in the source material. If the source doesn't mention a chef's name, neither do you.
 - Do NOT evaluate, recommend, or editorialize. No "worth a visit", no "standout", no "beloved".
+- Do NOT include city or neighborhood in the output description. Identity/subline already owns location context.
 - The output should read like the place describing itself on its own website — because that's where the words came from.
 
 OUTPUT: Return ONLY the description paragraph. No labels, no quotes, no commentary.`;
@@ -70,12 +71,13 @@ export function buildAboutSynthUserPrompt(
 
   parts.push('');
   parts.push('Write a 40-80 word About paragraph using their language.');
+  parts.push('Do not include city/neighborhood in the paragraph.');
 
   return parts.join('\n');
 }
 
 // ============================================================================
-// TIER 3 — COMPOSE FROM SIGNALS (about-compose-v1)
+// TIER 3 — COMPOSE FROM SIGNALS (about-compose-v2)
 // ============================================================================
 
 export const ABOUT_COMPOSE_SYSTEM_PROMPT = `You are writing a short About description for a restaurant or place. You don't have their own words — you're working from identity signals and metadata.
@@ -87,7 +89,8 @@ RULES:
 - No marketing tone. No "you'll love", no "perfect for", no superlatives.
 - No review language. No "standout", no "worth a visit", no "beloved".
 - Warm and specific, not generic. Use the signals to write something that could only describe THIS place.
-- Anchor on concrete details: a chef's name, a signature dish, a neighborhood, an origin story, a cooking style.
+- Anchor on concrete details: a chef's name, a signature dish, an origin story, a cooking style.
+- Do NOT include city or neighborhood in the output description. Identity/subline already owns location context.
 - 40-80 words. 2-3 sentences. Every sentence carries weight.
 - Only reference facts derivable from the input signals. Do NOT invent details.
 - The tone target: "A seasonal pasta spot centered on hand-rolled shapes and natural wine, in a corner storefront on Sunset." — grounded, specific, observational.
@@ -228,6 +231,7 @@ export function buildAboutComposeUserPrompt(
 
   parts.push('');
   parts.push('Write a 40-80 word grounded description. Specific and observational, not evaluative.');
+  parts.push('Do not include city/neighborhood in the paragraph.');
 
   return parts.join('\n');
 }

@@ -656,8 +656,8 @@
   object-fit: cover;
   object-position: center;
   display: block;
-  /* Subtle lift for dark IG photos — conservative, reversible */
-  filter: brightness(1.06) contrast(1.03);
+  /* Brightness lift for dark social photos; keep contrast conservative */
+  filter: brightness(1.08) contrast(1.03);
 }
 
 /* P1: spans 2 columns and 2 rows */

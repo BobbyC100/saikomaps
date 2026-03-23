@@ -451,6 +451,42 @@ function dedupeTaglineNeighborhood(tagline: string | null | undefined, neighborh
   return stripped;
 }
 
+function joinPhrases(parts: string[]): string {
+  if (parts.length <= 1) return parts[0] ?? '';
+  if (parts.length === 2) return `${parts[0]} and ${parts[1]}`;
+  return `${parts.slice(0, -1).join(', ')}, and ${parts[parts.length - 1]}`;
+}
+
+function enhanceIdentitySubline(base: string | null, location: LocationData): string | null {
+  if (!base) return null;
+  if (location.primaryVertical !== 'EAT') return base;
+
+  const wineIntent = location.offeringSignals?.wineProgramIntent ?? null;
+  const wineMaturity = location.offeringPrograms?.wine_program?.maturity ?? null;
+  const supportsWineBar =
+    ['serious', 'dedicated', 'natural_leaning', 'integrated'].includes(wineIntent ?? '') ||
+    ['considered', 'dedicated'].includes(wineMaturity ?? '');
+  const desc = `${location.description ?? ''} ${location.tagline ?? ''}`.toLowerCase();
+  const supportsWineShop = /\b(bottle shop|wine shop)\b/.test(desc);
+
+  if (!supportsWineBar && !supportsWineShop) return base;
+
+  const inIdx = base.toLowerCase().indexOf(' in ');
+  const formatPart = inIdx >= 0 ? base.slice(0, inIdx) : base;
+  const locationPart = inIdx >= 0 ? base.slice(inIdx) : '';
+  const phrases: string[] = [formatPart];
+
+  if (supportsWineBar && !/\bwine bar\b/i.test(formatPart)) {
+    phrases.push('wine bar');
+  }
+  if (supportsWineShop && !/\bwine shop\b/i.test(formatPart)) {
+    phrases.push('wine shop');
+  }
+  if (phrases.length === 1) return base;
+
+  return `${joinPhrases(phrases)}${locationPart}`;
+}
+
 // ---------------------------------------------------------------------------
 // Offering line builder — composes richer sentences from signals
 // ---------------------------------------------------------------------------
@@ -513,9 +549,12 @@ function buildOfferingLines(location: LocationData): { label: string; sentence: 
         sentence: composeSentence('Wine list', wineFragments, 'featuring'),
       });
     } else if ((location.keyProducers?.length ?? 0) > 0) {
+      const producerList = toSentenceList((location.keyProducers ?? []).slice(0, 3));
       lines.push({
         label: 'Wine',
-        sentence: `Considered wine selection with producers like ${toSentenceList((location.keyProducers ?? []).slice(0, 3))}`,
+        sentence: wineIntent === 'natural_leaning'
+          ? `Considered wine selection with a natural, small-producer focus including ${producerList}`
+          : `Considered wine selection with producers like ${producerList}`,
       });
     } else {
       lines.push({
@@ -785,6 +824,7 @@ export default function PlacePage() {
       cuisineType: location.cuisineType ?? null,
       offeringSignals: location.offeringSignals ?? null,
     }) ?? renderLocation({ neighborhood: location.neighborhood, category: location.category });
+  const displayIdentitySubline = enhanceIdentitySubline(identitySubline, location);
 
   const energyPhrase = location.scenesense?.atmosphere?.[0] ?? null;
   const displayTagline = dedupeTaglineNeighborhood(location.tagline, location.neighborhood);
@@ -827,7 +867,6 @@ export default function PlacePage() {
 
   // Offering (Price row is surfaced in Scene instead)
   const offeringRows = buildOfferingLines(location);
-  const priceText = offeringRows.find(r => r.label === 'Price')?.sentence ?? null;
   const hasOfferingSection = offeringRows.some(r => r.label !== 'Price');
 
   // B-lite fallback: treat low-density entities as "thin" and collapse to single column.
@@ -873,8 +912,8 @@ export default function PlacePage() {
                   </div>
                 )}
                 <h1 id="place-title" className="sk-display">{location.name}</h1>
-                {identitySubline && (
-                  <p id="identity-subline" className="sk-identity">{identitySubline}</p>
+                {displayIdentitySubline && (
+                  <p id="identity-subline" className="sk-identity">{displayIdentitySubline}</p>
                 )}
                 {displayTagline && (
                   <p id="identity-tagline">{displayTagline}</p>
@@ -978,7 +1017,9 @@ export default function PlacePage() {
                     )}
                     {location.keyProducers && location.keyProducers.length > 0 && (
                       <p id="key-producers" className="known-for-line">
-                        Wine focus includes producers like {toSentenceList(location.keyProducers.slice(0, 4))}.
+                        {location.offeringSignals?.wineProgramIntent === 'natural_leaning'
+                          ? `Natural wine focus includes producers like ${toSentenceList(location.keyProducers.slice(0, 4))}.`
+                          : `Wine focus includes producers like ${toSentenceList(location.keyProducers.slice(0, 4))}.`}
                       </p>
                     )}
                   </>
