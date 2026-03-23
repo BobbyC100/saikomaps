@@ -61,11 +61,40 @@ if (!targetSlug && !targetEntityId && !batchSize) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Download image and convert to base64
+// ─────────────────────────────────────────────────────────────────────────────
+
+async function downloadImageAsBase64(mediaUrl: string): Promise<string | null> {
+  try {
+    const response = await fetch(mediaUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Saiko Places Bot)',
+      },
+    });
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const buffer = await response.arrayBuffer();
+    return Buffer.from(buffer).toString('base64');
+  } catch (err) {
+    return null;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Classify single image
 // ─────────────────────────────────────────────────────────────────────────────
 
 async function classifySingleImage(mediaUrl: string): Promise<PhotoType | null> {
   try {
+    // Download image and convert to base64
+    const base64 = await downloadImageAsBase64(mediaUrl);
+    if (!base64) {
+      return null;
+    }
+
     const response = await client.messages.create({
       model: 'claude-haiku-4-5-20251001',
       max_tokens: 100,
@@ -76,8 +105,9 @@ async function classifySingleImage(mediaUrl: string): Promise<PhotoType | null> 
             {
               type: 'image',
               source: {
-                type: 'url',
-                url: mediaUrl,
+                type: 'base64',
+                media_type: 'image/jpeg',
+                data: base64,
               },
             },
             {
@@ -109,7 +139,9 @@ Response: `,
     }
     return null;
   } catch (err) {
-    console.error('  Classification error:', err);
+    if (process.env.DEBUG_CLASSIFY === '1') {
+      console.error('  Classification error:', err);
+    }
     return null;
   }
 }
