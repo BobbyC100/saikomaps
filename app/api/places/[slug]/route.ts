@@ -195,11 +195,7 @@ export async function GET(
           });
 
           if (allMedia.length > 0) {
-            // Separate classified and unclassified
-            const classified = allMedia.filter(m => m.photoType);
-            const unclassified = allMedia.filter(m => !m.photoType);
-
-            // Rank classified by photoType preference: INTERIOR, FOOD, FOOD, BAR_DRINKS, CROWD_ENERGY, DETAIL
+            // Rank by photoType preference: INTERIOR, FOOD, FOOD, BAR_DRINKS, CROWD_ENERGY, DETAIL
             const photoTypeRanking: Record<string, number> = {
               INTERIOR: 0,
               FOOD: 1,
@@ -209,16 +205,13 @@ export async function GET(
               EXTERIOR: 6,
             };
 
-            classified.sort((a, b) => {
-              const rankA = photoTypeRanking[a.photoType!] ?? 999;
-              const rankB = photoTypeRanking[b.photoType!] ?? 999;
+            const ranked = allMedia.sort((a, b) => {
+              const rankA = a.photoType ? (photoTypeRanking[a.photoType] ?? 999) : 999;
+              const rankB = b.photoType ? (photoTypeRanking[b.photoType] ?? 999) : 999;
               return rankA - rankB;
             });
 
-            // Combine: ranked classified first, then unclassified recent ones
-            const combined = [...classified, ...unclassified];
-
-            photoUrls = combined
+            photoUrls = ranked
               .filter((m) => m.mediaUrl)
               .slice(0, 6)
               .map((m) => m.mediaUrl as string);
