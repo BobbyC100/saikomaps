@@ -178,28 +178,44 @@ export async function GET(
         });
 
         if (instagramAccount) {
-          console.log(`[places API] ${entity.slug}: Found Instagram account (userId: ${instagramAccount.instagramUserId})`);
-
-          // Get 6 most recent media with mediaUrl, any type
-          const media = await db.instagram_media.findMany({
+          // Fetch 12 most recent media for filtering and ranking
+          const allMedia = await db.instagram_media.findMany({
             where: {
               instagramUserId: instagramAccount.instagramUserId,
             },
             select: {
               mediaUrl: true,
+              photoType: true,
+              timestamp: true,
             },
-            take: 6,
+            take: 12,
             orderBy: {
               timestamp: 'desc',
             },
           });
 
-          if (media.length > 0) {
-            photoUrls = media
+          if (allMedia.length > 0) {
+            // Rank by photoType preference: INTERIOR, FOOD, FOOD, BAR_DRINKS, CROWD_ENERGY, DETAIL
+            const photoTypeRanking: Record<string, number> = {
+              INTERIOR: 0,
+              FOOD: 1,
+              BAR_DRINKS: 3,
+              CROWD_ENERGY: 4,
+              DETAIL: 5,
+              EXTERIOR: 6,
+            };
+
+            const ranked = allMedia.sort((a, b) => {
+              const rankA = a.photoType ? (photoTypeRanking[a.photoType] ?? 999) : 999;
+              const rankB = b.photoType ? (photoTypeRanking[b.photoType] ?? 999) : 999;
+              return rankA - rankB;
+            });
+
+            photoUrls = ranked
               .filter((m) => m.mediaUrl)
+              .slice(0, 6)
               .map((m) => m.mediaUrl as string);
           }
-          console.log(`[places API] ${entity.slug}: Set ${photoUrls.length} photo URLs`);
         } else {
           console.log(`[places API] ${entity.slug}: No Instagram account found`);
         }
