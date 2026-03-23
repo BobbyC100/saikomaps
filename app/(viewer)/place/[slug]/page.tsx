@@ -751,23 +751,24 @@ export default function PlacePage() {
 
   // Sidebar: Links
   // Instagram is shown in the header action row — exclude it here to avoid duplication
+  // Directions is a primary CTA (navigational intent), not a reference link — excluded from sidebar
   const sidebarLinks: { label: string; url: string }[] = [];
-  if (mapRefUrl) sidebarLinks.push({ label: 'Directions', url: mapRefUrl });
   if (location.menuUrl) sidebarLinks.push({ label: 'Menu', url: location.menuUrl });
   if (location.winelistUrl) sidebarLinks.push({ label: 'Wine list', url: location.winelistUrl });
   if (phoneUrl) sidebarLinks.push({ label: 'Call', url: phoneUrl });
 
   // Sidebar: Scene / Atmosphere / Ambiance
-  const sceneText = location.placePersonality?.trim() || null;
+  // placePersonality is an internal classification token (e.g. "concept-driven") —
+  // never render it directly. SceneSense already derives display copy from it.
   const sceneTags = location.scenesense?.scene ?? [];
   const atmosphereTags = location.scenesense?.atmosphere ?? [];
   const energyTags = location.scenesense?.energy ?? [];
-  const hasScene = !!(sceneText || sceneTags.length);
+  const hasScene = sceneTags.length > 0;
   const hasAtmosphere = atmosphereTags.length > 0;
   const hasEnergy = energyTags.length > 0;
 
-  // Primary CTAs
-  const hasPrimaryCtas = !!(location.reservationUrl || location.website || location.instagram || location.tiktok);
+  // Primary CTAs (Directions is an action, lives here not in sidebar links)
+  const hasPrimaryCtas = !!(location.reservationUrl || location.website || location.instagram || location.tiktok || mapRefUrl);
 
   // More Maps
   const moreMapsCards = appearsOn.slice(0, 3);
@@ -829,6 +830,9 @@ export default function PlacePage() {
                     )}
                     {location.tiktok && (
                       <a href={`https://tiktok.com/@${location.tiktok.replace(/^@/, '')}`} target="_blank" rel="noopener noreferrer">TikTok <span className="action-arrow">↗</span></a>
+                    )}
+                    {mapRefUrl && (
+                      <a href={mapRefUrl} target="_blank" rel="noopener noreferrer">Directions <span className="action-arrow">↗</span></a>
                     )}
                   </div>
                 )}
@@ -1008,7 +1012,6 @@ export default function PlacePage() {
                   <>
                     <div className="sk-section-header"><span>Scene</span></div>
                     <div className="sidebar-tag-block">
-                      {sceneText && <p>{sceneText}</p>}
                       {sceneTags.length > 0 && (
                         <p className="tag-line">{sceneTags.join(' · ')}</p>
                       )}
@@ -1160,10 +1163,10 @@ export default function PlacePage() {
                 </div>
               </div>
 
-              {/* COVERAGE column */}
-              <div id="appendix-coverage">
-                <h2>Coverage</h2>
-                {location.coverageSources && location.coverageSources.length > 0 ? (
+              {/* COVERAGE column — collapse silently when empty */}
+              {location.coverageSources && location.coverageSources.length > 0 && (
+                <div id="appendix-coverage">
+                  <h2>Coverage</h2>
                   <ul className="coverage-entries">
                     {location.coverageSources.map((cs) => (
                       <li key={cs.url} className="coverage-entry">
@@ -1180,10 +1183,8 @@ export default function PlacePage() {
                       </li>
                     ))}
                   </ul>
-                ) : (
-                  <p className="coverage-empty">No coverage sources yet.</p>
-                )}
-              </div>
+                </div>
+              )}
 
               {/* PLATE MARK */}
               <p id="plate-mark">Saiko Fields: TRACES — Los Angeles</p>
