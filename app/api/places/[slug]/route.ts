@@ -185,6 +185,7 @@ export async function GET(
             },
             select: {
               mediaUrl: true,
+              permalink: true,
               photoType: true,
               timestamp: true,
             },
@@ -195,7 +196,7 @@ export async function GET(
           });
 
           if (allMedia.length > 0) {
-            // Rank by photoType preference: INTERIOR, FOOD, FOOD, BAR_DRINKS, CROWD_ENERGY, DETAIL
+            // Rank by photoType preference: INTERIOR, FOOD, BAR_DRINKS, CROWD_ENERGY, DETAIL, EXTERIOR
             const photoTypeRanking: Record<string, number> = {
               INTERIOR: 0,
               FOOD: 1,
@@ -212,9 +213,9 @@ export async function GET(
             });
 
             photoUrls = ranked
-              .filter((m) => m.mediaUrl)
+              .filter((m) => m.mediaUrl || m.permalink)
               .slice(0, 6)
-              .map((m) => m.mediaUrl as string);
+              .map((m) => (m.mediaUrl || m.permalink) as string);
           }
         } else {
           console.log(`[places API] ${entity.slug}: No Instagram account found`);
