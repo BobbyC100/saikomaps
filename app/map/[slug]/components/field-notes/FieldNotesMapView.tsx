@@ -12,7 +12,7 @@ import {
   ExpandedMapView,
   QuietCardTopo,
 } from './index';
-import type { PlaceCardData } from './PlaceCard';
+import type { EntityCardData } from './EntityCard';
 import { getPhotoRefFromStored, getGooglePhotoUrl } from '@/lib/google-places';
 
 const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '';
@@ -127,7 +127,7 @@ export function FieldNotesMapView({
 
   const themeClass = theme === 'dark' ? 'dark' : '';
 
-  const places: PlaceCardData[] = useMemo(() => {
+  const places: EntityCardData[] = useMemo(() => {
     return locations.map((loc) => ({
       id: loc.id,
       placeSlug: loc.placeSlug,

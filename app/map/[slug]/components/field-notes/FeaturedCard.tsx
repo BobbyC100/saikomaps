@@ -1,11 +1,11 @@
 'use client';
 
 import Link from 'next/link';
-import type { PlaceCardData } from './PlaceCard';
-import { CardMetaRow } from './PlaceCard';
+import type { EntityCardData } from './EntityCard';
+import { CardMetaRow } from './EntityCard';
 
 interface FeaturedCardProps {
-  place: PlaceCardData;
+  place: EntityCardData;
   theme: 'light' | 'dark';
 }
 

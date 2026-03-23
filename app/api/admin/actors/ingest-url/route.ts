@@ -19,7 +19,7 @@ import { parseHtml } from "@/lib/website-enrichment/parse";
 import { normalizeUrl } from "@/lib/website-enrichment/url";
 import { upsertOperatorActor } from "@/lib/actors/upsertOperatorActor";
 import { upsertOperatorPlaceCandidates } from "@/lib/actors/upsertOperatorPlaceCandidates";
-import { logPlaceJob } from "@/lib/place-job-log";
+import { logPlaceJob } from "@/lib/entity-job-log";
 
 function isValidHttpUrl(s: string): boolean {
   try {

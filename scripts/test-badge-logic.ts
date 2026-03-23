@@ -2,9 +2,9 @@
  * Quick test to verify badge logic is working
  */
 
-import { computeInternalBadges, PlaceCardData } from '../components/search-results/types';
+import { computeInternalBadges, EntityCardData } from '../components/search-results/types';
 
-const testCases: PlaceCardData[] = [
+const testCases: EntityCardData[] = [
   {
     slug: 'test-1',
     name: 'Menu Only',

@@ -19,7 +19,7 @@ import { SaikoLogo } from '@/components/ui/SaikoLogo';
 import FloatingMiniNav from '@/components/editor/FloatingMiniNav';
 import FloatingPublish from '@/components/editor/FloatingPublish';
 import TitleSection from '@/components/editor/TitleSection';
-import PlaceIndexSection from '@/components/editor/PlaceIndexSection';
+import PlaceIndexSection from '@/components/editor/EntityIndexSection';
 import AddLocationModal from '@/components/AddLocationModal';
 
 interface Location {

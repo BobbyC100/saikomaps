@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import type { PlaceCardData } from './PlaceCard';
+import type { EntityCardData } from './EntityCard';
 
 const POPUP_WIDTH = 310;
 const PHOTO_WIDTH = 115;
@@ -10,7 +10,7 @@ const POPUP_HEIGHT_ESTIMATE = 195;
 const GAP_ABOVE_PIN = 14;
 
 interface BentoCardPopupProps {
-  place: PlaceCardData;
+  place: EntityCardData;
   theme: 'light' | 'dark';
   pinPixelX: number;
   pinPixelY: number;
@@ -18,7 +18,7 @@ interface BentoCardPopupProps {
   mapSlug?: string;
 }
 
-function getDirectionsUrl(place: PlaceCardData): string {
+function getDirectionsUrl(place: EntityCardData): string {
   const lat = place.latitude;
   const lng = place.longitude;
   if (lat != null && lng != null) {

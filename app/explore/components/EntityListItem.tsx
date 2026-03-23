@@ -2,17 +2,17 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { PlaceCardData } from '../types'
+import { EntityCardData } from '../types'
 
-interface PlaceListItemProps {
-  place: PlaceCardData
+interface EntityListItemProps {
+  place: EntityCardData
 }
 
 /**
- * PlaceListItem — For search results "Places matching {query}" section
+ * EntityListItem — For search results "Places matching {query}" section
  * Meta format: {neighborhood} · On {mapCount} maps
  */
-export function PlaceListItem({ place }: PlaceListItemProps) {
+export function EntityListItem({ place }: EntityListItemProps) {
   return (
     <Link
       href={`/place/${place.slug}`}

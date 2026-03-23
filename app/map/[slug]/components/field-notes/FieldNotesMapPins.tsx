@@ -2,12 +2,12 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { BentoCardPopup } from './BentoCardPopup';
-import type { PlaceCardData } from './PlaceCard';
+import type { EntityCardData } from './EntityCard';
 
 interface PinPosition {
   x: number;
   y: number;
-  place: PlaceCardData;
+  place: EntityCardData;
   index: number;
 }
 
@@ -16,7 +16,7 @@ export type FieldNotesMapPinsVariant = 'split' | 'expanded';
 interface FieldNotesMapPinsProps {
   map: google.maps.Map | null;
   mapDivRef: React.RefObject<HTMLDivElement | null>;
-  places: PlaceCardData[];
+  places: EntityCardData[];
   theme: 'light' | 'dark';
   /** 'split' = Bento popup on pin tap. 'expanded' = carousel sync, no popup */
   variant?: FieldNotesMapPinsVariant;
@@ -28,12 +28,12 @@ interface FieldNotesMapPinsProps {
 }
 
 /** Determine if a place is "featured" — first place or has curator descriptor */
-function isFeatured(place: PlaceCardData, index: number): boolean {
+function isFeatured(place: EntityCardData, index: number): boolean {
   return index === 0 || !!(place.editorial?.quote_text || place.editorial?.tags?.length);
 }
 
 /** Determine if a pin is ghost (unlabeled, low opacity) — only in split view for background density */
-function isGhost(place: PlaceCardData, index: number, variant: FieldNotesMapPinsVariant): boolean {
+function isGhost(place: EntityCardData, index: number, variant: FieldNotesMapPinsVariant): boolean {
   // In expanded view, never show ghost pins (all places are visible)
   if (variant === 'expanded') return false;
   // In split view, non-featured places can be ghost pins

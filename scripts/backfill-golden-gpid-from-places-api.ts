@@ -19,7 +19,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 import { Prisma } from '@prisma/client'
 import { db } from '@/lib/db'
-import { logPlaceJob } from '@/lib/place-job-log'
+import { logPlaceJob } from '@/lib/entity-job-log'
 import { searchPlace, getPlaceDetails } from '@/lib/google-places'
 import type { PlaceSearchResult } from '@/lib/google-places'
 
