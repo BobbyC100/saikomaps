@@ -184,7 +184,7 @@ export async function GET(
           const classifiedMedia = await db.instagram_media.findMany({
             where: {
               instagramUserId: instagramAccount.instagramUserId,
-              photoType: { not: null },
+              photoType: { isNot: null },
             },
             select: {
               mediaUrl: true,
