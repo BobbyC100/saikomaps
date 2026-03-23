@@ -201,12 +201,11 @@ export async function GET(
               .filter((m) => m.mediaUrl)
               .map((m) => m.mediaUrl as string);
           } else {
-            // Fallback: get recent IMAGE-only media if no classified photos exist
-            console.log(`[places API] ${entity.slug}: No classified photos, falling back to recent images`);
+            // Fallback: get 6 most recent media with mediaUrl if no classified photos exist
+            console.log(`[places API] ${entity.slug}: No classified photos, falling back to recent media`);
             const recentMedia = await db.instagram_media.findMany({
               where: {
                 instagramUserId: instagramAccount.instagramUserId,
-                mediaType: 'IMAGE',
               },
               select: {
                 mediaUrl: true,
@@ -218,12 +217,13 @@ export async function GET(
             });
 
             if (recentMedia.length > 0) {
-              console.log(`[places API] ${entity.slug}: Found ${recentMedia.length} recent images`);
+              console.log(`[places API] ${entity.slug}: Found ${recentMedia.length} recent media items`);
               photoUrls = recentMedia
                 .filter((m) => m.mediaUrl)
                 .map((m) => m.mediaUrl as string);
+              console.log(`[places API] ${entity.slug}: ${photoUrls.length} have mediaUrl`);
             } else {
-              console.log(`[places API] ${entity.slug}: No images found (checked classified and recent)`);
+              console.log(`[places API] ${entity.slug}: No media found at all`);
             }
           }
           console.log(`[places API] ${entity.slug}: Set ${photoUrls.length} photo URLs`);
