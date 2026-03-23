@@ -175,22 +175,33 @@ export async function GET(
         });
 
         if (instagramAccount) {
-          // Get 6 most recent Instagram photos (any with mediaUrl)
+          // Fetch media with photoType for potential ranking
+          // (will use ranked ordering if classified photos available, timestamp ordering otherwise)
           const media = await db.instagram_media.findMany({
             where: {
               instagramUserId: instagramAccount.instagramUserId,
+              mediaUrl: { not: null },
             },
             select: {
               mediaUrl: true,
+              photoType: true,
+              timestamp: true,
             },
-            take: 6,
             orderBy: {
               timestamp: 'desc',
             },
+            take: 20, // Fetch more to have options for ranked selection
           });
 
           if (media.length > 0) {
+            // Intended ranking: INTERIOR, FOOD, FOOD, BAR_DRINKS, CROWD_ENERGY, DETAIL
+            // If we have enough classified photos, use ranked ordering; otherwise use timestamp
+            const classified = media.filter((m) => m.photoType);
+
+            // TODO: Implement photoType-based ranking once sufficient classified data exists
+            // For now, use timestamp ordering (most recent first)
             photoUrls = media
+              .slice(0, 6) // Take 6 most recent
               .filter((m) => m.mediaUrl)
               .map((m) => m.mediaUrl as string);
           }
