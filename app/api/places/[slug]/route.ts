@@ -179,36 +179,54 @@ export async function GET(
 
         if (instagramAccount) {
           console.log(`[places API] ${entity.slug}: Found Instagram account (userId: ${instagramAccount.instagramUserId})`);
-          // Fetch media with photoType for future ranking support
-          const media = await db.instagram_media.findMany({
+
+          // Try to get 6 classified photos first
+          const classifiedMedia = await db.instagram_media.findMany({
             where: {
               instagramUserId: instagramAccount.instagramUserId,
+              photoType: { not: null },
             },
             select: {
               mediaUrl: true,
-              photoType: true,
-              timestamp: true,
             },
+            take: 6,
             orderBy: {
-              timestamp: 'desc',
+              classifiedAt: 'desc',
             },
-            take: 20,
           });
 
-          console.log(`[places API] ${entity.slug}: Fetched ${media.length} total media items`);
-          if (media.length > 0) {
-            // Filter for items with mediaUrl and take 6 most recent
-            // TODO: Implement photoType-based ranking (INTERIOR, FOOD, FOOD, BAR_DRINKS, CROWD_ENERGY, DETAIL)
-            // once sufficient classified data is available
-            const withUrl = media.filter((m) => m.mediaUrl);
-            console.log(`[places API] ${entity.slug}: ${withUrl.length} items have mediaUrl, taking 6`);
-            photoUrls = withUrl
-              .slice(0, 6)
+          if (classifiedMedia.length > 0) {
+            console.log(`[places API] ${entity.slug}: Found ${classifiedMedia.length} classified photos`);
+            photoUrls = classifiedMedia
+              .filter((m) => m.mediaUrl)
               .map((m) => m.mediaUrl as string);
-            console.log(`[places API] ${entity.slug}: Set ${photoUrls.length} photo URLs`);
           } else {
-            console.log(`[places API] ${entity.slug}: No media found for this Instagram account`);
+            // Fallback: get recent IMAGE-only media if no classified photos exist
+            console.log(`[places API] ${entity.slug}: No classified photos, falling back to recent images`);
+            const recentMedia = await db.instagram_media.findMany({
+              where: {
+                instagramUserId: instagramAccount.instagramUserId,
+                mediaType: 'IMAGE',
+              },
+              select: {
+                mediaUrl: true,
+              },
+              take: 6,
+              orderBy: {
+                timestamp: 'desc',
+              },
+            });
+
+            if (recentMedia.length > 0) {
+              console.log(`[places API] ${entity.slug}: Found ${recentMedia.length} recent images`);
+              photoUrls = recentMedia
+                .filter((m) => m.mediaUrl)
+                .map((m) => m.mediaUrl as string);
+            } else {
+              console.log(`[places API] ${entity.slug}: No images found (checked classified and recent)`);
+            }
           }
+          console.log(`[places API] ${entity.slug}: Set ${photoUrls.length} photo URLs`);
         } else {
           console.log(`[places API] ${entity.slug}: No Instagram account found`);
         }
