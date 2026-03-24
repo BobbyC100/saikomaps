@@ -111,6 +111,63 @@ export interface ScanSummary {
   results: ScanResult[];
 }
 
+const IDENTITY_ANCHOR_WEIGHTS = {
+  website: 3,
+  instagram: 2,
+  tiktok: 2,
+  phone: 1,
+  neighborhood: 1,
+  coords: 2,
+} as const;
+
+type IdentityAnchorKey = keyof typeof IDENTITY_ANCHOR_WEIGHTS;
+
+function getIdentityAnchorState(entity: ScanEntity) {
+  const anchors: Record<IdentityAnchorKey, boolean> = {
+    website: Boolean(entity.website || entity.cesWebsite),
+    instagram: Boolean(entity.instagram || entity.cesInstagram),
+    tiktok: Boolean(entity.tiktok || entity.cesTiktok),
+    phone: Boolean(entity.phone || entity.cesPhone),
+    neighborhood: Boolean(entity.neighborhood || entity.cesNeighborhood),
+    coords: Boolean(entity.latitude && entity.longitude),
+  };
+
+  const score = (Object.keys(anchors) as IdentityAnchorKey[]).reduce((sum, key) => {
+    return sum + (anchors[key] ? IDENTITY_ANCHOR_WEIGHTS[key] : 0);
+  }, 0);
+
+  return { anchors, score };
+}
+
+function getFastestIdentityFixes(
+  anchors: Record<IdentityAnchorKey, boolean>,
+  pointsNeeded: number,
+): string[] {
+  if (pointsNeeded <= 0) return [];
+
+  const options = [
+    { key: 'website', label: 'Add website (+3)', points: IDENTITY_ANCHOR_WEIGHTS.website },
+    { key: 'instagram', label: 'Add Instagram (+2)', points: IDENTITY_ANCHOR_WEIGHTS.instagram },
+    { key: 'coords', label: 'Add coordinates (+2)', points: IDENTITY_ANCHOR_WEIGHTS.coords },
+    { key: 'tiktok', label: 'Add TikTok (+2)', points: IDENTITY_ANCHOR_WEIGHTS.tiktok },
+    { key: 'phone', label: 'Add phone (+1)', points: IDENTITY_ANCHOR_WEIGHTS.phone },
+    { key: 'neighborhood', label: 'Add neighborhood (+1)', points: IDENTITY_ANCHOR_WEIGHTS.neighborhood },
+  ] as const satisfies ReadonlyArray<{ key: IdentityAnchorKey; label: string; points: number }>;
+
+  const missingOptions = options.filter((opt) => !anchors[opt.key]);
+
+  const rankedOptions = [...missingOptions].sort((a, b) => b.points - a.points);
+
+  const plan: string[] = [];
+  let accumulated = 0;
+  for (const opt of rankedOptions) {
+    if (accumulated >= pointsNeeded) break;
+    plan.push(opt.label);
+    accumulated += opt.points;
+  }
+  return plan;
+}
+
 // ---------------------------------------------------------------------------
 // Issue Rules
 // ---------------------------------------------------------------------------
@@ -127,14 +184,7 @@ export const ISSUE_RULES: IssueRule[] = [
       // not just GPID. A taco cart with an IG handle + neighborhood is valid.
       if (e.googlePlaceId) return null; // GPID alone = resolved
 
-      // Weighted anchors (mirrors lib/identity-enrichment.ts ANCHOR_WEIGHTS)
-      let score = 0;
-      if (e.website || e.cesWebsite) score += 3;
-      if (e.instagram || e.cesInstagram) score += 2;
-      if (e.tiktok || e.cesTiktok) score += 2;
-      if (e.phone || e.cesPhone) score += 1;
-      if (e.neighborhood || e.cesNeighborhood) score += 1;
-      if (e.latitude && e.longitude) score += 2;
+      const { anchors, score } = getIdentityAnchorState(e);
 
       // Nomadic entities (pop-ups) have lower identity threshold.
       // They don't need coords/GPID — name + Instagram or name + website is enough.
@@ -143,7 +193,23 @@ export const ISSUE_RULES: IssueRule[] = [
       const threshold = e.isNomadic ? 2 : 4;
       if (score >= threshold) return null;
 
-      return { detected: true, detail: { identity_score: score, has_gpid: false, is_nomadic: e.isNomadic } };
+      const pointsNeeded = threshold - score;
+      const presentAnchors = (Object.keys(anchors) as IdentityAnchorKey[]).filter((k) => anchors[k]);
+      const missingAnchors = (Object.keys(anchors) as IdentityAnchorKey[]).filter((k) => !anchors[k]);
+
+      return {
+        detected: true,
+        detail: {
+          identity_score: score,
+          threshold,
+          points_needed: pointsNeeded,
+          has_gpid: false,
+          is_nomadic: e.isNomadic,
+          present_anchors: presentAnchors,
+          missing_anchors: missingAnchors,
+          fastest_fixes: getFastestIdentityFixes(anchors, pointsNeeded),
+        },
+      };
     },
   },
   {
@@ -158,13 +224,7 @@ export const ISSUE_RULES: IssueRule[] = [
       if (e.isNomadic) return null;
       if (e.googlePlaceId) return null;
       // Only flag if identity IS sufficient (otherwise unresolved_identity covers it)
-      let score = 0;
-      if (e.website || e.cesWebsite) score += 3;
-      if (e.instagram || e.cesInstagram) score += 2;
-      if (e.tiktok || e.cesTiktok) score += 2;
-      if (e.phone || e.cesPhone) score += 1;
-      if (e.neighborhood || e.cesNeighborhood) score += 1;
-      if (e.latitude && e.longitude) score += 2;
+      const { score } = getIdentityAnchorState(e);
       if (score < 4) return null; // covered by unresolved_identity
       return { detected: true };
     },
