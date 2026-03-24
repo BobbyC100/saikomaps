@@ -45,7 +45,7 @@ const instrumentSerif = Instrument_Serif({
 });
 
 export const metadata: Metadata = {
-  title: "Saiko Maps",
+  title: "Saiko Fields",
   description: "Create cool, personal maps — fast",
 };
 
