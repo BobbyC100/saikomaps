@@ -320,7 +320,7 @@ Not every entity type needs every signal. A taco cart doesn't need a wine progra
 The issue scanner (`lib/coverage/issue-scanner.ts`) should evolve to check coverage depth per tier:
 
 ### Current (Tier 1 only)
-- `unresolved_identity` — no GPID
+- `unresolved_identity` — insufficient weighted identity anchors (not GPID-specific)
 - `missing_coords` — no lat/lng (blocking)
 - `missing_neighborhood` — no neighborhood
 - `missing_phone` — no phone

@@ -20,6 +20,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { scanEntities, ISSUE_RULES } from '@/lib/coverage/issue-scanner';
 import { scanForDuplicates } from '@/lib/coverage/duplicate-scanner';
+import { getIssueActionability } from '@/lib/coverage/issue-policy';
 
 export async function POST(request: NextRequest) {
   try {
@@ -94,6 +95,10 @@ export async function POST(request: NextRequest) {
       const totalActive = byStatus
         .filter((r) => !['resolved', 'suppressed'].includes(r.status))
         .reduce((sum, r) => sum + r.count, 0);
+      const informationalOpen = byType
+        .filter((r) => getIssueActionability(r.issue_type) === 'informational')
+        .reduce((sum, r) => sum + r.count, 0);
+      const actionableOpen = Math.max(0, totalActive - informationalOpen);
 
       // Blocking publish count
       const blockingRows = await db.$queryRaw<{ count: number }[]>`
@@ -101,13 +106,23 @@ export async function POST(request: NextRequest) {
         FROM entity_issues
         WHERE blocking_publish = true AND status NOT IN ('resolved', 'suppressed')
       `;
+      const suppressedRows = await db.$queryRaw<{ count: number }[]>`
+        SELECT COUNT(*)::int AS count
+        FROM entity_issues
+        WHERE status = 'suppressed'
+          AND suppressed_reason IN ('confirmed_none', 'not_applicable')
+      `;
 
       return NextResponse.json({
         action: 'summary',
         total_active: totalActive,
+        actionable_open_issues: actionableOpen,
+        informational_open_issues: informationalOpen,
+        suppressed_confirmed_none: suppressedRows[0]?.count ?? 0,
         blocking_publish_entities: blockingRows[0]?.count ?? 0,
         by_status: byStatus,
         byClass: byClass,
+        by_type: byType,
         byType: byType,
         availableRules: ISSUE_RULES.map((r) => ({
           issueType: r.issueType,
@@ -244,8 +259,12 @@ export async function GET(request: NextRequest) {
         LIMIT 500
       `;
 
-      const active = issues.filter((i) => i.status !== 'suppressed');
-      const suppressed = issues.filter((i) => i.status === 'suppressed');
+      const withActionability = issues.map((i) => ({
+        ...i,
+        actionability: getIssueActionability(i.issue_type),
+      }));
+      const active = withActionability.filter((i) => i.status !== 'suppressed');
+      const suppressed = withActionability.filter((i) => i.status === 'suppressed');
 
       return NextResponse.json({
         total_active: active.length,

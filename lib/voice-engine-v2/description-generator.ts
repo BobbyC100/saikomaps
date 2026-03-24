@@ -17,7 +17,19 @@ import {
 } from './description-prompts';
 import type { CoverageEvidence } from '../coverage/normalize-evidence';
 
-const anthropic = new Anthropic();
+function getAnthropicClient(): Anthropic {
+  const apiKey =
+    process.env.ANTHROPIC_API_KEY ||
+    process.env.NEXT_PUBLIC_ANTHROPIC_API_KEY;
+
+  if (!apiKey) {
+    throw new Error(
+      'ANTHROPIC_API_KEY not set (also checked NEXT_PUBLIC_ANTHROPIC_API_KEY)'
+    );
+  }
+
+  return new Anthropic({ apiKey });
+}
 
 const MODEL = 'claude-haiku-4-5-20251001';
 const MAX_TOKENS = 256;
@@ -72,6 +84,7 @@ export async function generateTier2Description(input: {
   textBlocks: string[];
   identitySignals: Record<string, unknown> | null;
 }): Promise<DescriptionGenerationResult> {
+  const anthropic = getAnthropicClient();
   const userPrompt = buildAboutSynthUserPrompt(
     input.entityName,
     input.textBlocks,
@@ -113,6 +126,7 @@ export async function generateTier3Description(input: {
   coverageSources?: Array<{ sourceName: string; excerpt: string | null }>;
   coverageEvidence?: CoverageEvidence;
 }): Promise<DescriptionGenerationResult> {
+  const anthropic = getAnthropicClient();
   const userPrompt = buildAboutComposeUserPrompt(
     input.entityName,
     input.category,

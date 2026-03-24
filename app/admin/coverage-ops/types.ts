@@ -7,6 +7,7 @@ export interface IssueRow {
   entity_id: string;
   entity_name: string;
   entity_slug: string;
+  actionability?: 'actionable' | 'informational';
   problem_class: string;
   issue_type: string;
   status: string;
@@ -21,6 +22,9 @@ export interface IssueRow {
 
 export interface SummaryData {
   total_active: number;
+  actionable_open_issues: number;
+  informational_open_issues: number;
+  suppressed_confirmed_none: number;
   blocking_publish_entities: number;
   by_type: { issue_type: string; severity: string; count: number }[];
 }

@@ -1,6 +1,7 @@
 /**
  * Coverage Operations — Constants & Configuration
  */
+import { getIssueActionability } from '@/lib/coverage/issue-policy';
 
 export const C = {
   bg: '#F5F0E1',
@@ -50,7 +51,7 @@ export const LANE_META: Record<string, { icon: string; label: string; order: num
 export const SECTION_META = {
   blocked: { label: 'Blocked from Publishing', order: 0, accent: '#991B1B', accentBg: '#FEE2E2', accentBorder: '#FCA5A5' },
   review: { label: 'Needs Human Review', order: 1, accent: '#92400E', accentBg: '#FEF3C7', accentBorder: '#FCD34D' },
-  enrich: { label: 'Ready to Enrich', order: 2, accent: '#0F766E', accentBg: '#CCFBF1', accentBorder: '#5EEAD4' },
+  enrich: { label: 'Automatable Gaps', order: 2, accent: '#0F766E', accentBg: '#CCFBF1', accentBorder: '#5EEAD4' },
   completeness: { label: 'Data Completeness', order: 3, accent: '#8B7355', accentBg: '#F5F0E1', accentBorder: '#C3B091' },
 } as const;
 
@@ -83,7 +84,7 @@ export const ISSUE_SECTION: Record<string, SectionKey> = {
 
 /** Problem-oriented descriptions (what's wrong, not what tool to run) */
 export const ISSUE_NEED_LABELS: Record<string, string> = {
-  unresolved_identity: 'Not enough identity signals to publish',
+  unresolved_identity: 'Insufficient identity anchors (website/social/location) to publish',
   enrichment_incomplete: 'Has GPID but never enriched',
   missing_coords: "Can\u2019t be placed on the map",
   potential_duplicate: 'May be a duplicate of another entity',
@@ -122,9 +123,29 @@ export const ISSUE_TYPE_LABELS: Record<string, string> = {
   missing_events_surface: 'Missing Events / Private Dining Surface',
 };
 
+/** Optional UI badge copy for per-issue actionability */
+export const ISSUE_ACTIONABILITY_LABELS: Record<string, 'actionable' | 'informational'> = {
+  unresolved_identity: getIssueActionability('unresolved_identity'),
+  enrichment_incomplete: getIssueActionability('enrichment_incomplete'),
+  missing_coords: getIssueActionability('missing_coords'),
+  missing_neighborhood: getIssueActionability('missing_neighborhood'),
+  missing_hours: getIssueActionability('missing_hours'),
+  missing_price_level: getIssueActionability('missing_price_level'),
+  missing_menu_link: getIssueActionability('missing_menu_link'),
+  missing_reservations: getIssueActionability('missing_reservations'),
+  operating_status_unknown: getIssueActionability('operating_status_unknown'),
+  missing_website: getIssueActionability('missing_website'),
+  missing_phone: getIssueActionability('missing_phone'),
+  missing_instagram: getIssueActionability('missing_instagram'),
+  missing_tiktok: getIssueActionability('missing_tiktok'),
+  missing_gpid: getIssueActionability('missing_gpid'),
+  google_says_closed: getIssueActionability('google_says_closed'),
+  potential_duplicate: getIssueActionability('potential_duplicate'),
+  missing_events_surface: getIssueActionability('missing_events_surface'),
+};
+
 /** Maps issue types to the entity field that can be manually entered */
 export const INLINE_EDITABLE: Record<string, { field: string; placeholder: string }> = {
-  unresolved_identity: { field: 'google_place_id', placeholder: 'ChIJ...' },
   missing_gpid: { field: 'google_place_id', placeholder: 'ChIJ...' },
   missing_website: { field: 'website', placeholder: 'https://...' },
   missing_phone: { field: 'phone', placeholder: '(213) 555-1234' },

@@ -64,6 +64,14 @@ function cleanUrl(raw: string): string | null {
   return url;
 }
 
+function normalizeSlug(raw: string): string {
+  try {
+    return decodeURIComponent(raw);
+  } catch {
+    return raw;
+  }
+}
+
 async function discoverInline(
   entity: { id: string; slug: string; name: string; neighborhood: string | null; category: string | null; website: string | null },
   mode: 'instagram' | 'tiktok' | 'website',
@@ -170,12 +178,13 @@ Return JSON (no markdown fences): { "website_url": "https://..." or null, "confi
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { mode, limit, slug, dryRun } = body as {
+    const { mode, limit, slug: rawSlug, dryRun } = body as {
       mode?: string;
       limit?: number;
       slug?: string;
       dryRun?: boolean;
     };
+    const slug = rawSlug ? normalizeSlug(rawSlug) : undefined;
 
     if (!mode || !['instagram', 'tiktok', 'website', 'both'].includes(mode)) {
       return NextResponse.json(
