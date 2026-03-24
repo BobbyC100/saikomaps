@@ -107,6 +107,14 @@ function isLocalImagePath(url: string): boolean {
   return url.startsWith('/')
 }
 
+function isWikimediaUrl(url: string): boolean {
+  try {
+    return new URL(url).hostname === 'upload.wikimedia.org'
+  } catch {
+    return false
+  }
+}
+
 async function isUsableImageUrl(url: string): Promise<boolean> {
   if (isLocalImagePath(url)) return true
   return isImageUrlReachable(url)
@@ -345,7 +353,9 @@ async function resolveGeoCardImage(
 
   const safeGeo = toSafeImageUrl(geoImageUrl)
   if (safeGeo) {
-    const usable = await isUsableImageUrl(safeGeo)
+    // Curated Wikimedia geo URLs are treated as trusted to avoid
+    // transient 429 rate-limit checks blanking neighborhood imagery.
+    const usable = isWikimediaUrl(safeGeo) ? true : await isUsableImageUrl(safeGeo)
     attempts.push({ source: 'wikimedia', url: safeGeo, usable })
     if (usable) return finalize(safeGeo, 'wikimedia')
   } else {
