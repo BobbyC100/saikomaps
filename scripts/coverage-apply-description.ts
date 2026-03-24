@@ -81,7 +81,6 @@ function assertDbIdentity(): void {
 function filterToDescription(candidates: CoverageCandidate[]): CoverageCandidate[] {
   return candidates.filter((c) => {
     if (!c.missing_groups.includes('NEED_DESCRIPTION')) return false;
-    if (!c.google_place_id?.trim()) return false;
     return true;
   });
 }
@@ -229,13 +228,13 @@ export function cleanMerchantAboutText(raw: string): string | null {
 async function tryStoredMerchantText(placeId: string): Promise<string | null> {
   const runs = await db.merchant_enrichment_runs.findMany({
     where: { entityId: placeId },
-    orderBy: { created_at: 'desc' },
+    orderBy: { createdAt: 'desc' },
     take: 5,
-    select: { extraction_json: true },
+    select: { extractionJson: true },
   });
 
   for (const run of runs) {
-    const json = run.extraction_json as Record<string, unknown> | null;
+    const json = run.extractionJson as Record<string, unknown> | null;
     if (!json) continue;
 
     const about = (json.about_text_sample as string)?.trim();
@@ -625,15 +624,6 @@ async function main() {
     return;
   }
 
-  if (!process.env.GOOGLE_PLACES_API_KEY) {
-    console.error('❌ GOOGLE_PLACES_API_KEY is not set.');
-    process.exit(1);
-  }
-  if (process.env.GOOGLE_PLACES_ENABLED !== 'true') {
-    console.error('❌ GOOGLE_PLACES_ENABLED must be true.');
-    process.exit(1);
-  }
-
   const report: CoverageApplyDescriptionReport = {
     run_id: `apply_desc_${Date.now()}`,
     created_at: new Date().toISOString(),
@@ -686,8 +676,16 @@ async function main() {
   const placeIds = toProcess.map((c) => c.place_id);
   const placesWithDesc = await db.entities.findMany({
     where: { id: { in: placeIds } },
-    select: { id: true, description: true },
+    select: {
+      id: true,
+      name: true,
+      website: true,
+      neighborhood: true,
+      description: true,
+      descriptionSource: true,
+    },
   });
+  const entityById = new Map(placesWithDesc.map((p) => [p.id, p]));
   const hasExistingDesc = new Set(
     placesWithDesc.filter((p) => p.description != null && p.description.trim().length > 0).map((p) => p.id)
   );
@@ -705,37 +703,48 @@ async function main() {
       continue;
     }
 
-    const gpid = google_place_id?.trim();
-    if (!gpid) {
+    const entity = entityById.get(place_id);
+    if (!entity) {
       report.counts.failed++;
       report.failed_slugs.push(candidateSlug);
-      report.errors.push({ slug: candidateSlug, error: 'No google_place_id' });
+      report.errors.push({ slug: candidateSlug, error: 'Entity metadata not found in prefetch map' });
       continue;
     }
 
     try {
-      const details = await getPlaceDetails(gpid);
-      await sleep(RATE_LIMIT_MS);
-
-      const desc = (details?.editorialSummary ?? '').trim();
-      if (!desc || desc.length === 0) {
+      const result = await resolveDescription(
+        {
+          id: place_id,
+          name: entity.name,
+          website: entity.website,
+          neighborhood: entity.neighborhood,
+        },
+        google_place_id ?? null,
+      );
+      if (!result) {
         report.counts.skipped_no_google_desc++;
-        if (i < 5) console.log(`  ⏭ ${candidateSlug} (NO_GOOGLE_DESCRIPTION)`);
+        if (i < 5) console.log(`  ⏭ ${candidateSlug} (NO_DESCRIPTION_RESULT)`);
         continue;
       }
 
       if (!dryRun) {
         await db.entities.update({
           where: { id: place_id },
-          data: { description: desc },
+          data: {
+            description: result.text,
+            descriptionSource: result.source,
+            descriptionConfidence: result.confidence,
+            descriptionReviewed: false,
+          },
         });
       }
 
       report.counts.written++;
       if (i < 10) {
         const label = dryRun ? '[DRY]' : '✓';
-        console.log(`  ${label} ${candidateSlug} → description (${desc.length} chars)`);
+        console.log(`  ${label} ${candidateSlug} → description (${result.source}, ${result.text.length} chars)`);
       }
+      await sleep(RATE_LIMIT_MS);
     } catch (e) {
       const error = e instanceof Error ? e.message : String(e);
       report.counts.failed++;
@@ -749,7 +758,7 @@ async function main() {
   console.log(`Processed: ${report.counts.processed}`);
   console.log(`Written: ${report.counts.written}`);
   console.log(`Skipped (existing): ${report.counts.skipped_existing}`);
-  console.log(`Skipped (NO_GOOGLE_DESCRIPTION): ${report.counts.skipped_no_google_desc}`);
+  console.log(`Skipped (NO_DESCRIPTION_RESULT): ${report.counts.skipped_no_google_desc}`);
   console.log(`Failed: ${report.counts.failed}`);
   if (dryRun) {
     console.log('\n(DRY RUN — no changes persisted. Run with --apply to write.)');

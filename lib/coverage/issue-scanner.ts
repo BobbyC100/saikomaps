@@ -23,7 +23,7 @@
  *   identity / enrichment_incomplete  — has GPID but never enriched (high, blocking)
  *   location / missing_coords         — has GPID but no lat/lng (high, blocking)
  *   location / missing_neighborhood   — has coords but no neighborhood (medium)
- *   location / missing_hours          — no canonical/entity hours (medium)
+ *   location / missing_hours          — no canonical/entity hours for hours-applicable verticals (medium)
  *   location / missing_price_level    — no canonical/entity price level for food/drink entities (low)
  *   location / missing_menu_link      — no canonical menu URL for food/drink entities (low)
  *   location / missing_reservations   — no canonical/entity reservation URL for reservation-likely entities (low)
@@ -228,6 +228,8 @@ export const ISSUE_RULES: IssueRule[] = [
     detect: (e) => {
       // Nomadic entities have schedules via appearances, not fixed hours
       if (e.isNomadic) return null;
+      // Hotels do not require opening hours in current entity-type expectations.
+      if (e.primaryVertical === 'STAY') return null;
       const hasHours = (e.cesHoursJson ?? e.hours) !== null && (e.cesHoursJson ?? e.hours) !== undefined;
       if (!hasHours) {
         return { detected: true, detail: { recommended_stage: 1 } };

@@ -4,8 +4,8 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { Loader } from '@googlemaps/js-api-loader';
 import { MarkerClusterer } from '@googlemaps/markerclusterer';
 import Link from 'next/link';
-import type { PlaceCardData } from './PlaceCard';
-import { CardMetaRow } from './PlaceCard';
+import type { EntityCardData } from './EntityCard';
+import { CardMetaRow } from './EntityCard';
 import { calculateSmartBounds } from '@/app/map/[slug]/lib/smart-bounds';
 import { fieldNotesMapStyle } from '../../lib/fieldNotesMapStyle';
 
@@ -14,7 +14,7 @@ const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '';
 interface ExpandedMapViewProps {
   title: string;
   mapSlug: string;
-  places: PlaceCardData[];
+  places: EntityCardData[];
   theme: 'light' | 'dark';
   onBack: () => void;
 }

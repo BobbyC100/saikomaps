@@ -8,7 +8,7 @@ import {
   validateLayout,
   debugLayout,
   type PlaceData,
-} from './PlacePageLayoutResolver';
+} from './EntityPageLayoutResolver';
 
 // ============================================================================
 // SCENARIO 1: FULL DATA

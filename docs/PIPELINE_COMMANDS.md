@@ -235,6 +235,26 @@ npx tsx scripts/audit-editorial-coverage.ts
 
 ---
 
+## Description Generation (resilient)
+
+Use this when you want broad VOICE_DESCRIPTOR coverage, including entities without GPID (for example pop-ups and taco trucks).
+
+```bash
+# One-command resilient run (reprocess + fallback + retries)
+npm run description:run:resilient
+
+# Equivalent explicit command
+npx tsx scripts/generate-descriptions-v1.ts \
+  --reprocess \
+  --allow-category-only \
+  --allow-name-only \
+  --concurrency=1 \
+  --max-retries=6 \
+  --retry-base-ms=1500
+```
+
+---
+
 ## Enrichment Stage Re-run
 
 Run a specific enrichment stage without the full pipeline.

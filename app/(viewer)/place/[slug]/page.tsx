@@ -9,7 +9,7 @@ import { GalleryLightbox } from '@/components/merchant/GalleryLightbox';
 import { parseHours } from './lib/parseHours';
 import { getOpenStateLabelV2 } from '@/lib/utils/get-open-state-label';
 import { renderLocation } from '@/lib/voice/saiko';
-import { getIdentitySublineV2 } from '@/lib/contracts/place-page.identity';
+import { getIdentitySublineV2 } from '@/lib/contracts/entity-page.identity';
 import './place.css';
 
 interface EditorialSource {
@@ -100,6 +100,14 @@ interface LocationData {
     non_alcoholic_program: { maturity: string; signals: string[] };
     coffee_tea_program: { maturity: string; signals: string[] };
     service_program: { maturity: string; signals: string[] };
+    private_dining_program: { maturity: string; signals: string[] };
+    group_dining_program: { maturity: string; signals: string[] };
+    catering_program: { maturity: string; signals: string[] };
+    dumpling_program: { maturity: string; signals: string[] };
+    sushi_raw_fish_program: { maturity: string; signals: string[] };
+    ramen_noodle_program: { maturity: string; signals: string[] };
+    taco_program: { maturity: string; signals: string[] };
+    pizza_program: { maturity: string; signals: string[] };
   } | null;
   primaryOperator?: { actorId: string; name: string; slug: string; website?: string } | null;
   placeType?: 'venue' | 'activity' | 'public';
@@ -258,7 +266,7 @@ function buildAppendixReferences(location: LocationData): AppendixRefGroup[] {
   return groups;
 }
 
-const OFFERING_CAP = 6;
+const OFFERING_CAP = 8;
 
 // ---------------------------------------------------------------------------
 // Signal vocabulary — human-readable phrases for each structural signal
@@ -366,19 +374,10 @@ const WINE_INTENT_LEADS: Record<string, string> = {
 /** Service model → full sentence */
 const SERVICE_MODEL_PHRASES: Record<string, string> = {
   'tasting-menu': 'Tasting menu format — the kitchen sets the pace',
-  'a-la-carte': 'À la carte ordering',
-  'small-plates': 'Small plates built for sharing',
+  'a-la-carte': 'À la carte ordering — dishes arrive as they are prepared',
+  'small-plates': 'Small plates built for sharing across the table',
   'family-style': 'Family-style, served to the center of the table',
   'counter': 'Counter service',
-};
-
-/** Origin story type → human-readable phrase */
-const ORIGIN_STORY_PHRASES: Record<string, string> = {
-  'chef-journey': 'A chef-driven project',
-  'family-legacy': 'Family legacy',
-  'neighborhood-love': 'Born from the neighborhood',
-  'concept-first': 'Concept-driven',
-  'partnership': 'A partnership project',
 };
 
 /** Price tier → full sentence */
@@ -406,6 +405,12 @@ function composeSentence(lead: string, fragments: string[], connector = 'with'):
   return `${lead} ${connector} ${rest} and ${last}`;
 }
 
+function appendClause(base: string, clause: string): string {
+  const trimmed = clause.trim();
+  if (!trimmed) return base;
+  return `${base} with ${trimmed}`;
+}
+
 /**
  * Pick up to N signal phrases from a program's signals array.
  * Returns human-readable fragments in the order they appear.
@@ -421,6 +426,81 @@ function resolveSignalPhrases(
     .slice(0, cap);
 }
 
+function toSentenceList(items: string[]): string {
+  if (items.length <= 1) return items[0] ?? '';
+  if (items.length === 2) return `${items[0]} and ${items[1]}`;
+  const head = items.slice(0, -1).join(', ');
+  return `${head}, and ${items[items.length - 1]}`;
+}
+
+function normalizeTextToken(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function dedupeTaglineNeighborhood(tagline: string | null | undefined, neighborhood: string | null | undefined): string | null {
+  if (!tagline) return null;
+  if (!neighborhood) return tagline;
+  const trimmed = tagline.trim();
+  if (!trimmed) return null;
+
+  const canonicalNeighborhood = normalizeTextToken(neighborhood);
+  if (!canonicalNeighborhood) return trimmed;
+
+  const trailingLocationPattern = new RegExp(
+    `(?:[\\s,;:\\-–—]+)?(?:in\\s+)?${escapeRegExp(neighborhood)}(?:,\\s*ca(?:lifornia)?)?[.!?\\s]*$`,
+    'i'
+  );
+  const stripped = trimmed.replace(trailingLocationPattern, '').replace(/[\s,;:\-–—]+$/, '').trim();
+
+  if (!stripped) return trimmed;
+  if (normalizeTextToken(stripped) === canonicalNeighborhood) return trimmed;
+  return stripped;
+}
+
+function joinPhrases(parts: string[]): string {
+  if (parts.length <= 1) return parts[0] ?? '';
+  if (parts.length === 2) return `${parts[0]} and ${parts[1]}`;
+  return `${parts.slice(0, -1).join(', ')}, and ${parts[parts.length - 1]}`;
+}
+
+function enhanceIdentitySubline(base: string | null, location: LocationData): string | null {
+  if (!base) return null;
+  if (location.primaryVertical !== 'EAT') return base;
+
+  const wineIntent = location.offeringSignals?.wineProgramIntent ?? null;
+  const wineMaturity = location.offeringPrograms?.wine_program?.maturity ?? null;
+  const supportsWineBar =
+    ['serious', 'dedicated', 'natural_leaning', 'integrated'].includes(wineIntent ?? '') ||
+    ['considered', 'dedicated'].includes(wineMaturity ?? '');
+  const desc = `${location.description ?? ''} ${location.tagline ?? ''}`.toLowerCase();
+  const supportsWineShop = /\b(bottle shop|wine shop)\b/.test(desc);
+
+  if (!supportsWineBar && !supportsWineShop) return base;
+
+  const inIdx = base.toLowerCase().indexOf(' in ');
+  const formatPart = inIdx >= 0 ? base.slice(0, inIdx) : base;
+  const locationPart = inIdx >= 0 ? base.slice(inIdx) : '';
+  const phrases: string[] = [formatPart];
+
+  if (supportsWineBar && !/\bwine bar\b/i.test(formatPart)) {
+    phrases.push('wine bar');
+  }
+  if (supportsWineShop && !/\bwine shop\b/i.test(formatPart)) {
+    phrases.push('wine shop');
+  }
+  if (phrases.length === 1) return base;
+
+  return `${joinPhrases(phrases)}${locationPart}`;
+}
+
 // ---------------------------------------------------------------------------
 // Offering line builder — composes richer sentences from signals
 // ---------------------------------------------------------------------------
@@ -430,27 +510,78 @@ function buildOfferingLines(location: LocationData): { label: string; sentence: 
   const os = location.offeringSignals;
   const op = location.offeringPrograms;
 
+  const hasActiveProgram = (program: { maturity: string; signals: string[] } | undefined): boolean => {
+    if (!program) return false;
+    return ['incidental', 'considered', 'dedicated'].includes(program.maturity) || (program.signals?.length ?? 0) > 0;
+  };
+
+  const specialtyPrograms: Array<{ key: string; phrase: string; program: { maturity: string; signals: string[] } | undefined }> = [
+    { key: 'taco_program', phrase: 'tacos', program: op?.taco_program },
+    { key: 'pizza_program', phrase: 'pizza', program: op?.pizza_program },
+    { key: 'dumpling_program', phrase: 'dumplings', program: op?.dumpling_program },
+    { key: 'sushi_raw_fish_program', phrase: 'sushi and raw fish', program: op?.sushi_raw_fish_program },
+    { key: 'ramen_noodle_program', phrase: 'ramen and noodles', program: op?.ramen_noodle_program },
+  ];
+  const activeSpecialtyPhrases = specialtyPrograms
+    .filter((p) => hasActiveProgram(p.program))
+    .map((p) => p.phrase);
+
   // ── Food ─────────────────────────────────────────────────────────────
   const foodSignals = op?.food_program?.signals ?? [];
   const foodMaturity = op?.food_program?.maturity;
   const foodFragments = resolveSignalPhrases(foodSignals, FOOD_SIGNAL_PHRASES);
 
   if (os?.cuisinePosture && CUISINE_POSTURE_LEADS[os.cuisinePosture]) {
-    // Rich case: cuisine posture as lead, signal fragments as detail
-    lines.push({
-      label: 'Food',
-      sentence: composeSentence(CUISINE_POSTURE_LEADS[os.cuisinePosture], foodFragments, 'built around'),
-    });
+    const lead = CUISINE_POSTURE_LEADS[os.cuisinePosture];
+    const specialtyClause = activeSpecialtyPhrases.length > 0
+      ? `specialties like ${toSentenceList(activeSpecialtyPhrases.slice(0, 3))}`
+      : '';
+    if (foodFragments.length === 0 && location.cuisineType) {
+      lines.push({
+        label: 'Food',
+        sentence: appendClause(`${lead} with ${location.cuisineType} influences`, specialtyClause),
+      });
+    } else if (foodFragments.length === 0 && !location.cuisineType && !specialtyClause) {
+      // Avoid rendering posture-only stubs like "Broadly composed menu".
+      // If we have no concrete support signals, skip the line entirely.
+    } else {
+      lines.push({
+        label: 'Food',
+        sentence: appendClause(composeSentence(lead, foodFragments, 'built around'), specialtyClause),
+      });
+    }
   } else if (foodMaturity && foodMaturity !== 'none' && foodMaturity !== 'unknown') {
     if (foodFragments.length > 0) {
       // Signals without posture: let the signals speak
       const lead = foodMaturity === 'dedicated' ? 'Dedicated kitchen' : 'Menu';
+      const specialtyClause = activeSpecialtyPhrases.length > 0
+        ? `specialties like ${toSentenceList(activeSpecialtyPhrases.slice(0, 3))}`
+        : '';
       lines.push({ label: 'Food', sentence: composeSentence(lead, foodFragments, 'featuring') });
+      if (specialtyClause) {
+        lines[lines.length - 1].sentence = appendClause(lines[lines.length - 1].sentence, specialtyClause);
+      }
     } else if (location.cuisineType) {
-      lines.push({ label: 'Food', sentence: `${location.cuisineType} kitchen` });
+      const specialtyClause = activeSpecialtyPhrases.length > 0
+        ? `specialties like ${toSentenceList(activeSpecialtyPhrases.slice(0, 3))}`
+        : '';
+      lines.push({
+        label: 'Food',
+        sentence: appendClause(foodMaturity === 'dedicated'
+          ? `${location.cuisineType} kitchen with a dedicated program`
+          : `Broadly composed ${location.cuisineType} menu with seasonal plates`, specialtyClause),
+      });
     }
   } else if (location.cuisineType) {
-    lines.push({ label: 'Food', sentence: `${location.cuisineType} kitchen` });
+    const specialtyClause = activeSpecialtyPhrases.length > 0
+      ? `specialties like ${toSentenceList(activeSpecialtyPhrases.slice(0, 3))}`
+      : '';
+    lines.push({ label: 'Food', sentence: appendClause(`${location.cuisineType} kitchen`, specialtyClause) });
+  } else if (activeSpecialtyPhrases.length > 0) {
+    lines.push({
+      label: 'Food',
+      sentence: `Focused on specialties like ${toSentenceList(activeSpecialtyPhrases.slice(0, 3))}`,
+    });
   }
 
   // ── Wine ─────────────────────────────────────────────────────────────
@@ -470,11 +601,23 @@ function buildOfferingLines(location: LocationData): { label: string; sentence: 
         label: 'Wine',
         sentence: composeSentence('Wine list', wineFragments, 'featuring'),
       });
+    } else if ((location.keyProducers?.length ?? 0) > 0) {
+      const producerList = toSentenceList((location.keyProducers ?? []).slice(0, 3));
+      lines.push({
+        label: 'Wine',
+        sentence: (wineIntent === 'natural_leaning' || wineIntent === 'natural')
+          ? `Considered wine selection with a natural, small-producer focus including ${producerList}`
+          : `Considered wine selection with producers like ${producerList}`,
+      });
     } else {
-      const label = wineMaturity === 'dedicated' ? 'Dedicated wine program'
-        : wineMaturity === 'considered' ? 'Considered wine selection'
-        : 'Wine available';
-      lines.push({ label: 'Wine', sentence: label });
+      lines.push({
+        label: 'Wine',
+        sentence: wineMaturity === 'dedicated'
+          ? 'Dedicated wine program with producer-driven focus'
+          : wineMaturity === 'considered'
+            ? 'Considered wine selection with a curated producer mix'
+            : 'Wine available',
+      });
     }
   } else if (os?.servesWine === true) {
     lines.push({ label: 'Wine', sentence: 'Wine list available' });
@@ -571,6 +714,18 @@ function buildOfferingLines(location: LocationData): { label: string; sentence: 
   // ── Service ──────────────────────────────────────────────────────────
   if (os?.serviceModel && SERVICE_MODEL_PHRASES[os.serviceModel]) {
     lines.push({ label: 'Service', sentence: SERVICE_MODEL_PHRASES[os.serviceModel] });
+  }
+
+  // ── Hospitality / Events ──────────────────────────────────────────────
+  const hospitalityModes: string[] = [];
+  if (hasActiveProgram(op?.private_dining_program)) hospitalityModes.push('private dining');
+  if (hasActiveProgram(op?.group_dining_program)) hospitalityModes.push('group dining');
+  if (hasActiveProgram(op?.catering_program)) hospitalityModes.push('catering');
+  if (hospitalityModes.length > 0) {
+    lines.push({
+      label: 'Hospitality',
+      sentence: `Supports ${toSentenceList(hospitalityModes)}`,
+    });
   }
 
   // ── Price ────────────────────────────────────────────────────────────
@@ -734,8 +889,10 @@ export default function PlacePage() {
       cuisineType: location.cuisineType ?? null,
       offeringSignals: location.offeringSignals ?? null,
     }) ?? renderLocation({ neighborhood: location.neighborhood, category: location.category });
+  const displayIdentitySubline = enhanceIdentitySubline(identitySubline, location);
 
   const energyPhrase = location.scenesense?.atmosphere?.[0] ?? null;
+  const displayTagline = dedupeTaglineNeighborhood(location.tagline, location.neighborhood);
   const hasSignalsSentence = !!(openStateLabel || energyPhrase);
   const mapRefUrl = buildMapRefUrl(location.googlePlaceId, location.latitude, location.longitude, location.address);
   const recognitions = (location.recognitions ?? []).slice(0, RECOGNITIONS_CAP);
@@ -751,30 +908,54 @@ export default function PlacePage() {
 
   // Sidebar: Links
   // Instagram is shown in the header action row — exclude it here to avoid duplication
+  // Directions is a primary CTA (navigational intent), not a reference link — excluded from sidebar
   const sidebarLinks: { label: string; url: string }[] = [];
-  if (mapRefUrl) sidebarLinks.push({ label: 'Directions', url: mapRefUrl });
   if (location.menuUrl) sidebarLinks.push({ label: 'Menu', url: location.menuUrl });
   if (location.winelistUrl) sidebarLinks.push({ label: 'Wine list', url: location.winelistUrl });
   if (phoneUrl) sidebarLinks.push({ label: 'Call', url: phoneUrl });
 
   // Sidebar: Scene / Atmosphere / Ambiance
-  const sceneText = location.placePersonality?.trim() || null;
+  // placePersonality is an internal classification token (e.g. "concept-driven") —
+  // never render it directly. SceneSense already derives display copy from it.
   const sceneTags = location.scenesense?.scene ?? [];
   const atmosphereTags = location.scenesense?.atmosphere ?? [];
   const energyTags = location.scenesense?.energy ?? [];
-  const hasScene = !!(sceneText || sceneTags.length);
+  const hasScene = sceneTags.length > 0;
   const hasAtmosphere = atmosphereTags.length > 0;
   const hasEnergy = energyTags.length > 0;
 
-  // Primary CTAs
-  const hasPrimaryCtas = !!(location.reservationUrl || location.website || location.instagram || location.tiktok);
+  // Primary CTAs (Directions is an action, lives here not in sidebar links)
+  const hasPrimaryCtas = !!(location.reservationUrl || location.website || location.instagram || location.tiktok || mapRefUrl);
 
   // More Maps
   const moreMapsCards = appearsOn.slice(0, 3);
 
   // Offering (Price row is surfaced in Scene instead)
   const offeringRows = buildOfferingLines(location);
-  const priceText = offeringRows.find(r => r.label === 'Price')?.sentence ?? null;
+  const hasOfferingSection = offeringRows.some(r => r.label !== 'Price');
+
+  // B-lite fallback: treat low-density entities as "thin" and collapse to single column.
+  const hasAboutSignal = !!location.description?.trim();
+  const hasSceneSenseSignal = Boolean(
+    (location.scenesense?.atmosphere?.length ?? 0) > 0 ||
+    (location.scenesense?.energy?.length ?? 0) > 0 ||
+    (location.scenesense?.scene?.length ?? 0) > 0
+  );
+  const hasCoverageSignal = Boolean(
+    location.pullQuote ||
+    (location.coverageSources?.length ?? 0) > 0
+  );
+  const hasTaglineSignal = !!location.tagline?.trim();
+  const contentDensityScore = [
+    hasAboutSignal,
+    hasOfferingSection,
+    hasSceneSenseSignal,
+    hasCoverageSignal,
+    hasTaglineSignal,
+  ].filter(Boolean).length;
+  const isThinEntity = contentDensityScore < 2;
+  const shouldShowSidebar = !isThinEntity;
+  const todayHours = fullWeekHours.find((row) => row.day === todayDayName) ?? null;
 
   return (
     <div style={{ background: '#F5F0E1', minHeight: '100vh' }}>
@@ -785,7 +966,7 @@ export default function PlacePage() {
           <div id="page-canvas">
 
             {/* ═══ TWO-COLUMN BODY ═══ */}
-            <div id="two-column-body">
+            <div id="two-column-body" className={isThinEntity ? 'thin-layout' : undefined}>
 
               {/* ─── LEFT: MAIN COLUMN ─── */}
               <div id="main-column">
@@ -796,11 +977,11 @@ export default function PlacePage() {
                   </div>
                 )}
                 <h1 id="place-title" className="sk-display">{location.name}</h1>
-                {identitySubline && (
-                  <p id="identity-subline" className="sk-identity">{identitySubline}</p>
+                {displayIdentitySubline && (
+                  <p id="identity-subline" className="sk-identity">{displayIdentitySubline}</p>
                 )}
-                {location.tagline && (
-                  <p id="identity-tagline">{location.tagline}</p>
+                {displayTagline && (
+                  <p id="identity-tagline">{displayTagline}</p>
                 )}
                 {location.timefold?.approvedBy && (
                   <p id="timefold-signal" className="sk-meta">{location.timefold.phrase}</p>
@@ -830,7 +1011,42 @@ export default function PlacePage() {
                     {location.tiktok && (
                       <a href={`https://tiktok.com/@${location.tiktok.replace(/^@/, '')}`} target="_blank" rel="noopener noreferrer">TikTok <span className="action-arrow">↗</span></a>
                     )}
+                    {mapRefUrl && (
+                      <a href={mapRefUrl} target="_blank" rel="noopener noreferrer">Directions <span className="action-arrow">↗</span></a>
+                    )}
                   </div>
+                )}
+
+                {isThinEntity && (hasHours || location.address || phoneUrl) && (
+                  <>
+                    <div className="sk-section-header"><span>Details</span></div>
+                    <div id="thin-details-block">
+                      {hasHours && (
+                        <p>
+                          <strong>Hours:</strong>{' '}
+                          {todayHours ? `${todayHours.day}: ${todayHours.hours}` : 'See current weekly schedule below.'}
+                        </p>
+                      )}
+                      {location.address && (
+                        <p>
+                          <strong>Address:</strong> {location.address}
+                          {mapRefUrl && (
+                            <>
+                              {' '}
+                              <a href={mapRefUrl} target="_blank" rel="noopener noreferrer">
+                                Map <span className="action-arrow">↗</span>
+                              </a>
+                            </>
+                          )}
+                        </p>
+                      )}
+                      {phoneUrl && rawPhone && (
+                        <p>
+                          <a href={phoneUrl}>Call {rawPhone} <span className="action-arrow">↗</span></a>
+                        </p>
+                      )}
+                    </div>
+                  </>
                 )}
 
                 {location.description && (
@@ -838,14 +1054,11 @@ export default function PlacePage() {
                     <div className="sk-section-header"><span>About</span></div>
                     <div id="identity-description">
                       <p>{location.description}</p>
-                      {location.originStoryType && ORIGIN_STORY_PHRASES[location.originStoryType] && (
-                        <p id="origin-story-type" className="origin-story-accent">{ORIGIN_STORY_PHRASES[location.originStoryType]}</p>
-                      )}
                     </div>
                   </>
                 )}
 
-                {offeringRows.length > 0 && (
+                {hasOfferingSection && (
                   <>
                     <div className="sk-section-header"><span>Offering</span></div>
                     <div id="offering-signals-rows">
@@ -863,15 +1076,15 @@ export default function PlacePage() {
                   <>
                     <div className="sk-section-header"><span>Known For</span></div>
                     {location.signatureDishes && location.signatureDishes.length > 0 && (
-                      <ul id="signature-dishes-list">
-                        {location.signatureDishes.map((dish) => (
-                          <li key={dish}>{dish}</li>
-                        ))}
-                      </ul>
+                      <p className="known-for-line">
+                        Signature dishes include {toSentenceList(location.signatureDishes.slice(0, 4))}.
+                      </p>
                     )}
                     {location.keyProducers && location.keyProducers.length > 0 && (
-                      <p id="key-producers" className="key-producers-line">
-                        Producers: {location.keyProducers.join(', ')}
+                      <p id="key-producers" className="known-for-line">
+                        {(location.offeringSignals?.wineProgramIntent === 'natural_leaning' || location.offeringSignals?.wineProgramIntent === 'natural')
+                          ? `Natural wine focus includes producers like ${toSentenceList(location.keyProducers.slice(0, 4))}.`
+                          : `Wine focus includes producers like ${toSentenceList(location.keyProducers.slice(0, 4))}.`}
                       </p>
                     )}
                   </>
@@ -962,8 +1175,9 @@ export default function PlacePage() {
               </div>
 
               {/* ─── RIGHT: SIDEBAR COLUMN ─── */}
-              <aside id="sidebar-column">
-                <div className="sidebar-spacer" aria-hidden="true" />
+              {shouldShowSidebar && (
+                <aside id="sidebar-column">
+                  <div className="sidebar-spacer" aria-hidden="true" />
 
                 {hasAtmosphere && (
                   <>
@@ -1004,19 +1218,18 @@ export default function PlacePage() {
                   </>
                 )}
 
-                {(hasScene || priceText) && (
+                {hasScene && (
                   <>
                     <div className="sk-section-header"><span>Scene</span></div>
                     <div className="sidebar-tag-block">
-                      {sceneText && <p>{sceneText}</p>}
                       {sceneTags.length > 0 && (
                         <p className="tag-line">{sceneTags.join(' · ')}</p>
                       )}
-                      {priceText && <p>{priceText}</p>}
                     </div>
                   </>
                 )}
-              </aside>
+                </aside>
+              )}
             </div>
 
             {/* ═══ FULL-WIDTH SECTIONS ═══ */}
@@ -1160,10 +1373,10 @@ export default function PlacePage() {
                 </div>
               </div>
 
-              {/* COVERAGE column */}
-              <div id="appendix-coverage">
-                <h2>Coverage</h2>
-                {location.coverageSources && location.coverageSources.length > 0 ? (
+              {/* COVERAGE column — collapse silently when empty */}
+              {location.coverageSources && location.coverageSources.length > 0 && (
+                <div id="appendix-coverage">
+                  <h2>Coverage</h2>
                   <ul className="coverage-entries">
                     {location.coverageSources.map((cs) => (
                       <li key={cs.url} className="coverage-entry">
@@ -1180,10 +1393,8 @@ export default function PlacePage() {
                       </li>
                     ))}
                   </ul>
-                ) : (
-                  <p className="coverage-empty">No coverage sources yet.</p>
-                )}
-              </div>
+                </div>
+              )}
 
               {/* PLATE MARK */}
               <p id="plate-mark">Saiko Fields: TRACES — Los Angeles</p>

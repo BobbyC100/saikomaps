@@ -9,7 +9,7 @@ import { db } from '@/lib/db';
 import { getPlaceDetails, getNeighborhoodFromPlaceDetails, getNeighborhoodFromCoords } from '@/lib/google-places';
 import { addLocationSchema } from '@/lib/validations';
 import { randomUUID } from 'crypto';
-import { generatePlaceSlug, ensureUniqueSlug } from '@/lib/place-slug';
+import { generatePlaceSlug, ensureUniqueSlug } from '@/lib/entity-slug';
 import { getSaikoCategory, parseCuisineType, ALL_CATEGORIES } from '@/lib/categoryMapping';
 import { resolvePrimaryVertical } from '@/lib/primaryVertical';
 

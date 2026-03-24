@@ -7,7 +7,7 @@ import { randomUUID } from 'crypto'
 import { db } from '@/lib/db'
 import { searchPlace, getPlaceDetails, getNeighborhoodFromPlaceDetails, getNeighborhoodFromCoords } from '@/lib/google-places'
 import { extractPlaceId } from '@/lib/utils/googleMapsParser'
-import { generatePlaceSlug, ensureUniqueSlug } from '@/lib/place-slug'
+import { generatePlaceSlug, ensureUniqueSlug } from '@/lib/entity-slug'
 import { getSaikoCategory, parseCuisineType } from '@/lib/categoryMapping'
 import fs from 'fs'
 

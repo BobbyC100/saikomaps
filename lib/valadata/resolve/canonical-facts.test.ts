@@ -8,7 +8,7 @@ import {
   resolveCanonicalServiceFacts,
   type ResolveInput,
 } from './canonical-facts';
-import { buildPlaceServiceFacts } from '@/lib/place-payload';
+import { buildEntityServiceFacts } from '@/lib/entity-payload';
 
 describe('extractServiceFields', () => {
   it('returns {} when attrs is undefined', () => {
@@ -184,9 +184,9 @@ describe('resolveCanonicalServiceFacts', () => {
   });
 });
 
-describe('buildPlaceServiceFacts contract', () => {
+describe('buildEntityServiceFacts contract', () => {
   it('response shape has facts.service and conflicts.service (always objects)', () => {
-    const out = buildPlaceServiceFacts({ googleAttrs: null, scrapeAttrs: null, manualOverrides: null });
+    const out = buildEntityServiceFacts({ googleAttrs: null, scrapeAttrs: null, manualOverrides: null });
     expect(out).toHaveProperty('facts');
     expect(out.facts).toHaveProperty('service');
     expect(typeof out.facts.service).toBe('object');

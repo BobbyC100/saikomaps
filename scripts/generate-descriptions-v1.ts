@@ -60,6 +60,10 @@ interface CliArgs {
   reprocess: boolean;
   tierOnly: DescriptionTier | null;
   concurrency: number;
+  maxRetries: number;
+  retryBaseMs: number;
+  allowCategoryOnly: boolean;
+  allowNameOnly: boolean;
 }
 
 interface Stats {
@@ -110,6 +114,14 @@ function parseArgs(): CliArgs {
     concurrency: args.find(a => a.startsWith('--concurrency='))
       ? parseInt(args.find(a => a.startsWith('--concurrency='))!.split('=')[1])
       : 3,
+    maxRetries: args.find(a => a.startsWith('--max-retries='))
+      ? parseInt(args.find(a => a.startsWith('--max-retries='))!.split('=')[1])
+      : 4,
+    retryBaseMs: args.find(a => a.startsWith('--retry-base-ms='))
+      ? parseInt(args.find(a => a.startsWith('--retry-base-ms='))!.split('=')[1])
+      : 1500,
+    allowCategoryOnly: args.includes('--allow-category-only'),
+    allowNameOnly: args.includes('--allow-name-only'),
   };
 }
 
@@ -125,6 +137,59 @@ function truncate(text: string, maxLen = 80): string {
   return text.length > maxLen ? text.slice(0, maxLen) + '…' : text;
 }
 
+function isRetryableError(err: unknown): boolean {
+  const msg = err instanceof Error ? err.message : String(err);
+  const lower = msg.toLowerCase();
+  return (
+    lower.includes('rate limit') ||
+    lower.includes('429') ||
+    lower.includes('503') ||
+    lower.includes('504') ||
+    lower.includes('529') ||
+    lower.includes('timeout') ||
+    lower.includes('timed out') ||
+    lower.includes('econnreset') ||
+    lower.includes('socket hang up') ||
+    lower.includes('overloaded')
+  );
+}
+
+async function withRetry<T>(
+  label: string,
+  fn: () => Promise<T>,
+  args: CliArgs,
+  verbose: boolean
+): Promise<T> {
+  let attempt = 0;
+  const maxAttempts = Math.max(1, args.maxRetries + 1);
+  let lastErr: unknown = null;
+
+  while (attempt < maxAttempts) {
+    try {
+      return await fn();
+    } catch (err) {
+      lastErr = err;
+      const retryable = isRetryableError(err);
+      const shouldRetry = retryable && attempt < maxAttempts - 1;
+
+      if (!shouldRetry) {
+        throw err;
+      }
+
+      const waitMs = Math.round(args.retryBaseMs * Math.pow(2, attempt) * (1 + Math.random() * 0.2));
+      if (verbose) {
+        const msg = err instanceof Error ? err.message : String(err);
+        console.log(`  ⚠ ${label} failed (attempt ${attempt + 1}/${maxAttempts}) — retrying in ${waitMs}ms`);
+        console.log(`     ${truncate(msg, 140)}`);
+      }
+      await sleep(waitMs);
+      attempt++;
+    }
+  }
+
+  throw lastErr instanceof Error ? lastErr : new Error(`${label} failed after retries`);
+}
+
 // ============================================================================
 // PROCESSING
 // ============================================================================
@@ -138,14 +203,41 @@ async function processEntity(
 ): Promise<void> {
   // Select tier
   const selection = selectTier(record);
+  const categoryOnlyFallback =
+    args.allowCategoryOnly &&
+    selection.tier === null &&
+    record.identitySignals === null &&
+    !!record.category;
+  const nameOnlyFallback =
+    args.allowNameOnly &&
+    selection.tier === null &&
+    record.identitySignals === null &&
+    !record.category;
 
   // Below minimum data gate
-  if (selection.tier === null) {
+  if (selection.tier === null && !categoryOnlyFallback && !nameOnlyFallback) {
     if (args.verbose) {
       console.log(`${prefix} ${record.name}`);
       console.log(`  ⚪ Skip: ${selection.reason}`);
     }
     stats.belowGate++;
+  if (categoryOnlyFallback) {
+    if (args.verbose) {
+      console.log(`${prefix} ${record.name}`);
+      console.log('  Tier: 3 — compose_from_category_only_fallback');
+    } else {
+      console.log(`${prefix} ${record.name} (tier 3*)`);
+    }
+  }
+  if (nameOnlyFallback) {
+    if (args.verbose) {
+      console.log(`${prefix} ${record.name}`);
+      console.log('  Tier: 3 — compose_from_name_only_fallback');
+    } else {
+      console.log(`${prefix} ${record.name} (tier 3**)`);
+    }
+  }
+
     stats.skipped++;
     return;
   }
@@ -230,7 +322,7 @@ async function processEntity(
     // Dry run: skip AI call, just report what would happen
     if (args.dryRun) {
       if (args.verbose) {
-        console.log(`  🔸 Would call AI (about-synth-v1) — skipped in dry run`);
+        console.log(`  🔸 Would call AI (about-synth-v2) — skipped in dry run`);
       }
       stats.generated++;
       stats.byTier.tier2++;
@@ -239,11 +331,16 @@ async function processEntity(
     }
 
     try {
-      const result = await generateTier2Description({
-        entityName: record.name,
-        textBlocks,
-        identitySignals: record.identitySignals,
-      });
+      const result = await withRetry(
+        'Tier 2 generation',
+        () => generateTier2Description({
+          entityName: record.name,
+          textBlocks,
+          identitySignals: record.identitySignals,
+        }),
+        args,
+        args.verbose
+      );
 
       if (args.verbose) {
         console.log(`  📝 Generated: "${truncate(result.text)}"`);
@@ -256,13 +353,13 @@ async function processEntity(
           text: result.text,
           description_quality: quality,
         },
-        promptVersion: 'about-synth-v1',
+        promptVersion: 'about-synth-v2',
         modelVersion: result.model,
         dryRun: false,
       });
 
       if (args.verbose) {
-        console.log(`  💾 Saved to interpretation_cache (VOICE_DESCRIPTOR, about-synth-v1)`);
+        console.log(`  💾 Saved to interpretation_cache (VOICE_DESCRIPTOR, about-synth-v2)`);
       }
 
       stats.generated++;
@@ -276,7 +373,43 @@ async function processEntity(
   }
 
   // ── Tier 3: compose from signals ─────────────────────────────────────
-  if (selection.tier === 3) {
+  if (selection.tier === 3 || categoryOnlyFallback || nameOnlyFallback) {
+    if (nameOnlyFallback) {
+      const fallbackText = record.neighborhood
+        ? `${record.name} is a local spot in ${record.neighborhood}, with profile details being expanded as additional source material is verified.`
+        : `${record.name} is a local Los Angeles spot, with profile details being expanded as additional source material is verified.`;
+      const quality = computeQuality(3, {
+        identitySignals: record.identitySignals,
+        hasCoverageSources: false,
+      });
+
+      if (args.verbose) {
+        console.log(`  📝 Name-only fallback: "${truncate(fallbackText)}"`);
+      }
+
+      if (!args.dryRun) {
+        await writeInterpretationCache(db, {
+          entityId: record.id,
+          outputType: 'VOICE_DESCRIPTOR',
+          content: {
+            text: fallbackText,
+            description_quality: quality,
+          },
+          promptVersion: 'about-nameonly-v1',
+          dryRun: false,
+        });
+
+        if (args.verbose) {
+          console.log('  💾 Saved to interpretation_cache (VOICE_DESCRIPTOR, about-nameonly-v1)');
+        }
+      }
+
+      stats.generated++;
+      stats.byTier.tier3++;
+      stats.byDensity[quality.signal_density]++;
+      return;
+    }
+
     // Materialize coverage evidence for richer grounding
     let coverageEvidence: CoverageEvidence | null = null;
     try {
@@ -293,9 +426,9 @@ async function processEntity(
       hasCoverageSources: coverageEvidence !== null && coverageEvidence.sourceCount > 0,
     });
 
-    if (args.verbose) {
-      const signalCount = record.identitySignals ? Object.keys(record.identitySignals).length : 0;
-      console.log(`  📥 Input: ${signalCount} identity signals, category=${record.category}, neighborhood=${record.neighborhood}`);
+      if (args.verbose) {
+        const signalCount = record.identitySignals ? Object.keys(record.identitySignals).length : 0;
+        console.log(`  📥 Input: ${signalCount} identity signals, category=${record.category}, neighborhood=${record.neighborhood}`);
       if (coverageEvidence) {
         console.log(`  📥 Coverage: ${coverageEvidence.sourceCount} sources, ${coverageEvidence.facts.people.length} people, ${coverageEvidence.facts.dishes.length} dishes, ${coverageEvidence.facts.accolades.length} accolades`);
       }
@@ -305,7 +438,7 @@ async function processEntity(
     // Dry run: skip AI call, just report what would happen
     if (args.dryRun) {
       if (args.verbose) {
-        console.log(`  🔸 Would call AI (about-compose-v1) — skipped in dry run`);
+        console.log(`  🔸 Would call AI (about-compose-v2) — skipped in dry run`);
       }
       stats.generated++;
       stats.byTier.tier3++;
@@ -314,13 +447,18 @@ async function processEntity(
     }
 
     try {
-      const result = await generateTier3Description({
-        entityName: record.name,
-        category: record.category,
-        neighborhood: record.neighborhood,
-        identitySignals: record.identitySignals,
-        coverageEvidence: coverageEvidence ?? undefined,
-      });
+      const result = await withRetry(
+        'Tier 3 generation',
+        () => generateTier3Description({
+          entityName: record.name,
+          category: record.category,
+          neighborhood: record.neighborhood,
+          identitySignals: record.identitySignals,
+          coverageEvidence: coverageEvidence ?? undefined,
+        }),
+        args,
+        args.verbose
+      );
 
       if (args.verbose) {
         console.log(`  📝 Generated: "${truncate(result.text)}"`);
@@ -333,13 +471,13 @@ async function processEntity(
           text: result.text,
           description_quality: quality,
         },
-        promptVersion: 'about-compose-v1',
+        promptVersion: 'about-compose-v2',
         modelVersion: result.model,
         dryRun: false,
       });
 
       if (args.verbose) {
-        console.log(`  💾 Saved to interpretation_cache (VOICE_DESCRIPTOR, about-compose-v1)`);
+        console.log(`  💾 Saved to interpretation_cache (VOICE_DESCRIPTOR, about-compose-v2)`);
       }
 
       stats.generated++;
@@ -374,6 +512,10 @@ async function main() {
   if (args.tierOnly) console.log(`🔸 Tier filter: Tier ${args.tierOnly} only`);
   if (args.verbose) console.log('🔸 Verbose mode enabled');
   console.log(`🔸 Concurrency: ${args.concurrency}`);
+  console.log(`🔸 Max retries: ${args.maxRetries}`);
+  console.log(`🔸 Retry base ms: ${args.retryBaseMs}`);
+  if (args.allowCategoryOnly) console.log('🔸 Category-only fallback: enabled');
+  if (args.allowNameOnly) console.log('🔸 Name-only fallback: enabled');
   console.log('');
 
   // Fetch records

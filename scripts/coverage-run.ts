@@ -378,17 +378,17 @@ export async function runCoverageAudit(options?: {
   try {
     const statuses = await db.place_coverage_status.findMany({
       select: {
-        dedupe_key: true,
-        last_success_at: true,
-        last_attempt_at: true,
-        last_attempt_status: true,
+        dedupeKey: true,
+        lastSuccessAt: true,
+        lastAttemptAt: true,
+        lastAttemptStatus: true,
       },
     });
     for (const s of statuses) {
-      statusByDedupeKey.set(s.dedupe_key, {
-        last_success_at: s.last_success_at,
-        last_attempt_at: s.last_attempt_at,
-        last_attempt_status: s.last_attempt_status,
+      statusByDedupeKey.set(s.dedupeKey, {
+        last_success_at: s.lastSuccessAt,
+        last_attempt_at: s.lastAttemptAt,
+        last_attempt_status: s.lastAttemptStatus,
       });
     }
   } catch (e) {

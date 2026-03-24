@@ -1,13 +1,13 @@
 'use client';
 
 import Link from 'next/link';
-import { PlaceCardData, getPersonalityLabel, computeInternalBadges } from './types';
+import { EntityCardData, getPersonalityLabel, computeInternalBadges } from './types';
 
-interface PlaceCard1x1Props {
-  place: PlaceCardData;
+interface EntityCard1x1Props {
+  place: EntityCardData;
 }
 
-export function PlaceCard1x1({ place }: PlaceCard1x1Props) {
+export function EntityCard1x1({ place }: EntityCard1x1Props) {
   const {
     slug,
     name,

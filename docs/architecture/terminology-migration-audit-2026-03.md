@@ -101,33 +101,33 @@ Additionally, "entity" is the canonical term for a business/place/point of inter
 | `lib/people-groups.ts` | `PersonPlace` | `PersonEntity` |
 | `lib/transformers/placeToCard.ts` | `PrismaPlace` | `PrismaEntity` |
 
-### File Renames — MEDIUM Priority
+### File Renames — MEDIUM Priority [COMPLETED 2026-03-23]
 
 **Components:**
-- [ ] `PlaceListItem.tsx` → `EntityListItem.tsx`
-- [ ] `PlaceCard.tsx` → `EntityCard.tsx`
-- [ ] `PlaceIndexSection.tsx` → `EntityIndexSection.tsx`
-- [ ] `PlaceCard1x1.tsx` → `EntityCard1x1.tsx`
-- [ ] `PlaceCard1x2.tsx` → `EntityCard1x2.tsx`
-- [ ] `PlaceCard2x1.tsx` → `EntityCard2x1.tsx`
-- [ ] `PlaceCard2x2.tsx` → `EntityCard2x2.tsx`
+- [x] `PlaceListItem.tsx` → `EntityListItem.tsx`
+- [x] `PlaceCard.tsx` → `EntityCard.tsx`
+- [x] `PlaceIndexSection.tsx` → `EntityIndexSection.tsx`
+- [x] `PlaceCard1x1.tsx` → `EntityCard1x1.tsx`
+- [x] `PlaceCard1x2.tsx` → `EntityCard1x2.tsx`
+- [x] `PlaceCard2x1.tsx` → `EntityCard2x1.tsx`
+- [x] `PlaceCard2x2.tsx` → `EntityCard2x2.tsx`
 
 **Libraries:**
-- [ ] `lib/place-job-log.ts` → `lib/entity-job-log.ts`
-- [ ] `lib/place-payload.ts` → `lib/entity-payload.ts`
-- [ ] `lib/place-slug.ts` → `lib/entity-slug.ts`
-- [ ] `lib/transformers/placeToCard.ts` → `lib/transformers/entityToCard.ts`
-- [ ] `lib/utils/PlacePageLayoutResolver.ts` → `lib/utils/EntityPageLayoutResolver.ts`
-- [ ] `lib/contracts/place-page.ts` → `lib/contracts/entity-page.ts`
-- [ ] `lib/contracts/place-page.identity.ts` → `lib/contracts/entity-page.identity.ts`
-- [ ] `lib/saikoai/generate-place-descriptor.ts` → `lib/saikoai/generate-entity-descriptor.ts`
-- [ ] `lib/saikoai/prompts/place-enrichment.ts` → `lib/saikoai/prompts/entity-enrichment.ts`
-- [ ] `lib/saikoai/prompts/place-extraction.ts` → `lib/saikoai/prompts/entity-extraction.ts`
+- [x] `lib/place-job-log.ts` → `lib/entity-job-log.ts`
+- [x] `lib/place-payload.ts` → `lib/entity-payload.ts`
+- [x] `lib/place-slug.ts` → `lib/entity-slug.ts`
+- [x] `lib/transformers/placeToCard.ts` → `lib/transformers/entityToCard.ts`
+- [x] `lib/utils/PlacePageLayoutResolver.ts` → `lib/utils/EntityPageLayoutResolver.ts` (+ 4 test files)
+- [x] `lib/contracts/place-page.ts` → `lib/contracts/entity-page.ts`
+- [x] `lib/contracts/place-page.identity.ts` → `lib/contracts/entity-page.identity.ts`
+- [x] `lib/saikoai/generate-place-descriptor.ts` → `lib/saikoai/generate-entity-descriptor.ts`
+- [x] `lib/saikoai/prompts/place-enrichment.ts` → `lib/saikoai/prompts/entity-enrichment.ts`
+- [x] `lib/saikoai/prompts/place-extraction.ts` → `lib/saikoai/prompts/entity-extraction.ts`
 
 **Tests:**
-- [ ] `tests/contracts/place-page.contract.test.ts` → `tests/contracts/entity-page.contract.test.ts`
-- [ ] `tests/ui/place-page.typography.test.ts` → `tests/ui/entity-page.typography.test.ts`
-- [ ] `lib/utils/PlacePageLayoutResolver*.test.ts` → `EntityPageLayoutResolver*.test.ts` (4 files)
+- [x] `tests/contracts/place-page.contract.test.ts` → `tests/contracts/entity-page.contract.test.ts`
+- [x] `tests/ui/place-page.typography.test.ts` → `tests/ui/entity-page.typography.test.ts`
+- [x] `lib/utils/PlacePageLayoutResolver*.test.ts` → `EntityPageLayoutResolver*.test.ts` (4 files)
 
 ### API Routes — MEDIUM Priority (breaking change considerations)
 
@@ -216,7 +216,7 @@ Patterns requiring global search-and-replace within files after structural renam
 - [x] Write Entity State Model doc (entity-state-model-v1.md)
 - [x] Write this audit doc
 - [ ] Get Bobby approval on Entity State Model
-- [ ] Add "SUPERSEDED" header to entity-lifecycle-and-closure-v1.md
+- [x] Add "SUPERSEDED" header to entity-lifecycle-and-closure-v1.md
 
 ### Phase 2 — Schema (State Model)
 - [ ] Add `operatingStatus` field to entities (new enum: SOFT_OPEN, OPERATING, TEMPORARILY_CLOSED, PERMANENTLY_CLOSED)
@@ -236,19 +236,24 @@ Patterns requiring global search-and-replace within files after structural renam
 - [ ] Rename fields where needed
 - [ ] Run check-schema.js after each migration
 
-### Phase 4 — Code (Types and Contracts)
-- [ ] Rename contract types (PlacePageData → EntityPageData, etc.)
-- [ ] Rename component files
-- [ ] Rename library files
-- [ ] Update function and variable names
-- [ ] Update API routes (with redirect strategy for consumer-facing routes)
+### Phase 4 — Code (Types and Contracts) [COMPLETED 2026-03-23]
+- [x] Rename contract types (PlacePageData → EntityPageData, etc.)
+- [x] Rename component files (PlaceListItem, PlaceCard*, PlaceIndexSection)
+- [x] Rename library files (place-*.ts → entity-*.ts, PlacePageLayoutResolver → EntityPageLayoutResolver)
+- [x] Update function and variable names (buildPlaceServiceFacts → buildEntityServiceFacts, etc.)
+- [x] Rename test files (place-page.contract.test.ts → entity-page.contract.test.ts, etc.)
+- [ ] Update API routes (deferred — requires explicit approval for consumer-facing routes)
 
-### Phase 5 — Documentation
-- [ ] Update HIGH priority docs
-- [ ] Update MEDIUM priority docs
+### Phase 5 — Documentation [COMPLETED 2026-03-23]
+- [x] Update HIGH priority docs:
+  - entity-lifecycle-and-closure-v1.md (already marked SUPERSEDED)
+  - place-identity-concept-v1.md → entity-identity-concept-v1.md (created + renamed)
+  - place-identity-implementation-verification-2026-03.md → entity-identity-implementation-verification-2026-03.md (created + renamed)
+- [x] Update MEDIUM priority docs:
+  - instagram-ingestion-status-v1.md (updated with photo pipeline completion status)
 - [ ] Update LOW priority docs
 
-### Phase 6 — Verification
+### Phase 6 — Verification [IN PROGRESS]
 - [ ] Typecheck passes
 - [ ] Build succeeds
 - [ ] All tests pass

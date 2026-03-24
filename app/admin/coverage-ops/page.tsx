@@ -32,6 +32,8 @@ import type {
 
 export default function CoverageOpsPage() {
   const ops = useCoverageOps();
+  const firstRunIssues = ops.filteredIssues.filter((i: IssueRow) => i.issue_type === 'enrichment_incomplete');
+  const firstRunEntityCount = new Set(firstRunIssues.map((i: IssueRow) => i.entity_id)).size;
 
   if (ops.loading) {
     return (
@@ -67,13 +69,17 @@ export default function CoverageOpsPage() {
 
         {/* Summary Stats */}
         <div className="rounded-xl p-5 shadow-sm mb-6" style={{ backgroundColor: C.cardBg }}>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
             <StatCard label="Can't Publish" value={ops.summary?.blocking_publish_entities ?? 0} color={C.red} />
+            <StatCard label="Actionable Open" value={ops.summary?.actionable_open_issues ?? ops.summary?.total_active ?? ops.issues.length} color={C.text} />
+            <StatCard label="Informational" value={ops.summary?.informational_open_issues ?? 0} color={C.muted} />
+            <StatCard label="Suppressed (Policy)" value={ops.summary?.suppressed_confirmed_none ?? 0} color={C.green} />
             <StatCard label="Need Review" value={ops.sections.find(s => s.key === 'review')?.entityCount ?? 0} color={C.amber} />
-            <StatCard label="Enrichable" value={ops.sections.find(s => s.key === 'enrich')?.entityCount ?? 0} color="#0F766E" />
-            <StatCard label="Total Issues" value={ops.summary?.total_active ?? ops.issues.length} />
           </div>
         </div>
+
+        {/* First-run queue: entities never successfully enriched */}
+        <FirstRunQueueCard ops={ops} firstRunIssues={firstRunIssues} entityCount={firstRunEntityCount} />
 
         {/* Toolbar */}
         <div className="flex flex-wrap items-center gap-3 mb-6">
@@ -164,6 +170,96 @@ export default function CoverageOpsPage() {
   );
 }
 
+function FirstRunQueueCard({
+  ops,
+  firstRunIssues,
+  entityCount,
+}: {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ops: any;
+  firstRunIssues: IssueRow[];
+  entityCount: number;
+}) {
+  if (firstRunIssues.length === 0) {
+    return (
+      <div className="rounded-xl p-4 shadow-sm mb-6 border" style={{ backgroundColor: C.cardBg, borderColor: `${C.green}33` }}>
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <div className="text-sm font-semibold" style={{ color: C.green }}>First-Run Queue is clear</div>
+            <div className="text-xs mt-0.5" style={{ color: C.muted }}>
+              No entities are currently flagged as never enriched.
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-xl p-4 shadow-sm mb-6 border" style={{ backgroundColor: C.cardBg, borderColor: `${C.red}44` }}>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <div className="text-sm font-bold" style={{ color: C.red }}>
+            First-Run Queue
+          </div>
+          <div className="text-xs mt-0.5" style={{ color: C.muted }}>
+            {entityCount} entities have never completed initial enrichment (`enrichment_incomplete`).
+            Run this queue first to avoid repeatedly re-running the same already-enriched rows.
+          </div>
+        </div>
+        <button
+          onClick={() => ops.handleBulkAction(['enrichment_incomplete'], 'First-Run Queue')}
+          disabled={ops.bulkRunning !== null}
+          className="px-3 py-1.5 rounded text-xs font-semibold disabled:opacity-50"
+          style={{ backgroundColor: C.red, color: '#fff' }}
+        >
+          {ops.bulkRunning === 'First-Run Queue' ? 'Running...' : `Run First Pass (${entityCount})`}
+        </button>
+      </div>
+
+      <div className="mt-3 divide-y" style={{ borderColor: `${C.border}33` }}>
+        {firstRunIssues.slice(0, 12).map((issue) => {
+          const actionState = ops.actionStates[issue.id] ?? 'idle';
+          return (
+            <div key={issue.id} className="flex items-center justify-between gap-3 py-2">
+              <div className="min-w-0">
+                <Link
+                  href={`/place/${encodeURIComponent(issue.entity_slug)}`}
+                  className="text-sm font-medium hover:underline truncate"
+                  style={{ color: C.accent }}
+                  target="_blank"
+                >
+                  {issue.entity_name}
+                </Link>
+                <div className="text-[11px]" style={{ color: C.muted }}>
+                  Never enriched yet
+                </div>
+              </div>
+              <button
+                onClick={() => ops.handleAction(issue)}
+                disabled={actionState === 'running' || actionState === 'done'}
+                className="px-3 py-1 rounded text-xs font-semibold disabled:opacity-50"
+                style={{
+                  backgroundColor: actionState === 'done' ? C.greenBg : actionState === 'error' ? C.redBg : C.accent,
+                  color: actionState === 'done' ? C.green : actionState === 'error' ? C.red : '#fff',
+                }}
+              >
+                {actionState === 'idle' ? 'Enrich' : actionState === 'running' ? '...' : actionState === 'done' ? 'Queued' : 'Retry'}
+              </button>
+            </div>
+          );
+        })}
+      </div>
+
+      {firstRunIssues.length > 12 && (
+        <div className="text-[11px] mt-2" style={{ color: C.muted }}>
+          Showing 12 of {firstRunIssues.length} first-run rows. Use the blocked section below for full triage.
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* ------------------------------------------------------------------ */
 /*  Section Card                                                       */
 /* ------------------------------------------------------------------ */
@@ -209,6 +305,11 @@ function SectionCard({ section, ops }: { section: Section; ops: any }) {
           <h2 className="text-base font-bold" style={{ color: C.text }}>
             {section.label}
           </h2>
+          {section.key === 'enrich' && (
+            <span className="text-[11px]" style={{ color: C.muted }}>
+              may include previously enriched entities; use First-Run Queue for never-enriched
+            </span>
+          )}
           <span
             className="text-xs px-2 py-0.5 rounded-full font-semibold"
             style={{ backgroundColor: section.accentBg, color: section.accent }}
@@ -434,7 +535,7 @@ function IssueRowComponent({
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <Link
-              href={`/place/${issue.entity_slug}`}
+              href={`/place/${encodeURIComponent(issue.entity_slug)}`}
               className="text-sm font-medium hover:underline truncate"
               style={{ color: C.accent }}
               target="_blank"
@@ -459,6 +560,11 @@ function IssueRowComponent({
           </div>
           <div className="text-xs truncate" style={{ color: C.muted }}>
             {ISSUE_TYPE_LABELS[issue.issue_type] ?? issue.issue_type}
+            {issue.actionability === 'informational' && (
+              <span className="ml-1 text-[10px] px-1 py-0.5 rounded" style={{ backgroundColor: C.bg, color: C.muted }}>
+                info
+              </span>
+            )}
             {issue.issue_type === 'google_says_closed' && issue.detail && (
               <span className="ml-1 font-semibold" style={{ color: C.red }}>
                 ({(issue.detail as GoogleSaysClosedDetail).googleStatus === 'CLOSED_PERMANENTLY' ? 'Permanently' : 'Temporarily'})

@@ -71,8 +71,11 @@ export function useCoverageOps() {
         const data = await summaryRes.json();
         setSummary({
           total_active: data.total_active,
+          actionable_open_issues: data.actionable_open_issues ?? data.total_active ?? 0,
+          informational_open_issues: data.informational_open_issues ?? 0,
+          suppressed_confirmed_none: data.suppressed_confirmed_none ?? 0,
           blocking_publish_entities: data.blocking_publish_entities,
-          by_type: data.by_type,
+          by_type: data.by_type ?? data.byType ?? [],
         });
       }
     } catch (err) {
@@ -96,7 +99,7 @@ export function useCoverageOps() {
     const poll = async () => {
       pollAttempts++;
       try {
-        const res = await fetch(`/api/admin/enrich/${slug}`);
+        const res = await fetch(`/api/admin/enrich/${encodeURIComponent(slug)}`);
         if (!res.ok) return;
         const data = await res.json();
         const stageNum = data.enrichmentStage ? parseInt(data.enrichmentStage, 10) : null;
@@ -276,7 +279,9 @@ export function useCoverageOps() {
         }
       } else {
         setActionStates((prev) => ({ ...prev, [issue.id]: 'error' }));
-        setToast({ message: `Failed for ${issue.entity_name}`, type: 'error' });
+        const data = await res.json().catch(() => null);
+        const reason = data?.error ?? data?.message ?? `HTTP ${res.status}`;
+        setToast({ message: `Failed for ${issue.entity_name}: ${reason}`, type: 'error' });
       }
     } catch {
       setActionStates((prev) => ({ ...prev, [issue.id]: 'error' }));
@@ -409,6 +414,7 @@ export function useCoverageOps() {
     let succeeded = 0;
     let failed = 0;
     let resolved = 0;
+    const failureDetails: string[] = [];
 
     // Prefer bulkInvoke (single API call) over sequential invoke (N calls)
     const firstTool = TOOL_ACTIONS[matching[0].issue_type];
@@ -433,12 +439,16 @@ export function useCoverageOps() {
             setActionStates((prev) => ({ ...prev, [issue.id]: 'done' }));
           }
         } else {
+          const data = await res.json().catch(() => null);
+          const reason = data?.error ?? data?.message ?? `HTTP ${res.status}`;
+          failureDetails.push(reason);
           for (const issue of matching) {
             setActionStates((prev) => ({ ...prev, [issue.id]: 'error' }));
           }
           failed = matching.length;
         }
       } catch {
+        failureDetails.push('Bulk request failed before response');
         for (const issue of matching) {
           setActionStates((prev) => ({ ...prev, [issue.id]: 'error' }));
         }
@@ -457,7 +467,13 @@ export function useCoverageOps() {
         }
         succeeded = res.ok ? matching.length : 0;
         failed = res.ok ? 0 : matching.length;
+        if (!res.ok) {
+          const data = await res.json().catch(() => null);
+          const reason = data?.error ?? data?.message ?? `HTTP ${res.status}`;
+          failureDetails.push(reason);
+        }
       } catch {
+        failureDetails.push('Batch request failed before response');
         for (const issue of matching) {
           setActionStates((prev) => ({ ...prev, [issue.id]: 'error' }));
         }
@@ -492,10 +508,14 @@ export function useCoverageOps() {
           } else {
             setActionStates((prev) => ({ ...prev, [issue.id]: 'error' }));
             failed++;
+            const data = await res.json().catch(() => null);
+            const reason = data?.error ?? data?.message ?? `HTTP ${res.status}`;
+            failureDetails.push(`${issue.entity_slug}: ${reason}`);
           }
         } catch {
           setActionStates((prev) => ({ ...prev, [issue.id]: 'error' }));
           failed++;
+          failureDetails.push(`${issue.entity_slug}: request failed`);
         }
       }
 
@@ -515,8 +535,12 @@ export function useCoverageOps() {
 
     setBulkRunning(null);
     const resolvedMsg = resolved > 0 ? `, ${resolved} resolved` : '';
+    const detailMsg =
+      failureDetails.length > 0
+        ? ` — ${failureDetails.slice(0, 2).join(' | ')}${failureDetails.length > 2 ? ` (+${failureDetails.length - 2} more)` : ''}`
+        : '';
     setToast({
-      message: `Bulk ${bulkLabel}: ${succeeded} processed${resolvedMsg}${failed ? `, ${failed} failed` : ''}`,
+      message: `Bulk ${bulkLabel}: ${succeeded} processed${resolvedMsg}${failed ? `, ${failed} failed` : ''}${detailMsg}`,
       type: failed > 0 ? 'error' : 'success',
     });
   };

@@ -127,6 +127,10 @@
   margin-top: var(--pp-hero-gap);
 }
 
+#two-column-body.thin-layout {
+  grid-template-columns: 1fr;
+}
+
 /* ---------------------------------------------------------------------------
    4. Main Column (left — identity + editorial)
    --------------------------------------------------------------------------- */
@@ -244,6 +248,35 @@
   font-weight: 500;
 }
 
+#thin-details-block {
+  font-family: var(--pp-font-ui);
+  font-size: var(--pp-font-small);
+  line-height: 1.6;
+  color: var(--pp-color-text);
+}
+
+#thin-details-block p {
+  margin: 0 0 6px;
+}
+
+#thin-details-block p:last-child {
+  margin-bottom: 0;
+}
+
+#thin-details-block strong {
+  font-weight: 600;
+}
+
+#thin-details-block a {
+  color: var(--pp-color-link);
+  text-decoration: none;
+}
+
+#thin-details-block a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 /* Offering rows */
 #offering-signals-rows {
   display: flex;
@@ -303,6 +336,13 @@
   opacity: 0.85;
   margin: 0.5em 0 0;
   letter-spacing: 0.01em;
+}
+
+.known-for-line {
+  margin: 0 0 0.5em;
+  font-size: var(--pp-font-small);
+  line-height: var(--pp-lh-list);
+  color: var(--pp-color-text);
 }
 
 /* Origin Story accent */
@@ -434,7 +474,7 @@
   align-items: center;
   gap: var(--sk-space-base);
   margin-top: var(--sk-space-stack);
-  margin-bottom: var(--sk-space-base);
+  margin-bottom: 8px;
 }
 
 .sk-section-header::after {
@@ -442,7 +482,7 @@
   height: 1px;
   flex: 1 1 auto;
   background: var(--sk-color-border-muted);
-  margin-right: 16px;
+  opacity: 0.7;
 }
 
 /* Span inside section header + standalone .sk-section role */
@@ -616,6 +656,8 @@
   object-fit: cover;
   object-position: center;
   display: block;
+  /* Brightness lift for dark social photos; keep contrast conservative */
+  filter: brightness(1.08) contrast(1.03);
 }
 
 /* P1: spans 2 columns and 2 rows */
