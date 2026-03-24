@@ -1,8 +1,8 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import styles from './CategoryCard.module.css'
+import styles from './CollectionCard.module.css'
 
-interface CategoryCardProps {
+interface CollectionCardProps {
   title: string
   description: string
   count: number
@@ -10,7 +10,7 @@ interface CategoryCardProps {
   href: string
 }
 
-export function CategoryCard({ title, description, count, imageUrl, href }: CategoryCardProps) {
+export function CollectionCard({ title, description, count, imageUrl, href }: CollectionCardProps) {
   return (
     <Link href={href} className={styles.card}>
       <div className={styles.image}>

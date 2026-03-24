@@ -7,7 +7,7 @@ export function Hero() {
       <div className={styles.mapBg}></div>
       <div className={styles.heroOverlay}></div>
       <div className={styles.heroLockup}>
-        <h1 className={styles.heroTitle}>Saiko Maps</h1>
+        <h1 className={styles.heroTitle}>Saiko Fields</h1>
         <div className={styles.heroLocation}>Los Angeles</div>
         <Link href="/explore" className={styles.heroCta}>
           Explore
