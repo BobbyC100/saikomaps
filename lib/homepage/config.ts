@@ -48,7 +48,28 @@ export const FEATURED_COLLECTION_SLUGS: string[] = []
  * - vertical key (e.g. "vertical-wine")
  * - list slug (e.g. "date-night-in-silver-lake")
  */
-export const IMAGE_OVERRIDES: Record<string, string> = {}
+export const IMAGE_OVERRIDES: Record<string, string> = {
+  'vertical-eat':
+    'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1600&h=1000&fit=crop&auto=format',
+  'vertical-culture':
+    'https://images.unsplash.com/photo-1566127444979-b3d2b654e3d7?w=1600&h=1000&fit=crop&auto=format',
+  'vertical-shop':
+    'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1600&h=1000&fit=crop&auto=format',
+  'vertical-activity':
+    'https://images.unsplash.com/photo-1551632811-561732d1e306?w=1600&h=1000&fit=crop&auto=format',
+  'vertical-parks':
+    'https://images.unsplash.com/photo-1472396961693-142e6e269027?w=1600&h=1000&fit=crop&auto=format',
+  'vertical-stay':
+    'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1600&h=1000&fit=crop&auto=format',
+  'vertical-nature':
+    'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1600&h=1000&fit=crop&auto=format',
+  'vertical-bakery':
+    'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=1600&h=1000&fit=crop&auto=format',
+  'category-restaurant':
+    'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1600&h=1000&fit=crop&auto=format',
+  'category-bar':
+    'https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=1600&h=1000&fit=crop&auto=format',
+}
 
 /**
  * Curated Wikimedia Commons image URLs for geo cards.
