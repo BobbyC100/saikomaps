@@ -90,3 +90,12 @@ export interface PotentialDuplicateDetail {
   duplicate_of_name?: string;
   match_reasons?: string[];
 }
+
+export interface UnresolvedIdentityDetail {
+  identity_score?: number;
+  threshold?: number;
+  is_nomadic?: boolean;
+  fastest_fixes?: string[];
+  missing_anchors?: string[];
+  present_anchors?: string[];
+}

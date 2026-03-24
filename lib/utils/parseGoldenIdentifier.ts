@@ -28,6 +28,40 @@ export interface ParsedIdentifier {
   }
 }
 
+const RESERVED_INSTAGRAM_PATHS = new Set([
+  'p',
+  'reel',
+  'reels',
+  'stories',
+  'explore',
+  'tv',
+  'ar',
+])
+
+function extractInstagramHandleFromUrl(rawUrl: string): string | null {
+  try {
+    const withProtocol = rawUrl.startsWith('http') ? rawUrl : `https://${rawUrl}`
+    const url = new URL(withProtocol)
+    const host = url.hostname.toLowerCase()
+    if (!host.includes('instagram.com')) return null
+
+    const segments = url.pathname
+      .split('/')
+      .filter(Boolean)
+      .map((s) => s.trim())
+
+    if (segments.length === 0) return null
+    const first = segments[0].toLowerCase()
+    if (RESERVED_INSTAGRAM_PATHS.has(first)) return null
+
+    const candidate = segments[0]
+    if (!/^[a-zA-Z0-9._]{1,30}$/.test(candidate)) return null
+    return candidate
+  } catch {
+    return null
+  }
+}
+
 export function parseGoldenIdentifier(raw: string): ParsedIdentifier {
   const trimmed = raw.trim()
   if (!trimmed) return { type: 'unknown', label: '', intakeFields: {} }
@@ -54,14 +88,13 @@ export function parseGoldenIdentifier(raw: string): ParsedIdentifier {
     // CID-only or unparseable Maps URL — fall through to website
   }
 
-  // 3. Instagram URL — contains instagram.com/<handle>
-  const igUrlMatch = trimmed.match(/instagram\.com\/([a-zA-Z0-9._]{1,30})/i)
-  if (igUrlMatch) {
-    const handle = igUrlMatch[1]
+  // 3. Instagram URL — profile URLs only (reject explore/reel/stories/etc)
+  const instagramHandleFromUrl = extractInstagramHandleFromUrl(trimmed)
+  if (instagramHandleFromUrl) {
     return {
       type: 'instagram',
-      label: `Instagram: @${handle}`,
-      intakeFields: { instagram: handle },
+      label: `Instagram: @${instagramHandleFromUrl}`,
+      intakeFields: { instagram: instagramHandleFromUrl },
     }
   }
 
@@ -80,8 +113,12 @@ export function parseGoldenIdentifier(raw: string): ParsedIdentifier {
     try {
       const url = trimmed.startsWith('http') ? trimmed : `https://${trimmed}`
       const hostname = new URL(url).hostname
-      // Exclude google maps URLs that didn't parse above (e.g. CID-only)
-      if (!hostname.includes('google.') && !hostname.includes('goo.gl')) {
+      // Exclude maps and social URLs that have dedicated parsers above
+      if (
+        !hostname.includes('google.')
+        && !hostname.includes('goo.gl')
+        && !hostname.includes('instagram.com')
+      ) {
         return {
           type: 'website',
           label: `Website: ${hostname}`,

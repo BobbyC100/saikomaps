@@ -2,6 +2,43 @@ import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
+const RESERVED_INSTAGRAM_PATHS = new Set([
+  'p',
+  'reel',
+  'reels',
+  'stories',
+  'explore',
+  'tv',
+  'ar',
+]);
+
+function parseInstagramHandle(input: string): { handle: string | null; invalidUrlPath: boolean } {
+  const trimmed = input.trim();
+  if (!trimmed) return { handle: null, invalidUrlPath: false };
+
+  if (!trimmed.includes('instagram.com/')) {
+    return { handle: trimmed.replace(/^@/, '').replace(/\/$/, '').trim(), invalidUrlPath: false };
+  }
+
+  try {
+    const withProtocol = trimmed.startsWith('http') ? trimmed : `https://${trimmed}`;
+    const url = new URL(withProtocol);
+    const segments = url.pathname
+      .split('/')
+      .filter(Boolean)
+      .map((segment) => segment.trim());
+
+    if (segments.length === 0) return { handle: null, invalidUrlPath: true };
+    const first = segments[0].toLowerCase();
+    if (RESERVED_INSTAGRAM_PATHS.has(first)) {
+      return { handle: null, invalidUrlPath: true };
+    }
+
+    return { handle: segments[0], invalidUrlPath: false };
+  } catch {
+    return { handle: null, invalidUrlPath: true };
+  }
+}
 
 /**
  * GET /api/admin/instagram
@@ -107,18 +144,17 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Extract handle from URL or @ prefix
-    let cleanHandle = instagram_handle.trim();
+    // Extract handle from URL or @ prefix; reject non-profile IG URL paths.
+    const { handle, invalidUrlPath } = parseInstagramHandle(instagram_handle);
+    const cleanHandle = (handle ?? '').replace(/^@/, '').replace(/\/$/, '');
 
-    if (cleanHandle.includes('instagram.com/')) {
-      const match = cleanHandle.match(/instagram\.com\/([a-zA-Z0-9._]+)/);
-      if (match) {
-        cleanHandle = match[1];
-      }
+    if (invalidUrlPath) {
+      console.error('[Instagram API] Invalid Instagram URL path:', instagram_handle);
+      return NextResponse.json(
+        { error: 'Invalid Instagram URL path. Use an account profile URL like https://instagram.com/username' },
+        { status: 400 }
+      );
     }
-
-    cleanHandle = cleanHandle.replace(/^@/, '');
-    cleanHandle = cleanHandle.replace(/\/$/, '');
 
     if (!/^[a-zA-Z0-9._]+$/.test(cleanHandle)) {
       console.error('[Instagram API] Invalid handle format:', cleanHandle);
