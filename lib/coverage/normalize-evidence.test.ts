@@ -272,14 +272,16 @@ describe('normalizeAccolades', () => {
 
 describe('normalizePullQuotes', () => {
   it('deduplicates by first 60 chars', () => {
+    const sharedPrefix =
+      'This is a great restaurant with amazing food, warm service, and';
     const rows = [
       makeRow({
-        pullQuotes: [{ text: 'This is a great restaurant with amazing food and vibes.', context: '' }],
+        pullQuotes: [{ text: `${sharedPrefix} vibrant energy every night.`, context: '' }],
         relevanceScore: 0.9,
       }),
       makeRow({
         id: 'ext-2',
-        pullQuotes: [{ text: 'This is a great restaurant with amazing food and vibes. Also try the wine.', context: '' }],
+        pullQuotes: [{ text: `${sharedPrefix} exceptional cocktails worth ordering.`, context: '' }],
         relevanceScore: 0.7,
       }),
     ];
