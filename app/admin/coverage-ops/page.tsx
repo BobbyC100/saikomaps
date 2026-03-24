@@ -23,7 +23,7 @@ import {
 } from './constants';
 import type {
   IssueRow, Section, CompareEntity, EnrichProgress, ActionState,
-  GoogleSaysClosedDetail, PotentialDuplicateDetail,
+  GoogleSaysClosedDetail, PotentialDuplicateDetail, UnresolvedIdentityDetail,
 } from './types';
 
 /* ------------------------------------------------------------------ */
@@ -469,6 +469,18 @@ function closedLabel(issue: IssueRow): string {
   return d?.googleStatus === 'CLOSED_PERMANENTLY' ? 'Mark Perm Closed' : 'Mark Temp Closed';
 }
 
+function unresolvedIdentityHint(issue: IssueRow): string | null {
+  if (issue.issue_type !== 'unresolved_identity') return null;
+  const d = issue.detail as UnresolvedIdentityDetail | null;
+  if (!d) return null;
+  const score = d.identity_score;
+  const threshold = d.threshold;
+  const fixes = d.fastest_fixes ?? [];
+  if (typeof score !== 'number' || typeof threshold !== 'number') return null;
+  const fixText = fixes.length > 0 ? ` · Fastest: ${fixes.slice(0, 2).join(' or ')}` : '';
+  return `Score ${score}/${threshold}${fixText}`;
+}
+
 function IssueRowComponent({
   issue, actionState, enrichProgress, onAction, onSuppress, onResolve, onInlineSave,
 }: {
@@ -482,17 +494,34 @@ function IssueRowComponent({
 }) {
   const [inlineValue, setInlineValue] = useState('');
   const [inlineSaving, setInlineSaving] = useState(false);
+  const [identityWebsiteValue, setIdentityWebsiteValue] = useState('');
+  const [identityInstagramValue, setIdentityInstagramValue] = useState('');
+  const [identitySavingField, setIdentitySavingField] = useState<string | null>(null);
   const [showExtra, setShowExtra] = useState(false);
   const [coverageUrl, setCoverageUrl] = useState('');
   const [coverageSaving, setCoverageSaving] = useState(false);
   const [coverageMsg, setCoverageMsg] = useState('');
   const tool = TOOL_ACTIONS[issue.issue_type];
   const editable = INLINE_EDITABLE[issue.issue_type];
+  const identityHint = unresolvedIdentityHint(issue);
+  const isUnresolvedIdentity = issue.issue_type === 'unresolved_identity';
 
   const handleInlineSubmit = () => {
     if (!editable || !inlineValue.trim()) return;
     setInlineSaving(true);
     onInlineSave(editable.field, inlineValue.trim());
+  };
+
+  const handleIdentitySave = (field: 'website' | 'instagram', value: string) => {
+    const trimmed = value.trim();
+    if (!trimmed) return;
+    setIdentitySavingField(field);
+    onInlineSave(field, trimmed);
+  };
+
+  const handleIdentityNone = (field: 'website' | 'instagram') => {
+    setIdentitySavingField(field);
+    onInlineSave(field, 'NONE');
   };
 
   const handleAddCoverage = async () => {
@@ -582,6 +611,70 @@ function IssueRowComponent({
               );
             })()}
           </div>
+          {identityHint && (
+            <div className="text-[11px] mt-0.5" style={{ color: C.amber }}>
+              {identityHint}
+            </div>
+          )}
+          {isUnresolvedIdentity && (
+            <div className="mt-1.5 flex flex-wrap items-center gap-2">
+              <input
+                type="text"
+                value={identityWebsiteValue}
+                onChange={(e) => setIdentityWebsiteValue(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleIdentitySave('website', identityWebsiteValue)}
+                placeholder="Website: https://..."
+                disabled={identitySavingField !== null}
+                className="text-xs border rounded px-2 py-1 w-44"
+                style={{ borderColor: C.border, color: C.text, backgroundColor: '#fff' }}
+              />
+              <button
+                onClick={() => handleIdentitySave('website', identityWebsiteValue)}
+                disabled={!identityWebsiteValue.trim() || identitySavingField !== null}
+                className="px-2 py-1 rounded text-xs font-semibold disabled:opacity-30"
+                style={{ backgroundColor: C.greenBg, color: C.green }}
+              >
+                {identitySavingField === 'website' ? '...' : 'Save Web'}
+              </button>
+              <button
+                onClick={() => handleIdentityNone('website')}
+                disabled={identitySavingField !== null}
+                className="px-2 py-1 rounded text-xs font-medium disabled:opacity-30"
+                style={{ backgroundColor: C.bg, color: C.muted, border: `1px solid ${C.border}` }}
+                title="Confirm this entity has no website"
+              >
+                No Web
+              </button>
+
+              <input
+                type="text"
+                value={identityInstagramValue}
+                onChange={(e) => setIdentityInstagramValue(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleIdentitySave('instagram', identityInstagramValue)}
+                placeholder="Instagram: @handle"
+                disabled={identitySavingField !== null}
+                className="text-xs border rounded px-2 py-1 w-40"
+                style={{ borderColor: C.border, color: C.text, backgroundColor: '#fff' }}
+              />
+              <button
+                onClick={() => handleIdentitySave('instagram', identityInstagramValue)}
+                disabled={!identityInstagramValue.trim() || identitySavingField !== null}
+                className="px-2 py-1 rounded text-xs font-semibold disabled:opacity-30"
+                style={{ backgroundColor: C.greenBg, color: C.green }}
+              >
+                {identitySavingField === 'instagram' ? '...' : 'Save IG'}
+              </button>
+              <button
+                onClick={() => handleIdentityNone('instagram')}
+                disabled={identitySavingField !== null}
+                className="px-2 py-1 rounded text-xs font-medium disabled:opacity-30"
+                style={{ backgroundColor: C.bg, color: C.muted, border: `1px solid ${C.border}` }}
+                title="Confirm this entity has no Instagram"
+              >
+                No IG
+              </button>
+            </div>
+          )}
           {enrichProgress && !enrichProgress.done && (
             <>
               <EnrichProgressBar progress={enrichProgress} />
