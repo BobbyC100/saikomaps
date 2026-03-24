@@ -43,6 +43,7 @@ export const FEATURED_COLLECTION_SLUGS: string[] = []
 
 /**
  * Manual image overrides by homepage card key.
+ * Note: non-geo overrides should remain minimal and policy-driven.
  * Keys:
  * - neighborhood slug (e.g. "echo-park")
  * - vertical key (e.g. "vertical-wine")
