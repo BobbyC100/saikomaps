@@ -51,6 +51,13 @@ const CATEGORY_PHOTO_PREFERENCES: Record<string, string[]> = {
   COFFEE: ['INTERIOR', 'FOOD', 'DETAIL'],
   EAT: ['FOOD', 'INTERIOR', 'DETAIL'],
   DRINKS: ['BAR_DRINKS', 'CROWD_ENERGY', 'INTERIOR'],
+  CULTURE: ['EXTERIOR', 'INTERIOR', 'DETAIL'],
+  SHOP: ['INTERIOR', 'DETAIL', 'EXTERIOR'],
+  ACTIVITY: ['EXTERIOR', 'CROWD_ENERGY', 'INTERIOR'],
+  PARKS: ['EXTERIOR', 'CROWD_ENERGY', 'DETAIL'],
+  STAY: ['INTERIOR', 'EXTERIOR', 'DETAIL'],
+  NATURE: ['EXTERIOR', 'DETAIL'],
+  BAKERY: ['INTERIOR', 'FOOD', 'DETAIL'],
 }
 
 const OPEN_ENTITY_FILTER: Prisma.entitiesWhereInput = {
@@ -278,7 +285,7 @@ async function resolveCardImage(
 
   const overridden = toSafeImageUrl(IMAGE_OVERRIDES[overrideKey])
   if (overridden) {
-    const usable = await isUsableImageUrl(overridden)
+    const usable = isWikimediaUrl(overridden) ? true : await isUsableImageUrl(overridden)
     attempts.push({ source: 'override', url: overridden, usable })
     if (usable) return finalize(overridden, 'override')
   } else {
@@ -542,7 +549,10 @@ export async function getCategories(usedEntityIds: Set<string> = new Set()): Pro
 
   return Promise.all(
     selectedCategories.map(async (item) => {
-      const preferredPhotoTypes = item.source === 'vertical' ? CATEGORY_PHOTO_PREFERENCES[item.vertical] ?? [] : []
+      const preferredPhotoTypes =
+        item.source === 'vertical'
+          ? CATEGORY_PHOTO_PREFERENCES[item.vertical] ?? ['INTERIOR', 'EXTERIOR', 'DETAIL']
+          : ['INTERIOR', 'EXTERIOR', 'DETAIL', 'FOOD', 'BAR_DRINKS', 'CROWD_ENERGY']
       const representativeEntityId =
         item.source === 'vertical'
           ? await chooseRepresentativeEntityId(
