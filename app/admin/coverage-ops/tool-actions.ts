@@ -21,19 +21,15 @@ export interface ToolConfig {
 
 export const TOOL_ACTIONS: Record<string, ToolConfig> = {
   unresolved_identity: {
-    label: 'Find GPID',
+    label: 'Strengthen Identity',
     queuedLabel: 'Queued',
     invoke: (issue) =>
-      fetch('/api/admin/tools/seed-gpid-queue', {
+      fetch('/api/admin/tools/discover-social', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ entityId: issue.entity_id }),
-      }),
-    bulkInvoke: (issues) =>
-      fetch('/api/admin/tools/seed-gpid-queue', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ entityIds: issues.map((i) => i.entity_id) }),
+        // Resolve identity by strengthening anchor coverage (website + Instagram),
+        // not by assuming GPID is the only path.
+        body: JSON.stringify({ mode: 'both', slug: issue.entity_slug }),
       }),
   },
   missing_gpid: {
@@ -56,7 +52,7 @@ export const TOOL_ACTIONS: Record<string, ToolConfig> = {
     label: 'Enrich',
     queuedLabel: 'Queued',
     invoke: (issue) =>
-      fetch(`/api/admin/enrich/${issue.entity_slug}`, { method: 'POST' }),
+      fetch(`/api/admin/enrich/${encodeURIComponent(issue.entity_slug)}`, { method: 'POST' }),
   },
   missing_coords: {
     label: 'Run Stage 1',
@@ -65,7 +61,7 @@ export const TOOL_ACTIONS: Record<string, ToolConfig> = {
       fetch('/api/admin/tools/enrich-stage', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ slug: issue.entity_slug, stage: 1 }),
+        body: JSON.stringify({ slug: encodeURIComponent(issue.entity_slug), stage: 1 }),
       }),
   },
   missing_neighborhood: {
@@ -85,7 +81,7 @@ export const TOOL_ACTIONS: Record<string, ToolConfig> = {
       fetch('/api/admin/tools/enrich-stage', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ slug: issue.entity_slug, stage: 1 }),
+        body: JSON.stringify({ slug: encodeURIComponent(issue.entity_slug), stage: 1 }),
       }),
   },
   missing_price_level: {
@@ -95,7 +91,7 @@ export const TOOL_ACTIONS: Record<string, ToolConfig> = {
       fetch('/api/admin/tools/enrich-stage', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ slug: issue.entity_slug, stage: 1 }),
+        body: JSON.stringify({ slug: encodeURIComponent(issue.entity_slug), stage: 1 }),
       }),
   },
   operating_status_unknown: {
@@ -105,7 +101,7 @@ export const TOOL_ACTIONS: Record<string, ToolConfig> = {
       fetch('/api/admin/tools/enrich-stage', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ slug: issue.entity_slug, stage: 1 }),
+        body: JSON.stringify({ slug: encodeURIComponent(issue.entity_slug), stage: 1 }),
       }),
   },
   missing_menu_link: {
@@ -115,7 +111,7 @@ export const TOOL_ACTIONS: Record<string, ToolConfig> = {
       fetch('/api/admin/tools/enrich-stage', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ slug: issue.entity_slug, stage: 6 }),
+        body: JSON.stringify({ slug: encodeURIComponent(issue.entity_slug), stage: 6 }),
       }),
   },
   missing_reservations: {
@@ -125,7 +121,7 @@ export const TOOL_ACTIONS: Record<string, ToolConfig> = {
       fetch('/api/admin/tools/enrich-stage', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ slug: issue.entity_slug, stage: 6 }),
+        body: JSON.stringify({ slug: encodeURIComponent(issue.entity_slug), stage: 6 }),
       }),
   },
   missing_website: {
@@ -135,7 +131,7 @@ export const TOOL_ACTIONS: Record<string, ToolConfig> = {
       fetch('/api/admin/tools/discover-social', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mode: 'website', slug: issue.entity_slug }),
+        body: JSON.stringify({ mode: 'website', slug: encodeURIComponent(issue.entity_slug) }),
       }),
   },
   missing_phone: {
@@ -145,7 +141,7 @@ export const TOOL_ACTIONS: Record<string, ToolConfig> = {
       fetch('/api/admin/tools/enrich-stage', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ slug: issue.entity_slug, stage: 1 }),
+        body: JSON.stringify({ slug: encodeURIComponent(issue.entity_slug), stage: 1 }),
       }),
   },
   missing_instagram: {
@@ -155,7 +151,7 @@ export const TOOL_ACTIONS: Record<string, ToolConfig> = {
       fetch('/api/admin/tools/discover-social', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mode: 'instagram', slug: issue.entity_slug }),
+        body: JSON.stringify({ mode: 'instagram', slug: encodeURIComponent(issue.entity_slug) }),
       }),
   },
   missing_tiktok: {
@@ -165,7 +161,7 @@ export const TOOL_ACTIONS: Record<string, ToolConfig> = {
       fetch('/api/admin/tools/discover-social', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mode: 'tiktok', slug: issue.entity_slug }),
+        body: JSON.stringify({ mode: 'tiktok', slug: encodeURIComponent(issue.entity_slug) }),
       }),
   },
   google_says_closed: {

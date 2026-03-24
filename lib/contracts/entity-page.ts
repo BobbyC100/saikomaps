@@ -1,23 +1,23 @@
 /**
- * Place Page Data Contract — v1
+ * Entity Page Data Contract — v1
  *
  * Canonical type for the /api/places/[slug] response shape.
  * The API must return exactly this structure — no extra keys, no missing keys.
  *
- * Drift is caught by tests/contracts/place-page.contract.test.ts.
+ * Drift is caught by tests/contracts/entity-page.contract.test.ts.
  */
 
 // ---------------------------------------------------------------------------
 // Sub-types
 // ---------------------------------------------------------------------------
 
-export type PlacePageSceneSense = {
+export type EntityPageSceneSense = {
   atmosphere: string[];
   energy: string[];
   scene: string[];
 };
 
-export type PlacePageOfferingSignals = {
+export type EntityPageOfferingSignals = {
   servesBeer: boolean | null;
   servesWine: boolean | null;
   servesVegetarianFood: boolean | null;
@@ -30,14 +30,14 @@ export type PlacePageOfferingSignals = {
   wineProgramIntent: string | null;
 };
 
-export type PlacePageCoverageSource = {
+export type EntityPageCoverageSource = {
   sourceName: string;
   url: string;
   excerpt: string | null;
   publishedAt: string | null;
 };
 
-export type PlacePageCoverageHighlights = {
+export type EntityPageCoverageHighlights = {
   sourceCount: number;
   tier1Count: number;
   tier2Count: number;
@@ -51,7 +51,7 @@ export type PlacePageCoverageHighlights = {
   } | null;
 };
 
-export type PlacePageAppearanceAsSubject = {
+export type EntityPageAppearanceAsSubject = {
   id: string;
   hostPlaceId: string | null;
   hostPlace: { id: string; name: string; slug: string } | null;
@@ -62,7 +62,7 @@ export type PlacePageAppearanceAsSubject = {
   status: string;
 };
 
-export type PlacePageAppearanceAsHost = {
+export type EntityPageAppearanceAsHost = {
   id: string;
   subjectPlaceId: string;
   subjectPlace: { id: string; name: string; slug: string } | null;
@@ -70,39 +70,39 @@ export type PlacePageAppearanceAsHost = {
   status: string;
 };
 
-export type PlacePageProgramClass = 'food' | 'beverage' | 'events' | 'service';
+export type EntityPageProgramClass = 'food' | 'beverage' | 'events' | 'service';
 
-export type PlacePageProgramEntry = {
-  program_class: PlacePageProgramClass;
+export type EntityPageProgramEntry = {
+  program_class: EntityPageProgramClass;
   maturity: 'none' | 'incidental' | 'considered' | 'dedicated' | 'unknown';
   signals: string[];
 };
 
-export type PlacePageOfferingPrograms = {
-  food_program: PlacePageProgramEntry;
-  wine_program: PlacePageProgramEntry;
-  beer_program: PlacePageProgramEntry;
-  cocktail_program: PlacePageProgramEntry;
-  non_alcoholic_program: PlacePageProgramEntry;
-  coffee_tea_program: PlacePageProgramEntry;
-  service_program: PlacePageProgramEntry;
-  private_dining_program: PlacePageProgramEntry;
-  group_dining_program: PlacePageProgramEntry;
-  catering_program: PlacePageProgramEntry;
-  dumpling_program: PlacePageProgramEntry;
-  sushi_raw_fish_program: PlacePageProgramEntry;
-  ramen_noodle_program: PlacePageProgramEntry;
-  taco_program: PlacePageProgramEntry;
-  pizza_program: PlacePageProgramEntry;
+export type EntityPageOfferingPrograms = {
+  food_program: EntityPageProgramEntry;
+  wine_program: EntityPageProgramEntry;
+  beer_program: EntityPageProgramEntry;
+  cocktail_program: EntityPageProgramEntry;
+  non_alcoholic_program: EntityPageProgramEntry;
+  coffee_tea_program: EntityPageProgramEntry;
+  service_program: EntityPageProgramEntry;
+  private_dining_program: EntityPageProgramEntry;
+  group_dining_program: EntityPageProgramEntry;
+  catering_program: EntityPageProgramEntry;
+  dumpling_program: EntityPageProgramEntry;
+  sushi_raw_fish_program: EntityPageProgramEntry;
+  ramen_noodle_program: EntityPageProgramEntry;
+  taco_program: EntityPageProgramEntry;
+  pizza_program: EntityPageProgramEntry;
 };
 
-export type PlacePageTimeFold = {
+export type EntityPageTimeFold = {
   class: 'STABILITY' | 'NEWNESS';
   phrase: string;
   approvedBy: string | null;
 };
 
-export type PlacePageAppearsOnItem = {
+export type EntityPageAppearsOnItem = {
   id: string;
   title: string;
   slug: string;
@@ -117,7 +117,7 @@ export type PlacePageAppearsOnItem = {
 // Primary location type
 // ---------------------------------------------------------------------------
 
-export type PlacePageLocation = {
+export type EntityPageLocation = {
   // Identity
   id: string;
   slug: string;
@@ -163,14 +163,14 @@ export type PlacePageLocation = {
 
   // SceneSense
   prl: number;
-  scenesense: PlacePageSceneSense | null;
+  scenesense: EntityPageSceneSense | null;
 
   // TimeFOLD (temporal signal)
-  timefold: PlacePageTimeFold | null;
+  timefold: EntityPageTimeFold | null;
 
   // Offering
-  offeringSignals: PlacePageOfferingSignals | null;
-  offeringPrograms: PlacePageOfferingPrograms | null;
+  offeringSignals: EntityPageOfferingSignals | null;
+  offeringPrograms: EntityPageOfferingPrograms | null;
 
   // Events / hospitality
   eventsUrl: string | null;
@@ -185,8 +185,8 @@ export type PlacePageLocation = {
   originStoryType: string | null;
 
   // Coverage
-  coverageSources: PlacePageCoverageSource[];
-  coverageHighlights: PlacePageCoverageHighlights | null;
+  coverageSources: EntityPageCoverageSource[];
+  coverageHighlights: EntityPageCoverageHighlights | null;
 
   // Parks-specific (only present when primaryVertical === 'PARKS')
   amenities?: string[];
@@ -194,18 +194,18 @@ export type PlacePageLocation = {
   parentPark?: { id: string; name: string; slug: string };
 
   // Appearances
-  appearancesAsSubject: PlacePageAppearanceAsSubject[];
-  appearancesAsHost: PlacePageAppearanceAsHost[];
+  appearancesAsSubject: EntityPageAppearanceAsSubject[];
+  appearancesAsHost: EntityPageAppearanceAsHost[];
 };
 
 // ---------------------------------------------------------------------------
 // Full response data shape (data.* from API)
 // ---------------------------------------------------------------------------
 
-export type PlacePageData = {
-  location: PlacePageLocation;
+export type EntityPageData = {
+  location: EntityPageLocation;
   guide: { id: string; title: string; slug: string; creatorName: string } | null;
-  appearsOn: PlacePageAppearsOnItem[];
+  appearsOn: EntityPageAppearsOnItem[];
   isOwner: boolean;
 };
 
@@ -213,7 +213,7 @@ export type PlacePageData = {
 // Canonical key list — single source of truth for drift tests
 // ---------------------------------------------------------------------------
 
-export const PLACE_PAGE_LOCATION_KEYS: ReadonlyArray<keyof PlacePageLocation> = [
+export const ENTITY_PAGE_LOCATION_KEYS: ReadonlyArray<keyof EntityPageLocation> = [
   // Identity
   'id',
   'slug',
@@ -279,7 +279,7 @@ export const PLACE_PAGE_LOCATION_KEYS: ReadonlyArray<keyof PlacePageLocation> = 
   'appearancesAsHost',
 ] as const;
 
-export const PLACE_PAGE_DATA_KEYS: ReadonlyArray<keyof PlacePageData> = [
+export const ENTITY_PAGE_DATA_KEYS: ReadonlyArray<keyof EntityPageData> = [
   'location',
   'guide',
   'appearsOn',
@@ -290,61 +290,61 @@ export const PLACE_PAGE_DATA_KEYS: ReadonlyArray<keyof PlacePageData> = [
 // Runtime guard
 // ---------------------------------------------------------------------------
 
-export function assertPlacePageData(x: unknown): asserts x is PlacePageData {
+export function assertEntityPageData(x: unknown): asserts x is EntityPageData {
   if (typeof x !== 'object' || x === null) {
-    throw new Error('PlacePageData: expected object');
+    throw new Error('EntityPageData: expected object');
   }
 
   const d = x as Record<string, unknown>;
 
   // Top-level keys
-  for (const key of PLACE_PAGE_DATA_KEYS) {
+  for (const key of ENTITY_PAGE_DATA_KEYS) {
     if (!(key in d)) {
-      throw new Error(`PlacePageData: missing required key "${key}"`);
+      throw new Error(`EntityPageData: missing required key "${key}"`);
     }
   }
 
   if (typeof d.location !== 'object' || d.location === null) {
-    throw new Error('PlacePageData: location must be an object');
+    throw new Error('EntityPageData: location must be an object');
   }
 
   const loc = d.location as Record<string, unknown>;
 
   // Required location keys
-  for (const key of PLACE_PAGE_LOCATION_KEYS) {
+  for (const key of ENTITY_PAGE_LOCATION_KEYS) {
     if (!(key in loc)) {
-      throw new Error(`PlacePageData.location: missing required key "${key}"`);
+      throw new Error(`EntityPageData.location: missing required key "${key}"`);
     }
   }
 
   // Array invariants
   if (!Array.isArray(loc.tips)) {
-    throw new Error('PlacePageData.location.tips must be an array');
+    throw new Error('EntityPageData.location.tips must be an array');
   }
   if (!Array.isArray(loc.photoUrls)) {
-    throw new Error('PlacePageData.location.photoUrls must be an array');
+    throw new Error('EntityPageData.location.photoUrls must be an array');
   }
   if (!Array.isArray(loc.signatureDishes)) {
-    throw new Error('PlacePageData.location.signatureDishes must be an array');
+    throw new Error('EntityPageData.location.signatureDishes must be an array');
   }
   if (!Array.isArray(loc.keyProducers)) {
-    throw new Error('PlacePageData.location.keyProducers must be an array');
+    throw new Error('EntityPageData.location.keyProducers must be an array');
   }
   if (!Array.isArray(loc.coverageSources)) {
-    throw new Error('PlacePageData.location.coverageSources must be an array');
+    throw new Error('EntityPageData.location.coverageSources must be an array');
   }
   if (!Array.isArray(loc.appearancesAsSubject)) {
-    throw new Error('PlacePageData.location.appearancesAsSubject must be an array');
+    throw new Error('EntityPageData.location.appearancesAsSubject must be an array');
   }
   if (!Array.isArray(loc.appearancesAsHost)) {
-    throw new Error('PlacePageData.location.appearancesAsHost must be an array');
+    throw new Error('EntityPageData.location.appearancesAsHost must be an array');
   }
   if (!Array.isArray(d.appearsOn)) {
-    throw new Error('PlacePageData.appearsOn must be an array');
+    throw new Error('EntityPageData.appearsOn must be an array');
   }
 
   // prl must be a number
   if (typeof loc.prl !== 'number') {
-    throw new Error('PlacePageData.location.prl must be a number');
+    throw new Error('EntityPageData.location.prl must be a number');
   }
 }

@@ -48,7 +48,7 @@ This applies to visit-fact checks like hours, price level, and reservation links
 
 | issue_type | problem_class | severity | gating/applicability | detection summary | UI action |
 |-----------|---------------|----------|----------------------|-------------------|----------|
-| `missing_hours` | `location` | medium | all active entities | no `canonical_entity_state.hours_json` and no `entities.hours` fallback | Run Stage 1 |
+| `missing_hours` | `location` | medium | active entities except hotel (`STAY`) | no `canonical_entity_state.hours_json` and no `entities.hours` fallback | Run Stage 1 |
 | `missing_price_level` | `location` | low | food/drink verticals (`EAT`, `COFFEE`, `WINE`, `DRINKS`, `BAKERY`) | no `canonical_entity_state.price_level` and no `entities.priceLevel` fallback | Run Stage 1 |
 | `missing_menu_link` | `location` | low | food/drink verticals (`EAT`, `COFFEE`, `WINE`, `DRINKS`, `BAKERY`) | no `canonical_entity_state.menu_url` | Run Stage 6 |
 | `missing_reservations` | `location` | low | reservation-likely verticals (`EAT`, `DRINKS`, `WINE`, `STAY`) | no `canonical_entity_state.reservation_url` and no `entities.reservationUrl` fallback | Run Stage 6 |
@@ -61,7 +61,7 @@ This applies to visit-fact checks like hours, price level, and reservation links
 
 | issue_type | problem_class | severity | UI action |
 |-----------|---------------|----------|----------|
-| `unresolved_identity` | `identity` | critical | Find GPID / inline GPID entry |
+| `unresolved_identity` | `identity` | critical | Strengthen Identity (discover website + Instagram) |
 | `missing_gpid` | `identity` | medium | Find GPID |
 | `enrichment_incomplete` | `identity` | high | Enrich |
 | `missing_coords` | `location` | high | Run Stage 1 |
@@ -86,6 +86,29 @@ Current action routes used by Coverage Ops:
 - GPID find: `POST /api/admin/tools/seed-gpid-queue`
 - Closure override/write: `PATCH /api/admin/entities/[id]/patch`
 - Resolve/suppress issue state: `POST /api/admin/tools/scan-issues`
+
+---
+
+## Actionability Policy (Dashboard Metrics)
+
+Coverage Ops summary metrics split open issues into:
+- actionable open
+- informational open
+- suppressed policy confirmations (`confirmed_none`, `not_applicable`)
+
+Source of truth in code:
+- `lib/coverage/issue-policy.ts`
+
+Current informational issue types:
+- `missing_menu_link`
+- `missing_reservations`
+- `missing_price_level`
+- `missing_phone`
+- `missing_instagram`
+- `missing_tiktok`
+- `missing_events_surface`
+
+All other open issue types are counted as actionable.
 
 ---
 

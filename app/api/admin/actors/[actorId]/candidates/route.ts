@@ -9,7 +9,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/auth/guards";
 import { db } from "@/lib/db";
 import { upsertOperatorPlaceCandidates } from "@/lib/actors/upsertOperatorPlaceCandidates";
-import { logPlaceJob } from "@/lib/place-job-log";
+import { logPlaceJob } from "@/lib/entity-job-log";
 import type { OperatorPlaceCandidateStatus } from "@prisma/client";
 
 export async function GET(

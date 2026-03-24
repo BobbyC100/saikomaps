@@ -16,11 +16,20 @@ import { db } from '@/lib/db';
 import { spawn } from 'child_process';
 import path from 'path';
 
+function normalizeSlugParam(raw: string): string {
+  try {
+    return decodeURIComponent(raw);
+  } catch {
+    return raw;
+  }
+}
+
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
 ) {
-  const { slug } = await params;
+  const { slug: rawSlug } = await params;
+  const slug = normalizeSlugParam(rawSlug);
 
   try {
     const entity = await db.entities.findUnique({
@@ -55,7 +64,8 @@ export async function POST(
   _request: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
 ) {
-  const { slug } = await params;
+  const { slug: rawSlug } = await params;
+  const slug = normalizeSlugParam(rawSlug);
 
   try {
     const entity = await db.entities.findUnique({

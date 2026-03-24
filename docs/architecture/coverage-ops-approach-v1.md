@@ -418,7 +418,8 @@ Triage board at `/admin/coverage-ops`:
 - Groups issues by problem_class (Identity, Location, Contact, Social, Editorial)
 - Severity pills (CRIT/HIGH/MED/LOW) with color coding
 - Per-issue inline actions:
-  - `Find GPID` for identity gaps
+  - `Strengthen Identity` (discover website + Instagram) for `unresolved_identity`
+  - `Find GPID` for `missing_gpid`
   - `Run Stage 1` for `missing_coords`, `missing_phone`, `missing_hours`, `missing_price_level`, `operating_status_unknown`
   - `Run Stage 6` for `missing_menu_link`, `missing_reservations`
   - `Discover IG/TikTok/Web` for social/website discovery
@@ -426,7 +427,7 @@ Triage board at `/admin/coverage-ops`:
   - `Mark Closed` / `Still Open` override for `google_says_closed`
 - Bulk actions: grouped by action label (for example `Run Stage 1 (N)` / `Run Stage 6 (N)`)
   - `Run Stage 2` for `missing_events_surface` (re-discover surfaces)
-- Inline editing: paste website URL, IG handle, TikTok handle, GPID, events URL directly
+- Inline editing: paste website URL, IG handle, TikTok handle, GPID (for `missing_gpid`), events URL directly
 - "None" button for confirmed-no-value (taco carts without websites, etc.)
 - "Skip" button for won't-fix items
 - Google search link per entity row

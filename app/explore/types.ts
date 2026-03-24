@@ -19,7 +19,7 @@ export interface MapCardData {
   updatedAt?: Date;
 }
 
-export interface PlaceCardData {
+export interface EntityCardData {
   id: string;
   slug: string;
   name: string;
@@ -32,7 +32,7 @@ export interface PlaceCardData {
 export interface SearchResults {
   query: string;
   maps: MapCardData[];
-  places: PlaceCardData[];
+  places: EntityCardData[];
 }
 
 export interface FilterTab {

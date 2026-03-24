@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getProfileIdentityLine } from './place-page.identity';
+import { getProfileIdentityLine } from './entity-page.identity';
 
 // ---------------------------------------------------------------------------
 // Helpers

@@ -8,7 +8,7 @@ import {
   SAIKOAI_PLACE_ENRICHMENT_SYSTEM_PROMPT,
   buildPlaceEnrichmentUserPrompt,
   type PlaceForEnrichment,
-} from './prompts/place-enrichment';
+} from './prompts/entity-enrichment';
 
 const client = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,

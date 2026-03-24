@@ -67,7 +67,7 @@ Entities are considered publishable when they have sufficient identity confidenc
 - **Anchor extraction**: `lib/identity-enrichment.ts` → `AnchorSet` interface
 - **Name matching (identity scoring)**: Jaro-Winkler similarity ≥ 0.85 for near-exact matches
 - **Name matching (GPID backfill)**: When `backfill-google-places.ts` searches by name (no pre-existing GPID or address), it guards against linking the wrong place using: (1) Jaro-Winkler ≥ 0.55 OR (2) substring containment (entity name ⊂ Google name or vice versa). Both must fail to reject. Our curated entity name is never overwritten by Google's display name — Google provides GPID, coords, hours, and photos only.
-- **Coverage integration**: `lib/coverage/issue-scanner.ts` flags `unresolved_identity` only when GPID is missing — but this does NOT block publication if other anchors are sufficient
+- **Coverage integration**: `lib/coverage/issue-scanner.ts` flags `unresolved_identity` from the weighted anchor score threshold (not GPID alone); `missing_gpid` is tracked separately as a non-blocking gap
 
 ## Design Rationale
 

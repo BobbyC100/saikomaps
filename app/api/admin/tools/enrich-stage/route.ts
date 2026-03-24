@@ -37,10 +37,19 @@ const STAGE_LABELS: Record<number, string> = {
   7: 'Tagline generation (AI)',
 };
 
+function normalizeSlug(raw: string): string {
+  try {
+    return decodeURIComponent(raw);
+  } catch {
+    return raw;
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { slug, stage, from } = body as { slug?: string; stage?: number; from?: number };
+    const { slug: rawSlug, stage, from } = body as { slug?: string; stage?: number; from?: number };
+    const slug = rawSlug ? normalizeSlug(rawSlug) : undefined;
 
     if (!slug) {
       return NextResponse.json({ error: 'slug is required' }, { status: 400 });

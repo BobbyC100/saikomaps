@@ -4,7 +4,7 @@ doc_type: problem-framing
 status: DRAFT
 owner: Bobby Ciccaglione
 created: 2026-03-20
-last_updated: 2026-03-20
+last_updated: 2026-03-23
 layer: Traces / Fields boundary
 depends_on:
   - ARCH-ENRICHMENT-MODEL-V1
@@ -136,6 +136,56 @@ Every interpretation layer field that can appear on the entity page, grouped by 
 | Appendix (References) | Computed from data provenance | Universal — traces sources for every populated section |
 | Appendix (Coverage) | coverage_sources table | Mostly restaurants. Growing for other types. |
 
+### 3.7 Empirical Snapshot (2026-03-23)
+
+To reduce "thin" from vibe language to something testable, we ran a corpus audit on active entities (`status IN OPEN, CANDIDATE`), using five page-relevant signals:
+
+- `About` present (voice descriptor or description)
+- `Offering` present (offering_programs derived signal)
+- `SceneSense` proxy present (energy_scores or place_tag_scores)
+- `Coverage` present (alive coverage_sources)
+- `Tagline` present (interpretation_cache TAGLINE or entities.tagline)
+
+#### Active Entity Mix by Vertical (n = 1,075)
+
+| Vertical | Count | Share |
+|---|---:|---:|
+| EAT | 805 | 74.9% |
+| CULTURE | 97 | 9.0% |
+| SHOP | 69 | 6.4% |
+| ACTIVITY | 39 | 3.6% |
+| PARKS | 36 | 3.3% |
+| STAY | 25 | 2.3% |
+| NATURE | 4 | 0.4% |
+
+#### Five-Signal Density Distribution (score 0-5)
+
+| Density score | Entity count | Share |
+|---|---:|---:|
+| 0 | 123 | 11.4% |
+| 1 | 472 | 43.9% |
+| 2 | 239 | 22.2% |
+| 3 | 132 | 12.3% |
+| 4 | 99 | 9.2% |
+| 5 | 10 | 0.9% |
+
+#### Candidate Thin Thresholds
+
+| Definition | Thin count | Thin share | Not-thin share |
+|---|---:|---:|---:|
+| thin = score < 1 | 123 | 11.4% | 88.6% |
+| thin = score < 2 | 595 | 55.3% | 44.7% |
+| thin = score < 3 | 834 | 77.6% | 22.4% |
+
+Working default for framing: **thin = score < 2**.
+
+Why this is a useful initial cut:
+- It cleanly separates the large "0-1 signal" cohort from entities with at least two meaningful content signals.
+- It creates a practical split for layout policy experiments (single-column fallback vs full two-column).
+- It is rerunnable as enrichment coverage changes, so the threshold can be recalibrated from data instead of opinion.
+
+Note: this snapshot uses a SceneSense **proxy** signal (energy/tag evidence) rather than strict `SCENESENSE_PRL` materialization; strict PRL-gated cuts should be run separately before policy lock.
+
 ---
 
 ## 4. Named Tensions
@@ -150,7 +200,7 @@ This is Saiko's most sophisticated voice system. But it only fires for food/drin
 
 ### Tension 2: Thin Pages Are Hollow
 
-A thinly enriched entity renders: title, identity subline, maybe hours, maybe address. No About, no Offering, no sidebar content. The two-column layout creates an empty right column. The page feels skeletal.
+A thinly enriched entity (working definition: five-signal score < 2) renders: title, identity subline, maybe hours, maybe address. No About, no Offering, no sidebar content. The two-column layout creates an empty right column. The page feels skeletal.
 
 **Question:** Should there be a minimum viable page template — a condensed single-column layout that activates when interpretation data is below a threshold? Or should we invest in enriching entities to a baseline before publishing, making thin pages a data problem rather than a design problem?
 
@@ -167,7 +217,7 @@ Every section uses the same `sk-section-header` treatment. About, Offering, Know
 
 The sidebar's primary content (Atmosphere, Energy, Scene) comes from SceneSense, which requires PRL ≥ 3. Entities below that threshold get a sidebar with just Links (and maybe nothing). This means the two-column layout's right column is meaningful only for well-enriched entities.
 
-**Question:** Should the sidebar contain non-SceneSense content for thinner entities? Candidates: hours (currently duplicated in photo utility rail), address, neighborhood context, transit info. Or should the layout collapse to single-column below a certain richness threshold?
+**Question:** Should the sidebar contain non-SceneSense content for thinner entities (working cut: score < 2)? Candidates: hours (currently duplicated in photo utility rail), address, neighborhood context, transit info. Or should the layout collapse to single-column below that threshold?
 
 ### Tension 5: Parks Were Bolted On
 
@@ -217,15 +267,17 @@ Based on the schema and API route, here's what each vertical *can* populate vs. 
 
 Fields that exist in the contract but **don't currently render** or render only via conditional bolting:
 
-| Field | In Contract | Currently Rendered | Notes |
-|---|---|---|---|
-| `placeType` ('venue' / 'activity' / 'public') | ✓ | ✗ not used | Could drive layout/section decisions |
-| `eventsUrl`, `cateringUrl` | ✓ | ✗ not rendered | In canonical_entity_state but no page section |
-| `eventInquiryEmail`, `eventInquiryFormUrl` | ✓ | ✗ not rendered | Same — hospitality fields with no home |
-| `appearancesAsSubject`, `appearancesAsHost` | ✓ | ✗ always empty arrays | Pop-up / market vendor support — not wired |
-| `transitAccessible` | ✓ | ✗ not rendered on canonical page | Was in MerchantGrid (old bento) but not in two-column layout |
-| `recognitions` | ✓ | ✓ rendered | But only for EAT — could apply to CULTURE |
-| `marketSchedule` | In LocationData interface | ✗ not rendered | For market/pop-up schedules |
+Provisional priority framing below is for decision support only; final assignment should be owner-reviewed.
+
+| Field | In Contract | Currently Rendered | Priority framing (provisional) | Notes |
+|---|---|---|---|---|
+| `placeType` ('venue' / 'activity' / 'public') | ✓ | ✗ not used | **Now** | Could drive layout/section decisions |
+| `eventsUrl`, `cateringUrl` | ✓ | ✗ not rendered | **Later** | In canonical_entity_state but no page section |
+| `eventInquiryEmail`, `eventInquiryFormUrl` | ✓ | ✗ not rendered | **Later** | Hospitality fields with no page home yet |
+| `appearancesAsSubject`, `appearancesAsHost` | ✓ | ✗ always empty arrays | **Later** | Pop-up / market vendor support — not wired |
+| `transitAccessible` | ✓ | ✗ not rendered on canonical page | **Intentionally omitted (for now)** | Was in MerchantGrid (old bento) but not in two-column layout |
+| `recognitions` | ✓ | ✓ rendered | **Now** | Already present; extension beyond EAT is low-lift |
+| `marketSchedule` | In LocationData interface | ✗ not rendered | **Later** | For market/pop-up schedules |
 
 ---
 
@@ -243,8 +295,12 @@ PARKS profile:  Identity → About → Amenities → Facilities → Part of
 COFFEE profile: Identity → About → Offering (coffee only) → Curator Note → Tips
 ```
 
-**Pro:** Explicit control per type. Easy to reason about.
-**Con:** Combinatorial — 13 verticals × section ordering = maintenance surface.
+Considerations:
+- **Implementation complexity:** low to moderate (mostly config + resolver wiring).
+- **Editorial control:** high (explicit ordering/section policy per vertical).
+- **UX consistency:** medium (can drift across verticals without guardrails).
+- **Time-to-ship:** good for top verticals; slower as long-tail profiles are added.
+- **Maintainability:** medium-low over time due to profile sprawl risk.
 
 ### Direction B: Content Tiers (Enrichment-Aware)
 
@@ -258,8 +314,12 @@ Instead of vertical-specific profiles, define content tiers based on what's popu
 
 The page adjusts density based on how many tiers have content. Thin entities get a compact single-tier layout. Rich entities get the full spread.
 
-**Pro:** Handles depth variation naturally. No per-vertical config needed.
-**Con:** Loses vertical-specific ordering control. A park's "primary" content might auto-select wrong.
+Considerations:
+- **Implementation complexity:** moderate (tier resolver and fallback behavior).
+- **Editorial control:** medium (good for depth handling, weaker for vertical nuance).
+- **UX consistency:** high for depth behavior, medium for type-specific expectations.
+- **Time-to-ship:** fast for a B-lite version (especially thin-page fallback).
+- **Maintainability:** high (single logic path), but depends on good tier definitions.
 
 ### Direction C: Hybrid (Profile + Tiers)
 
@@ -271,8 +331,14 @@ PARKS:  primary = [About, Amenities]   detail = [Facilities]   editorial = [Cura
 COFFEE: primary = [About, Offering]    detail = []             editorial = [Curator, Tips]
 ```
 
-**Pro:** Best of both — type-aware ordering with depth-aware rendering.
-**Con:** Most complex to implement. Needs a content resolution layer between data and rendering.
+Considerations:
+- **Implementation complexity:** highest (resolver layer + profile schema + tier semantics).
+- **Editorial control:** high (explicit type policy with depth-aware rendering).
+- **UX consistency:** high when tuned; strongest long-term model.
+- **Time-to-ship:** slower initial rollout unless phased.
+- **Maintainability:** good after stabilization, but initial cognitive load is high.
+
+Boundary note (pending final call): this resolver should likely live in Traces as rendering policy, while Fields continues to own contract availability and data shape.
 
 ### Direction D: Page Variants (Minimal)
 
@@ -281,8 +347,12 @@ Instead of a flexible system, define 2–3 page variants:
 - **Public page** (PARKS, NATURE) — redesigned for amenity/facility data
 - **Activity page** (ACTIVITY, pop-ups) — schedule-centric, lighter
 
-**Pro:** Simple. Each variant is purpose-built.
-**Con:** Code duplication. Every shared improvement must be applied N times.
+Considerations:
+- **Implementation complexity:** low for first variant split, grows with each divergence.
+- **Editorial control:** high within each variant.
+- **UX consistency:** medium (consistency within variant, divergence across variants).
+- **Time-to-ship:** fast for immediate vertical pain relief.
+- **Maintainability:** low-medium long term due to duplication and parallel evolution.
 
 ---
 
@@ -292,15 +362,19 @@ Instead of a flexible system, define 2–3 page variants:
 
 2. **Should the Offering section remain food/drink-specific?** Or should we generalize it into a "What's Here" section that renders type-appropriate content (programs for restaurants, amenities for parks, collection info for museums)?
 
-3. **Is there a minimum enrichment bar for publication?** If thin pages look hollow, is the answer better design or stricter publication rules? (Relates to: should enrichmentStatus gate publicationStatus?)
+3. **What should a thin page look like?** For entities below the working threshold (`score < 2`), should the canonical fallback be single-column, compact two-column, or another variant?
 
-4. **Which direction (A–D) matches your instinct?** Or is there a different framing?
+4. **Should thin entities be publishable at all?** Separate from layout fallback: should there be a publication gate tied to enrichment depth (for example, depth threshold and/or PRL requirements)?
 
-5. **Where do events and hospitality fields live?** `eventsUrl`, `cateringUrl`, `eventInquiryEmail` exist in the contract but have no page section. Is this a near-term addition or future work?
+5. **Which direction (A–D) matches your instinct?** Or is there a different framing?
 
-6. **Should mobile vendors / pop-ups get the `appearances` treatment now?** The data model supports it (place_appearances, appearancesAsSubject/Host) but the page renders empty arrays. Is this a priority?
+6. **Where do events and hospitality fields live?** `eventsUrl`, `cateringUrl`, `eventInquiryEmail` exist in the contract but have no page section. Is this a near-term addition or future work?
 
-7. **Does the CSS rename (`place.css` → `entity.css`) belong in this project or as a standalone housekeeping task?**
+7. **Should mobile vendors / pop-ups get the `appearances` treatment now?** The data model supports it (place_appearances, appearancesAsSubject/Host) but the page renders empty arrays. Is this a priority?
+
+8. **Do you agree with the provisional "Now / Later / Intentionally omitted" framing in Section 5.2?** If not, which fields move tiers first?
+
+9. **Does the CSS rename (`place.css` → `entity.css`) belong in this project or as a standalone housekeeping task?**
 
 ---
 

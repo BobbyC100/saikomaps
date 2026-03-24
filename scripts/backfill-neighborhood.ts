@@ -53,7 +53,10 @@ async function main() {
     where = {
       latitude: { not: null },
       longitude: { not: null },
-      neighborhood: null,
+      OR: [
+        { neighborhood: null },
+        { neighborhood: '' },
+      ],
     };
   }
 
@@ -101,7 +104,7 @@ async function main() {
         });
         // Also update canonical_entity_state if it exists (updateMany returns 0 if no row)
         await prisma.canonical_entity_state.updateMany({
-          where: { entity_id: entity.id },
+          where: { entityId: entity.id },
           data: { neighborhood: result.neighborhood },
         });
       }
