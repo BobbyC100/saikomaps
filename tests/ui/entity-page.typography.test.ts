@@ -152,18 +152,18 @@ describe('Place Page CSS — #identity-subline', () => {
 });
 
 // ---------------------------------------------------------------------------
-// #facts-band (action row) tests
+// #primary-ctas (action row) tests
 // ---------------------------------------------------------------------------
 
-describe('Place Page CSS — #facts-band', () => {
+describe('Place Page CSS — #primary-ctas', () => {
   it('has an explicit font-family declaration', () => {
-    const block = extractBlock(css, '#facts-band');
+    const block = extractBlock(css, '#primary-ctas');
     expect(block).not.toBeNull();
     expect(blockContains(block!, 'font-family:')).toBe(true);
   });
 
   it('uses var(--pp-font-ui) for font-family', () => {
-    const block = extractBlock(css, '#facts-band');
+    const block = extractBlock(css, '#primary-ctas');
     expect(block).not.toBeNull();
     expect(blockContains(block!, 'font-family: var(--pp-font-ui)')).toBe(true);
   });
