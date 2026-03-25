@@ -148,6 +148,7 @@ export const ISSUE_ACTIONABILITY_LABELS: Record<string, 'actionable' | 'informat
 export const INLINE_EDITABLE: Record<string, { field: string; placeholder: string }> = {
   missing_gpid: { field: 'google_place_id', placeholder: 'ChIJ...' },
   missing_website: { field: 'website', placeholder: 'https://...' },
+  missing_hours: { field: 'hours', placeholder: '{"weekday_text":["Mon: 8:00 AM - 4:00 PM"]}' },
   missing_phone: { field: 'phone', placeholder: '(213) 555-1234' },
   missing_instagram: { field: 'instagram', placeholder: '@handle' },
   missing_tiktok: { field: 'tiktok', placeholder: '@handle' },
