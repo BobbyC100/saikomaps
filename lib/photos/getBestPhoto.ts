@@ -74,30 +74,48 @@ function isLikelyImageUrl(url: string): boolean {
 }
 
 export async function getBestPhoto(entityId: string, options: BestPhotoOptions = {}): Promise<string | null> {
-  const entity = await db.entities.findUnique({
-    where: { id: entityId },
-    select: {
-      id: true,
-      googlePhotos: true,
-      instagram_accounts: {
-        select: { instagramUserId: true },
-        take: 1,
-      },
-    },
-  })
+  const entity = await (async () => {
+    try {
+      return await db.entities.findUnique({
+        where: { id: entityId },
+        select: {
+          id: true,
+          googlePhotos: true,
+          instagram_accounts: {
+            select: { instagramUserId: true },
+            take: 1,
+          },
+        },
+      })
+    } catch {
+      // Local DBs may not have Instagram tables yet.
+      return db.entities.findUnique({
+        where: { id: entityId },
+        select: {
+          id: true,
+          googlePhotos: true,
+        },
+      })
+    }
+  })()
 
   if (!entity) return null
 
-  const instagramUserId = entity.instagram_accounts[0]?.instagramUserId
+  const instagramUserId =
+    'instagram_accounts' in entity && Array.isArray(entity.instagram_accounts)
+      ? entity.instagram_accounts[0]?.instagramUserId
+      : null
 
   if (instagramUserId) {
     const ranking = buildRanking(options.preferredPhotoTypes)
-    const media = await db.instagram_media.findMany({
-      where: { instagramUserId },
-      select: { mediaUrl: true, permalink: true, photoType: true, timestamp: true },
-      orderBy: { timestamp: 'desc' },
-      take: 12,
-    })
+    const media = await db.instagram_media
+      .findMany({
+        where: { instagramUserId },
+        select: { mediaUrl: true, permalink: true, photoType: true, timestamp: true },
+        orderBy: { timestamp: 'desc' },
+        take: 12,
+      })
+      .catch(() => [])
 
     const rankedMedia = media
       .sort((a, b) => {

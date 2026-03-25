@@ -10,6 +10,7 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'maps.googleapis.com' },
       { protocol: 'https', hostname: 'scontent.cdninstagram.com' },
       { protocol: 'https', hostname: '**.cdninstagram.com' },
+      { protocol: 'https', hostname: 'upload.wikimedia.org' },
     ],
   },
 };
