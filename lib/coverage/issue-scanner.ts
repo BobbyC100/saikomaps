@@ -611,9 +611,13 @@ export async function scanEntities(
       where: { entityId: entity.id },
     });
     const issueMap = new Map(existingIssues.map((i) => [i.issueType, i]));
+    const isClosedEntity = entity.status === 'CLOSED' || entity.status === 'PERMANENTLY_CLOSED';
 
     for (const rule of ISSUE_RULES) {
-      const detection = rule.detect(entity);
+      // Closed entities should remain observable in core records, but they are not
+      // actionable for enrichment/completeness triage. Force non-detection here so
+      // stale open issues are auto-resolved on re-scan.
+      const detection = isClosedEntity ? null : rule.detect(entity);
       const existing = issueMap.get(rule.issueType);
 
       if (detection) {
