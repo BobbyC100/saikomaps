@@ -23,7 +23,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { spawn } from 'child_process';
+import { spawn, spawnSync } from 'child_process';
 import path from 'path';
 import os from 'os';
 
@@ -115,6 +115,45 @@ export async function POST(request: NextRequest) {
     // the operator explicitly asked to re-run this stage.
     if (stage !== undefined || from !== undefined) {
       spawnArgs.push('--force');
+    }
+
+    const isServerlessRuntime = Boolean(process.env.VERCEL);
+    if (isServerlessRuntime) {
+      // Serverless runtimes are not reliable for detached/background child jobs.
+      // Run synchronously so callers get a real success/failure result.
+      const result = spawnSync('node', spawnArgs, {
+        cwd: projectRoot,
+        env: { ...process.env },
+        stdio: ['ignore', 'pipe', 'pipe'],
+      });
+      if (result.status !== 0) {
+        const stderr = result.stderr?.toString().trim();
+        const stdout = result.stdout?.toString().trim();
+        const message = stderr || stdout || `enrich-place exited with status ${result.status}`;
+        return NextResponse.json(
+          { error: 'Failed to run enrichment stage', message },
+          { status: 500 },
+        );
+      }
+
+      return NextResponse.json(
+        {
+          slug: entity.slug,
+          name: entity.name,
+          status: 'completed',
+          stage: stage ?? null,
+          from: from ?? null,
+          description,
+          // Shape this like other "completed" tools so Coverage Ops can auto-resolve rows.
+          results: {
+            enrichment: {
+              saved: true,
+              discovered: `stage-${stage ?? from ?? 'full'}`,
+            },
+          },
+        },
+        { status: 200 },
+      );
     }
 
     const fs = await import('fs');
