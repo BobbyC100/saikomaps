@@ -69,7 +69,7 @@ One row per entity. Keyed by `instagram_user_id` (unique).
 
 ### instagram_media
 
-Up to N rows per account (default 200, current batch uses 10).
+Up to N rows per account (default 200, current batch uses 12).
 
 | Field | Source |
 |---|---|
@@ -79,7 +79,26 @@ Up to N rows per account (default 200, current batch uses 10).
 | permalink | Permanent IG post URL |
 | caption | Full post text |
 | timestamp | Original post time |
+| photoType | AI-classified (see below) |
 | raw_payload | Full API response preserved |
+
+### photoType Classification (added 2026-03-22)
+
+The `photoType` field on `instagram_media` is populated by an AI photo classification step. Values:
+
+| photoType | Meaning |
+|-----------|---------|
+| `INTERIOR` | Interior shot of the space |
+| `FOOD` | Food plating, dishes |
+| `BAR_DRINKS` | Bar setup, cocktails, wine |
+| `CROWD_ENERGY` | People, atmosphere, crowd |
+| `DETAIL` | Close-up details, textures |
+| `EXTERIOR` | Exterior/facade shot |
+| `null` | Not yet classified |
+
+**Classification script:** `scripts/classify-entity-photos.ts` — downloads photos, sends to Claude for classification, writes `photoType` back to `instagram_media`.
+
+**Photo ranking in entity page contract:** Photos are ranked by photoType preference order: INTERIOR (0) → FOOD (1) → BAR_DRINKS (2) → CROWD_ENERGY (3) → DETAIL (4) → EXTERIOR (5). Unclassified photos sort after classified ones. Top 6 photos are returned as `photoUrls` in the entity page contract.
 
 ---
 

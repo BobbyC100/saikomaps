@@ -4,7 +4,7 @@ doc_type: architecture
 status: active
 owner: Bobby Ciccaglione
 created: 2026-03-12
-last_updated: 2026-03-14
+last_updated: 2026-03-24
 project_id: SAIKO
 systems:
   - fields-data-layer
@@ -13,7 +13,7 @@ related_docs:
   - docs/architecture/entity-pipeline-overview-v1.md
   - docs/architecture/fields-era-overview-v1.md
   - docs/FIELDS_V2_TARGET_ARCHITECTURE.md
-summary: Defines Saiko's 12-vertical taxonomy — the primary domains of urban life used to classify every place in the system. Documents anthropological rationale, system role, technical anchors, and design implications.
+summary: Defines Saiko's 13-vertical taxonomy — the primary domains of urban life used to classify every place in the system. Documents anthropological rationale, system role, technical anchors, and design implications.
 ---
 
 # Saiko Vertical Taxonomy
@@ -47,9 +47,9 @@ A place appears on Saiko not because it exists, but because it meaningfully cont
 
 ---
 
-## 2. The 12 Vertical Domains
+## 2. The 13 Vertical Domains
 
-Saiko uses twelve verticals to represent the primary domains of urban life.
+Saiko uses thirteen verticals to represent the primary domains of urban life.
 
 | Vertical | Display Label | Identity Noun |
 |----------|--------------|---------------|
@@ -65,6 +65,9 @@ Saiko uses twelve verticals to represent the primary domains of urban life.
 | `PURVEYORS` | Purveyor | market |
 | `NATURE` | Nature | park |
 | `ACTIVITY` | Activity | venue |
+| `PARKS` | Park | park |
+
+> **NATURE vs PARKS:** `NATURE` covers general natural environments and outdoor spaces. `PARKS` is a more specific domain for civic/municipal parks with defined facilities and boundaries. Both represent landscape interaction but at different scales of formality.
 
 Each vertical represents a type of lived interaction with the city.
 
@@ -128,7 +131,7 @@ The taxonomy intentionally balances three constraints:
 
 Too many categories produce noise. Too few erase meaningful distinctions.
 
-Twelve verticals provide enough resolution to represent the diversity of urban life while remaining intuitive for navigation and discovery.
+Thirteen verticals provide enough resolution to represent the diversity of urban life while remaining intuitive for navigation and discovery.
 
 They also map well onto natural mental models people already use when exploring a city:
 
@@ -145,7 +148,7 @@ They also map well onto natural mental models people already use when exploring 
 The taxonomy is defined in three places in the codebase. These are the sources of truth.
 
 ### `lib/primaryVertical.ts`
-- `PRIMARY_VERTICALS` — the canonical array of all 12 valid values (used for validation and dropdowns)
+- `PRIMARY_VERTICALS` — the canonical array of all 13 valid values (used for validation and dropdowns)
 - `VERTICAL_DISPLAY` — maps each vertical to its UI display label
 - `categoryToPrimaryVertical()` — maps legacy string categories to the enum
 - `resolvePrimaryVertical()` — resolves vertical from category + Google types, defaults to `EAT`

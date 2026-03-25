@@ -235,6 +235,25 @@ npx tsx scripts/audit-editorial-coverage.ts
 
 ---
 
+## Instagram Photo Classification
+
+Classify Instagram photos by type (INTERIOR, FOOD, BAR_DRINKS, CROWD_ENERGY, DETAIL, EXTERIOR). This populates the `photoType` field on `instagram_media`, which controls photo ranking on entity pages.
+
+```bash
+# Classify photos for a single entity
+npx tsx scripts/classify-entity-photos.ts --slug=buvons
+
+# Classify all unclassified photos
+npx tsx scripts/classify-entity-photos.ts
+
+# Dry run
+npx tsx scripts/classify-entity-photos.ts --dry-run
+```
+
+Uses Claude vision to analyze each photo and assign a type. Photos are downloaded and sent as base64 to bypass CDN restrictions. Classified photos are ranked for display: INTERIOR (highest priority) → FOOD → BAR_DRINKS → CROWD_ENERGY → DETAIL → EXTERIOR (lowest).
+
+---
+
 ## Description Generation (resilient)
 
 Use this when you want broad VOICE_DESCRIPTOR coverage, including entities without GPID (for example pop-ups and taco trucks).

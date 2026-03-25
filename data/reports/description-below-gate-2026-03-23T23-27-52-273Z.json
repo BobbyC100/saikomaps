@@ -1,0 +1,65 @@
+{
+  "generatedAt": "2026-03-23T23:27:52.273Z",
+  "count": 4,
+  "rows": [
+    {
+      "entityId": "a978247e-a1eb-4cd3-99c0-01dfd8e08448",
+      "name": "Bao Dim Sum House",
+      "missing_surfaces": true,
+      "missing_identity_signals": true,
+      "missing_category_context": true,
+      "has_category": false,
+      "has_neighborhood": false,
+      "missing_inputs": [
+        "merchant_surfaces",
+        "identity_signals",
+        "category",
+        "neighborhood"
+      ]
+    },
+    {
+      "entityId": "3ebe544c-d9bd-43c6-a3e3-4b441f03a67c",
+      "name": "Berenjak",
+      "missing_surfaces": true,
+      "missing_identity_signals": true,
+      "missing_category_context": true,
+      "has_category": false,
+      "has_neighborhood": false,
+      "missing_inputs": [
+        "merchant_surfaces",
+        "identity_signals",
+        "category",
+        "neighborhood"
+      ]
+    },
+    {
+      "entityId": "f45b645e-6691-4ac0-9e14-2e26d50b0bd2",
+      "name": "Best Shawarma",
+      "missing_surfaces": true,
+      "missing_identity_signals": true,
+      "missing_category_context": true,
+      "has_category": false,
+      "has_neighborhood": true,
+      "missing_inputs": [
+        "merchant_surfaces",
+        "identity_signals",
+        "category"
+      ]
+    },
+    {
+      "entityId": "091e2839-d4da-4749-b5c4-1c4dedaa4e47",
+      "name": "Casa Victoria",
+      "missing_surfaces": true,
+      "missing_identity_signals": true,
+      "missing_category_context": true,
+      "has_category": false,
+      "has_neighborhood": false,
+      "missing_inputs": [
+        "merchant_surfaces",
+        "identity_signals",
+        "category",
+        "neighborhood"
+      ]
+    }
+  ]
+}

@@ -4,11 +4,11 @@ doc_type: reference
 status: active
 owner: Bobby Ciccaglione
 created: '2026-03-10'
-last_updated: '2026-03-10'
+last_updated: '2026-03-24'
 project_id: SAIKO
 summary: ''
 ---
-# Saiko Maps - Sitemap
+# Saiko — Sitemap
 
 ## Public Routes
 
@@ -25,10 +25,19 @@ summary: ''
     - Smart bounds with outlier detection
     - Hydrology-inspired map styling
 
-### Individual Place Pages
-- `/place/[slug]` - Standalone place detail page
-  - Example: `/place/covell`
-  - Displays: photos, tagline, vibe tags, tips, pull quotes, hours, contact
+### Entity Pages
+- `/place/[slug]` - Standalone entity detail page (route group: `(viewer)`)
+  - Example: `/place/buvons`, `/place/republique`
+  - Displays: photos (Instagram/Google), tagline, description, coverage, offerings, hours, contact
+  - Three-tier content hierarchy with graceful degradation
+
+### Explore
+- `/explore` - Browse and search entities
+  - Filter by vertical, neighborhood, cuisine
+  - Search with location bias
+
+### Coverage (Public)
+- `/coverage` - Geographic coverage and data quality metrics (public, no auth required)
 
 ---
 
@@ -108,6 +117,25 @@ summary: ''
 
 ---
 
+## Admin Routes
+
+**Requires:** Admin authentication (email in `ADMIN_EMAILS`)
+
+| Route | Purpose |
+|-------|---------|
+| `/admin` | Admin home |
+| `/admin/coverage` | Coverage dashboard — resolution health, tier summary, neighborhood coverage, missing fields |
+| `/admin/coverage-ops` | Coverage operations triage board — actionable issues with inline resolution tools |
+| `/admin/entity/[id]` | Entity profile — detailed entity inspection, enrichment controls, signal viewer |
+| `/admin/gpid-queue` | GPID resolution queue — human review for ambiguous Google Place ID matches |
+| `/admin/instagram` | Instagram handle management — add, edit, remove handles |
+| `/admin/photo-eval` | Photo quality evaluation |
+| `/admin/intake` | Entity intake tools |
+| `/admin/actors` | Actor/operator management |
+| `/admin/appearances` | Place appearance management |
+
+---
+
 ## API Routes
 
 ### AI & Generation
@@ -171,9 +199,36 @@ summary: ''
   - Dynamic social sharing image
   - Shows map preview + title
 
-### Debug
-- `GET /api/debug/locations` - Debug locations data
-  - Development tool
+### Admin Tools API
+- `POST /api/admin/tools/scan-issues` - Run entity issue scanner (full scan or single entity)
+- `POST /api/admin/tools/enrich-stage` - Run specific enrichment stage for an entity
+- `POST /api/admin/tools/discover-social` - Discover Instagram/TikTok/website via AI
+- `POST /api/admin/tools/derive-neighborhood` - Derive neighborhood from coordinates
+- `POST /api/admin/tools/seed-gpid-queue` - Seed GPID resolution queue
+
+### Admin Entity API
+- `GET /api/admin/entities/[id]/detail` - Full entity detail
+- `GET /api/admin/entities/[id]/coverage` - Entity coverage sources
+- `POST /api/admin/entities/[id]/coverage` - Add coverage source manually
+- `POST /api/admin/entities/[id]/mark-nomadic` - Mark entity as nomadic
+- `GET /api/admin/entities/[id]/timefold` - Entity timefold data
+- `POST /api/admin/entities/compare` - Compare entities for merge
+- `POST /api/admin/entities/merge` - Merge duplicate entities
+
+### Admin Enrichment API
+- `POST /api/admin/enrich/[slug]` - Run enrichment on entity by slug
+- `POST /api/admin/smart-enrich` - Smart enrich (single or batch)
+
+### Admin Coverage API
+- `GET /api/admin/coverage-dashboard` - Coverage dashboard data
+- `GET /api/admin/stats` - System statistics
+
+### Admin Instagram API
+- `GET/POST /api/admin/instagram` - Instagram handle CRUD
+
+### Admin Intake API
+- `POST /api/admin/intake` - Entity intake
+- `POST /api/admin/intake/resolve` - Resolve intake entity
 
 ---
 

@@ -23,7 +23,7 @@ export function HomepageFooter() {
           </div>
         </div>
       </div>
-      <div className={styles.bottom}>© 2026 Saiko Maps</div>
+      <div className={styles.bottom}>© 2026 Saiko Fields</div>
     </footer>
   )
 }

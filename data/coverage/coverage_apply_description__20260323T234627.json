@@ -1,0 +1,47 @@
+{
+  "run_id": "apply_desc_1774309585203",
+  "created_at": "2026-03-23T23:46:25.203Z",
+  "dry_run": true,
+  "params": {
+    "limit": 5,
+    "la_only": false,
+    "ttl_days": 90
+  },
+  "counts": {
+    "candidates_filtered": 69,
+    "processed": 5,
+    "written": 0,
+    "skipped_existing": 0,
+    "skipped_no_google_desc": 0,
+    "failed": 5
+  },
+  "failed_slugs": [
+    "101-noodle-express",
+    "18th-street-arts-center",
+    "303-boards",
+    "3sixteen",
+    "800-degrees-pizza"
+  ],
+  "errors": [
+    {
+      "slug": "101-noodle-express",
+      "error": "\nInvalid `db.merchant_enrichment_runs.findMany()` invocation in\n/Users/bobbyciccaglione/code/saiko-maps/scripts/coverage-apply-description.ts:229:50\n\n  226  * Runs raw text through cleanMerchantAboutText; falls through if cleaning returns null.\n  227  */\n  228 async function tryStoredMerchantText(placeId: string): Promise<string | null> {\n→ 229   const runs = await db.merchant_enrichment_runs.findMany({\n          where: {\n            entityId: \"6bc99d76-db29-4512-9847-b51dcaf8daaf\"\n          },\n          orderBy: {\n            created_at: \"desc\",\n            ~~~~~~~~~~\n        ?   id?: SortOrder,\n        ?   entityId?: SortOrder,\n        ?   sourceUrl?: SortOrder,\n        ?   finalUrl?: SortOrder | SortOrderInput,\n        ?   fetchedAt?: SortOrder,\n        ?   httpStatus?: SortOrder | SortOrderInput,\n        ?   extractionJson?: SortOrder,\n        ?   confidence?: SortOrder | SortOrderInput,\n        ?   costUsd?: SortOrder,\n        ?   createdAt?: SortOrder,\n        ?   entities?: entitiesOrderByWithRelationInput\n          },\n          take: 5,\n          select: {\n            extraction_json: true\n          }\n        })\n\nUnknown argument `created_at`. Did you mean `createdAt`? Available options are marked with ?."
+    },
+    {
+      "slug": "18th-street-arts-center",
+      "error": "\nInvalid `db.merchant_enrichment_runs.findMany()` invocation in\n/Users/bobbyciccaglione/code/saiko-maps/scripts/coverage-apply-description.ts:229:50\n\n  226  * Runs raw text through cleanMerchantAboutText; falls through if cleaning returns null.\n  227  */\n  228 async function tryStoredMerchantText(placeId: string): Promise<string | null> {\n→ 229   const runs = await db.merchant_enrichment_runs.findMany({\n          where: {\n            entityId: \"390a1987-1291-4367-80e3-ad23b255c0ce\"\n          },\n          orderBy: {\n            created_at: \"desc\",\n            ~~~~~~~~~~\n        ?   id?: SortOrder,\n        ?   entityId?: SortOrder,\n        ?   sourceUrl?: SortOrder,\n        ?   finalUrl?: SortOrder | SortOrderInput,\n        ?   fetchedAt?: SortOrder,\n        ?   httpStatus?: SortOrder | SortOrderInput,\n        ?   extractionJson?: SortOrder,\n        ?   confidence?: SortOrder | SortOrderInput,\n        ?   costUsd?: SortOrder,\n        ?   createdAt?: SortOrder,\n        ?   entities?: entitiesOrderByWithRelationInput\n          },\n          take: 5,\n          select: {\n            extraction_json: true\n          }\n        })\n\nUnknown argument `created_at`. Did you mean `createdAt`? Available options are marked with ?."
+    },
+    {
+      "slug": "303-boards",
+      "error": "\nInvalid `db.merchant_enrichment_runs.findMany()` invocation in\n/Users/bobbyciccaglione/code/saiko-maps/scripts/coverage-apply-description.ts:229:50\n\n  226  * Runs raw text through cleanMerchantAboutText; falls through if cleaning returns null.\n  227  */\n  228 async function tryStoredMerchantText(placeId: string): Promise<string | null> {\n→ 229   const runs = await db.merchant_enrichment_runs.findMany({\n          where: {\n            entityId: \"913d0ff0-d6c7-4d51-aa8d-d7648a032e2f\"\n          },\n          orderBy: {\n            created_at: \"desc\",\n            ~~~~~~~~~~\n        ?   id?: SortOrder,\n        ?   entityId?: SortOrder,\n        ?   sourceUrl?: SortOrder,\n        ?   finalUrl?: SortOrder | SortOrderInput,\n        ?   fetchedAt?: SortOrder,\n        ?   httpStatus?: SortOrder | SortOrderInput,\n        ?   extractionJson?: SortOrder,\n        ?   confidence?: SortOrder | SortOrderInput,\n        ?   costUsd?: SortOrder,\n        ?   createdAt?: SortOrder,\n        ?   entities?: entitiesOrderByWithRelationInput\n          },\n          take: 5,\n          select: {\n            extraction_json: true\n          }\n        })\n\nUnknown argument `created_at`. Did you mean `createdAt`? Available options are marked with ?."
+    },
+    {
+      "slug": "3sixteen",
+      "error": "\nInvalid `db.merchant_enrichment_runs.findMany()` invocation in\n/Users/bobbyciccaglione/code/saiko-maps/scripts/coverage-apply-description.ts:229:50\n\n  226  * Runs raw text through cleanMerchantAboutText; falls through if cleaning returns null.\n  227  */\n  228 async function tryStoredMerchantText(placeId: string): Promise<string | null> {\n→ 229   const runs = await db.merchant_enrichment_runs.findMany({\n          where: {\n            entityId: \"47131824-dce1-4173-a2a6-4bb276694ac0\"\n          },\n          orderBy: {\n            created_at: \"desc\",\n            ~~~~~~~~~~\n        ?   id?: SortOrder,\n        ?   entityId?: SortOrder,\n        ?   sourceUrl?: SortOrder,\n        ?   finalUrl?: SortOrder | SortOrderInput,\n        ?   fetchedAt?: SortOrder,\n        ?   httpStatus?: SortOrder | SortOrderInput,\n        ?   extractionJson?: SortOrder,\n        ?   confidence?: SortOrder | SortOrderInput,\n        ?   costUsd?: SortOrder,\n        ?   createdAt?: SortOrder,\n        ?   entities?: entitiesOrderByWithRelationInput\n          },\n          take: 5,\n          select: {\n            extraction_json: true\n          }\n        })\n\nUnknown argument `created_at`. Did you mean `createdAt`? Available options are marked with ?."
+    },
+    {
+      "slug": "800-degrees-pizza",
+      "error": "\nInvalid `db.merchant_enrichment_runs.findMany()` invocation in\n/Users/bobbyciccaglione/code/saiko-maps/scripts/coverage-apply-description.ts:229:50\n\n  226  * Runs raw text through cleanMerchantAboutText; falls through if cleaning returns null.\n  227  */\n  228 async function tryStoredMerchantText(placeId: string): Promise<string | null> {\n→ 229   const runs = await db.merchant_enrichment_runs.findMany({\n          where: {\n            entityId: \"c9e84499-dccd-484d-827c-b4830605535a\"\n          },\n          orderBy: {\n            created_at: \"desc\",\n            ~~~~~~~~~~\n        ?   id?: SortOrder,\n        ?   entityId?: SortOrder,\n        ?   sourceUrl?: SortOrder,\n        ?   finalUrl?: SortOrder | SortOrderInput,\n        ?   fetchedAt?: SortOrder,\n        ?   httpStatus?: SortOrder | SortOrderInput,\n        ?   extractionJson?: SortOrder,\n        ?   confidence?: SortOrder | SortOrderInput,\n        ?   costUsd?: SortOrder,\n        ?   createdAt?: SortOrder,\n        ?   entities?: entitiesOrderByWithRelationInput\n          },\n          take: 5,\n          select: {\n            extraction_json: true\n          }\n        })\n\nUnknown argument `created_at`. Did you mean `createdAt`? Available options are marked with ?."
+    }
+  ]
+}

@@ -4,7 +4,7 @@ doc_type: overview
 status: active
 owner: Bobby Ciccaglione
 created: '2026-03-10'
-last_updated: '2026-03-14'
+last_updated: '2026-03-24'
 project_id: SAIKO
 summary: ''
 ---
@@ -30,14 +30,14 @@ Maps live at shareable URLs. Each place gets its own merchant profile page with 
 
 ## Templates
 
-Four aesthetic-first templates, each with its own personality, color palette, typography, and share card design.
+Four template concepts were designed, but only **Field Notes** is currently implemented:
 
-| Template | Tone | Font | Vibe |
+| Template | Tone | Font | Status |
 |---|---|---|---|
-| **Postcard** | Warm, nostalgic | Nunito | Polaroid vacation snapshots, golden hour, faded coral |
-| **Neon** | Bold, nightlife | Bebas Neue | Drive poster energy, Tokyo signage, 2am underground |
-| **Field Notes** | Minimal, editorial | Libre Baskerville | Well-kept travel journal, worn leather, quiet confidence |
-| **Zine** | DIY, irreverent | Special Elite | Cut-and-paste, punk flyers, record shop staples |
+| **Field Notes** | Minimal, editorial | Libre Baskerville | **Implemented** — active map template |
+| **Postcard** | Warm, nostalgic | Nunito | Designed only |
+| **Neon** | Bold, nightlife | Bebas Neue | Designed only |
+| **Zine** | DIY, irreverent | Special Elite | Designed only |
 
 *All template fonts are free via Google Fonts.*
 
@@ -210,4 +210,21 @@ Without these, development allows requests with a warning; production fails clos
 
 ---
 
-**Saiko Maps · 2026**
+## Key Documentation
+
+| Doc | What it covers |
+|-----|----------------|
+| `APP_OVERVIEW.md` | High-level system overview — layers, features, tech stack |
+| `DATABASE_SCHEMA.md` | Schema reference — all major tables, enums, data flows |
+| `SITEMAP.md` | Route reference — public, creator, admin, API |
+| `PIPELINE_COMMANDS.md` | Operator command reference — enrichment, coverage, social discovery |
+| `homepage-solutions.md` | Homepage implementation plan — decisions, build order, file inventory |
+| `architecture/vertical-taxonomy-v1.md` | 13-vertical classification system |
+| `architecture/coverage-tiers-v1.md` | Six-tier enrichment model |
+| `architecture/coverage-ops-approach-v1.md` | Coverage operations architecture |
+| `architecture/instagram-ingestion-status-v1.md` | Instagram pipeline operational status |
+| `architecture/fields-era-overview-v1.md` | Entity Record Awareness (ERA) framework |
+
+---
+
+**Saiko · 2026**

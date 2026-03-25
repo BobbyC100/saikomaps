@@ -1,0 +1,5 @@
+entity_id,name,missing_surfaces,missing_identity_signals,missing_category_context,has_category,has_neighborhood,missing_inputs
+a978247e-a1eb-4cd3-99c0-01dfd8e08448,"Bao Dim Sum House",true,true,true,false,false,"merchant_surfaces|identity_signals|category|neighborhood"
+3ebe544c-d9bd-43c6-a3e3-4b441f03a67c,"Berenjak",true,true,true,false,false,"merchant_surfaces|identity_signals|category|neighborhood"
+f45b645e-6691-4ac0-9e14-2e26d50b0bd2,"Best Shawarma",true,true,true,false,true,"merchant_surfaces|identity_signals|category"
+091e2839-d4da-4749-b5c4-1c4dedaa4e47,"Casa Victoria",true,true,true,false,false,"merchant_surfaces|identity_signals|category|neighborhood"

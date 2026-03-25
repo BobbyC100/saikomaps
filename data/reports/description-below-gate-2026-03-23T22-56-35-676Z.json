@@ -1,0 +1,653 @@
+{
+  "generatedAt": "2026-03-23T22:56:35.677Z",
+  "count": 46,
+  "rows": [
+    {
+      "entityId": "913d0ff0-d6c7-4d51-aa8d-d7648a032e2f",
+      "name": "303 Boards",
+      "missing_surfaces": true,
+      "missing_identity_signals": true,
+      "missing_category_context": true,
+      "has_category": true,
+      "has_neighborhood": false,
+      "missing_inputs": [
+        "merchant_surfaces",
+        "identity_signals",
+        "neighborhood"
+      ]
+    },
+    {
+      "entityId": "458736ac-8598-4041-9166-a90c49571a8b",
+      "name": "Alondra Park",
+      "missing_surfaces": true,
+      "missing_identity_signals": true,
+      "missing_category_context": true,
+      "has_category": true,
+      "has_neighborhood": false,
+      "missing_inputs": [
+        "merchant_surfaces",
+        "identity_signals",
+        "neighborhood"
+      ]
+    },
+    {
+      "entityId": "8c1f1388-1b7c-4194-af89-b9e178c44044",
+      "name": "Alondra Park Golf Course",
+      "missing_surfaces": true,
+      "missing_identity_signals": true,
+      "missing_category_context": true,
+      "has_category": true,
+      "has_neighborhood": false,
+      "missing_inputs": [
+        "merchant_surfaces",
+        "identity_signals",
+        "neighborhood"
+      ]
+    },
+    {
+      "entityId": "6c4e5dea-f676-4c3d-83ab-23af9847987d",
+      "name": "Alondra Park Soccer Fields",
+      "missing_surfaces": true,
+      "missing_identity_signals": true,
+      "missing_category_context": true,
+      "has_category": true,
+      "has_neighborhood": false,
+      "missing_inputs": [
+        "merchant_surfaces",
+        "identity_signals",
+        "neighborhood"
+      ]
+    },
+    {
+      "entityId": "42e95c9b-d020-4840-8c7e-697f423f563f",
+      "name": "Alondra Park Splash Pad & Pool",
+      "missing_surfaces": true,
+      "missing_identity_signals": true,
+      "missing_category_context": true,
+      "has_category": true,
+      "has_neighborhood": false,
+      "missing_inputs": [
+        "merchant_surfaces",
+        "identity_signals",
+        "neighborhood"
+      ]
+    },
+    {
+      "entityId": "6fec9063-8b8b-4a6b-81a5-4b0f1758871f",
+      "name": "Angeles National Golf Club",
+      "missing_surfaces": true,
+      "missing_identity_signals": true,
+      "missing_category_context": true,
+      "has_category": true,
+      "has_neighborhood": false,
+      "missing_inputs": [
+        "merchant_surfaces",
+        "identity_signals",
+        "neighborhood"
+      ]
+    },
+    {
+      "entityId": "0c9a557b-16e1-496e-b6c4-2bebd0a81e75",
+      "name": "Apollonia’s Pizzeria",
+      "missing_surfaces": true,
+      "missing_identity_signals": true,
+      "missing_category_context": true,
+      "has_category": true,
+      "has_neighborhood": false,
+      "missing_inputs": [
+        "merchant_surfaces",
+        "identity_signals",
+        "neighborhood"
+      ]
+    },
+    {
+      "entityId": "1904da65-e687-4550-9c19-74f697b86021",
+      "name": "Arcadia County Park Tennis Courts",
+      "missing_surfaces": true,
+      "missing_identity_signals": true,
+      "missing_category_context": true,
+      "has_category": true,
+      "has_neighborhood": false,
+      "missing_inputs": [
+        "merchant_surfaces",
+        "identity_signals",
+        "neighborhood"
+      ]
+    },
+    {
+      "entityId": "5da20021-2499-40cd-8883-28971dfe7b9c",
+      "name": "Army Surplus Warehouse",
+      "missing_surfaces": true,
+      "missing_identity_signals": true,
+      "missing_category_context": true,
+      "has_category": true,
+      "has_neighborhood": false,
+      "missing_inputs": [
+        "merchant_surfaces",
+        "identity_signals",
+        "neighborhood"
+      ]
+    },
+    {
+      "entityId": "367e3ab7-31d2-4739-aeca-f623b7740688",
+      "name": "Ba Fang Dumpling",
+      "missing_surfaces": true,
+      "missing_identity_signals": true,
+      "missing_category_context": true,
+      "has_category": true,
+      "has_neighborhood": false,
+      "missing_inputs": [
+        "merchant_surfaces",
+        "identity_signals",
+        "neighborhood"
+      ]
+    },
+    {
+      "entityId": "d8315160-6378-47e9-acb6-3c571cca7663",
+      "name": "Balboa Golf Course",
+      "missing_surfaces": true,
+      "missing_identity_signals": true,
+      "missing_category_context": true,
+      "has_category": true,
+      "has_neighborhood": false,
+      "missing_inputs": [
+        "merchant_surfaces",
+        "identity_signals",
+        "neighborhood"
+      ]
+    },
+    {
+      "entityId": "a978247e-a1eb-4cd3-99c0-01dfd8e08448",
+      "name": "Bao Dim Sum House",
+      "missing_surfaces": true,
+      "missing_identity_signals": true,
+      "missing_category_context": true,
+      "has_category": false,
+      "has_neighborhood": false,
+      "missing_inputs": [
+        "merchant_surfaces",
+        "identity_signals",
+        "category",
+        "neighborhood"
+      ]
+    },
+    {
+      "entityId": "809c6f33-984d-4dff-aab2-6eec7cba90bc",
+      "name": "Bell Gardens Sports Complex",
+      "missing_surfaces": true,
+      "missing_identity_signals": true,
+      "missing_category_context": true,
+      "has_category": true,
+      "has_neighborhood": false,
+      "missing_inputs": [
+        "merchant_surfaces",
+        "identity_signals",
+        "neighborhood"
+      ]
+    },
+    {
+      "entityId": "e8f0de0e-9fd8-40ce-b983-5f4bc1ceb43d",
+      "name": "Belvedere Aquatic Center",
+      "missing_surfaces": true,
+      "missing_identity_signals": true,
+      "missing_category_context": true,
+      "has_category": true,
+      "has_neighborhood": false,
+      "missing_inputs": [
+        "merchant_surfaces",
+        "identity_signals",
+        "neighborhood"
+      ]
+    },
+    {
+      "entityId": "3ebe544c-d9bd-43c6-a3e3-4b441f03a67c",
+      "name": "Berenjak",
+      "missing_surfaces": true,
+      "missing_identity_signals": true,
+      "missing_category_context": true,
+      "has_category": false,
+      "has_neighborhood": false,
+      "missing_inputs": [
+        "merchant_surfaces",
+        "identity_signals",
+        "category",
+        "neighborhood"
+      ]
+    },
+    {
+      "entityId": "f45b645e-6691-4ac0-9e14-2e26d50b0bd2",
+      "name": "Best Shawarma",
+      "missing_surfaces": true,
+      "missing_identity_signals": true,
+      "missing_category_context": true,
+      "has_category": false,
+      "has_neighborhood": true,
+      "missing_inputs": [
+        "merchant_surfaces",
+        "identity_signals",
+        "category"
+      ]
+    },
+    {
+      "entityId": "0f18bf5b-644c-42de-8456-5192b12a661a",
+      "name": "Beverly Hills Tennis (La Cienega Park Courts)",
+      "missing_surfaces": true,
+      "missing_identity_signals": true,
+      "missing_category_context": true,
+      "has_category": true,
+      "has_neighborhood": false,
+      "missing_inputs": [
+        "merchant_surfaces",
+        "identity_signals",
+        "neighborhood"
+      ]
+    },
+    {
+      "entityId": "a55c759f-ae9f-4a04-887d-da8a205d47d3",
+      "name": "Boarders LA",
+      "missing_surfaces": true,
+      "missing_identity_signals": true,
+      "missing_category_context": true,
+      "has_category": true,
+      "has_neighborhood": false,
+      "missing_inputs": [
+        "merchant_surfaces",
+        "identity_signals",
+        "neighborhood"
+      ]
+    },
+    {
+      "entityId": "3242b227-3a85-4908-b8d0-68a92d0bcdcb",
+      "name": "Bomb Chicken",
+      "missing_surfaces": true,
+      "missing_identity_signals": true,
+      "missing_category_context": true,
+      "has_category": true,
+      "has_neighborhood": false,
+      "missing_inputs": [
+        "merchant_surfaces",
+        "identity_signals",
+        "neighborhood"
+      ]
+    },
+    {
+      "entityId": "4bc02fa3-0823-464d-945f-f3b3a8bc07fc",
+      "name": "Brookside Golf Club (Pasadena)",
+      "missing_surfaces": true,
+      "missing_identity_signals": true,
+      "missing_category_context": true,
+      "has_category": true,
+      "has_neighborhood": false,
+      "missing_inputs": [
+        "merchant_surfaces",
+        "identity_signals",
+        "neighborhood"
+      ]
+    },
+    {
+      "entityId": "b473c903-6a03-4a38-bc9d-4628d9f950f3",
+      "name": "Burbank Lawn Bowling Club",
+      "missing_surfaces": true,
+      "missing_identity_signals": true,
+      "missing_category_context": true,
+      "has_category": true,
+      "has_neighborhood": false,
+      "missing_inputs": [
+        "merchant_surfaces",
+        "identity_signals",
+        "neighborhood"
+      ]
+    },
+    {
+      "entityId": "1cdd5ed9-2c48-4f10-9d24-def52a85f57c",
+      "name": "California Pizza Kitchen (flag for control group)",
+      "missing_surfaces": true,
+      "missing_identity_signals": true,
+      "missing_category_context": true,
+      "has_category": true,
+      "has_neighborhood": false,
+      "missing_inputs": [
+        "merchant_surfaces",
+        "identity_signals",
+        "neighborhood"
+      ]
+    },
+    {
+      "entityId": "a92a0825-e3b9-4804-a8b9-3167eba077d8",
+      "name": "Camouflage",
+      "missing_surfaces": true,
+      "missing_identity_signals": true,
+      "missing_category_context": true,
+      "has_category": true,
+      "has_neighborhood": false,
+      "missing_inputs": [
+        "merchant_surfaces",
+        "identity_signals",
+        "neighborhood"
+      ]
+    },
+    {
+      "entityId": "b5737f7c-5fd1-4a60-90ca-880d0b7e5383",
+      "name": "Casa Bianca Pizza Pie",
+      "missing_surfaces": true,
+      "missing_identity_signals": true,
+      "missing_category_context": true,
+      "has_category": true,
+      "has_neighborhood": false,
+      "missing_inputs": [
+        "merchant_surfaces",
+        "identity_signals",
+        "neighborhood"
+      ]
+    },
+    {
+      "entityId": "091e2839-d4da-4749-b5c4-1c4dedaa4e47",
+      "name": "Casa Victoria",
+      "missing_surfaces": true,
+      "missing_identity_signals": true,
+      "missing_category_context": true,
+      "has_category": false,
+      "has_neighborhood": false,
+      "missing_inputs": [
+        "merchant_surfaces",
+        "identity_signals",
+        "category",
+        "neighborhood"
+      ]
+    },
+    {
+      "entityId": "18dee625-b945-4616-a520-fbe72aa6b160",
+      "name": "Central Library Downtown LA",
+      "missing_surfaces": true,
+      "missing_identity_signals": true,
+      "missing_category_context": true,
+      "has_category": true,
+      "has_neighborhood": false,
+      "missing_inputs": [
+        "merchant_surfaces",
+        "identity_signals",
+        "neighborhood"
+      ]
+    },
+    {
+      "entityId": "cf136e35-cded-4fa1-9d80-ac5340f2a9d4",
+      "name": "CM Chicken",
+      "missing_surfaces": true,
+      "missing_identity_signals": true,
+      "missing_category_context": true,
+      "has_category": true,
+      "has_neighborhood": false,
+      "missing_inputs": [
+        "merchant_surfaces",
+        "identity_signals",
+        "neighborhood"
+      ]
+    },
+    {
+      "entityId": "46e9c414-ce2b-438a-929d-7b2e242de3c8",
+      "name": "Culver City Plunge",
+      "missing_surfaces": true,
+      "missing_identity_signals": true,
+      "missing_category_context": true,
+      "has_category": true,
+      "has_neighborhood": false,
+      "missing_inputs": [
+        "merchant_surfaces",
+        "identity_signals",
+        "neighborhood"
+      ]
+    },
+    {
+      "entityId": "24ac3d1b-6fcd-4410-88b7-937c654a1287",
+      "name": "Danny Boy’s Famous Original Pizza",
+      "missing_surfaces": true,
+      "missing_identity_signals": true,
+      "missing_category_context": true,
+      "has_category": true,
+      "has_neighborhood": false,
+      "missing_inputs": [
+        "merchant_surfaces",
+        "identity_signals",
+        "neighborhood"
+      ]
+    },
+    {
+      "entityId": "230b2847-e4b5-4aa1-b674-353decd7176e",
+      "name": "DeBell Golf Club",
+      "missing_surfaces": true,
+      "missing_identity_signals": true,
+      "missing_category_context": true,
+      "has_category": true,
+      "has_neighborhood": false,
+      "missing_inputs": [
+        "merchant_surfaces",
+        "identity_signals",
+        "neighborhood"
+      ]
+    },
+    {
+      "entityId": "e6a69d69-4b11-4c20-8a3d-50258f09f2ec",
+      "name": "Dogdrop",
+      "missing_surfaces": true,
+      "missing_identity_signals": true,
+      "missing_category_context": true,
+      "has_category": true,
+      "has_neighborhood": false,
+      "missing_inputs": [
+        "merchant_surfaces",
+        "identity_signals",
+        "neighborhood"
+      ]
+    },
+    {
+      "entityId": "3dd89ecd-281f-40f3-bf2c-5782cb0c5f9b",
+      "name": "Dover Street Market LA",
+      "missing_surfaces": true,
+      "missing_identity_signals": true,
+      "missing_category_context": true,
+      "has_category": true,
+      "has_neighborhood": false,
+      "missing_inputs": [
+        "merchant_surfaces",
+        "identity_signals",
+        "neighborhood"
+      ]
+    },
+    {
+      "entityId": "8c5e0d33-be8e-4168-8e16-330f26ecf50a",
+      "name": "Eaton Canyon Trail",
+      "missing_surfaces": true,
+      "missing_identity_signals": true,
+      "missing_category_context": true,
+      "has_category": true,
+      "has_neighborhood": false,
+      "missing_inputs": [
+        "merchant_surfaces",
+        "identity_signals",
+        "neighborhood"
+      ]
+    },
+    {
+      "entityId": "84eded0a-8999-4464-af83-b6ec1d5ab132",
+      "name": "Echo Park Library",
+      "missing_surfaces": true,
+      "missing_identity_signals": true,
+      "missing_category_context": true,
+      "has_category": true,
+      "has_neighborhood": false,
+      "missing_inputs": [
+        "merchant_surfaces",
+        "identity_signals",
+        "neighborhood"
+      ]
+    },
+    {
+      "entityId": "29d25565-e806-42b0-994c-15da69ad6b5c",
+      "name": "Echo Park Tennis Courts",
+      "missing_surfaces": true,
+      "missing_identity_signals": true,
+      "missing_category_context": true,
+      "has_category": true,
+      "has_neighborhood": false,
+      "missing_inputs": [
+        "merchant_surfaces",
+        "identity_signals",
+        "neighborhood"
+      ]
+    },
+    {
+      "entityId": "387c1f3b-68b1-40c2-9c34-6ef88ab31f6b",
+      "name": "El Sereno Recreation Center Fields",
+      "missing_surfaces": true,
+      "missing_identity_signals": true,
+      "missing_category_context": true,
+      "has_category": true,
+      "has_neighborhood": false,
+      "missing_inputs": [
+        "merchant_surfaces",
+        "identity_signals",
+        "neighborhood"
+      ]
+    },
+    {
+      "entityId": "1af4ffec-0632-48c9-909a-959df2f1d92d",
+      "name": "Encino Golf Course",
+      "missing_surfaces": true,
+      "missing_identity_signals": true,
+      "missing_category_context": true,
+      "has_category": true,
+      "has_neighborhood": false,
+      "missing_inputs": [
+        "merchant_surfaces",
+        "identity_signals",
+        "neighborhood"
+      ]
+    },
+    {
+      "entityId": "ddf8c41e-5bd0-48f0-a020-58f4e3b9a543",
+      "name": "Expo Center Pool (Robertson Recreation Center)",
+      "missing_surfaces": true,
+      "missing_identity_signals": true,
+      "missing_category_context": true,
+      "has_category": true,
+      "has_neighborhood": false,
+      "missing_inputs": [
+        "merchant_surfaces",
+        "identity_signals",
+        "neighborhood"
+      ]
+    },
+    {
+      "entityId": "1807dbc3-f3b5-4fdc-92bd-ff13dadd2b6c",
+      "name": "Flour Pizza",
+      "missing_surfaces": true,
+      "missing_identity_signals": true,
+      "missing_category_context": true,
+      "has_category": true,
+      "has_neighborhood": false,
+      "missing_inputs": [
+        "merchant_surfaces",
+        "identity_signals",
+        "neighborhood"
+      ]
+    },
+    {
+      "entityId": "54928350-190e-444b-bc33-c26ae6f50dd2",
+      "name": "Garage Pizza",
+      "missing_surfaces": true,
+      "missing_identity_signals": true,
+      "missing_category_context": true,
+      "has_category": true,
+      "has_neighborhood": false,
+      "missing_inputs": [
+        "merchant_surfaces",
+        "identity_signals",
+        "neighborhood"
+      ]
+    },
+    {
+      "entityId": "c93f6d3a-1d46-417f-9d98-9b512d459b63",
+      "name": "Garrett Leight",
+      "missing_surfaces": true,
+      "missing_identity_signals": true,
+      "missing_category_context": true,
+      "has_category": true,
+      "has_neighborhood": false,
+      "missing_inputs": [
+        "merchant_surfaces",
+        "identity_signals",
+        "neighborhood"
+      ]
+    },
+    {
+      "entityId": "2dc7cb8a-2fbd-42e3-9c2d-1c1ae5b903f9",
+      "name": "Garys Custom Clothing",
+      "missing_surfaces": true,
+      "missing_identity_signals": true,
+      "missing_category_context": true,
+      "has_category": true,
+      "has_neighborhood": false,
+      "missing_inputs": [
+        "merchant_surfaces",
+        "identity_signals",
+        "neighborhood"
+      ]
+    },
+    {
+      "entityId": "2c7254cb-b141-46b9-b9c9-f60a02580685",
+      "name": "GI Surplus Store",
+      "missing_surfaces": true,
+      "missing_identity_signals": true,
+      "missing_category_context": true,
+      "has_category": true,
+      "has_neighborhood": false,
+      "missing_inputs": [
+        "merchant_surfaces",
+        "identity_signals",
+        "neighborhood"
+      ]
+    },
+    {
+      "entityId": "ece5d04a-c7fe-430a-8d81-45df2dedef33",
+      "name": "Griffith Park Soccer Fields",
+      "missing_surfaces": true,
+      "missing_identity_signals": true,
+      "missing_category_context": true,
+      "has_category": true,
+      "has_neighborhood": false,
+      "missing_inputs": [
+        "merchant_surfaces",
+        "identity_signals",
+        "neighborhood"
+      ]
+    },
+    {
+      "entityId": "b5aca000-8f19-440f-beb7-d19e70a9229d",
+      "name": "Griffith Park Tennis Courts",
+      "missing_surfaces": true,
+      "missing_identity_signals": true,
+      "missing_category_context": true,
+      "has_category": true,
+      "has_neighborhood": false,
+      "missing_inputs": [
+        "merchant_surfaces",
+        "identity_signals",
+        "neighborhood"
+      ]
+    },
+    {
+      "entityId": "964cdde2-8818-4c21-816b-3ed388b83f3c",
+      "name": "Gus's Barbecue",
+      "missing_surfaces": true,
+      "missing_identity_signals": true,
+      "missing_category_context": true,
+      "has_category": true,
+      "has_neighborhood": false,
+      "missing_inputs": [
+        "merchant_surfaces",
+        "identity_signals",
+        "neighborhood"
+      ]
+    }
+  ]
+}

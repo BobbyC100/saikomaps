@@ -4,112 +4,93 @@ doc_type: overview
 status: active
 owner: Bobby Ciccaglione
 created: '2026-03-10'
-last_updated: '2026-03-10'
+last_updated: '2026-03-24'
 project_id: SAIKO
-summary: ''
+summary: 'High-level overview of the Saiko platform: entity data system, enrichment pipeline, map creation, and consumer surfaces.'
 ---
-# Saiko Maps - Application Overview
+# Saiko — Application Overview
 
 ## Core Concept
-A curated map platform for creating and sharing beautiful, editorial-style lists of places (restaurants, wine bars, shops, etc.). Think "Spotify playlists but for places."
+A curated cultural place-data platform. Saiko maps the places that meaningfully contribute to how people live well in a city. The system is built around a canonical entity data layer with editorial enrichment, published as curated maps and individual entity pages.
+
+---
+
+## System Layers
+
+Saiko has three architectural layers (see CLAUDE.md for full rules):
+
+| Layer | Responsibility | Key surfaces |
+|-------|---------------|--------------|
+| **Data Layer** | System of record — canonical entity identity, structured facts, signals, confidence, provenance | `entities`, `canonical_entity_state`, `derived_signals`, `coverage_sources` |
+| **Saiko Fields** | Platform/infrastructure — transforms raw data into stable product-safe contracts, enrichment orchestration | Entity page contract (`EntityPageData`), photo pipeline, SceneSense |
+| **Traces** | Consumer product — presentation, interaction, user-facing experience | Map views, entity pages, homepage, explore |
 
 ---
 
 ## Major Features
 
-### 1. **Map Creation & Management**
-- Users create custom maps/lists with places
-- Add places with Google Place ID integration
-- Order and curate places with descriptors/notes
+### 1. Entity Data Enrichment
+
+The core enrichment pipeline is a 7-stage Entity Record Awareness (ERA) system:
+
+| Stage | Name | What it does |
+|-------|------|-------------|
+| 1 | Google Places identity | GPID commit, coordinates, hours, photos |
+| 2 | Surface discovery | Find homepage, menu, about, contact URLs |
+| 3 | Surface fetch | Capture raw HTML from discovered surfaces |
+| 4 | Surface parse | Structure captured content into artifacts |
+| 5 | Identity signal extraction | AI extraction into `derived_signals` |
+| 6 | Website enrichment | menu_url, reservation_url into Fields v2 |
+| 7 | Interpretation | Tagline, voice descriptor, SceneSense into `interpretation_cache` |
+
+**Smart Enrich** is a cost-optimized alternative (~$0.01-0.04/entity) that uses Haiku web search + scraping before falling back to Google Places.
+
+See `docs/PIPELINE_COMMANDS.md` for all operator commands.
+
+#### Coverage Source Enrichment
+A separate 4-stage pipeline discovers, fetches, and extracts signals from editorial coverage (Eater, LA Times, Infatuation, etc.):
+- Backfill → Discover → Fetch → Extract
+- Signals stored in `coverage_sources` + `coverage_source_extractions`
+
+#### Instagram Ingestion
+Batch ingestion of Instagram account data and recent media for entities with handles. Photos are classified by `photoType` (INTERIOR, FOOD, BAR_DRINKS, CROWD_ENERGY, DETAIL, EXTERIOR) and ranked for display.
+
+#### SceneSense
+Saiko's atmosphere/energy/scene signal engine. Produces:
+- **PRL** (Place Reachability Level, 1-5) — how easy to reach/access
+- **Atmosphere signals** — quiet, lively, intimate, etc.
+- **Energy signals** — calm, buzzy, electric, etc.
+- **Scene signals** — date night, solo dinner, group, etc.
+
+### 2. Map Creation & Management
+- Users create custom maps/lists with entities
+- Add entities with Google Place ID integration
+- Order and curate with descriptors/notes per map
 - Public/private access control with optional password protection
+- Published as "Field Notes" template (magazine-style presentation)
 
-### 2. **Place Data Enrichment**
+### 3. Entity Pages (`/place/[slug]`)
+Individual entity detail pages with a three-tier content hierarchy:
+- **Tier 1 — Identity + Action:** Hero photos (Instagram or Google), name, meta row, action buttons
+- **Tier 2 — Editorial + Context:** Description, coverage quotes, offerings, hours
+- **Tier 3 — Reference + Discovery:** Map tile, coverage links, "Also On" cross-references
 
-#### Google Places API Integration
-Automatic backfill of:
-- Photos (stored as JSON references)
-- Address, hours, phone, website
-- Types/categories
-- Price level (0-4)
-- Reverse geocoded neighborhood
+Data degrades gracefully — if a tier has no data, the space collapses.
 
-#### Voice Engine (AI Content Generation)
-Powered by Anthropic Claude, generates:
-- **Taglines:** Editorial one-liners (e.g., "Low-key wine bar with natural selections")
-- **Vibe Tags:** Atmosphere descriptors (["Standing room", "Surf crowd"])
-- **Tips:** Helpful visitor advice (["Go early for a seat", "Cash only"])
-- **Pull Quotes:** Editorial quotes with source attribution
+### 4. Field Notes View (Map Template)
+Magazine-quality map presentation with three viewing modes:
 
-### 3. **Field Notes View** (Premium Template)
-Magazine-quality presentation with three viewing modes:
+- **Cover Map** — Google Map with hydrology-inspired aesthetic, smart bounds (IQR outlier detection)
+- **List View** — Vertical feed of entity cards with photos, taglines, metadata, curator descriptors
+- **Expanded Map** — Full-screen interactive map with marker clustering and horizontal card carousel
 
-#### Cover/Header Map
-- Real Google Map with hydrology-inspired aesthetic
-- Cool gray-blue roads (#9aabb5 highways, #c4ced3 arterials)
-- Smart bounds with IQR outlier detection (zooms tight on core cluster)
-- All pins same size, no labels
-- Decorative elements: compass rose, scale bar, ocean wash overlay
+### 5. Homepage (saikofields.com)
+Platform front door with three content sections:
+- **By Neighborhood** — curated allow-list, real entity counts
+- **By Category** — `primaryVertical` groupings with editorial labels
+- **Collections** — published maps/lists
 
-#### List View
-- Vertical feed of place cards
-- Hero photos (Google or user-uploaded)
-- AI-generated taglines and editorial content
-- Metadata: category, price level, cuisine, neighborhood
-- Curator descriptors
-- Field Notes design: parchment/charcoal palette, Libre Baskerville typography
-
-#### Expanded Map View
-- Full-screen interactive map
-- Marker clustering (prevents label soup at zoom-out)
-- Labels positioned below pins
-- Horizontal carousel of place cards at bottom
-- Click pin → scroll to card, click card → center map
-- Same hydrology aesthetic as cover map
-
-### 4. **Map Viewing Modes**
-- **Split Desktop View:** Map on left, scrollable place cards on right
-- **Mobile Toggle:** Switch between list and map views
-- **Expanded Map:** Full-screen exploration with card carousel
-
-### 5. **Smart Geography**
-
-#### Outlier Detection
-IQR-based algorithm:
-- Calculates distance from center for all places
-- Uses interquartile range (IQR) to identify outliers
-- Fits map bounds to core cluster (80%+ of pins)
-- Outlier pins still render, just outside initial viewport
-- Tighter multiplier for cover map (0.8) vs expanded (1.0)
-
-#### Centroid Positioning
-- Calculates average lat/lng of all included places
-- Centers map on centroid after fitting bounds
-- Keeps cluster visually centered
-
-#### Neighborhood Aggregation
-- Extracts neighborhoods from all places
-- Counts frequency
-- Displays sorted by popularity
-- Dynamic singular/plural labels
-
-#### Marker Clustering (Expanded View Only)
-- Groups nearby pins when zoomed out
-- Shows count in cluster marker
-- Click cluster → zoom in → explode into individual pins
-- Custom styling: Field Notes charcoal circle with parchment text
-
-### 6. **Place Cards**
-Display format for each place:
-- Hero photo (Google or user-uploaded)
-- AI-generated tagline
-- Category badge
-- Price level indicators ($-$$$$)
-- Cuisine type
-- Curator descriptor (editorial description from map creator)
-- Vibe tags
-- Tips
-- Pull quotes
-- Metadata: neighborhood, open status, hours
+See `docs/homepage-solutions.md` for implementation plan.
 
 ---
 
@@ -121,70 +102,80 @@ Display format for each place:
 - **TypeScript:** Full type safety
 
 ### Database & ORM
-- **PostgreSQL:** Primary database
-- **Prisma:** ORM with type-safe queries
+- **PostgreSQL:** Primary database (Neon pooled connections)
+- **Prisma:** ORM with type-safe queries, 50+ models
 - **Migrations:** Version-controlled schema changes
 
 ### External Services
-- **Google Maps JavaScript API:**
-  - Map rendering with custom styles
-  - Place Details API for enrichment
-  - Photo references
-- **Google Places API:** Place data backfill
-- **Anthropic Claude (API):** Voice Engine content generation
+- **Google Maps JavaScript API:** Map rendering with custom styles
+- **Google Places API:** Entity data enrichment (Stage 1)
+- **Anthropic Claude:** AI signal extraction (Sonnet), social discovery (Haiku)
+- **Meta Graph API:** Instagram Business Discovery for photo ingestion
 - **NextAuth.js:** Authentication & session management
+- **Upstash Redis:** Rate limiting for AI endpoints
 
 ### Styling & UI
-- **Tailwind CSS:** Utility-first styling
-- **Custom Design System:**
-  - Field Notes palette: charcoal (#36454F), parchment (#F5F0E1), khaki (#C3B091)
-  - Typography: Libre Baskerville (serif), system sans fallbacks
-  - Print-inspired aesthetic
-
-### Maps & Geo
-- **@googlemaps/js-api-loader:** Dynamic Google Maps loading
-- **@googlemaps/markerclusterer:** Marker clustering
-- **Custom map styles:** Hydrology-inspired JSON styles
-- **Smart bounds algorithm:** IQR-based outlier detection
+- **Tailwind CSS 4:** Utility-first styling
+- **CSS Modules:** Component-scoped styles
+- **Custom Design System:** Parchment/charcoal palette, Libre Baskerville + Instrument Serif typography
 
 ---
 
 ## Data Models (Simplified)
 
-### Core Entities
+### Core Flow
 ```
-User → List (Maps) → MapPlace → Place
-                              ↓
-                        ViewerBookmark
+User → List (Maps) → MapPlace → Entity (canonical)
+                                     ↓
+                              derived_signals
+                              interpretation_cache
+                              instagram_media
+                              coverage_sources
 ```
 
 ### Key Models
 
-**List (Map):**
-- Title, description, slug
-- Organizing logic (time/neighborhood/route/purpose-based)
+**Entity** (`entities`):
+- Canonical place identity: slug, name, address, coordinates
+- Classification: `primaryVertical` (13 domains), `category`, `cuisineType`, `neighborhood`
+- Editorial: tagline, description, pullQuote, tips
+- State: `operatingStatus`, `enrichmentStatus`, `publicationStatus`
+- Enrichment: `lastEnrichedAt`, `confidence` (JSONB)
+
+**List** (`lists`):
+- Title, description, slug, organizing logic
 - Template type (currently: field-notes)
 - Access control (public/password/private)
-- Status (draft/ready/published/archived)
+- Status (DRAFT/READY/PUBLISHED/ARCHIVED)
 
-**Place (Canonical):**
-- Google Places data (address, photos, hours, types)
-- AI-generated content (tagline, SceneSense output, tips, pull quotes)
-- Enrichment timestamps
-
-**MapPlace (Junction):**
-- Links Place to List (many-to-many)
+**MapPlace** (`map_places`):
+- Junction table: Entity ↔ List (many-to-many)
 - Curator-specific: descriptor, order, notes, photos per map
 
-**Location (Legacy):**
-- Original model (being phased out)
-- Tied directly to List (1:many)
-- Migrating to Place/MapPlace architecture
+**Derived Signals** (`derived_signals`):
+- AI-extracted signals keyed by `signalKey` (identity_signals, offering_programs)
+- JSON value with provenance
 
-**ActivitySpot:**
-- Skateparks, surf breaks
-- Separate from food/drink places
-- Layer-based display (SKATE | SURF)
+**Interpretation Cache** (`interpretation_cache`):
+- SceneSense, taglines, voice descriptors
+- Typed by `outputType` (TAGLINE, PULL_QUOTE, VOICE_DESCRIPTOR, TIMEFOLD)
+
+**Coverage Sources** (`coverage_sources`):
+- Editorial articles about entities from approved publications
+- Staged pipeline: INGESTED → FETCHED → EXTRACTED
+
+---
+
+## Admin Surfaces
+
+| Page | URL | Purpose |
+|------|-----|---------|
+| Coverage Dashboard | `/admin/coverage` | Resolution health, tier summary, neighborhood coverage |
+| Coverage Ops | `/admin/coverage-ops` | Triage board — actionable issues with inline resolution tools |
+| GPID Queue | `/admin/gpid-queue` | Human review for ambiguous Google Place ID matches |
+| Entity Profile | `/admin/entity/[id]` | Detailed entity inspection and enrichment controls |
+| Instagram Admin | `/admin/instagram` | Instagram handle management |
+| Photo Eval | `/admin/photo-eval` | Photo quality evaluation |
 
 ---
 
@@ -193,163 +184,61 @@ User → List (Maps) → MapPlace → Place
 ### 1. Create Map
 ```
 1. User creates List (title, description, organizing logic)
-2. Add places via search or Google Place ID
-3. Set order and curator descriptors per place
-4. System creates MapPlace entries linking to canonical Place
-5. Backfill Google Places data (photos, hours, address)
-6. Generate AI content (taglines, SceneSense output, tips)
-7. Preview in Field Notes template
-8. Publish → status: PUBLISHED
+2. Add entities via search or Google Place ID
+3. Set order and curator descriptors per entity
+4. System creates MapPlace entries linking to canonical Entity
+5. Publish → status: PUBLISHED
 ```
 
-### 2. View Public Map
+### 2. Enrich Entity
+```
+1. Entity created (via intake, import, or map addition)
+2. Smart Enrich discovers identity (website, Instagram, coords)
+3. Full pipeline runs stages 2-7 (surface discovery → interpretation)
+4. Coverage source enrichment finds/extracts editorial articles
+5. Instagram ingestion fetches and classifies photos
+6. Entity now fully enriched and ready for display
+```
+
+### 3. View Public Map
 ```
 1. User visits /map/[slug]
-2. Fetch List by slug
-3. Load MapPlaces (ordered, with curator descriptors)
-4. Join to Places (with Google + AI enrichments)
-5. Render Field Notes template:
-   - Cover map with smart bounds
-   - Scrollable place cards
-   - Expandable full-screen map
-```
-
-### 3. Enrich Place Data
-```
-1. Place created with googlePlaceId
-2. Backfill script (`npm run backfill:google`):
-   - Fetch Google Places details
-   - Update photos, address, hours, phone, types, priceLevel
-   - Set placesDataCachedAt timestamp
-3. Voice Engine script (`npm run enrich:voice`):
-   - Generate tagline with pattern detection
-   - Route language signals through SceneSense
-   - Generate tips
-   - Find/create pull quotes
-4. Place now "enriched" and ready for beautiful display
-```
-
----
-
-## Admin & Maintenance
-
-### Scripts (package.json)
-
-**Data Enrichment:**
-- `npm run backfill:google` - Fetch Google Places data
-- `npm run enrich:voice` - Generate AI content
-- `npm run test:voice-engine` - Test tagline generation
-
-**Data Analysis:**
-- `npm run analyze:coverage` - Check enrichment status
-- `npm run diagnose:photos` - Investigate missing photos
-- `npm run list:needs-photos` - Find places needing photo backfill
-
-**Data Cleanup:**
-- `npm run find:duplicates` - Detect duplicate places
-- `npm run merge:duplicates` - Merge duplicate records
-
-### Key Algorithms
-
-**Smart Bounds (IQR Outlier Detection):**
-```typescript
-// Calculate distance from center for each place
-const centerLat = avg(places.map(p => p.lat))
-const centerLng = avg(places.map(p => p.lng))
-const distances = places.map(p => distanceFrom(p, center))
-
-// Find outliers using IQR
-const q1 = quantile(distances, 0.25)
-const q3 = quantile(distances, 0.75)
-const iqr = q3 - q1
-const upperFence = q3 + multiplier * iqr
-
-// Filter to included (non-outlier) places
-const included = places.filter(p => p.distance <= upperFence)
-
-// Fit bounds to included only
-map.fitBounds(boundsOf(included))
-```
-
-**Centroid Calculation:**
-```typescript
-const centroid = {
-  lat: places.reduce((sum, p) => sum + p.lat, 0) / places.length,
-  lng: places.reduce((sum, p) => sum + p.lng, 0) / places.length
-}
-map.panTo(centroid)
+2. Fetch List by slug with MapPlaces (ordered, with descriptors)
+3. Join to Entities (with enrichments via EntityPageData contract)
+4. Render Field Notes template
 ```
 
 ---
 
 ## Design System
 
-### Field Notes Palette
-
-**Light Theme:**
+### Palette
 - **Charcoal:** `#36454F` (text, pins)
-- **Parchment:** `#F5F0E1` (background, pin borders)
+- **Parchment:** `#F5F0E1` (background)
 - **Khaki:** `#C3B091` (accents, labels)
-- **Landscape:** `#e8e2d4` (map background)
-- **Water:** `#c9d9e0` (soft blue-grey)
-- **Roads:** `#9aabb5` (highways), `#c4ced3` (arterials)
-- **Parks:** `#e2e5dc` (barely-there sage)
+- **Warm White:** `#FAF8F3` (card backgrounds)
 
-**Typography:**
-- **Serif:** Libre Baskerville (headings, place names, labels)
-- **Sans:** System font stack (body text, metadata)
+### Typography
+- **Instrument Serif:** Card titles, display text
+- **Libre Baskerville:** Headings, editorial content
+- **DM Sans / Nunito:** Body text, metadata
 
-**Map Styling:**
+### Map Styling
 - Hydrology-inspired aesthetic
-- Cool gray-blue roads
-- Muted, desaturated look (saturation: -25)
-- No POI labels
-- Subtle neighborhood labels
-- Hidden local roads
+- Cool gray-blue roads, muted desaturated palette
+- Smart bounds with IQR outlier detection
 
 ---
 
-## Current Architecture Decisions
+## Architecture Decisions
 
-### Why Place + MapPlace?
-**Problem:** Original `Location` model tied places directly to lists (1:many)
-**Issue:** Same restaurant appears on multiple lists → duplicated data, inconsistent enrichment
+### Why Entity + MapPlace?
+**Problem:** Original `Location` model tied places directly to lists (1:many) — same restaurant on multiple lists meant duplicated data and inconsistent enrichment.
 
-**Solution:** Canonical `Place` entity + `MapPlace` junction table
-**Benefits:**
-- Place enrichment happens once
-- Same place on multiple maps
-- Curator context (descriptor, order) separated from canonical data
-- Better data consistency
+**Solution:** Canonical `entities` table + `map_places` junction table. Enrichment happens once per entity. Same entity on multiple maps. Curator context separated from canonical data.
 
-### Why Smart Bounds?
-**Problem:** Geographic outliers (one place 10 miles away) force map to zoom out, making main cluster tiny
-**Solution:** IQR-based outlier detection
-**Result:** Tight zoom on core cluster, outliers still render but outside initial view
+### Why 13 Verticals?
+Saiko classifies places by human activity domain, not business category. See `docs/architecture/vertical-taxonomy-v1.md`.
 
-### Why Marker Clustering (Expanded Only)?
-**Cover Map:** Visual overview showing distribution → no clustering
-**Expanded Map:** Interactive navigation → clustering prevents label soup at zoom-out
-
----
-
-## Future Considerations
-
-### Location → Place Migration
-- Migrate remaining `Location` records to `Place`/`MapPlace`
-- Update all queries to use new schema
-- Deprecate `Location` model
-
-### Additional Templates
-- Current: Field Notes (magazine-style)
-- Future: Grid view, minimalist, interactive story
-
-### Voice Engine Enhancements
-- Pattern detection improvements
-- Multi-language support
-- Curator tone customization
-
-### Performance
-- Implement Redis caching for frequently accessed maps
-- Optimize Google Places API calls (batch, rate limiting)
-- Image optimization (CDN, WebP, responsive)
+### Why Coverage Sources?
+Editorial coverage from trusted publications provides independent signal about entity identity, quality, and offerings — stronger than self-reported data alone.
