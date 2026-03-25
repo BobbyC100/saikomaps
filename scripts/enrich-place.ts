@@ -264,7 +264,7 @@ async function runBatch(n: number) {
     let failed = false;
 
     for (const stage of stages) {
-      if (stage.n < fromStage) continue;
+      if (onlyStage === null && stage.n < fromStage) continue;
       if (onlyStage !== null && stage.n !== onlyStage) continue;
 
       if (!force && onlyStage === null) {
@@ -409,7 +409,7 @@ async function main() {
       results.push({ n: stage.n, label: stage.label, status: 'skipped' });
       continue;
     }
-    if (stage.n < fromStage) {
+    if (onlyStage === null && stage.n < fromStage) {
       results.push({ n: stage.n, label: stage.label, status: 'skipped' });
       continue;
     }
