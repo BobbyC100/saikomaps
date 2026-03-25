@@ -25,6 +25,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { spawn } from 'child_process';
 import path from 'path';
+import os from 'os';
 
 const VALID_STAGES = [1, 2, 3, 4, 5, 6, 7];
 const STAGE_LABELS: Record<number, string> = {
@@ -116,29 +117,48 @@ export async function POST(request: NextRequest) {
       spawnArgs.push('--force');
     }
 
-    const logFile = path.join(projectRoot, 'data', 'logs', `enrich-${slug}-${Date.now()}.log`);
     const fs = await import('fs');
-    fs.writeFileSync(logFile, `[${new Date().toISOString()}] ${description} for ${slug}\n`);
-    const logFd = fs.openSync(logFile, 'a');
+    const timestamp = Date.now();
+    const defaultLogDir = path.join(projectRoot, 'data', 'logs');
+    // In serverless runtimes (e.g. Vercel), /var/task is read-only. Use temp dir.
+    const runtimeLogDir = process.env.VERCEL
+      ? path.join(os.tmpdir(), 'saiko-logs')
+      : defaultLogDir;
+    const logFile = path.join(runtimeLogDir, `enrich-${slug}-${timestamp}.log`);
+
+    let logFd: number | null = null;
+    try {
+      fs.mkdirSync(runtimeLogDir, { recursive: true });
+      fs.writeFileSync(logFile, `[${new Date().toISOString()}] ${description} for ${slug}\n`);
+      logFd = fs.openSync(logFile, 'a');
+    } catch (logError: any) {
+      console.warn(
+        `[Enrich Stage] Logging disabled for ${slug}: ${logError?.message ?? String(logError)}`,
+      );
+    }
 
     const child = spawn('node', spawnArgs, {
       cwd: projectRoot,
       detached: false,
-      stdio: ['ignore', logFd, logFd],
+      stdio: logFd !== null ? ['ignore', logFd, logFd] : 'ignore',
       env: { ...process.env },
     });
 
     // Monitor process completion
     child.on('close', (code) => {
       try {
-        fs.appendFileSync(logFile, `\n[${new Date().toISOString()}] Process exited with code: ${code}\n`);
-        fs.closeSync(logFd);
+        if (logFd !== null) {
+          fs.appendFileSync(logFile, `\n[${new Date().toISOString()}] Process exited with code: ${code}\n`);
+          fs.closeSync(logFd);
+        }
       } catch (_) {}
     });
     child.on('error', (err) => {
       try {
-        fs.appendFileSync(logFile, `\n[ERROR] ${err.message}\n`);
-        fs.closeSync(logFd);
+        if (logFd !== null) {
+          fs.appendFileSync(logFile, `\n[ERROR] ${err.message}\n`);
+          fs.closeSync(logFd);
+        }
       } catch (_) {}
     });
 
