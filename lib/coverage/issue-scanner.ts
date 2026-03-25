@@ -36,6 +36,7 @@
  */
 
 import { PrismaClient, Prisma } from '@prisma/client';
+import { expectsAccessField } from '@/lib/coverage/enrichment-profiles';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -288,8 +289,8 @@ export const ISSUE_RULES: IssueRule[] = [
     detect: (e) => {
       // Nomadic entities have schedules via appearances, not fixed hours
       if (e.isNomadic) return null;
-      // Hotels do not require opening hours in current entity-type expectations.
-      if (e.primaryVertical === 'STAY') return null;
+      // Reuse vertical expectation profiles for hours applicability.
+      if (!expectsAccessField(e.primaryVertical, 'hours')) return null;
       const hasHours = (e.cesHoursJson ?? e.hours) !== null && (e.cesHoursJson ?? e.hours) !== undefined;
       if (!hasHours) {
         return { detected: true, detail: { recommended_stage: 1 } };
