@@ -86,8 +86,15 @@ export const ENRICHMENT_PROFILES: EnrichmentProfile[] = [
     offering_expected: ['scenesense'],
   },
   {
-    // §4.7 — Hospitality / Wellness / Purveyors (default high-touch)
-    verticals: ['STAY', 'WELLNESS', 'PURVEYORS'],
+    // §4.7a — Hospitality (hotels/lodging)
+    // Hotels generally don't have "operating hours" in the same sense as venues.
+    verticals: ['STAY'],
+    access_expected: ['website', 'instagram', 'phone'],
+    offering_expected: ['scenesense', 'editorial'],
+  },
+  {
+    // §4.7b — Wellness / Purveyors (default high-touch)
+    verticals: ['WELLNESS', 'PURVEYORS'],
     access_expected: ['hours', 'website', 'instagram', 'phone'],
     offering_expected: ['scenesense', 'editorial'],
   },
@@ -119,6 +126,15 @@ const DEFAULT_PROFILE: EnrichmentProfile = {
 export function getProfileForVertical(vertical: string | null): EnrichmentProfile {
   if (!vertical) return DEFAULT_PROFILE;
   return PROFILE_BY_VERTICAL.get(vertical) ?? DEFAULT_PROFILE;
+}
+
+/** True if this vertical expects the given access field. */
+export function expectsAccessField(
+  vertical: string | null,
+  field: AccessFieldKey,
+): boolean {
+  const profile = getProfileForVertical(vertical);
+  return profile.access_expected.includes(field);
 }
 
 /**
