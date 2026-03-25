@@ -155,7 +155,6 @@ export async function POST(request: NextRequest) {
         { status: 200 },
       );
     }
-
     const fs = await import('fs');
     const timestamp = Date.now();
     const defaultLogDir = path.join(projectRoot, 'data', 'logs');
