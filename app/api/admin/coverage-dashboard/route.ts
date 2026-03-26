@@ -170,7 +170,7 @@ export async function GET() {
 
         FROM hood_entities he
         LEFT JOIN hood_verticals hv ON hv.hood = he.hood
-        GROUP BY he.hood, hv.verticals
+        GROUP BY he.hood, hv.verticals::text
         HAVING COUNT(*) >= 2
         ORDER BY COUNT(*) DESC
       `,

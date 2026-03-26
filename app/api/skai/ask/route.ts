@@ -33,10 +33,7 @@ interface StructuredAnswer {
 
 type AskMode = 'answer' | 'learn';
 type AskDepth = 'short' | 'standard' | 'detailed';
-
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
+const DEFAULT_ANTHROPIC_MODEL = 'claude-sonnet-4-5-20250929';
 
 function toContextBlock(chunks: Awaited<ReturnType<typeof queryKnowledge>>): string {
   return chunks
@@ -167,9 +164,14 @@ function depthGuidance(depth: AskDepth): string {
   }
 }
 
-async function generateGroundedStructuredAnswer(question: string, contextBlock: string): Promise<string> {
-  const completion = await anthropic.messages.create({
-    model: 'claude-sonnet-4-5-20250929',
+async function generateGroundedStructuredAnswer(
+  client: Anthropic,
+  model: string,
+  question: string,
+  contextBlock: string,
+): Promise<string> {
+  const completion = await client.messages.create({
+    model,
     max_tokens: 900,
     system: [
       'You are the SKAI answer layer.',
@@ -219,14 +221,16 @@ async function generateGroundedStructuredAnswer(question: string, contextBlock: 
 }
 
 async function generateLearnAnswer(params: {
+  client: Anthropic;
+  model: string;
   question: string;
   depth: AskDepth;
   contextBlock: string;
   groundedStructured: StructuredAnswer | null;
   groundedAnswer: string;
 }): Promise<string> {
-  const completion = await anthropic.messages.create({
-    model: 'claude-sonnet-4-5-20250929',
+  const completion = await params.client.messages.create({
+    model: params.model,
     max_tokens: 1400,
     system: [
       'You are the SKAI learn-mode explainer.',
@@ -294,12 +298,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const chunks = await queryKnowledge({
-      question,
-      topK: body.topK,
-      category: body.category,
-      systems: body.systems,
-    });
+    let chunks;
+    try {
+      chunks = await queryKnowledge({
+        question,
+        topK: body.topK,
+        category: body.category,
+        systems: body.systems,
+      });
+    } catch (queryError) {
+      console.error('[SKAI Ask] Knowledge query failed:', queryError);
+      return NextResponse.json(
+        {
+          error: 'SKAI knowledge index is unavailable',
+          message: queryError instanceof Error ? queryError.message : String(queryError),
+        },
+        { status: 503 },
+      );
+    }
 
     if (chunks.length === 0) {
       return NextResponse.json({
@@ -311,9 +327,22 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    const anthropicApiKey = process.env.ANTHROPIC_API_KEY?.trim();
+    if (!anthropicApiKey) {
+      return NextResponse.json(
+        {
+          error: 'SKAI answer provider is not configured',
+          message: 'Missing ANTHROPIC_API_KEY in server environment.',
+        },
+        { status: 503 },
+      );
+    }
+    const model = process.env.AI_MODEL?.trim() || DEFAULT_ANTHROPIC_MODEL;
+    const anthropic = new Anthropic({ apiKey: anthropicApiKey });
+
     const contextBlock = toContextBlock(chunks);
     const allowedDocIds = new Set(uniqueDocIds(chunks));
-    const rawAnswer = await generateGroundedStructuredAnswer(question, contextBlock);
+    const rawAnswer = await generateGroundedStructuredAnswer(anthropic, model, question, contextBlock);
     const structured = parseStructuredAnswer(rawAnswer);
     const groundedAnswer = structured
       ? formatStructuredAnswer(structured, allowedDocIds)
@@ -322,6 +351,8 @@ export async function POST(request: NextRequest) {
 
     if (mode === 'learn') {
       const learnAnswer = await generateLearnAnswer({
+        client: anthropic,
+        model,
         question,
         depth,
         contextBlock,
@@ -344,7 +375,10 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('[SKAI Ask] Error:', error);
     return NextResponse.json(
-      { error: 'Failed to answer SKAI question' },
+      {
+        error: 'Failed to answer SKAI question',
+        message: error instanceof Error ? error.message : String(error),
+      },
       { status: 500 },
     );
   }
