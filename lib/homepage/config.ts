@@ -1,4 +1,5 @@
 import type { PrimaryVertical } from '@prisma/client'
+import { COLLECTION_DEFINITIONS } from '@/lib/collections/config'
 
 export const FEATURED_NEIGHBORHOODS = [
   'Echo Park',
@@ -39,7 +40,11 @@ export const FEATURED_VERTICALS: FeaturedVertical[] = [
  * Ordered allow-list of published list slugs for homepage collections.
  * Replace with final curated slugs as editorial locks them.
  */
-export const FEATURED_COLLECTION_SLUGS: string[] = []
+export const FEATURED_COLLECTION_SLUGS: string[] = COLLECTION_DEFINITIONS
+  .filter((item) => item.scope === 'city')
+  .sort((a, b) => a.sortRank - b.sortRank)
+  .slice(0, 4)
+  .map((item) => item.slug)
 
 /**
  * Manual image overrides by homepage card key.

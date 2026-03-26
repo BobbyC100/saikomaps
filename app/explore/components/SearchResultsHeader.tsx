@@ -26,7 +26,7 @@ export function SearchResultsHeader({ query, mapCount, placeCount }: SearchResul
           marginBottom: '4px',
         }}
       >
-        "{query}"
+        &quot;{query}&quot;
       </div>
       <div
         style={{

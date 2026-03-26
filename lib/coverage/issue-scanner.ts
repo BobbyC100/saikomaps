@@ -36,7 +36,7 @@
  */
 
 import { PrismaClient, Prisma } from '@prisma/client';
-import { expectsAccessField } from '@/lib/coverage/enrichment-profiles';
+import { expectsAccessFieldForEntity } from '@/lib/coverage/enrichment-profiles';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -63,6 +63,7 @@ export interface ScanEntity {
   name: string;
   status: string;
   primaryVertical: string | null;
+  category: string | null;
   googlePlaceId: string | null;
   latitude: unknown;
   longitude: unknown;
@@ -289,11 +290,33 @@ export const ISSUE_RULES: IssueRule[] = [
     detect: (e) => {
       // Nomadic entities have schedules via appearances, not fixed hours
       if (e.isNomadic) return null;
-      // Reuse vertical expectation profiles for hours applicability.
-      if (!expectsAccessField(e.primaryVertical, 'hours')) return null;
+      // Reuse profile expectations for hours applicability, with subtype-aware overrides.
+      if (!expectsAccessFieldForEntity({
+        vertical: e.primaryVertical,
+        category: e.category,
+        slug: e.slug,
+        name: e.name,
+      }, 'hours')) return null;
       const hasHours = (e.cesHoursJson ?? e.hours) !== null && (e.cesHoursJson ?? e.hours) !== undefined;
       if (!hasHours) {
-        return { detected: true, detail: { recommended_stage: 1 } };
+        const hasWebsite = Boolean((e.cesWebsite ?? e.website)?.trim());
+        const hasGpid = Boolean(e.googlePlaceId);
+        // Strategy follows enrichment policy: free/source-first before paid GPID lookup.
+        // If website exists, run website enrichment first; otherwise use Google (if available)
+        // or discovery when neither source is present.
+        const recommendedStage = hasWebsite ? 6 : hasGpid ? 1 : 2;
+        // Candidate for "not found" manual review:
+        // we have run enrichment before, still no hours, and there is no GPID path.
+        const notFindableCandidate = hasWebsite && !hasGpid && Boolean(e.lastEnrichedAt);
+        return {
+          detected: true,
+          detail: {
+            recommended_stage: recommendedStage,
+            has_website: hasWebsite,
+            has_gpid: hasGpid,
+            not_findable_candidate: notFindableCandidate,
+          },
+        };
       }
       return null;
     },
@@ -501,6 +524,7 @@ export async function scanEntities(
       name: true,
       status: true,
       primaryVertical: true,
+      category: true,
       googlePlaceId: true,
       latitude: true,
       longitude: true,
@@ -570,6 +594,7 @@ export async function scanEntities(
       name: raw.name,
       status: raw.status,
       primaryVertical: raw.primaryVertical ?? null,
+      category: raw.category ?? null,
       googlePlaceId: raw.googlePlaceId,
       latitude: raw.latitude,
       longitude: raw.longitude,
@@ -650,7 +675,20 @@ export async function scanEntities(
               console.log(`  REOPEN ${entity.slug}: ${rule.issueType}`);
             }
           } else {
-            // Active issue already exists — leave it
+          // Active issue already exists. Keep status, but refresh detail when
+          // recommendation context changes (e.g., stage routing updates).
+          const existingDetail = existing.detail ?? null;
+          const nextDetail = detection.detail ?? existingDetail;
+          const detailChanged =
+            JSON.stringify(existingDetail) !== JSON.stringify(nextDetail);
+          if (detailChanged && !dryRun) {
+            await prisma.entity_issues.update({
+              where: { id: existing.id },
+              data: {
+                detail: (nextDetail ?? Prisma.JsonNull) as Prisma.InputJsonValue,
+              },
+            });
+          }
             result.issuesUnchanged++;
           }
         } else {

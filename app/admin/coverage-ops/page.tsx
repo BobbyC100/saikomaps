@@ -23,7 +23,7 @@ import {
 } from './constants';
 import type {
   IssueRow, Section, CompareEntity, EnrichProgress, ActionState,
-  GoogleSaysClosedDetail, PotentialDuplicateDetail, UnresolvedIdentityDetail,
+  GoogleSaysClosedDetail, PotentialDuplicateDetail, UnresolvedIdentityDetail, MissingHoursDetail,
 } from './types';
 
 /* ------------------------------------------------------------------ */
@@ -481,6 +481,13 @@ function unresolvedIdentityHint(issue: IssueRow): string | null {
   return `Score ${score}/${threshold}${fixText}`;
 }
 
+function missingHoursReviewHint(issue: IssueRow): string | null {
+  if (issue.issue_type !== 'missing_hours') return null;
+  const d = issue.detail as MissingHoursDetail | null;
+  if (!d?.not_findable_candidate) return null;
+  return 'Possible not findable — review before rerunning automation';
+}
+
 function IssueRowComponent({
   issue, actionState, enrichProgress, onAction, onSuppress, onResolve, onInlineSave,
 }: {
@@ -504,6 +511,7 @@ function IssueRowComponent({
   const tool = TOOL_ACTIONS[issue.issue_type];
   const editable = INLINE_EDITABLE[issue.issue_type];
   const identityHint = unresolvedIdentityHint(issue);
+  const hoursReviewHint = missingHoursReviewHint(issue);
   const isUnresolvedIdentity = issue.issue_type === 'unresolved_identity';
 
   const handleInlineSubmit = () => {
@@ -614,6 +622,11 @@ function IssueRowComponent({
           {identityHint && (
             <div className="text-[11px] mt-0.5" style={{ color: C.amber }}>
               {identityHint}
+            </div>
+          )}
+          {hoursReviewHint && (
+            <div className="text-[11px] mt-0.5 font-medium" style={{ color: C.amber }}>
+              {hoursReviewHint}
             </div>
           )}
           {isUnresolvedIdentity && (

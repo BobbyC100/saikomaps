@@ -14,9 +14,14 @@ systems:
   - decision-system
 related_docs:
   - docs/decisions/DEC-001.md
+  - docs/skai/skai-system-overview-v1.md
 ---
 
 # Decision Index v1
+
+> Canonical SKAI definition lives in `docs/skai/skai-system-overview-v1.md`.
+> This document defines one subsystem inside SKAI (decision retrieval), not SKAI
+> as a whole.
 
 ## 1. Purpose
 

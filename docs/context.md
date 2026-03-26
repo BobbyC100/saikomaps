@@ -1,8 +1,8 @@
 # Saiko — Context Snapshot
 
-> Generated: 2026-03-22T19:58:40.958Z
-> Source: docs/registry.json (2026-03-22T19:58:40.706Z)
-> Documents: 91 included / 114 total
+> Generated: 2026-03-26T17:53:42.906Z
+> Source: docs/registry.json (2026-03-26T17:53:42.668Z)
+> Documents: 100 included / 129 total
 > Filters: status=active
 
 ---
@@ -21,6 +21,8 @@ To regenerate: `npm run docs:context`
 - [FIELDS-ENRICHMENT-OPS-INVENTORY-V1](#fields-enrichment-ops-inventory-v1) — Enrichment Operations Inventory: Canonical inventory of all enrichment operations available on an entity record — automated (Google Places, neighborhood lookup), semi-automated (GPID, Instagram, Photos), and human-only (editorial fields). Coverage Dashboard and Entity Profile are designed from this inventory outward.
 **KNOWLEDGE-SYSTEM**
 - [SKAI/DECISION-INDEX-SPEC-V1](#skai-decision-index-spec-v1) — Decision Index v1
+- [SKAI/SYSTEM-OVERVIEW-V1](#skai-system-overview-v1) — SKAI 1.0 Foundation: Foundational definition of SKAI, including scope, system boundaries, and how related Fields/TRACES/data-layer documents connect. Created to close the documentation gap where SKAI-prefixed docs existed without a formal top-level definition of SKAI itself.
+
 - [SYS-BOOT-CONTEXT-INVENTORY](#sys-boot-context-inventory) — Boot Context Inventory
 - [SYS-COVERAGE-DASHBOARD-DESIGN-V1](#sys-coverage-dashboard-design-v1) — Coverage Dashboard — Design Principles: Design principles for the Coverage Dashboard — work surface, not report; smart counts; group by solution; automation first
 - [SYS-DRAFT-TRIGGER-V1](#sys-draft-trigger-v1) — Draft Trigger v1: Defines when reusable knowledge must become a controlled draft.
@@ -39,6 +41,12 @@ To regenerate: `npm run docs:context`
 - [ARCH-ENTITY-MAINTENANCE-POLICY-V1](#arch-entity-maintenance-policy-v1) — Entity Maintenance Policy v1: Defines how Saiko maintains entity data across the full lifecycle — from soft-open through permanent closure. Establishes maintenance postures by operating status, re-enrichment cadences by source and status, and rules for when entities enter and exit active maintenance. Unifies the source-aware staleness tiers (enrichment-evidence-model-v1), link health cadences (coverage-source-enrichment-v1), and closure recheck rules (entity-state-model-v1) into a single policy.
 
 - [ARCH-IDENTITY-SCORING-V1](#arch-identity-scoring-v1) — Identity Scoring — Weighted Anchor Model: Weighted anchor scoring model for entity identity confidence. GPID is not required — entities reach publication threshold through any combination of anchors that demonstrates sufficient identity certainty.
+- [ARCH-INSTAGRAM-INGESTION-STATUS-V1](#arch-instagram-ingestion-status-v1) — Instagram Ingestion — Operational Status (V1): Operational status of the Instagram batch ingestion pipeline. Documents what is being ingested (accounts + media via Business Discovery API), known limitations (CDN URL expiration, account type requirements), and downstream wiring priorities (caption signal extraction, photo pipeline, profile signals). 914 entities with Instagram handles as of 2026-03-18.
+
+- [ARCH-PERSON-ACTORS-V1](#arch-person-actors-v1) — Person Actors — Chef & Sommelier Mapping (V1): Maps chefs, sommeliers, and beverage professionals to venues as first-class person actors in the Saiko graph. Uses the existing Actor model with kind=person and five new ActorRole values. V1 is manual entry and linking only — no automated extraction. V1.5 adds candidate generation from website enrichment and coverage source extraction.
+
+- [ARCH-RESERVATION-V1-REVIEW](#arch-reservation-v1-review) — Reservation Validation V1 — Architecture Review: Architecture review of the reservation validation V1 proposal. Documents what exists today (merchant-evidence-only extraction, no provider API integration), recommends a separate reservation_provider_matches table with a three-tier confidence model (weak / strong_merchant / provider_verified), and defines provider-specific render behavior as an additive upgrade over the existing generic Reserve button. Includes backlog bucket analysis of 751 open missing_reservations issues.
+
 - [ARCH-SOCIAL-FIELDS-V1](#arch-social-fields-v1) — Social Fields — Entity-Level Specification: Specification for social media handle fields on entities (Instagram, TikTok). Covers storage format, discovery, validation, identity weight, and the sentinel value convention for confirmed-none.
 - [ARCH-SYSTEM-CONTRACT](#arch-system-contract) — SYSTEM CONTRACT
 - [ARCHITECTURE-INSTAGRAM-API-INTEGRATION-V1](#architecture-instagram-api-integration-v1) — Instagram API Integration — Current State: Instagram Graph API integration state — Meta app config, permissions, verified endpoints, architectural models for media ingestion
@@ -48,7 +56,7 @@ To regenerate: `npm run docs:context`
 
 - [COVOPS-APPROACH-V1](#covops-approach-v1) — Coverage Operations — Architectural Position: Architectural position for Coverage Operations — introduces entity_issues as a unified operational layer over existing queue fragments, with tool readiness assessment and phased implementation plan.
 - [FIELDS-ERA-OVERVIEW-V1](#fields-era-overview-v1) — Entity Record Awareness (ERA) — One-Pager: Defines Entity Record Awareness (ERA) — how Saiko becomes aware a place exists, separating awareness from canonical (Golden) status to prevent silent drift.
-- [FIELDS-VERTICAL-TAXONOMY-V1](#fields-vertical-taxonomy-v1) — Saiko Vertical Taxonomy: Defines Saiko's 12-vertical taxonomy — the primary domains of urban life used to classify every place in the system. Documents anthropological rationale, system role, technical anchors, and design implications.
+- [FIELDS-VERTICAL-TAXONOMY-V1](#fields-vertical-taxonomy-v1) — Saiko Vertical Taxonomy: Defines Saiko's 13-vertical taxonomy — the primary domains of urban life used to classify every place in the system. Documents anthropological rationale, system role, technical anchors, and design implications.
 - [SAIKO-COVERAGE-DASHBOARD-DESIGN-V1](#saiko-coverage-dashboard-design-v1) — Coverage Dashboard — Design Principles: Design principles for the Coverage Dashboard — a work surface for resolving data gaps, organized by solution type (automated vs. semi-automated vs. human-only) rather than by missing field.
 - [SAIKO-DEFERRED-MIGRATION-GATES](#saiko-deferred-migration-gates) — Deferred Migration Gates: Gate conditions that must be satisfied before applying the two deferred Fields v2 migrations — slim entities and legacy table drop.
 - [SAIKO-ENTITIES-CONTRACT-RECONCILIATION](#saiko-entities-contract-reconciliation) — Entities Contract Reconciliation: Field-level audit and decision log for the entities table — what belongs, what migrates, and what is retired as part of the Fields v2 architecture.
@@ -73,13 +81,13 @@ To regenerate: `npm run docs:context`
 - [APPROVED-SOURCE-REGISTRY-V1](#approved-source-registry-v1) — Approved Editorial Source Registry: Canonical reference for Saiko's curated list of approved editorial sources. Bobby maintains this list. A source enters only if it clearly improves cultural interpretation or factual coverage. This document mirrors the code-level registry in lib/source-registry.ts.
 
 - [SAIKO-DATA-PIPELINE-QUICK-START](#saiko-data-pipeline-quick-start) — Data Pipeline — Quick Start: Quick-start guide for entity intake and enrichment. Start here if you have a list of place names to add.
-- [SAIKO-DATABASE-SCHEMA](#saiko-database-schema) — Saiko Maps - Database Schema
+- [SAIKO-DATABASE-SCHEMA](#saiko-database-schema) — Saiko — Database Schema: Schema reference for the Saiko PostgreSQL database. Covers core entity tables, enrichment/signal tables, map/list tables, and Fields v2 canonical layer.
 - [SAIKO-DATABASE-SETUP](#saiko-database-setup) — Database Setup: Database setup: Neon (production), local Postgres (dev), Prisma ORM.
 - [SAIKO-ENV-TEMPLATE](#saiko-env-template) — Environment Variables: Environment variable reference. Three files: .env (defaults), .env.local (secrets), .env.example (template).
 - [SAIKO-GOOGLE-PLACES-SETUP](#saiko-google-places-setup) — Google Places API — Unblock Legacy Text Search
 - [SAIKO-PIPELINE-COMMANDS](#saiko-pipeline-commands) — Pipeline Commands: Operator command reference for entity enrichment, identity resolution, social discovery, and coverage operations.
 - [SAIKO-PROVENANCE-QUICK-REF](#saiko-provenance-quick-ref) — Provenance System - Quick Reference
-- [SAIKO-SITEMAP](#saiko-sitemap) — Saiko Maps - Sitemap
+- [SAIKO-SITEMAP](#saiko-sitemap) — Saiko — Sitemap
 - [OPS-STALE-DEPLOYMENTS](#ops-stale-deployments) — Debugging Stale Deployments & Local Updates
 - [SAIKO-DATA-SYNC-RUNBOOK](#saiko-data-sync-runbook) — Data Sync Runbook: Copy-paste commands for verifying and syncing data across environments.
 - [SAIKO-LOCAL-DEV](#saiko-local-dev) — Local Development: Local development setup: install, configure, run.
@@ -90,15 +98,24 @@ To regenerate: `npm run docs:context`
 - [ARCHITECTURE-FIELDS-INGESTION-PIPELINE-V1](#architecture-fields-ingestion-pipeline-v1) — (untitled)
 - [SAIKO-ADMIN-SPRING-CLEANING-2026-03](#saiko-admin-spring-cleaning-2026-03) — Admin Spring Cleaning Log — March 2026: Record of admin routes and features retired or fixed in March 2026 — Review Queue, Energy Engine, Appearances auth, GPID Queue URL. Captures rationale for each retirement.
 - [SAIKO-SAIKOAI-EXTRACTION-PROMPT-V2-1](#saiko-saikoai-extraction-prompt-v2-1) — SaikoAI Extraction Prompt — V2.1
-- [SAIKO-APP-OVERVIEW](#saiko-app-overview) — Saiko Maps - Application Overview
+- [SAIKO-APP-OVERVIEW](#saiko-app-overview) — Saiko — Application Overview: High-level overview of the Saiko platform: entity data system, enrichment pipeline, map creation, and consumer surfaces.
 - [SAIKO-README](#saiko-readme) — Saiko Maps
+- [HOMEPAGE-SOLUTIONS-V1](#homepage-solutions-v1) — Homepage Solutions Doc — saikofields.com: Locked implementation decisions and execution plan for wiring the homepage to real data sources, including section model, curation strategy, build order, and verification checklist.
+
+- [OPS-RELEASE-RUNBOOK-V1](#ops-release-runbook-v1) — Saiko Release Runbook v1: Release runbook covering the deploy flow (branch → PR → build gate → preview → merge → production), branch protection rules, incident response / rollback procedures, database migration rules, and build gate checks.
+
 - [OS-BEVERAGE-PROGRAM-VOCAB-V1](#os-beverage-program-vocab-v1) — Beverage Program + Signal Vocabulary (v1): Canonical beverage program model and signal vocabulary for derived offering enrichment. Defines 5 program containers, maturity scale, and locked signal sets for wine, beer, cocktail, non-alcoholic, and coffee/tea programs.
+- [SAIKO-FIELDS-IDENTITY-VERIFICATION-2026-03](#saiko-fields-identity-verification-2026-03) — Entity Identity - Implementation Verification: Repository and Neon DB verification snapshot for place identity implementation state as of 2026-03.
 - [SAIKO-FIELDS-IDENTITY-VERIFICATION-2026-03](#saiko-fields-identity-verification-2026-03) — Place Identity - Implementation Verification: Repository and Neon DB verification snapshot for place identity implementation state as of 2026-03.
 - [SKAI-DOC-LA-PLACES-PROGRAM-MAPPING-V1](#skai-doc-la-places-program-mapping-v1) — LA Places → Program Mapping (v1): Real-world validation of sushi/ramen/dumpling programs across 20 LA restaurants.
 - [SKAI-DOC-LA-RAMEN-PROGRAM-VALIDATION-V1](#skai-doc-la-ramen-program-validation-v1) — Ramen Program — LA Validation Mapping: Real-world stress test of ramen program across specialty shops, multi-style bars, and legacy anchors in Los Angeles.
 - [SKAI-DOC-LA-TACO-PROGRAM-VALIDATION-V1](#skai-doc-la-taco-program-validation-v1) — Taco Program — LA Validation Mapping: Real-world stress test of taco program across street tacos, taquerias, and contemporary concepts in Los Angeles.
 - [SOP-CHEATSHEET-V1](#sop-cheatsheet-v1) — Saiko Operations Cheatsheet
 - [SOP-SESSION-RELEASE-V1](#sop-session-release-v1) — Session Release Workflow v1
+- [TRACE-ENTITY-PAGE-FEEDBACK-BUVONS-2026-03-23](#trace-entity-page-feedback-buvons-2026-03-23) — Entity Page Voice/Copy Feedback — Buvons (2026-03-23): Production review notes for Buvons entity page voice/copy quality, including issues discovered, fixes shipped, and remaining follow-up items.
+
+- [UI-PLACE-PAGE-PATCH-LOG-V1](#ui-place-page-patch-log-v1) — Place Page Patch Log: Guardrail patch log used by place-page validation checks to track patch-level updates that keep CI token checks unblocked.
+
 **saiko-fields**
 - [SKAI-DOC-FIELDS-ATOMIC-SIGNALS-001](#skai-doc-fields-atomic-signals-001) — Atomic Cultural Signals: Defines the atomic cultural signal model used to structure place data in Saiko Fields.
 - [SKAI-DOC-FIELDS-DATA-LAYER-CONTRACT-001](#skai-doc-fields-data-layer-contract-001) — Data Layer Contract: Defines architectural boundaries and data access rules between the Saiko Data Layer, Fields platform, and TRACES consumer product.
@@ -694,6 +711,10 @@ Always run automated operations first. Human work is reserved for what the syste
 
 # Decision Index v1
 
+> Canonical SKAI definition lives in `docs/skai/skai-system-overview-v1.md`.
+> This document defines one subsystem inside SKAI (decision retrieval), not SKAI
+> as a whole.
+
 ## 1. Purpose
 
 This document defines the field specification for Saiko's Decision Index.
@@ -870,6 +891,122 @@ controlled vocab values valid, `superseded_by` references resolve to real files.
 **Starting point:** do not backfill all prior decisions immediately. Create records
 for decisions being made now and for the highest-value prior decisions that
 will be retrieved frequently. Grow the index organically from kickoff use.
+
+---
+
+## SKAI/SYSTEM-OVERVIEW-V1
+
+| Field | Value |
+|-------|-------|
+| **Type** | architecture |
+| **Status** | active |
+| **Project** | KNOWLEDGE-SYSTEM |
+| **Path** | `docs/skai/skai-system-overview-v1.md` |
+| **Last Updated** | Wed Mar 25 2026 17:00:00 GMT-0700 (Pacific Daylight Time) |
+| **Summary** | Foundational definition of SKAI, including scope, system boundaries, and how related Fields/TRACES/data-layer documents connect. Created to close the documentation gap where SKAI-prefixed docs existed without a formal top-level definition of SKAI itself.
+ |
+| **Systems** | knowledge-system, fields-data-layer, traces |
+
+# SKAI 1.0 Foundation
+
+## 1. Why this document exists
+
+Several canonical documents use SKAI-prefixed identifiers, but those documents
+primarily define subsystem contracts (signals, data-layer boundaries, enrichment
+evidence, and decision storage). They did not previously provide one explicit
+top-level definition of SKAI as a whole.
+
+This document is the missing root context.
+
+## 1.1 Source of truth statement
+
+This document is the canonical source of truth for the definition and scope of
+SKAI. When other SKAI-related docs focus on subsystems (signals, enrichment,
+contracts, retrieval), this doc remains the authoritative top-level reference
+for what SKAI is and how SKAI boundaries are defined.
+
+## 2. What SKAI 1.0 is
+
+SKAI 1.0 is Saiko's knowledge-and-architecture control surface for how canonical
+system understanding is defined, stored, governed, and retrieved across the stack.
+
+In practical terms, SKAI is the umbrella that binds:
+
+- canonical architecture documents in the repo (`/docs`)
+- the document/decision indexing pattern used for retrieval
+- cross-layer contracts between Data Layer, Fields, and TRACES
+- governance rules for how truth, interpretation, and product surfaces stay separated
+
+SKAI 1.0 is not a separate runtime app. It is a canonical architecture +
+knowledge framework that governs how the system is described and consumed.
+
+In short: **SKAI 1.0 is the system-definition layer above implementation layers.**
+
+## 3. Scope and boundaries
+
+### In scope
+
+- Defining canonical documentation contracts and IDs
+- Defining layer boundaries and ownership contracts
+- Defining signal/evidence models used by downstream systems
+- Defining retrieval surfaces for decisions and architecture context
+
+### Out of scope
+
+- Replacing the operational Fields platform implementation
+- Replacing the TRACES consumer product implementation
+- Acting as a standalone serving API with independent product behavior
+
+## 4. Relationship map (system-of-systems view)
+
+The current documented relationship is:
+
+1. **Data Layer** stores canonical, governed system-of-record data
+2. **Fields** performs ingestion, normalization, identity resolution, and derived signal production
+3. **TRACES** consumes canonical contracts for product interpretation/rendering
+4. **SKAI knowledge layer** defines and governs the documentation/contracts that keep those boundaries stable and retrievable
+
+SKAI therefore sits as the architecture-knowledge control plane over these
+systems, not as a replacement for them.
+
+## 5. SKAI-related canonical documents (current set)
+
+The following docs are currently the primary SKAI-related sources referenced in
+retrieval and architecture work:
+
+| Doc ID | Purpose |
+|---|---|
+| `SKAI-DOC-FIELDS-SIGNALS-REGISTRY-001` | Canonical registry contract for atomic/derived signal definitions and governance. |
+| `SKAI-DOC-FIELDS-ATOMIC-SIGNALS-001` | Atomic signal model used as non-interpretive evidence primitives. |
+| `SKAI-DOC-FIELDS-DATA-LAYER-CONTRACT-001` | Layer boundary and access contract between Data Layer, Fields, and TRACES. |
+| `ARCH-ENRICHMENT-EVIDENCE-MODEL-V1` | Evidence-first enrichment principles: presence/absence, staleness, sequencing before interpretation. |
+| `DEC-002` | Decision that canonical knowledge lives in repo docs with structured frontmatter. |
+| `SKAI/DECISION-INDEX-SPEC-V1` | Decision-level retrieval model above document-level registry indexing. |
+
+## 6. Naming note
+
+`SKAI-DOC-*` is a document identifier convention used by several architecture
+docs. In this repo, SKAI-prefixed IDs and `SKAI/*` IDs both appear as canonical
+knowledge identifiers. This document serves as the root definition for that
+namespace.
+
+## 7. Documentation gap closed by SKAI 1.0
+
+Before this file, a reader could find multiple SKAI-related implementation and
+contract documents but no single introductory definition of:
+
+- what SKAI is
+- what SKAI is not
+- where SKAI sits relative to Data Layer, Fields, and TRACES
+- how to navigate SKAI-related docs as one coherent system
+
+This document is now the top-level entry point for SKAI context and should be
+linked whenever SKAI is referenced as a system umbrella.
+
+## 8. Future updates
+
+As new SKAI-prefixed documents are added, update section 5 with the new canonical
+entries and keep this doc as the stable starting node for SKAI retrieval.
 
 ---
 
@@ -1523,6 +1660,10 @@ Research documents version like all canonical docs. If new research significantl
 | **Systems** | knowledge-system |
 
 # AI-Native Knowledge & Data Architecture Patterns (2023–2026)
+
+> Canonical SKAI definition and scope are maintained in
+> `docs/skai/skai-system-overview-v1.md`. This file is research input, not the
+> top-level SKAI contract.
 
 ## 1. Purpose
 
@@ -2710,6 +2851,11 @@ Not every entity type needs every signal. A taco cart doesn't need a wine progra
 **Expected:** Website, Instagram, description, hours
 **Not applicable:** Most food/beverage signals
 
+**Subtype policy note (implemented 2026-03-25):**
+- For CULTURE entities that match event-led music venue patterns (music venue, theater/theatre, concert hall),
+  hours are treated as optional in issue scanning.
+- This is an expectation policy override only; if hours are found via enrichment, they should still be displayed.
+
 ---
 
 ## Scanner Integration
@@ -2717,7 +2863,7 @@ Not every entity type needs every signal. A taco cart doesn't need a wine progra
 The issue scanner (`lib/coverage/issue-scanner.ts`) should evolve to check coverage depth per tier:
 
 ### Current (Tier 1 only)
-- `unresolved_identity` — no GPID
+- `unresolved_identity` — insufficient weighted identity anchors (not GPID-specific)
 - `missing_coords` — no lat/lng (blocking)
 - `missing_neighborhood` — no neighborhood
 - `missing_phone` — no phone
@@ -2727,7 +2873,7 @@ The issue scanner (`lib/coverage/issue-scanner.ts`) should evolve to check cover
 - `potential_duplicate` — fuzzy name/GPID/social match
 
 ### Next phase (Tier 2)
-- `missing_hours` — no hours data
+- `missing_hours` — no hours data (for hours-applicable entities after vertical/subtype policy)
 - `missing_price_level` — no price level (restaurants only)
 - `missing_menu_link` — no menu URL available for entities that should expose one
 - `missing_reservations` — no reservation URL for reservation-relevant entities
@@ -3578,7 +3724,7 @@ Entities are considered publishable when they have sufficient identity confidenc
 - **Anchor extraction**: `lib/identity-enrichment.ts` → `AnchorSet` interface
 - **Name matching (identity scoring)**: Jaro-Winkler similarity ≥ 0.85 for near-exact matches
 - **Name matching (GPID backfill)**: When `backfill-google-places.ts` searches by name (no pre-existing GPID or address), it guards against linking the wrong place using: (1) Jaro-Winkler ≥ 0.55 OR (2) substring containment (entity name ⊂ Google name or vice versa). Both must fail to reject. Our curated entity name is never overwritten by Google's display name — Google provides GPID, coords, hours, and photos only.
-- **Coverage integration**: `lib/coverage/issue-scanner.ts` flags `unresolved_identity` only when GPID is missing — but this does NOT block publication if other anchors are sufficient
+- **Coverage integration**: `lib/coverage/issue-scanner.ts` flags `unresolved_identity` from the weighted anchor score threshold (not GPID alone); `missing_gpid` is tracked separately as a non-blocking gap
 
 ## Design Rationale
 
@@ -3600,6 +3746,762 @@ A binary "has GPID = verified" model can't express nuance. A place with GPID but
 - **Website at 3**: An official website requires effort to create and maintain. Strong signal of an established business.
 - **Social at 2 each**: Active social presence confirms the entity exists and is operating. Two platforms are worth more than one (independence).
 - **Corroborators at 1 each**: These confirm but don't independently establish identity. A matching phone number is good, but phone numbers can be wrong or reused.
+
+---
+
+## ARCH-INSTAGRAM-INGESTION-STATUS-V1
+
+| Field | Value |
+|-------|-------|
+| **Type** | architecture |
+| **Status** | active |
+| **Project** | SAIKO |
+| **Path** | `docs/architecture/instagram-ingestion-status-v1.md` |
+| **Last Updated** | 2026-03-23 |
+| **Summary** | Operational status of the Instagram batch ingestion pipeline. Documents what is being ingested (accounts + media via Business Discovery API), known limitations (CDN URL expiration, account type requirements), and downstream wiring priorities (caption signal extraction, photo pipeline, profile signals). 914 entities with Instagram handles as of 2026-03-18.
+ |
+| **Systems** | enrichment, instagram |
+
+# Instagram Ingestion — Operational Status (V1)
+
+---
+
+## 1. Current State
+
+Instagram batch ingestion is operational and verified working in production. Instagram photos are now successfully ingested and displayed on entity pages. The workflow fetches 12 most recent media per entity, ranks by photo type preference, and displays the top 6 photos.
+
+As of 2026-03-18, the system ingests account data and recent media for 914 entities with Instagram handles. Production verification completed on Buvons (verified 2026-03-23).
+
+### What is being ingested
+
+| Data | Table | Status |
+|---|---|---|
+| Account profiles | `instagram_accounts` | Writing (username, media_count, followers_count) |
+| Recent media (10 per entity) | `instagram_media` | Writing (photos, videos, captions, permalinks, timestamps) |
+| Insight snapshots | `instagram_insight_snapshots` | Not yet (requires account-level permissions) |
+
+### Infrastructure
+
+| Component | Status |
+|---|---|
+| Meta Graph API credentials | Active (TRACES THREE dev app) |
+| Business Discovery endpoint | Verified, working |
+| Rate limiter | 180 calls/hour with exponential backoff |
+| Circuit breaker | 5 consecutive rate limits → stop batch |
+| Ingestion script | `scripts/ingest-instagram.ts --batch` |
+
+---
+
+## 2. Data Model
+
+### instagram_accounts
+
+One row per entity. Keyed by `instagram_user_id` (unique).
+
+| Field | Source |
+|---|---|
+| username | Business Discovery |
+| media_count | Business Discovery |
+| account_type | Business Discovery (BUSINESS / CREATOR / PERSONAL) |
+| canonical_instagram_url | Derived |
+| raw_payload | Full API response preserved |
+
+### instagram_media
+
+Up to N rows per account (default 200, current batch uses 12).
+
+| Field | Source |
+|---|---|
+| media_type | IMAGE / VIDEO / CAROUSEL_ALBUM |
+| media_url | CDN URL (**expires** — not permanent) |
+| thumbnail_url | For videos |
+| permalink | Permanent IG post URL |
+| caption | Full post text |
+| timestamp | Original post time |
+| photoType | AI-classified (see below) |
+| raw_payload | Full API response preserved |
+
+### photoType Classification (added 2026-03-22)
+
+The `photoType` field on `instagram_media` is populated by an AI photo classification step. Values:
+
+| photoType | Meaning |
+|-----------|---------|
+| `INTERIOR` | Interior shot of the space |
+| `FOOD` | Food plating, dishes |
+| `BAR_DRINKS` | Bar setup, cocktails, wine |
+| `CROWD_ENERGY` | People, atmosphere, crowd |
+| `DETAIL` | Close-up details, textures |
+| `EXTERIOR` | Exterior/facade shot |
+| `null` | Not yet classified |
+
+**Classification script:** `scripts/classify-entity-photos.ts` — downloads photos, sends to Claude for classification, writes `photoType` back to `instagram_media`.
+
+**Photo ranking in entity page contract:** Photos are ranked by photoType preference order: INTERIOR (0) → FOOD (1) → BAR_DRINKS (2) → CROWD_ENERGY (3) → DETAIL (4) → EXTERIOR (5). Unclassified photos sort after classified ones. Top 6 photos are returned as `photoUrls` in the entity page contract.
+
+---
+
+## 3. Known Limitations
+
+### CDN URL expiration and fallback strategy (RESOLVED)
+
+`media_url` and `thumbnail_url` are temporary Instagram CDN links that expire after an unknown period (hours to days).
+
+**Solution implemented (2026-03-23):** The API route `app/api/places/[slug]/route.ts` now implements a fallback strategy:
+- Attempts to fetch top 6 photos from most recent 12 Instagram media items
+- If `mediaUrl` (CDN) is expired, falls back to `permalink` (permanent Instagram post URL)
+- Photo ranking preference: INTERIOR (0) → FOOD (1) → BAR_DRINKS (3) → CROWD_ENERGY (4) → DETAIL (5) → EXTERIOR (6)
+- This ensures photos remain accessible even when CDN URLs expire
+
+Production verified working on Buvons (2026-03-23).
+
+### Account type requirements
+
+Business Discovery only works for Business and Professional Instagram accounts. Personal accounts return "not found." This affects a small percentage of entities (~3 handles failed in initial testing).
+
+### Bio not fetched
+
+The current Business Discovery fields do not include `biography`. Adding this field would provide place descriptions from the operator's own words — valuable for signal extraction.
+
+---
+
+## 4. Downstream Wiring (Partially Built)
+
+### Priority 1 — Photo pipeline (IMPLEMENTED)
+
+Instagram images are now surfaced through place page contracts. Current workflow (2026-03-23):
+
+1. API route fetches 12 most recent Instagram media items per entity
+2. Photos ranked by type preference: INTERIOR → FOOD → BAR_DRINKS → CROWD_ENERGY → DETAIL → EXTERIOR
+3. Top 6 photos returned as `photoUrls` in entity page contract
+4. CDN URLs with fallback to permalinks implemented
+5. Verified working in production on Buvons and other EAT/HOSPITALITY entities
+
+### Priority 2 — Caption signal extraction
+
+Instagram captions are rich text from the operator's own voice. They feed the same extraction pipelines as website text blocks:
+
+- SceneSense lenses (atmosphere, energy, scene signals)
+- Cuisine/offering signals
+- Events Program detection ("private dining", "catering", "book our space")
+- Hours/schedule clues
+
+**Approach:** Register Instagram as a `merchant_surface` source type so existing extraction code reads caption text blocks without a separate pipeline.
+
+Status: Not yet implemented. Requires merchant_surface registration.
+
+### Priority 3 — Profile signals
+
+| Signal | Source | Status |
+|---|---|---|
+| Follower count | `instagram_accounts.raw_payload` | Available (not yet surfaced) |
+| Post frequency | Derived from `instagram_media.timestamp` | Available (not yet surfaced) |
+| Media count | `instagram_accounts.media_count` | Available (not yet surfaced) |
+| Account type | `instagram_accounts.account_type` | Available (not yet surfaced) |
+
+These signals are captured in the raw data but not yet wired into entity page contracts or scoring pipelines.
+
+### Priority 4 — Temporal signals
+
+Not yet in schema. Would require `instagram_temporal_signals` table for:
+- Closure/reopening events detected from captions
+- Seasonal patterns
+- Event announcements
+
+Status: Not yet implemented.
+
+---
+
+## 5. Enrichment Pipeline Integration
+
+Instagram is not yet wired into the 7-stage ERA pipeline. Two integration points:
+
+1. **Stage 2 extension** — surface discovery recognizes Instagram as a source, creates `merchant_surfaces` row
+2. **Stage 6 extension** — website enrichment reads Instagram captions alongside website text blocks
+
+Alternatively, Instagram ingestion could become a standalone stage (Stage 8) or run as a parallel track outside the main ERA sequence.
+
+---
+
+## 6. Files
+
+| File | Purpose |
+|---|---|
+| `scripts/ingest-instagram.ts` | Main ingestion script (batch + single modes) |
+| `scripts/backfill-instagram-handles.ts` | Extract handles from merchant surfaces |
+| `scripts/find-instagram-handles.ts` | Discover handles for entities |
+| `app/api/admin/instagram/route.ts` | Admin handle CRUD |
+| `app/api/admin/tools/instagram-discover/route.ts` | Operator action endpoint |
+| `app/admin/instagram/page.tsx` | Admin handle management UI |
+| `docs/architecture/instagram-api-integration-v1.md` | API setup and permissions |
+| `docs/architecture/instagram-implementation-v1.md` | Implementation plan and phases |
+| `docs/architecture/instagram-ingestion-field-spec-v1.md` | Field-level schema spec |
+
+---
+
+## ARCH-PERSON-ACTORS-V1
+
+| Field | Value |
+|-------|-------|
+| **Type** | architecture |
+| **Status** | active |
+| **Project** | SAIKO |
+| **Path** | `docs/architecture/person-actors-v1.md` |
+| **Last Updated** | 2026-03-22 |
+| **Summary** | Maps chefs, sommeliers, and beverage professionals to venues as first-class person actors in the Saiko graph. Uses the existing Actor model with kind=person and five new ActorRole values. V1 is manual entry and linking only — no automated extraction. V1.5 adds candidate generation from website enrichment and coverage source extraction.
+ |
+| **Systems** | entity-model, actors, admin |
+
+# Person Actors — Chef & Sommelier Mapping (V1)
+
+---
+
+## 1. Purpose
+
+Map chefs, sommeliers, and beverage professionals to venues as first-class actors in the Saiko graph. People are not places, but they have durable relationships to places that users care about.
+
+V1 = Manual entry and linking only. No automated extraction.
+
+---
+
+## 2. Model
+
+Person actors use the existing `Actor` model with `kind = person`.
+
+### Actor Table
+
+| Field | Value |
+|---|---|
+| kind | `person` |
+| name | Full name (e.g., "Walter Manzke") |
+| slug | Deterministic: `walter-manzke` (collision: `-2`, `-3`) |
+| website | Optional personal site |
+| description | Optional bio/context |
+| visibility | `INTERNAL` (default) |
+| confidence | `1.0` for manual entry |
+| sources | `{ seed: "manual_entry", created_at, created_by }` |
+
+### Roles (ActorRole enum)
+
+Five person-specific roles added in V1:
+
+| Role | Meaning |
+|---|---|
+| `chef` | Executive chef, head chef, chef de cuisine |
+| `sommelier` | Sommelier, head sommelier |
+| `pastry_chef` | Pastry chef, pastry director |
+| `beverage_director` | Beverage director, bar director |
+| `wine_director` | Wine director, wine program lead |
+
+### Linking
+
+Person actors link to venues via `PlaceActorRelationship`:
+
+```
+PlaceActorRelationship {
+  entityId    → entities.id
+  actorId     → Actor.id
+  role        → ActorRole (chef, sommelier, etc.)
+  isPrimary   → true/false
+  confidence  → 1.0 (manual)
+  sources     → { seed: "manual_entry", ... }
+}
+```
+
+**Primary override rule:** If a venue already has `isPrimary = true` for the same role with a different actor, the existing primary is demoted to `isPrimary = false`. One primary per (entity, role).
+
+---
+
+## 3. Scope (V1)
+
+### What V1 includes
+
+- Manual creation of person actors via admin UI
+- Manual linking to venues with role selection
+- One actor can link to multiple venues (chef at two restaurants)
+- One venue can have multiple person actors (chef + sommelier)
+- Primary flag per role per venue
+- Public actor page at `/actor/[slug]` (shared with operator actors)
+
+### What V1 excludes
+
+- No automated extraction from websites
+- No historical/founding roles (former chef, opening chef)
+- No temporal bounds (start_date, end_date on relationships)
+- No confidence scoring below 1.0 (all manual = high confidence)
+- No candidate review queue for person actors
+
+### Scope decisions
+
+| Decision | Rationale |
+|---|---|
+| Current roles only | Historical roles get muddy fast — "founding chef" vs "former chef" vs "consulting chef" |
+| Manual entry only | People data from websites is noisy — titles change, pages go stale, multiple people per role |
+| No extraction pipeline | Will be added in V1.5 as candidate generation, not auto-write |
+
+---
+
+## 4. Admin Interface
+
+### Create Person: `/admin/actors/add-person`
+
+Form fields:
+- **Name** (required) — person's full name
+- **Role** (required) — dropdown: Chef, Sommelier, Pastry Chef, Beverage Director, Wine Director
+- **Link to venue** (optional) — typeahead search by venue name, links in same request
+- **Website** (optional) — personal site
+- **Description** (optional) — brief context
+
+After creation, shows confirmation with link to actor page.
+
+### API Routes
+
+| Route | Method | Purpose |
+|---|---|---|
+| `/api/admin/actors/create-person` | POST | Create Actor(kind=person) + optional venue link |
+| `/api/admin/actors/[actorId]/link-place` | POST | Link existing actor to additional venue |
+
+---
+
+## 5. Future (V1.5 / V2)
+
+### V1.5 — Extraction as candidate pipeline
+
+Two extraction sources feed person-actor candidates:
+
+**Website enrichment** detects person-role patterns from venue websites:
+- "Executive Chef: John Smith"
+- "Our sommelier, Jane Doe"
+- "Wine Director: Alex Park"
+- "led by chef Maria Lopez"
+
+**Coverage source extraction** detects person-role patterns from editorial
+articles (see COVERAGE-SOURCE-ENRICHMENT-V1). The `people` field in
+`coverage_source_extractions` captures: name, role, context, isPrimary.
+Coverage extraction uses an expanded role vocabulary including: chef,
+executive_chef, sous_chef, pastry_chef, sommelier, beverage_director,
+wine_director, bartender, general_manager, foh_director, foh_manager,
+owner, founder, partner, operator.
+
+Both sources generate **candidate observations**, not canonical actors.
+Candidates go through:
+1. Match against existing person actors
+2. If match found → propose relationship for review
+3. If no match → create review candidate (not auto-create actor)
+
+### V2 — Temporal relationships
+
+Add `startDate` / `endDate` to `PlaceActorRelationship`:
+- Track chef transitions ("Walter Manzke at République since 2015")
+- Enable historical queries ("who was the chef at X in 2020?")
+- Express founding roles with time bounds
+
+### V2 — Additional roles
+
+Potential additions to the `ActorRole` enum (some already used in coverage
+extraction's person vocabulary but not yet in the schema enum):
+- `founding_chef`
+- `consulting_chef`
+- `bartender` — already in coverage extraction vocabulary
+- `general_manager` — already in coverage extraction vocabulary
+- `foh_director` — already in coverage extraction vocabulary
+- `foh_manager` — already in coverage extraction vocabulary
+- `creative_director`
+
+---
+
+## 6. Relationship to Operator Actors
+
+Person actors and operator actors coexist in the same `Actor` table and `PlaceActorRelationship` system. They differ only in `kind` and typical `role`:
+
+| Kind | Typical Roles | Ingestion |
+|---|---|---|
+| `operator` | operator, owner, parent, brand | Automated (URL ingestion pipeline) |
+| `person` | chef, sommelier, pastry_chef, etc. | Manual (V1), candidate pipeline (V1.5) |
+
+Both link to venues through `PlaceActorRelationship`. A venue can have both an operator actor and multiple person actors.
+
+---
+
+## 7. Files
+
+| File | Purpose |
+|---|---|
+| `prisma/schema.prisma` | ActorRole enum (5 new values) |
+| `prisma/migrations/20260318100000_add_person_actor_roles/` | Migration |
+| `app/admin/actors/add-person/page.tsx` | Admin create form |
+| `app/api/admin/actors/create-person/route.ts` | Create API |
+| `app/api/admin/actors/[actorId]/link-place/route.ts` | Link API |
+| `lib/utils/actorSlug.ts` | Slug generation (shared) |
+| `lib/actors/approveCandidate.ts` | Primary override logic (shared) |
+
+---
+
+## ARCH-RESERVATION-V1-REVIEW
+
+| Field | Value |
+|-------|-------|
+| **Type** | architecture |
+| **Status** | active |
+| **Project** | SAIKO |
+| **Path** | `docs/reservation-v1-architecture-review.md` |
+| **Last Updated** | 2026-03-22 |
+| **Summary** | Architecture review of the reservation validation V1 proposal. Documents what exists today (merchant-evidence-only extraction, no provider API integration), recommends a separate reservation_provider_matches table with a three-tier confidence model (weak / strong_merchant / provider_verified), and defines provider-specific render behavior as an additive upgrade over the existing generic Reserve button. Includes backlog bucket analysis of 751 open missing_reservations issues.
+ |
+| **Systems** | enrichment, fields-data-layer, traces-place-page, coverage-ops |
+
+# Reservation Validation V1 — Architecture Review
+
+---
+
+## 1. Executive Summary
+
+Saiko already has a working reservation extraction pipeline. It detects reservation URLs from merchant websites, stores them in `merchant_signals`, and renders a generic "Reserve" button on the place page. What it does **not** have is any form of provider-side validation. No OpenTable API. No Resy API. No external provider calls of any kind. The system today is merchant-evidence-only, with no confidence gate at render time.
+
+V1 is correctly framed as a **validation-and-confidence layer on top of an existing extraction system** — not a new reservation feature. The existing pipeline is the foundation. V1 adds trust, accuracy, and provider specificity to what already flows through the system.
+
+The most important near-term risk is not "we don't have a reservation button" (we do), but "we render reservation buttons with no confidence gate, no provider verification, and no way to distinguish strong evidence from weak evidence." V1 should fix that.
+
+---
+
+## 2. What Exists Today
+
+### Data layer
+
+| Table | Reservation Fields | Purpose |
+|-------|-------------------|---------|
+| `entities` | `reservationUrl` | Legacy convenience field, direct on entity |
+| `merchant_signals` | `reservation_provider`, `reservation_url`, `extraction_confidence` | Current best per entity, upserted from enrichment |
+| `merchant_surface_scans` | `reservation_platform`, `reservation_url` | Snapshot from homepage scans |
+| `merchant_surfaces` | Raw HTML capture | Immutable evidence (includes reservation links in raw form) |
+| `merchant_surface_artifacts` | Parsed JSON from surfaces | Structured extraction output, may contain reservation links |
+| `entity_issues` | `issue_type = 'missing_reservations'` | Tracks entities with no reservation URL (751 open) |
+
+### Enrichment pipeline
+
+The website enrichment pipeline (Stage 6) detects reservation URLs by pattern-matching HTML content against known provider domains: `resy.com`, `opentable.com`, `exploretock.com`, `tock.com`, `yelp.com/reservations`, `sevenrooms.com`, `reserve.com`, `bookatable`, `tablein.com`. It writes results to `merchant_signals` at confidence >= 0.5 and to Fields v2 canonical state at confidence >= 0.75.
+
+Separately, `extract-reservation-menu.js` promotes reservation URLs from parsed merchant surface artifacts into `merchant_signals` and resolves corresponding `entity_issues`.
+
+### Render path
+
+The API route (`/api/places/[slug]/route.ts`) reads `merchant_signals.reservation_url` with a fallback to `entities.reservationUrl`. It does **not** select `extraction_confidence` or `reservation_provider`. The place page renders a generic "Reserve" button whenever `reservationUrl` is truthy. There is **no confidence threshold, no provider check, and no validation gate at render time**.
+
+### What does NOT exist
+
+- No OpenTable API integration (no keys, no client code, no endpoints)
+- No Resy API integration (no keys, no client code, no endpoints)
+- No provider-side validation of any kind
+- No external API calls to reservation providers
+- No venue-level matching against provider data
+- The `reservation_provider` field in `merchant_signals` is written but **never read** by the API or UI
+- The `extraction_confidence` field in `merchant_signals` is written but **never read** at query/render time
+
+The system today is exclusively merchant-evidence-based. Every reservation URL comes from scraping merchant websites and pattern-matching against known provider domains.
+
+---
+
+## 3. What V1 Actually Is
+
+V1 is a **validation layer added to an existing reservation extraction system**. It is not a new reservation feature.
+
+What changes:
+
+1. **A place to store validation state** — today, `merchant_signals` stores "we found this URL on their website." V1 adds "we evaluated this URL against the provider and here's the result."
+2. **A confidence ladder** — today, the system writes with confidence thresholds but reads without them. V1 introduces a read-time confidence gate.
+3. **Provider-specific labels** — today, the button says "Reserve." V1 says "Reserve on OpenTable" or "Reserve on Resy" when confidence justifies it.
+4. **An audit surface** — today, ambiguous or near-threshold matches are invisible. V1 surfaces them for review.
+
+What does NOT change:
+
+- The existing enrichment pipeline continues to extract reservation URLs from merchant HTML
+- The existing `merchant_signals` table continues to store extraction results
+- The existing generic "Reserve" button continues to render for entities without a validated provider match
+- No existing tables are modified
+
+---
+
+## 4. Recommended Data Model
+
+### Separate table: `reservation_provider_matches`
+
+A separate table is the right pattern. Here's why:
+
+**Idempotency.** `merchant_signals` is a 1:1 upsert per entity — one row, latest-wins. Provider validation needs to store one result per entity *per provider*. An entity could have both an OpenTable and a Resy match candidate. A separate table with a unique constraint on `(entity_id, provider)` handles this cleanly.
+
+**Auditability.** `merchant_signals` overwrites on each enrichment run. Provider match state needs to persist across runs with its own timestamps (`last_checked_at`, `last_verified_at`). Mixing this into `merchant_signals` would conflate extraction state with validation state.
+
+**Separation of concerns.** `merchant_signals` answers "what did we extract from the merchant's website?" `reservation_provider_matches` answers "what do we believe about this entity's relationship to a specific provider?" These are architecturally distinct questions.
+
+**Future providers.** New providers (Tock, SevenRooms) become new rows, not new columns. The model scales without schema changes.
+
+### Recommended shape
+
+```
+reservation_provider_matches
+  id                UUID (PK)
+  entity_id         String (FK → entities)
+  provider          String ('opentable' | 'resy' | 'tock' | 'sevenrooms')
+  provider_venue_id String?
+  booking_url       String?
+  match_status      String ('matched' | 'probable' | 'ambiguous' | 'no_match' | 'unverified')
+  match_score       Float?
+  match_signals     JSONB?
+  validation_source String ('website_link' | 'widget_metadata' | 'manual' | 'directory_api')
+  confidence_level  String ('weak' | 'strong_merchant' | 'provider_verified')
+  is_renderable     Boolean
+  program_signals   JSONB?
+  last_checked_at   DateTime
+  last_verified_at  DateTime?
+  created_at        DateTime
+  updated_at        DateTime
+
+  @@unique([entity_id, provider])
+  @@index([entity_id])
+  @@index([provider, match_status])
+  @@index([provider, is_renderable])
+```
+
+**Important distinction:** `validation_source` should reflect what actually happened, not what we hope to have. If no provider API exists today, the only valid V1 sources are `website_link`, `widget_metadata`, and `manual`. `directory_api` is reserved for when that integration exists.
+
+---
+
+## 5. Recommended Confidence Model
+
+Three tiers. Minimal and honest.
+
+### Tier 1 — `weak`
+
+- Text mention of a provider name without a direct URL
+- Fuzzy signal (e.g., "reservations available" without a provider link)
+- URL found but provider unclear or domain ambiguous
+
+**Render:** No. Never.
+
+### Tier 2 — `strong_merchant`
+
+- Direct provider-specific booking URL found on the merchant's official website
+- Identity signals align (name/address/domain match the entity)
+- Widget or embed metadata detected (especially relevant for Resy)
+- Extraction confidence >= 0.75 from the existing enrichment pipeline
+
+**Render:** Provider-dependent. For Resy (no public API), this is the ceiling for V1 — renderable if identity alignment is strong. For OpenTable, this triggers a provider validation attempt when API access exists; until then, it is the practical ceiling.
+
+### Tier 3 — `provider_verified`
+
+- Direct confirmation from provider API (Directory API lookup returns a matching venue with booking link)
+- Or equivalent official confirmation (partner data, manual verification from provider source)
+
+**Render:** Yes. Always (assuming valid booking URL).
+
+### What this means in practice for V1
+
+Since no provider API integration exists today, **every V1 match will be Tier 1 or Tier 2**. That's fine. The model is designed to accommodate Tier 3 when it becomes available without restructuring. The ladder is honest about what the system can actually claim right now.
+
+The confidence model should not claim `provider_verified` until a real provider validation source exists. This is not a limitation — it's integrity.
+
+---
+
+## 6. Recommended Render Behavior
+
+### Principle: additive enhancement, not restrictive gate
+
+V1 should **not** break the existing render behavior. Today, any entity with a truthy `reservationUrl` gets a "Reserve" button. That behavior should persist as the baseline.
+
+What V1 adds on top:
+
+1. **Provider-specific labels.** If `reservation_provider_matches` has a renderable match for the entity, upgrade the label from "Reserve" to "Reserve on OpenTable" / "Reserve on Resy" / etc. Use the validated booking URL from the match table instead of the raw merchant_signals URL.
+
+2. **Confidence-gated upgrade.** The provider-specific label only appears when `is_renderable = true` on the match record. Otherwise, fall back to the existing generic behavior.
+
+3. **No regressions.** If an entity has a reservation URL in `merchant_signals` but no validated provider match, the generic "Reserve" button continues to render. V1 does not remove buttons — it upgrades them.
+
+### Why not gate the existing button on confidence?
+
+Because the existing button already renders for some set of entities, and pulling it without replacing it with something better would be a visible regression. The right V1 move is to layer validation on top, let the validated version gradually replace the generic version, and consider tightening the generic gate in V2 once coverage is sufficient.
+
+### One exception worth considering
+
+There is currently no confidence check at render time at all. The `extraction_confidence` field exists in `merchant_signals` but is never read by the API. A low-risk V1 enhancement (independent of provider validation) would be to add a minimum extraction confidence threshold to the API query — e.g., only return `reservationUrl` when `extraction_confidence >= 0.5`. This would suppress buttons based on very weak extraction evidence. But this is a separate, smaller decision from the provider validation work.
+
+---
+
+## 7. Validation-Source Reality Check
+
+This is the most important section.
+
+| Question | Answer | Evidence |
+|----------|--------|----------|
+| OpenTable API integration? | **Does not exist.** | No API keys, no client code, no endpoints, no dependencies in package.json. |
+| Resy API integration? | **Does not exist.** | No API keys, no client code, no endpoints. The crawler explicitly skips resy.com URLs to avoid crawling into the platform. |
+| Provider-side validation hooks? | **Do not exist.** | No code anywhere calls an external reservation provider API. |
+| Merchant-side extraction? | **Yes, exists and is active.** | `lib/website-enrichment/pipeline.ts` pattern-matches against resy.com, opentable.com, etc. `scripts/extract-reservation-menu.js` extracts from parsed artifacts. |
+| `reservation_provider` field used at read time? | **No.** | The API route selects `reservation_url` but never selects `reservation_provider`. |
+| `extraction_confidence` field used at read time? | **No.** | Written during enrichment (0.5 threshold to write, 0.75 for Fields v2), but never checked when the API serves data or the UI renders. |
+
+**Bottom line:** The system today is 100% merchant-evidence-based. Every reservation signal comes from pattern-matching HTML on merchant websites. No external provider has ever been called. The `reservation_provider` and `extraction_confidence` fields are written but not read — they are dormant infrastructure that V1 can activate.
+
+---
+
+## 8. Recommended Audit Views
+
+### View 1: `reservation_provider_audit_queue`
+
+Primary operational view. Surfaces records from `reservation_provider_matches` that need human review.
+
+```sql
+CREATE VIEW reservation_provider_audit_queue AS
+SELECT
+  rpm.entity_id,
+  e.name AS entity_name,
+  e.slug,
+  rpm.provider,
+  rpm.match_status,
+  rpm.confidence_level,
+  rpm.booking_url,
+  rpm.match_score,
+  rpm.validation_source,
+  rpm.last_checked_at,
+  ms.reservation_url AS merchant_signal_url,
+  ms.reservation_provider AS merchant_signal_provider,
+  ms.extraction_confidence
+FROM reservation_provider_matches rpm
+JOIN entities e ON e.id = rpm.entity_id
+LEFT JOIN merchant_signals ms ON ms.entity_id = rpm.entity_id
+WHERE rpm.match_status IN ('probable', 'ambiguous')
+   OR (rpm.match_status = 'matched' AND rpm.confidence_level = 'weak')
+ORDER BY rpm.match_score DESC NULLS LAST, rpm.last_checked_at ASC;
+```
+
+### View 2: `reservation_coverage_summary`
+
+High-level coverage dashboard. Shows where we stand across the entity corpus.
+
+```sql
+CREATE VIEW reservation_coverage_summary AS
+SELECT
+  COALESCE(rpm.provider, ms.reservation_provider, 'none') AS provider,
+  COUNT(*) AS entity_count,
+  COUNT(CASE WHEN rpm.is_renderable THEN 1 END) AS renderable_count,
+  COUNT(CASE WHEN rpm.match_status = 'probable' THEN 1 END) AS probable_count,
+  COUNT(CASE WHEN rpm.match_status = 'ambiguous' THEN 1 END) AS ambiguous_count,
+  COUNT(CASE WHEN ms.reservation_url IS NOT NULL AND rpm.id IS NULL THEN 1 END) AS extracted_not_validated
+FROM entities e
+LEFT JOIN reservation_provider_matches rpm ON rpm.entity_id = e.id
+LEFT JOIN merchant_signals ms ON ms.entity_id = e.id
+WHERE e.primary_vertical IN ('EAT', 'DRINKS', 'WINE', 'STAY')
+GROUP BY COALESCE(rpm.provider, ms.reservation_provider, 'none');
+```
+
+### View 3: `reservation_backlog_buckets`
+
+Operational triage of the missing_reservations backlog (see Section 9 below for bucket definitions).
+
+```sql
+CREATE VIEW reservation_backlog_buckets AS
+SELECT
+  ei.entity_id,
+  e.name,
+  e.slug,
+  CASE
+    WHEN e.website IS NULL OR e.website = '' THEN 'no_website'
+    WHEN ms.reservation_url IS NOT NULL AND ms.reservation_url != '' THEN 'extracted_not_synced'
+    WHEN ms.reservation_provider IS NOT NULL THEN 'provider_without_url'
+    WHEN EXISTS (
+      SELECT 1 FROM merchant_surfaces surf
+      WHERE surf.entity_id = e.id AND surf.surface_type = 'reservation'
+    ) THEN 'surface_captured_not_extracted'
+    WHEN EXISTS (
+      SELECT 1 FROM merchant_surfaces surf
+      WHERE surf.entity_id = e.id
+    ) THEN 'has_surfaces_no_reservation_signal'
+    ELSE 'no_signal'
+  END AS bucket,
+  ms.reservation_provider,
+  ms.reservation_url,
+  ms.extraction_confidence,
+  e.website,
+  e.primary_vertical
+FROM entity_issues ei
+JOIN entities e ON e.id = ei.entity_id
+LEFT JOIN merchant_signals ms ON ms.entity_id = e.id
+WHERE ei.issue_type = 'missing_reservations'
+  AND ei.status = 'open';
+```
+
+---
+
+## 9. Missing Reservations Backlog — Bucket Analysis
+
+The 751 open `missing_reservations` issues are currently a flat list. They should be categorized into operationally distinct buckets:
+
+### Bucket 1: `no_website`
+Entity has no website at all. No merchant surface to scan. These are the hardest to resolve through automation — they require either manual research, Google Places data, or waiting for the merchant to establish a web presence. **Lowest ROI for V1 automation.**
+
+### Bucket 2: `no_signal`
+Entity has a website, possibly even merchant surfaces, but no reservation signal of any kind was detected. Could mean: the restaurant doesn't take reservations, or the reservation link is behind JavaScript / in an iframe / on a subpage the crawler didn't reach. **Good candidates for deeper crawling or manual spot-check.**
+
+### Bucket 3: `has_surfaces_no_reservation_signal`
+Merchant surfaces were fetched and parsed, but no reservation URL pattern was matched. Similar to `no_signal` but with confirmed surface coverage. The raw HTML exists — a re-parse with updated patterns might extract something. **Good candidates for pattern expansion.**
+
+### Bucket 4: `surface_captured_not_extracted`
+A reservation-type surface was captured but the URL hasn't been promoted to `merchant_signals`. The data exists in the evidence layer but hasn't flowed through. **Quick wins — these may just need the extraction script to run.**
+
+### Bucket 5: `provider_without_url`
+`merchant_signals.reservation_provider` is set (the system knows which provider) but `reservation_url` is null. The provider was detected but the specific booking link wasn't captured. **Good candidates for targeted provider-URL extraction.**
+
+### Bucket 6: `extracted_not_synced`
+`merchant_signals.reservation_url` exists and is non-empty, but the entity_issue is still open. This means the URL was extracted but the issue wasn't resolved — possibly a timing issue or the resolution script hasn't run. **Immediate wins — run the sync/resolution logic.**
+
+### Operational priority
+
+1. **extracted_not_synced** — run resolution script, close issues immediately
+2. **surface_captured_not_extracted** — run extraction pipeline, likely quick wins
+3. **provider_without_url** — targeted URL extraction by provider
+4. **has_surfaces_no_reservation_signal** — re-parse with updated patterns
+5. **no_signal** — deeper crawling or manual review
+6. **no_website** — lowest priority, requires external data
+
+---
+
+## 10. Risks and Ambiguities
+
+### Risk 1: V1 scope creep into API integration
+The specs reference OpenTable Directory API as a V1 validation source. But no API integration exists today, and partner access is not confirmed. **V1 should be designed to work without any provider API.** If API access materializes, it becomes a confidence upgrade source — not a V1 dependency.
+
+### Risk 2: Confidence model without a read-time gate
+The existing system writes `extraction_confidence` but never reads it at render time. V1 adds a new confidence model (`reservation_provider_matches.confidence_level`) but the risk is that the generic fallback path (entities without a provider match) still has no confidence gate. Consider whether V1 should also add a minimum confidence threshold to the existing render path.
+
+### Risk 3: Dual-read complexity
+The API already does a dual-read (merchant_signals → entities fallback). V1 adds a third source (reservation_provider_matches). The read priority needs to be explicit: provider_matches first (if is_renderable), then merchant_signals, then entities.reservationUrl. This should be documented as a contract, not left implicit in the API route code.
+
+### Risk 4: entity_issues vs. provider match state
+`entity_issues` tracks "this entity is missing reservation data." `reservation_provider_matches` will track "this entity's reservation data has been evaluated against a provider." These are related but distinct. V1 should NOT overload `entity_issues` with provider match state. The provider match table is the right home for validation state; entity_issues should only be updated (resolved/closed) when a validated match is achieved.
+
+### Ambiguity: What "renderable" means for Resy without API access
+The specs say Resy allows `strong_merchant` to render because no public API exists. This is a reasonable V1 posture, but it means Resy matches will always be lower-confidence than OpenTable matches (once OpenTable API access exists). The UI should not distinguish between these visually — "Reserve on Resy" should look identical to "Reserve on OpenTable" to the user. The confidence difference is an internal property, not a user-facing signal.
+
+---
+
+## 11. Final Recommendation
+
+Build V1 as a **validation-and-confidence layer on top of the existing extraction system**. The four deliverables in the review prompt are the right scope:
+
+1. **Provider match table** — `reservation_provider_matches` as a separate table. Correct pattern for idempotency, auditability, and multi-provider support.
+
+2. **Confidence model** — three tiers (weak / strong_merchant / provider_verified). Honest about what the system can actually claim. V1 will operate at Tier 1 and Tier 2 only. Tier 3 is reserved for real provider API integration.
+
+3. **Provider-specific labels** — upgrade from generic "Reserve" to "Reserve on [Provider]" when a validated match exists. Preserve existing generic behavior as fallback. No regressions.
+
+4. **Audit views** — SQL-first, three views covering operational review, coverage summary, and backlog bucketing.
+
+### Critical V1 constraint
+
+**Do not make provider API access a V1 dependency.** The entire V1 should be buildable and shippable with only merchant-side evidence. Provider API integration is a confidence upgrade path, not a prerequisite.
+
+### First implementation step
+
+Before building the provider match table, run the backlog bucket analysis against the actual 751 issues. The `extracted_not_synced` and `surface_captured_not_extracted` buckets may yield immediate wins that improve coverage without any new infrastructure. That's free value.
 
 ---
 
@@ -5126,7 +6028,7 @@ system, not a UI decoration.
 | **Status** | active |
 | **Project** | SAIKO |
 | **Path** | `docs/architecture/coverage-ops-approach-v1.md` |
-| **Last Updated** | Fri Mar 13 2026 17:00:00 GMT-0700 (Pacific Daylight Time) |
+| **Last Updated** | Tue Mar 24 2026 17:00:00 GMT-0700 (Pacific Daylight Time) |
 | **Summary** | Architectural position for Coverage Operations — introduces entity_issues as a unified operational layer over existing queue fragments, with tool readiness assessment and phased implementation plan. |
 | **Systems** | coverage-operations, fields-data-layer, data-pipeline |
 
@@ -5524,26 +6426,35 @@ All four "needs to be built" tools are now operational:
 - Issues have severity (CRITICAL/HIGH/MEDIUM/LOW), blocking_publish flag, problem_class grouping
 - Re-scan is triggered manually from the UI or via API
 
-**Phase 2 — Coverage Operations UI: COMPLETE (v1)**
+**Phase 2 — Coverage Operations UI: COMPLETE (v1, with routing updates through 2026-03-25)**
 
 Triage board at `/admin/coverage-ops`:
 - Groups issues by problem_class (Identity, Location, Contact, Social, Editorial)
 - Severity pills (CRIT/HIGH/MED/LOW) with color coding
 - Per-issue inline actions:
-  - `Find GPID` for identity gaps
-  - `Run Stage 1` for `missing_coords`, `missing_phone`, `missing_hours`, `missing_price_level`, `operating_status_unknown`
+  - `Strengthen Identity` (discover website + Instagram) for `unresolved_identity`
+  - `Find GPID` for `missing_gpid`
+  - `Run Stage 1` for `missing_coords`, `missing_phone`, `missing_price_level`, `operating_status_unknown`
+  - `Resolve Hours` for `missing_hours` (evidence-aware routing):
+    - Stage 6 when website evidence exists and hours are still missing
+    - Stage 1 when GPID path is available but website path is not
+    - Stage 2 when neither website nor GPID evidence exists (discover surfaces first)
   - `Run Stage 6` for `missing_menu_link`, `missing_reservations`
   - `Discover IG/TikTok/Web` for social/website discovery
   - `Derive` for neighborhood backfill
   - `Mark Closed` / `Still Open` override for `google_says_closed`
 - Bulk actions: grouped by action label (for example `Run Stage 1 (N)` / `Run Stage 6 (N)`)
   - `Run Stage 2` for `missing_events_surface` (re-discover surfaces)
-- Inline editing: paste website URL, IG handle, TikTok handle, GPID, events URL directly
+- Inline editing: paste website URL, IG handle, TikTok handle, GPID (for `missing_gpid`), events URL directly
 - "None" button for confirmed-no-value (taco carts without websites, etc.)
 - "Skip" button for won't-fix items
 - Google search link per entity row
 - Duplicate detection modal with side-by-side comparison and merge
 - Re-scan Issues button to refresh after actions complete
+
+`missing_hours` also carries issue detail for exhaustion triage:
+- `not_findable_candidate = true` when expected sources have been attempted and hours remain unavailable.
+- These rows should be routed to human review/suppression policy (confirmed-none style handling) instead of repeated blind reruns.
 
 Coverage Dashboard at `/admin/coverage`:
 - Summary metrics: total entities, publishable count, missing field counts
@@ -5702,8 +6613,8 @@ This document is the canonical reference for that separation.
 | **Status** | active |
 | **Project** | SAIKO |
 | **Path** | `docs/architecture/vertical-taxonomy-v1.md` |
-| **Last Updated** | Fri Mar 13 2026 17:00:00 GMT-0700 (Pacific Daylight Time) |
-| **Summary** | Defines Saiko's 12-vertical taxonomy — the primary domains of urban life used to classify every place in the system. Documents anthropological rationale, system role, technical anchors, and design implications. |
+| **Last Updated** | Mon Mar 23 2026 17:00:00 GMT-0700 (Pacific Daylight Time) |
+| **Summary** | Defines Saiko's 13-vertical taxonomy — the primary domains of urban life used to classify every place in the system. Documents anthropological rationale, system role, technical anchors, and design implications. |
 | **Systems** | fields-data-layer, entity-resolution |
 
 # Saiko Vertical Taxonomy
@@ -5737,9 +6648,9 @@ A place appears on Saiko not because it exists, but because it meaningfully cont
 
 ---
 
-## 2. The 12 Vertical Domains
+## 2. The 13 Vertical Domains
 
-Saiko uses twelve verticals to represent the primary domains of urban life.
+Saiko uses thirteen verticals to represent the primary domains of urban life.
 
 | Vertical | Display Label | Identity Noun |
 |----------|--------------|---------------|
@@ -5755,6 +6666,9 @@ Saiko uses twelve verticals to represent the primary domains of urban life.
 | `PURVEYORS` | Purveyor | market |
 | `NATURE` | Nature | park |
 | `ACTIVITY` | Activity | venue |
+| `PARKS` | Park | park |
+
+> **NATURE vs PARKS:** `NATURE` covers general natural environments and outdoor spaces. `PARKS` is a more specific domain for civic/municipal parks with defined facilities and boundaries. Both represent landscape interaction but at different scales of formality.
 
 Each vertical represents a type of lived interaction with the city.
 
@@ -5818,7 +6732,7 @@ The taxonomy intentionally balances three constraints:
 
 Too many categories produce noise. Too few erase meaningful distinctions.
 
-Twelve verticals provide enough resolution to represent the diversity of urban life while remaining intuitive for navigation and discovery.
+Thirteen verticals provide enough resolution to represent the diversity of urban life while remaining intuitive for navigation and discovery.
 
 They also map well onto natural mental models people already use when exploring a city:
 
@@ -5835,7 +6749,7 @@ They also map well onto natural mental models people already use when exploring 
 The taxonomy is defined in three places in the codebase. These are the sources of truth.
 
 ### `lib/primaryVertical.ts`
-- `PRIMARY_VERTICALS` — the canonical array of all 12 valid values (used for validation and dropdowns)
+- `PRIMARY_VERTICALS` — the canonical array of all 13 valid values (used for validation and dropdowns)
 - `VERTICAL_DISPLAY` — maps each vertical to its UI display label
 - `categoryToPrimaryVertical()` — maps legacy string categories to the enum
 - `resolvePrimaryVertical()` — resolves vertical from category + Google types, defaults to `EAT`
@@ -10402,7 +11316,7 @@ This applies to visit-fact checks like hours, price level, and reservation links
 
 | issue_type | problem_class | severity | gating/applicability | detection summary | UI action |
 |-----------|---------------|----------|----------------------|-------------------|----------|
-| `missing_hours` | `location` | medium | all active entities | no `canonical_entity_state.hours_json` and no `entities.hours` fallback | Run Stage 1 |
+| `missing_hours` | `location` | medium | active entities except hotel (`STAY`) | no `canonical_entity_state.hours_json` and no `entities.hours` fallback | Run Stage 1 |
 | `missing_price_level` | `location` | low | food/drink verticals (`EAT`, `COFFEE`, `WINE`, `DRINKS`, `BAKERY`) | no `canonical_entity_state.price_level` and no `entities.priceLevel` fallback | Run Stage 1 |
 | `missing_menu_link` | `location` | low | food/drink verticals (`EAT`, `COFFEE`, `WINE`, `DRINKS`, `BAKERY`) | no `canonical_entity_state.menu_url` | Run Stage 6 |
 | `missing_reservations` | `location` | low | reservation-likely verticals (`EAT`, `DRINKS`, `WINE`, `STAY`) | no `canonical_entity_state.reservation_url` and no `entities.reservationUrl` fallback | Run Stage 6 |
@@ -10415,7 +11329,7 @@ This applies to visit-fact checks like hours, price level, and reservation links
 
 | issue_type | problem_class | severity | UI action |
 |-----------|---------------|----------|----------|
-| `unresolved_identity` | `identity` | critical | Find GPID / inline GPID entry |
+| `unresolved_identity` | `identity` | critical | Strengthen Identity (discover website + Instagram) |
 | `missing_gpid` | `identity` | medium | Find GPID |
 | `enrichment_incomplete` | `identity` | high | Enrich |
 | `missing_coords` | `location` | high | Run Stage 1 |
@@ -10440,6 +11354,29 @@ Current action routes used by Coverage Ops:
 - GPID find: `POST /api/admin/tools/seed-gpid-queue`
 - Closure override/write: `PATCH /api/admin/entities/[id]/patch`
 - Resolve/suppress issue state: `POST /api/admin/tools/scan-issues`
+
+---
+
+## Actionability Policy (Dashboard Metrics)
+
+Coverage Ops summary metrics split open issues into:
+- actionable open
+- informational open
+- suppressed policy confirmations (`confirmed_none`, `not_applicable`)
+
+Source of truth in code:
+- `lib/coverage/issue-policy.ts`
+
+Current informational issue types:
+- `missing_menu_link`
+- `missing_reservations`
+- `missing_price_level`
+- `missing_phone`
+- `missing_instagram`
+- `missing_tiktok`
+- `missing_events_surface`
+
+All other open issue types are counted as actionable.
 
 ---
 
@@ -10712,454 +11649,361 @@ See `docs/PIPELINE_COMMANDS.md` for the complete operator reference.
 | **Status** | active |
 | **Project** | SAIKO |
 | **Path** | `docs/DATABASE_SCHEMA.md` |
-| **Last Updated** | 2026-03-10 |
+| **Last Updated** | 2026-03-24 |
+| **Summary** | Schema reference for the Saiko PostgreSQL database. Covers core entity tables, enrichment/signal tables, map/list tables, and Fields v2 canonical layer. |
 | **Systems** | database |
 
-# Saiko Maps - Database Schema
+# Saiko — Database Schema
 
-## Core Entity Relationships
+## Overview
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                         USER ECOSYSTEM                           │
-└─────────────────────────────────────────────────────────────────┘
+The database has 50+ models organized across several domains:
 
-                            ┌──────────┐
-                            │   User   │
-                            │   (id)   │
-                            └────┬─────┘
-                                 │
-                    ┌────────────┼────────────┐
-                    │            │            │
-             ┌──────▼──────┐ ┌──▼──────┐ ┌──▼────────┐
-             │    List     │ │ Viewer  │ │  Import   │
-             │   (maps)    │ │Bookmark │ │   Job     │
-             └──────┬──────┘ └────┬────┘ └───────────┘
-                    │             │
-                    │             │
-┌───────────────────┴─────────────┴──────────────────────────────┐
-│                      PLACE ECOSYSTEM                            │
-└─────────────────────────────────────────────────────────────────┘
-
-         ┌─────────────────┐
-         │      List       │
-         │  (Maps/Guides)  │
-         └────────┬────────┘
-                  │
-         ┌────────┴─────────────────┐
-         │                          │
-    ┌────▼─────┐           ┌────────▼────────┐
-    │ Location │           │    MapPlace     │
-    │ (legacy) │           │  (join table)   │
-    └──────────┘           └────────┬────────┘
-                                    │
-                           ┌────────▼────────┐
-                           │     Place       │
-                           │  (canonical)    │
-                           └────────┬────────┘
-                                    │
-                           ┌────────▼────────┐
-                           │ ViewerBookmark  │
-                           └─────────────────┘
-
-┌─────────────────────────────────────────────────────────────────┐
-│                      ACTIVITY LAYERS                             │
-└─────────────────────────────────────────────────────────────────┘
-
-                        ┌──────────────┐
-                        │ ActivitySpot │
-                        │ (skate/surf) │
-                        └──────────────┘
-```
-
-## Detailed Schema Breakdown
-
-### **User** (`users`)
-**Purpose:** Creator accounts, authentication
-
-**Fields:**
-- `id` (UUID, PK)
-- `email` (unique)
-- `name`
-- `passwordHash`
-- `avatarUrl`
-- `subscriptionTier` (free | personal | business)
-- `createdAt`, `updatedAt`
-
-**Relations:**
-- → **List** (1:many) - Created maps
-- → **ViewerBookmark** (1:many) - Saved places
-- → **ImportJob** (1:many) - Import operations
+| Domain | Key tables | Purpose |
+|--------|-----------|---------|
+| **Entity core** | `entities`, `canonical_entity_state` | Canonical place identity and Fields v2 state |
+| **Enrichment signals** | `derived_signals`, `interpretation_cache`, `energy_scores`, `place_tag_scores` | AI-extracted and computed signals |
+| **Coverage** | `coverage_sources`, `coverage_source_extractions` | Editorial article sourcing and extraction |
+| **Instagram** | `instagram_accounts`, `instagram_media` | Social media photo ingestion |
+| **Merchant surfaces** | `merchant_surfaces`, `merchant_surface_artifacts`, `merchant_signals` | Website enrichment pipeline |
+| **Maps/Lists** | `lists`, `map_places` | User-created curated maps |
+| **Users** | `users`, `viewer_bookmarks`, `saved_maps` | Authentication and user data |
+| **People/Actors** | `people`, `person_places`, `Actor`, `EntityActorRelationship` | Chef/owner/curator attribution |
+| **Resolution** | `raw_records`, `resolution_links`, `gpid_resolution_queue` | Entity resolution and GPID matching |
+| **Issues** | `entity_issues`, `review_queue` | Data quality tracking |
 
 ---
 
-### **List** (`lists`)
-**Purpose:** Maps/Guides created by users (published as Field Notes)
+## Core Entity Tables
 
-**Content Fields:**
-- `id` (UUID, PK)
-- `userId` (FK → User)
-- `title`, `subtitle`, `description`, `slug` (unique)
-- `introText`
-- `descriptionSource` (ai | edited | manual)
+### **entities** (canonical place table)
 
-**Creation Context:**
-- `functionType` - Purpose of the map
-- `functionContext` - Additional context
-- `scopeGeography` - Geographic scope
-- `scopePlaceTypes[]` - Types of places included
-- `scopeExclusions[]` - Types excluded
-- `organizingLogic` (enum: TIME_BASED | NEIGHBORHOOD_BASED | ROUTE_BASED | PURPOSE_BASED | LAYERED)
-- `organizingLogicNote` - Notes on organization
-- `notes` - Internal notes
-- `status` (enum: DRAFT | READY | PUBLISHED | ARCHIVED)
-- `publishedAt`
+The primary system-of-record table. Every place in Saiko is an entity.
 
-**Design:**
-- `templateType` (currently only "field-notes")
-- `coverImageUrl`
-- `primaryColor`, `secondaryColor`
+**Identity:**
+- `id` (UUID, PK), `slug` (unique), `name`, `address`
+- `latitude`, `longitude` (Decimal)
+- `googlePlaceId` (unique nullable)
+- `phone`, `website`, `instagram`, `tiktok`
 
-**Access Control:**
-- `accessLevel` (public | password | private)
-- `passwordHash` - For password-protected maps
-- `allowedEmails[]` - For private maps
-
-**Metadata:**
-- `published` (boolean)
-- `viewCount`
-- `createdAt`, `updatedAt`
-
-**Relations:**
-- ← **User** (many:1)
-- → **Location** (1:many) - Legacy locations
-- → **MapPlace** (1:many) - Modern place associations
-- → **ImportJob** (1:many)
-
-**Indexes:**
-- `userId`, `slug`, `published`, `status`
-
----
-
-### **Location** (`locations`) [LEGACY - Being Phased Out]
-**Purpose:** Original location model (before Place/MapPlace refactor)
-
-**Google Places Data:**
-- `id` (UUID, PK)
-- `listId` (FK → List)
-- `googlePlaceId`
-- `name`, `address`
-- `latitude`, `longitude` (Decimal 10,8 / 11,8)
-- `phone`, `website`, `instagram`
-- `hours` (JSON)
-- `description`
-- `googlePhotos` (JSON)
-- `googleTypes[]`
-- `priceLevel` (0-4)
-- `neighborhood`
-
-**User-Added Data:**
-- `userPhotos[]` - Uploaded image URLs
-- `userNote` - Curator notes
-- `category` - Food, Drinks, Coffee, etc.
-- `descriptor` - Editorial description (max 120 chars)
-
-**Organization:**
-- `orderIndex` - Position in list
-
-**Cache Management:**
-- `placesDataCachedAt` - When Google data was last fetched
-
-**Relations:**
-- ← **List** (many:1)
-
-**Indexes:**
-- `listId`, `googlePlaceId`, `[listId, orderIndex]`, `[listId, category]`
-
----
-
-### **Place** (`places`) [CANONICAL ENTITY]
-**Purpose:** Canonical place entity with full Google + AI enrichment
-
-**Core Data:**
-- `id` (UUID, PK)
-- `slug` (unique)
-- `googlePlaceId` (unique)
-- `name`, `address`
-- `latitude`, `longitude` (Decimal 10,8 / 11,8)
-- `phone`, `website`, `instagram`
-- `hours` (JSON)
-- `description`
-
-**Google Places Data:**
-- `googlePhotos` (JSON) - Array of photo references
-- `googleTypes[]` - Raw Google Places types
-- `priceLevel` (0-4)
-- `neighborhood` - Reverse geocoded
-- `cuisineType`
-- `category`
-- `sources` (JSON) - Editorial sources
-
-**Voice Engine v1.1 - Taglines:**
-- `tagline` - Selected tagline
-- `taglineCandidates[]` - Alternative options generated
-- `taglinePattern` (food | neighborhood | energy | authority)
-- `taglineGenerated` - Timestamp
-- `taglineSignals` (JSON) - Snapshot of merchant signals at generation
-
-**Voice Engine v1.1 - Ad Units:**
-- `adUnitType` (A | B | D | E)
-- `adUnitOverride` (boolean) - Manual override flag
-
-**Voice Engine v1.1 - Pull Quotes:**
-- `pullQuote` - Quote text
-- `pullQuoteSource` - Source name
-- `pullQuoteAuthor` - Author name
-- `pullQuoteUrl` - Source URL
-- `pullQuoteType` (editorial | owner | self)
-
-**Bento Grid Enrichment:**
-- ~~`vibeTags[]`~~ - **Deprecated** (column removed from entities; language signals in `golden_records.identity_signals.language_signals`)
-- `tips[]` - Helpful visitor tips: ["Go early for a seat", "Cash only"]
-
-**Cache Management:**
-- `placesDataCachedAt` - When Google data was last fetched
-
-**Metadata:**
-- `createdAt`, `updatedAt`
-
-**Relations:**
-- → **MapPlace** (1:many) - Appears on multiple maps
-- → **ViewerBookmark** (1:many) - Saved by viewers
-
-**Indexes:**
-- `googlePlaceId`, `category`, `neighborhood`
-
----
-
-### **MapPlace** (`map_places`) [JOIN TABLE]
-**Purpose:** Many-to-many relationship between Place and List (Map)
-**Why:** Same place can appear on multiple maps with different curator context
-
-**Fields:**
-- `id` (UUID, PK)
-- `mapId` (FK → List)
-- `placeId` (FK → Place)
-
-**Curator-Specific Data (per-map):**
-- `descriptor` (VARCHAR 120) - Map-specific editorial description
-- `userNote` - Curator's private notes
-- `userPhotos[]` - Map-specific photos
-- `orderIndex` - Position in this specific map
-
-**Metadata:**
-- `createdAt`, `updatedAt`
-
-**Relations:**
-- ← **List** (many:1)
-- ← **Place** (many:1)
-
-**Unique Constraint:**
-- `[mapId, placeId]` - A place can only appear once per map
-
-**Indexes:**
-- `mapId`, `placeId`, `[mapId, orderIndex]`
-
----
-
-### **ViewerBookmark** (`viewer_bookmarks`)
-**Purpose:** Users saving places for later / personal collections
-
-**Fields:**
-- `id` (UUID, PK)
-- `viewerUserId` (FK → User, nullable)
-- `placeId` (FK → Place)
-- `visited` (boolean)
-- `personalNote` - Private user notes
-- `createdAt`, `updatedAt`
-
-**Relations:**
-- ← **User** (many:1)
-- ← **Place** (many:1)
-
-**Unique Constraint:**
-- `[viewerUserId, placeId]` - Can't bookmark same place twice
-
-**Indexes:**
-- `viewerUserId`, `placeId`
-
----
-
-### **ActivitySpot** (`activity_spots`)
-**Purpose:** Skateparks, surf breaks, etc. (separate from food/drink places)
-
-**Location:**
-- `id` (CUID, PK)
-- `name`, `slug` (unique)
-- `latitude`, `longitude` (Float)
-- `city`, `region`, `country`
-
-**Type & Classification:**
-- `layerType` (enum: SKATE | SURF)
-- `spotType` - Skate: park/street/plaza | Surf: beach/reef/point
-- `tags[]` - Skate: ["ledge", "rail", "bowl"] | Surf: ["hollow", "mellow"]
-
-**Skate-Specific:**
-- `surface` (smooth | rough | mixed)
-- `skillLevel` (beginner | intermediate | advanced | all)
-
-**Surf-Specific:**
-- `exposure` - Primary swell direction
-- `seasonality` - Best season info
+**Classification:**
+- `primaryVertical` (PrimaryVertical enum — 13 values)
+- `category` (string — human-readable fallback)
+- `cuisineType` (string — e.g., "Mexican", "Italian")
+- `entityType` (string — structural kind: venue, activity, public)
+- `neighborhood` (string — reverse geocoded or derived)
 
 **Editorial:**
-- `description`
-- `isPublic` (boolean)
+- `tagline` — AI-generated one-liner
+- `description`, `descriptionSource`
+- `pullQuote`, `pullQuoteAuthor`, `pullQuoteSource`
+- `tips[]` — visitor tips array
 
-**Source Tracking:**
-- `source` (enum: OSM | CITY_DATA | EDITORIAL | COMMUNITY)
-- `sourceId` - External ID (OSM node, city dataset ID)
-- `sourceUrl`
+**Google Places Data:**
+- `googlePhotos` (JSON) — photo references array
+- `googleTypes[]` — raw Google Places types
+- `priceLevel` (0-4)
+- `hours` (JSON)
 
-**Status:**
-- `verified` (boolean)
-- `enabled` (boolean)
-- `createdAt`, `updatedAt`
+**State Model (three independent axes):**
+- `operatingStatus` (OperatingStatus: OPEN, CLOSED, UNKNOWN)
+- `enrichmentStatus` (EnrichmentStatus: CANDIDATE, ENRICHING, ENRICHED, FAILED)
+- `publicationStatus` (PublicationStatus: DRAFT, PUBLISHED, ARCHIVED)
 
-**Indexes:**
-- `[layerType, city]`, `[layerType, latitude, longitude]`, `[source, sourceId]`
+**Enrichment Metadata:**
+- `lastEnrichedAt`, `placesDataCachedAt`
+- `confidence` (JSON), `overallConfidence`
+
+**Indexes:** `slug`, `googlePlaceId`, `category`, `neighborhood`, `primaryVertical`, `status`, `lastEnrichedAt`
 
 ---
 
-### **ImportJob** (`import_jobs`)
-**Purpose:** Track bulk place import operations
+### **canonical_entity_state** (Fields v2)
+
+The Fields v2 canonical layer. Stores sanctioned (validated) attribute state per entity.
 
 **Fields:**
-- `id` (UUID, PK)
-- `userId` (FK → User)
-- `listId` (FK → List, nullable)
-- `status` (processing | completed | failed)
-- `totalLocations`
-- `processedLocations`
-- `failedLocations`
-- `errorLog` (JSON)
-- `createdAt`, `completedAt`
-
-**Relations:**
-- ← **User** (many:1)
-- ← **List** (many:1)
-
-**Indexes:**
-- `userId`, `status`
+- `id`, `entityId` (FK → entities, unique)
+- `sanctioned_name`, `sanctioned_address`, `sanctioned_phone`, `sanctioned_website`
+- `sanctioned_hours`, `sanctioned_instagram`
+- `sanctioned_latitude`, `sanctioned_longitude`
+- `sanctioned_neighborhood`
+- `menu_url`, `reservation_url`, `reservation_provider`
+- `about_text`, `about_source_url`
+- `updatedAt`
 
 ---
 
-## Enums
+## Enrichment & Signal Tables
 
-### OrganizingLogic
-```typescript
-enum OrganizingLogic {
-  TIME_BASED        // Chronological order (morning → night)
-  NEIGHBORHOOD_BASED // Geographic clustering
-  ROUTE_BASED       // Walking/driving route
-  PURPOSE_BASED     // By activity type
-  LAYERED           // Multiple organizing principles
-}
+### **derived_signals**
+
+AI-extracted structured signals per entity. Keyed by `signalKey`.
+
+- `id`, `entityId` (FK → entities)
+- `signalKey` — e.g., `identity_signals`, `offering_programs`
+- `signalValue` (JSON) — structured extraction output
+- `version`, `createdAt`, `updatedAt`
+
+**Common signal keys:**
+- `identity_signals` — language signals, vibe words, cultural markers
+- `offering_programs` — food_program, wine_program, beer_program, cocktail_program
+
+### **interpretation_cache**
+
+SceneSense and voice engine outputs. Typed by `outputType`.
+
+- `id`, `entityId` (FK → entities)
+- `outputType` (InterpretationType: TAGLINE, PULL_QUOTE, VOICE_DESCRIPTOR, TIMEFOLD)
+- `content` (JSON) — the generated interpretation
+- `isCurrent` (boolean) — marks active version
+- `promptVersion`, `modelVersion`
+- `generatedAt`, `createdAt`
+
+### **energy_scores**
+
+Computed energy scores per entity.
+
+- `id`, `entityId` (FK → entities)
+- `energy_score`, `raw_energy_score`
+- `source_signals` (JSON)
+
+### **place_tag_scores**
+
+Scene/atmosphere tag scores per entity.
+
+- `id`, `entityId` (FK → entities)
+- `tag`, `score`, `raw_score`
+- `source_signals` (JSON)
+
+---
+
+## Coverage Tables
+
+### **coverage_sources**
+
+Editorial articles about entities from approved publications.
+
+- `id`, `entityId` (FK → entities)
+- `url` (unique per entity), `sourceSlug`, `sourceName`
+- `articleTitle`, `articleAuthor`, `articlePublishedAt`
+- `archivedText` — full article text (captured by fetch stage)
+- `enrichmentStage` (CoverageEnrichmentStage: INGESTED, FETCHED, EXTRACTED, FAILED)
+- `sourceType` (CoverageSourceType)
+- `discoveredAt`, `fetchedAt`, `extractedAt`
+
+### **coverage_source_extractions**
+
+AI-extracted signals from coverage articles.
+
+- `id`, `coverageSourceId` (FK → coverage_sources)
+- `entityId` (FK → entities)
+- `people` (JSON) — mentioned chefs/owners
+- `food_evidence`, `beverage_evidence`, `service_evidence` (JSON)
+- `atmosphere_signals`, `origin_story`, `accolades` (JSON)
+- `pull_quotes` (JSON), `sentiment`, `article_type`, `relevance_score`
+- `promptVersion`, `extractedAt`
+
+---
+
+## Instagram Tables
+
+### **instagram_accounts**
+
+One row per entity with an Instagram handle.
+
+- `id`, `entityId` (FK → entities, unique)
+- `instagramUserId` (unique), `username`
+- `mediaCount`, `followersCount`, `followsCount`
+- `accountType` (BUSINESS / CREATOR / PERSONAL)
+- `canonicalInstagramUrl`
+- `rawPayload` (JSON)
+
+### **instagram_media**
+
+Recent media items per account (up to 12 per entity).
+
+- `id`, `instagramAccountId` (FK → instagram_accounts)
+- `instagramMediaId` (unique)
+- `mediaType` (IMAGE / VIDEO / CAROUSEL_ALBUM)
+- `mediaUrl` — CDN URL (expires)
+- `permalink` — permanent IG post URL (fallback)
+- `caption`, `timestamp`
+- `photoType` (nullable) — AI-classified: INTERIOR, FOOD, BAR_DRINKS, CROWD_ENERGY, DETAIL, EXTERIOR
+- `rawPayload` (JSON)
+
+**Photo ranking:** Photos are ranked by `photoType` preference (INTERIOR first, EXTERIOR last). Unclassified photos sort after classified ones.
+
+---
+
+## Merchant Surface Tables
+
+### **merchant_surfaces**
+
+Discovered web pages for entities (homepage, menu, about, contact).
+
+- `id`, `entityId` (FK → entities)
+- `url`, `surfaceType` (homepage, menu, about, contact, instagram, etc.)
+- `discoveredAt`, `fetchedAt`
+
+### **merchant_surface_artifacts**
+
+Structured content extracted from merchant surfaces.
+
+- `id`, `surfaceId` (FK → merchant_surfaces)
+- `artifactType`, `content` (JSON)
+- `extractedAt`
+
+### **merchant_signals**
+
+Structured merchant signals per entity.
+
+- `id`, `entityId` (FK → entities)
+- `menuUrl`, `reservationUrl`, `winelistUrl`
+- `hasOnlineOrdering`, `hasDelivery`
+- Various boolean/string fields for service capabilities
+
+---
+
+## Map & List Tables
+
+### **lists** (maps/guides)
+
+User-created curated maps.
+
+- `id` (UUID), `userId` (FK → users), `slug` (unique)
+- `title`, `subtitle`, `description`, `introText`
+- `organizingLogic` (OrganizingLogic enum)
+- `status` (MapStatus: DRAFT, READY, PUBLISHED, ARCHIVED)
+- `templateType` (currently: "field-notes")
+- `published` (boolean), `publishedAt`
+- `accessLevel` (public / password / private)
+- `coverImageUrl`, `primaryColor`, `secondaryColor`
+- `viewCount`
+
+### **map_places** (junction table)
+
+Many-to-many: Entity ↔ List. Same entity can appear on multiple maps with different curator context.
+
+- `id`, `mapId` (FK → lists), `entityId` (FK → entities)
+- `descriptor` (VARCHAR 120) — curator's editorial note for this map
+- `userNote`, `userPhotos[]`
+- `orderIndex`
+- Unique constraint: `[mapId, entityId]`
+
+---
+
+## User Tables
+
+### **users**
+- `id`, `email` (unique), `name`, `passwordHash`
+- `subscriptionTier` (free / personal / business)
+- `avatarUrl`
+
+### **viewer_bookmarks**
+- `viewerUserId` (FK → users), `placeId` (FK → entities)
+- `visited` (boolean), `personalNote`
+
+---
+
+## People & Actor Tables
+
+### **people**
+- `id`, `slug`, `name`, `role` (PersonRole), `bio`, `imageUrl`
+
+### **person_places**
+- `personId` (FK → people), `entityId` (FK → entities)
+- `role` (PersonPlaceRole: CHEF, OWNER, FOUNDER, etc.)
+
+### **Actor** / **EntityActorRelationship**
+- Restaurant group / operator relationships to entities
+
+---
+
+## Resolution Tables
+
+### **gpid_resolution_queue**
+- Entities needing Google Place ID resolution
+- `entityId`, `status` (GpidResolverStatus), `matchConfidence`
+- Human review fields: `humanStatus`, `humanDecision`
+
+### **entity_issues**
+- Data quality issues detected by issue scanner
+- `entityId`, `issueType`, `severity`, `details` (JSON)
+- `resolvedAt` — null until resolved
+
+---
+
+## Key Enums
+
+### PrimaryVertical (13 values)
+```
+EAT · COFFEE · WINE · DRINKS · BAKERY · SHOP · CULTURE ·
+NATURE · STAY · WELLNESS · PURVEYORS · ACTIVITY · PARKS
+```
+Plus `CANDIDATE` for pre-enrichment intake entities.
+
+### Entity State Enums
+```
+OperatingStatus:   OPEN · CLOSED · UNKNOWN
+EnrichmentStatus:  CANDIDATE · ENRICHING · ENRICHED · FAILED
+PublicationStatus:  DRAFT · PUBLISHED · ARCHIVED
 ```
 
-### MapStatus
-```typescript
-enum MapStatus {
-  DRAFT      // Being created
-  READY      // Ready to publish
-  PUBLISHED  // Live and public
-  ARCHIVED   // Hidden from public
-}
+### Coverage Pipeline
+```
+CoverageEnrichmentStage:  INGESTED · FETCHED · EXTRACTED · FAILED
 ```
 
-### LayerType
-```typescript
-enum LayerType {
-  SKATE  // Skateboarding spots
-  SURF   // Surf breaks
-}
+### Interpretation Types
 ```
-
-### SpotSource
-```typescript
-enum SpotSource {
-  OSM          // OpenStreetMap
-  CITY_DATA    // Official city datasets
-  EDITORIAL    // Curated by team
-  COMMUNITY    // User-contributed
-}
+InterpretationType:  TAGLINE · PULL_QUOTE · VOICE_DESCRIPTOR · TIMEFOLD
 ```
 
 ---
 
 ## Key Data Flows
 
-### 1. Map Creation Flow
+### Entity Enrichment Flow
+```
+Entity created (CANDIDATE)
+  ↓
+Smart Enrich (website + IG discovery)
+  ↓
+Full Pipeline stages 1–7 (Google → AI signals → interpretation)
+  ↓
+Coverage source enrichment (discover → fetch → extract)
+  ↓
+Instagram ingestion (account + media + photo classification)
+  ↓
+Entity now ENRICHED with full signal set
+```
+
+### Map Creation Flow
 ```
 User creates List
   ↓
-Add Places to MapPlace (with descriptor, order)
+Add Entities to MapPlace (with descriptor, order)
   ↓
-Link to canonical Place entity
-  ↓
-Backfill Google Places data on Place
-  ↓
-Generate AI content (Voice Engine) on Place
+Link to canonical Entity
   ↓
 Publish List (status: PUBLISHED)
 ```
 
-### 2. Public Viewing Flow
+### Entity Page Serving Flow
 ```
-User visits /map/[slug]
+Request: GET /api/places/[slug]
   ↓
-Fetch List by slug
+Fetch entity + derived_signals + interpretation_cache
   ↓
-Get MapPlaces (ordered, with descriptors)
+Fetch Instagram photos (ranked by photoType)
   ↓
-Join to Places (with Google + AI data)
+Fetch coverage highlights
   ↓
-Render Field Notes template
+Assemble EntityPageData contract
+  ↓
+Return to consumer layer
 ```
-
-### 3. Place Enrichment Flow
-```
-Place created with googlePlaceId
-  ↓
-Backfill script fetches Google Places API
-  ↓
-Updates: photos, hours, phone, address, types, priceLevel
-  ↓
-Voice Engine generates: tagline, tips, pullQuote (language signals now in `identity_signals.language_signals` via SceneSense)
-  ↓
-Place now "enriched" and ready for display
-```
-
----
-
-## Migration Notes
-
-### Location → Place Migration
-**Status:** In progress (both models coexist)
-
-**Legacy:** `Location` was tied directly to `List` (1:many)
-**New:** `Place` is canonical, `MapPlace` enables many:many
-
-**Benefits:**
-- Same place can appear on multiple maps
-- Enrichment (Google + AI) done once per place
-- Better data consistency
-- Separate curator context (MapPlace) from canonical data (Place)
-
-**Next Steps:**
-- Migrate remaining Location data to Place/MapPlace
-- Update all queries to use Place/MapPlace
-- Deprecate Location model
 
 ---
 
@@ -11675,6 +12519,45 @@ npx tsx scripts/audit-editorial-coverage.ts
 
 ---
 
+## Instagram Photo Classification
+
+Classify Instagram photos by type (INTERIOR, FOOD, BAR_DRINKS, CROWD_ENERGY, DETAIL, EXTERIOR). This populates the `photoType` field on `instagram_media`, which controls photo ranking on entity pages.
+
+```bash
+# Classify photos for a single entity
+npx tsx scripts/classify-entity-photos.ts --slug=buvons
+
+# Classify all unclassified photos
+npx tsx scripts/classify-entity-photos.ts
+
+# Dry run
+npx tsx scripts/classify-entity-photos.ts --dry-run
+```
+
+Uses Claude vision to analyze each photo and assign a type. Photos are downloaded and sent as base64 to bypass CDN restrictions. Classified photos are ranked for display: INTERIOR (highest priority) → FOOD → BAR_DRINKS → CROWD_ENERGY → DETAIL → EXTERIOR (lowest).
+
+---
+
+## Description Generation (resilient)
+
+Use this when you want broad VOICE_DESCRIPTOR coverage, including entities without GPID (for example pop-ups and taco trucks).
+
+```bash
+# One-command resilient run (reprocess + fallback + retries)
+npm run description:run:resilient
+
+# Equivalent explicit command
+npx tsx scripts/generate-descriptions-v1.ts \
+  --reprocess \
+  --allow-category-only \
+  --allow-name-only \
+  --concurrency=1 \
+  --max-retries=6 \
+  --retry-base-ms=1500
+```
+
+---
+
 ## Enrichment Stage Re-run
 
 Run a specific enrichment stage without the full pipeline.
@@ -11839,9 +12722,9 @@ Done! 🎉
 | **Status** | active |
 | **Project** | SAIKO |
 | **Path** | `docs/SITEMAP.md` |
-| **Last Updated** | 2026-03-10 |
+| **Last Updated** | 2026-03-24 |
 
-# Saiko Maps - Sitemap
+# Saiko — Sitemap
 
 ## Public Routes
 
@@ -11858,10 +12741,19 @@ Done! 🎉
     - Smart bounds with outlier detection
     - Hydrology-inspired map styling
 
-### Individual Place Pages
-- `/place/[slug]` - Standalone place detail page
-  - Example: `/place/covell`
-  - Displays: photos, tagline, vibe tags, tips, pull quotes, hours, contact
+### Entity Pages
+- `/place/[slug]` - Standalone entity detail page (route group: `(viewer)`)
+  - Example: `/place/buvons`, `/place/republique`
+  - Displays: photos (Instagram/Google), tagline, description, coverage, offerings, hours, contact
+  - Three-tier content hierarchy with graceful degradation
+
+### Explore
+- `/explore` - Browse and search entities
+  - Filter by vertical, neighborhood, cuisine
+  - Search with location bias
+
+### Coverage (Public)
+- `/coverage` - Geographic coverage and data quality metrics (public, no auth required)
 
 ---
 
@@ -11941,6 +12833,25 @@ Done! 🎉
 
 ---
 
+## Admin Routes
+
+**Requires:** Admin authentication (email in `ADMIN_EMAILS`)
+
+| Route | Purpose |
+|-------|---------|
+| `/admin` | Admin home |
+| `/admin/coverage` | Coverage dashboard — resolution health, tier summary, neighborhood coverage, missing fields |
+| `/admin/coverage-ops` | Coverage operations triage board — actionable issues with inline resolution tools |
+| `/admin/entity/[id]` | Entity profile — detailed entity inspection, enrichment controls, signal viewer |
+| `/admin/gpid-queue` | GPID resolution queue — human review for ambiguous Google Place ID matches |
+| `/admin/instagram` | Instagram handle management — add, edit, remove handles |
+| `/admin/photo-eval` | Photo quality evaluation |
+| `/admin/intake` | Entity intake tools |
+| `/admin/actors` | Actor/operator management |
+| `/admin/appearances` | Place appearance management |
+
+---
+
 ## API Routes
 
 ### AI & Generation
@@ -12004,9 +12915,36 @@ Done! 🎉
   - Dynamic social sharing image
   - Shows map preview + title
 
-### Debug
-- `GET /api/debug/locations` - Debug locations data
-  - Development tool
+### Admin Tools API
+- `POST /api/admin/tools/scan-issues` - Run entity issue scanner (full scan or single entity)
+- `POST /api/admin/tools/enrich-stage` - Run specific enrichment stage for an entity
+- `POST /api/admin/tools/discover-social` - Discover Instagram/TikTok/website via AI
+- `POST /api/admin/tools/derive-neighborhood` - Derive neighborhood from coordinates
+- `POST /api/admin/tools/seed-gpid-queue` - Seed GPID resolution queue
+
+### Admin Entity API
+- `GET /api/admin/entities/[id]/detail` - Full entity detail
+- `GET /api/admin/entities/[id]/coverage` - Entity coverage sources
+- `POST /api/admin/entities/[id]/coverage` - Add coverage source manually
+- `POST /api/admin/entities/[id]/mark-nomadic` - Mark entity as nomadic
+- `GET /api/admin/entities/[id]/timefold` - Entity timefold data
+- `POST /api/admin/entities/compare` - Compare entities for merge
+- `POST /api/admin/entities/merge` - Merge duplicate entities
+
+### Admin Enrichment API
+- `POST /api/admin/enrich/[slug]` - Run enrichment on entity by slug
+- `POST /api/admin/smart-enrich` - Smart enrich (single or batch)
+
+### Admin Coverage API
+- `GET /api/admin/coverage-dashboard` - Coverage dashboard data
+- `GET /api/admin/stats` - System statistics
+
+### Admin Instagram API
+- `GET/POST /api/admin/instagram` - Instagram handle CRUD
+
+### Admin Intake API
+- `POST /api/admin/intake` - Entity intake
+- `POST /api/admin/intake/resolve` - Resolve intake entity
 
 ---
 
@@ -12796,7 +13734,7 @@ npm run dev
 | **Type** | guide |
 | **Status** | active |
 | **Project** | SAIKO |
-| **Path** | `docs/MIGRATION_GUIDE.md` |
+| **Path** | `docs/archive/MIGRATION_GUIDE_ARCHIVED_20260324.md` |
 | **Last Updated** | 2026-03-10 |
 | **Systems** | database |
 
@@ -13731,110 +14669,92 @@ See `docs/extraction-test-output-maru-coffee.json` for sample output.
 | **Status** | active |
 | **Project** | SAIKO |
 | **Path** | `docs/APP_OVERVIEW.md` |
-| **Last Updated** | 2026-03-10 |
+| **Last Updated** | 2026-03-24 |
+| **Summary** | High-level overview of the Saiko platform: entity data system, enrichment pipeline, map creation, and consumer surfaces. |
 
-# Saiko Maps - Application Overview
+# Saiko — Application Overview
 
 ## Core Concept
-A curated map platform for creating and sharing beautiful, editorial-style lists of places (restaurants, wine bars, shops, etc.). Think "Spotify playlists but for places."
+A curated cultural place-data platform. Saiko maps the places that meaningfully contribute to how people live well in a city. The system is built around a canonical entity data layer with editorial enrichment, published as curated maps and individual entity pages.
+
+---
+
+## System Layers
+
+Saiko has three architectural layers (see CLAUDE.md for full rules):
+
+| Layer | Responsibility | Key surfaces |
+|-------|---------------|--------------|
+| **Data Layer** | System of record — canonical entity identity, structured facts, signals, confidence, provenance | `entities`, `canonical_entity_state`, `derived_signals`, `coverage_sources` |
+| **Saiko Fields** | Platform/infrastructure — transforms raw data into stable product-safe contracts, enrichment orchestration | Entity page contract (`EntityPageData`), photo pipeline, SceneSense |
+| **Traces** | Consumer product — presentation, interaction, user-facing experience | Map views, entity pages, homepage, explore |
 
 ---
 
 ## Major Features
 
-### 1. **Map Creation & Management**
-- Users create custom maps/lists with places
-- Add places with Google Place ID integration
-- Order and curate places with descriptors/notes
+### 1. Entity Data Enrichment
+
+The core enrichment pipeline is a 7-stage Entity Record Awareness (ERA) system:
+
+| Stage | Name | What it does |
+|-------|------|-------------|
+| 1 | Google Places identity | GPID commit, coordinates, hours, photos |
+| 2 | Surface discovery | Find homepage, menu, about, contact URLs |
+| 3 | Surface fetch | Capture raw HTML from discovered surfaces |
+| 4 | Surface parse | Structure captured content into artifacts |
+| 5 | Identity signal extraction | AI extraction into `derived_signals` |
+| 6 | Website enrichment | menu_url, reservation_url into Fields v2 |
+| 7 | Interpretation | Tagline, voice descriptor, SceneSense into `interpretation_cache` |
+
+**Smart Enrich** is a cost-optimized alternative (~$0.01-0.04/entity) that uses Haiku web search + scraping before falling back to Google Places.
+
+See `docs/PIPELINE_COMMANDS.md` for all operator commands.
+
+#### Coverage Source Enrichment
+A separate 4-stage pipeline discovers, fetches, and extracts signals from editorial coverage (Eater, LA Times, Infatuation, etc.):
+- Backfill → Discover → Fetch → Extract
+- Signals stored in `coverage_sources` + `coverage_source_extractions`
+
+#### Instagram Ingestion
+Batch ingestion of Instagram account data and recent media for entities with handles. Photos are classified by `photoType` (INTERIOR, FOOD, BAR_DRINKS, CROWD_ENERGY, DETAIL, EXTERIOR) and ranked for display.
+
+#### SceneSense
+Saiko's atmosphere/energy/scene signal engine. Produces:
+- **PRL** (Place Reachability Level, 1-5) — how easy to reach/access
+- **Atmosphere signals** — quiet, lively, intimate, etc.
+- **Energy signals** — calm, buzzy, electric, etc.
+- **Scene signals** — date night, solo dinner, group, etc.
+
+### 2. Map Creation & Management
+- Users create custom maps/lists with entities
+- Add entities with Google Place ID integration
+- Order and curate with descriptors/notes per map
 - Public/private access control with optional password protection
+- Published as "Field Notes" template (magazine-style presentation)
 
-### 2. **Place Data Enrichment**
+### 3. Entity Pages (`/place/[slug]`)
+Individual entity detail pages with a three-tier content hierarchy:
+- **Tier 1 — Identity + Action:** Hero photos (Instagram or Google), name, meta row, action buttons
+- **Tier 2 — Editorial + Context:** Description, coverage quotes, offerings, hours
+- **Tier 3 — Reference + Discovery:** Map tile, coverage links, "Also On" cross-references
 
-#### Google Places API Integration
-Automatic backfill of:
-- Photos (stored as JSON references)
-- Address, hours, phone, website
-- Types/categories
-- Price level (0-4)
-- Reverse geocoded neighborhood
+Data degrades gracefully — if a tier has no data, the space collapses.
 
-#### Voice Engine (AI Content Generation)
-Powered by Anthropic Claude, generates:
-- **Taglines:** Editorial one-liners (e.g., "Low-key wine bar with natural selections")
-- **Vibe Tags:** Atmosphere descriptors (["Standing room", "Surf crowd"])
-- **Tips:** Helpful visitor advice (["Go early for a seat", "Cash only"])
-- **Pull Quotes:** Editorial quotes with source attribution
+### 4. Field Notes View (Map Template)
+Magazine-quality map presentation with three viewing modes:
 
-### 3. **Field Notes View** (Premium Template)
-Magazine-quality presentation with three viewing modes:
+- **Cover Map** — Google Map with hydrology-inspired aesthetic, smart bounds (IQR outlier detection)
+- **List View** — Vertical feed of entity cards with photos, taglines, metadata, curator descriptors
+- **Expanded Map** — Full-screen interactive map with marker clustering and horizontal card carousel
 
-#### Cover/Header Map
-- Real Google Map with hydrology-inspired aesthetic
-- Cool gray-blue roads (#9aabb5 highways, #c4ced3 arterials)
-- Smart bounds with IQR outlier detection (zooms tight on core cluster)
-- All pins same size, no labels
-- Decorative elements: compass rose, scale bar, ocean wash overlay
+### 5. Homepage (saikofields.com)
+Platform front door with three content sections:
+- **By Neighborhood** — curated allow-list, real entity counts
+- **By Category** — `primaryVertical` groupings with editorial labels
+- **Collections** — published maps/lists
 
-#### List View
-- Vertical feed of place cards
-- Hero photos (Google or user-uploaded)
-- AI-generated taglines and editorial content
-- Metadata: category, price level, cuisine, neighborhood
-- Curator descriptors
-- Field Notes design: parchment/charcoal palette, Libre Baskerville typography
-
-#### Expanded Map View
-- Full-screen interactive map
-- Marker clustering (prevents label soup at zoom-out)
-- Labels positioned below pins
-- Horizontal carousel of place cards at bottom
-- Click pin → scroll to card, click card → center map
-- Same hydrology aesthetic as cover map
-
-### 4. **Map Viewing Modes**
-- **Split Desktop View:** Map on left, scrollable place cards on right
-- **Mobile Toggle:** Switch between list and map views
-- **Expanded Map:** Full-screen exploration with card carousel
-
-### 5. **Smart Geography**
-
-#### Outlier Detection
-IQR-based algorithm:
-- Calculates distance from center for all places
-- Uses interquartile range (IQR) to identify outliers
-- Fits map bounds to core cluster (80%+ of pins)
-- Outlier pins still render, just outside initial viewport
-- Tighter multiplier for cover map (0.8) vs expanded (1.0)
-
-#### Centroid Positioning
-- Calculates average lat/lng of all included places
-- Centers map on centroid after fitting bounds
-- Keeps cluster visually centered
-
-#### Neighborhood Aggregation
-- Extracts neighborhoods from all places
-- Counts frequency
-- Displays sorted by popularity
-- Dynamic singular/plural labels
-
-#### Marker Clustering (Expanded View Only)
-- Groups nearby pins when zoomed out
-- Shows count in cluster marker
-- Click cluster → zoom in → explode into individual pins
-- Custom styling: Field Notes charcoal circle with parchment text
-
-### 6. **Place Cards**
-Display format for each place:
-- Hero photo (Google or user-uploaded)
-- AI-generated tagline
-- Category badge
-- Price level indicators ($-$$$$)
-- Cuisine type
-- Curator descriptor (editorial description from map creator)
-- Vibe tags
-- Tips
-- Pull quotes
-- Metadata: neighborhood, open status, hours
+See `docs/homepage-solutions.md` for implementation plan.
 
 ---
 
@@ -13846,70 +14766,80 @@ Display format for each place:
 - **TypeScript:** Full type safety
 
 ### Database & ORM
-- **PostgreSQL:** Primary database
-- **Prisma:** ORM with type-safe queries
+- **PostgreSQL:** Primary database (Neon pooled connections)
+- **Prisma:** ORM with type-safe queries, 50+ models
 - **Migrations:** Version-controlled schema changes
 
 ### External Services
-- **Google Maps JavaScript API:**
-  - Map rendering with custom styles
-  - Place Details API for enrichment
-  - Photo references
-- **Google Places API:** Place data backfill
-- **Anthropic Claude (API):** Voice Engine content generation
+- **Google Maps JavaScript API:** Map rendering with custom styles
+- **Google Places API:** Entity data enrichment (Stage 1)
+- **Anthropic Claude:** AI signal extraction (Sonnet), social discovery (Haiku)
+- **Meta Graph API:** Instagram Business Discovery for photo ingestion
 - **NextAuth.js:** Authentication & session management
+- **Upstash Redis:** Rate limiting for AI endpoints
 
 ### Styling & UI
-- **Tailwind CSS:** Utility-first styling
-- **Custom Design System:**
-  - Field Notes palette: charcoal (#36454F), parchment (#F5F0E1), khaki (#C3B091)
-  - Typography: Libre Baskerville (serif), system sans fallbacks
-  - Print-inspired aesthetic
-
-### Maps & Geo
-- **@googlemaps/js-api-loader:** Dynamic Google Maps loading
-- **@googlemaps/markerclusterer:** Marker clustering
-- **Custom map styles:** Hydrology-inspired JSON styles
-- **Smart bounds algorithm:** IQR-based outlier detection
+- **Tailwind CSS 4:** Utility-first styling
+- **CSS Modules:** Component-scoped styles
+- **Custom Design System:** Parchment/charcoal palette, Libre Baskerville + Instrument Serif typography
 
 ---
 
 ## Data Models (Simplified)
 
-### Core Entities
+### Core Flow
 ```
-User → List (Maps) → MapPlace → Place
-                              ↓
-                        ViewerBookmark
+User → List (Maps) → MapPlace → Entity (canonical)
+                                     ↓
+                              derived_signals
+                              interpretation_cache
+                              instagram_media
+                              coverage_sources
 ```
 
 ### Key Models
 
-**List (Map):**
-- Title, description, slug
-- Organizing logic (time/neighborhood/route/purpose-based)
+**Entity** (`entities`):
+- Canonical place identity: slug, name, address, coordinates
+- Classification: `primaryVertical` (13 domains), `category`, `cuisineType`, `neighborhood`
+- Editorial: tagline, description, pullQuote, tips
+- State: `operatingStatus`, `enrichmentStatus`, `publicationStatus`
+- Enrichment: `lastEnrichedAt`, `confidence` (JSONB)
+
+**List** (`lists`):
+- Title, description, slug, organizing logic
 - Template type (currently: field-notes)
 - Access control (public/password/private)
-- Status (draft/ready/published/archived)
+- Status (DRAFT/READY/PUBLISHED/ARCHIVED)
 
-**Place (Canonical):**
-- Google Places data (address, photos, hours, types)
-- AI-generated content (tagline, SceneSense output, tips, pull quotes)
-- Enrichment timestamps
-
-**MapPlace (Junction):**
-- Links Place to List (many-to-many)
+**MapPlace** (`map_places`):
+- Junction table: Entity ↔ List (many-to-many)
 - Curator-specific: descriptor, order, notes, photos per map
 
-**Location (Legacy):**
-- Original model (being phased out)
-- Tied directly to List (1:many)
-- Migrating to Place/MapPlace architecture
+**Derived Signals** (`derived_signals`):
+- AI-extracted signals keyed by `signalKey` (identity_signals, offering_programs)
+- JSON value with provenance
 
-**ActivitySpot:**
-- Skateparks, surf breaks
-- Separate from food/drink places
-- Layer-based display (SKATE | SURF)
+**Interpretation Cache** (`interpretation_cache`):
+- SceneSense, taglines, voice descriptors
+- Typed by `outputType` (TAGLINE, PULL_QUOTE, VOICE_DESCRIPTOR, TIMEFOLD)
+
+**Coverage Sources** (`coverage_sources`):
+- Editorial articles about entities from approved publications
+- Staged pipeline: INGESTED → FETCHED → EXTRACTED
+
+---
+
+## Admin Surfaces
+
+| Page | URL | Purpose |
+|------|-----|---------|
+| Coverage Dashboard | `/admin/coverage` | Resolution health, tier summary, neighborhood coverage |
+| Coverage Ops | `/admin/coverage-ops` | Triage board — actionable issues with inline resolution tools |
+| GPID Queue | `/admin/gpid-queue` | Human review for ambiguous Google Place ID matches |
+| Entity Profile | `/admin/entity/[id]` | Detailed entity inspection and enrichment controls |
+| Instagram Admin | `/admin/instagram` | Instagram handle management |
+| Photo Eval | `/admin/photo-eval` | Photo quality evaluation |
 
 ---
 
@@ -13918,166 +14848,64 @@ User → List (Maps) → MapPlace → Place
 ### 1. Create Map
 ```
 1. User creates List (title, description, organizing logic)
-2. Add places via search or Google Place ID
-3. Set order and curator descriptors per place
-4. System creates MapPlace entries linking to canonical Place
-5. Backfill Google Places data (photos, hours, address)
-6. Generate AI content (taglines, SceneSense output, tips)
-7. Preview in Field Notes template
-8. Publish → status: PUBLISHED
+2. Add entities via search or Google Place ID
+3. Set order and curator descriptors per entity
+4. System creates MapPlace entries linking to canonical Entity
+5. Publish → status: PUBLISHED
 ```
 
-### 2. View Public Map
+### 2. Enrich Entity
+```
+1. Entity created (via intake, import, or map addition)
+2. Smart Enrich discovers identity (website, Instagram, coords)
+3. Full pipeline runs stages 2-7 (surface discovery → interpretation)
+4. Coverage source enrichment finds/extracts editorial articles
+5. Instagram ingestion fetches and classifies photos
+6. Entity now fully enriched and ready for display
+```
+
+### 3. View Public Map
 ```
 1. User visits /map/[slug]
-2. Fetch List by slug
-3. Load MapPlaces (ordered, with curator descriptors)
-4. Join to Places (with Google + AI enrichments)
-5. Render Field Notes template:
-   - Cover map with smart bounds
-   - Scrollable place cards
-   - Expandable full-screen map
-```
-
-### 3. Enrich Place Data
-```
-1. Place created with googlePlaceId
-2. Backfill script (`npm run backfill:google`):
-   - Fetch Google Places details
-   - Update photos, address, hours, phone, types, priceLevel
-   - Set placesDataCachedAt timestamp
-3. Voice Engine script (`npm run enrich:voice`):
-   - Generate tagline with pattern detection
-   - Route language signals through SceneSense
-   - Generate tips
-   - Find/create pull quotes
-4. Place now "enriched" and ready for beautiful display
-```
-
----
-
-## Admin & Maintenance
-
-### Scripts (package.json)
-
-**Data Enrichment:**
-- `npm run backfill:google` - Fetch Google Places data
-- `npm run enrich:voice` - Generate AI content
-- `npm run test:voice-engine` - Test tagline generation
-
-**Data Analysis:**
-- `npm run analyze:coverage` - Check enrichment status
-- `npm run diagnose:photos` - Investigate missing photos
-- `npm run list:needs-photos` - Find places needing photo backfill
-
-**Data Cleanup:**
-- `npm run find:duplicates` - Detect duplicate places
-- `npm run merge:duplicates` - Merge duplicate records
-
-### Key Algorithms
-
-**Smart Bounds (IQR Outlier Detection):**
-```typescript
-// Calculate distance from center for each place
-const centerLat = avg(places.map(p => p.lat))
-const centerLng = avg(places.map(p => p.lng))
-const distances = places.map(p => distanceFrom(p, center))
-
-// Find outliers using IQR
-const q1 = quantile(distances, 0.25)
-const q3 = quantile(distances, 0.75)
-const iqr = q3 - q1
-const upperFence = q3 + multiplier * iqr
-
-// Filter to included (non-outlier) places
-const included = places.filter(p => p.distance <= upperFence)
-
-// Fit bounds to included only
-map.fitBounds(boundsOf(included))
-```
-
-**Centroid Calculation:**
-```typescript
-const centroid = {
-  lat: places.reduce((sum, p) => sum + p.lat, 0) / places.length,
-  lng: places.reduce((sum, p) => sum + p.lng, 0) / places.length
-}
-map.panTo(centroid)
+2. Fetch List by slug with MapPlaces (ordered, with descriptors)
+3. Join to Entities (with enrichments via EntityPageData contract)
+4. Render Field Notes template
 ```
 
 ---
 
 ## Design System
 
-### Field Notes Palette
-
-**Light Theme:**
+### Palette
 - **Charcoal:** `#36454F` (text, pins)
-- **Parchment:** `#F5F0E1` (background, pin borders)
+- **Parchment:** `#F5F0E1` (background)
 - **Khaki:** `#C3B091` (accents, labels)
-- **Landscape:** `#e8e2d4` (map background)
-- **Water:** `#c9d9e0` (soft blue-grey)
-- **Roads:** `#9aabb5` (highways), `#c4ced3` (arterials)
-- **Parks:** `#e2e5dc` (barely-there sage)
+- **Warm White:** `#FAF8F3` (card backgrounds)
 
-**Typography:**
-- **Serif:** Libre Baskerville (headings, place names, labels)
-- **Sans:** System font stack (body text, metadata)
+### Typography
+- **Instrument Serif:** Card titles, display text
+- **Libre Baskerville:** Headings, editorial content
+- **DM Sans / Nunito:** Body text, metadata
 
-**Map Styling:**
+### Map Styling
 - Hydrology-inspired aesthetic
-- Cool gray-blue roads
-- Muted, desaturated look (saturation: -25)
-- No POI labels
-- Subtle neighborhood labels
-- Hidden local roads
+- Cool gray-blue roads, muted desaturated palette
+- Smart bounds with IQR outlier detection
 
 ---
 
-## Current Architecture Decisions
+## Architecture Decisions
 
-### Why Place + MapPlace?
-**Problem:** Original `Location` model tied places directly to lists (1:many)
-**Issue:** Same restaurant appears on multiple lists → duplicated data, inconsistent enrichment
+### Why Entity + MapPlace?
+**Problem:** Original `Location` model tied places directly to lists (1:many) — same restaurant on multiple lists meant duplicated data and inconsistent enrichment.
 
-**Solution:** Canonical `Place` entity + `MapPlace` junction table
-**Benefits:**
-- Place enrichment happens once
-- Same place on multiple maps
-- Curator context (descriptor, order) separated from canonical data
-- Better data consistency
+**Solution:** Canonical `entities` table + `map_places` junction table. Enrichment happens once per entity. Same entity on multiple maps. Curator context separated from canonical data.
 
-### Why Smart Bounds?
-**Problem:** Geographic outliers (one place 10 miles away) force map to zoom out, making main cluster tiny
-**Solution:** IQR-based outlier detection
-**Result:** Tight zoom on core cluster, outliers still render but outside initial view
+### Why 13 Verticals?
+Saiko classifies places by human activity domain, not business category. See `docs/architecture/vertical-taxonomy-v1.md`.
 
-### Why Marker Clustering (Expanded Only)?
-**Cover Map:** Visual overview showing distribution → no clustering
-**Expanded Map:** Interactive navigation → clustering prevents label soup at zoom-out
-
----
-
-## Future Considerations
-
-### Location → Place Migration
-- Migrate remaining `Location` records to `Place`/`MapPlace`
-- Update all queries to use new schema
-- Deprecate `Location` model
-
-### Additional Templates
-- Current: Field Notes (magazine-style)
-- Future: Grid view, minimalist, interactive story
-
-### Voice Engine Enhancements
-- Pattern detection improvements
-- Multi-language support
-- Curator tone customization
-
-### Performance
-- Implement Redis caching for frequently accessed maps
-- Optimize Google Places API calls (batch, rate limiting)
-- Image optimization (CDN, WebP, responsive)
+### Why Coverage Sources?
+Editorial coverage from trusted publications provides independent signal about entity identity, quality, and offerings — stronger than self-reported data alone.
 
 ---
 
@@ -14089,7 +14917,7 @@ map.panTo(centroid)
 | **Status** | active |
 | **Project** | SAIKO |
 | **Path** | `docs/README.md` |
-| **Last Updated** | 2026-03-14 |
+| **Last Updated** | 2026-03-24 |
 
 # Saiko Maps
 
@@ -14113,14 +14941,14 @@ Maps live at shareable URLs. Each place gets its own merchant profile page with 
 
 ## Templates
 
-Four aesthetic-first templates, each with its own personality, color palette, typography, and share card design.
+Four template concepts were designed, but only **Field Notes** is currently implemented:
 
-| Template | Tone | Font | Vibe |
+| Template | Tone | Font | Status |
 |---|---|---|---|
-| **Postcard** | Warm, nostalgic | Nunito | Polaroid vacation snapshots, golden hour, faded coral |
-| **Neon** | Bold, nightlife | Bebas Neue | Drive poster energy, Tokyo signage, 2am underground |
-| **Field Notes** | Minimal, editorial | Libre Baskerville | Well-kept travel journal, worn leather, quiet confidence |
-| **Zine** | DIY, irreverent | Special Elite | Cut-and-paste, punk flyers, record shop staples |
+| **Field Notes** | Minimal, editorial | Libre Baskerville | **Implemented** — active map template |
+| **Postcard** | Warm, nostalgic | Nunito | Designed only |
+| **Neon** | Bold, nightlife | Bebas Neue | Designed only |
+| **Zine** | DIY, irreverent | Special Elite | Designed only |
 
 *All template fonts are free via Google Fonts.*
 
@@ -14293,7 +15121,363 @@ Without these, development allows requests with a warning; production fails clos
 
 ---
 
-**Saiko Maps · 2026**
+## Key Documentation
+
+| Doc | What it covers |
+|-----|----------------|
+| `APP_OVERVIEW.md` | High-level system overview — layers, features, tech stack |
+| `DATABASE_SCHEMA.md` | Schema reference — all major tables, enums, data flows |
+| `SITEMAP.md` | Route reference — public, creator, admin, API |
+| `PIPELINE_COMMANDS.md` | Operator command reference — enrichment, coverage, social discovery |
+| `homepage-solutions.md` | Homepage implementation plan — decisions, build order, file inventory |
+| `architecture/vertical-taxonomy-v1.md` | 13-vertical classification system |
+| `architecture/coverage-tiers-v1.md` | Six-tier enrichment model |
+| `architecture/coverage-ops-approach-v1.md` | Coverage operations architecture |
+| `architecture/instagram-ingestion-status-v1.md` | Instagram pipeline operational status |
+| `architecture/fields-era-overview-v1.md` | Entity Record Awareness (ERA) framework |
+
+---
+
+**Saiko · 2026**
+
+---
+
+## HOMEPAGE-SOLUTIONS-V1
+
+| Field | Value |
+|-------|-------|
+| **Type** | planning |
+| **Status** | active |
+| **Project** | SAIKO |
+| **Path** | `docs/homepage-solutions.md` |
+| **Last Updated** | Mon Mar 23 2026 17:00:00 GMT-0700 (Pacific Daylight Time) |
+| **Summary** | Locked implementation decisions and execution plan for wiring the homepage to real data sources, including section model, curation strategy, build order, and verification checklist.
+ |
+| **Systems** | homepage, traces |
+
+# Homepage Solutions Doc — saikofields.com
+
+**Date:** 2026-03-24
+**Status:** Decisions locked, ready for implementation
+**Scope:** What needs to happen to make the homepage live with real content
+
+---
+
+## Current State
+
+The homepage is a static mockup. All data (neighborhoods, categories, experiences, counts, images) is hardcoded in `app/page.tsx`. There are no database queries and no API calls. The layout and component architecture are solid - the issue is purely that nothing is wired to real data.
+
+The good news: **all underlying data already exists in the database.** Entities have `neighborhood`, `primaryVertical`, `category`, and `cuisineType` fields. Instagram and Google Photos data exist for imagery. Published maps/lists already exist for collections. We just need queries and a thin data-fetching layer.
+
+---
+
+## Decisions (locked 2026-03-24)
+
+| # | Question | Decision |
+|---|----------|----------|
+| 1 | Neighborhoods | **Hand-curated.** Short allow-list in code, not a new table. Homepage should feel intentional, not operationally derived. |
+| 2 | Categories | **Use `primaryVertical` as system truth**, but present with editorial labels where needed (e.g., "Natural Wine" not just "Wine"). No second classification system. |
+| 3 | Experiences | **Use published maps/lists (Option A).** Already real, already curated, already fits the product. No experience tags yet. |
+| 4 | BrowseSection | **Remove it.** Creates redundancy and muddies page hierarchy. Sections below do the real work. Lighter nav index can come later. |
+| 5 | Item count | **4 per section, across the board.** Cleaner, more consistent, easier to source strong imagery. |
+| 6 | Branding | **Saiko Fields.** The domain is saikofields.com. This is the platform/company front door, not a pure consumer destination. The consumer Maps homepage should live on its own surface. |
+| 7 | Photo quality | **Assume partial confidence.** Don't block on a full audit, but don't trust auto-selected images blind. Build the pipeline, then manually review the final 12–16 homepage images and override weak ones. |
+
+**Guiding principle:** The homepage should reflect real Saiko editorial objects, not invented homepage-only concepts. That means curated neighborhoods, real verticals, and published lists.
+
+---
+
+## Section Model (final)
+
+The homepage has three content sections after Hero + Search:
+
+| Section | Label | Data source | Cards |
+|---------|-------|-------------|-------|
+| 1 | BY NEIGHBORHOOD | `entities` grouped by `neighborhood`, filtered to curated allow-list | 4 NeighborhoodCards |
+| 2 | BY CATEGORY | `entities` grouped by `primaryVertical`, with editorial display labels | 4 CategoryCards |
+| 3 | COLLECTIONS | `lists` where `published = true`, filtered to curated slug allow-list in config | 4 CollectionCards |
+
+BrowseSection is removed. "BY EXPERIENCE" is renamed to "COLLECTIONS" (final label).
+
+---
+
+## Issue-by-Issue Plan
+
+### 1. Neighborhoods — wire to curated allow-list
+
+**What changes:**
+- Define a curated neighborhood list in code (e.g., `lib/homepage/config.ts`):
+  ```ts
+  export const FEATURED_NEIGHBORHOODS = [
+    'Echo Park',
+    'Highland Park',
+    'Koreatown',
+    'San Gabriel Valley',
+  ]
+  ```
+- Query `entities` for neighborhood counts, filtered to the allow-list
+- Select a representative place per neighborhood for cover imagery and use its best photo
+- Keep the component contract unchanged: `{ name, count, imageUrl, href }`
+
+**Files touched:** `lib/homepage/config.ts` (new), `lib/homepage/queries.ts` (new), `app/page.tsx`
+
+---
+
+### 2. Categories — wire to primaryVertical with editorial labels
+
+**What changes:**
+- Define editorial config mapping verticals to display labels and descriptions:
+  ```ts
+  export const FEATURED_VERTICALS = [
+    { vertical: 'WINE', label: 'Natural Wine', description: 'Natural pours and neighborhood gems' },
+    { vertical: 'COFFEE', label: 'Coffee', description: 'Third wave pours and quiet corners' },
+    { vertical: 'EAT', label: 'Restaurants', description: 'The places worth knowing about' },
+    { vertical: 'DRINKS', label: 'Bars & Drinks', description: 'Where the night starts' },
+  ]
+  ```
+- Query entity counts grouped by `primaryVertical`, filtered to the featured list
+- Select the best photo from a representative place in each vertical for cover imagery
+- Keep the component contract unchanged: `{ title, description, count, imageUrl, href }`
+
+**Files touched:** `lib/homepage/config.ts`, `lib/homepage/queries.ts`, `app/page.tsx`
+
+**Note:** The 4 verticals shown are a starting suggestion. Bobby picks the final 4.
+
+---
+
+### 3. Collections — wire to published lists
+
+**What changes:**
+- Query `lists` where `published = true`, filtered by a curated allow-list of list slugs in `lib/homepage/config.ts` (take the first 4 in configured order)
+- Normalize list card contract to: `{ title, description, count, imageUrl, href }`
+  - `description` resolves from `subtitle ?? description ?? ''`
+- Rename the section from "BY EXPERIENCE" to "COLLECTIONS"
+- Create a new `CollectionCard` component, or adapt `NeighborhoodCard`, to fit the list data shape
+
+**Files touched:** `lib/homepage/queries.ts`, `app/page.tsx`, possibly `components/homepage/CollectionCard.tsx` (new)
+
+**Decision locked:** Feature collections via allow-list of list slugs in config (same pattern as neighborhoods). DB flag can be evaluated in a separate work order later.
+
+---
+
+### 4. Remove BrowseSection
+
+**What changes:**
+- Delete `BrowseSection` import and usage from `app/page.tsx`
+- Optionally remove `components/homepage/BrowseSection.tsx` and `BrowseSection.module.css` if they are no longer used
+
+**Files touched:** `app/page.tsx`, `components/homepage/BrowseSection.tsx` (delete), `components/homepage/index.ts`
+
+---
+
+### 5. Shared photo selection utility
+
+**What changes:**
+- Extract the Instagram -> Google Photos fallback logic from `app/api/places/[slug]/route.ts` into a shared utility: `lib/photos/getBestPhoto.ts`
+- Define the function signature as `getBestPhoto(entityId): Promise<string | null>`
+  - Check `instagram_media` for the entity, rank by photoType preference
+  - Fall back to `entities.googlePhotos`
+  - Return a URL string
+- Call this utility from homepage queries for each featured card's representative place
+
+**Files touched:** `lib/photos/getBestPhoto.ts` (new), `lib/homepage/queries.ts` (uses it)
+
+---
+
+### 6. Update branding to Saiko Fields
+
+**What changes:**
+- Update Hero text from "Saiko Maps" to "Saiko Fields"
+- Set the Hero subtitle to the locked copy: "Los Angeles"
+- Keep the footer "SAIKO" logo text, and update tagline copy only if needed
+- Update `app/layout.tsx` metadata title from "Saiko Maps" to "Saiko Fields"
+- Update footer copyright from "Saiko Maps" to "Saiko Fields"
+
+**Files touched:** `components/homepage/Hero.tsx`, `components/homepage/HomepageFooter.tsx`, `app/layout.tsx`
+
+**Hero copy locked:**
+- H1: "Saiko Fields"
+- H2: "Los Angeles"
+- CTA: "Explore" (unchanged)
+
+---
+
+### 7. `next/image` optimization
+
+**What changes:**
+- Switch `<img>` tags in `NeighborhoodCard`, `CategoryCard`, and the new `CollectionCard` to `<Image>` from `next/image`
+- Add `remotePatterns` to `next.config.ts` for Instagram CDN and Google Photos domains
+- Add `sizes` prop for responsive behavior
+- Add `width`/`height` props to prevent layout shift
+
+**Files touched:** `components/homepage/NeighborhoodCard.tsx`, `components/homepage/CategoryCard.tsx`, `next.config.ts`
+
+---
+
+### 8. Manual image QA pass
+
+**What changes:**
+- Review the 12–16 auto-selected homepage images after data wiring is complete
+- Add manual overrides in `lib/homepage/config.ts` for any weak selections:
+  ```ts
+  export const IMAGE_OVERRIDES: Record<string, string> = {
+    'echo-park': 'https://...manually-selected-url',
+  }
+  ```
+- Ensure query logic checks overrides first and falls back to auto-selection
+
+**Files touched:** `lib/homepage/config.ts`, `lib/homepage/queries.ts`
+
+---
+
+## Build Order (locked)
+
+| Step | Task | Depends on |
+|------|------|------------|
+| 1 | Lock branding — update Hero, Footer, metadata to "Saiko Fields" | — |
+| 2 | Lock section model — rename section heading "BY EXPERIENCE" -> "COLLECTIONS" and map the data source to published lists | — |
+| 3 | Remove BrowseSection import/usage from the homepage and delete component files if unreferenced | — |
+| 4 | Create `lib/homepage/config.ts` — curated neighborhoods, featured verticals, featured list slugs | — |
+| 5 | Create `lib/photos/getBestPhoto.ts` — shared photo fallback utility | — |
+| 6 | Create `lib/homepage/queries.ts` — data queries for all 3 sections | Steps 4, 5 |
+| 7 | Wire `app/page.tsx` — replace hardcoded data with query calls, 4 cards per section | Step 6 |
+| 8 | Switch to `next/image` in card components | Step 7 |
+| 9 | Manual image QA — review 12–16 images, add overrides for weak ones | Step 7 |
+| 10 | Add ISR/revalidate caching (optional) | Step 7 |
+
+Steps 1–3 can be done in parallel. Steps 4–5 can be done in parallel. Step 6 depends on both. Step 7 wires everything together. Steps 8–10 are polish.
+
+---
+
+## New Files Summary
+
+| File | Purpose |
+|------|---------|
+| `lib/homepage/config.ts` | Curated allow-lists: neighborhoods, verticals (with editorial labels), collection slugs, image overrides |
+| `lib/homepage/queries.ts` | Server-side data queries: `getNeighborhoods()`, `getCategories()`, `getCollections()` |
+| `lib/photos/getBestPhoto.ts` | Shared Instagram → Google Photos fallback, extracted from place API |
+| `components/homepage/CollectionCard.tsx` | Card component for published lists (if NeighborhoodCard doesn't fit) |
+
+## Verification Checklist
+
+- Homepage renders with live query-backed data for all 3 sections (no hardcoded section arrays in `app/page.tsx`)
+- Section headings are: `BY NEIGHBORHOOD`, `BY CATEGORY`, `COLLECTIONS`
+- Exactly 4 cards render in each section
+- Collection cards resolve `description` via `subtitle ?? description ?? ''` without runtime errors
+- Image selection follows override-first, then auto-selection fallback
+- BrowseSection is not imported, rendered, or exported anywhere
+- Branding copy shows `Saiko Fields` in Hero/footer/metadata targets listed in this doc
+
+## Out of Scope (this work order)
+
+- No schema migrations or table changes
+- No new second classification system beyond `primaryVertical` + editorial labels
+- No new `featuredOnHomepage` database flag
+- No redesign of homepage layout architecture beyond the locked section model changes
+
+## Modified Files Summary
+
+| File | Change |
+|------|--------|
+| `app/page.tsx` | Remove hardcoded data, remove BrowseSection, wire to queries, rename experience section |
+| `app/layout.tsx` | Update metadata title to "Saiko Fields" |
+| `components/homepage/Hero.tsx` | Update branding text |
+| `components/homepage/HomepageFooter.tsx` | Update branding text |
+| `components/homepage/NeighborhoodCard.tsx` | Switch to next/image |
+| `components/homepage/CategoryCard.tsx` | Switch to next/image |
+| `components/homepage/index.ts` | Remove BrowseSection export, add CollectionCard export |
+| `next.config.ts` | Add remotePatterns for Instagram/Google Photos domains |
+
+## Deleted Files
+
+| File | Reason |
+|------|--------|
+| `components/homepage/BrowseSection.tsx` | Removed per decision #4 |
+| `components/homepage/BrowseSection.module.css` | Removed per decision #4 |
+
+---
+
+## OPS-RELEASE-RUNBOOK-V1
+
+| Field | Value |
+|-------|-------|
+| **Type** | operations |
+| **Status** | active |
+| **Project** | SAIKO |
+| **Path** | `docs/RELEASE-RUNBOOK.md` |
+| **Last Updated** | 2026-03-22 |
+| **Summary** | Release runbook covering the deploy flow (branch → PR → build gate → preview → merge → production), branch protection rules, incident response / rollback procedures, database migration rules, and build gate checks.
+ |
+| **Systems** | deployment, ci-cd |
+
+# Saiko Release Runbook v1
+
+## Release Flow
+
+```
+local dev → push branch → open PR → build gate passes → preview deploy → merge → production
+```
+
+### Step by step
+
+1. **Work on a branch** — never push directly to `main`
+2. **Open a PR** against `main`
+3. **Build gate runs automatically** — lint, typecheck, Prisma generate, production build
+4. **Preview deploy** — Vercel creates a preview URL on every PR push. Click through it.
+5. **Merge when green** — both build gate and preview look good
+6. **Production deploys** — Vercel auto-deploys `main` to tracesla.com
+
+## Branch Protection (set up in GitHub)
+
+Go to **Settings → Branches → Add rule** for `main`:
+- Require status checks to pass: `build-gate`
+- Require branches to be up to date before merging: yes
+- Do not allow bypassing the above settings
+
+## Incident Response: Rollback First
+
+If production is broken:
+
+1. **Confirm the issue** — check tracesla.com, Vercel dashboard, Sentry
+2. **Rollback immediately** — don't fix forward as the first move
+   ```bash
+   # List recent production deploys
+   vercel ls saikomaps --prod
+
+   # Rollback to last known good deploy
+   vercel rollback <deployment-id>
+   ```
+   Or use the Vercel dashboard: Deployments → find last good deploy → Promote to Production
+3. **Open an incident note** — what broke, when, who noticed
+4. **Fix on a branch** — normal PR flow, build gate, preview
+5. **Merge the fix** — production redeploys
+
+## Database Migration Rules
+
+App rollback is instant. DB rollback is not. Keep them decoupled.
+
+1. **Additive migrations first** — add columns/tables, don't remove or rename
+2. **Deploy code that works with old AND new schema** — so rollback is safe
+3. **Backfill data** if needed
+4. **Only later** remove old columns/paths in a separate deploy
+
+Never ship a breaking schema change and new app code in the same deploy.
+
+## What the Build Gate Checks
+
+| Step | Command | What it catches |
+|------|---------|-----------------|
+| Install | `npm ci` | Dependency issues, lockfile drift |
+| Prisma generate | `npx prisma generate` | Schema/client mismatch |
+| Lint | `npm run lint` | Code quality, import issues |
+| Typecheck | `npm run typecheck` | Type errors across the codebase |
+| Build | `npm run build` | Build failures, missing modules, SSR issues |
+
+## Costs
+
+- GitHub Actions: uses free included minutes (~2-3 min per build)
+- Vercel preview deploys: included in your plan
+- No additional services required
 
 ---
 
@@ -14625,6 +15809,145 @@ Signal sets locked for v1:
 **Coffee / Tea:** `coffee_program`, `espresso_program`, `specialty_coffee_presence`, `tea_program`, `specialty_tea_presence`, `matcha_program`, `bubble_tea_program`, `bubble_tea_chain`, `tea_house_structure`, `afternoon_tea_service`, `arabic_coffee_program`
 
 Maturity scale locked: `none`, `incidental`, `considered`, `dedicated`, `unknown`
+
+---
+
+## SAIKO-FIELDS-IDENTITY-VERIFICATION-2026-03
+
+| Field | Value |
+|-------|-------|
+| **Type** | verification |
+| **Status** | active |
+| **Project** | SAIKO |
+| **Path** | `docs/architecture/entity-identity-implementation-verification-2026-03.md` |
+| **Last Updated** | Sun Mar 15 2026 17:00:00 GMT-0700 (Pacific Daylight Time) |
+| **Summary** | Repository and Neon DB verification snapshot for place identity implementation state as of 2026-03. |
+| **Systems** | fields-data-layer, entity-resolution |
+
+# Entity Identity - Implementation Verification
+
+**Document ID:** SAIKO-FIELDS-IDENTITY-VERIFICATION-2026-03  
+**Layer:** Architecture Verification  
+**Status:** Active  
+**Verified Against:** Repo + Neon DB
+
+---
+
+## Purpose
+
+This document records the current implementation state of Entity Identity relative to the architecture documents.
+
+---
+
+## Confirmed Identity Fields in `entities`
+
+Core fields:
+
+- `id`
+- `slug`
+- `name`
+- `status`
+- `neighborhood`
+- `google_place_id`
+- `website`
+- `enrichment_stage`
+- `last_enriched_at`
+
+Identity-adjacent:
+
+- `address`
+- `latitude`
+- `longitude`
+- `instagram`
+- `tiktok`
+- `tagline`
+
+---
+
+## Fields Referenced in Architecture but Missing
+
+- `instagram_handle`
+- `website_domain`
+- `cuisine_posture`
+- `service_model`
+- `entity_tagline`
+- `successor_of`
+- `predecessor_of`
+- `identity_note`
+
+---
+
+## Naming Differences
+
+| Concept | Schema |
+|---|---|
+| instagram_handle | instagram |
+| googlePlaceId | google_place_id |
+| coordinates | latitude + longitude |
+| entity_tagline | tagline |
+
+---
+
+## Lifecycle Status Enum
+
+Schema enum:
+
+- OPEN
+- CLOSED
+- PERMANENTLY_CLOSED
+- CANDIDATE
+
+Current DB counts:
+
+- OPEN - 323
+- CANDIDATE - 288
+- CLOSED - 1
+
+Not implemented:
+
+- PUBLISHED
+- TEMP_CLOSED
+
+---
+
+## Identity Anchor Constraints
+
+Existing:
+
+- `google_place_id` unique
+- `slug` unique
+
+Missing:
+
+- `instagram` uniqueness
+- `website` uniqueness
+
+---
+
+## Resolver Thresholds in Code
+
+Active:
+
+- `NAME_SIMILARITY_THRESHOLD` ~= 0.85
+- `NEARBY_RADIUS` ~= 200m
+
+`90/70` thresholds appear only in a backup script.
+
+---
+
+## Canonical vs Source Separation
+
+Source tables:
+
+- `observed_claims`
+- `source_registry`
+
+Canonical tables:
+
+- `canonical_entity_state`
+- `canonical_sanctions`
+
+The `entities` table still contains mixed operational fields.
 
 ---
 
@@ -15769,6 +17092,181 @@ Follow the [Release Runbook](../RELEASE-RUNBOOK.md):
 Previously: push directly to `main` and hope Vercel builds successfully. This caused 10+ consecutive failed production deploys in March 2026.
 
 Now: every change is validated before it reaches production. Auto-merge removes friction without removing safety.
+
+---
+
+## TRACE-ENTITY-PAGE-FEEDBACK-BUVONS-2026-03-23
+
+| Field | Value |
+|-------|-------|
+| **Type** | trace |
+| **Status** | active |
+| **Project** | SAIKO |
+| **Path** | `docs/traces/entity-page-feedback-buvons-2026-03-23.md` |
+| **Last Updated** | Tue Mar 24 2026 17:00:00 GMT-0700 (Pacific Daylight Time) |
+| **Summary** | Production review notes for Buvons entity page voice/copy quality, including issues discovered, fixes shipped, and remaining follow-up items.
+ |
+| **Systems** | traces, entity-page |
+
+# Entity Page Voice/Copy Feedback — Buvons (2026-03-23)
+
+> Source: Bobby's live review of Buvons entity page on production.
+> Status: PARTIALLY RESOLVED (updated 2026-03-25) — major page fixes shipped; remaining items are broader system/design follow-ups.
+
+---
+
+## Entity Context
+
+Buvons is a natural wine bar, wine shop, and restaurant. The wine shop and wine bar share one space; the restaurant is in another. They have two addresses, and the shop has different hours than the restaurant.
+
+---
+
+## Issues Found
+
+### 1. Tagline duplicates neighborhood (Long Beach appears twice)
+
+**Current rendering:**
+```
+Buvons
+RESTAURANT IN LONG BEACH                    ← identity subline
+Natural wine. Small producers. French-Mediterranean cooking. Long Beach.   ← tagline
+```
+
+**Problem:** "Long Beach" appears in the identity subline AND at the end of the tagline. Can't have both.
+
+**Fix needed:** Strip neighborhood from tagline when identity subline already contains it — OR — remove neighborhood from one of the two. Decision: TBD (likely strip from tagline since identity subline owns location).
+
+**Files:** `page.tsx` (tagline rendering, ~line 827–829), possibly tagline generation pipeline.
+
+---
+
+### 2. "Concept-driven" is a data leak
+
+**Current rendering:**
+```
+ABOUT
+Buvons is a natural wine bar, bottle shop, and restaurant in Long Beach...
+Concept-driven                               ← origin story accent line
+```
+
+**Problem:** `originStoryType` value ("concept-first" → "Concept-driven") is rendering as a visible accent line. This is an internal classification token, not user-facing copy. Data leak.
+
+**Fix needed:** Remove the origin story accent line from rendering entirely. The `ORIGIN_STORY_PHRASES` block and its render logic (page.tsx ~line 901–903) should be removed or gated behind a flag.
+
+**Files:** `page.tsx` lines 901–903 (render), lines 375–382 (phrase map).
+
+---
+
+### 3. Offering lines are too terse — need to be sentence-length
+
+**Current rendering:**
+```
+OFFERING
+Food       Broadly composed menu
+Wine       Considered wine selection
+Service    À la carte ordering
+```
+
+**Problem:** These read as labels, not sentences. They should be richer — a sentence each that actually tells you something about the experience.
+
+**What "sentence-length" looks like (directional):**
+- Food: "Broadly composed menu with seasonal, French-Mediterranean plates" (pulls in cuisine context)
+- Wine: "Considered wine selection focused on small, natural producers" (pulls in identity signals)
+- Service: "À la carte ordering — dishes arrive as they're ready" (adds experiential detail)
+
+**Fix needed:** The `buildOfferingLines()` composition system needs to produce richer output. Current fallback paths (no signals, no posture) produce stub phrases. The function needs better sentence templates when signal data is thin.
+
+**Files:** `page.tsx` `buildOfferingLines()` (~lines 428–587), phrase maps.
+
+---
+
+### 4. Scene section — is it duplicative?
+
+**Current rendering:**
+```
+SCENE
+Higher-end pricing
+```
+
+**Question from Bobby:** Is Scene showing info that's already elsewhere on the page? Price is already derivable from the Offering section. If Scene only contains price, it's adding an empty-feeling sidebar section for redundant info.
+
+**Fix needed:** Audit what Scene renders vs what's already on the page. If Scene is only showing price (which is already an offering line), consider either enriching Scene with actual scene data or collapsing it when it would only duplicate.
+
+**Files:** `page.tsx` lines 1068–1078 (Scene render), line 778 (priceText extraction).
+
+---
+
+### 5. Known For — pulling wrong data, needs proper wiring
+
+**Current rendering:**
+```
+KNOWN FOR
+Producers: Antoine Chevalier, Benjamin Taillandier, Fabien Jouves, Lassaigne, Marcel Lapierre
+```
+
+**Problem:** Known For is showing only key producers as a flat comma list. The section name implies broader knowledge (dishes, specialties, defining characteristics). The data wiring needs to be revisited — what should Known For actually contain, and is the current source (derived_signals.keyProducers) the right one?
+
+**Files:** `page.tsx` lines 922–938 (Known For render).
+
+---
+
+### 6. Description also mentions Long Beach (triple redundancy)
+
+**Current rendering:**
+```
+ABOUT
+Buvons is a natural wine bar, bottle shop, and restaurant in Long Beach, California.
+```
+
+**Problem:** "Long Beach" now appears THREE times on the page: identity subline, tagline, and description. The description is merchant-sourced text (or synthesized), so stripping it there is harder — but the tagline fix (issue #1) should at minimum eliminate one instance.
+
+---
+
+## Implemented Since Review (2026-03-25)
+
+- Tagline neighborhood dedupe added at render-time.
+- Offering fallback improved so food program can still render when signal detail is thin.
+- References index moved higher in the page.
+- Coverage section moved above photos.
+- People section added with reported-role framing.
+- Buvons-specific role correction applied: Marie Delbarry surfaces as former role.
+- Footer typo corrected to "Saiko Fields Los Angeles."
+- Hero top spacing reduced; Known For typography normalized.
+
+## Still Open / Follow-up
+
+- Known For source strategy and composition depth remain product/policy follow-up.
+- Pipeline-level description/tagline location constraints remain a generation-policy follow-up.
+
+## Priority
+
+These are voice/copy quality issues visible on production right now. They affect how Saiko presents its most enriched entities.
+
+---
+
+*Saved from Bobby's live review session — 2026-03-23*
+
+---
+
+## UI-PLACE-PAGE-PATCH-LOG-V1
+
+| Field | Value |
+|-------|-------|
+| **Type** | operations |
+| **Status** | active |
+| **Project** | SAIKO |
+| **Path** | `docs/ui/place-page/patch-log.md` |
+| **Last Updated** | Sun Mar 22 2026 17:00:00 GMT-0700 (Pacific Daylight Time) |
+| **Summary** | Guardrail patch log used by place-page validation checks to track patch-level updates that keep CI token checks unblocked.
+ |
+| **Systems** | traces, place-page |
+
+# Place Page Patch Log
+
+## 2026-03-23
+
+- Restored guardrail patch log file required by `scripts/check-place-page-tokens.mjs`.
+- No runtime behavior change; this keeps `check:place-page` CI validation unblocked.
 
 ---
 
@@ -17987,8 +19485,8 @@ The deeper structural point: these signals describe what a place is from within 
 
 | Field | Value |
 |-------|-------|
-| Registry generated | 2026-03-22T19:58:40.706Z |
-| Context generated | 2026-03-22T19:58:40.962Z |
-| Docs included | 91 |
+| Registry generated | 2026-03-26T17:53:42.668Z |
+| Context generated | 2026-03-26T17:53:42.909Z |
+| Docs included | 100 |
 | Docs missing on disk | 0 |
 | Filters applied | status=active |

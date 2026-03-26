@@ -5,7 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Loader } from '@googlemaps/js-api-loader';
 import { MarkerClusterer } from '@googlemaps/markerclusterer';
-import { getMapTemplate, MAP_TEMPLATES, type MapTemplate } from '@/lib/map-templates';
+import { getMapTemplate, type MapTemplate } from '@/lib/map-templates';
 import { DEV_SHOW_ALL_UI } from '@/lib/config';
 import { saikoMapStyle } from '@/lib/mapStyle';
 import { getGooglePhotoUrl, getPhotoRefFromStored } from '@/lib/google-places';
@@ -180,6 +180,8 @@ export default function PublicMapPage({ params }: { params: Promise<{ slug: stri
   const router = useRouter();
   const searchParams = useSearchParams();
   const devOwner = searchParams.get('devOwner') === '1';
+  const back = searchParams.get('back');
+  const backHref = back ? decodeURIComponent(back) : null;
   const [mapData, setMapData] = useState<MapData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [mobileView, setMobileView] = useState<'list' | 'map'>('list');
@@ -229,7 +231,7 @@ export default function PublicMapPage({ params }: { params: Promise<{ slug: stri
     );
   };
 
-  let template: MapTemplate = getMapTemplate(mapData?.templateType);
+  const template: MapTemplate = getMapTemplate(mapData?.templateType);
   // Flatten mapPlaces to locations (place + mapPlace curator data)
   const locations: Location[] = (mapData?.mapPlaces ?? mapData?.locations ?? []).map((mp: MapPlaceWithPlace | Location) => {
     if ('place' in mp && mp.place) {
@@ -578,7 +580,7 @@ export default function PublicMapPage({ params }: { params: Promise<{ slug: stri
       });
 
       // Add smooth zoom on cluster click
-      clusterer.addListener('click', (event: any) => {
+      clusterer.addListener('click', (event: { position: google.maps.LatLng }) => {
         if (!map) return;
         const clusterCenter = event.position as google.maps.LatLng;
         const currentZoom = map.getZoom() || 10;
@@ -813,6 +815,18 @@ export default function PublicMapPage({ params }: { params: Promise<{ slug: stri
     >
       {/* Minimal Header - Logo only */}
       <MapHeader template={template} onShare={handleShare} />
+      {backHref && (
+        <div className="px-4 sm:px-6 lg:px-8 py-2">
+          <button
+            type="button"
+            onClick={() => router.push(backHref)}
+            className="text-xs font-medium underline underline-offset-4"
+            style={{ color: template.textMuted }}
+          >
+            Back to Explore
+          </button>
+        </div>
+      )}
 
       {/* Split layout: below 768px stack (map top 300px, cards below); above 768px ~55% cards / 45% map */}
       <div className="flex flex-col md:flex-row md:h-[calc(100vh-8rem)]">

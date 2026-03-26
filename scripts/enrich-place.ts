@@ -123,7 +123,7 @@ async function shouldSkip(stage: number, entity: Awaited<ReturnType<typeof getEn
     }
     case 5: {
       const existing = await db.derived_signals.findFirst({
-        where: { entityId: entity.id, signal_key: 'identity_signals' },
+        where: { entityId: entity.id, signalKey: 'identity_signals' },
         select: { entityId: true },
       });
       if (existing) return { skip: true, reason: 'identity_signals already in derived_signals' };
@@ -136,7 +136,7 @@ async function shouldSkip(stage: number, entity: Awaited<ReturnType<typeof getEn
     }
     case 7: {
       const existing = await db.interpretation_cache.findFirst({
-        where: { entityId: entity.id, output_type: 'TAGLINE', is_current: true },
+        where: { entityId: entity.id, outputType: 'TAGLINE', isCurrent: true },
         select: { entityId: true },
       });
       if (existing) return { skip: true, reason: 'TAGLINE already in interpretation_cache' };
@@ -218,7 +218,7 @@ async function runBatch(n: number) {
   // AND entities that already have lastEnrichedAt set (already ran pipeline
   // but couldn't produce a tagline — re-running won't help).
   const enrichedIds = (await db.interpretation_cache.findMany({
-    where: { output_type: 'TAGLINE', is_current: true },
+    where: { outputType: 'TAGLINE', isCurrent: true },
     select: { entityId: true },
   })).map((r) => r.entityId).filter(Boolean) as string[];
 
@@ -296,7 +296,7 @@ async function runBatch(n: number) {
       }
 
       const hasTagline = await db.interpretation_cache.findFirst({
-        where: { entityId: entity.id, output_type: 'TAGLINE', is_current: true },
+        where: { entityId: entity.id, outputType: 'TAGLINE', isCurrent: true },
         select: { entityId: true },
       });
       if (hasTagline) {
@@ -449,7 +449,7 @@ async function main() {
     }
 
     const hasTagline = await db.interpretation_cache.findFirst({
-      where: { entityId: entity.id, output_type: 'TAGLINE', is_current: true },
+      where: { entityId: entity.id, outputType: 'TAGLINE', isCurrent: true },
       select: { entityId: true },
     });
     if (hasTagline) {
@@ -470,7 +470,7 @@ async function main() {
     console.log('\nRe-scanning issues...');
     try {
       const scanResult = await scanEntities(db, { slugs: [entity.slug!] });
-      console.log(`  Issues: ${scanResult.issues_created} created, ${scanResult.issues_resolved} resolved, ${scanResult.issues_unchanged} unchanged`);
+      console.log(`  Issues: ${scanResult.issuesCreated} created, ${scanResult.issuesResolved} resolved, ${scanResult.issuesUnchanged} unchanged`);
     } catch (e) {
       console.error('  Issue rescan failed (non-fatal):', e);
     }

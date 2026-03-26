@@ -1,3 +1,22 @@
+---
+doc_id: HOMEPAGE-SOLUTIONS-V1
+doc_type: planning
+status: active
+owner: Bobby Ciccaglione
+created: 2026-03-24
+last_updated: 2026-03-24
+project_id: SAIKO
+systems:
+  - homepage
+  - traces
+related_docs:
+  - docs/APP_OVERVIEW.md
+summary: >
+  Locked implementation decisions and execution plan for wiring the homepage to
+  real data sources, including section model, curation strategy, build order,
+  and verification checklist.
+---
+
 # Homepage Solutions Doc — saikofields.com
 
 **Date:** 2026-03-24

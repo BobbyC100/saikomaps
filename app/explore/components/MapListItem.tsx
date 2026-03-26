@@ -6,16 +6,17 @@ import { MapCardData } from '../types'
 
 interface MapListItemProps {
   map: MapCardData
+  href?: string
 }
 
 /**
  * MapListItem — List view variant (2-col grid on desktop)
  * Used in "By Neighborhood" section and list view mode
  */
-export function MapListItem({ map }: MapListItemProps) {
+export function MapListItem({ map, href }: MapListItemProps) {
   return (
     <Link
-      href={`/map/${map.slug}`}
+      href={href ?? `/map/${map.slug}`}
       style={{
         background: '#FFFDF7',
         padding: '12px 16px',

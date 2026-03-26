@@ -44,7 +44,7 @@
   --pp-rule-weight-light: 1px;
   --pp-section-gap: 2em;
   --pp-section-pad: 1.5em;
-  --pp-hero-gap: 36px;
+  --pp-hero-gap: 24px;
   --pp-grid-gap: 24px;
   --pp-sidebar-gap: 32px;
   --pp-sidebar-pad: 24px;
@@ -104,7 +104,7 @@
    1. Document Frame
    --------------------------------------------------------------------------- */
 #document-frame {
-  padding-top: max(96px, env(safe-area-inset-top));
+  padding-top: max(84px, env(safe-area-inset-top));
   min-height: 100vh;
 }
 
@@ -340,8 +340,9 @@
 
 .known-for-line {
   margin: 0 0 0.5em;
-  font-size: var(--pp-font-small);
-  line-height: var(--pp-lh-list);
+  font-family: var(--pp-font-ui);
+  font-size: var(--sk-type-body-size);
+  line-height: var(--sk-type-body-line-height);
   color: var(--pp-color-text);
 }
 
@@ -514,7 +515,7 @@
 }
 
 .sidebar-spacer {
-  height: 140px;
+  height: 108px;
 }
 
 /* Hours */
@@ -607,6 +608,88 @@
   opacity: 0.75;
 }
 
+/* Hero-level references jump index (moved higher than appendix) */
+#hero-references-index {
+  margin-top: 1.25em;
+}
+
+#hero-references-index nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+}
+
+#hero-references-index nav li {
+  margin: 0;
+}
+
+#hero-references-index nav a {
+  font-family: var(--pp-font-ui);
+  font-size: var(--pp-font-nano);
+  text-transform: uppercase;
+  letter-spacing: var(--pp-l1-spacing);
+  color: var(--pp-color-text);
+  opacity: var(--pp-l1-opacity);
+  text-decoration: none;
+}
+
+#hero-references-index nav a:hover {
+  opacity: 1;
+}
+
+/* People section */
+#people-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px 16px;
+}
+
+.people-row {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  padding-bottom: 8px;
+}
+
+.people-name {
+  margin: 0;
+  font-family: var(--pp-font-ui);
+  font-size: var(--pp-font-small);
+  color: var(--pp-color-text);
+  font-weight: 600;
+}
+
+.people-role {
+  margin: 2px 0 0;
+  font-family: var(--pp-font-ui);
+  font-size: var(--pp-font-micro);
+  color: var(--pp-color-text);
+  opacity: 0.72;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+#people-empty {
+  margin: 0;
+  font-family: var(--pp-font-ui);
+  font-size: var(--pp-font-small);
+  color: var(--pp-color-text);
+  opacity: 0.7;
+}
+
+#people-disclaimer {
+  margin: 0 0 10px;
+  font-family: var(--pp-font-ui);
+  font-size: var(--pp-font-micro);
+  color: var(--pp-color-text);
+  opacity: 0.6;
+  line-height: 1.45;
+}
+
 /* ---------------------------------------------------------------------------
    7. Photos Section — compact editorial preview (max 6 square tiles)
    Layout: P1 (2×2 span) | P2+P3 stacked (1×1 each) | P4+P5+P6 bottom row
@@ -618,6 +701,20 @@
   grid-template-columns: minmax(0, 640px) 1fr;
   column-gap: 32px;
   align-items: start;
+}
+
+#coverage-section {
+  padding-top: var(--pp-section-pad);
+}
+
+#coverage-section > h2 {
+  font-size: var(--pp-font-micro);
+  font-weight: var(--pp-l1-weight);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--pp-color-text);
+  opacity: 0.7;
+  margin: 0 0 0.75em;
 }
 
 #photos-section h2 {
@@ -927,8 +1024,7 @@
   margin-top: var(--pp-section-gap);
   padding-top: 1.25em;
   display: grid;
-  grid-template-columns: 200px 1fr 240px;
-  column-gap: 24px;
+  grid-template-columns: 1fr;
   row-gap: 16px;
 }
 

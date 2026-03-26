@@ -5,7 +5,7 @@ status: draft
 title: "Enrichment Model V1 — Vertical-Aware Completeness"
 owner: Bobby Ciccaglione
 created: "2026-03-19"
-last_updated: "2026-03-19"
+last_updated: "2026-03-25"
 project_id: SAIKO
 summary: "Defines three-bucket enrichment model (Identity / Access / Offering) with vertical-aware completeness profiles. Replaces flat field checklist with context-relative scoring."
 systems:
@@ -148,6 +148,11 @@ Completeness is defined relative to what is expected for the entity's vertical, 
 - **Offering:** Low-medium
   - programming, exhibitions (not menus)
 
+**Subtype note (implemented in scanner policy, 2026-03-25):**
+- Some CULTURE subtypes treat hours as optional when schedule cadence is irregular or event-based.
+- Current implemented exception: music-venue/theater/theatre/concert-hall patterns.
+- Important: this affects **expectation + issue detection**, not rendering. If hours are present, they still render.
+
 ### 4.4 SHOP
 
 - **Identity:** Required
@@ -202,6 +207,8 @@ Optional:
 
 - Vertical-level profiles are sufficient for V1
 - Subtype logic (e.g., fine dining vs taco cart) is deferred
+- Operational exception: limited subtype overrides are allowed when they remove known false-positive issues
+  without changing the core vertical model (e.g., CULTURE music-venue hours expectation in scanner policy).
 
 ### 6.3 No Weighted Scoring (V1)
 

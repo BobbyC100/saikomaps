@@ -137,6 +137,50 @@ export function expectsAccessField(
   return profile.access_expected.includes(field);
 }
 
+export interface AccessFieldContext {
+  vertical: string | null;
+  category?: string | null;
+  slug?: string | null;
+  name?: string | null;
+}
+
+function isHoursOptionalSubtype(context: AccessFieldContext): boolean {
+  if (context.vertical !== 'CULTURE') return false;
+
+  const signals = [
+    context.category ?? '',
+    context.slug ?? '',
+    context.name ?? '',
+  ]
+    .join(' ')
+    .toLowerCase();
+
+  if (!signals.trim()) return false;
+
+  const musicVenueTokens = [
+    'music venue',
+    'theater',
+    'theatre',
+    'concert hall',
+    'live music',
+    'performance venue',
+  ];
+
+  return musicVenueTokens.some((token) => signals.includes(token));
+}
+
+/**
+ * Entity-aware access expectation.
+ * Default is vertical profile behavior, with subtype exceptions layered on top.
+ */
+export function expectsAccessFieldForEntity(
+  context: AccessFieldContext,
+  field: AccessFieldKey,
+): boolean {
+  if (field === 'hours' && isHoursOptionalSubtype(context)) return false;
+  return expectsAccessField(context.vertical, field);
+}
+
 /**
  * Compute access completeness for an entity.
  * Returns { complete: boolean, satisfied: number, expected: number }

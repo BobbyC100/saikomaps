@@ -13,8 +13,8 @@ export function HomepageFooter() {
           <div className={styles.linkGroup}>
             <h4>Explore</h4>
             <Link href="/explore">All Maps</Link>
-            <Link href="/explore?filter=neighborhoods">Neighborhoods</Link>
-            <Link href="/explore?filter=categories">Categories</Link>
+            <Link href="/explore?scope=neighborhood">Neighborhoods</Link>
+            <Link href="/explore?scope=city">Categories</Link>
           </div>
           <div className={styles.linkGroup}>
             <h4>Saiko</h4>

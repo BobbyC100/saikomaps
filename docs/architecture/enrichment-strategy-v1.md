@@ -4,6 +4,7 @@ title: Entity Enrichment Strategy
 status: draft
 owner: bobby
 created: 2026-03-15
+last_updated: 2026-03-25
 related_docs:
   - docs/architecture/entity-classification-framework-v1.md
   - docs/architecture/entity-type-problem-definition-v1.md
@@ -58,6 +59,17 @@ Run all free sources. Order within this phase is flexible — optimize for signa
 3. **Evidence before canonical** — enrichment writes to evidence tables first, not directly to canonical state
 4. **Pluggable architecture** — new data sources slot in as tools; the system doesn't hardcode a fixed pipeline order
 5. **Provenance always** — every field tracks where its data came from
+6. **Exhaustion must be explicit** — if expected enrichment paths have been attempted and a field (for example hours) is still missing, mark it as a `possible_not_findable` review candidate rather than endlessly re-running the same step
+
+## Exhaustion + Human Review Policy
+
+When a required/expected field remains missing after policy-aligned attempts:
+
+1. Mark the gap as **possibly not existing / not currently findable**.
+2. Route to **manual review** (operator confirms whether the value likely does not exist, is seasonally unavailable, or needs deferred follow-up).
+3. Avoid repeated identical automation loops unless there is new evidence (new surface fetch, updated source, or policy change).
+4. If confirmed, use suppression/confirmation state so the scanner does not reopen the same issue every cycle.
+5. Recheck later on cadence (freshness strategy), not immediate blind retries.
 
 ## Evidence vs Canonical
 

@@ -20,7 +20,7 @@ export default async function Home() {
         <SectionHeader 
           title="BY NEIGHBORHOOD" 
           linkText="See all" 
-          linkHref="/explore?view=neighborhoods" 
+          linkHref="/explore?scope=neighborhood" 
         />
         <div className={styles.neighborhoodGrid}>
           {neighborhoods.map((neighborhood) => (
@@ -34,7 +34,7 @@ export default async function Home() {
           <SectionHeader 
             title="BY CATEGORY" 
             linkText="See all" 
-            linkHref="/explore?filter=categories" 
+            linkHref="/explore?scope=city" 
           />
           <div className={styles.categoryGrid}>
             {categories.map((category) => (
@@ -48,7 +48,7 @@ export default async function Home() {
         <SectionHeader 
           title="COLLECTIONS" 
           linkText="See all" 
-          linkHref="/explore?view=collections" 
+          linkHref="/explore" 
         />
         <div className={styles.neighborhoodGrid}>
           {collections.map((collection) => (

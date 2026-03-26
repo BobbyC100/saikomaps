@@ -7,6 +7,7 @@ import { MapCardData } from '../types'
 interface ExploreMapCardProps {
   map: MapCardData
   featured?: boolean
+  href?: string
 }
 
 /**
@@ -14,10 +15,10 @@ interface ExploreMapCardProps {
  * - Standard (2×1): Single column span
  * - Featured (2×2): 2 column span (only in browse mode, after Priority Zone)
  */
-export function ExploreMapCard({ map, featured = false }: ExploreMapCardProps) {
+export function ExploreMapCard({ map, featured = false, href }: ExploreMapCardProps) {
   return (
     <Link
-      href={`/map/${map.slug}`}
+      href={href ?? `/map/${map.slug}`}
       className={`map-card ${featured ? 'featured' : ''}`}
       style={{
         background: '#FFFDF7',

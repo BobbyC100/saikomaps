@@ -4,7 +4,7 @@ doc_type: change-spec
 status: DRAFT
 owner: Bobby Ciccaglione
 created: 2026-03-23
-last_updated: 2026-03-23
+last_updated: 2026-03-25
 layer: Traces
 depends_on:
   - ARCH-ENTITY-PAGE-CONTENT-SYSTEM-V0
@@ -15,6 +15,25 @@ depends_on:
 
 > **Source:** Bobby's live review of Buvons entity page + earlier voice layer feedback session (2026-03-23).
 > These are **system-wide issues**, not Buvons-specific. Buvons is the reference case because it's a richly enriched entity where all the problems are visible at once.
+
+---
+
+## Implementation Update (2026-03-25)
+
+The following items from this doc were implemented in Traces:
+
+- Added People section rendering from coverage evidence with empty-state handling.
+- Moved references index higher in page structure (hero-adjacent jump links).
+- Moved coverage list above photos and preserved reference anchors.
+- Added shop CTA rendering when a confirmed/qualified shop link is present.
+- Fixed footer plate mark typo to "Saiko Fields Los Angeles."
+- Reduced hero top buffer and aligned Known For typography with page type system.
+- Added food-program fallback sentence path so incidental/considered food programs are not silently dropped.
+
+Additional policy applied to People rendering:
+
+- People roles are displayed as **reported** (not treated as hard employment confirmation).
+- Former-role wording is supported (e.g., "Former Sommelier (reported)") for entity-specific corrections.
 
 ---
 

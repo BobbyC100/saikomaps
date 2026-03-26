@@ -5,6 +5,7 @@
 
 export type ExploreMode = 'browse' | 'search';
 export type ViewMode = 'grid' | 'list';
+export type CollectionScope = 'neighborhood' | 'region' | 'city';
 
 export interface MapCardData {
   id: string;
@@ -38,6 +39,30 @@ export interface SearchResults {
 export interface FilterTab {
   id: string;
   label: string;
+}
+
+export interface CollectionFilters {
+  scope: CollectionScope | 'all';
+  vertical: string | 'all';
+  region: string | 'all';
+  neighborhood: string | 'all';
+}
+
+export interface CollectionListResponse {
+  data: MapCardData[];
+  pagination: {
+    page: number;
+    pageSize: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
+export interface CollectionFacetResponse {
+  scopes: Array<{ key: CollectionScope; label: string; count: number }>;
+  verticals: Array<{ key: string; label: string; count: number }>;
+  regions: Array<{ key: string; label: string; count: number }>;
+  neighborhoods: Array<{ key: string; label: string; count: number }>;
 }
 
 export const FILTERS: FilterTab[] = [

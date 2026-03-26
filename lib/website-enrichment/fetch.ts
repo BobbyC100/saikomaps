@@ -39,7 +39,8 @@ function isPathDisallowed(robotsTxt: string, path: string, userAgent: string): b
     if (inRelevantGroup && line.startsWith("disallow:")) {
       const disallowPath = line.slice(9).trim();
       if (!disallowPath) continue;
-      const pattern = disallowPath.replace(/\*/g, ".*");
+      const escaped = disallowPath.replace(/[.+?^${}()|[\]\\]/g, "\\$&");
+      const pattern = escaped.replace(/\*/g, ".*");
       const re = new RegExp(`^${pattern}`);
       if (re.test(path)) return true;
     }

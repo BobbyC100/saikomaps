@@ -1,7 +1,25 @@
+---
+doc_id: TRACE-ENTITY-PAGE-FEEDBACK-BUVONS-2026-03-23
+doc_type: trace
+status: active
+owner: Bobby Ciccaglione
+created: 2026-03-23
+last_updated: 2026-03-25
+project_id: SAIKO
+systems:
+  - traces
+  - entity-page
+related_docs:
+  - docs/traces/entity-page-structural-fixes-v1.md
+summary: >
+  Production review notes for Buvons entity page voice/copy quality, including
+  issues discovered, fixes shipped, and remaining follow-up items.
+---
+
 # Entity Page Voice/Copy Feedback — Buvons (2026-03-23)
 
 > Source: Bobby's live review of Buvons entity page on production.
-> Status: ACTIVE — changes needed in page.tsx and supporting files.
+> Status: PARTIALLY RESOLVED (updated 2026-03-25) — major page fixes shipped; remaining items are broader system/design follow-ups.
 
 ---
 
@@ -111,6 +129,22 @@ Buvons is a natural wine bar, bottle shop, and restaurant in Long Beach, Califor
 **Problem:** "Long Beach" now appears THREE times on the page: identity subline, tagline, and description. The description is merchant-sourced text (or synthesized), so stripping it there is harder — but the tagline fix (issue #1) should at minimum eliminate one instance.
 
 ---
+
+## Implemented Since Review (2026-03-25)
+
+- Tagline neighborhood dedupe added at render-time.
+- Offering fallback improved so food program can still render when signal detail is thin.
+- References index moved higher in the page.
+- Coverage section moved above photos.
+- People section added with reported-role framing.
+- Buvons-specific role correction applied: Marie Delbarry surfaces as former role.
+- Footer typo corrected to "Saiko Fields Los Angeles."
+- Hero top spacing reduced; Known For typography normalized.
+
+## Still Open / Follow-up
+
+- Known For source strategy and composition depth remain product/policy follow-up.
+- Pipeline-level description/tagline location constraints remain a generation-policy follow-up.
 
 ## Priority
 

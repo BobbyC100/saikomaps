@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { GlobalHeader } from '@/components/layouts/GlobalHeader';
 import { GlobalFooter } from '@/components/layouts/GlobalFooter';
 import { GalleryLightbox } from '@/components/merchant/GalleryLightbox';
+import { MoreMapsSection } from './components/MoreMapsSection';
 import { parseHours } from './lib/parseHours';
 import { getOpenStateLabelV2 } from '@/lib/utils/get-open-state-label';
 import { renderLocation } from '@/lib/voice/saiko';
@@ -114,6 +115,19 @@ interface LocationData {
   categorySlug?: string | null;
   marketSchedule?: unknown;
   coverageSources?: { sourceName: string; url: string; excerpt?: string | null; publishedAt?: string | null }[];
+  coverageHighlights?: {
+    sourceCount: number;
+    tier1Count: number;
+    tier2Count: number;
+    people: Array<{ name: string; role: string }>;
+    accolades: Array<{ name: string; year: number | null; type: string }>;
+    dishes: string[];
+    originStory: {
+      foundingYear: number | null;
+      founderNames: string[];
+      geographicOrigin: string | null;
+    } | null;
+  } | null;
   recognitions?: { name: string; source?: string; year?: string }[] | null;
   appearancesAsSubject?: {
     id: string;
@@ -441,6 +455,43 @@ function normalizeTextToken(value: string): string {
     .trim();
 }
 
+function normalizeRoleLabel(role: string | null | undefined): string | null {
+  if (!role) return null;
+  const trimmed = role.trim();
+  if (!trimmed) return null;
+  return trimmed
+    .split(/[_\s]+/)
+    .map((token) => token.charAt(0).toUpperCase() + token.slice(1).toLowerCase())
+    .join(' ');
+}
+
+function formatReportedRole(role: string | null | undefined): string {
+  const normalized = normalizeRoleLabel(role);
+  if (!normalized) return 'Role unconfirmed (reported)';
+  const roleLower = normalized.toLowerCase();
+  if (roleLower.startsWith('former ')) {
+    const baseRole = normalized.replace(/^former\s+/i, '');
+    return `Former ${baseRole} (reported)`;
+  }
+  if (roleLower.startsWith('ex ')) {
+    const baseRole = normalized.replace(/^ex\s+/i, '');
+    return `Former ${baseRole} (reported)`;
+  }
+  return `${normalized} (reported)`;
+}
+
+function getConfirmedShopLink(location: LocationData): string | null {
+  const winelist = location.winelistUrl?.trim() ?? '';
+  const website = location.website?.trim() ?? '';
+  const contextText = `${location.name} ${location.description ?? ''} ${location.tagline ?? ''}`.toLowerCase();
+  const hasShopContext = /\b(wine shop|bottle shop|shop)\b/.test(contextText);
+  const websiteLooksShopSpecific = /(?:^https?:\/\/)?(?:shop\.)|\/shop(?:[/?#]|$)/i.test(website);
+
+  if (winelist && hasShopContext) return winelist;
+  if (website && websiteLooksShopSpecific) return website;
+  return null;
+}
+
 function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
@@ -542,8 +593,15 @@ function buildOfferingLines(location: LocationData): { label: string; sentence: 
         sentence: appendClause(`${lead} with ${location.cuisineType} influences`, specialtyClause),
       });
     } else if (foodFragments.length === 0 && !location.cuisineType && !specialtyClause) {
-      // Avoid rendering posture-only stubs like "Broadly composed menu".
-      // If we have no concrete support signals, skip the line entirely.
+      // Keep avoiding posture-only stubs unless maturity confirms a real food program.
+      if (foodMaturity && foodMaturity !== 'none' && foodMaturity !== 'unknown') {
+        lines.push({
+          label: 'Food',
+          sentence: foodMaturity === 'dedicated'
+            ? 'Dedicated food program with a full kitchen identity'
+            : 'Active food program in regular service',
+        });
+      }
     } else {
       lines.push({
         label: 'Food',
@@ -570,6 +628,13 @@ function buildOfferingLines(location: LocationData): { label: string; sentence: 
         sentence: appendClause(foodMaturity === 'dedicated'
           ? `${location.cuisineType} kitchen with a dedicated program`
           : `Broadly composed ${location.cuisineType} menu with seasonal plates`, specialtyClause),
+      });
+    } else {
+      lines.push({
+        label: 'Food',
+        sentence: foodMaturity === 'dedicated'
+          ? 'Dedicated food program with a full kitchen identity'
+          : 'Active food program in regular service',
       });
     }
   } else if (location.cuisineType) {
@@ -897,9 +962,11 @@ export default function PlacePage() {
   const mapRefUrl = buildMapRefUrl(location.googlePlaceId, location.latitude, location.longitude, location.address);
   const recognitions = (location.recognitions ?? []).slice(0, RECOGNITIONS_CAP);
   const appendixGroups = buildAppendixReferences(location);
+  const hasCoverageSources = (location.coverageSources?.length ?? 0) > 0;
   // Guard against sentinel values like "NONE" stored in DB instead of null
   const rawPhone = location.phone && location.phone.toUpperCase() !== 'NONE' ? location.phone : null;
   const phoneUrl = rawPhone ? `tel:${rawPhone.replace(/\D/g, '')}` : null;
+  const shopLinkUrl = getConfirmedShopLink(location);
 
   // Sidebar: Hours
   const fullWeekHours = parsedHours.fullWeek;
@@ -925,7 +992,7 @@ export default function PlacePage() {
   const hasEnergy = energyTags.length > 0;
 
   // Primary CTAs (Directions is an action, lives here not in sidebar links)
-  const hasPrimaryCtas = !!(location.reservationUrl || location.website || location.instagram || location.tiktok || mapRefUrl);
+  const hasPrimaryCtas = !!(location.reservationUrl || shopLinkUrl || location.website || location.instagram || location.tiktok || mapRefUrl);
 
   // More Maps
   const moreMapsCards = appearsOn.slice(0, 3);
@@ -956,6 +1023,18 @@ export default function PlacePage() {
   const isThinEntity = contentDensityScore < 2;
   const shouldShowSidebar = !isThinEntity;
   const todayHours = fullWeekHours.find((row) => row.day === todayDayName) ?? null;
+  const peopleRows = Array.from(
+    new Map(
+      (location.coverageHighlights?.people ?? [])
+        .filter((person) => person?.name?.trim())
+        .map((person) => {
+          const name = person.name.trim();
+          const role = formatReportedRole(person.role);
+          return [name.toLowerCase(), { name, role }];
+        })
+    ).values()
+  ).slice(0, 8);
+  const shouldRenderPeopleSection = location.coverageHighlights != null;
 
   return (
     <div style={{ background: '#F5F0E1', minHeight: '100vh' }}>
@@ -1002,6 +1081,11 @@ export default function PlacePage() {
                         <span className="action-arrow">↗</span>
                       </a>
                     )}
+                    {shopLinkUrl && (
+                      <a href={shopLinkUrl} target="_blank" rel="noopener noreferrer">
+                        Shop <span className="action-arrow">↗</span>
+                      </a>
+                    )}
                     {location.website && (
                       <a href={location.website} target="_blank" rel="noopener noreferrer">Website <span className="action-arrow">↗</span></a>
                     )}
@@ -1016,6 +1100,20 @@ export default function PlacePage() {
                     )}
                   </div>
                 )}
+
+                <div id="hero-references-index" aria-label="References index">
+                  <div className="sk-section-header"><span>References</span></div>
+                  <nav aria-label="References jump links">
+                    <ul>
+                      {appendixGroups.map((group) => (
+                        <li key={group.anchorId}>
+                          <a href={`#${group.anchorId}`}>{group.label}</a>
+                        </li>
+                      ))}
+                      <li><a href="#appendix-methodology">Methodology</a></li>
+                    </ul>
+                  </nav>
+                </div>
 
                 {isThinEntity && (hasHours || location.address || phoneUrl) && (
                   <>
@@ -1055,6 +1153,25 @@ export default function PlacePage() {
                     <div id="identity-description">
                       <p>{location.description}</p>
                     </div>
+                  </>
+                )}
+
+                {shouldRenderPeopleSection && (
+                  <>
+                    <div className="sk-section-header"><span>People</span></div>
+                    <p id="people-disclaimer">People and roles are reported from coverage sources and may lag current staffing.</p>
+                    {peopleRows.length > 0 ? (
+                      <ul id="people-list">
+                        {peopleRows.map((person) => (
+                          <li key={person.name} className="people-row">
+                            <p className="people-name">{person.name}</p>
+                            {person.role && <p className="people-role">{person.role}</p>}
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p id="people-empty">No confirmed people associations yet.</p>
+                    )}
                   </>
                 )}
 
@@ -1234,6 +1351,30 @@ export default function PlacePage() {
 
             {/* ═══ FULL-WIDTH SECTIONS ═══ */}
 
+            {hasCoverageSources && <hr className="heavy-rule" />}
+
+            {hasCoverageSources && (
+              <section id="coverage-section">
+                <h2>Coverage</h2>
+                <ul className="coverage-entries">
+                  {location.coverageSources?.map((cs) => (
+                    <li key={cs.url} className="coverage-entry">
+                      <span className="coverage-source-name">{cs.sourceName}</span>
+                      {cs.excerpt && <p className="coverage-excerpt">{cs.excerpt}</p>}
+                      {cs.publishedAt && (
+                        <span className="coverage-date">
+                          {new Date(cs.publishedAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+                        </span>
+                      )}
+                      <a href={cs.url} target="_blank" rel="noopener noreferrer" className="coverage-read-link">
+                        Read article <span className="action-arrow">↗</span>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+
             {validPhotos.length > 0 && <hr className="heavy-rule" />}
 
             {validPhotos.length > 0 && (
@@ -1296,29 +1437,7 @@ export default function PlacePage() {
 
             {moreMapsCards.length > 0 && <hr className="heavy-rule" />}
 
-            {moreMapsCards.length > 0 && (
-              <section id="more-maps">
-                <h2>More Maps</h2>
-                <div id="more-maps-grid">
-                  {moreMapsCards.map((map) => (
-                    <Link key={map.id} href={`/map/${map.slug}`} className="map-card">
-                      {map.coverImageUrl && (
-                        <div className="map-card-image" style={{ backgroundImage: `url(${map.coverImageUrl})` }} />
-                      )}
-                      <div className="map-card-body">
-                        <span className="map-card-type">
-                          MAP · {map.placeCount ?? 0} {(map.placeCount ?? 0) === 1 ? 'PLACE' : 'PLACES'}
-                        </span>
-                        <span className="map-card-title">{map.title}</span>
-                        <span className="map-card-creator">
-                          {map.authorType === 'saiko' ? 'Curator Pick' : `By ${map.creatorName}`}
-                        </span>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              </section>
-            )}
+            {moreMapsCards.length > 0 && <MoreMapsSection maps={moreMapsCards} />}
 
             {recognitions.length > 0 && (
               <section id="recognitions-section">
@@ -1334,26 +1453,6 @@ export default function PlacePage() {
             <hr className="heavy-rule" />
 
             <footer id="place-appendix">
-              {/* INDEX column */}
-              <nav id="appendix-index" aria-label="Appendix navigation">
-                <h2>Index</h2>
-                <ul>
-                  {appendixGroups.map((group) => (
-                    <li key={group.anchorId}>
-                      <a href={`#${group.anchorId}`}>{group.label}</a>
-                    </li>
-                  ))}
-                  <li><a href="#appendix-methodology">Methodology</a></li>
-                </ul>
-                <div className="reference-legend">
-                  <svg className="legend-globe" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="12" cy="12" r="10"/>
-                    <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-                  </svg>
-                  <span>Section references<br/>Links to source entry in References</span>
-                </div>
-              </nav>
-
               {/* REFERENCES column */}
               <div id="appendix-references">
                 <h2>References</h2>
@@ -1373,31 +1472,8 @@ export default function PlacePage() {
                 </div>
               </div>
 
-              {/* COVERAGE column — collapse silently when empty */}
-              {location.coverageSources && location.coverageSources.length > 0 && (
-                <div id="appendix-coverage">
-                  <h2>Coverage</h2>
-                  <ul className="coverage-entries">
-                    {location.coverageSources.map((cs) => (
-                      <li key={cs.url} className="coverage-entry">
-                        <span className="coverage-source-name">{cs.sourceName}</span>
-                        {cs.excerpt && <p className="coverage-excerpt">{cs.excerpt}</p>}
-                        {cs.publishedAt && (
-                          <span className="coverage-date">
-                            {new Date(cs.publishedAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
-                          </span>
-                        )}
-                        <a href={cs.url} target="_blank" rel="noopener noreferrer" className="coverage-read-link">
-                          Read article <span className="action-arrow">↗</span>
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
               {/* PLATE MARK */}
-              <p id="plate-mark">Saiko Fields: TRACES — Los Angeles</p>
+              <p id="plate-mark">Saiko Fields Los Angeles</p>
             </footer>
           </div>
         </div>

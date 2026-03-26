@@ -460,7 +460,7 @@ export async function getNeighborhoods(usedEntityIds: Set<string> = new Set()): 
         name,
         count,
         imageUrl,
-        href: `/explore?neighborhood=${slug}`,
+        href: `/explore?scope=neighborhood&neighborhood=${encodeURIComponent(name)}`,
       }
     })
   )
@@ -593,7 +593,10 @@ export async function getCategories(usedEntityIds: Set<string> = new Set()): Pro
         description: item.description,
         count: item.count,
         imageUrl,
-        href: `/explore?category=${generateSlug(item.label)}`,
+        href:
+          item.source === 'vertical'
+            ? `/explore?vertical=${item.vertical.toLowerCase()}`
+            : `/explore?scope=city`,
       }
     })
   )

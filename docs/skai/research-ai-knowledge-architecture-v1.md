@@ -12,10 +12,15 @@ source_type: research synthesis
 systems:
   - knowledge-system
 related_docs:
+  - docs/skai/skai-system-overview-v1.md
   - docs/skai/decision-index-spec-v1.md
 ---
 
 # AI-Native Knowledge & Data Architecture Patterns (2023–2026)
+
+> Canonical SKAI definition and scope are maintained in
+> `docs/skai/skai-system-overview-v1.md`. This file is research input, not the
+> top-level SKAI contract.
 
 ## 1. Purpose
 

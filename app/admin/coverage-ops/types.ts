@@ -91,6 +91,13 @@ export interface PotentialDuplicateDetail {
   match_reasons?: string[];
 }
 
+export interface MissingHoursDetail {
+  recommended_stage?: number;
+  has_website?: boolean;
+  has_gpid?: boolean;
+  not_findable_candidate?: boolean;
+}
+
 export interface UnresolvedIdentityDetail {
   identity_score?: number;
   threshold?: number;

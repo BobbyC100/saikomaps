@@ -1,6 +1,6 @@
 {
-  "generated": "2026-03-22T20:07:30.122Z",
-  "doc_count": 119,
+  "generated": "2026-03-26T17:53:42.668Z",
+  "doc_count": 129,
   "docs": [
     {
       "doc_id": "APPROVED-SOURCE-REGISTRY-V1",
@@ -125,6 +125,20 @@
         "ARCH-COVERAGE-TIERS-V1",
         "ENRICH-STRATEGY-V1"
       ]
+    },
+    {
+      "doc_id": "ARCH-DATA-INTERPRETATION-GAP-AUDIT-V1",
+      "doc_type": "audit",
+      "status": "ACTIVE",
+      "title": "Data-to-Interpretation Gap Audit v1",
+      "path": "docs/architecture/data-to-interpretation-gap-audit-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "Sun Mar 22 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "last_updated": "Sun Mar 22 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "project_id": "",
+      "summary": "",
+      "systems": [],
+      "related_docs": []
     },
     {
       "doc_id": "ARCH-ENRICHMENT-EFFECTIVENESS-V0",
@@ -320,7 +334,7 @@
       "path": "docs/architecture/entity-page-content-system-v0.md",
       "owner": "Bobby Ciccaglione",
       "created": "Thu Mar 19 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
-      "last_updated": "Thu Mar 19 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "last_updated": "Sun Mar 22 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
       "project_id": "",
       "summary": "",
       "systems": [],
@@ -442,7 +456,7 @@
       "path": "docs/architecture/instagram-ingestion-status-v1.md",
       "owner": "Bobby Ciccaglione",
       "created": "2026-03-01",
-      "last_updated": "2026-03-22",
+      "last_updated": "2026-03-23",
       "project_id": "SAIKO",
       "summary": "Operational status of the Instagram batch ingestion pipeline. Documents what is being ingested (accounts + media via Business Discovery API), known limitations (CDN URL expiration, account type requirements), and downstream wiring priorities (caption signal extraction, photo pipeline, profile signals). 914 entities with Instagram handles as of 2026-03-18.\n",
       "systems": [
@@ -650,6 +664,31 @@
       "related_docs": []
     },
     {
+      "doc_id": "COVERAGE-EVIDENCE-NORMALIZATION-V1",
+      "doc_type": "architecture",
+      "status": "draft",
+      "title": "Coverage Evidence Normalization — Phase 5 Wiring Spec",
+      "path": "docs/architecture/coverage-evidence-normalization-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "2026-03-22",
+      "last_updated": "2026-03-22",
+      "project_id": "SAIKO",
+      "summary": "Defines the normalization layer that sits between raw coverage_source_extractions and the five downstream interpretation pipelines. Establishes source precedence rules, the facts-vs-interpretations boundary, multi-source deduplication, and the canonical coverage evidence contract that all downstream consumers read from. This is the Phase 5 wiring spec referenced in COVERAGE-SOURCE-ENRICHMENT-V1.\n",
+      "systems": [
+        "fields-data-layer",
+        "enrichment",
+        "interpretation",
+        "traces"
+      ],
+      "related_docs": [
+        "docs/architecture/coverage-source-enrichment-v1.md",
+        "docs/architecture/enrichment-evidence-model-v1.md",
+        "docs/architecture/enrichment-strategy-v1.md",
+        "docs/architecture/derived-signals-engine-v1.md",
+        "docs/architecture/entity-page-content-system-v0.md"
+      ]
+    },
+    {
       "doc_id": "COVERAGE-SOURCE-ENRICHMENT-V1",
       "doc_type": "architecture",
       "status": "active",
@@ -685,7 +724,7 @@
       "path": "docs/architecture/coverage-ops-approach-v1.md",
       "owner": "Bobby Ciccaglione",
       "created": "Thu Mar 12 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
-      "last_updated": "Fri Mar 13 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "last_updated": "Tue Mar 24 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
       "project_id": "SAIKO",
       "summary": "Architectural position for Coverage Operations — introduces entity_issues as a unified operational layer over existing queue fragments, with tool readiness assessment and phased implementation plan.",
       "systems": [
@@ -742,7 +781,7 @@
       "path": "docs/architecture/enrichment-strategy-v1.md",
       "owner": "bobby",
       "created": "Sat Mar 14 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
-      "last_updated": "",
+      "last_updated": "Tue Mar 24 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
       "project_id": "",
       "summary": "",
       "systems": [],
@@ -864,9 +903,9 @@
       "path": "docs/architecture/vertical-taxonomy-v1.md",
       "owner": "Bobby Ciccaglione",
       "created": "Wed Mar 11 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
-      "last_updated": "Fri Mar 13 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "last_updated": "Mon Mar 23 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
       "project_id": "SAIKO",
-      "summary": "Defines Saiko's 12-vertical taxonomy — the primary domains of urban life used to classify every place in the system. Documents anthropological rationale, system role, technical anchors, and design implications.",
+      "summary": "Defines Saiko's 13-vertical taxonomy — the primary domains of urban life used to classify every place in the system. Documents anthropological rationale, system role, technical anchors, and design implications.",
       "systems": [
         "fields-data-layer",
         "entity-resolution"
@@ -875,6 +914,25 @@
         "docs/architecture/entity-pipeline-overview-v1.md",
         "docs/architecture/fields-era-overview-v1.md",
         "docs/FIELDS_V2_TARGET_ARCHITECTURE.md"
+      ]
+    },
+    {
+      "doc_id": "HOMEPAGE-SOLUTIONS-V1",
+      "doc_type": "planning",
+      "status": "active",
+      "title": "Homepage Solutions Doc — saikofields.com",
+      "path": "docs/homepage-solutions.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "Mon Mar 23 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "last_updated": "Mon Mar 23 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "project_id": "SAIKO",
+      "summary": "Locked implementation decisions and execution plan for wiring the homepage to real data sources, including section model, curation strategy, build order, and verification checklist.\n",
+      "systems": [
+        "homepage",
+        "traces"
+      ],
+      "related_docs": [
+        "docs/APP_OVERVIEW.md"
       ]
     },
     {
@@ -944,6 +1002,22 @@
         "traces"
       ],
       "related_docs": []
+    },
+    {
+      "doc_id": "PI-CONCEPT-V1",
+      "doc_type": "document",
+      "status": "DRAFT",
+      "title": "SAIKO FIELDS — entity identity Concept Document",
+      "path": "docs/architecture/entity-identity-concept-v1.md",
+      "owner": "Bobby",
+      "created": "",
+      "last_updated": "Sun Mar 15 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "project_id": "",
+      "summary": "",
+      "systems": [],
+      "related_docs": [
+        "SKAI-DOC-FIELDS-ATOMIC-SIGNALS-001"
+      ]
     },
     {
       "doc_id": "PI-CONCEPT-V1",
@@ -1043,13 +1117,13 @@
       "doc_id": "SAIKO-APP-OVERVIEW",
       "doc_type": "overview",
       "status": "active",
-      "title": "Saiko Maps - Application Overview",
+      "title": "Saiko — Application Overview",
       "path": "docs/APP_OVERVIEW.md",
       "owner": "Bobby Ciccaglione",
       "created": "2026-03-10",
-      "last_updated": "2026-03-10",
+      "last_updated": "2026-03-24",
       "project_id": "SAIKO",
-      "summary": "",
+      "summary": "High-level overview of the Saiko platform: entity data system, enrichment pipeline, map creation, and consumer surfaces.",
       "systems": [],
       "related_docs": []
     },
@@ -1107,13 +1181,13 @@
       "doc_id": "SAIKO-DATABASE-SCHEMA",
       "doc_type": "reference",
       "status": "active",
-      "title": "Saiko Maps - Database Schema",
+      "title": "Saiko — Database Schema",
       "path": "docs/DATABASE_SCHEMA.md",
       "owner": "Bobby Ciccaglione",
       "created": "2026-03-10",
-      "last_updated": "2026-03-10",
+      "last_updated": "2026-03-24",
       "project_id": "SAIKO",
-      "summary": "",
+      "summary": "Schema reference for the Saiko PostgreSQL database. Covers core entity tables, enrichment/signal tables, map/list tables, and Fields v2 canonical layer.",
       "systems": [
         "database"
       ],
@@ -1227,6 +1301,28 @@
       "summary": "Environment variable reference. Three files: .env (defaults), .env.local (secrets), .env.example (template).",
       "systems": [],
       "related_docs": []
+    },
+    {
+      "doc_id": "SAIKO-FIELDS-IDENTITY-VERIFICATION-2026-03",
+      "doc_type": "verification",
+      "status": "active",
+      "title": "Entity Identity - Implementation Verification",
+      "path": "docs/architecture/entity-identity-implementation-verification-2026-03.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "Sun Mar 15 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "last_updated": "Sun Mar 15 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "project_id": "SAIKO",
+      "summary": "Repository and Neon DB verification snapshot for place identity implementation state as of 2026-03.",
+      "systems": [
+        "fields-data-layer",
+        "entity-resolution"
+      ],
+      "related_docs": [
+        "docs/architecture/entity-identity-concept-v1.md",
+        "docs/architecture/identity-resolver-spec-v1.md",
+        "docs/architecture/identity-scoring-v1.md",
+        "docs/architecture/fields-ingestion-pipeline-v1.md"
+      ]
     },
     {
       "doc_id": "SAIKO-FIELDS-IDENTITY-VERIFICATION-2026-03",
@@ -1350,7 +1446,7 @@
       "doc_type": "guide",
       "status": "active",
       "title": "Migration Guide: Places → Golden Records",
-      "path": "docs/MIGRATION_GUIDE.md",
+      "path": "docs/archive/MIGRATION_GUIDE_ARCHIVED_20260324.md",
       "owner": "Bobby Ciccaglione",
       "created": "2026-03-10",
       "last_updated": "2026-03-10",
@@ -1478,7 +1574,7 @@
       "path": "docs/README.md",
       "owner": "Bobby Ciccaglione",
       "created": "2026-03-10",
-      "last_updated": "2026-03-14",
+      "last_updated": "2026-03-24",
       "project_id": "SAIKO",
       "summary": "",
       "systems": [],
@@ -1518,11 +1614,11 @@
       "doc_id": "SAIKO-SITEMAP",
       "doc_type": "reference",
       "status": "active",
-      "title": "Saiko Maps - Sitemap",
+      "title": "Saiko — Sitemap",
       "path": "docs/SITEMAP.md",
       "owner": "Bobby Ciccaglione",
       "created": "2026-03-10",
-      "last_updated": "2026-03-10",
+      "last_updated": "2026-03-24",
       "project_id": "SAIKO",
       "summary": "",
       "systems": [],
@@ -1602,7 +1698,7 @@
       "path": "docs/architecture/enrichment-model-v1.md",
       "owner": "Bobby Ciccaglione",
       "created": "2026-03-19",
-      "last_updated": "2026-03-19",
+      "last_updated": "2026-03-25",
       "project_id": "SAIKO",
       "summary": "Defines three-bucket enrichment model (Identity / Access / Offering) with vertical-aware completeness profiles. Replaces flat field checklist with context-relative scoring.",
       "systems": [
@@ -1936,7 +2032,8 @@
         "decision-system"
       ],
       "related_docs": [
-        "docs/decisions/DEC-001.md"
+        "docs/decisions/DEC-001.md",
+        "docs/skai/skai-system-overview-v1.md"
       ]
     },
     {
@@ -1954,6 +2051,32 @@
         "knowledge-system"
       ],
       "related_docs": [
+        "docs/skai/skai-system-overview-v1.md",
+        "docs/skai/decision-index-spec-v1.md"
+      ]
+    },
+    {
+      "doc_id": "SKAI/SYSTEM-OVERVIEW-V1",
+      "doc_type": "architecture",
+      "status": "active",
+      "title": "SKAI 1.0 Foundation",
+      "path": "docs/skai/skai-system-overview-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "Wed Mar 25 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "last_updated": "Wed Mar 25 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "project_id": "KNOWLEDGE-SYSTEM",
+      "summary": "Foundational definition of SKAI, including scope, system boundaries, and how related Fields/TRACES/data-layer documents connect. Created to close the documentation gap where SKAI-prefixed docs existed without a formal top-level definition of SKAI itself.\n",
+      "systems": [
+        "knowledge-system",
+        "fields-data-layer",
+        "traces"
+      ],
+      "related_docs": [
+        "docs/architecture/signals-registry-v1.md",
+        "docs/architecture/atomic-cultural-signals-v1.md",
+        "docs/architecture/data-layer-contract-v1.md",
+        "docs/architecture/enrichment-evidence-model-v1.md",
+        "docs/decisions/DEC-002.md",
         "docs/skai/decision-index-spec-v1.md"
       ]
     },
@@ -2273,6 +2396,72 @@
         "repo-workflow"
       ],
       "related_docs": []
+    },
+    {
+      "doc_id": "TRACE-COVERAGE-OPS-MISSING-HOURS-ROUTING-2026-03-25",
+      "doc_type": "change-spec",
+      "status": "DRAFT",
+      "title": "Coverage Ops Missing Hours Routing Update (2026-03-25)",
+      "path": "docs/traces/coverage-ops-missing-hours-routing-2026-03-25.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "Tue Mar 24 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "last_updated": "Tue Mar 24 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "project_id": "",
+      "summary": "",
+      "systems": [],
+      "related_docs": []
+    },
+    {
+      "doc_id": "TRACE-ENTITY-PAGE-FEEDBACK-BUVONS-2026-03-23",
+      "doc_type": "trace",
+      "status": "active",
+      "title": "Entity Page Voice/Copy Feedback — Buvons (2026-03-23)",
+      "path": "docs/traces/entity-page-feedback-buvons-2026-03-23.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "Sun Mar 22 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "last_updated": "Tue Mar 24 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "project_id": "SAIKO",
+      "summary": "Production review notes for Buvons entity page voice/copy quality, including issues discovered, fixes shipped, and remaining follow-up items.\n",
+      "systems": [
+        "traces",
+        "entity-page"
+      ],
+      "related_docs": [
+        "docs/traces/entity-page-structural-fixes-v1.md"
+      ]
+    },
+    {
+      "doc_id": "TRACE-ENTITY-PAGE-STRUCTURAL-FIXES-V1",
+      "doc_type": "change-spec",
+      "status": "DRAFT",
+      "title": "Entity Page Structural Fixes v1",
+      "path": "docs/traces/entity-page-structural-fixes-v1.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "Sun Mar 22 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "last_updated": "Tue Mar 24 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "project_id": "",
+      "summary": "",
+      "systems": [],
+      "related_docs": []
+    },
+    {
+      "doc_id": "UI-PLACE-PAGE-PATCH-LOG-V1",
+      "doc_type": "operations",
+      "status": "active",
+      "title": "Place Page Patch Log",
+      "path": "docs/ui/place-page/patch-log.md",
+      "owner": "Bobby Ciccaglione",
+      "created": "Sun Mar 22 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "last_updated": "Sun Mar 22 2026 17:00:00 GMT-0700 (Pacific Daylight Time)",
+      "project_id": "SAIKO",
+      "summary": "Guardrail patch log used by place-page validation checks to track patch-level updates that keep CI token checks unblocked.\n",
+      "systems": [
+        "traces",
+        "place-page"
+      ],
+      "related_docs": [
+        "docs/architecture/entity-page-content-system-v0.md"
+      ]
     },
     {
       "doc_id": "VOICE-SAIKO-VOICE-LAYER",

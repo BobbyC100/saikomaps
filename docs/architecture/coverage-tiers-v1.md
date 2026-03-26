@@ -313,6 +313,11 @@ Not every entity type needs every signal. A taco cart doesn't need a wine progra
 **Expected:** Website, Instagram, description, hours
 **Not applicable:** Most food/beverage signals
 
+**Subtype policy note (implemented 2026-03-25):**
+- For CULTURE entities that match event-led music venue patterns (music venue, theater/theatre, concert hall),
+  hours are treated as optional in issue scanning.
+- This is an expectation policy override only; if hours are found via enrichment, they should still be displayed.
+
 ---
 
 ## Scanner Integration
@@ -330,7 +335,7 @@ The issue scanner (`lib/coverage/issue-scanner.ts`) should evolve to check cover
 - `potential_duplicate` — fuzzy name/GPID/social match
 
 ### Next phase (Tier 2)
-- `missing_hours` — no hours data
+- `missing_hours` — no hours data (for hours-applicable entities after vertical/subtype policy)
 - `missing_price_level` — no price level (restaurants only)
 - `missing_menu_link` — no menu URL available for entities that should expose one
 - `missing_reservations` — no reservation URL for reservation-relevant entities

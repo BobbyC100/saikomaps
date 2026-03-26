@@ -4,7 +4,7 @@ doc_type: architecture
 status: active
 owner: Bobby Ciccaglione
 created: 2026-03-13
-last_updated: 2026-03-14
+last_updated: 2026-03-25
 project_id: SAIKO
 systems:
   - coverage-operations
@@ -412,7 +412,7 @@ All four "needs to be built" tools are now operational:
 - Issues have severity (CRITICAL/HIGH/MEDIUM/LOW), blocking_publish flag, problem_class grouping
 - Re-scan is triggered manually from the UI or via API
 
-**Phase 2 — Coverage Operations UI: COMPLETE (v1)**
+**Phase 2 — Coverage Operations UI: COMPLETE (v1, with routing updates through 2026-03-25)**
 
 Triage board at `/admin/coverage-ops`:
 - Groups issues by problem_class (Identity, Location, Contact, Social, Editorial)
@@ -420,7 +420,11 @@ Triage board at `/admin/coverage-ops`:
 - Per-issue inline actions:
   - `Strengthen Identity` (discover website + Instagram) for `unresolved_identity`
   - `Find GPID` for `missing_gpid`
-  - `Run Stage 1` for `missing_coords`, `missing_phone`, `missing_hours`, `missing_price_level`, `operating_status_unknown`
+  - `Run Stage 1` for `missing_coords`, `missing_phone`, `missing_price_level`, `operating_status_unknown`
+  - `Resolve Hours` for `missing_hours` (evidence-aware routing):
+    - Stage 6 when website evidence exists and hours are still missing
+    - Stage 1 when GPID path is available but website path is not
+    - Stage 2 when neither website nor GPID evidence exists (discover surfaces first)
   - `Run Stage 6` for `missing_menu_link`, `missing_reservations`
   - `Discover IG/TikTok/Web` for social/website discovery
   - `Derive` for neighborhood backfill
@@ -433,6 +437,10 @@ Triage board at `/admin/coverage-ops`:
 - Google search link per entity row
 - Duplicate detection modal with side-by-side comparison and merge
 - Re-scan Issues button to refresh after actions complete
+
+`missing_hours` also carries issue detail for exhaustion triage:
+- `not_findable_candidate = true` when expected sources have been attempted and hours remain unavailable.
+- These rows should be routed to human review/suppression policy (confirmed-none style handling) instead of repeated blind reruns.
 
 Coverage Dashboard at `/admin/coverage`:
 - Summary metrics: total entities, publishable count, missing field counts

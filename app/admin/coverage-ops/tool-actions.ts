@@ -5,7 +5,7 @@
  * Used by both individual row actions and bulk operations.
  */
 
-import type { IssueRow, GoogleSaysClosedDetail } from './types';
+import type { IssueRow, GoogleSaysClosedDetail, MissingHoursDetail } from './types';
 
 export interface ToolConfig {
   label: string;
@@ -75,14 +75,19 @@ export const TOOL_ACTIONS: Record<string, ToolConfig> = {
       }),
   },
   missing_hours: {
-    label: 'Run Stage 1',
+    label: 'Resolve Hours',
     queuedLabel: 'Queued',
-    invoke: (issue) =>
-      fetch('/api/admin/tools/enrich-stage', {
+    invoke: (issue) => {
+      const detail = issue.detail as MissingHoursDetail | null;
+      const stage = detail?.recommended_stage && Number.isFinite(detail.recommended_stage)
+        ? detail.recommended_stage
+        : 1;
+      return fetch('/api/admin/tools/enrich-stage', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ slug: encodeURIComponent(issue.entity_slug), stage: 1 }),
-      }),
+        body: JSON.stringify({ slug: encodeURIComponent(issue.entity_slug), stage }),
+      });
+    },
   },
   missing_price_level: {
     label: 'Run Stage 1',

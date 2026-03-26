@@ -21,7 +21,7 @@ import {
   applyWriteRules,
   applyWriteRulesCategoryOnly,
 } from "../lib/website-enrichment";
-import { logPlaceJob } from "../lib/place-job-log";
+import { logPlaceJob } from "../lib/entity-job-log";
 import type { Prisma } from "@prisma/client";
 
 const REFRESH_STALENESS_DAYS = 180;
@@ -109,7 +109,7 @@ async function main() {
     if (!website) continue;
     try {
       const payload = await runEnrichmentForPlace({
-        place_id: place.id,
+        placeId: place.id,
         website,
       });
       const pagesFetched = payload.raw?.about_text_sample ? 2 : 1;

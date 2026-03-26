@@ -35,6 +35,56 @@ const BUILD_ID =
   'local-dev';
 const ENV = process.env.VERCEL_ENV || process.env.NODE_ENV || 'local';
 
+const COVERAGE_PEOPLE_ROLE_OVERRIDES: Record<string, Record<string, string>> = {
+  buvons: {
+    'marie delbarry': 'former sommelier',
+  },
+};
+
+function getCoveragePersonRole(slug: string, name: string, role: string): string {
+  const slugOverrides = COVERAGE_PEOPLE_ROLE_OVERRIDES[slug];
+  if (!slugOverrides) return role;
+  const override = slugOverrides[name.trim().toLowerCase()];
+  return override ?? role;
+}
+
+function parseHoursValue(raw: unknown): Record<string, string> | null {
+  if (!raw) return null;
+  try {
+    return typeof raw === 'string'
+      ? (JSON.parse(raw) as Record<string, string>)
+      : (raw as Record<string, string>);
+  } catch {
+    return null;
+  }
+}
+
+function sanitizeAboutDescription(raw: string | null | undefined, placeName: string): string | null {
+  if (!raw) return null;
+  let text = raw.replace(/\s+/g, ' ').trim();
+  if (!text) return null;
+
+  // Remove common website scrape noise from image placeholders.
+  text = text.replace(/loading image:\s*/gi, '').replace(/\s+/g, ' ').trim();
+
+  // If noise still prepended content before the first place-name mention, trim to name.
+  const lower = text.toLowerCase();
+  const nameIdx = lower.indexOf(placeName.toLowerCase());
+  if (nameIdx > 0 && lower.slice(0, nameIdx).includes('image')) {
+    text = text.slice(nameIdx).trim();
+  }
+
+  // Prefer the canonical narrative sentence when present.
+  // This strips prefixed UI alt-text / hero-caption noise.
+  const narrativeAnchor = `${placeName.toLowerCase()} is `;
+  const narrativeIdx = text.toLowerCase().indexOf(narrativeAnchor);
+  if (narrativeIdx >= 0) {
+    text = text.slice(narrativeIdx).trim();
+  }
+
+  return text || null;
+}
+
 function jsonHeaders(extra: Record<string, string> = {}, bypassCache = false): Record<string, string> {
   const base: Record<string, string> = {
     'Content-Type': 'application/json',
@@ -118,6 +168,7 @@ export async function GET(
         },
         canonical_state: {
           select: {
+            hoursJson: true,
             eventsUrl: true,
             cateringUrl: true,
             eventInquiryEmail: true,
@@ -257,18 +308,8 @@ export async function GET(
       }
     }
 
-    // Parse hours
-    let hours: Record<string, string> | null = null;
-    if (entity.hours) {
-      try {
-        hours =
-          typeof entity.hours === 'string'
-            ? JSON.parse(entity.hours)
-            : (entity.hours as Record<string, string>);
-      } catch {
-        hours = null;
-      }
-    }
+    // Parse hours: canonical state first, then entities fallback.
+    const hours = parseHoursValue(entity.canonical_state?.hoursJson) ?? parseHoursValue(entity.hours);
 
     // Format appearsOn (only published maps) and curator note from first map with descriptor
     const publishedMapPlaces = entity.map_places.filter((mp) => mp.lists && mp.lists.status === 'PUBLISHED');
@@ -544,7 +585,7 @@ export async function GET(
       // Description: VOICE_DESCRIPTOR (interpretation_cache) → entities.description fallback
       description: (() => {
         const vd = voiceDescriptorRow?.content as { text?: string } | null;
-        return vd?.text ?? entity.description ?? null;
+        return sanitizeAboutDescription(vd?.text ?? entity.description ?? null, entity.name);
       })(),
       descriptionSource: (() => {
         if (voiceDescriptorRow?.promptVersion) return voiceDescriptorRow.promptVersion;
@@ -622,7 +663,10 @@ export async function GET(
             people: evidence.facts.people
               .filter((p) => p.stalenessBand === 'current' || p.stalenessBand === 'aging')
               .slice(0, 5)
-              .map((p) => ({ name: p.name, role: p.role })),
+              .map((p) => ({
+                name: p.name,
+                role: getCoveragePersonRole(slug, p.name, p.role),
+              })),
             accolades: evidence.facts.accolades
               .slice(0, 5)
               .map((a) => ({ name: a.name, year: a.year, type: a.type })),
