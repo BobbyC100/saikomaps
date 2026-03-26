@@ -117,13 +117,21 @@ const BUCKET_LABELS: Record<string, string> = {
 export default function CoverageDashboard() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchData = useCallback(async () => {
     try {
+      setLoading(true);
+      setError(null);
       const res = await fetch('/api/admin/coverage-dashboard');
-      if (res.ok) setData(await res.json());
+      if (!res.ok) {
+        const payload = await res.json().catch(() => null);
+        throw new Error(payload?.message ?? `Request failed (${res.status})`);
+      }
+      setData(await res.json());
     } catch (e) {
       console.error('Failed to load dashboard', e);
+      setError(e instanceof Error ? e.message : 'Failed to load dashboard');
     } finally {
       setLoading(false);
     }
@@ -131,10 +139,31 @@ export default function CoverageDashboard() {
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
-  if (loading || !data) {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: C.bg }}>
         <div className="text-lg" style={{ color: C.muted }}>Loading dashboard...</div>
+      </div>
+    );
+  }
+
+  if (error || !data) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-6" style={{ backgroundColor: C.bg }}>
+        <div className="rounded-xl p-6 shadow-sm max-w-lg w-full text-center" style={{ backgroundColor: C.card }}>
+          <h2 className="text-lg font-semibold mb-2" style={{ color: C.text }}>Dashboard failed to load</h2>
+          <p className="text-sm mb-4" style={{ color: C.muted }}>
+            {error ?? 'No dashboard data was returned.'}
+          </p>
+          <button
+            type="button"
+            onClick={fetchData}
+            className="px-4 py-2 rounded text-sm font-medium"
+            style={{ backgroundColor: C.accent, color: '#fff' }}
+          >
+            Retry
+          </button>
+        </div>
       </div>
     );
   }
