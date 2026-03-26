@@ -43,7 +43,12 @@ export default function SkaiPage() {
 
       if (!response.ok) {
         const body = await response.json().catch(() => ({}));
-        const message = typeof body.error === 'string' ? body.error : 'Failed to get SKAI answer';
+        const message =
+          typeof body.message === 'string'
+            ? body.message
+            : typeof body.error === 'string'
+              ? body.error
+              : 'Failed to get SKAI answer';
         throw new Error(message);
       }
 
