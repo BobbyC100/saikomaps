@@ -35,6 +35,13 @@ import {
   fetchAndCaptureSurface,
 } from '../lib/merchant-surface-discovery';
 
+type SurfaceRowCompat = {
+  surfaceType?: string;
+  surface_type?: string;
+  sourceUrl?: string;
+  source_url?: string;
+};
+
 // ---------------------------------------------------------------------------
 // Args
 // ---------------------------------------------------------------------------
@@ -71,8 +78,9 @@ async function main() {
   let failed  = 0;
 
   for (const row of rows) {
-    const surfaceTypeLabel = (row as any).surfaceType ?? (row as any).surface_type ?? 'unknown';
-    const sourceUrl = (row as any).sourceUrl ?? (row as any).source_url ?? '';
+    const compat = row as SurfaceRowCompat;
+    const surfaceTypeLabel = compat.surfaceType ?? compat.surface_type ?? 'unknown';
+    const sourceUrl = compat.sourceUrl ?? compat.source_url ?? '';
     const label = `  [${surfaceTypeLabel}] ${String(sourceUrl).slice(0, 72)}`;
     process.stdout.write(`${label} … `);
 
@@ -88,8 +96,9 @@ async function main() {
         case 'deduped': console.log('↩ deduped');   deduped++; break;
         case 'failed':  console.log('✗ failed');    failed++;  break;
       }
-    } catch (err: any) {
-      console.log(`✗ error — ${err?.message ?? err}`);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      console.log(`✗ error — ${message}`);
       failed++;
     }
   }

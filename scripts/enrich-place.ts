@@ -24,7 +24,7 @@
  */
 
 import { spawnSync, spawn as spawnAsync } from 'child_process';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Prisma } from '@prisma/client';
 import { scanEntities } from '../lib/coverage/issue-scanner';
 import { isEntityEnriched } from '../lib/coverage/enrichment-profiles';
 
@@ -64,6 +64,10 @@ if (!slug && !batchSize) {
 // ---------------------------------------------------------------------------
 
 const db = new PrismaClient();
+
+function getErrorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
+}
 
 async function markEnrichmentStatus(entityId: string, status: 'ENRICHING' | 'ENRICHED') {
   await db.entities.update({
@@ -314,8 +318,8 @@ async function run(stage: number, label: string, script: string, extraArgs: stri
         data: { enrichmentStage: String(stage) },
       });
       console.log(`  ✓ enrichmentStage updated to ${stage}`);
-    } catch (err: any) {
-      console.error(`  ✗ Failed to update enrichmentStage: ${err.message}`);
+    } catch (err: unknown) {
+      console.error(`  ✗ Failed to update enrichmentStage: ${getErrorMessage(err)}`);
     }
   }
 
@@ -332,7 +336,7 @@ async function runBatch(n: number) {
   if (force) console.log('   FORCE MODE — including previously enriched entities\n');
 
   // Pick N not-yet-enriched entities for website-first lane work.
-  const whereClause: any = {
+  const whereClause: Prisma.entitiesWhereInput = {
     website: { not: null },
     ...(force ? {} : { enrichmentStatus: { in: ['INGESTED', 'ENRICHING'] } }),
   };
@@ -373,8 +377,8 @@ async function runBatch(n: number) {
     if (!dryRun) {
       try {
         await markEnrichmentStatus(entity.id, 'ENRICHING');
-      } catch (err: any) {
-        console.error(`  ✗ Failed to mark enrichmentStatus=ENRICHING: ${err.message}`);
+      } catch (err: unknown) {
+        console.error(`  ✗ Failed to mark enrichmentStatus=ENRICHING: ${getErrorMessage(err)}`);
       }
     }
 
@@ -406,8 +410,8 @@ async function runBatch(n: number) {
           data: { lastEnrichedAt: new Date() },
         });
         console.log(`  ✓ lastEnrichedAt updated`);
-      } catch (err: any) {
-        console.error(`  ✗ Failed to update lastEnrichedAt: ${err.message}`);
+      } catch (err: unknown) {
+        console.error(`  ✗ Failed to update lastEnrichedAt: ${getErrorMessage(err)}`);
       }
 
       try {
@@ -417,8 +421,8 @@ async function runBatch(n: number) {
         } else {
           console.log(`  · Interpretation layer incomplete; remains ENRICHING (missing: ${statusResult.missing.join(', ') || 'none'})`);
         }
-      } catch (err: any) {
-        console.error(`  ✗ Failed to evaluate enrichment completion: ${err.message}`);
+      } catch (err: unknown) {
+        console.error(`  ✗ Failed to evaluate enrichment completion: ${getErrorMessage(err)}`);
       }
 
       const hasTagline = await db.interpretation_cache.findFirst({
@@ -432,8 +436,8 @@ async function runBatch(n: number) {
             data: { needsHumanReview: false },
           });
           console.log(`  ✓ needsHumanReview cleared`);
-        } catch (err: any) {
-          console.error(`  ✗ Failed to clear needsHumanReview: ${err.message}`);
+        } catch (err: unknown) {
+          console.error(`  ✗ Failed to clear needsHumanReview: ${getErrorMessage(err)}`);
         }
       }
     }
@@ -443,7 +447,7 @@ async function runBatch(n: number) {
 
   // Process entities with concurrency limit
   if (concurrency > 1) {
-    const pLimit = require('p-limit');
+    const { default: pLimit } = await import('p-limit');
     const limit = pLimit(concurrency);
     const results = await Promise.all(
       batch.map((entity) => limit(() => enrichEntity(entity)))
@@ -534,8 +538,8 @@ async function main() {
     try {
       await markEnrichmentStatus(entity.id, 'ENRICHING');
       console.log(`  ✓ enrichmentStatus set to ENRICHING`);
-    } catch (err: any) {
-      console.error(`  ✗ Failed to set enrichmentStatus=ENRICHING: ${err.message}`);
+    } catch (err: unknown) {
+      console.error(`  ✗ Failed to set enrichmentStatus=ENRICHING: ${getErrorMessage(err)}`);
     }
   }
 
@@ -578,8 +582,8 @@ async function main() {
           data: { lastEnrichedAt: new Date() },
         });
         console.log(`  ✓ lastEnrichedAt updated`);
-      } catch (err: any) {
-        console.error(`  ✗ Failed to update lastEnrichedAt: ${err.message}`);
+      } catch (err: unknown) {
+        console.error(`  ✗ Failed to update lastEnrichedAt: ${getErrorMessage(err)}`);
       }
 
       try {
@@ -589,8 +593,8 @@ async function main() {
         } else {
           console.log(`  · Interpretation layer incomplete; remains ENRICHING (missing: ${statusResult.missing.join(', ') || 'none'})`);
         }
-      } catch (err: any) {
-        console.error(`  ✗ Failed to evaluate enrichment completion: ${err.message}`);
+      } catch (err: unknown) {
+        console.error(`  ✗ Failed to evaluate enrichment completion: ${getErrorMessage(err)}`);
       }
     }
 
@@ -605,8 +609,8 @@ async function main() {
           data: { needsHumanReview: false },
         });
         console.log(`  ✓ needsHumanReview cleared`);
-      } catch (err: any) {
-        console.error(`  ✗ Failed to clear needsHumanReview: ${err.message}`);
+      } catch (err: unknown) {
+        console.error(`  ✗ Failed to clear needsHumanReview: ${getErrorMessage(err)}`);
       }
     }
   }
