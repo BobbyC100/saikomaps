@@ -88,7 +88,7 @@ npm run enrich:place -- --batch=50 --include-google
 4. Surface parse (structure captured content into artifacts)
 5. Identity signal extraction (AI → derived_signals)
 6. Website enrichment (menu_url, reservation_url → Fields v2)
-7. Tagline generation (AI → interpretation_cache)
+7. Interpretation — tagline generation (AI → interpretation_cache)
 
 ---
 
@@ -235,6 +235,25 @@ npx tsx scripts/audit-editorial-coverage.ts
 
 ---
 
+## Instagram Photo Classification
+
+Classify Instagram photos by type (INTERIOR, FOOD, BAR_DRINKS, CROWD_ENERGY, DETAIL, EXTERIOR). This populates the `photoType` field on `instagram_media`, which controls photo ranking on entity pages.
+
+```bash
+# Classify photos for a single entity
+npx tsx scripts/classify-entity-photos.ts --slug=buvons
+
+# Classify all unclassified photos
+npx tsx scripts/classify-entity-photos.ts
+
+# Dry run
+npx tsx scripts/classify-entity-photos.ts --dry-run
+```
+
+Uses Claude vision to analyze each photo and assign a type. Photos are downloaded and sent as base64 to bypass CDN restrictions. Classified photos are ranked for display: INTERIOR (highest priority) → FOOD → BAR_DRINKS → CROWD_ENERGY → DETAIL → EXTERIOR (lowest).
+
+---
+
 ## Description Generation (resilient)
 
 Use this when you want broad VOICE_DESCRIPTOR coverage, including entities without GPID (for example pop-ups and taco trucks).
@@ -278,7 +297,7 @@ curl -X POST localhost:3000/api/admin/tools/enrich-stage \
 Detect data quality issues across all entities.
 
 ```bash
-# Full scan (all non-CANDIDATE entities)
+# Full scan (all entities with enrichmentStatus set, plus legacy non-CANDIDATE fallback)
 curl -X POST localhost:3000/api/admin/tools/scan-issues \
   -H "Content-Type: application/json" \
   -d '{"action": "scan"}'

@@ -1,6 +1,6 @@
 ---
 doc_id: ARCH-ENTITY-STATE-MODEL-V1
-status: DRAFT
+status: IMPLEMENTING
 owner: Bobby
 created: 2026-03-20
 last_updated: 2026-03-20
@@ -14,7 +14,7 @@ related_docs:
 
 # Entity State Model
 
-> **Status:** DRAFT — Pending Bobby approval.
+> **Status:** IMPLEMENTING — Concept approved by Bobby. Phase 1 (dual-write) and Phase 2 (Coverage-Ops read migration) shipped 2026-03-26. Lane-first enrichment (lane-first-enrichment-v1.md) shipped 2026-03-26 — `enrichmentStatus` transitions are now policy-driven via `isEntityEnriched()`, four-layer completion gate live (Identity, Access, Offering, Interpretation). Phase 3 (remove implicit CANDIDATE→OPEN promotion) and Phase 4 (legacy status read deprecation) planned.
 > **Layer:** Concept Doc (Layer 1).
 > **Scope:** Defines how Saiko models entity state across three independent concerns. Supersedes `entity-lifecycle-and-closure-v1.md` for state modeling. The closure-as-a-claim model, status claims ledger, and Reference Confidence Model from that earlier doc remain valid as evidence-flow mechanisms.
 
@@ -193,4 +193,34 @@ This document establishes the conceptual model and defines the three status fiel
 
 ---
 
-*Saiko Fields · Entity State Model · Draft 2026-03-20 · Pending Bobby Approval*
+---
+
+## 8. Implementation Status
+
+This section tracks the rollout of the three-axis model into the codebase.
+
+### Phase 1 — Dual-Write (Shipped 2026-03-26)
+
+All intake paths now set `enrichmentStatus: INGESTED` and `publicationStatus: UNPUBLISHED` alongside legacy `status: CANDIDATE`. Enrichment trigger sets `enrichmentStatus: ENRICHING` on start. Pipeline completion (stage 7) sets `enrichmentStatus: ENRICHED`. Files touched: `app/api/admin/intake/route.ts`, `app/api/admin/intake/resolve/route.ts`, `lib/smart-enrich.ts`, `scripts/bulk-intake.ts`, `scripts/intake-ramen-places.ts`, `scripts/intake-pizza-places.ts`, `app/api/admin/enrich/[slug]/route.ts`, `app/api/admin/tools/enrich-stage/route.ts`, `scripts/enrich-place.ts`.
+
+### Phase 2 — Coverage-Ops Read Migration (Shipped 2026-03-26)
+
+Issue scanner and coverage dashboard filter on three-axis fields with legacy fallback for pre-migration entities. Pending enrichment count surfaced in dashboard. Files touched: `lib/coverage/issue-scanner.ts`, `lib/coverage/duplicate-scanner.ts`, `app/api/admin/coverage-dashboard/route.ts`, `lib/admin/coverage/dashboard-queries.ts`, `app/admin/coverage/page.tsx`.
+
+### Phase 3 — Remove Implicit CANDIDATE→OPEN Promotion (Planned)
+
+The enrichment trigger currently still sets `status: OPEN` when promoting from CANDIDATE. This phase removes that side effect so enrichment transitions stay on the enrichment axis only. Operating status will be set independently based on evidence (e.g., Google Places business status).
+
+### Phase 4 — Legacy Status Read Deprecation (Planned)
+
+Remaining code that reads `entity.status` will be migrated to the appropriate axis. The legacy `PlaceStatus` enum and `status` field will be marked deprecated.
+
+### Tooling
+
+Validation: `scripts/validate-entity-state-model.ts` — checks that recent entities have non-null three-axis fields.
+
+Backfill: `scripts/backfill-entity-state-model.ts` — one-time migration for pre-dual-write entities. Idempotent (only writes where all three fields are null). Dry-run by default, requires `--apply` for writes.
+
+---
+
+*Saiko Fields · Entity State Model · Updated 2026-03-26 · Phases 1-2 Shipped*
