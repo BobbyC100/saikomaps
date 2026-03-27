@@ -55,7 +55,16 @@ export async function GET(request: NextRequest) {
     const where: any = {
       instagram: null,
       googlePlaceId: { not: null },
-      status: 'OPEN',
+      OR: [
+        { enrichmentStatus: { in: ['INGESTED', 'ENRICHING', 'ENRICHED'] } },
+        { enrichmentStatus: null, status: 'OPEN' },
+      ],
+      NOT: {
+        OR: [
+          { operatingStatus: 'PERMANENTLY_CLOSED' },
+          { operatingStatus: null, status: 'PERMANENTLY_CLOSED' },
+        ],
+      },
     };
 
     const total = await prisma.entities.count({ where });

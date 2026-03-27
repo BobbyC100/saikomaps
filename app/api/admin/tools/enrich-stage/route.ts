@@ -16,7 +16,7 @@
  *   4 = Surface parse
  *   5 = Identity signal extraction (AI)
  *   6 = Website enrichment
- *   7 = Tagline generation (AI)
+ *   7 = Interpretation (AI)
  *
  * Coverage Operations resolution tool (see COVOPS-APPROACH-V1).
  */
@@ -35,7 +35,7 @@ const STAGE_LABELS: Record<number, string> = {
   4: 'Surface parse',
   5: 'Identity signal extraction (AI)',
   6: 'Website enrichment',
-  7: 'Tagline generation (AI)',
+  7: 'Interpretation (AI)',
 };
 
 function normalizeSlug(raw: string): string {
@@ -80,13 +80,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: `Entity not found: ${slug}` }, { status: 404 });
     }
 
-    // Promote CANDIDATE → OPEN so enrich-place.ts can find it.
-    // Reset enrichmentStage for progress tracking, but preserve lastEnrichedAt
-    // so batch mode doesn't re-select entities that have already been through the pipeline.
+    // Mark enrichment as in progress and reset the live stage tracker.
     await db.entities.update({
       where: { slug },
       data: {
-        ...(entity.status === 'CANDIDATE' ? { status: 'OPEN' } : {}),
+        enrichmentStatus: 'ENRICHING',
         enrichmentStage: null,
       },
     });
@@ -155,6 +153,7 @@ export async function POST(request: NextRequest) {
         { status: 200 },
       );
     }
+
     const fs = await import('fs');
     const timestamp = Date.now();
     const defaultLogDir = path.join(projectRoot, 'data', 'logs');

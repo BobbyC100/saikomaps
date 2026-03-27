@@ -21,6 +21,7 @@
  *   identity / unresolved_identity    — insufficient identity anchors (critical, blocking)
  *   identity / missing_gpid           — no GPID but identity sufficient (medium, non-blocking)
  *   identity / enrichment_incomplete  — has GPID but never enriched (high, blocking)
+ *   identity / enrichment_stalled     — enrichment in progress but completion gate not met (high, blocking)
  *   location / missing_coords         — has GPID but no lat/lng (high, blocking)
  *   location / missing_neighborhood   — has coords but no neighborhood (medium)
  *   location / missing_hours          — no canonical/entity hours for hours-applicable verticals (medium)
@@ -36,7 +37,7 @@
  */
 
 import { PrismaClient, Prisma } from '@prisma/client';
-import { expectsAccessField } from '@/lib/coverage/enrichment-profiles';
+import { expectsAccessFieldForEntity, isEntityEnriched } from '@/lib/coverage/enrichment-profiles';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -62,7 +63,11 @@ export interface ScanEntity {
   slug: string;
   name: string;
   status: string;
+  operatingStatus: string | null;
+  enrichmentStatus: string | null;
+  publicationStatus: string | null;
   primaryVertical: string | null;
+  category: string | null;
   googlePlaceId: string | null;
   latitude: unknown;
   longitude: unknown;
@@ -90,6 +95,10 @@ export interface ScanEntity {
   businessStatus: string | null;
   // Surface scan hints
   hasEventsSurface: boolean;
+  hasOfferingPrograms: boolean;
+  hasScenesense: boolean;
+  hasEditorialCoverage: boolean;
+  hasCurrentTagline: boolean;
   // Nomadic / pop-up — derived from place_appearances
   isNomadic: boolean;
 }
@@ -231,16 +240,69 @@ export const ISSUE_RULES: IssueRule[] = [
     },
   },
   {
+    issueType: 'enrichment_stalled',
+    problemClass: 'identity',
+    severity: 'high',
+    blockingPublish: true,
+    recommendedTool: 'enrich_full',
+    detect: (e) => {
+      if (e.enrichmentStatus !== 'ENRICHING') return null;
+
+      const assessment = isEntityEnriched({
+        vertical: e.primaryVertical,
+        category: e.category,
+        slug: e.slug,
+        name: e.name,
+        isNomadic: e.isNomadic,
+        googlePlaceId: e.googlePlaceId,
+        website: e.website,
+        instagram: e.instagram,
+        phone: e.phone,
+        latitude: e.latitude,
+        longitude: e.longitude,
+        neighborhood: e.neighborhood,
+        reservationUrl: e.reservationUrl,
+        cesWebsite: e.cesWebsite,
+        cesInstagram: e.cesInstagram,
+        cesPhone: e.cesPhone,
+        cesHoursJson: e.cesHoursJson,
+        cesReservationUrl: e.cesReservationUrl,
+        cesMenuUrl: e.cesMenuUrl,
+        cesEventsUrl: e.cesEventsUrl,
+        hasOfferingPrograms: e.hasOfferingPrograms,
+        hasScenesense: e.hasScenesense,
+        hasEditorialCoverage: e.hasEditorialCoverage,
+        hasCurrentTagline: e.hasCurrentTagline,
+      });
+      if (assessment.done) return null;
+
+      const missing = [
+        ...assessment.identity.missing,
+        ...assessment.access.missing,
+        ...assessment.offering.missing,
+        ...assessment.interpretation.missing,
+      ];
+      return {
+        detected: true,
+        detail: {
+          enrichmentStage: e.enrichmentStage,
+          missing,
+          interpretation_required: assessment.interpretation.required,
+        },
+      };
+    },
+  },
+  {
     issueType: 'enrichment_incomplete',
     problemClass: 'identity',
     severity: 'high',
     blockingPublish: true,
     recommendedTool: 'enrich_full',
     detect: (e) => {
-      // Only applies if entity has GPID but was never enriched
-      if (!e.googlePlaceId) return null; // covered by unresolved_identity
+      // Only applies if entity has identity anchors but enrichment never started.
+      if (!e.googlePlaceId) return null;
+      if (e.enrichmentStatus === 'ENRICHED' || e.enrichmentStatus === 'ENRICHING') return null;
       if (e.enrichmentStage && e.enrichmentStage !== 'none') return null;
-      if (e.lastEnrichedAt) return null;
       return { detected: true, detail: { enrichmentStage: e.enrichmentStage } };
     },
   },
@@ -289,11 +351,33 @@ export const ISSUE_RULES: IssueRule[] = [
     detect: (e) => {
       // Nomadic entities have schedules via appearances, not fixed hours
       if (e.isNomadic) return null;
-      // Reuse vertical expectation profiles for hours applicability.
-      if (!expectsAccessField(e.primaryVertical, 'hours')) return null;
+      // Reuse profile expectations for hours applicability, with subtype-aware overrides.
+      if (!expectsAccessFieldForEntity({
+        vertical: e.primaryVertical,
+        category: e.category,
+        slug: e.slug,
+        name: e.name,
+      }, 'hours')) return null;
       const hasHours = (e.cesHoursJson ?? e.hours) !== null && (e.cesHoursJson ?? e.hours) !== undefined;
       if (!hasHours) {
-        return { detected: true, detail: { recommended_stage: 1 } };
+        const hasWebsite = Boolean((e.cesWebsite ?? e.website)?.trim());
+        const hasGpid = Boolean(e.googlePlaceId);
+        // Strategy follows enrichment policy: free/source-first before paid GPID lookup.
+        // If website exists, run website enrichment first; otherwise use Google (if available)
+        // or discovery when neither source is present.
+        const recommendedStage = hasWebsite ? 6 : hasGpid ? 1 : 2;
+        // Candidate for "not found" manual review:
+        // we have run enrichment before, still no hours, and there is no GPID path.
+        const notFindableCandidate = hasWebsite && !hasGpid && Boolean(e.lastEnrichedAt);
+        return {
+          detected: true,
+          detail: {
+            recommended_stage: recommendedStage,
+            has_website: hasWebsite,
+            has_gpid: hasGpid,
+            not_findable_candidate: notFindableCandidate,
+          },
+        };
       }
       return null;
     },
@@ -427,11 +511,13 @@ export const ISSUE_RULES: IssueRule[] = [
       if (!e.businessStatus) return null;
       const bs = e.businessStatus.toUpperCase();
       if (bs === 'CLOSED_TEMPORARILY') {
-        // Only flag if entity status is still OPEN
-        if (e.status === 'OPEN') return { detected: true, detail: { googleStatus: 'CLOSED_TEMPORARILY' } };
+        // Only flag if we still think the place is operating.
+        const operating = e.operatingStatus ?? (e.status === 'OPEN' ? 'OPERATING' : null);
+        if (operating === 'OPERATING') return { detected: true, detail: { googleStatus: 'CLOSED_TEMPORARILY' } };
       }
       if (bs === 'CLOSED_PERMANENTLY') {
-        if (e.status !== 'PERMANENTLY_CLOSED') return { detected: true, detail: { googleStatus: 'CLOSED_PERMANENTLY' } };
+        const permanentlyClosed = e.operatingStatus === 'PERMANENTLY_CLOSED' || e.status === 'PERMANENTLY_CLOSED';
+        if (!permanentlyClosed) return { detected: true, detail: { googleStatus: 'CLOSED_PERMANENTLY' } };
       }
       return null;
     },
@@ -481,9 +567,12 @@ export async function scanEntities(
 ): Promise<ScanSummary> {
   const { slugs, entityIds, dryRun = false, verbose = false } = options;
 
-  // Build where clause — only non-CANDIDATE entities
+  // Build where clause — include all enrichment-axis states, with legacy fallback.
   const where: Record<string, unknown> = {
-    status: { not: 'CANDIDATE' },
+    OR: [
+      { enrichmentStatus: { in: ['INGESTED', 'ENRICHING', 'ENRICHED'] } },
+      { enrichmentStatus: null, status: { not: 'CANDIDATE' } },
+    ],
   };
   if (slugs && slugs.length > 0) {
     where.slug = { in: slugs };
@@ -500,7 +589,11 @@ export async function scanEntities(
       slug: true,
       name: true,
       status: true,
+      operatingStatus: true,
+      enrichmentStatus: true,
+      publicationStatus: true,
       primaryVertical: true,
+      category: true,
       googlePlaceId: true,
       latitude: true,
       longitude: true,
@@ -553,6 +646,42 @@ export async function scanEntities(
     : [];
   const hasEventsSurfaceSet = new Set(eventsSurfaceRows.map((r) => r.entityId));
 
+  const offeringProgramRows = allEntityIds.length > 0
+    ? await prisma.derived_signals.findMany({
+        where: { entityId: { in: allEntityIds }, signalKey: 'offering_programs' },
+        select: { entityId: true },
+        distinct: ['entityId'],
+      })
+    : [];
+  const hasOfferingProgramsSet = new Set(offeringProgramRows.map((r) => r.entityId));
+
+  const scenesenseRows = allEntityIds.length > 0
+    ? await prisma.interpretation_cache.findMany({
+        where: { entityId: { in: allEntityIds }, outputType: 'SCENESENSE_PRL', isCurrent: true },
+        select: { entityId: true },
+        distinct: ['entityId'],
+      })
+    : [];
+  const hasScenesenseSet = new Set(scenesenseRows.map((r) => r.entityId));
+
+  const taglineRows = allEntityIds.length > 0
+    ? await prisma.interpretation_cache.findMany({
+        where: { entityId: { in: allEntityIds }, outputType: 'TAGLINE', isCurrent: true },
+        select: { entityId: true },
+        distinct: ['entityId'],
+      })
+    : [];
+  const hasCurrentTaglineSet = new Set(taglineRows.map((r) => r.entityId));
+
+  const editorialRows = allEntityIds.length > 0
+    ? await prisma.coverage_sources.findMany({
+        where: { entityId: { in: allEntityIds } },
+        select: { entityId: true },
+        distinct: ['entityId'],
+      })
+    : [];
+  const hasEditorialCoverageSet = new Set(editorialRows.map((r) => r.entityId));
+
   // Pre-fetch nomadic status — entities with place_appearances are pop-ups/mobile
   const nomadicRows = allEntityIds.length > 0
     ? await prisma.place_appearances.findMany({
@@ -569,7 +698,11 @@ export async function scanEntities(
       slug: raw.slug,
       name: raw.name,
       status: raw.status,
+      operatingStatus: raw.operatingStatus ?? null,
+      enrichmentStatus: raw.enrichmentStatus ?? null,
+      publicationStatus: raw.publicationStatus ?? null,
       primaryVertical: raw.primaryVertical ?? null,
+      category: raw.category ?? null,
       googlePlaceId: raw.googlePlaceId,
       latitude: raw.latitude,
       longitude: raw.longitude,
@@ -595,6 +728,10 @@ export async function scanEntities(
       cesNeighborhood: raw.canonical_state?.neighborhood ?? null,
       cesEventsUrl: raw.canonical_state?.eventsUrl ?? null,
       hasEventsSurface: hasEventsSurfaceSet.has(raw.id),
+      hasOfferingPrograms: hasOfferingProgramsSet.has(raw.id),
+      hasScenesense: hasScenesenseSet.has(raw.id),
+      hasEditorialCoverage: hasEditorialCoverageSet.has(raw.id),
+      hasCurrentTagline: hasCurrentTaglineSet.has(raw.id),
       isNomadic: nomadicEntitySet.has(raw.id),
     };
 
@@ -612,7 +749,9 @@ export async function scanEntities(
       where: { entityId: entity.id },
     });
     const issueMap = new Map(existingIssues.map((i) => [i.issueType, i]));
-    const isClosedEntity = entity.status === 'CLOSED' || entity.status === 'PERMANENTLY_CLOSED';
+    const isClosedEntity = entity.operatingStatus === 'TEMPORARILY_CLOSED'
+      || entity.operatingStatus === 'PERMANENTLY_CLOSED'
+      || (entity.operatingStatus === null && (entity.status === 'CLOSED' || entity.status === 'PERMANENTLY_CLOSED'));
 
     for (const rule of ISSUE_RULES) {
       // Closed entities should remain observable in core records, but they are not
@@ -650,7 +789,20 @@ export async function scanEntities(
               console.log(`  REOPEN ${entity.slug}: ${rule.issueType}`);
             }
           } else {
-            // Active issue already exists — leave it
+          // Active issue already exists. Keep status, but refresh detail when
+          // recommendation context changes (e.g., stage routing updates).
+          const existingDetail = existing.detail ?? null;
+          const nextDetail = detection.detail ?? existingDetail;
+          const detailChanged =
+            JSON.stringify(existingDetail) !== JSON.stringify(nextDetail);
+          if (detailChanged && !dryRun) {
+            await prisma.entity_issues.update({
+              where: { id: existing.id },
+              data: {
+                detail: (nextDetail ?? Prisma.JsonNull) as Prisma.InputJsonValue,
+              },
+            });
+          }
             result.issuesUnchanged++;
           }
         } else {

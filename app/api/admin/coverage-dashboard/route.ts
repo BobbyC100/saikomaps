@@ -32,20 +32,39 @@ export async function GET() {
       recentActivity,
     ] = await Promise.all([
       // Total entities (all statuses, for header context)
-      db.$queryRaw<{ total: number; published: number; ingested: number }[]>`
+      db.$queryRaw<{ total: number; published: number; not_enriched: number }[]>`
         SELECT
           COUNT(*)::int AS total,
           COUNT(CASE WHEN e.publication_status = 'PUBLISHED' THEN 1 END)::int AS published,
-          COUNT(CASE WHEN e.enrichment_status = 'INGESTED' THEN 1 END)::int AS ingested
+          COUNT(CASE WHEN
+            e.enrichment_status IN ('INGESTED'::"EnrichmentStatus", 'ENRICHING'::"EnrichmentStatus")
+            OR (e.enrichment_status IS NULL AND e.status = 'CANDIDATE'::"PlaceStatus")
+          THEN 1 END)::int AS not_enriched
         FROM entities e
-        WHERE e.status != 'PERMANENTLY_CLOSED'
+        WHERE
+          (
+            e.enrichment_status IN ('INGESTED'::"EnrichmentStatus", 'ENRICHING'::"EnrichmentStatus", 'ENRICHED'::"EnrichmentStatus")
+            OR (e.enrichment_status IS NULL AND e.status != 'CANDIDATE'::"PlaceStatus")
+          )
+          AND NOT (
+            e.operating_status = 'PERMANENTLY_CLOSED'::"OperatingStatus"
+            OR (e.operating_status IS NULL AND e.status = 'PERMANENTLY_CLOSED'::"PlaceStatus")
+          )
       `,
 
       // Operating status distribution
       db.$queryRaw<{ status: string | null; count: number }[]>`
         SELECT operating_status::text AS status, COUNT(*)::int AS count
-        FROM entities
-        WHERE status != 'PERMANENTLY_CLOSED'
+        FROM entities e
+        WHERE
+          (
+            e.enrichment_status IN ('INGESTED'::"EnrichmentStatus", 'ENRICHING'::"EnrichmentStatus", 'ENRICHED'::"EnrichmentStatus")
+            OR (e.enrichment_status IS NULL AND e.status != 'CANDIDATE'::"PlaceStatus")
+          )
+          AND NOT (
+            e.operating_status = 'PERMANENTLY_CLOSED'::"OperatingStatus"
+            OR (e.operating_status IS NULL AND e.status = 'PERMANENTLY_CLOSED'::"PlaceStatus")
+          )
         GROUP BY operating_status
         ORDER BY count DESC
       `,
@@ -53,8 +72,16 @@ export async function GET() {
       // Enrichment status distribution
       db.$queryRaw<{ status: string | null; count: number }[]>`
         SELECT enrichment_status::text AS status, COUNT(*)::int AS count
-        FROM entities
-        WHERE status != 'PERMANENTLY_CLOSED'
+        FROM entities e
+        WHERE
+          (
+            e.enrichment_status IN ('INGESTED'::"EnrichmentStatus", 'ENRICHING'::"EnrichmentStatus", 'ENRICHED'::"EnrichmentStatus")
+            OR (e.enrichment_status IS NULL AND e.status != 'CANDIDATE'::"PlaceStatus")
+          )
+          AND NOT (
+            e.operating_status = 'PERMANENTLY_CLOSED'::"OperatingStatus"
+            OR (e.operating_status IS NULL AND e.status = 'PERMANENTLY_CLOSED'::"PlaceStatus")
+          )
         GROUP BY enrichment_status
         ORDER BY count DESC
       `,
@@ -62,8 +89,16 @@ export async function GET() {
       // Publication status distribution
       db.$queryRaw<{ status: string | null; count: number }[]>`
         SELECT publication_status::text AS status, COUNT(*)::int AS count
-        FROM entities
-        WHERE status != 'PERMANENTLY_CLOSED'
+        FROM entities e
+        WHERE
+          (
+            e.enrichment_status IN ('INGESTED'::"EnrichmentStatus", 'ENRICHING'::"EnrichmentStatus", 'ENRICHED'::"EnrichmentStatus")
+            OR (e.enrichment_status IS NULL AND e.status != 'CANDIDATE'::"PlaceStatus")
+          )
+          AND NOT (
+            e.operating_status = 'PERMANENTLY_CLOSED'::"OperatingStatus"
+            OR (e.operating_status IS NULL AND e.status = 'PERMANENTLY_CLOSED'::"PlaceStatus")
+          )
         GROUP BY publication_status
         ORDER BY count DESC
       `,
@@ -84,7 +119,15 @@ export async function GET() {
           SELECT e.*,
             COALESCE(LOWER(TRIM(e.neighborhood)), 'unknown') AS hood
           FROM entities e
-          WHERE e.status != 'PERMANENTLY_CLOSED' AND e.status != 'CANDIDATE'
+          WHERE
+            (
+              e.enrichment_status IN ('INGESTED'::"EnrichmentStatus", 'ENRICHING'::"EnrichmentStatus", 'ENRICHED'::"EnrichmentStatus")
+              OR (e.enrichment_status IS NULL AND e.status != 'CANDIDATE'::"PlaceStatus")
+            )
+            AND NOT (
+              e.operating_status = 'PERMANENTLY_CLOSED'::"OperatingStatus"
+              OR (e.operating_status IS NULL AND e.status = 'PERMANENTLY_CLOSED'::"PlaceStatus")
+            )
         ),
         hood_verticals AS (
           SELECT hood,
@@ -185,7 +228,15 @@ export async function GET() {
         WITH active_entities AS (
           SELECT e.*
           FROM entities e
-          WHERE e.status != 'PERMANENTLY_CLOSED' AND e.status != 'CANDIDATE'
+          WHERE
+            (
+              e.enrichment_status IN ('INGESTED'::"EnrichmentStatus", 'ENRICHING'::"EnrichmentStatus", 'ENRICHED'::"EnrichmentStatus")
+              OR (e.enrichment_status IS NULL AND e.status != 'CANDIDATE'::"PlaceStatus")
+            )
+            AND NOT (
+              e.operating_status = 'PERMANENTLY_CLOSED'::"OperatingStatus"
+              OR (e.operating_status IS NULL AND e.status = 'PERMANENTLY_CLOSED'::"PlaceStatus")
+            )
         )
         -- Identity bucket gaps
         SELECT 'missing_gpid' AS gap_type, 'identity' AS bucket,
@@ -374,13 +425,13 @@ export async function GET() {
       };
     });
 
-    const totals = serialize(totalEntities)[0] ?? { total: 0, published: 0, ingested: 0 };
+    const totals = serialize(totalEntities)[0] ?? { total: 0, published: 0, not_enriched: 0 };
 
     return NextResponse.json({
       // Header
       totalEntities: totals.total,
       publishedCount: totals.published,
-      ingestedCount: totals.ingested,
+      notEnrichedCount: totals.not_enriched,
       // System Summary: three state axes
       systemSummary: {
         operatingStatus: serialize(operatingStatusCounts).map((r) => ({

@@ -3,11 +3,11 @@
  * POST /api/admin/enrich/[slug] — trigger ERA enrichment pipeline for an entity.
  * GET  /api/admin/enrich/[slug] — poll enrichment status.
  *
- * POST: Marks entity status OPEN (so enrich-place.ts can find it), then spawns
- * the enrichment pipeline in the background. Returns 202 immediately.
+ * POST: Marks enrichment status ENRICHING, then spawns the enrichment
+ * pipeline in the background. Returns 202 immediately.
  *
- * GET: Returns current enrichment state from entities.enrichmentStage + lastEnrichedAt.
- * Enrichment is considered "done" when enrichmentStage is non-null (any stage was written).
+ * GET: Returns current enrichment state from enrichmentStatus + enrichmentStage.
+ * "done" is policy-driven and represented by enrichmentStatus === ENRICHED.
  * The caller can track: idle → queued → stage:N → done.
  */
 
@@ -34,22 +34,19 @@ export async function GET(
   try {
     const entity = await db.entities.findUnique({
       where: { slug },
-      select: { slug: true, name: true, status: true, enrichmentStage: true, lastEnrichedAt: true },
+      select: { slug: true, name: true, status: true, enrichmentStatus: true, enrichmentStage: true, lastEnrichedAt: true },
     });
 
     if (!entity) {
       return NextResponse.json({ error: `Entity not found: ${slug}` }, { status: 404 });
     }
 
-    const stageNum = entity.enrichmentStage ? parseInt(entity.enrichmentStage, 10) : null;
-    // "done" means stage 7 reached (enrichmentStage is the live progress tracker;
-    // lastEnrichedAt is historical and should NOT be used for done detection since
-    // it persists across re-runs)
-    const done = stageNum === 7;
+    const done = entity.enrichmentStatus === 'ENRICHED';
     return NextResponse.json({
       slug: entity.slug,
       name: entity.name,
       status: entity.status,
+      enrichmentStatus: entity.enrichmentStatus,
       enrichmentStage: entity.enrichmentStage,
       lastEnrichedAt: entity.lastEnrichedAt,
       done,
@@ -77,13 +74,11 @@ export async function POST(
       return NextResponse.json({ error: `Entity not found: ${slug}` }, { status: 404 });
     }
 
-    // Promote CANDIDATE → OPEN so the enrichment pipeline can locate it.
-    // Reset enrichmentStage for progress tracking, but preserve lastEnrichedAt
-    // so batch mode doesn't re-select entities that have already been through the pipeline.
+    // Mark enrichment as in progress and reset the live stage tracker.
     await db.entities.update({
       where: { slug },
       data: {
-        ...(entity.status === 'CANDIDATE' ? { status: 'OPEN' } : {}),
+        enrichmentStatus: 'ENRICHING',
         enrichmentStage: null,
       },
     });

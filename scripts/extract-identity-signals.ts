@@ -630,7 +630,7 @@ async function main() {
   let processedIds = new Set<string>();
   if (!args.reprocess) {
     const done = await prisma.derived_signals.findMany({
-      where: { signal_key: 'identity_signals' },
+      where: { signalKey: 'identity_signals' },
       select: { entityId: true },
     });
     processedIds = new Set(done.map(d => d.entityId));
@@ -643,28 +643,28 @@ async function main() {
   const entityIdsForArtifacts = unprocessed.map(e => e.id);
 
   type ArtifactRow = {
-    merchant_surface: { entityId: string; surface_type: string };
-    artifact_json: unknown;
+    merchant_surface: { entityId: string; surfaceType: string };
+    artifactJson: unknown;
   };
   const surfaceArtifacts: ArtifactRow[] = entityIdsForArtifacts.length
     ? await prisma.merchant_surface_artifacts.findMany({
         where: {
           merchant_surface: {
             entityId: { in: entityIdsForArtifacts },
-            surface_type: { in: ['menu', 'about', 'homepage'] },
-            parse_status: 'parse_success',
+            surfaceType: { in: ['menu', 'about', 'homepage'] },
+            parseStatus: 'parse_success',
           },
         },
         select: {
-          artifact_json: true,
-          merchant_surface: { select: { entityId: true, surface_type: true } },
+          artifactJson: true,
+          merchant_surface: { select: { entityId: true, surfaceType: true } },
         },
       })
     : [];
 
   // Index by entityId → { menu_text, about_text }
-  function textBlocksToString(artifact_json: unknown): string {
-    const j = artifact_json as Record<string, unknown>;
+  function textBlocksToString(artifactJson: unknown): string {
+    const j = artifactJson as Record<string, unknown>;
     const blocks = Array.isArray(j?.text_blocks) ? (j.text_blocks as string[]) : [];
     return blocks.join('\n').trim();
   }
@@ -672,10 +672,10 @@ async function main() {
   const surfaceTextByEntity = new Map<string, { menu_text: string; about_text: string }>();
   for (const row of surfaceArtifacts) {
     const eid = row.merchant_surface.entityId;
-    const st  = row.merchant_surface.surface_type;
+    const st  = row.merchant_surface.surfaceType;
     if (!surfaceTextByEntity.has(eid)) surfaceTextByEntity.set(eid, { menu_text: '', about_text: '' });
     const entry = surfaceTextByEntity.get(eid)!;
-    const text = textBlocksToString(row.artifact_json);
+    const text = textBlocksToString(row.artifactJson);
     if (st === 'menu' && text.length > entry.menu_text.length) entry.menu_text = text;
     if ((st === 'about' || st === 'homepage') && text.length > entry.about_text.length) entry.about_text = text;
   }

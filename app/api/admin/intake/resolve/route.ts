@@ -185,6 +185,8 @@ export async function POST(request: NextRequest) {
         neighborhood: resolvedNeighborhood,
         primaryVertical: 'EAT',
         status: 'CANDIDATE',
+        enrichmentStatus: 'INGESTED',
+        publicationStatus: 'UNPUBLISHED',
       },
       select: { id: true, slug: true, name: true, status: true, googlePlaceId: true },
     });

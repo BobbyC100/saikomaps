@@ -11,8 +11,17 @@ export async function GET() {
     { id: string; slug: string; name: string; google_place_id: string | null }[]
   >`
     SELECT p.id, p.slug, p.name, p.google_place_id
-    FROM v_places_la_bbox p
-    WHERE p.status = 'OPEN'
+    FROM entities p
+    WHERE p.google_place_id IS NOT NULL
+      AND (
+        p.publication_status = 'PUBLISHED'::"PublicationStatus"
+        OR (p.publication_status IS NULL AND p.status = 'OPEN'::"PlaceStatus")
+      )
+      AND NOT (
+        p.operating_status = 'TEMPORARILY_CLOSED'::"OperatingStatus"
+        OR p.operating_status = 'PERMANENTLY_CLOSED'::"OperatingStatus"
+        OR (p.operating_status IS NULL AND p.status IN ('CLOSED'::"PlaceStatus", 'PERMANENTLY_CLOSED'::"PlaceStatus"))
+      )
     ORDER BY random()
     LIMIT 25
   `;

@@ -9,7 +9,9 @@
  *   Phase 2: Scrape (HTTP)                    FREE    — surface discovery + fetch + parse
  *   Phase 3: Extract (parsed HTML)            FREE    — menu/reservation/hours from surfaces
  *   Phase 4: Gap fill (Google Places)         ~$0.03  — only if coords/hours/GPID still missing
- *   Phase 5: Interpret (Claude Sonnet)        ~$0.03  — AI signals + tagline, only if surfaces exist
+ *
+ * Smart enrich does NOT run the Interpretation layer. It focuses on identity
+ * and low-cost evidence collection so the full ERA pipeline can finish later.
  *
  * Usage:
  *   import { smartEnrich } from '@/lib/smart-enrich';
@@ -24,6 +26,7 @@ import { parseAndCaptureSurface } from '@/lib/merchant-surface-parse';
 import { searchPlace, getPlaceDetails } from '@/lib/google-places';
 import { tokenSortRatio } from '@/lib/similarity';
 import { scanEntities } from '@/lib/coverage/issue-scanner';
+import { isEntityEnriched } from '@/lib/coverage/enrichment-profiles';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -336,6 +339,94 @@ function checkGaps(entity: EntityState): string[] {
   return gaps;
 }
 
+async function assessAndSyncSmartEnrichStatus(entityId: string): Promise<void> {
+  const [entity, hasOfferingPrograms, hasScenesense, hasEditorialCoverage, hasCurrentTagline, isNomadic] =
+    await Promise.all([
+      db.entities.findUnique({
+        where: { id: entityId },
+        select: {
+          primaryVertical: true,
+          category: true,
+          slug: true,
+          name: true,
+          googlePlaceId: true,
+          website: true,
+          instagram: true,
+          phone: true,
+          latitude: true,
+          longitude: true,
+          neighborhood: true,
+          reservationUrl: true,
+          canonical_state: {
+            select: {
+              website: true,
+              instagram: true,
+              phone: true,
+              hoursJson: true,
+              reservationUrl: true,
+              menuUrl: true,
+              eventsUrl: true,
+            },
+          },
+        },
+      }),
+      db.derived_signals.findFirst({
+        where: { entityId, signalKey: 'offering_programs' },
+        select: { entityId: true },
+      }),
+      db.interpretation_cache.findFirst({
+        where: { entityId, outputType: 'SCENESENSE_PRL', isCurrent: true },
+        select: { entityId: true },
+      }),
+      db.coverage_sources.findFirst({
+        where: { entityId },
+        select: { entityId: true },
+      }),
+      db.interpretation_cache.findFirst({
+        where: { entityId, outputType: 'TAGLINE', isCurrent: true },
+        select: { entityId: true },
+      }),
+      db.place_appearances.findFirst({
+        where: { subjectEntityId: entityId },
+        select: { subjectEntityId: true },
+      }),
+    ]);
+
+  if (!entity) return;
+
+  const assessment = isEntityEnriched({
+    vertical: entity.primaryVertical ?? null,
+    category: entity.category ?? null,
+    slug: entity.slug,
+    name: entity.name,
+    isNomadic: Boolean(isNomadic),
+    googlePlaceId: entity.googlePlaceId,
+    website: entity.website,
+    instagram: entity.instagram,
+    phone: entity.phone,
+    latitude: entity.latitude,
+    longitude: entity.longitude,
+    neighborhood: entity.neighborhood,
+    reservationUrl: entity.reservationUrl,
+    cesWebsite: entity.canonical_state?.website ?? null,
+    cesInstagram: entity.canonical_state?.instagram ?? null,
+    cesPhone: entity.canonical_state?.phone ?? null,
+    cesHoursJson: entity.canonical_state?.hoursJson ?? null,
+    cesReservationUrl: entity.canonical_state?.reservationUrl ?? null,
+    cesMenuUrl: entity.canonical_state?.menuUrl ?? null,
+    cesEventsUrl: entity.canonical_state?.eventsUrl ?? null,
+    hasOfferingPrograms: Boolean(hasOfferingPrograms),
+    hasScenesense: Boolean(hasScenesense),
+    hasEditorialCoverage: Boolean(hasEditorialCoverage),
+    hasCurrentTagline: Boolean(hasCurrentTagline),
+  });
+
+  await db.entities.update({
+    where: { id: entityId },
+    data: { enrichmentStatus: assessment.done ? 'ENRICHED' : 'ENRICHING' },
+  });
+}
+
 // ---------------------------------------------------------------------------
 // Main orchestrator
 // ---------------------------------------------------------------------------
@@ -383,6 +474,8 @@ export async function smartEnrich(input: SmartEnrichInput): Promise<SmartEnrichR
           name: input.name,
           slug: newSlug,
           status: 'CANDIDATE',
+          enrichmentStatus: 'INGESTED',
+          publicationStatus: 'UNPUBLISHED',
           neighborhood: input.neighborhood ?? null,
           category: category,
           primary_vertical: 'EAT',
@@ -400,6 +493,13 @@ export async function smartEnrich(input: SmartEnrichInput): Promise<SmartEnrichR
         gaps: ['Entity would be created (dry run)'],
       };
     }
+  }
+
+  if (!input.dryRun && entityId) {
+    await db.entities.update({
+      where: { id: entityId },
+      data: { enrichmentStatus: 'ENRICHING' },
+    }).catch(() => {});
   }
 
   // ── Phase 1: Discover via Haiku (~$0.01) ──────────────────────────
@@ -533,12 +633,9 @@ export async function smartEnrich(input: SmartEnrichInput): Promise<SmartEnrichR
     });
   }
 
-  // ── Update enrichment tracking ────────────────────────────────────
+  // ── Update enrichment state and re-scan issues ───────────────────
   if (!input.dryRun) {
-    await db.entities.update({
-      where: { id: entityId },
-      data: { lastEnrichedAt: new Date() },
-    }).catch(() => {});
+    await assessAndSyncSmartEnrichStatus(entityId).catch(() => {});
 
     // Auto-rescan issues
     try {

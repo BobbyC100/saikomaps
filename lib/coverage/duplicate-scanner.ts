@@ -194,9 +194,20 @@ export async function scanForDuplicates(
 ): Promise<DuplicateScanSummary> {
   const { dryRun = false, verbose = false } = options;
 
-  // Fetch all non-CANDIDATE entities
+  // Fetch entities in Coverage-Ops scope using three-axis states, with legacy fallback.
   const rawEntities = await prisma.entities.findMany({
-    where: { status: { not: 'CANDIDATE' } },
+    where: {
+      OR: [
+        { enrichmentStatus: { in: ['INGESTED', 'ENRICHING', 'ENRICHED'] } },
+        { enrichmentStatus: null, status: { not: 'CANDIDATE' } },
+      ],
+      NOT: {
+        OR: [
+          { operatingStatus: 'PERMANENTLY_CLOSED' },
+          { operatingStatus: null, status: 'PERMANENTLY_CLOSED' },
+        ],
+      },
+    },
     select: {
       id: true,
       slug: true,

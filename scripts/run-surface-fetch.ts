@@ -71,7 +71,9 @@ async function main() {
   let failed  = 0;
 
   for (const row of rows) {
-    const label = `  [${row.surface_type}] ${row.source_url.slice(0, 72)}`;
+    const surfaceTypeLabel = (row as any).surfaceType ?? (row as any).surface_type ?? 'unknown';
+    const sourceUrl = (row as any).sourceUrl ?? (row as any).source_url ?? '';
+    const label = `  [${surfaceTypeLabel}] ${String(sourceUrl).slice(0, 72)}`;
     process.stdout.write(`${label} … `);
 
     if (isDryRun) {
