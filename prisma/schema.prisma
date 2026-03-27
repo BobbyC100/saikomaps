@@ -277,6 +277,7 @@ model entities {
   entityActorRelationships EntityActorRelationship[]
   place_tag_scores       place_tag_scores[]
   place_photo_eval       place_photo_eval[]
+  place_photos           place_photos[]
   place_coverage_status  place_coverage_status[]
   gpid_resolution_queue   gpid_resolution_queue[]
   place_actor_relationships PlaceActorRelationship[]
@@ -782,6 +783,37 @@ model place_photo_eval {
 
   @@unique([entityId, photoRef])
   @@index([entityId])
+}
+
+model place_photos {
+  id               String      @id @default(cuid())
+  entityId         String      @map("entity_id")
+  source           PhotoSource
+  sourceRef        String      @map("source_ref")
+  sourceUrl        String?     @map("source_url")
+  widthPx          Int?        @map("width_px")
+  heightPx         Int?        @map("height_px")
+  aspectRatio      Float?      @map("aspect_ratio")
+  eligible         Boolean     @default(false)
+  ineligibleReason String?     @map("ineligible_reason")
+  sourceRank       Int         @map("source_rank")
+  ingestedAt       DateTime    @default(now()) @map("ingested_at")
+  updatedAt        DateTime    @updatedAt @map("updated_at")
+  entity           entities    @relation(fields: [entityId], references: [id], onDelete: Cascade)
+
+  @@unique([entityId, source, sourceRef])
+  @@index([entityId])
+  @@index([entityId, eligible])
+  @@index([source])
+  @@index([entityId, eligible, sourceRank, ingestedAt])
+  @@map("place_photos")
+}
+
+enum PhotoSource {
+  GOOGLE
+  INSTAGRAM
+  WEBSITE
+  MANUAL
 }
 
 enum PlacePhotoEvalTier {
