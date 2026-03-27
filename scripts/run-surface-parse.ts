@@ -35,6 +35,17 @@ import {
   ARTIFACT_VERSION,
 } from '../lib/merchant-surface-parse';
 
+type ParseRowCompat = {
+  surfaceType?: string;
+  surface_type?: string;
+  sourceUrl?: string;
+  source_url?: string;
+  rawHtml?: string | null;
+  raw_html?: string | null;
+  rawText?: string | null;
+  raw_text?: string | null;
+};
+
 // ---------------------------------------------------------------------------
 // Args
 // ---------------------------------------------------------------------------
@@ -73,11 +84,14 @@ async function main() {
   let failed  = 0;
 
   for (const row of rows) {
-    const label = `  [${row.surface_type.padEnd(11)}] ${row.source_url.slice(0, 68)}`;
+    const compat = row as ParseRowCompat;
+    const surfaceTypeValue = compat.surfaceType ?? compat.surface_type ?? 'unknown';
+    const sourceUrl = compat.sourceUrl ?? compat.source_url ?? '';
+    const label = `  [${String(surfaceTypeValue).padEnd(11)}] ${String(sourceUrl).slice(0, 68)}`;
     process.stdout.write(`${label} … `);
 
     if (isDryRun) {
-      const hasHtml = !!(row.raw_html ?? row.raw_text);
+      const hasHtml = !!(compat.rawHtml ?? compat.raw_html ?? compat.rawText ?? compat.raw_text);
       console.log(`[dry-run] ${hasHtml ? 'has HTML' : 'no HTML content'}`);
       continue;
     }

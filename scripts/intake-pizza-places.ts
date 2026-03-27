@@ -135,6 +135,8 @@ async function main() {
           category: 'pizzeria',
           primary_vertical: 'EAT',
           status: 'CANDIDATE',
+          enrichmentStatus: 'INGESTED',
+          publicationStatus: 'UNPUBLISHED',
           editorialSources: { sources: ['pizza-intake-2026-03-19'] },
         },
       });

@@ -20,12 +20,13 @@
  *   4  Surface parse                  (structure captured content)
  *   5  Identity signal extraction     (AI → derived_signals)
  *   6  Website enrichment             (menu_url, reservation_url → Fields v2)
- *   7  Tagline generation             (AI → interpretation_cache)
+ *   7  Interpretation                 (AI → interpretation_cache)
  */
 
 import { spawnSync, spawn as spawnAsync } from 'child_process';
-import { PrismaClient } from '@prisma/client';
-import { scanEntities } from '@/lib/coverage/issue-scanner';
+import { PrismaClient, Prisma } from '@prisma/client';
+import { scanEntities } from '../lib/coverage/issue-scanner';
+import { isEntityEnriched } from '../lib/coverage/enrichment-profiles';
 
 // ---------------------------------------------------------------------------
 // Args
@@ -64,9 +65,114 @@ if (!slug && !batchSize) {
 
 const db = new PrismaClient();
 
+function getErrorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
+}
+
+async function markEnrichmentStatus(entityId: string, status: 'ENRICHING' | 'ENRICHED') {
+  await db.entities.update({
+    where: { id: entityId },
+    data: { enrichmentStatus: status },
+  });
+}
+
+async function assessAndSyncEnrichmentStatus(entityId: string) {
+  const [entity, hasOfferingPrograms, hasScenesense, hasEditorialCoverage, hasCurrentTagline, isNomadic] =
+    await Promise.all([
+      db.entities.findUnique({
+        where: { id: entityId },
+        select: {
+          primaryVertical: true,
+          category: true,
+          slug: true,
+          name: true,
+          googlePlaceId: true,
+          website: true,
+          instagram: true,
+          phone: true,
+          latitude: true,
+          longitude: true,
+          neighborhood: true,
+          reservationUrl: true,
+          canonical_state: {
+            select: {
+              website: true,
+              instagram: true,
+              phone: true,
+              hoursJson: true,
+              reservationUrl: true,
+              menuUrl: true,
+              eventsUrl: true,
+            },
+          },
+        },
+      }),
+      db.derived_signals.findFirst({
+        where: { entityId, signalKey: 'offering_programs' },
+        select: { entityId: true },
+      }),
+      db.interpretation_cache.findFirst({
+        where: { entityId, outputType: 'SCENESENSE_PRL', isCurrent: true },
+        select: { entityId: true },
+      }),
+      db.coverage_sources.findFirst({
+        where: { entityId },
+        select: { entityId: true },
+      }),
+      db.interpretation_cache.findFirst({
+        where: { entityId, outputType: 'TAGLINE', isCurrent: true },
+        select: { entityId: true },
+      }),
+      db.place_appearances.findFirst({
+        where: { subjectEntityId: entityId },
+        select: { subjectEntityId: true },
+      }),
+    ]);
+
+  if (!entity) return { done: false, missing: ['entity_not_found'] };
+
+  const assessment = isEntityEnriched({
+    vertical: entity.primaryVertical ?? null,
+    category: entity.category ?? null,
+    slug: entity.slug,
+    name: entity.name,
+    isNomadic: Boolean(isNomadic),
+    googlePlaceId: entity.googlePlaceId,
+    website: entity.website,
+    instagram: entity.instagram,
+    phone: entity.phone,
+    latitude: entity.latitude,
+    longitude: entity.longitude,
+    neighborhood: entity.neighborhood,
+    reservationUrl: entity.reservationUrl,
+    cesWebsite: entity.canonical_state?.website ?? null,
+    cesInstagram: entity.canonical_state?.instagram ?? null,
+    cesPhone: entity.canonical_state?.phone ?? null,
+    cesHoursJson: entity.canonical_state?.hoursJson ?? null,
+    cesReservationUrl: entity.canonical_state?.reservationUrl ?? null,
+    cesMenuUrl: entity.canonical_state?.menuUrl ?? null,
+    cesEventsUrl: entity.canonical_state?.eventsUrl ?? null,
+    hasOfferingPrograms: Boolean(hasOfferingPrograms),
+    hasScenesense: Boolean(hasScenesense),
+    hasEditorialCoverage: Boolean(hasEditorialCoverage),
+    hasCurrentTagline: Boolean(hasCurrentTagline),
+  });
+
+  await markEnrichmentStatus(entityId, assessment.done ? 'ENRICHED' : 'ENRICHING');
+  return {
+    done: assessment.done,
+    missing: [
+      ...assessment.identity.missing,
+      ...assessment.access.missing,
+      ...assessment.offering.missing,
+      ...assessment.interpretation.missing,
+    ],
+  };
+}
+
 async function getEntity() {
   const entity = await db.entities.findUnique({
-    where: { slug },
+    where: { slug: slug! },
     select: {
       id: true,
       name: true,
@@ -83,7 +189,12 @@ async function getEntity() {
   return entity;
 }
 
-async function shouldSkip(stage: number, entity: Awaited<ReturnType<typeof getEntity>>): Promise<{ skip: boolean; reason: string }> {
+type SkipEntity = {
+  id: string;
+  website: string | null;
+};
+
+async function shouldSkip(stage: number, entity: SkipEntity): Promise<{ skip: boolean; reason: string }> {
   switch (stage) {
     case 1: {
       // Skip only if Google Places data has actually been fetched and cached
@@ -107,7 +218,7 @@ async function shouldSkip(stage: number, entity: Awaited<ReturnType<typeof getEn
     }
     case 3: {
       const pending = await db.merchant_surfaces.findFirst({
-        where: { entityId: entity.id, fetch_status: 'discovered' },
+        where: { entityId: entity.id, fetchStatus: 'discovered' },
         select: { id: true },
       });
       if (!pending) return { skip: true, reason: 'no surfaces with fetch_status=discovered' };
@@ -115,7 +226,7 @@ async function shouldSkip(stage: number, entity: Awaited<ReturnType<typeof getEn
     }
     case 4: {
       const pending = await db.merchant_surfaces.findFirst({
-        where: { entityId: entity.id, fetch_status: 'fetch_success', parse_status: 'parse_pending' },
+        where: { entityId: entity.id, fetchStatus: 'fetch_success', parseStatus: 'parse_pending' },
         select: { id: true },
       });
       if (!pending) return { skip: true, reason: 'no surfaces pending parse' };
@@ -123,20 +234,31 @@ async function shouldSkip(stage: number, entity: Awaited<ReturnType<typeof getEn
     }
     case 5: {
       const existing = await db.derived_signals.findFirst({
-        where: { entityId: entity.id, signal_key: 'identity_signals' },
+        where: { entityId: entity.id, signalKey: 'identity_signals' },
         select: { entityId: true },
       });
       if (existing) return { skip: true, reason: 'identity_signals already in derived_signals' };
       return { skip: false, reason: '' };
     }
     case 6: {
-      if (entity.lastEnrichedAt) return { skip: true, reason: 'lastEnrichedAt already set' };
       if (!entity.website) return { skip: true, reason: 'no website' };
+      const existing = await db.entities.findUnique({
+        where: { id: entity.id },
+        select: {
+          reservationUrl: true,
+          canonical_state: {
+            select: { menuUrl: true },
+          },
+        },
+      });
+      if (existing?.reservationUrl && existing.canonical_state?.menuUrl) {
+        return { skip: true, reason: 'website enrichment outputs already present' };
+      }
       return { skip: false, reason: '' };
     }
     case 7: {
       const existing = await db.interpretation_cache.findFirst({
-        where: { entityId: entity.id, output_type: 'TAGLINE', is_current: true },
+        where: { entityId: entity.id, outputType: 'TAGLINE', isCurrent: true },
         select: { entityId: true },
       });
       if (existing) return { skip: true, reason: 'TAGLINE already in interpretation_cache' };
@@ -196,8 +318,8 @@ async function run(stage: number, label: string, script: string, extraArgs: stri
         data: { enrichmentStage: String(stage) },
       });
       console.log(`  ✓ enrichmentStage updated to ${stage}`);
-    } catch (err: any) {
-      console.error(`  ✗ Failed to update enrichmentStage: ${err.message}`);
+    } catch (err: unknown) {
+      console.error(`  ✗ Failed to update enrichmentStage: ${getErrorMessage(err)}`);
     }
   }
 
@@ -213,22 +335,11 @@ async function runBatch(n: number) {
   if (dryRun) console.log('   DRY RUN — no writes\n');
   if (force) console.log('   FORCE MODE — including previously enriched entities\n');
 
-  // Pick N unenriched LA-area entities.
-  // Exclude entities that already have a TAGLINE (fully enriched)
-  // AND entities that already have lastEnrichedAt set (already ran pipeline
-  // but couldn't produce a tagline — re-running won't help).
-  const enrichedIds = (await db.interpretation_cache.findMany({
-    where: { output_type: 'TAGLINE', is_current: true },
-    select: { entityId: true },
-  })).map((r) => r.entityId).filter(Boolean) as string[];
-
-  const whereClause: any = {
-    id: { notIn: enrichedIds },
-    website: { not: null },  // website-first: only need a website to enrich
+  // Pick N not-yet-enriched entities for website-first lane work.
+  const whereClause: Prisma.entitiesWhereInput = {
+    website: { not: null },
+    ...(force ? {} : { enrichmentStatus: { in: ['INGESTED', 'ENRICHING'] } }),
   };
-  if (!force) {
-    whereClause.lastEnrichedAt = null; // skip already-enriched entities
-  }
 
   const candidates = await db.entities.findMany({
     where: whereClause,
@@ -263,6 +374,14 @@ async function runBatch(n: number) {
     const stages = buildStages(entity);
     let failed = false;
 
+    if (!dryRun) {
+      try {
+        await markEnrichmentStatus(entity.id, 'ENRICHING');
+      } catch (err: unknown) {
+        console.error(`  ✗ Failed to mark enrichmentStatus=ENRICHING: ${getErrorMessage(err)}`);
+      }
+    }
+
     for (const stage of stages) {
       if (onlyStage === null && stage.n < fromStage) continue;
       if (onlyStage !== null && stage.n !== onlyStage) continue;
@@ -291,12 +410,23 @@ async function runBatch(n: number) {
           data: { lastEnrichedAt: new Date() },
         });
         console.log(`  ✓ lastEnrichedAt updated`);
-      } catch (err: any) {
-        console.error(`  ✗ Failed to update lastEnrichedAt: ${err.message}`);
+      } catch (err: unknown) {
+        console.error(`  ✗ Failed to update lastEnrichedAt: ${getErrorMessage(err)}`);
+      }
+
+      try {
+        const statusResult = await assessAndSyncEnrichmentStatus(entity.id);
+        if (statusResult.done) {
+          console.log('  ✓ Interpretation layer satisfied; entity marked ENRICHED');
+        } else {
+          console.log(`  · Interpretation layer incomplete; remains ENRICHING (missing: ${statusResult.missing.join(', ') || 'none'})`);
+        }
+      } catch (err: unknown) {
+        console.error(`  ✗ Failed to evaluate enrichment completion: ${getErrorMessage(err)}`);
       }
 
       const hasTagline = await db.interpretation_cache.findFirst({
-        where: { entityId: entity.id, output_type: 'TAGLINE', is_current: true },
+        where: { entityId: entity.id, outputType: 'TAGLINE', isCurrent: true },
         select: { entityId: true },
       });
       if (hasTagline) {
@@ -306,8 +436,8 @@ async function runBatch(n: number) {
             data: { needsHumanReview: false },
           });
           console.log(`  ✓ needsHumanReview cleared`);
-        } catch (err: any) {
-          console.error(`  ✗ Failed to clear needsHumanReview: ${err.message}`);
+        } catch (err: unknown) {
+          console.error(`  ✗ Failed to clear needsHumanReview: ${getErrorMessage(err)}`);
         }
       }
     }
@@ -317,7 +447,7 @@ async function runBatch(n: number) {
 
   // Process entities with concurrency limit
   if (concurrency > 1) {
-    const pLimit = require('p-limit');
+    const { default: pLimit } = await import('p-limit');
     const limit = pLimit(concurrency);
     const results = await Promise.all(
       batch.map((entity) => limit(() => enrichEntity(entity)))
@@ -380,7 +510,7 @@ function buildStages(entity: Awaited<ReturnType<typeof getEntity>>) {
     },
     {
       n: 7,
-      label: 'Tagline generation (AI)',
+      label: 'Interpretation (AI)',
       script: 'scripts/generate-taglines-v2.ts',
       args: () => [`--place=${entity.name}`],
     },
@@ -403,6 +533,15 @@ async function main() {
 
   const stages = buildStages(entity);
   const results: { n: number; label: string; status: 'ran' | 'skipped' | 'failed' }[] = [];
+
+  if (!dryRun) {
+    try {
+      await markEnrichmentStatus(entity.id, 'ENRICHING');
+      console.log(`  ✓ enrichmentStatus set to ENRICHING`);
+    } catch (err: unknown) {
+      console.error(`  ✗ Failed to set enrichmentStatus=ENRICHING: ${getErrorMessage(err)}`);
+    }
+  }
 
   for (const stage of stages) {
     if (onlyStage !== null && stage.n !== onlyStage) {
@@ -443,13 +582,24 @@ async function main() {
           data: { lastEnrichedAt: new Date() },
         });
         console.log(`  ✓ lastEnrichedAt updated`);
-      } catch (err: any) {
-        console.error(`  ✗ Failed to update lastEnrichedAt: ${err.message}`);
+      } catch (err: unknown) {
+        console.error(`  ✗ Failed to update lastEnrichedAt: ${getErrorMessage(err)}`);
+      }
+
+      try {
+        const statusResult = await assessAndSyncEnrichmentStatus(entity.id);
+        if (statusResult.done) {
+          console.log('  ✓ Interpretation layer satisfied; entity marked ENRICHED');
+        } else {
+          console.log(`  · Interpretation layer incomplete; remains ENRICHING (missing: ${statusResult.missing.join(', ') || 'none'})`);
+        }
+      } catch (err: unknown) {
+        console.error(`  ✗ Failed to evaluate enrichment completion: ${getErrorMessage(err)}`);
       }
     }
 
     const hasTagline = await db.interpretation_cache.findFirst({
-      where: { entityId: entity.id, output_type: 'TAGLINE', is_current: true },
+      where: { entityId: entity.id, outputType: 'TAGLINE', isCurrent: true },
       select: { entityId: true },
     });
     if (hasTagline) {
@@ -459,8 +609,8 @@ async function main() {
           data: { needsHumanReview: false },
         });
         console.log(`  ✓ needsHumanReview cleared`);
-      } catch (err: any) {
-        console.error(`  ✗ Failed to clear needsHumanReview: ${err.message}`);
+      } catch (err: unknown) {
+        console.error(`  ✗ Failed to clear needsHumanReview: ${getErrorMessage(err)}`);
       }
     }
   }
@@ -470,7 +620,7 @@ async function main() {
     console.log('\nRe-scanning issues...');
     try {
       const scanResult = await scanEntities(db, { slugs: [entity.slug!] });
-      console.log(`  Issues: ${scanResult.issues_created} created, ${scanResult.issues_resolved} resolved, ${scanResult.issues_unchanged} unchanged`);
+      console.log(`  Issues: ${scanResult.issuesCreated} created, ${scanResult.issuesResolved} resolved, ${scanResult.issuesUnchanged} unchanged`);
     } catch (e) {
       console.error('  Issue rescan failed (non-fatal):', e);
     }

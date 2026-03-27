@@ -129,6 +129,8 @@ async function main() {
         category: row.category,
         primaryVertical: row.primaryVertical,
         status: 'CANDIDATE',
+        enrichmentStatus: 'INGESTED',
+        publicationStatus: 'UNPUBLISHED',
         editorialSources: { sources: [row.sourceUrl] },
       },
     });

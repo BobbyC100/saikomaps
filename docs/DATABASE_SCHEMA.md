@@ -4,454 +4,371 @@ doc_type: reference
 status: active
 owner: Bobby Ciccaglione
 created: '2026-03-10'
-last_updated: '2026-03-10'
+last_updated: '2026-03-24'
 project_id: SAIKO
 systems:
   - database
-summary: ''
+summary: 'Schema reference for the Saiko PostgreSQL database. Covers core entity tables, enrichment/signal tables, map/list tables, and Fields v2 canonical layer.'
 ---
-# Saiko Maps - Database Schema
+# Saiko — Database Schema
 
-## Core Entity Relationships
+## Overview
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                         USER ECOSYSTEM                           │
-└─────────────────────────────────────────────────────────────────┘
+The database has 50+ models organized across several domains:
 
-                            ┌──────────┐
-                            │   User   │
-                            │   (id)   │
-                            └────┬─────┘
-                                 │
-                    ┌────────────┼────────────┐
-                    │            │            │
-             ┌──────▼──────┐ ┌──▼──────┐ ┌──▼────────┐
-             │    List     │ │ Viewer  │ │  Import   │
-             │   (maps)    │ │Bookmark │ │   Job     │
-             └──────┬──────┘ └────┬────┘ └───────────┘
-                    │             │
-                    │             │
-┌───────────────────┴─────────────┴──────────────────────────────┐
-│                      PLACE ECOSYSTEM                            │
-└─────────────────────────────────────────────────────────────────┘
-
-         ┌─────────────────┐
-         │      List       │
-         │  (Maps/Guides)  │
-         └────────┬────────┘
-                  │
-         ┌────────┴─────────────────┐
-         │                          │
-    ┌────▼─────┐           ┌────────▼────────┐
-    │ Location │           │    MapPlace     │
-    │ (legacy) │           │  (join table)   │
-    └──────────┘           └────────┬────────┘
-                                    │
-                           ┌────────▼────────┐
-                           │     Place       │
-                           │  (canonical)    │
-                           └────────┬────────┘
-                                    │
-                           ┌────────▼────────┐
-                           │ ViewerBookmark  │
-                           └─────────────────┘
-
-┌─────────────────────────────────────────────────────────────────┐
-│                      ACTIVITY LAYERS                             │
-└─────────────────────────────────────────────────────────────────┘
-
-                        ┌──────────────┐
-                        │ ActivitySpot │
-                        │ (skate/surf) │
-                        └──────────────┘
-```
-
-## Detailed Schema Breakdown
-
-### **User** (`users`)
-**Purpose:** Creator accounts, authentication
-
-**Fields:**
-- `id` (UUID, PK)
-- `email` (unique)
-- `name`
-- `passwordHash`
-- `avatarUrl`
-- `subscriptionTier` (free | personal | business)
-- `createdAt`, `updatedAt`
-
-**Relations:**
-- → **List** (1:many) - Created maps
-- → **ViewerBookmark** (1:many) - Saved places
-- → **ImportJob** (1:many) - Import operations
+| Domain | Key tables | Purpose |
+|--------|-----------|---------|
+| **Entity core** | `entities`, `canonical_entity_state` | Canonical place identity and Fields v2 state |
+| **Enrichment signals** | `derived_signals`, `interpretation_cache`, `energy_scores`, `place_tag_scores` | AI-extracted and computed signals |
+| **Coverage** | `coverage_sources`, `coverage_source_extractions` | Editorial article sourcing and extraction |
+| **Instagram** | `instagram_accounts`, `instagram_media` | Social media photo ingestion |
+| **Merchant surfaces** | `merchant_surfaces`, `merchant_surface_artifacts`, `merchant_signals` | Website enrichment pipeline |
+| **Maps/Lists** | `lists`, `map_places` | User-created curated maps |
+| **Users** | `users`, `viewer_bookmarks`, `saved_maps` | Authentication and user data |
+| **People/Actors** | `people`, `person_places`, `Actor`, `EntityActorRelationship` | Chef/owner/curator attribution |
+| **Resolution** | `raw_records`, `resolution_links`, `gpid_resolution_queue` | Entity resolution and GPID matching |
+| **Issues** | `entity_issues`, `review_queue` | Data quality tracking |
 
 ---
 
-### **List** (`lists`)
-**Purpose:** Maps/Guides created by users (published as Field Notes)
+## Core Entity Tables
 
-**Content Fields:**
-- `id` (UUID, PK)
-- `userId` (FK → User)
-- `title`, `subtitle`, `description`, `slug` (unique)
-- `introText`
-- `descriptionSource` (ai | edited | manual)
+### **entities** (canonical place table)
 
-**Creation Context:**
-- `functionType` - Purpose of the map
-- `functionContext` - Additional context
-- `scopeGeography` - Geographic scope
-- `scopePlaceTypes[]` - Types of places included
-- `scopeExclusions[]` - Types excluded
-- `organizingLogic` (enum: TIME_BASED | NEIGHBORHOOD_BASED | ROUTE_BASED | PURPOSE_BASED | LAYERED)
-- `organizingLogicNote` - Notes on organization
-- `notes` - Internal notes
-- `status` (enum: DRAFT | READY | PUBLISHED | ARCHIVED)
-- `publishedAt`
+The primary system-of-record table. Every place in Saiko is an entity.
 
-**Design:**
-- `templateType` (currently only "field-notes")
-- `coverImageUrl`
-- `primaryColor`, `secondaryColor`
+**Identity:**
+- `id` (UUID, PK), `slug` (unique), `name`, `address`
+- `latitude`, `longitude` (Decimal)
+- `googlePlaceId` (unique nullable)
+- `phone`, `website`, `instagram`, `tiktok`
 
-**Access Control:**
-- `accessLevel` (public | password | private)
-- `passwordHash` - For password-protected maps
-- `allowedEmails[]` - For private maps
-
-**Metadata:**
-- `published` (boolean)
-- `viewCount`
-- `createdAt`, `updatedAt`
-
-**Relations:**
-- ← **User** (many:1)
-- → **Location** (1:many) - Legacy locations
-- → **MapPlace** (1:many) - Modern place associations
-- → **ImportJob** (1:many)
-
-**Indexes:**
-- `userId`, `slug`, `published`, `status`
-
----
-
-### **Location** (`locations`) [LEGACY - Being Phased Out]
-**Purpose:** Original location model (before Place/MapPlace refactor)
-
-**Google Places Data:**
-- `id` (UUID, PK)
-- `listId` (FK → List)
-- `googlePlaceId`
-- `name`, `address`
-- `latitude`, `longitude` (Decimal 10,8 / 11,8)
-- `phone`, `website`, `instagram`
-- `hours` (JSON)
-- `description`
-- `googlePhotos` (JSON)
-- `googleTypes[]`
-- `priceLevel` (0-4)
-- `neighborhood`
-
-**User-Added Data:**
-- `userPhotos[]` - Uploaded image URLs
-- `userNote` - Curator notes
-- `category` - Food, Drinks, Coffee, etc.
-- `descriptor` - Editorial description (max 120 chars)
-
-**Organization:**
-- `orderIndex` - Position in list
-
-**Cache Management:**
-- `placesDataCachedAt` - When Google data was last fetched
-
-**Relations:**
-- ← **List** (many:1)
-
-**Indexes:**
-- `listId`, `googlePlaceId`, `[listId, orderIndex]`, `[listId, category]`
-
----
-
-### **Place** (`places`) [CANONICAL ENTITY]
-**Purpose:** Canonical place entity with full Google + AI enrichment
-
-**Core Data:**
-- `id` (UUID, PK)
-- `slug` (unique)
-- `googlePlaceId` (unique)
-- `name`, `address`
-- `latitude`, `longitude` (Decimal 10,8 / 11,8)
-- `phone`, `website`, `instagram`
-- `hours` (JSON)
-- `description`
-
-**Google Places Data:**
-- `googlePhotos` (JSON) - Array of photo references
-- `googleTypes[]` - Raw Google Places types
-- `priceLevel` (0-4)
-- `neighborhood` - Reverse geocoded
-- `cuisineType`
-- `category`
-- `sources` (JSON) - Editorial sources
-
-**Voice Engine v1.1 - Taglines:**
-- `tagline` - Selected tagline
-- `taglineCandidates[]` - Alternative options generated
-- `taglinePattern` (food | neighborhood | energy | authority)
-- `taglineGenerated` - Timestamp
-- `taglineSignals` (JSON) - Snapshot of merchant signals at generation
-
-**Voice Engine v1.1 - Ad Units:**
-- `adUnitType` (A | B | D | E)
-- `adUnitOverride` (boolean) - Manual override flag
-
-**Voice Engine v1.1 - Pull Quotes:**
-- `pullQuote` - Quote text
-- `pullQuoteSource` - Source name
-- `pullQuoteAuthor` - Author name
-- `pullQuoteUrl` - Source URL
-- `pullQuoteType` (editorial | owner | self)
-
-**Bento Grid Enrichment:**
-- ~~`vibeTags[]`~~ - **Deprecated** (column removed from entities; language signals in `golden_records.identity_signals.language_signals`)
-- `tips[]` - Helpful visitor tips: ["Go early for a seat", "Cash only"]
-
-**Cache Management:**
-- `placesDataCachedAt` - When Google data was last fetched
-
-**Metadata:**
-- `createdAt`, `updatedAt`
-
-**Relations:**
-- → **MapPlace** (1:many) - Appears on multiple maps
-- → **ViewerBookmark** (1:many) - Saved by viewers
-
-**Indexes:**
-- `googlePlaceId`, `category`, `neighborhood`
-
----
-
-### **MapPlace** (`map_places`) [JOIN TABLE]
-**Purpose:** Many-to-many relationship between Place and List (Map)
-**Why:** Same place can appear on multiple maps with different curator context
-
-**Fields:**
-- `id` (UUID, PK)
-- `mapId` (FK → List)
-- `placeId` (FK → Place)
-
-**Curator-Specific Data (per-map):**
-- `descriptor` (VARCHAR 120) - Map-specific editorial description
-- `userNote` - Curator's private notes
-- `userPhotos[]` - Map-specific photos
-- `orderIndex` - Position in this specific map
-
-**Metadata:**
-- `createdAt`, `updatedAt`
-
-**Relations:**
-- ← **List** (many:1)
-- ← **Place** (many:1)
-
-**Unique Constraint:**
-- `[mapId, placeId]` - A place can only appear once per map
-
-**Indexes:**
-- `mapId`, `placeId`, `[mapId, orderIndex]`
-
----
-
-### **ViewerBookmark** (`viewer_bookmarks`)
-**Purpose:** Users saving places for later / personal collections
-
-**Fields:**
-- `id` (UUID, PK)
-- `viewerUserId` (FK → User, nullable)
-- `placeId` (FK → Place)
-- `visited` (boolean)
-- `personalNote` - Private user notes
-- `createdAt`, `updatedAt`
-
-**Relations:**
-- ← **User** (many:1)
-- ← **Place** (many:1)
-
-**Unique Constraint:**
-- `[viewerUserId, placeId]` - Can't bookmark same place twice
-
-**Indexes:**
-- `viewerUserId`, `placeId`
-
----
-
-### **ActivitySpot** (`activity_spots`)
-**Purpose:** Skateparks, surf breaks, etc. (separate from food/drink places)
-
-**Location:**
-- `id` (CUID, PK)
-- `name`, `slug` (unique)
-- `latitude`, `longitude` (Float)
-- `city`, `region`, `country`
-
-**Type & Classification:**
-- `layerType` (enum: SKATE | SURF)
-- `spotType` - Skate: park/street/plaza | Surf: beach/reef/point
-- `tags[]` - Skate: ["ledge", "rail", "bowl"] | Surf: ["hollow", "mellow"]
-
-**Skate-Specific:**
-- `surface` (smooth | rough | mixed)
-- `skillLevel` (beginner | intermediate | advanced | all)
-
-**Surf-Specific:**
-- `exposure` - Primary swell direction
-- `seasonality` - Best season info
+**Classification:**
+- `primaryVertical` (PrimaryVertical enum — 13 values)
+- `category` (string — human-readable fallback)
+- `cuisineType` (string — e.g., "Mexican", "Italian")
+- `entityType` (string — structural kind: venue, activity, public)
+- `neighborhood` (string — reverse geocoded or derived)
 
 **Editorial:**
-- `description`
-- `isPublic` (boolean)
+- `tagline` — AI-generated one-liner
+- `description`, `descriptionSource`
+- `pullQuote`, `pullQuoteAuthor`, `pullQuoteSource`
+- `tips[]` — visitor tips array
 
-**Source Tracking:**
-- `source` (enum: OSM | CITY_DATA | EDITORIAL | COMMUNITY)
-- `sourceId` - External ID (OSM node, city dataset ID)
-- `sourceUrl`
+**Google Places Data:**
+- `googlePhotos` (JSON) — photo references array
+- `googleTypes[]` — raw Google Places types
+- `priceLevel` (0-4)
+- `hours` (JSON)
 
-**Status:**
-- `verified` (boolean)
-- `enabled` (boolean)
-- `createdAt`, `updatedAt`
+**State Model (three independent axes — see `docs/architecture/entity-state-model-v1.md`):**
+- `operatingStatus` (OperatingStatus: SOFT_OPEN, OPERATING, TEMPORARILY_CLOSED, PERMANENTLY_CLOSED)
+- `enrichmentStatus` (EnrichmentStatus: INGESTED, ENRICHING, ENRICHED)
+- `publicationStatus` (PublicationStatus: PUBLISHED, UNPUBLISHED)
 
-**Indexes:**
-- `[layerType, city]`, `[layerType, latitude, longitude]`, `[source, sourceId]`
+**Enrichment Metadata:**
+- `lastEnrichedAt`, `placesDataCachedAt`
+- `confidence` (JSON), `overallConfidence`
+
+**Indexes:** `slug`, `googlePlaceId`, `category`, `neighborhood`, `primaryVertical`, `status`, `lastEnrichedAt`
 
 ---
 
-### **ImportJob** (`import_jobs`)
-**Purpose:** Track bulk place import operations
+### **canonical_entity_state** (Fields v2)
+
+The Fields v2 canonical layer. Stores sanctioned (validated) attribute state per entity.
 
 **Fields:**
-- `id` (UUID, PK)
-- `userId` (FK → User)
-- `listId` (FK → List, nullable)
-- `status` (processing | completed | failed)
-- `totalLocations`
-- `processedLocations`
-- `failedLocations`
-- `errorLog` (JSON)
-- `createdAt`, `completedAt`
-
-**Relations:**
-- ← **User** (many:1)
-- ← **List** (many:1)
-
-**Indexes:**
-- `userId`, `status`
+- `id`, `entityId` (FK → entities, unique)
+- `sanctioned_name`, `sanctioned_address`, `sanctioned_phone`, `sanctioned_website`
+- `sanctioned_hours`, `sanctioned_instagram`
+- `sanctioned_latitude`, `sanctioned_longitude`
+- `sanctioned_neighborhood`
+- `menu_url`, `reservation_url`, `reservation_provider`
+- `about_text`, `about_source_url`
+- `updatedAt`
 
 ---
 
-## Enums
+## Enrichment & Signal Tables
 
-### OrganizingLogic
-```typescript
-enum OrganizingLogic {
-  TIME_BASED        // Chronological order (morning → night)
-  NEIGHBORHOOD_BASED // Geographic clustering
-  ROUTE_BASED       // Walking/driving route
-  PURPOSE_BASED     // By activity type
-  LAYERED           // Multiple organizing principles
-}
+### **derived_signals**
+
+AI-extracted structured signals per entity. Keyed by `signalKey`.
+
+- `id`, `entityId` (FK → entities)
+- `signalKey` — e.g., `identity_signals`, `offering_programs`
+- `signalValue` (JSON) — structured extraction output
+- `version`, `createdAt`, `updatedAt`
+
+**Common signal keys:**
+- `identity_signals` — language signals, vibe words, cultural markers
+- `offering_programs` — food_program, wine_program, beer_program, cocktail_program
+
+### **interpretation_cache**
+
+SceneSense and voice engine outputs. Typed by `outputType`.
+
+- `id`, `entityId` (FK → entities)
+- `outputType` (InterpretationType: TAGLINE, PULL_QUOTE, VOICE_DESCRIPTOR, TIMEFOLD)
+- `content` (JSON) — the generated interpretation
+- `isCurrent` (boolean) — marks active version
+- `promptVersion`, `modelVersion`
+- `generatedAt`, `createdAt`
+
+### **energy_scores**
+
+Computed energy scores per entity.
+
+- `id`, `entityId` (FK → entities)
+- `energy_score`, `raw_energy_score`
+- `source_signals` (JSON)
+
+### **place_tag_scores**
+
+Scene/atmosphere tag scores per entity.
+
+- `id`, `entityId` (FK → entities)
+- `tag`, `score`, `raw_score`
+- `source_signals` (JSON)
+
+---
+
+## Coverage Tables
+
+### **coverage_sources**
+
+Editorial articles about entities from approved publications.
+
+- `id`, `entityId` (FK → entities)
+- `url` (unique per entity), `sourceSlug`, `sourceName`
+- `articleTitle`, `articleAuthor`, `articlePublishedAt`
+- `archivedText` — full article text (captured by fetch stage)
+- `enrichmentStage` (CoverageEnrichmentStage: INGESTED, FETCHED, EXTRACTED, FAILED)
+- `sourceType` (CoverageSourceType)
+- `discoveredAt`, `fetchedAt`, `extractedAt`
+
+### **coverage_source_extractions**
+
+AI-extracted signals from coverage articles.
+
+- `id`, `coverageSourceId` (FK → coverage_sources)
+- `entityId` (FK → entities)
+- `people` (JSON) — mentioned chefs/owners
+- `food_evidence`, `beverage_evidence`, `service_evidence` (JSON)
+- `atmosphere_signals`, `origin_story`, `accolades` (JSON)
+- `pull_quotes` (JSON), `sentiment`, `article_type`, `relevance_score`
+- `promptVersion`, `extractedAt`
+
+---
+
+## Instagram Tables
+
+### **instagram_accounts**
+
+One row per entity with an Instagram handle.
+
+- `id`, `entityId` (FK → entities, unique)
+- `instagramUserId` (unique), `username`
+- `mediaCount`, `followersCount`, `followsCount`
+- `accountType` (BUSINESS / CREATOR / PERSONAL)
+- `canonicalInstagramUrl`
+- `rawPayload` (JSON)
+
+### **instagram_media**
+
+Recent media items per account (up to 12 per entity).
+
+- `id`, `instagramAccountId` (FK → instagram_accounts)
+- `instagramMediaId` (unique)
+- `mediaType` (IMAGE / VIDEO / CAROUSEL_ALBUM)
+- `mediaUrl` — CDN URL (expires)
+- `permalink` — permanent IG post URL (fallback)
+- `caption`, `timestamp`
+- `photoType` (nullable) — AI-classified: INTERIOR, FOOD, BAR_DRINKS, CROWD_ENERGY, DETAIL, EXTERIOR
+- `rawPayload` (JSON)
+
+**Photo ranking:** Photos are ranked by `photoType` preference (INTERIOR first, EXTERIOR last). Unclassified photos sort after classified ones.
+
+---
+
+## Merchant Surface Tables
+
+### **merchant_surfaces**
+
+Discovered web pages for entities (homepage, menu, about, contact).
+
+- `id`, `entityId` (FK → entities)
+- `url`, `surfaceType` (homepage, menu, about, contact, instagram, etc.)
+- `discoveredAt`, `fetchedAt`
+
+### **merchant_surface_artifacts**
+
+Structured content extracted from merchant surfaces.
+
+- `id`, `surfaceId` (FK → merchant_surfaces)
+- `artifactType`, `content` (JSON)
+- `extractedAt`
+
+### **merchant_signals**
+
+Structured merchant signals per entity.
+
+- `id`, `entityId` (FK → entities)
+- `menuUrl`, `reservationUrl`, `winelistUrl`
+- `hasOnlineOrdering`, `hasDelivery`
+- Various boolean/string fields for service capabilities
+
+---
+
+## Map & List Tables
+
+### **lists** (maps/guides)
+
+User-created curated maps.
+
+- `id` (UUID), `userId` (FK → users), `slug` (unique)
+- `title`, `subtitle`, `description`, `introText`
+- `organizingLogic` (OrganizingLogic enum)
+- `status` (MapStatus: DRAFT, READY, PUBLISHED, ARCHIVED)
+- `templateType` (currently: "field-notes")
+- `published` (boolean), `publishedAt`
+- `accessLevel` (public / password / private)
+- `coverImageUrl`, `primaryColor`, `secondaryColor`
+- `viewCount`
+
+### **map_places** (junction table)
+
+Many-to-many: Entity ↔ List. Same entity can appear on multiple maps with different curator context.
+
+- `id`, `mapId` (FK → lists), `entityId` (FK → entities)
+- `descriptor` (VARCHAR 120) — curator's editorial note for this map
+- `userNote`, `userPhotos[]`
+- `orderIndex`
+- Unique constraint: `[mapId, entityId]`
+
+---
+
+## User Tables
+
+### **users**
+- `id`, `email` (unique), `name`, `passwordHash`
+- `subscriptionTier` (free / personal / business)
+- `avatarUrl`
+
+### **viewer_bookmarks**
+- `viewerUserId` (FK → users), `placeId` (FK → entities)
+- `visited` (boolean), `personalNote`
+
+---
+
+## People & Actor Tables
+
+### **people**
+- `id`, `slug`, `name`, `role` (PersonRole), `bio`, `imageUrl`
+
+### **person_places**
+- `personId` (FK → people), `entityId` (FK → entities)
+- `role` (PersonPlaceRole: CHEF, OWNER, FOUNDER, etc.)
+
+### **Actor** / **EntityActorRelationship**
+- Restaurant group / operator relationships to entities
+
+---
+
+## Resolution Tables
+
+### **gpid_resolution_queue**
+- Entities needing Google Place ID resolution
+- `entityId`, `status` (GpidResolverStatus), `matchConfidence`
+- Human review fields: `humanStatus`, `humanDecision`
+
+### **entity_issues**
+- Data quality issues detected by issue scanner
+- `entityId`, `issueType`, `severity`, `details` (JSON)
+- `resolvedAt` — null until resolved
+
+---
+
+## Key Enums
+
+### PrimaryVertical (13 values)
+```
+EAT · COFFEE · WINE · DRINKS · BAKERY · SHOP · CULTURE ·
+NATURE · STAY · WELLNESS · PURVEYORS · ACTIVITY · PARKS
+```
+Note: `CANDIDATE` appears in the legacy `PlaceStatus` enum for pre-enrichment intake entities. In the three-axis model, this maps to `enrichmentStatus: INGESTED`.
+
+### Entity State Enums (Three-Axis Model)
+```
+OperatingStatus:   SOFT_OPEN · OPERATING · TEMPORARILY_CLOSED · PERMANENTLY_CLOSED
+EnrichmentStatus:  INGESTED · ENRICHING · ENRICHED
+PublicationStatus:  PUBLISHED · UNPUBLISHED
 ```
 
-### MapStatus
-```typescript
-enum MapStatus {
-  DRAFT      // Being created
-  READY      // Ready to publish
-  PUBLISHED  // Live and public
-  ARCHIVED   // Hidden from public
-}
+### Legacy PlaceStatus (being migrated to three-axis model)
+```
+PlaceStatus:  CANDIDATE · OPEN · CLOSED · PERMANENTLY_CLOSED
 ```
 
-### LayerType
-```typescript
-enum LayerType {
-  SKATE  // Skateboarding spots
-  SURF   // Surf breaks
-}
+### Coverage Pipeline
+```
+CoverageEnrichmentStage:  INGESTED · FETCHED · EXTRACTED · FAILED
 ```
 
-### SpotSource
-```typescript
-enum SpotSource {
-  OSM          // OpenStreetMap
-  CITY_DATA    // Official city datasets
-  EDITORIAL    // Curated by team
-  COMMUNITY    // User-contributed
-}
+### Interpretation Types
+```
+InterpretationType:  TAGLINE · PULL_QUOTE · VOICE_DESCRIPTOR · TIMEFOLD
 ```
 
 ---
 
 ## Key Data Flows
 
-### 1. Map Creation Flow
+### Entity Enrichment Flow
+```
+Entity created (enrichmentStatus: INGESTED, publicationStatus: UNPUBLISHED)
+  ↓
+Smart Enrich (website + IG discovery)
+  ↓
+Enrichment triggered (enrichmentStatus: ENRICHING)
+  ↓
+Full Pipeline stages 1–7 (Google → AI signals → interpretation)
+  ↓
+Pipeline complete (enrichmentStatus: ENRICHED)
+  ↓
+Coverage source enrichment (discover → fetch → extract)
+  ↓
+Instagram ingestion (account + media + photo classification)
+  ↓
+Issue scanner: blocking issues resolved → publication gate
+  ↓
+Entity published (publicationStatus: PUBLISHED)
+```
+
+### Map Creation Flow
 ```
 User creates List
   ↓
-Add Places to MapPlace (with descriptor, order)
+Add Entities to MapPlace (with descriptor, order)
   ↓
-Link to canonical Place entity
-  ↓
-Backfill Google Places data on Place
-  ↓
-Generate AI content (Voice Engine) on Place
+Link to canonical Entity
   ↓
 Publish List (status: PUBLISHED)
 ```
 
-### 2. Public Viewing Flow
+### Entity Page Serving Flow
 ```
-User visits /map/[slug]
+Request: GET /api/places/[slug]
   ↓
-Fetch List by slug
+Fetch entity + derived_signals + interpretation_cache
   ↓
-Get MapPlaces (ordered, with descriptors)
+Fetch Instagram photos (ranked by photoType)
   ↓
-Join to Places (with Google + AI data)
+Fetch coverage highlights
   ↓
-Render Field Notes template
+Assemble EntityPageData contract
+  ↓
+Return to consumer layer
 ```
-
-### 3. Place Enrichment Flow
-```
-Place created with googlePlaceId
-  ↓
-Backfill script fetches Google Places API
-  ↓
-Updates: photos, hours, phone, address, types, priceLevel
-  ↓
-Voice Engine generates: tagline, tips, pullQuote (language signals now in `identity_signals.language_signals` via SceneSense)
-  ↓
-Place now "enriched" and ready for display
-```
-
----
-
-## Migration Notes
-
-### Location → Place Migration
-**Status:** In progress (both models coexist)
-
-**Legacy:** `Location` was tied directly to `List` (1:many)
-**New:** `Place` is canonical, `MapPlace` enables many:many
-
-**Benefits:**
-- Same place can appear on multiple maps
-- Enrichment (Google + AI) done once per place
-- Better data consistency
-- Separate curator context (MapPlace) from canonical data (Place)
-
-**Next Steps:**
-- Migrate remaining Location data to Place/MapPlace
-- Update all queries to use Place/MapPlace
-- Deprecate Location model

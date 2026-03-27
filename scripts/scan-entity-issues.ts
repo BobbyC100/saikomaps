@@ -55,19 +55,19 @@ async function main() {
 
   // Summary
   console.log('\n--- Scan Complete ---');
-  console.log(`Entities scanned: ${result.entities_scanned}`);
-  console.log(`Issues created:   ${result.issues_created}`);
-  console.log(`Issues resolved:  ${result.issues_resolved}`);
-  console.log(`Issues unchanged: ${result.issues_unchanged}`);
+  console.log(`Entities scanned: ${result.entitiesScanned}`);
+  console.log(`Issues created:   ${result.issuesCreated}`);
+  console.log(`Issues resolved:  ${result.issuesResolved}`);
+  console.log(`Issues unchanged: ${result.issuesUnchanged}`);
 
   if (showSummary || verbose) {
     console.log('\nIssue type breakdown:');
     // Show all rule types, sorted by count descending
     const sorted = ISSUE_RULES.map((r) => ({
-      type: r.issue_type,
-      class: r.problem_class,
+      type: r.issueType,
+      class: r.problemClass,
       severity: r.severity,
-      count: result.by_type[r.issue_type] ?? 0,
+      count: result.byType[r.issueType] ?? 0,
     })).sort((a, b) => b.count - a.count);
 
     for (const row of sorted) {
@@ -84,14 +84,14 @@ async function main() {
 
   // Show entities with most issues (top 10)
   if (verbose && result.results.length > 0) {
-    const withIssues = result.results.filter((r) => r.issues_created > 0);
+    const withIssues = result.results.filter((r) => r.issuesCreated > 0);
     if (withIssues.length > 0) {
       console.log(`\nTop entities by new issues:`);
       const top = withIssues
-        .sort((a, b) => b.issues_created - a.issues_created)
+        .sort((a, b) => b.issuesCreated - a.issuesCreated)
         .slice(0, 10);
       for (const r of top) {
-        console.log(`  ${r.slug.padEnd(35)} +${r.issues_created} new`);
+        console.log(`  ${r.slug.padEnd(35)} +${r.issuesCreated} new`);
       }
     }
   }

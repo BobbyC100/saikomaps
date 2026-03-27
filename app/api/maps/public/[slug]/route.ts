@@ -72,11 +72,12 @@ export async function GET(
     });
     
     // Enrich mapPlaces with identity signals (closed places already excluded)
-    const enrichedMapPlaces = openMapPlaces.map(mp => {
+    const enrichedMapPlaces = openMapPlaces.map((mp) => {
       const signals = signalsMap.get(mp.entities.id) ?? null;
       return {
         ...mp,
-        places: {
+        // Keep the legacy `place` contract expected by the map page.
+        place: {
           ...mp.entities,
           placePersonality: signals?.placePersonality || null,
           priceTier: signals?.priceTier || null,

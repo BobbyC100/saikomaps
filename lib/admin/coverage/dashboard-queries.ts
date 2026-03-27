@@ -142,8 +142,16 @@ export async function fetchCoverageDashboardData(): Promise<CoverageDashboardDat
         COUNT(CASE WHEN latitude IS NOT NULL AND longitude IS NOT NULL THEN 1 END)::int AS has_coords,
         COUNT(CASE WHEN neighborhood IS NOT NULL THEN 1 END)::int AS has_neighborhood,
         COUNT(CASE WHEN google_place_id IS NULL AND latitude IS NULL THEN 1 END)::int AS unresolved
-      FROM entities
-      WHERE status != 'CANDIDATE'
+      FROM entities e
+      WHERE
+        (
+          e.enrichment_status IN ('INGESTED'::"EnrichmentStatus", 'ENRICHING'::"EnrichmentStatus", 'ENRICHED'::"EnrichmentStatus")
+          OR (e.enrichment_status IS NULL AND e.status != 'CANDIDATE'::"PlaceStatus")
+        )
+        AND NOT (
+          e.operating_status = 'PERMANENTLY_CLOSED'::"OperatingStatus"
+          OR (e.operating_status IS NULL AND e.status = 'PERMANENTLY_CLOSED'::"PlaceStatus")
+        )
     `.then(serialize),
 
     // Panel 1 — Tier Summary (3-tier: healthy / needs_work / unresolved)
@@ -157,14 +165,31 @@ export async function fetchCoverageDashboardData(): Promise<CoverageDashboardDat
         COUNT(*)::int AS count
       FROM entity_enrichment_tiers t
       JOIN entities e ON e.id = t.id
-      WHERE e.status != 'CANDIDATE'
+      WHERE
+        (
+          e.enrichment_status IN ('INGESTED'::"EnrichmentStatus", 'ENRICHING'::"EnrichmentStatus", 'ENRICHED'::"EnrichmentStatus")
+          OR (e.enrichment_status IS NULL AND e.status != 'CANDIDATE'::"PlaceStatus")
+        )
+        AND NOT (
+          e.operating_status = 'PERMANENTLY_CLOSED'::"OperatingStatus"
+          OR (e.operating_status IS NULL AND e.status = 'PERMANENTLY_CLOSED'::"PlaceStatus")
+        )
       GROUP BY display_tier
     `.then(serialize),
 
     // Panel 1b — Vertical breakdown
     db.$queryRaw<VerticalRow[]>`
       SELECT COALESCE(primary_vertical::text, 'unknown') AS primary_vertical, COUNT(*)::int AS count
-      FROM entities WHERE status != 'CANDIDATE'
+      FROM entities e
+      WHERE
+        (
+          e.enrichment_status IN ('INGESTED'::"EnrichmentStatus", 'ENRICHING'::"EnrichmentStatus", 'ENRICHED'::"EnrichmentStatus")
+          OR (e.enrichment_status IS NULL AND e.status != 'CANDIDATE'::"PlaceStatus")
+        )
+        AND NOT (
+          e.operating_status = 'PERMANENTLY_CLOSED'::"OperatingStatus"
+          OR (e.operating_status IS NULL AND e.status = 'PERMANENTLY_CLOSED'::"PlaceStatus")
+        )
       GROUP BY primary_vertical ORDER BY count DESC
     `.then(serialize),
 
@@ -179,7 +204,15 @@ export async function fetchCoverageDashboardData(): Promise<CoverageDashboardDat
              THEN COALESCE(e.editorial_sources->'sources', '[]'::jsonb)
              ELSE '[]'::jsonb END
       ) AS source_val ON true
-      WHERE e.status != 'CANDIDATE'
+      WHERE
+        (
+          e.enrichment_status IN ('INGESTED'::"EnrichmentStatus", 'ENRICHING'::"EnrichmentStatus", 'ENRICHED'::"EnrichmentStatus")
+          OR (e.enrichment_status IS NULL AND e.status != 'CANDIDATE'::"PlaceStatus")
+        )
+        AND NOT (
+          e.operating_status = 'PERMANENTLY_CLOSED'::"OperatingStatus"
+          OR (e.operating_status IS NULL AND e.status = 'PERMANENTLY_CLOSED'::"PlaceStatus")
+        )
       GROUP BY source_val
       ORDER BY count DESC
       LIMIT 10
@@ -195,7 +228,15 @@ export async function fetchCoverageDashboardData(): Promise<CoverageDashboardDat
         ROUND(AVG(t.field_completion) * 100, 1)::float8 AS avg_completion_pct
       FROM entity_enrichment_tiers t
       JOIN entities e ON e.id = t.id
-      WHERE e.status != 'CANDIDATE'
+      WHERE
+        (
+          e.enrichment_status IN ('INGESTED'::"EnrichmentStatus", 'ENRICHING'::"EnrichmentStatus", 'ENRICHED'::"EnrichmentStatus")
+          OR (e.enrichment_status IS NULL AND e.status != 'CANDIDATE'::"PlaceStatus")
+        )
+        AND NOT (
+          e.operating_status = 'PERMANENTLY_CLOSED'::"OperatingStatus"
+          OR (e.operating_status IS NULL AND e.status = 'PERMANENTLY_CLOSED'::"PlaceStatus")
+        )
       GROUP BY ${NEIGHBORHOOD_NORM}
       ORDER BY needs_work DESC, total DESC
     `.then(serialize),
@@ -235,7 +276,15 @@ export async function fetchCoverageDashboardData(): Promise<CoverageDashboardDat
       FROM entity_enrichment_tiers t
       JOIN entities e ON e.id = t.id
       WHERE t.enrichment_tier IN ('partial', 'sparse')
-        AND e.status = 'OPEN'
+        AND (
+          e.enrichment_status IN ('INGESTED'::"EnrichmentStatus", 'ENRICHING'::"EnrichmentStatus", 'ENRICHED'::"EnrichmentStatus")
+          OR (e.enrichment_status IS NULL AND e.status != 'CANDIDATE'::"PlaceStatus")
+        )
+        AND NOT (
+          e.operating_status = 'TEMPORARILY_CLOSED'::"OperatingStatus"
+          OR e.operating_status = 'PERMANENTLY_CLOSED'::"OperatingStatus"
+          OR (e.operating_status IS NULL AND e.status IN ('CLOSED'::"PlaceStatus", 'PERMANENTLY_CLOSED'::"PlaceStatus"))
+        )
       ORDER BY t.field_completion ASC
       LIMIT 50
     `.then(serialize),

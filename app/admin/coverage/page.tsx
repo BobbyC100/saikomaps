@@ -22,7 +22,7 @@ import { useCallback, useEffect, useState } from 'react';
 interface DashboardData {
   totalEntities: number;
   publishedCount: number;
-  ingestedCount: number;
+  notEnrichedCount: number;
   systemSummary: {
     operatingStatus: StatusCount[];
     enrichmentStatus: StatusCount[];
@@ -192,7 +192,7 @@ export default function CoverageDashboard() {
           <p className="text-sm mt-1" style={{ color: C.muted }}>
             {data.totalEntities.toLocaleString()} entities &middot;{' '}
             {data.publishedCount.toLocaleString()} published &middot;{' '}
-            {data.ingestedCount.toLocaleString()} ingested
+            {data.notEnrichedCount.toLocaleString()} not enriched
           </p>
         </header>
 

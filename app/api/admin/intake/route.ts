@@ -192,6 +192,8 @@ async function processOne(input: IntakeInput): Promise<IntakeResult> {
         neighborhood: neighborhood || undefined,
         primaryVertical: 'EAT',
         status: 'CANDIDATE',
+        enrichmentStatus: 'INGESTED',
+        publicationStatus: 'UNPUBLISHED',
         editorialSources: source ? { sources: [source] } : undefined,
       },
       select: { id: true, slug: true, name: true, status: true, googlePlaceId: true },

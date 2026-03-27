@@ -123,7 +123,23 @@ export async function GET(request: NextRequest) {
           { category: { contains: queryLower, mode: 'insensitive' } },
           { cuisineType: { contains: queryLower, mode: 'insensitive' } },
         ],
-        status: 'OPEN',
+        AND: [
+          {
+            OR: [
+              { publicationStatus: 'PUBLISHED' },
+              { publicationStatus: null, status: 'OPEN' },
+            ],
+          },
+          {
+            NOT: {
+              OR: [
+                { operatingStatus: 'TEMPORARILY_CLOSED' },
+                { operatingStatus: 'PERMANENTLY_CLOSED' },
+                { operatingStatus: null, status: { in: ['CLOSED', 'PERMANENTLY_CLOSED'] } },
+              ],
+            },
+          },
+        ],
       },
       select: {
         id: true,
