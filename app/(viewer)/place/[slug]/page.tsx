@@ -1228,6 +1228,27 @@ export default function PlacePage() {
                     </div>
                   </>
                 )}
+
+                {appendixGroups.length > 0 && (
+                  <nav id="appendix-index" aria-label="Appendix navigation">
+                    <div className="sk-section-header"><span>Index</span></div>
+                    <ul>
+                      {appendixGroups.map((group) => (
+                        <li key={group.anchorId}>
+                          <a href={`#${group.anchorId}`}>{group.label}</a>
+                        </li>
+                      ))}
+                      <li><a href="#appendix-methodology">Methodology</a></li>
+                    </ul>
+                    <div className="reference-legend">
+                      <svg className="legend-globe" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                      </svg>
+                      <span>Section references<br/>Links to source entry in References</span>
+                    </div>
+                  </nav>
+                )}
                 </aside>
               )}
             </div>
@@ -1334,26 +1355,6 @@ export default function PlacePage() {
             <hr className="heavy-rule" />
 
             <footer id="place-appendix">
-              {/* INDEX column */}
-              <nav id="appendix-index" aria-label="Appendix navigation">
-                <h2>Index</h2>
-                <ul>
-                  {appendixGroups.map((group) => (
-                    <li key={group.anchorId}>
-                      <a href={`#${group.anchorId}`}>{group.label}</a>
-                    </li>
-                  ))}
-                  <li><a href="#appendix-methodology">Methodology</a></li>
-                </ul>
-                <div className="reference-legend">
-                  <svg className="legend-globe" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="12" cy="12" r="10"/>
-                    <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-                  </svg>
-                  <span>Section references<br/>Links to source entry in References</span>
-                </div>
-              </nav>
-
               {/* REFERENCES column */}
               <div id="appendix-references">
                 <h2>References</h2>
