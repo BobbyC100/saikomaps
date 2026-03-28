@@ -22,6 +22,8 @@ import { VERTICAL_DISPLAY } from '@/lib/primaryVertical';
 import {
   fetchPlaceForPRLBySlug,
   assembleSceneSenseFromMaterialized,
+  buildCoverageAtmosphereInput,
+  type CoverageAtmosphereExtractionRow,
 } from '@/lib/scenesense';
 import type { EntityPageData, EntityPageLocation, EntityPageCoverageHighlights } from '@/lib/contracts/entity-page';
 import { materializeCoverageEvidence } from '@/lib/coverage/normalize-evidence';
@@ -274,7 +276,7 @@ export async function GET(
     const publishedMapPlaces = entity.map_places.filter((mp) => mp.lists && mp.lists.status === 'PUBLISHED');
     const mapIds = publishedMapPlaces.map(mp => mp.lists!.id);
 
-    const [activeOverlays, placeCounts, coverageSources, identitySignalsRow, offeringProgramsRow, taglineRow, pullQuoteRow, voiceDescriptorRow, timefoldRow] = await Promise.all([
+    const [activeOverlays, placeCounts, coverageSources, identitySignalsRow, offeringProgramsRow, taglineRow, pullQuoteRow, voiceDescriptorRow, timefoldRow, coverageAtmosphereRows] = await Promise.all([
       getActiveOverlays({ placeId: entity.id, now: new Date() }).catch((err) => {
         console.error(`[Newsletter Overlay] Failed to fetch overlays for place ${entity.slug}:`, err);
         return [] as Awaited<ReturnType<typeof getActiveOverlays>>;
@@ -336,6 +338,17 @@ export async function GET(
         select: { content: true },
         orderBy: { generatedAt: 'desc' },
       }).catch(() => null),
+      db.coverage_source_extractions.findMany({
+        where: {
+          // Must match cache-warmer filter to guarantee shared-assembly parity.
+          isCurrent: true,
+          coverageSource: { entityId: entity.id },
+        },
+        select: {
+          isCurrent: true,
+          atmosphereSignals: true,
+        },
+      }).catch(() => [] as CoverageAtmosphereExtractionRow[]),
     ]);
 
     // Service facts from google_places_attributes — null until that column is added to entities
@@ -403,6 +416,7 @@ export async function GET(
           neighborhood: entity.neighborhood,
           category: entity.category ?? (entity as any).category_rel?.slug ?? null,
           identitySignals: sv ? { place_personality: placePersonality, language_signals: languageSignals, signature_dishes: signatureDishes } : null,
+          coverageAtmosphere: buildCoverageAtmosphereInput(coverageAtmosphereRows),
         })
       : { prl: 1 as const, mode: 'LITE' as const, scenesense: null, prlResult: null as never };
 

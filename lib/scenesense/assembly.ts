@@ -12,8 +12,8 @@ import type { PlaceForPRL } from './prl';
 import { generateSceneSenseCopy, type Mode, type VoiceOutput } from './voice-engine';
 import { lintSceneSenseOutput } from './lint';
 import { mapPlaceToPlaceForPRL } from './mappers';
-import { mapToCanonicalSceneSense } from './mappers';
-import type { PRL } from './types';
+import { mapToCanonicalSceneSense, mergeCoverageIntoCanonical } from './mappers';
+import type { CoverageAtmosphereInput, PRL } from './types';
 
 interface PlaceForAssembly {
   name?: string | null;
@@ -64,6 +64,7 @@ export function assembleSceneSenseFromMaterialized(args: {
     language_signals?: string[];
     signature_dishes?: string[];
   } | null;
+  coverageAtmosphere?: CoverageAtmosphereInput | null;
 }): SceneSenseAssemblyResult {
   const prlOverride =
     args.placeForPRL.prlOverride != null &&
@@ -85,13 +86,17 @@ export function assembleSceneSenseFromMaterialized(args: {
   }
 
   const mode: Mode = prl >= 4 ? 'FULL' : 'LITE';
-  const canonical = mapToCanonicalSceneSense({
+  const canonicalIdentity = mapToCanonicalSceneSense({
     language_signals: args.identitySignals?.language_signals ?? [],
     place_personality: args.identitySignals?.place_personality ?? null,
     signature_dishes: args.identitySignals?.signature_dishes ?? [],
     neighborhood: args.neighborhood ?? null,
     category: args.category ?? null,
   });
+  const canonical = mergeCoverageIntoCanonical(
+    canonicalIdentity,
+    args.coverageAtmosphere ?? null,
+  );
 
   const hasLanguageSignals = (args.identitySignals?.language_signals ?? []).length > 0;
   const hasDishes =

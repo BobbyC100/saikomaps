@@ -4,6 +4,12 @@
 
 import type { PlaceForPRL } from './prl';
 import type { CanonicalSceneSense } from './voice-engine';
+import type {
+  CoverageAtmosphereInput,
+  CoverageAtmosphereMapping,
+  EnergyToken,
+  SceneFormalityToken,
+} from './types';
 
 /**
  * Maps raw language signals to canonical energy tokens for the Energy lens.
@@ -25,6 +31,129 @@ const LANGUAGE_SIGNAL_TO_ENERGY: Record<string, 'BUZZY' | 'CHILL' | 'LIVELY' | '
   airy: 'CALM',
   'sun-drenched': 'CALM',
 };
+
+export const COVERAGE_DESCRIPTOR_TO_ENERGY: Record<string, EnergyToken> = {
+  buzzy: 'BUZZY',
+  bustling: 'BUZZY',
+  energetic: 'LIVELY',
+  lively: 'LIVELY',
+  vibrant: 'LIVELY',
+  chill: 'CHILL',
+  cozy: 'CHILL',
+  'laid-back': 'CHILL',
+  intimate: 'CALM',
+  quiet: 'CALM',
+  serene: 'CALM',
+  moody: 'CALM',
+  'low-key': 'LOW_KEY',
+  relaxed: 'LOW_KEY',
+  steady: 'STEADY',
+};
+
+export const COVERAGE_DESCRIPTOR_TO_ATMOSPHERE: Record<string, CoverageAtmosphereMapping> = {
+  'dimly-lit': { field: 'lighting', value: 'DIM' },
+  candlelit: { field: 'lighting', value: 'DIM' },
+  bright: { field: 'lighting', value: 'BRIGHT' },
+  'sun-drenched': { field: 'lighting', value: 'BRIGHT' },
+  'warm-lit': { field: 'lighting', value: 'WARM' },
+  loud: { field: 'noise', value: 'LOUD' },
+  noisy: { field: 'noise', value: 'LOUD' },
+  quiet: { field: 'noise', value: 'QUIET' },
+  hushed: { field: 'noise', value: 'QUIET' },
+  packed: { field: 'density', value: 'PACKED' },
+  crowded: { field: 'density', value: 'PACKED' },
+  cramped: { field: 'density', value: 'TIGHT' },
+  tight: { field: 'density', value: 'TIGHT' },
+  spacious: { field: 'density', value: 'AIRY' },
+  airy: { field: 'density', value: 'AIRY' },
+};
+
+export const COVERAGE_FORMALITY_TO_SCENE: Record<string, SceneFormalityToken> = {
+  casual: 'CASUAL',
+  relaxed: 'CASUAL',
+  informal: 'CASUAL',
+  'smart-casual': 'CASUAL_REFINED',
+  'casual-refined': 'CASUAL_REFINED',
+  polished: 'CASUAL_REFINED',
+  upscale: 'REFINED',
+  refined: 'REFINED',
+  formal: 'REFINED',
+  'fine-dining': 'REFINED',
+};
+
+function normalizeCoverageKey(value: string): string {
+  return value.trim().toLowerCase();
+}
+
+export function mergeCoverageIntoCanonical(
+  canonical: CanonicalSceneSense,
+  coverage?: CoverageAtmosphereInput | null,
+): CanonicalSceneSense {
+  if (!coverage || coverage.sourceCount <= 0) return canonical;
+
+  const descriptors = (coverage.descriptors ?? [])
+    .map(normalizeCoverageKey)
+    .filter(Boolean);
+
+  const merged: CanonicalSceneSense = {
+    ...canonical,
+    atmosphere: canonical.atmosphere ? { ...canonical.atmosphere } : undefined,
+    energy: canonical.energy ? { ...canonical.energy } : undefined,
+    scene: canonical.scene ? { ...canonical.scene } : undefined,
+  };
+
+  for (const descriptor of descriptors) {
+    const mapping = COVERAGE_DESCRIPTOR_TO_ATMOSPHERE[descriptor];
+    if (!mapping) continue;
+
+    if (!merged.atmosphere) merged.atmosphere = {};
+    if (mapping.field === 'lighting' && !merged.atmosphere.lighting) {
+      merged.atmosphere.lighting = mapping.value;
+    }
+    if (mapping.field === 'noise' && !merged.atmosphere.noise) {
+      merged.atmosphere.noise = mapping.value;
+    }
+    if (mapping.field === 'density' && !merged.atmosphere.density) {
+      merged.atmosphere.density = mapping.value;
+    }
+  }
+
+  const hasEnergy = Boolean(merged.energy?.tokens?.length);
+  if (!hasEnergy) {
+    const descriptorTokens: EnergyToken[] = [];
+    for (const descriptor of descriptors) {
+      const token = COVERAGE_DESCRIPTOR_TO_ENERGY[descriptor];
+      if (token && !descriptorTokens.includes(token)) descriptorTokens.push(token);
+    }
+    if (descriptorTokens.length > 0) {
+      merged.energy = {
+        ...(merged.energy ?? {}),
+        tokens: descriptorTokens,
+      };
+    } else if (coverage.energyLevel) {
+      const energyToken = COVERAGE_DESCRIPTOR_TO_ENERGY[normalizeCoverageKey(coverage.energyLevel)];
+      if (energyToken) {
+        merged.energy = {
+          ...(merged.energy ?? {}),
+          tokens: [energyToken],
+        };
+      }
+    }
+  }
+
+  const hasFormality = Boolean(merged.scene?.formality);
+  if (!hasFormality && coverage.formality) {
+    const formality = COVERAGE_FORMALITY_TO_SCENE[normalizeCoverageKey(coverage.formality)];
+    if (formality) {
+      merged.scene = {
+        ...(merged.scene ?? {}),
+        formality,
+      };
+    }
+  }
+
+  return merged;
+}
 
 /** Map our API/DB place shape to PlaceForPRL */
 export function mapPlaceToPlaceForPRL(place: {
