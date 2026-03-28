@@ -2,6 +2,7 @@
  * SceneSense — Display Contract & Types
  * Spec: place-page-visual-design-spec.md (bundle)
  */
+import type { CanonicalSceneSense } from './voice-engine';
 
 /** Place Readiness Level 1–4 */
 export type PRL = 1 | 2 | 3 | 4;
@@ -47,6 +48,26 @@ export interface VoiceEngineInput {
 
 /** Voice Engine output */
 export type VoiceOutput = SceneSenseOutput;
+
+export type EnergyToken = NonNullable<CanonicalSceneSense['energy']>['tokens'] extends Array<infer T>
+  ? T
+  : never;
+export type SceneFormalityToken = NonNullable<CanonicalSceneSense['scene']>['formality'];
+export type AtmosphereLightingToken = NonNullable<CanonicalSceneSense['atmosphere']>['lighting'];
+export type AtmosphereNoiseToken = NonNullable<CanonicalSceneSense['atmosphere']>['noise'];
+export type AtmosphereDensityToken = NonNullable<CanonicalSceneSense['atmosphere']>['density'];
+
+export type CoverageAtmosphereMapping =
+  | { field: 'lighting'; value: AtmosphereLightingToken }
+  | { field: 'noise'; value: AtmosphereNoiseToken }
+  | { field: 'density'; value: AtmosphereDensityToken };
+
+export interface CoverageAtmosphereInput {
+  descriptors: string[];
+  energyLevel: string | null;
+  formality: string | null;
+  sourceCount: number;
+}
 
 /** Lint severity */
 export type LintSeverity = 'error' | 'warning';
