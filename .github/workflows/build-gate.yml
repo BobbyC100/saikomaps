@@ -3,6 +3,13 @@ name: Build Gate
 on:
   pull_request:
     branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: build-gate-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build-gate:
