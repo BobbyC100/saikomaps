@@ -927,7 +927,7 @@
   margin-top: var(--pp-section-gap);
   padding-top: 1.25em;
   display: grid;
-  grid-template-columns: 1fr 240px;
+  grid-template-columns: 1fr;
   column-gap: 24px;
   row-gap: 16px;
 }
