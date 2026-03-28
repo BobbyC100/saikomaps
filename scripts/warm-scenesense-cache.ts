@@ -24,6 +24,8 @@ import {
   fetchPlaceForPRLBatch,
   fetchPlaceForPRLBySlug,
   assembleSceneSenseFromMaterialized,
+  buildCoverageAtmosphereInput,
+  type CoverageAtmosphereExtractionRow,
 } from '@/lib/scenesense';
 import { writeInterpretationCache } from '@/lib/fields-v2/write-claim';
 
@@ -113,6 +115,36 @@ async function main() {
   });
 
   const entityBySlug = new Map(entities.map((e) => [e.slug, e]));
+  const entityIds = entities.map((e) => e.id);
+  const coverageRows = entityIds.length > 0
+    ? await db.coverage_source_extractions.findMany({
+        where: {
+          // SceneSense coverage input must only use current extractions so warmer and route stay parity-safe.
+          isCurrent: true,
+          coverageSource: {
+            entityId: { in: entityIds },
+          },
+        },
+        select: {
+          isCurrent: true,
+          atmosphereSignals: true,
+          coverageSource: {
+            select: {
+              entityId: true,
+            },
+          },
+        },
+      })
+    : [];
+  const coverageRowsByEntityId = new Map<string, CoverageAtmosphereExtractionRow[]>();
+  for (const row of coverageRows) {
+    const entityCoverageRows = coverageRowsByEntityId.get(row.coverageSource.entityId) ?? [];
+    entityCoverageRows.push({
+      isCurrent: row.isCurrent,
+      atmosphereSignals: row.atmosphereSignals,
+    });
+    coverageRowsByEntityId.set(row.coverageSource.entityId, entityCoverageRows);
+  }
 
   let processed = 0;
   let warmed = 0;
@@ -135,11 +167,15 @@ async function main() {
 
     try {
       const identity = parseIdentity(entity.derived_signals[0]?.signalValue ?? null);
+      const coverageAtmosphere = buildCoverageAtmosphereInput(
+        coverageRowsByEntityId.get(entity.id),
+      );
       const result = assembleSceneSenseFromMaterialized({
         placeForPRL: p,
         neighborhood: entity.neighborhood,
         category: entity.category ?? entity.category_rel?.slug ?? null,
         identitySignals: identity,
+        coverageAtmosphere,
       });
 
       if (!dryRun) {

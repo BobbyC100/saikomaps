@@ -19,7 +19,15 @@ export {
   type CanonicalSceneSense,
 } from './voice-engine';
 export { lintSceneSenseOutput, type LintResult } from './lint';
-export { mapPlaceToPlaceForPRL, mapToCanonicalSceneSense } from './mappers';
+export {
+  mapPlaceToPlaceForPRL,
+  mapToCanonicalSceneSense,
+  mergeCoverageIntoCanonical,
+} from './mappers';
+export {
+  buildCoverageAtmosphereInput,
+  type CoverageAtmosphereExtractionRow,
+} from './coverage';
 export {
   fetchPlaceForPRLBySlug,
   fetchPlaceForPRLBatch,
