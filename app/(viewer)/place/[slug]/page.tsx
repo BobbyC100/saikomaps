@@ -1398,7 +1398,7 @@ export default function PlacePage() {
               )}
 
               {/* PLATE MARK */}
-              <p id="plate-mark">Saiko Fields: TRACES — Los Angeles</p>
+              <p id="plate-mark">Saiko Fields: Los Angeles</p>
             </footer>
           </div>
         </div>
