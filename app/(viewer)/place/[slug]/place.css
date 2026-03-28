@@ -933,9 +933,7 @@
 }
 
 /* ── Shared column headers (INDEX | REFERENCES | COVERAGE) ── */
-#appendix-index h2,
 #appendix-references > h2,
-#appendix-coverage h2 {
   font-family: var(--pp-font-ui);
   font-size: var(--pp-font-micro);
   font-weight: var(--pp-l1-weight);

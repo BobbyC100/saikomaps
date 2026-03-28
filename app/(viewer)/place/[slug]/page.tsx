@@ -1229,6 +1229,28 @@ export default function PlacePage() {
                   </>
                 )}
 
+                {location.coverageSources && location.coverageSources.length > 0 && (
+                  <div id="appendix-coverage">
+                    <div className="sk-section-header"><span>Coverage</span></div>
+                    <ul className="coverage-entries">
+                      {location.coverageSources.map((cs) => (
+                        <li key={cs.url} className="coverage-entry">
+                          <span className="coverage-source-name">{cs.sourceName}</span>
+                          {cs.excerpt && <p className="coverage-excerpt">{cs.excerpt}</p>}
+                          {cs.publishedAt && (
+                            <span className="coverage-date">
+                              {new Date(cs.publishedAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+                            </span>
+                          )}
+                          <a href={cs.url} target="_blank" rel="noopener noreferrer" className="coverage-read-link">
+                            Read article <span className="action-arrow">↗</span>
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
                 {appendixGroups.length > 0 && (
                   <nav id="appendix-index" aria-label="Appendix navigation">
                     <div className="sk-section-header"><span>Index</span></div>
@@ -1373,29 +1395,6 @@ export default function PlacePage() {
                   <p><Link href="/sources">How Saiko assembles place pages</Link></p>
                 </div>
               </div>
-
-              {/* COVERAGE column — collapse silently when empty */}
-              {location.coverageSources && location.coverageSources.length > 0 && (
-                <div id="appendix-coverage">
-                  <h2>Coverage</h2>
-                  <ul className="coverage-entries">
-                    {location.coverageSources.map((cs) => (
-                      <li key={cs.url} className="coverage-entry">
-                        <span className="coverage-source-name">{cs.sourceName}</span>
-                        {cs.excerpt && <p className="coverage-excerpt">{cs.excerpt}</p>}
-                        {cs.publishedAt && (
-                          <span className="coverage-date">
-                            {new Date(cs.publishedAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
-                          </span>
-                        )}
-                        <a href={cs.url} target="_blank" rel="noopener noreferrer" className="coverage-read-link">
-                          Read article <span className="action-arrow">↗</span>
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
 
               {/* PLATE MARK */}
               <p id="plate-mark">Saiko Fields: Los Angeles</p>
