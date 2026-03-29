@@ -319,8 +319,8 @@ const WINE_SIGNAL_PHRASES: Record<string, string> = {
 
 /** Beer program signal → descriptive fragment (Locked v1) */
 const BEER_SIGNAL_PHRASES: Record<string, string> = {
-  beer_program: 'beer on the menu',
-  'coverage:beer_mentioned': 'a beer list in rotation',
+  beer_program: 'tap and bottle depth',
+  'coverage:beer_mentioned': 'a rotating beer list',
   'coverage:craft_beer_selection': 'a craft-leaning selection',
   // Future v2 signals (vocabulary locked, detection pending):
   // craft_beer_presence: 'craft beer focus',
@@ -408,7 +408,7 @@ const WINE_INTENT_LEADS: Record<string, string> = {
 /** Service model → full sentence */
 const SERVICE_MODEL_PHRASES: Record<string, string> = {
   'tasting-menu': 'Tasting menu format — the kitchen sets the pace',
-  'a-la-carte': 'À la carte ordering — dishes arrive as they are prepared',
+  'a-la-carte': 'À la carte service with kitchen-paced coursing across the meal',
   'small-plates': 'Small plates built for sharing across the table',
   'family-style': 'Family-style, served to the center of the table',
   'counter': 'Counter service',
@@ -445,6 +445,13 @@ function appendClause(base: string, clause: string): string {
   return `${base} with ${trimmed}`;
 }
 
+function appendClauses(base: string, clauses: string[]): string {
+  const cleaned = clauses.map((c) => c.trim()).filter(Boolean);
+  if (cleaned.length === 0) return base;
+  if (cleaned.length === 1) return appendClause(base, cleaned[0]!);
+  return appendClause(base, `${cleaned.slice(0, -1).join(', ')} and ${cleaned[cleaned.length - 1]}`);
+}
+
 function dedupeFragments(fragments: string[]): string[] {
   const seen = new Set<string>();
   const out: string[] = [];
@@ -455,6 +462,15 @@ function dedupeFragments(fragments: string[]): string[] {
     out.push(fragment);
   }
   return out;
+}
+
+function getWineProducerNames(names: string[] | null | undefined, cap = 4): string[] {
+  return (names ?? [])
+    .filter((name) => {
+      const lower = name.toLowerCase();
+      return /\b(vineyard|vineyards|winery|wineries|domaine|cellars|cellar|estate|vigneron|wine)\b/.test(lower);
+    })
+    .slice(0, cap);
 }
 
 /**
@@ -601,6 +617,8 @@ function buildOfferingLines(location: LocationData): { label: string; sentence: 
   const foodSignals = op?.food_program?.signals ?? [];
   const foodMaturity = op?.food_program?.maturity;
   const foodFragments = resolveSignalPhrases(foodSignals, FOOD_SIGNAL_PHRASES);
+  const featuredFoodDishes = (location.signatureDishes ?? []).slice(0, 2);
+  const foodDishClause = featuredFoodDishes.length > 0 ? `dishes like ${toSentenceList(featuredFoodDishes)}` : '';
 
   if (os?.cuisinePosture && CUISINE_POSTURE_LEADS[os.cuisinePosture]) {
     const lead = CUISINE_POSTURE_LEADS[os.cuisinePosture];
@@ -610,7 +628,7 @@ function buildOfferingLines(location: LocationData): { label: string; sentence: 
     if (foodFragments.length === 0 && location.cuisineType) {
       lines.push({
         label: 'Food',
-        sentence: appendClause(`${lead} with ${location.cuisineType} influences`, specialtyClause),
+        sentence: appendClauses(`${lead} with ${location.cuisineType} influences`, [specialtyClause, foodDishClause]),
       });
     } else if (foodFragments.length === 0 && !location.cuisineType && !specialtyClause) {
       // Avoid rendering posture-only stubs like "Broadly composed menu".
@@ -618,7 +636,7 @@ function buildOfferingLines(location: LocationData): { label: string; sentence: 
     } else {
       lines.push({
         label: 'Food',
-        sentence: appendClause(composeSentence(lead, foodFragments, 'built around'), specialtyClause),
+        sentence: appendClauses(composeSentence(lead, foodFragments, 'built around'), [specialtyClause, foodDishClause]),
       });
     }
   } else if (foodMaturity && foodMaturity !== 'none' && foodMaturity !== 'unknown') {
@@ -629,8 +647,8 @@ function buildOfferingLines(location: LocationData): { label: string; sentence: 
         ? `specialties like ${toSentenceList(activeSpecialtyPhrases.slice(0, 3))}`
         : '';
       lines.push({ label: 'Food', sentence: composeSentence(lead, foodFragments, 'featuring') });
-      if (specialtyClause) {
-        lines[lines.length - 1].sentence = appendClause(lines[lines.length - 1].sentence, specialtyClause);
+      if (specialtyClause || foodDishClause) {
+        lines[lines.length - 1].sentence = appendClauses(lines[lines.length - 1].sentence, [specialtyClause, foodDishClause]);
       }
     } else if (location.cuisineType) {
       const specialtyClause = activeSpecialtyPhrases.length > 0
@@ -638,20 +656,28 @@ function buildOfferingLines(location: LocationData): { label: string; sentence: 
         : '';
       lines.push({
         label: 'Food',
-        sentence: appendClause(foodMaturity === 'dedicated'
-          ? `${location.cuisineType} kitchen with a dedicated program`
-          : `Broadly composed ${location.cuisineType} menu with seasonal plates`, specialtyClause),
+        sentence: appendClauses(
+          foodMaturity === 'dedicated'
+            ? `${location.cuisineType} kitchen with a dedicated program`
+            : `Broadly composed ${location.cuisineType} menu with seasonal plates`,
+          [specialtyClause, foodDishClause],
+        ),
       });
     }
   } else if (location.cuisineType) {
     const specialtyClause = activeSpecialtyPhrases.length > 0
       ? `specialties like ${toSentenceList(activeSpecialtyPhrases.slice(0, 3))}`
       : '';
-    lines.push({ label: 'Food', sentence: appendClause(`${location.cuisineType} kitchen`, specialtyClause) });
+    lines.push({ label: 'Food', sentence: appendClauses(`${location.cuisineType} kitchen`, [specialtyClause, foodDishClause]) });
   } else if (activeSpecialtyPhrases.length > 0) {
     lines.push({
       label: 'Food',
       sentence: `Focused on specialties like ${toSentenceList(activeSpecialtyPhrases.slice(0, 3))}`,
+    });
+  } else if (foodDishClause) {
+    lines.push({
+      label: 'Food',
+      sentence: `Kitchen anchored by ${foodDishClause}`,
     });
   }
 
@@ -662,13 +688,7 @@ function buildOfferingLines(location: LocationData): { label: string; sentence: 
   const wineIntent = os?.wineProgramIntent;
   const hasNaturalWineSignal = wineSignals.includes('coverage:natural_wine_focus');
   const hasSommelierSignal = wineSignals.includes('coverage:sommelier_noted');
-  const rawProducerList = location.keyProducers ?? [];
-  const wineProducerList = rawProducerList
-    .filter((name) => {
-      const lower = name.toLowerCase();
-      return /\b(vineyard|vineyards|winery|wineries|domaine|cellars|cellar|estate|vigneron|wine)\b/.test(lower);
-    })
-    .slice(0, 3);
+  const wineProducerList = getWineProducerNames(location.keyProducers, 3);
   const naturalWineIntent = wineIntent === 'natural_leaning' || wineIntent === 'natural';
   const curatedWineIntent = new Set([
     'serious',
@@ -746,21 +766,33 @@ function buildOfferingLines(location: LocationData): { label: string; sentence: 
   const beerMaturity = op?.beer_program?.maturity;
   const beerFragments = resolveSignalPhrases(beerSignals, BEER_SIGNAL_PHRASES);
   const hasCraftBeerSignal = beerSignals.includes('coverage:craft_beer_selection');
+  const prunedBeerFragments = dedupeFragments(beerFragments);
 
   if (beerMaturity && beerMaturity !== 'none' && beerMaturity !== 'unknown') {
-    const lead = hasCraftBeerSignal
-      ? beerMaturity === 'dedicated'
-        ? 'Dedicated craft beer program'
-        : 'Considered craft beer selection'
-      : beerMaturity === 'dedicated'
-        ? 'Dedicated beer program'
-        : beerMaturity === 'considered'
-          ? 'Considered beer selection'
-          : 'Beer';
-    lines.push({
-      label: 'Beer',
-      sentence: composeSentence(lead, beerFragments, 'with'),
-    });
+    if (prunedBeerFragments.length > 0) {
+      const lead = hasCraftBeerSignal
+        ? beerMaturity === 'dedicated'
+          ? 'Dedicated craft beer program'
+          : 'Considered craft beer selection'
+        : beerMaturity === 'dedicated'
+          ? 'Dedicated tap-and-bottle program'
+          : beerMaturity === 'considered'
+            ? 'Considered beer selection'
+            : 'Beer selection';
+      lines.push({
+        label: 'Beer',
+        sentence: composeSentence(lead, prunedBeerFragments, 'featuring'),
+      });
+    } else {
+      lines.push({
+        label: 'Beer',
+        sentence: hasCraftBeerSignal
+          ? 'Craft-leaning beer selection in rotation'
+          : beerMaturity === 'dedicated'
+            ? 'Dedicated tap-and-bottle beer program'
+            : 'Beer list in rotation',
+      });
+    }
   } else if (os?.servesBeer === true) {
     lines.push({ label: 'Beer', sentence: 'Beer available' });
   }
@@ -1364,11 +1396,11 @@ export default function PlacePage() {
                         Signature dishes include {toSentenceList(location.signatureDishes.slice(0, 4))}.
                       </p>
                     )}
-                    {location.keyProducers && location.keyProducers.length > 0 && (
+                    {getWineProducerNames(location.keyProducers, 4).length > 0 && (
                       <p id="key-producers" className="known-for-line">
                         {(location.offeringSignals?.wineProgramIntent === 'natural_leaning' || location.offeringSignals?.wineProgramIntent === 'natural')
-                          ? `Natural wine focus includes producers like ${toSentenceList(location.keyProducers.slice(0, 4))}.`
-                          : `Wine focus includes producers like ${toSentenceList(location.keyProducers.slice(0, 4))}.`}
+                          ? `Natural wine focus includes producers like ${toSentenceList(getWineProducerNames(location.keyProducers, 4))}.`
+                          : `Wine focus includes producers like ${toSentenceList(getWineProducerNames(location.keyProducers, 4))}.`}
                       </p>
                     )}
                   </>
