@@ -430,7 +430,7 @@ async function ingestBatch() {
       id: true,
       name: true,
       instagram: true,
-      instagramAccounts: {
+      instagram_accounts: {
         select: { instagramUserId: true, lastFetchedAt: true },
         take: 1,
       },
@@ -443,7 +443,7 @@ async function ingestBatch() {
   const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
   const targets = entities.filter((e) => {
     if (!e.instagram || e.instagram === 'NONE') return false;
-    const existing = e.instagramAccounts[0];
+    const existing = e.instagram_accounts[0];
     if (!existing) return true; // never ingested
     if (existing.lastFetchedAt && existing.lastFetchedAt < oneDayAgo) return true; // stale
     return false;

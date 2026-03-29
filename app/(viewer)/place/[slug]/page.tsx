@@ -309,11 +309,11 @@ const FOOD_SIGNAL_PHRASES: Record<string, string> = {
 
 /** Wine program signal → descriptive fragment (Locked v1: beverage-program-vocab-v1) */
 const WINE_SIGNAL_PHRASES: Record<string, string> = {
-  extensive_wine_list: 'an extensive list',
+  extensive_wine_list: 'broad by-the-glass and bottle depth',
   natural_wine_presence: 'natural wine focus',
   aperitif_focus: 'aperitif-driven',
-  'coverage:wine_mentioned': 'wine throughout the menu',
-  'coverage:natural_wine_focus': 'a natural-wine leaning list',
+  'coverage:wine_mentioned': 'wine integrated across the menu',
+  'coverage:natural_wine_focus': 'natural-wine leaning producers',
   'coverage:sommelier_noted': 'an identified wine lead',
 };
 
@@ -443,6 +443,18 @@ function appendClause(base: string, clause: string): string {
   const trimmed = clause.trim();
   if (!trimmed) return base;
   return `${base} with ${trimmed}`;
+}
+
+function dedupeFragments(fragments: string[]): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const fragment of fragments) {
+    const key = normalizeTextToken(fragment);
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+    out.push(fragment);
+  }
+  return out;
 }
 
 /**
@@ -650,61 +662,62 @@ function buildOfferingLines(location: LocationData): { label: string; sentence: 
   const wineIntent = os?.wineProgramIntent;
   const hasNaturalWineSignal = wineSignals.includes('coverage:natural_wine_focus');
   const hasSommelierSignal = wineSignals.includes('coverage:sommelier_noted');
-  const producerList = (location.keyProducers ?? []).slice(0, 3);
+  const rawProducerList = location.keyProducers ?? [];
+  const wineProducerList = rawProducerList
+    .filter((name) => {
+      const lower = name.toLowerCase();
+      return /\b(vineyard|vineyards|winery|wineries|domaine|cellars|cellar|estate|vigneron|wine)\b/.test(lower);
+    })
+    .slice(0, 3);
+  const naturalWineIntent = wineIntent === 'natural_leaning' || wineIntent === 'natural';
+  const curatedWineIntent = new Set([
+    'serious',
+    'dedicated',
+    'integrated',
+    'mediterranean_focused',
+    'california_leaning',
+    'classical',
+    'natural_leaning',
+    'eclectic',
+  ]);
+  const canUseWineProducerClause =
+    wineProducerList.length > 0 &&
+    (hasSommelierSignal ||
+      hasNaturalWineSignal ||
+      naturalWineIntent ||
+      curatedWineIntent.has(wineIntent ?? ''));
 
-  if (wineIntent && wineIntent !== 'none' && WINE_INTENT_LEADS[wineIntent]) {
-    const lead = hasSommelierSignal
-      ? 'Sommelier-shaped wine program'
-      : WINE_INTENT_LEADS[wineIntent];
-    const baseSentence = composeSentence(lead, wineFragments, 'with');
-    const producerClause = producerList.length > 0 ? `producers like ${toSentenceList(producerList)}` : '';
-    lines.push({ label: 'Wine', sentence: appendClause(baseSentence, producerClause) });
-  } else if (wineMaturity && wineMaturity !== 'none' && wineMaturity !== 'unknown') {
-    if (wineFragments.length > 0) {
-      if (hasSommelierSignal && producerList.length > 0) {
-        lines.push({
-          label: 'Wine',
-          sentence: `Sommelier-shaped wine program with producers like ${toSentenceList(producerList)}`,
-        });
-      } else if (hasSommelierSignal) {
-        lines.push({
-          label: 'Wine',
-          sentence: 'Sommelier-shaped wine program with an intentionally curated list',
-        });
-      } else if (hasNaturalWineSignal && producerList.length > 0) {
-        lines.push({
-          label: 'Wine',
-          sentence: `Considered wine program with a natural, small-producer focus including ${toSentenceList(producerList)}`,
-        });
-      } else if (hasNaturalWineSignal) {
-        lines.push({
-          label: 'Wine',
-          sentence: 'Considered wine program with a natural, small-producer focus',
-        });
-      } else {
-      lines.push({
-        label: 'Wine',
-        sentence: composeSentence('Wine list', wineFragments, 'featuring'),
-      });
+  const prunedWineFragments = dedupeFragments(
+    wineFragments.filter((fragment) => {
+      if (hasSommelierSignal && fragment === 'an identified wine lead') return false;
+      if (
+        (hasNaturalWineSignal || naturalWineIntent) &&
+        fragment === 'natural-wine leaning producers'
+      ) {
+        return false;
       }
-    } else if ((location.keyProducers?.length ?? 0) > 0) {
-      const producerList = toSentenceList((location.keyProducers ?? []).slice(0, 3));
-      lines.push({
-        label: 'Wine',
-        sentence: (wineIntent === 'natural_leaning' || wineIntent === 'natural')
-          ? `Considered wine selection with a natural, small-producer focus including ${producerList}`
-          : `Considered wine selection with producers like ${producerList}`,
-      });
-    } else {
-      lines.push({
-        label: 'Wine',
-        sentence: wineMaturity === 'dedicated'
-          ? 'Dedicated wine program with producer-driven focus'
-          : wineMaturity === 'considered'
-            ? 'Considered wine selection with a curated producer mix'
-            : 'Wine available',
-      });
-    }
+      return true;
+    }),
+  );
+
+  if (
+    (wineIntent && wineIntent !== 'none' && WINE_INTENT_LEADS[wineIntent]) ||
+    (wineMaturity && wineMaturity !== 'none' && wineMaturity !== 'unknown')
+  ) {
+    const lead =
+      hasSommelierSignal
+        ? 'Sommelier-shaped wine program'
+        : (wineIntent && WINE_INTENT_LEADS[wineIntent])
+          ? WINE_INTENT_LEADS[wineIntent]
+          : wineMaturity === 'dedicated'
+            ? 'Dedicated wine program'
+            : wineMaturity === 'considered'
+              ? 'Considered wine program'
+              : 'Wine program';
+    const baseSentence = composeSentence(lead, prunedWineFragments, 'featuring');
+    const producerClause =
+      canUseWineProducerClause ? `producers like ${toSentenceList(wineProducerList)}` : '';
+    lines.push({ label: 'Wine', sentence: appendClause(baseSentence, producerClause) });
   } else if (os?.servesWine === true) {
     lines.push({ label: 'Wine', sentence: 'Wine list available' });
   }
