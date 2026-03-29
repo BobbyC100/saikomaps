@@ -39,6 +39,7 @@ import { db }              from "../lib/db";
 import { writeDerivedSignal } from "../lib/fields-v2/write-claim";
 import { materializeCoverageEvidence, type CoverageEvidence } from "../lib/coverage/normalize-evidence";
 import { ORCHESTRATION_REASON, type OrchestrationReason, FRESHNESS_WINDOWS_MS, ageMs } from "../lib/enrichment/orchestration-reasons";
+import { getOfferingExpectationProfile } from "../lib/offering/expectation-profile";
 
 // ---------------------------------------------------------------------------
 // Config
@@ -158,6 +159,8 @@ interface AssembleTarget {
   entityId:   string;
   entityName: string;
   slug:        string;
+  primaryVertical: string | null;
+  placeType: 'venue' | 'activity' | 'public' | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -420,33 +423,44 @@ function round2(n: number): number {
   return Math.round(n * 100) / 100;
 }
 
-function computeGateReasons(src: SourceSignals): OrchestrationReason[] {
+function computeGateReasons(src: SourceSignals, target: AssembleTarget): OrchestrationReason[] {
   const reasons: OrchestrationReason[] = [];
+  const profile = getOfferingExpectationProfile({
+    primaryVertical: target.primaryVertical,
+    placeType: target.placeType,
+  });
+  const requiresMenuSignals =
+    profile.programs.food || profile.programs.wine || profile.programs.beer || profile.programs.coffee;
+  const requiresCoverage = profile.richMode.minCoverageSources > 0;
 
-  if (!src.menuIdentity) {
-    reasons.push(ORCHESTRATION_REASON.NO_MENU_IDENTITY_SIGNAL);
-  } else {
-    const menuIdentityAge = ageMs(src.menuIdentity.computedAt);
-    if (menuIdentityAge !== null && menuIdentityAge > FRESHNESS_WINDOWS_MS.MENU_SIGNAL_MAX_AGE) {
-      reasons.push(ORCHESTRATION_REASON.MENU_IDENTITY_STALE);
+  if (requiresMenuSignals) {
+    if (!src.menuIdentity) {
+      reasons.push(ORCHESTRATION_REASON.NO_MENU_IDENTITY_SIGNAL);
+    } else {
+      const menuIdentityAge = ageMs(src.menuIdentity.computedAt);
+      if (menuIdentityAge !== null && menuIdentityAge > FRESHNESS_WINDOWS_MS.MENU_SIGNAL_MAX_AGE) {
+        reasons.push(ORCHESTRATION_REASON.MENU_IDENTITY_STALE);
+      }
+    }
+
+    if (!src.menuStructure) {
+      reasons.push(ORCHESTRATION_REASON.NO_MENU_STRUCTURE_SIGNAL);
+    } else {
+      const menuStructureAge = ageMs(src.menuStructure.computedAt);
+      if (menuStructureAge !== null && menuStructureAge > FRESHNESS_WINDOWS_MS.MENU_SIGNAL_MAX_AGE) {
+        reasons.push(ORCHESTRATION_REASON.MENU_STRUCTURE_STALE);
+      }
     }
   }
 
-  if (!src.menuStructure) {
-    reasons.push(ORCHESTRATION_REASON.NO_MENU_STRUCTURE_SIGNAL);
-  } else {
-    const menuStructureAge = ageMs(src.menuStructure.computedAt);
-    if (menuStructureAge !== null && menuStructureAge > FRESHNESS_WINDOWS_MS.MENU_SIGNAL_MAX_AGE) {
-      reasons.push(ORCHESTRATION_REASON.MENU_STRUCTURE_STALE);
-    }
-  }
-
-  if (!src.coverageEvidence) {
-    reasons.push(ORCHESTRATION_REASON.NO_COVERAGE_EVIDENCE);
-  } else {
-    const coverageAge = ageMs(src.coverageEvidence.materializedAt);
-    if (coverageAge !== null && coverageAge > FRESHNESS_WINDOWS_MS.COVERAGE_MAX_AGE) {
-      reasons.push(ORCHESTRATION_REASON.COVERAGE_STALE);
+  if (requiresCoverage) {
+    if (!src.coverageEvidence) {
+      reasons.push(ORCHESTRATION_REASON.NO_COVERAGE_EVIDENCE);
+    } else {
+      const coverageAge = ageMs(src.coverageEvidence.materializedAt);
+      if (coverageAge !== null && coverageAge > FRESHNESS_WINDOWS_MS.COVERAGE_MAX_AGE) {
+        reasons.push(ORCHESTRATION_REASON.COVERAGE_STALE);
+      }
     }
   }
 
@@ -1012,7 +1026,7 @@ async function loadTargets(
         },
       },
     },
-    select: { id: true, name: true, slug: true },
+    select: { id: true, name: true, slug: true, primaryVertical: true, placeType: true },
     take: limit,
     orderBy: { updatedAt: "desc" },
   });
@@ -1035,7 +1049,13 @@ async function loadTargets(
 
   return candidates
     .filter((c) => reprocess || !existingIds.has(c.id))
-    .map((c) => ({ entityId: c.id, entityName: c.name, slug: c.slug }));
+    .map((c) => ({
+      entityId: c.id,
+      entityName: c.name,
+      slug: c.slug,
+      primaryVertical: c.primaryVertical ?? null,
+      placeType: c.placeType ?? null,
+    }));
 }
 
 // ---------------------------------------------------------------------------
@@ -1178,7 +1198,7 @@ async function main() {
   for (const target of targets) {
     const src      = signalMap.get(target.entityId) ?? { menuIdentity: null, menuStructure: null, identitySignals: null, surfaceScanHints: null, coverageEvidence: null };
     const programs = assemblePrograms(src);
-    const gateReasons = computeGateReasons(src);
+    const gateReasons = computeGateReasons(src, target);
     const isReady = gateReasons.length === 0;
     programs.readiness = {
       isReadyForOfferingAssembly: isReady,

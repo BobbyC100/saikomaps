@@ -10,6 +10,10 @@ import { parseHours } from './lib/parseHours';
 import { getOpenStateLabelV2 } from '@/lib/utils/get-open-state-label';
 import { renderLocation } from '@/lib/voice/saiko';
 import { getIdentitySublineV2 } from '@/lib/contracts/entity-page.identity';
+import {
+  getOfferingExpectationProfile,
+  meetsRichOfferingEvidence,
+} from '@/lib/offering/expectation-profile';
 import './place.css';
 
 interface EditorialSource {
@@ -320,7 +324,7 @@ const WINE_SIGNAL_PHRASES: Record<string, string> = {
 /** Beer program signal → descriptive fragment (Locked v1) */
 const BEER_SIGNAL_PHRASES: Record<string, string> = {
   beer_program: 'tap and bottle depth',
-  'coverage:beer_mentioned': 'a rotating beer list',
+  'coverage:beer_mentioned': 'beer in rotation',
   'coverage:craft_beer_selection': 'a craft-leaning selection',
   // Future v2 signals (vocabulary locked, detection pending):
   // craft_beer_presence: 'craft beer focus',
@@ -389,7 +393,7 @@ const CUISINE_POSTURE_LEADS: Record<string, string> = {
   'protein-centric': 'Protein-focused menu',
   'carb-forward': 'Carb-forward comfort cooking',
   'seafood-focused': 'Seafood-centered menu',
-  'balanced': 'Broadly composed menu',
+  'balanced': 'Seasonal kitchen',
 };
 
 /** Wine program intent → lead phrase for the wine sentence */
@@ -450,6 +454,10 @@ function appendClauses(base: string, clauses: string[]): string {
   if (cleaned.length === 0) return base;
   if (cleaned.length === 1) return appendClause(base, cleaned[0]!);
   return appendClause(base, `${cleaned.slice(0, -1).join(', ')} and ${cleaned[cleaned.length - 1]}`);
+}
+
+function stripLeadingDishesLike(clause: string): string {
+  return clause.replace(/^dishes like\s+/i, '').trim();
 }
 
 function dedupeFragments(fragments: string[]): string[] {
@@ -553,19 +561,39 @@ function enhanceIdentitySubline(base: string | null, location: LocationData): st
   if (!base) return null;
   if (location.primaryVertical !== 'EAT') return base;
 
-  const wineIntent = location.offeringSignals?.wineProgramIntent ?? null;
-  const wineMaturity = location.offeringPrograms?.wine_program?.maturity ?? null;
+  // Avoid repeating cuisine identity in both subline + tagline.
+  // If the tagline already carries a British cue, strip the British prefix from the subline.
+  const taglineLower = (location.tagline ?? '').toLowerCase();
+  const shouldDropBritishPrefix = /\bbritish\b/.test(taglineLower);
+  const baseWithoutPrefix = shouldDropBritishPrefix
+    ? base.replace(/^\s*british(?:-inspired)?\s+/i, '')
+    : base;
+  const normalizedBase = baseWithoutPrefix.length > 0
+    ? `${baseWithoutPrefix[0]!.toUpperCase()}${baseWithoutPrefix.slice(1)}`
+    : baseWithoutPrefix;
+
+  const foodSignals = location.offeringPrograms?.food_program?.signals ?? [];
+  const coffeeSignals = location.offeringPrograms?.coffee_tea_program?.signals ?? [];
+  const hasPastryProgram = foodSignals.includes('pastry_program') || foodSignals.includes('bakery_program');
+  const hasCoffeeBreakfastProgram = coffeeSignals.some((s) =>
+    s.includes('coffee') || s.includes('espresso') || s.includes('breakfast') || s.includes('brunch')
+  );
+  if (hasPastryProgram && hasCoffeeBreakfastProgram) {
+    return 'Restaurant, bakery and coffee shop';
+  }
+
+  // Only promote to wine bar if the phrase is explicitly present in authored copy.
+  // Strong wine signals alone are not enough to re-type the venue.
   const supportsWineBar =
-    ['serious', 'dedicated', 'natural_leaning', 'integrated'].includes(wineIntent ?? '') ||
-    ['considered', 'dedicated'].includes(wineMaturity ?? '');
+    /\bwine bar\b/.test(`${location.description ?? ''} ${location.tagline ?? ''}`.toLowerCase());
   const desc = `${location.description ?? ''} ${location.tagline ?? ''}`.toLowerCase();
   const supportsWineShop = /\b(bottle shop|wine shop)\b/.test(desc);
 
-  if (!supportsWineBar && !supportsWineShop) return base;
+  if (!supportsWineBar && !supportsWineShop) return normalizedBase;
 
-  const inIdx = base.toLowerCase().indexOf(' in ');
-  const formatPart = inIdx >= 0 ? base.slice(0, inIdx) : base;
-  const locationPart = inIdx >= 0 ? base.slice(inIdx) : '';
+  const inIdx = normalizedBase.toLowerCase().indexOf(' in ');
+  const formatPart = inIdx >= 0 ? normalizedBase.slice(0, inIdx) : normalizedBase;
+  const locationPart = inIdx >= 0 ? normalizedBase.slice(inIdx) : '';
   const phrases: string[] = [formatPart];
 
   if (supportsWineBar && !/\bwine bar\b/i.test(formatPart)) {
@@ -574,7 +602,7 @@ function enhanceIdentitySubline(base: string | null, location: LocationData): st
   if (supportsWineShop && !/\bwine shop\b/i.test(formatPart)) {
     phrases.push('wine shop');
   }
-  if (phrases.length === 1) return base;
+  if (phrases.length === 1) return `${phrases[0]}${locationPart}`;
 
   return `${joinPhrases(phrases)}${locationPart}`;
 }
@@ -588,6 +616,22 @@ function buildOfferingLines(location: LocationData): { label: string; sentence: 
   const os = location.offeringSignals;
   const op = location.offeringPrograms;
   const ch = location.coverageHighlights ?? null;
+  const offeringProfile = getOfferingExpectationProfile({
+    primaryVertical: location.primaryVertical,
+    placeType: location.placeType ?? null,
+  });
+  const hasMenuSignals = Boolean(
+    (op?.food_program?.signals?.length ?? 0) > 0 ||
+      (op?.wine_program?.signals?.length ?? 0) > 0 ||
+      (op?.beer_program?.signals?.length ?? 0) > 0 ||
+      (op?.coffee_tea_program?.signals?.length ?? 0) > 0,
+  );
+  const coverageSourceCount =
+    ch?.sourceCount ?? location.coverageSources?.length ?? 0;
+  const richOfferingMode = meetsRichOfferingEvidence(offeringProfile, {
+    coverageSourceCount,
+    hasMenuSignals,
+  });
 
   const hasActiveProgram = (program: { maturity: string; signals: string[] } | undefined): boolean => {
     if (!program) return false;
@@ -614,71 +658,99 @@ function buildOfferingLines(location: LocationData): { label: string; sentence: 
     .map((p) => p.phrase);
 
   // ── Food ─────────────────────────────────────────────────────────────
-  const foodSignals = op?.food_program?.signals ?? [];
-  const foodMaturity = op?.food_program?.maturity;
-  const foodFragments = resolveSignalPhrases(foodSignals, FOOD_SIGNAL_PHRASES);
-  const featuredFoodDishes = (location.signatureDishes ?? []).slice(0, 2);
-  const foodDishClause = featuredFoodDishes.length > 0 ? `dishes like ${toSentenceList(featuredFoodDishes)}` : '';
+  if (offeringProfile.programs.food) {
+    const foodSignals = op?.food_program?.signals ?? [];
+    const foodMaturity = op?.food_program?.maturity;
+    const foodFragments = resolveSignalPhrases(foodSignals, FOOD_SIGNAL_PHRASES);
+    const featuredFoodDishes = (location.signatureDishes ?? []).slice(0, 2);
+    const foodDishClause = featuredFoodDishes.length > 0 ? `dishes like ${toSentenceList(featuredFoodDishes)}` : '';
+    const isPastryDominantFood = foodFragments.length === 1 && foodFragments[0] === 'a pastry program';
+    const hasWineDepth =
+      ['considered', 'dedicated'].includes(op?.wine_program?.maturity ?? '') ||
+      ['serious', 'dedicated', 'integrated', 'natural_leaning', 'eclectic'].includes(os?.wineProgramIntent ?? '');
+    const likelyDinnerPrimary =
+      os?.servesDinner === true ||
+      (location.primaryVertical === 'EAT' && os?.serviceModel === 'a-la-carte' && hasWineDepth);
+    const dinnerForwardLead = os?.servesDinner === true
+      ? (location.cuisineType ? `${location.cuisineType} dinner-forward menu` : 'Dinner-forward menu')
+      : null;
 
-  if (os?.cuisinePosture && CUISINE_POSTURE_LEADS[os.cuisinePosture]) {
-    const lead = CUISINE_POSTURE_LEADS[os.cuisinePosture];
-    const specialtyClause = activeSpecialtyPhrases.length > 0
-      ? `specialties like ${toSentenceList(activeSpecialtyPhrases.slice(0, 3))}`
-      : '';
-    if (foodFragments.length === 0 && location.cuisineType) {
-      lines.push({
-        label: 'Food',
-        sentence: appendClauses(`${lead} with ${location.cuisineType} influences`, [specialtyClause, foodDishClause]),
-      });
-    } else if (foodFragments.length === 0 && !location.cuisineType && !specialtyClause) {
-      // Avoid rendering posture-only stubs like "Broadly composed menu".
-      // If we have no concrete support signals, skip the line entirely.
-    } else {
-      lines.push({
-        label: 'Food',
-        sentence: appendClauses(composeSentence(lead, foodFragments, 'built around'), [specialtyClause, foodDishClause]),
-      });
-    }
-  } else if (foodMaturity && foodMaturity !== 'none' && foodMaturity !== 'unknown') {
-    if (foodFragments.length > 0) {
-      // Signals without posture: let the signals speak
-      const lead = foodMaturity === 'dedicated' ? 'Dedicated kitchen' : 'Menu';
+    if (os?.cuisinePosture && CUISINE_POSTURE_LEADS[os.cuisinePosture]) {
+      const lead = CUISINE_POSTURE_LEADS[os.cuisinePosture];
       const specialtyClause = activeSpecialtyPhrases.length > 0
         ? `specialties like ${toSentenceList(activeSpecialtyPhrases.slice(0, 3))}`
         : '';
-      lines.push({ label: 'Food', sentence: composeSentence(lead, foodFragments, 'featuring') });
-      if (specialtyClause || foodDishClause) {
-        lines[lines.length - 1].sentence = appendClauses(lines[lines.length - 1].sentence, [specialtyClause, foodDishClause]);
+      if (foodFragments.length === 0 && location.cuisineType) {
+        lines.push({
+          label: 'Food',
+          sentence: appendClauses(`${lead} with ${location.cuisineType} influences`, [specialtyClause, foodDishClause]),
+        });
+      } else if (foodFragments.length === 0 && !location.cuisineType && !specialtyClause) {
+        // Avoid rendering posture-only stubs like "Broadly composed menu".
+        // If we have no concrete support signals, skip the line entirely.
+      } else {
+      const richPastryFallback =
+        isPastryDominantFood && foodDishClause && richOfferingMode
+          ? appendClauses(
+              likelyDinnerPrimary
+                ? (location.cuisineType ? `${location.cuisineType} dinner menu` : 'Dinner-forward menu')
+                : (location.cuisineType ? `${location.cuisineType} kitchen` : 'Seasonal kitchen'),
+              likelyDinnerPrimary
+                ? [stripLeadingDishesLike(foodDishClause), 'house pastries in a supporting role']
+                : [stripLeadingDishesLike(foodDishClause), 'house pastries as part of the format'],
+            )
+          : null;
+        lines.push({
+          label: 'Food',
+          sentence:
+          richPastryFallback
+            ? richPastryFallback
+            : isPastryDominantFood && dinnerForwardLead && foodDishClause && richOfferingMode
+              ? appendClauses(dinnerForwardLead, [foodDishClause, 'a pastry thread through the format'])
+              : appendClauses(composeSentence(lead, foodFragments, 'featuring'), [specialtyClause, foodDishClause]),
+        });
+      }
+    } else if (foodMaturity && foodMaturity !== 'none' && foodMaturity !== 'unknown') {
+      if (foodFragments.length > 0) {
+        // Signals without posture: let the signals speak
+        const lead = foodMaturity === 'dedicated' ? 'Dedicated kitchen' : 'Menu';
+        const specialtyClause = activeSpecialtyPhrases.length > 0
+          ? `specialties like ${toSentenceList(activeSpecialtyPhrases.slice(0, 3))}`
+          : '';
+        lines.push({ label: 'Food', sentence: composeSentence(lead, foodFragments, 'featuring') });
+        if (specialtyClause || foodDishClause) {
+          lines[lines.length - 1].sentence = appendClauses(lines[lines.length - 1].sentence, [specialtyClause, foodDishClause]);
+        }
+      } else if (location.cuisineType) {
+        const specialtyClause = activeSpecialtyPhrases.length > 0
+          ? `specialties like ${toSentenceList(activeSpecialtyPhrases.slice(0, 3))}`
+          : '';
+        lines.push({
+          label: 'Food',
+          sentence: appendClauses(
+            foodMaturity === 'dedicated'
+              ? `${location.cuisineType} kitchen with a dedicated program`
+              : `Seasonal ${location.cuisineType} menu`,
+            [specialtyClause, foodDishClause],
+          ),
+        });
       }
     } else if (location.cuisineType) {
       const specialtyClause = activeSpecialtyPhrases.length > 0
         ? `specialties like ${toSentenceList(activeSpecialtyPhrases.slice(0, 3))}`
         : '';
+      lines.push({ label: 'Food', sentence: appendClauses(`${location.cuisineType} kitchen`, [specialtyClause, foodDishClause]) });
+    } else if (activeSpecialtyPhrases.length > 0) {
       lines.push({
         label: 'Food',
-        sentence: appendClauses(
-          foodMaturity === 'dedicated'
-            ? `${location.cuisineType} kitchen with a dedicated program`
-            : `Broadly composed ${location.cuisineType} menu with seasonal plates`,
-          [specialtyClause, foodDishClause],
-        ),
+        sentence: `Focused on specialties like ${toSentenceList(activeSpecialtyPhrases.slice(0, 3))}`,
+      });
+    } else if (foodDishClause) {
+      lines.push({
+        label: 'Food',
+        sentence: `Kitchen anchored by ${foodDishClause}`,
       });
     }
-  } else if (location.cuisineType) {
-    const specialtyClause = activeSpecialtyPhrases.length > 0
-      ? `specialties like ${toSentenceList(activeSpecialtyPhrases.slice(0, 3))}`
-      : '';
-    lines.push({ label: 'Food', sentence: appendClauses(`${location.cuisineType} kitchen`, [specialtyClause, foodDishClause]) });
-  } else if (activeSpecialtyPhrases.length > 0) {
-    lines.push({
-      label: 'Food',
-      sentence: `Focused on specialties like ${toSentenceList(activeSpecialtyPhrases.slice(0, 3))}`,
-    });
-  } else if (foodDishClause) {
-    lines.push({
-      label: 'Food',
-      sentence: `Kitchen anchored by ${foodDishClause}`,
-    });
   }
 
   // ── Wine ─────────────────────────────────────────────────────────────
@@ -720,26 +792,28 @@ function buildOfferingLines(location: LocationData): { label: string; sentence: 
     }),
   );
 
-  if (
-    (wineIntent && wineIntent !== 'none' && WINE_INTENT_LEADS[wineIntent]) ||
-    (wineMaturity && wineMaturity !== 'none' && wineMaturity !== 'unknown')
-  ) {
-    const lead =
-      hasSommelierSignal
-        ? 'Sommelier-shaped wine program'
-        : (wineIntent && WINE_INTENT_LEADS[wineIntent])
-          ? WINE_INTENT_LEADS[wineIntent]
-          : wineMaturity === 'dedicated'
-            ? 'Dedicated wine program'
-            : wineMaturity === 'considered'
-              ? 'Considered wine program'
-              : 'Wine program';
-    const baseSentence = composeSentence(lead, prunedWineFragments, 'featuring');
-    const producerClause =
-      canUseWineProducerClause ? `producers like ${toSentenceList(wineProducerList)}` : '';
-    lines.push({ label: 'Wine', sentence: appendClause(baseSentence, producerClause) });
-  } else if (os?.servesWine === true) {
-    lines.push({ label: 'Wine', sentence: 'Wine list available' });
+  if (offeringProfile.programs.wine) {
+    if (
+      (wineIntent && wineIntent !== 'none' && WINE_INTENT_LEADS[wineIntent]) ||
+      (wineMaturity && wineMaturity !== 'none' && wineMaturity !== 'unknown')
+    ) {
+      const lead =
+        hasSommelierSignal
+          ? 'Sommelier-shaped wine program'
+          : (wineIntent && WINE_INTENT_LEADS[wineIntent])
+            ? WINE_INTENT_LEADS[wineIntent]
+            : wineMaturity === 'dedicated'
+              ? 'Dedicated wine program'
+              : wineMaturity === 'considered'
+                ? 'Considered wine program'
+                : 'Wine program';
+      const baseSentence = composeSentence(lead, prunedWineFragments, 'featuring');
+      const producerClause =
+        canUseWineProducerClause ? `producers like ${toSentenceList(wineProducerList)}` : '';
+      lines.push({ label: 'Wine', sentence: appendClause(baseSentence, producerClause) });
+    } else if (os?.servesWine === true) {
+      lines.push({ label: 'Wine', sentence: 'Wine list available' });
+    }
   }
 
   // ── Cocktails ────────────────────────────────────────────────────────
@@ -768,33 +842,42 @@ function buildOfferingLines(location: LocationData): { label: string; sentence: 
   const hasCraftBeerSignal = beerSignals.includes('coverage:craft_beer_selection');
   const prunedBeerFragments = dedupeFragments(beerFragments);
 
-  if (beerMaturity && beerMaturity !== 'none' && beerMaturity !== 'unknown') {
-    if (prunedBeerFragments.length > 0) {
-      const lead = hasCraftBeerSignal
-        ? beerMaturity === 'dedicated'
-          ? 'Dedicated craft beer program'
-          : 'Considered craft beer selection'
-        : beerMaturity === 'dedicated'
-          ? 'Dedicated tap-and-bottle program'
-          : beerMaturity === 'considered'
-            ? 'Considered beer selection'
-            : 'Beer selection';
-      lines.push({
-        label: 'Beer',
-        sentence: composeSentence(lead, prunedBeerFragments, 'featuring'),
-      });
-    } else {
-      lines.push({
-        label: 'Beer',
-        sentence: hasCraftBeerSignal
-          ? 'Craft-leaning beer selection in rotation'
+  if (offeringProfile.programs.beer) {
+    if (beerMaturity && beerMaturity !== 'none' && beerMaturity !== 'unknown') {
+      const beerSignalsOnlyCoverageMention =
+        beerSignals.length === 1 && beerSignals[0] === 'coverage:beer_mentioned';
+      if (beerMaturity === 'incidental' && beerSignalsOnlyCoverageMention) {
+        lines.push({
+          label: 'Beer',
+          sentence: 'Beer appears as a supporting lane beside the broader beverage program',
+        });
+      } else if (prunedBeerFragments.length > 0) {
+        const lead = hasCraftBeerSignal
+          ? beerMaturity === 'dedicated'
+            ? 'Dedicated craft beer program'
+            : 'Considered craft beer selection'
           : beerMaturity === 'dedicated'
-            ? 'Dedicated tap-and-bottle beer program'
-            : 'Beer list in rotation',
-      });
+            ? 'Dedicated tap-and-bottle program'
+            : beerMaturity === 'considered'
+              ? 'Considered beer selection'
+              : 'Beer selection';
+        lines.push({
+          label: 'Beer',
+          sentence: composeSentence(lead, prunedBeerFragments, 'featuring'),
+        });
+      } else {
+        lines.push({
+          label: 'Beer',
+          sentence: hasCraftBeerSignal
+            ? 'Craft-leaning beer selection in rotation'
+            : beerMaturity === 'dedicated'
+              ? 'Dedicated tap-and-bottle beer program'
+              : 'Beer list in rotation',
+        });
+      }
+    } else if (os?.servesBeer === true) {
+      lines.push({ label: 'Beer', sentence: 'Beer available' });
     }
-  } else if (os?.servesBeer === true) {
-    lines.push({ label: 'Beer', sentence: 'Beer available' });
   }
 
   // ── Non-Alcoholic ────────────────────────────────────────────────────
@@ -846,46 +929,48 @@ function buildOfferingLines(location: LocationData): { label: string; sentence: 
   const hasBreakfastSignal = ctSignals.some((s) => s.includes('breakfast') || s.includes('brunch') || s.includes('morning'));
   const preferBreakfastLabel = hasBreakfastEvidence || hasBreakfastSignal;
 
-  if (ctFragments.length > 0) {
-    // Signals drive the sentence — maturity shapes the lead
-    const lead = preferBreakfastLabel
-      ? ctMaturity === 'dedicated'
-        ? 'Dedicated coffee and breakfast program'
-        : ctMaturity === 'considered'
-          ? 'Considered coffee and breakfast format'
-          : 'Coffee and breakfast'
-      : ctMaturity === 'dedicated'
+  if (offeringProfile.programs.coffee) {
+    if (ctFragments.length > 0) {
+      // Signals drive the sentence — maturity shapes the lead
+      const lead = preferBreakfastLabel
+        ? ctMaturity === 'dedicated'
+          ? 'Dedicated coffee and breakfast program'
+          : ctMaturity === 'considered'
+            ? 'Considered coffee and breakfast format'
+            : 'Coffee and breakfast'
+        : ctMaturity === 'dedicated'
+          ? 'Dedicated coffee and tea program'
+          : ctMaturity === 'considered'
+            ? 'Considered coffee and tea selection'
+            : 'Coffee and tea';
+      const sentence = composeSentence(lead, ctFragments, 'featuring');
+      const breakfastDishClause =
+        breakfastDishes.length > 0 ? `breakfast dishes like ${toSentenceList(breakfastDishes)}` : '';
+      lines.push({
+        label: preferBreakfastLabel ? 'Coffee & Breakfast' : 'Coffee & Tea',
+        sentence: appendClause(sentence, breakfastDishClause),
+      });
+    } else if (preferBreakfastLabel || hasCoffeeSignal) {
+      const breakfastDishClause =
+        breakfastDishes.length > 0 ? ` with dishes like ${toSentenceList(breakfastDishes)}` : '';
+      lines.push({
+        label: preferBreakfastLabel ? 'Coffee & Breakfast' : 'Coffee & Tea',
+        sentence: preferBreakfastLabel
+          ? `Breakfast and coffee are part of the format${breakfastDishClause}`
+          : 'Coffee and tea available',
+      });
+    } else if (ctMaturity && ctMaturity !== 'none' && ctMaturity !== 'unknown') {
+      const sentence = ctMaturity === 'dedicated'
         ? 'Dedicated coffee and tea program'
         : ctMaturity === 'considered'
           ? 'Considered coffee and tea selection'
-          : 'Coffee and tea';
-    const sentence = composeSentence(lead, ctFragments, 'featuring');
-    const breakfastDishClause =
-      breakfastDishes.length > 0 ? `breakfast dishes like ${toSentenceList(breakfastDishes)}` : '';
-    lines.push({
-      label: preferBreakfastLabel ? 'Coffee & Breakfast' : 'Coffee & Tea',
-      sentence: appendClause(sentence, breakfastDishClause),
-    });
-  } else if (preferBreakfastLabel || hasCoffeeSignal) {
-    const breakfastDishClause =
-      breakfastDishes.length > 0 ? ` with dishes like ${toSentenceList(breakfastDishes)}` : '';
-    lines.push({
-      label: preferBreakfastLabel ? 'Coffee & Breakfast' : 'Coffee & Tea',
-      sentence: preferBreakfastLabel
-        ? `Breakfast and coffee are part of the format${breakfastDishClause}`
-        : 'Coffee and tea available',
-    });
-  } else if (ctMaturity && ctMaturity !== 'none' && ctMaturity !== 'unknown') {
-    const sentence = ctMaturity === 'dedicated'
-      ? 'Dedicated coffee and tea program'
-      : ctMaturity === 'considered'
-        ? 'Considered coffee and tea selection'
-        : 'Coffee and tea available';
-    lines.push({ label: 'Coffee & Tea', sentence });
+          : 'Coffee and tea available';
+      lines.push({ label: 'Coffee & Tea', sentence });
+    }
   }
 
   // ── Service ──────────────────────────────────────────────────────────
-  if (os?.serviceModel && SERVICE_MODEL_PHRASES[os.serviceModel]) {
+  if (offeringProfile.programs.service && os?.serviceModel && SERVICE_MODEL_PHRASES[os.serviceModel]) {
     lines.push({ label: 'Service', sentence: SERVICE_MODEL_PHRASES[os.serviceModel] });
   }
 
