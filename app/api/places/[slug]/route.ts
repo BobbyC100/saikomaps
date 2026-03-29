@@ -165,22 +165,40 @@ export async function GET(
       );
     }
 
-    // Get photo URLs: prioritize Instagram media (if EAT/HOSPITALITY), fall back to Google Photos
+    // -----------------------------------------------------------------------
+    // Photo selection — priority order:
+    //   1. HERO photo from place_photo_eval (human-curated, all verticals)
+    //   2. Instagram media (EAT/HOSPITALITY only, ranked by photoType)
+    //   3. Eligible place_photos registry (source-ranked: Website > IG > Google)
+    //   4. Legacy fallback: entities.googlePhotos JSON blob
+    // -----------------------------------------------------------------------
     let photoUrls: string[] = [];
+    let heroUrl: string | null = null;
 
-    // Try Instagram media first for EAT and HOSPITALITY verticals
+    // --- Priority 1: HERO from place_photo_eval ---
+    try {
+      const heroEval = await db.place_photo_eval.findFirst({
+        where: { entityId: entity.id, tier: 'HERO' },
+        select: { photoRef: true, requestedMaxWidthPx: true },
+        orderBy: { updatedAt: 'desc' },
+      });
+      if (heroEval?.photoRef) {
+        heroUrl = getGooglePhotoUrl(heroEval.photoRef, heroEval.requestedMaxWidthPx ?? 1600);
+      }
+    } catch (err) {
+      console.error(`[places API] HERO photo query failed for ${entity.slug}:`, err instanceof Error ? err.message : err);
+    }
+
+    // --- Priority 2: Instagram media (EAT/HOSPITALITY verticals) ---
     const instagramEligibleVerticals = ['EAT', 'HOSPITALITY'];
     if (instagramEligibleVerticals.includes(entity.primaryVertical || '')) {
-      console.log(`[places API] ${entity.slug}: Checking Instagram (vertical: ${entity.primaryVertical})`);
       try {
-        // First, check if entity has an instagram_accounts record
         const instagramAccount = await db.instagram_accounts.findFirst({
           where: { entityId: entity.id },
           select: { id: true, instagramUserId: true, username: true },
         });
 
         if (instagramAccount) {
-          // Fetch 12 most recent media for filtering and ranking
           const allMedia = await db.instagram_media.findMany({
             where: {
               instagramUserId: instagramAccount.instagramUserId,
@@ -192,13 +210,10 @@ export async function GET(
               timestamp: true,
             },
             take: 12,
-            orderBy: {
-              timestamp: 'desc',
-            },
+            orderBy: { timestamp: 'desc' },
           });
 
           if (allMedia.length > 0) {
-            // Rank by photoType preference: INTERIOR, FOOD, BAR_DRINKS, CROWD_ENERGY, DETAIL, EXTERIOR
             const photoTypeRanking: Record<string, number> = {
               INTERIOR: 0,
               FOOD: 1,
@@ -219,21 +234,48 @@ export async function GET(
               .slice(0, 6)
               .map((m) => (m.mediaUrl || m.permalink) as string);
           }
-        } else {
-          console.log(`[places API] ${entity.slug}: No Instagram account found`);
         }
       } catch (err) {
-        // Log error and fall through to Google Photos if Instagram query fails
         console.error(`[places API] Instagram media query failed for ${entity.slug}:`, err instanceof Error ? err.message : err);
-        if (process.env.DEBUG_INSTAGRAM === '1') {
-          console.error(`[places API] Full error:`, err);
-        }
       }
-    } else {
-      console.log(`[places API] ${entity.slug}: Not eligible for Instagram (vertical: ${entity.primaryVertical})`);
     }
 
-    // Fall back to Google Photos if no Instagram media found
+    // --- Priority 3: Eligible photos from place_photos registry ---
+    // Only use this if we still have fewer than 6 photos (Instagram may have covered it)
+    if (photoUrls.length < 6) {
+      try {
+        const registryPhotos = await db.place_photos.findMany({
+          where: { entityId: entity.id, eligible: true },
+          select: { source: true, sourceRef: true, sourceUrl: true, sourceRank: true },
+          orderBy: [{ sourceRank: 'asc' }, { ingestedAt: 'desc' }],
+          take: 6,
+        });
+
+        for (const rp of registryPhotos) {
+          if (photoUrls.length >= 6) break;
+          let url: string | null = null;
+          if (rp.source === 'GOOGLE') {
+            try { url = getGooglePhotoUrl(rp.sourceRef, 800); } catch { /* skip */ }
+          } else if (rp.source === 'INSTAGRAM') {
+            // Instagram sourceUrl is a permalink (not a CDN URL) — skip if we already
+            // have Instagram media URLs from Priority 2 (those have actual CDN URLs).
+            // Only use if we have zero Instagram coverage.
+            if (photoUrls.length === 0 && rp.sourceUrl) {
+              url = rp.sourceUrl;
+            }
+          } else if (rp.source === 'WEBSITE' || rp.source === 'MANUAL') {
+            url = rp.sourceUrl ?? null;
+          }
+          if (url && !photoUrls.includes(url)) {
+            photoUrls.push(url);
+          }
+        }
+      } catch (err) {
+        console.error(`[places API] place_photos query failed for ${entity.slug}:`, err instanceof Error ? err.message : err);
+      }
+    }
+
+    // --- Priority 4: Legacy fallback — entities.googlePhotos JSON ---
     if (photoUrls.length === 0 && entity.googlePhotos && Array.isArray(entity.googlePhotos as unknown[])) {
       const photosWithArea = (entity.googlePhotos as unknown[])
         .map((p) => {
@@ -257,6 +299,14 @@ export async function GET(
           }
         }
       }
+    }
+
+    // --- Assemble final photoUrls: HERO leads, gallery follows ---
+    if (heroUrl) {
+      // Remove hero from gallery if it appears there (dedup)
+      photoUrls = photoUrls.filter((u) => u !== heroUrl);
+      // HERO always takes position 0
+      photoUrls = [heroUrl, ...photoUrls.slice(0, 5)];
     }
 
     // Parse hours
