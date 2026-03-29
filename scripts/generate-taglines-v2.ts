@@ -11,6 +11,7 @@
  *   --limit=N       Process only N records
  *   --verbose       Show detailed generation info
  *   --place=NAME    Process single place by name
+ *   --slug=SLUG     Process single place by slug
  *   --reprocess     Regenerate even if tagline exists
  *   --concurrency=N Parallel generation (default: 5)
  * 
@@ -35,6 +36,7 @@ import {
   assessSignalQuality,
 } from '../lib/voice-engine-v2';
 import { materializeCoverageEvidence } from '../lib/coverage/normalize-evidence';
+import { selectMostDiverseCandidate } from '../lib/voice-engine-v2/diversity';
 
 // ============================================================================
 // TYPES
@@ -45,6 +47,7 @@ interface CliArgs {
   limit: number | null;
   verbose: boolean;
   placeName: string | null;
+  slug: string | null;
   reprocess: boolean;
   concurrency: number;
 }
@@ -54,6 +57,7 @@ interface Stats {
   generated: number;
   skipped: number;
   failed: number;
+  diversityAdjusted: number;
   byPattern: {
     food: number;
     neighborhood: number;
@@ -84,6 +88,9 @@ function parseArgs(): CliArgs {
     placeName: args.find(a => a.startsWith('--place='))
       ? args.find(a => a.startsWith('--place='))!.split('=')[1].replace(/"/g, '')
       : null,
+    slug: args.find(a => a.startsWith('--slug='))
+      ? args.find(a => a.startsWith('--slug='))!.split('=')[1].replace(/"/g, '')
+      : null,
     reprocess: args.includes('--reprocess'),
     concurrency: args.find(a => a.startsWith('--concurrency='))
       ? parseInt(args.find(a => a.startsWith('--concurrency='))!.split('=')[1])
@@ -113,6 +120,7 @@ async function main() {
   if (args.dryRun) console.log('🔸 DRY RUN MODE — no database writes');
   if (args.limit) console.log(`🔸 Limit: ${args.limit} records`);
   if (args.placeName) console.log(`🔸 Single place: "${args.placeName}"`);
+  if (args.slug) console.log(`🔸 Single slug: "${args.slug}"`);
   if (args.reprocess) console.log('🔸 Reprocessing existing taglines');
   if (args.verbose) console.log('🔸 Verbose mode enabled');
   console.log(`🔸 Concurrency: ${args.concurrency}`);
@@ -120,11 +128,24 @@ async function main() {
 
   // Fetch records
   console.log('📍 Fetching records with identity signals...');
-  
+  let placeId: string | undefined;
+  if (args.slug) {
+    const entity = await prisma.entities.findUnique({
+      where: { slug: args.slug },
+      select: { id: true },
+    });
+    if (!entity) {
+      console.log(`Entity not found for slug: ${args.slug}`);
+      return;
+    }
+    placeId = entity.id;
+  }
+
   const records = await fetchRecordsForTaglineGeneration({
     county: 'Los Angeles',
     limit: args.limit ?? undefined,
     reprocess: args.reprocess,
+    placeId,
   });
   
   // Filter by name if specified
@@ -145,6 +166,7 @@ async function main() {
     generated: 0,
     skipped: 0,
     failed: 0,
+    diversityAdjusted: 0,
     byPattern: {
       food: 0,
       neighborhood: 0,
@@ -158,6 +180,8 @@ async function main() {
       insufficient: 0,
     },
   };
+  const recentSelectedTaglines: string[] = [];
+  const recentSelectedPatterns: Array<'food' | 'neighborhood' | 'energy' | 'authority'> = [];
 
   // Process in batches with concurrency limit
   for (let i = 0; i < filteredRecords.length; i += args.concurrency) {
@@ -216,19 +240,43 @@ async function main() {
         // Generate tagline
         const result = await enrichPlaceV2(input);
         
+        // Apply batch-level anti-repetition to avoid identical cadence nearby
+        const selectedIdxFromPattern = ({
+          food: 0,
+          neighborhood: 1,
+          energy: 2,
+          authority: 3,
+        } as const)[result.taglinePattern as 'food' | 'neighborhood' | 'energy' | 'authority'] ?? 0;
+        const diversityPick = selectMostDiverseCandidate(
+          result.taglineCandidates as [string, string, string, string],
+          selectedIdxFromPattern,
+          recentSelectedTaglines,
+          recentSelectedPatterns,
+        );
+        const finalTagline = result.taglineCandidates[diversityPick.index];
+        const finalPattern = diversityPick.pattern;
+        if (diversityPick.changed) {
+          stats.diversityAdjusted++;
+        }
+
         // Log result
         if (args.verbose) {
-          console.log(`  🏷️  [${result.taglinePattern}] "${result.tagline}"`);
+          const diversityNote = diversityPick.changed ? ' (diversity-adjusted)' : '';
+          console.log(`  🏷️  [${finalPattern}] "${finalTagline}"${diversityNote}`);
           console.log(`  📝 Candidates:`);
           result.taglineCandidates.forEach((c, idx) => {
-            const marker = c === result.tagline ? '✅' : '  ';
+            const marker = idx === diversityPick.index ? '✅' : '  ';
             console.log(`     ${marker} "${c}"`);
           });
         }
         
         // Update stats
         stats.generated++;
-        stats.byPattern[result.taglinePattern as keyof Stats['byPattern']]++;
+        stats.byPattern[finalPattern as keyof Stats['byPattern']]++;
+        recentSelectedTaglines.push(finalTagline);
+        if (recentSelectedTaglines.length > 8) recentSelectedTaglines.shift();
+        recentSelectedPatterns.push(finalPattern as 'food' | 'neighborhood' | 'energy' | 'authority');
+        if (recentSelectedPatterns.length > 8) recentSelectedPatterns.shift();
         
         // Write to database
         if (!args.dryRun) {
@@ -247,11 +295,11 @@ async function main() {
               entityId: interpretationEntityId,
               outputType: 'TAGLINE',
               content: {
-                text: result.tagline,
+                text: finalTagline,
                 candidates: result.taglineCandidates,
-                pattern: result.taglinePattern,
+                pattern: finalPattern,
               },
-              promptVersion: `voice-v2-${result.taglinePattern}`,
+              promptVersion: `voice-v2-${finalPattern}`,
               inputSignalIds: [],
             }).catch((err) => {
               console.warn(`  [Fields v2] interpretation_cache write failed:`, err);
@@ -289,6 +337,7 @@ async function main() {
   console.log(`Generated:        ${stats.generated}`);
   console.log(`Skipped:          ${stats.skipped}`);
   console.log(`Failed:           ${stats.failed}`);
+  console.log(`Diversity swaps:  ${stats.diversityAdjusted}`);
   console.log('');
   console.log('By Pattern:');
   console.log(`  Food Forward:       ${stats.byPattern.food}`);

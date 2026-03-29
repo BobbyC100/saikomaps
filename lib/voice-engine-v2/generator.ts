@@ -9,7 +9,8 @@ import {
   TAGLINE_GENERATOR_SYSTEM_PROMPT_V2,
   buildTaglineGeneratorUserPromptV2,
 } from './prompts';
-import { validateTaglineCandidates, filterValidTaglines } from '../voice-engine/validation';
+import { validateTaglineCandidates } from '../voice-engine/validation';
+import { validateCandidateVariety } from './diversity';
 
 const anthropic = new Anthropic();
 
@@ -99,11 +100,19 @@ export async function generateTaglineCandidatesWithRetryV2(
   
   while (attempts <= maxRetries) {
     lastResult = await generateTaglineCandidatesV2(input);
-    
-    if (lastResult.allValid) {
+    const variety = validateCandidateVariety(lastResult.candidates);
+    const validBundle = lastResult.allValid && variety.valid;
+
+    if (validBundle) {
       return lastResult;
     }
-    
+
+    if (!variety.valid) {
+      console.warn(
+        `[Voice Engine v2.0] Candidate variety check failed: openings=[${variety.repeatedOpenings.join(', ')}], maxOverlap=${variety.maxOverlap.toFixed(2)}`
+      );
+    }
+
     // Log retry attempt
     if (attempts < maxRetries) {
       console.warn(
