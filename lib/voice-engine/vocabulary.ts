@@ -46,7 +46,6 @@ export const VOCABULARY: VocabularyPools = {
     'No complaints.',
     "Doesn't need to.",
     "Everything's fine.",
-    "That's the whole pitch.",
     'Good luck finding it.',
     'So should you.',
   ],
@@ -91,6 +90,9 @@ export const VOCABULARY: VocabularyPools = {
     'no cap',
     'hits different',
     "chef's kiss",
+    "that's the whole pitch",
+    'whole pitch',
+    "order what's there",
   ],
 };
 

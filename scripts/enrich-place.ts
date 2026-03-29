@@ -42,6 +42,7 @@ function getArg(name: string): string | null {
 const slug = getArg('slug');
 const dryRun = args.includes('--dry-run');
 const force = args.includes('--force');
+const noAutoComplete = args.includes('--no-autocomplete');
 const includeGoogle = args.includes('--include-google');
 const fromStage = parseInt(getArg('from') ?? (includeGoogle ? '1' : '2'), 10);
 const onlyStage = getArg('only') ? parseInt(getArg('only')!, 10) : null;
@@ -482,7 +483,7 @@ function buildStages(entity: Awaited<ReturnType<typeof getEntity>>) {
       n: 2,
       label: 'Surface discovery',
       script: 'scripts/run-surface-discovery.ts',
-      args: () => [`--entity-id=${entity.id}`, '--limit=1'],
+      args: () => [`--entity-id=${entity.id}`, '--limit=1', ...(force ? ['--refresh'] : [])],
     },
     {
       n: 3,
@@ -500,7 +501,7 @@ function buildStages(entity: Awaited<ReturnType<typeof getEntity>>) {
       n: 5,
       label: 'Identity signal extraction (AI)',
       script: 'scripts/extract-identity-signals.ts',
-      args: () => [`--place=${entity.name}`],
+      args: () => [`--slug=${entity.slug}`],
     },
     {
       n: 6,
@@ -512,7 +513,7 @@ function buildStages(entity: Awaited<ReturnType<typeof getEntity>>) {
       n: 7,
       label: 'Interpretation (AI)',
       script: 'scripts/generate-taglines-v2.ts',
-      args: () => [`--place=${entity.name}`],
+      args: () => [`--slug=${entity.slug}`],
     },
   ];
 }
@@ -569,6 +570,53 @@ async function main() {
     if (!ok) {
       console.error(`\nPipeline stopped at stage ${stage.n}. Fix the error and re-run with --from=${stage.n}`);
       break;
+    }
+  }
+
+  // Autonomous completion lane: coverage discovery/fetch/extract + offering assembly.
+  // This makes single-entity enrichment closer to "enter place, pipeline finishes".
+  if (!dryRun && !noAutoComplete && onlyStage === null) {
+    const completionSteps = [
+      {
+        n: 8,
+        label: 'Coverage discovery',
+        script: 'scripts/discover-coverage-sources.ts',
+        args: () => [`--slug=${entity.slug}`, '--limit=1'],
+      },
+      {
+        n: 9,
+        label: 'Coverage fetch',
+        script: 'scripts/fetch-coverage-sources.ts',
+        args: () => [`--slug=${entity.slug}`, '--limit=20'],
+      },
+      {
+        n: 10,
+        label: 'Coverage extraction',
+        script: 'scripts/extract-coverage-sources.ts',
+        args: () => [`--slug=${entity.slug}`, '--limit=20'],
+      },
+      {
+        n: 11,
+        label: 'Offering program assembly (finalize)',
+        script: 'scripts/assemble-offering-programs.ts',
+        args: () => [`--slug=${entity.slug}`, '--reprocess'],
+      },
+      {
+        n: 12,
+        label: 'Interpretation refresh',
+        script: 'scripts/generate-taglines-v2.ts',
+        args: () => [`--slug=${entity.slug}`, '--reprocess'],
+      },
+    ] as const;
+
+    console.log('\nRunning autonomous completion steps...');
+    for (const step of completionSteps) {
+      const ok = await run(step.n, step.label, step.script, step.args());
+      results.push({ n: step.n, label: step.label, status: ok ? 'ran' : 'failed' });
+      if (!ok) {
+        console.error(`\nAutonomous completion stopped at step ${step.n}.`);
+        break;
+      }
     }
   }
 

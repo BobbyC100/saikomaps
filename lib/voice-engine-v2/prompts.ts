@@ -21,6 +21,8 @@ TONE RULES:
 - Give instructions, not invitations. "Don't be in a hurry" not "Take your time to enjoy."
 - Let the restaurant prove itself. Imply quality, don't declare it.
 - Three-beat rhythm is your signature: X. Y. Z. (three short sentences with periods)
+- Every candidate must include at least one concrete anchor (dish, cuisine style, named person, wine cue, or service format).
+- Avoid generic commands that are not descriptive ("order what's there", "figure it out", "that's enough").
 
 IDENTITY SIGNALS:
 You'll receive structured identity signals about this place. Use them:
@@ -38,9 +40,9 @@ PLACE WORDS: spot, joint, place, corner, room, counter, patio
 
 ACTION WORDS: pull up to, settle in at, posted up at, duck into, line up at, roll through
 
-DEADPAN CLOSERS: Ask around. / You'll figure out why. / That's the point. / No complaints. / Doesn't need to. / Everything's fine. / That's the whole pitch. / So should you.
+DEADPAN CLOSERS: Ask around. / You'll figure out why. / That's the point. / No complaints. / Doesn't need to. / Everything's fine. / So should you.
 
-BANNED WORDS (never use): hidden gem, must-try, elevated, curated, artisanal, mouthwatering, to die for, delicious, amazing, incredible, unique, authentic, foodie, farm-to-table, crafted, perfect for, you'll love, don't miss, a must, treat yourself, you deserve, so good, wonderful, fantastic, swell, bro, dude, gnarly, epic, vibes, lowkey, highkey, slaps, bussin, fire (as adjective), no cap, hits different, chef's kiss
+BANNED WORDS (never use): hidden gem, must-try, elevated, curated, artisanal, mouthwatering, to die for, delicious, amazing, incredible, unique, authentic, foodie, farm-to-table, crafted, perfect for, you'll love, don't miss, a must, treat yourself, you deserve, so good, wonderful, fantastic, swell, bro, dude, gnarly, epic, vibes, lowkey, highkey, slaps, bussin, fire (as adjective), no cap, hits different, chef's kiss, that's the whole pitch, whole pitch, order what's there
 
 Generate exactly 4 taglines, one for each pattern:
 
@@ -100,9 +102,9 @@ export function buildTaglineGeneratorUserPromptV2(
     parts.push('');
     parts.push('COVERAGE CONTEXT (from press — use for grounding, not quoting):');
 
-    // People — current only for taglines
+    // People — current + aging to avoid losing known operators from slightly older profiles
     const currentPeople = coverageEvidence.facts.people
-      .filter((p) => p.stalenessBand === 'current')
+      .filter((p) => p.stalenessBand === 'current' || p.stalenessBand === 'aging')
       .slice(0, 3);
     if (currentPeople.length > 0) {
       parts.push(`Key People: ${currentPeople.map((p) => `${p.name} (${p.role})`).join(', ')}`);
@@ -138,6 +140,20 @@ export function buildTaglineGeneratorUserPromptV2(
       parts.push(`Atmosphere: ${atm.descriptors.slice(0, 3).join(', ')}`);
     }
 
+    const covFood = coverageEvidence.interpretations.food;
+    if (covFood.cuisinePosture) {
+      parts.push(`Coverage Cuisine: ${covFood.cuisinePosture}`);
+    }
+
+    const covWine = coverageEvidence.interpretations.beverage.wine;
+    if (covWine.mentioned) {
+      const wineNotes: string[] = ['wine mentioned'];
+      if (covWine.naturalFocus) wineNotes.push('natural focus');
+      if (covWine.sommelierMentioned) wineNotes.push('sommelier mentioned');
+      if (covWine.listDepth) wineNotes.push(`list depth: ${covWine.listDepth}`);
+      parts.push(`Coverage Wine: ${wineNotes.join(', ')}`);
+    }
+
     coverageBlock = parts.join('\n');
   }
 
@@ -170,8 +186,10 @@ export const TAGLINE_SELECTOR_SYSTEM_PROMPT_V2 = `You are an editorial quality f
 2. Signal usage — uses the identity signals specifically, not generic
 3. Rhythm — reads well out loud, periods land correctly
 4. Length — shorter wins if quality is equal
+5. Descriptive specificity — concrete details beat generic attitude
 
 Consider the pattern weights as a tie-breaker, but prioritize quality.
+Disqualify candidates that read as generic commands with weak descriptive content.
 
 Return ONLY the index (0, 1, 2, or 3). No commentary.`;
 

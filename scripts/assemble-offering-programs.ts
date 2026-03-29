@@ -800,7 +800,12 @@ function assemblePrograms(src: SourceSignals): OfferingPrograms {
       const hasBevPerson = cov.facts.people.some(
         (p) => ["sommelier", "beverage_director", "wine_director"].includes(p.role) && p.stalenessBand !== "stale",
       );
-      if (hasBevPerson) {
+      const hasProgramDepth =
+        covBev.wine.naturalFocus ||
+        Boolean(covBev.wine.listDepth) ||
+        hasBevPerson ||
+        cov.sourceCount >= 3;
+      if (hasProgramDepth) {
         wineMaturity = "considered";
       }
     }
@@ -932,7 +937,7 @@ async function loadTargets(
   const candidates = await db.entities.findMany({
     where: {
       ...(slugArg ? { slug: slugArg } : {}),
-      derivedSignals: {
+      derived_signals: {
         some: {
           signalKey: {
             in: [
@@ -954,7 +959,7 @@ async function loadTargets(
   // Check which already have offering_programs v1
   let existingIds = new Set<string>();
   if (!reprocess) {
-    const existing = await db.derivedSignals.findMany({
+    const existing = await db.derived_signals.findMany({
       where: {
         entityId:      { in: candidates.map((c) => c.id) },
         signalKey:     SIGNAL_KEY,
@@ -1019,14 +1024,14 @@ async function fetchSourceSignals(entityIds: string[]): Promise<Map<string, Sour
   }
 
   // Fetch merchant_surface_scans for private_dining_present + events surface existence
-  const scanRows = await db.merchantSurfaceScans.findMany({
+  const scanRows = await db.merchant_surface_scans.findMany({
     where: { entityId: { in: entityIds } },
     select: { entityId: true, privateDiningPresent: true },
     orderBy: { fetchedAt: "desc" },
     distinct: ["entityId"],
   });
 
-  const eventsSurfaceRows = await db.merchantSurfaces.findMany({
+  const eventsSurfaceRows = await db.merchant_surfaces.findMany({
     where: {
       entityId: { in: entityIds },
       surfaceType: "events",

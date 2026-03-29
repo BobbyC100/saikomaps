@@ -120,6 +120,7 @@ export async function GET(
         },
         canonical_state: {
           select: {
+            hoursJson: true,
             eventsUrl: true,
             cateringUrl: true,
             eventInquiryEmail: true,
@@ -199,34 +200,71 @@ export async function GET(
         });
 
         if (instagramAccount) {
+          const igPhotoMeta = await db.place_photos.findMany({
+            where: {
+              entityId: entity.id,
+              source: 'INSTAGRAM',
+              eligible: true,
+            },
+            select: {
+              sourceRef: true,
+              aspectRatio: true,
+              widthPx: true,
+              heightPx: true,
+            },
+            take: 100,
+          });
+          const photoMetaByMediaId = new Map(
+            igPhotoMeta.map((m) => [m.sourceRef, m]),
+          );
+
           const allMedia = await db.instagram_media.findMany({
             where: {
               instagramUserId: instagramAccount.instagramUserId,
             },
             select: {
+              instagramMediaId: true,
               mediaUrl: true,
               permalink: true,
               photoType: true,
               timestamp: true,
             },
-            take: 12,
+            take: 40,
             orderBy: { timestamp: 'desc' },
           });
 
           if (allMedia.length > 0) {
-            const photoTypeRanking: Record<string, number> = {
-              INTERIOR: 0,
-              FOOD: 1,
-              BAR_DRINKS: 3,
-              CROWD_ENERGY: 4,
-              DETAIL: 5,
-              EXTERIOR: 6,
-            };
-
+            // Hero policy: prefer spatial context (wide interior/exterior) over dish closeups.
             const ranked = allMedia.sort((a, b) => {
-              const rankA = a.photoType ? (photoTypeRanking[a.photoType] ?? 999) : 999;
-              const rankB = b.photoType ? (photoTypeRanking[b.photoType] ?? 999) : 999;
-              return rankA - rankB;
+              const metaA = photoMetaByMediaId.get(a.instagramMediaId);
+              const metaB = photoMetaByMediaId.get(b.instagramMediaId);
+              const arA = metaA?.aspectRatio ?? null;
+              const arB = metaB?.aspectRatio ?? null;
+              const minDimA = metaA?.widthPx && metaA?.heightPx ? Math.min(metaA.widthPx, metaA.heightPx) : 0;
+              const minDimB = metaB?.widthPx && metaB?.heightPx ? Math.min(metaB.widthPx, metaB.heightPx) : 0;
+
+              const getHeroBucket = (
+                photoType: string | null,
+                aspectRatio: number | null,
+              ): number => {
+                const wideish = aspectRatio != null && aspectRatio >= 1.15;
+                if (photoType === 'INTERIOR' && wideish) return 0;
+                if (photoType === 'EXTERIOR' && wideish) return 1;
+                if (photoType === 'INTERIOR') return 2;
+                if (photoType === 'EXTERIOR') return 3;
+                if (photoType === 'FOOD') return 4;
+                if (photoType === 'BAR_DRINKS') return 5;
+                if (photoType === 'CROWD_ENERGY') return 6;
+                if (photoType === 'DETAIL') return 7;
+                return 999;
+              };
+
+              const bucketA = getHeroBucket(a.photoType, arA);
+              const bucketB = getHeroBucket(b.photoType, arB);
+
+              if (bucketA !== bucketB) return bucketA - bucketB;
+              if (minDimA !== minDimB) return minDimB - minDimA;
+              return b.timestamp.getTime() - a.timestamp.getTime();
             });
 
             photoUrls = ranked
@@ -311,12 +349,13 @@ export async function GET(
 
     // Parse hours
     let hours: Record<string, string> | null = null;
-    if (entity.hours) {
+    const hoursSource = entity.hours ?? entity.canonical_state?.hoursJson ?? null;
+    if (hoursSource) {
       try {
         hours =
-          typeof entity.hours === 'string'
-            ? JSON.parse(entity.hours)
-            : (entity.hours as Record<string, string>);
+          typeof hoursSource === 'string'
+            ? JSON.parse(hoursSource)
+            : (hoursSource as Record<string, string>);
       } catch {
         hours = null;
       }
@@ -400,6 +439,9 @@ export async function GET(
         },
       }).catch(() => [] as CoverageAtmosphereExtractionRow[]),
     ]);
+
+    // Materialize coverage evidence once for all downstream consumers.
+    const coverageEvidence = await materializeCoverageEvidence(entity.id).catch(() => null);
 
     // Service facts from google_places_attributes — null until that column is added to entities
     let facts: { service: Partial<Record<string, boolean | null>> };
@@ -511,7 +553,8 @@ export async function GET(
     const reservationProviderLabel: string | null =
       provider && TIER_1.has(provider) ? (BUTTON_LABELS[provider] ?? null) : null;
 
-    // Parse offering programs from derived_signals
+    // Parse offering programs from derived_signals.
+    // Accept both legacy snake_case and current camelCase serializer outputs.
     const opv = offeringProgramsRow?.signalValue as Record<string, unknown> | null ?? null;
     const PROGRAM_KEYS = [
       'food_program', 'wine_program', 'beer_program', 'cocktail_program',
@@ -519,16 +562,33 @@ export async function GET(
       'private_dining_program', 'group_dining_program', 'catering_program',
       'dumpling_program', 'sushi_raw_fish_program', 'ramen_noodle_program', 'taco_program', 'pizza_program',
     ] as const;
+    const PROGRAM_CAMEL_ALIASES: Record<(typeof PROGRAM_KEYS)[number], string> = {
+      food_program: 'foodProgram',
+      wine_program: 'wineProgram',
+      beer_program: 'beerProgram',
+      cocktail_program: 'cocktailProgram',
+      non_alcoholic_program: 'nonAlcoholicProgram',
+      coffee_tea_program: 'coffeeTeaProgram',
+      service_program: 'serviceProgram',
+      private_dining_program: 'privateDiningProgram',
+      group_dining_program: 'groupDiningProgram',
+      catering_program: 'cateringProgram',
+      dumpling_program: 'dumplingProgram',
+      sushi_raw_fish_program: 'sushiRawFishProgram',
+      ramen_noodle_program: 'ramenNoodleProgram',
+      taco_program: 'tacoProgram',
+      pizza_program: 'pizzaProgram',
+    };
     const DEFAULT_PROGRAM = { programClass: 'food' as const, maturity: 'unknown' as const, signals: [] };
     const offeringPrograms = opv
       ? Object.fromEntries(
           PROGRAM_KEYS.map((k) => {
-            const raw = opv[k] as Record<string, unknown> | undefined;
+            const raw = (opv[k] ?? opv[PROGRAM_CAMEL_ALIASES[k]]) as Record<string, unknown> | undefined;
             return [
               k,
               raw
                 ? {
-                    programClass: (raw.program_class as string) ?? 'food',
+                    programClass: ((raw.programClass as string) ?? (raw.program_class as string) ?? 'food'),
                     maturity: (raw.maturity as string) ?? 'unknown',
                     signals: Array.isArray(raw.signals) ? (raw.signals as string[]) : [],
                   }
@@ -537,6 +597,12 @@ export async function GET(
           })
         )
       : null;
+
+    const coverageCuisinePosture = coverageEvidence?.interpretations.food.cuisinePosture ?? null;
+    const inferredCuisineType =
+      !entity.cuisineType && coverageCuisinePosture
+        ? coverageCuisinePosture.charAt(0).toUpperCase() + coverageCuisinePosture.slice(1)
+        : null;
 
     // --- Parks-specific data ---
     let parkAmenities: string[] = [];
@@ -598,7 +664,7 @@ export async function GET(
       hours: hours ?? null,
       priceLevel: entity.priceLevel ?? null,
       businessStatus: businessStatus ?? null,
-      cuisineType: entity.cuisineType ?? null,
+      cuisineType: entity.cuisineType ?? inferredCuisineType ?? null,
       googlePlaceId: entity.googlePlaceId ?? null,
       reservationUrl,
       reservationProvider,
@@ -675,37 +741,30 @@ export async function GET(
           publishedAt: src.publishedAt ? src.publishedAt.toISOString() : null,
         };
       }),
-      coverageHighlights: await (async (): Promise<EntityPageCoverageHighlights | null> => {
-        try {
-          const evidence = await materializeCoverageEvidence(entity.id);
-          if (!evidence) return null;
-          return {
-            sourceCount: evidence.sourceCount,
-            tier1Count: evidence.provenance.tier1Sources,
-            tier2Count: evidence.provenance.tier2Sources,
-            people: evidence.facts.people
+      coverageHighlights: coverageEvidence
+        ? {
+            sourceCount: coverageEvidence.sourceCount,
+            tier1Count: coverageEvidence.provenance.tier1Sources,
+            tier2Count: coverageEvidence.provenance.tier2Sources,
+            people: coverageEvidence.facts.people
               .filter((p) => p.stalenessBand === 'current' || p.stalenessBand === 'aging')
               .slice(0, 5)
               .map((p) => ({ name: p.name, role: p.role })),
-            accolades: evidence.facts.accolades
+            accolades: coverageEvidence.facts.accolades
               .slice(0, 5)
               .map((a) => ({ name: a.name, year: a.year, type: a.type })),
-            dishes: evidence.facts.dishes.slice(0, 6).map((d) => d.text),
-            originStory: evidence.facts.originStoryFacts
+            dishes: coverageEvidence.facts.dishes.slice(0, 6).map((d) => d.text),
+            originStory: coverageEvidence.facts.originStoryFacts
               ? {
-                  foundingYear: evidence.facts.originStoryFacts.foundingYear
-                    ? parseInt(evidence.facts.originStoryFacts.foundingYear, 10) || null
+                  foundingYear: coverageEvidence.facts.originStoryFacts.foundingYear
+                    ? parseInt(coverageEvidence.facts.originStoryFacts.foundingYear, 10) || null
                     : null,
-                  founderNames: evidence.facts.originStoryFacts.founderNames,
-                  geographicOrigin: evidence.facts.originStoryFacts.geographicOrigin,
+                  founderNames: coverageEvidence.facts.originStoryFacts.founderNames,
+                  geographicOrigin: coverageEvidence.facts.originStoryFacts.geographicOrigin,
                 }
               : null,
-          };
-        } catch {
-          // Non-fatal: coverage highlights are supplementary
-          return null;
-        }
-      })(),
+          }
+        : null,
       // Parks-specific
       amenities: parkAmenities.length > 0 ? parkAmenities : undefined,
       parkFacilities: parkFacilities.length > 0 ? parkFacilities : undefined,
