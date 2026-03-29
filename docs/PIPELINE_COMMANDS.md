@@ -4,7 +4,7 @@ doc_type: reference
 status: active
 owner: Bobby Ciccaglione
 created: '2026-03-10'
-last_updated: '2026-03-22'
+last_updated: '2026-03-29'
 project_id: SAIKO
 systems:
   - data-pipeline
@@ -54,13 +54,16 @@ curl -X POST localhost:3000/api/admin/smart-enrich \
 
 ---
 
-## Full 7-Stage Pipeline
+## Full Pipeline (Core 7 + Autocomplete Lane)
 
-When you need the full enrichment pipeline (Google Places + AI signals + taglines). ~$0.12/entity.
+When you need end-to-end enrichment with minimal operator intervention. `enrich:place` runs the core 7 ERA stages, then (by default) runs completion steps for coverage and offering assembly.
 
 ```bash
 # Single entity (stages 2–7, website-first)
 npm run enrich:place -- --slug=republique
+
+# Single entity with forced refresh behavior (re-discover surfaces, rerun stages)
+npm run enrich:place -- --slug=republique --force
 
 # Include Google Places (stage 1)
 npm run enrich:place -- --slug=republique --from=1
@@ -70,6 +73,9 @@ npm run enrich:place -- --slug=republique --from=3
 
 # Run only one stage
 npm run enrich:place -- --slug=republique --only=5
+
+# Disable autonomous completion lane (coverage/offering refresh) if needed
+npm run enrich:place -- --slug=republique --no-autocomplete
 
 # Batch (25 entities, website-first)
 npm run enrich:batch
@@ -81,7 +87,7 @@ npm run enrich:place -- --batch=50 --concurrency=5
 npm run enrich:place -- --batch=50 --include-google
 ```
 
-**Stages:**
+**Core ERA stages (always available):**
 1. Google Places identity commit (GPID, coords, hours, photos)
 2. Surface discovery (find homepage/menu/about/contact URLs)
 3. Surface fetch (capture raw HTML)
@@ -89,6 +95,28 @@ npm run enrich:place -- --batch=50 --include-google
 5. Identity signal extraction (AI → derived_signals)
 6. Website enrichment (menu_url, reservation_url → Fields v2)
 7. Interpretation — tagline generation (AI → interpretation_cache)
+
+**Autocomplete lane (default in single-entity runs):**
+8. Coverage discovery (`discover-coverage-sources`)
+9. Coverage fetch (`fetch-coverage-sources`)
+10. Coverage extraction (`extract-coverage-sources`)
+11. Offering program assembly (`assemble-offering-programs`)
+12. Interpretation refresh (`generate-taglines-v2 --reprocess`)
+
+### Orchestration Scorecard (lane observability)
+
+Use this to inspect discovery->fetch->interpret->offering handoff health with explicit denominators.
+
+```bash
+# Human-readable single entity
+node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/enrichment-orchestration-scorecard.ts --slug=republique
+
+# JSON output (rows + SLO numerator/denominator/ratio payload)
+node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/enrichment-orchestration-scorecard.ts --slug=republique --json
+
+# Small cohort snapshot
+node -r ./scripts/load-env.js ./node_modules/.bin/tsx scripts/enrichment-orchestration-scorecard.ts --limit=10
+```
 
 ---
 
@@ -189,6 +217,9 @@ npx tsx scripts/fetch-coverage-sources.ts --dry-run
 # Fetch a small test batch
 npx tsx scripts/fetch-coverage-sources.ts --limit=10
 
+# Fetch for a single entity slug
+npx tsx scripts/fetch-coverage-sources.ts --slug=republique --limit=20
+
 # Fetch all INGESTED sources
 npx tsx scripts/fetch-coverage-sources.ts
 
@@ -206,6 +237,9 @@ npx tsx scripts/extract-coverage-sources.ts --dry-run
 
 # Extract a test batch with verbose output
 npx tsx scripts/extract-coverage-sources.ts --limit=5 --verbose
+
+# Extract for a single entity slug
+npx tsx scripts/extract-coverage-sources.ts --slug=republique --limit=20
 
 # Extract all FETCHED sources (≥50 words)
 npx tsx scripts/extract-coverage-sources.ts
@@ -251,6 +285,20 @@ npx tsx scripts/classify-entity-photos.ts --dry-run
 ```
 
 Uses Claude vision to analyze each photo and assign a type. Photos are downloaded and sent as base64 to bypass CDN restrictions. Classified photos are ranked for display: INTERIOR (highest priority) → FOOD → BAR_DRINKS → CROWD_ENERGY → DETAIL → EXTERIOR (lowest).
+
+### Instagram Photo Bridge (eligibility + dimensions)
+
+Bridge IG media into `place_photos` and compute eligibility.
+
+```bash
+# Bridge photos for a single entity (recommended after IG ingest)
+npx tsx scripts/bridge-instagram-photos.ts --entity-id=<entity-id> --batch=100
+
+# Dry run
+npx tsx scripts/bridge-instagram-photos.ts --entity-id=<entity-id> --dry-run
+```
+
+The bridge now resolves image dimensions from media URLs, and falls back to permalink `og:image` when CDN signatures expire. This prevents stale IG URLs from forcing `MISSING_DIM` ineligibility.
 
 ---
 

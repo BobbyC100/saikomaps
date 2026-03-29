@@ -38,6 +38,7 @@ if (!process.env.SAIKO_DB_FROM_WRAPPER) {
 import { db }              from "../lib/db";
 import { writeDerivedSignal } from "../lib/fields-v2/write-claim";
 import { materializeCoverageEvidence, type CoverageEvidence } from "../lib/coverage/normalize-evidence";
+import { ORCHESTRATION_REASON, type OrchestrationReason, FRESHNESS_WINDOWS_MS, ageMs } from "../lib/enrichment/orchestration-reasons";
 
 // ---------------------------------------------------------------------------
 // Config
@@ -86,11 +87,18 @@ interface OfferingPrograms {
     menuStructurePresent:        boolean;
     identitySignalsPresent:      boolean;
     merchantSurfaceScansPresent: boolean;
+    coverageEvidencePresent:     boolean;
+    coverageSourceCount:         number;
   };
   sourceTimestamps: {
     menuIdentity:    string | null;
     menuStructure:   string | null;
     identitySignals: string | null;
+    coverageEvidence: string | null;
+  };
+  readiness: {
+    isReadyForOfferingAssembly: boolean;
+    gateReasons: OrchestrationReason[];
   };
 }
 
@@ -203,6 +211,17 @@ const WINE_SIGNALS = new Set([
   "extensive_wine_list",
   "natural_wine_presence",
   "aperitif_focus",  // WO-008: moved from cocktail → wine
+]);
+
+const COFFEE_TEA_SIGNALS = new Set([
+  "coffee_program",
+  "espresso_program",
+  "specialty_coffee_presence",
+  "tea_program",
+  "specialty_tea_presence",
+  "breakfast_service",
+  "brunch_service",
+  "morning_service",
 ]);
 
 const EVENT_SIGNALS = new Set([
@@ -401,6 +420,39 @@ function round2(n: number): number {
   return Math.round(n * 100) / 100;
 }
 
+function computeGateReasons(src: SourceSignals): OrchestrationReason[] {
+  const reasons: OrchestrationReason[] = [];
+
+  if (!src.menuIdentity) {
+    reasons.push(ORCHESTRATION_REASON.NO_MENU_IDENTITY_SIGNAL);
+  } else {
+    const menuIdentityAge = ageMs(src.menuIdentity.computedAt);
+    if (menuIdentityAge !== null && menuIdentityAge > FRESHNESS_WINDOWS_MS.MENU_SIGNAL_MAX_AGE) {
+      reasons.push(ORCHESTRATION_REASON.MENU_IDENTITY_STALE);
+    }
+  }
+
+  if (!src.menuStructure) {
+    reasons.push(ORCHESTRATION_REASON.NO_MENU_STRUCTURE_SIGNAL);
+  } else {
+    const menuStructureAge = ageMs(src.menuStructure.computedAt);
+    if (menuStructureAge !== null && menuStructureAge > FRESHNESS_WINDOWS_MS.MENU_SIGNAL_MAX_AGE) {
+      reasons.push(ORCHESTRATION_REASON.MENU_STRUCTURE_STALE);
+    }
+  }
+
+  if (!src.coverageEvidence) {
+    reasons.push(ORCHESTRATION_REASON.NO_COVERAGE_EVIDENCE);
+  } else {
+    const coverageAge = ageMs(src.coverageEvidence.materializedAt);
+    if (coverageAge !== null && coverageAge > FRESHNESS_WINDOWS_MS.COVERAGE_MAX_AGE) {
+      reasons.push(ORCHESTRATION_REASON.COVERAGE_STALE);
+    }
+  }
+
+  return reasons;
+}
+
 function assemblePrograms(src: SourceSignals): OfferingPrograms {
   const mi = src.menuIdentity?.payload ?? null;
   const ms = src.menuStructure?.payload ?? null;
@@ -514,11 +566,17 @@ function assemblePrograms(src: SourceSignals): OfferingPrograms {
     program_class: "beverage", maturity: "unknown", signals: [], confidence: 0, evidence: [],
   };
 
-  // ── coffee_tea_program (no inference in v1) ───────────────────────────────
-
-  const coffeeTeaProgram: ProgramEntry = {
-    program_class: "beverage", maturity: "unknown", signals: [], confidence: 0, evidence: [],
-  };
+  // ── coffee_tea_program ─────────────────────────────────────────────────────
+  const coffeeTeaSignalNames = msSignalNames.filter((s) => COFFEE_TEA_SIGNALS.has(s));
+  const coffeeTeaProgram: ProgramEntry = coffeeTeaSignalNames.length > 0
+    ? {
+        programClass: "beverage",
+        maturity: coffeeTeaSignalNames.length >= 2 ? "considered" : "incidental",
+        signals: coffeeTeaSignalNames,
+        confidence: ms ? round2(ms.confidence) : 0,
+        evidence: evidenceFor(COFFEE_TEA_SIGNALS),
+      }
+    : { program_class: "beverage", maturity: "unknown", signals: [], confidence: 0, evidence: [] };
 
   // ── service_program ───────────────────────────────────────────────────────
 
@@ -920,6 +978,11 @@ function assemblePrograms(src: SourceSignals): OfferingPrograms {
       menuIdentity:    src.menuIdentity?.computedAt.toISOString()    ?? null,
       menuStructure:   src.menuStructure?.computedAt.toISOString()   ?? null,
       identitySignals: src.identitySignals?.computedAt.toISOString() ?? null,
+      coverageEvidence: src.coverageEvidence?.materializedAt.toISOString() ?? null,
+    },
+    readiness: {
+      isReadyForOfferingAssembly: true,
+      gateReasons: [],
     },
   };
 }
@@ -1115,6 +1178,12 @@ async function main() {
   for (const target of targets) {
     const src      = signalMap.get(target.entityId) ?? { menuIdentity: null, menuStructure: null, identitySignals: null, surfaceScanHints: null, coverageEvidence: null };
     const programs = assemblePrograms(src);
+    const gateReasons = computeGateReasons(src);
+    const isReady = gateReasons.length === 0;
+    programs.readiness = {
+      isReadyForOfferingAssembly: isReady,
+      gateReasons,
+    };
 
     const srcTag = [
       src.menuIdentity    ? "MI" : "  ",
@@ -1123,6 +1192,7 @@ async function main() {
       src.surfaceScanHints ? "SC" : "  ",
       src.coverageEvidence ? `CE(${src.coverageEvidence.sourceCount})` : "  ",
     ].join(" ");
+    const gateTag = isReady ? "READY" : `BLOCKED(${gateReasons.length})`;
 
     console.log(
       `  ${target.entityName.slice(0, 34).padEnd(34)} ` +
@@ -1134,7 +1204,7 @@ async function main() {
       `${programs.privateDiningProgram.maturity.padEnd(12)} ` +
       `${programs.groupDiningProgram.maturity.padEnd(12)} ` +
       `${programs.cateringProgram.maturity.padEnd(12)} ` +
-      `${srcTag}`,
+      `${srcTag} ${gateTag}`,
     );
 
     if (verbose) {
@@ -1152,6 +1222,9 @@ async function main() {
         console.log(`    food evidence: "${programs.foodProgram.evidence[0]?.slice(0, 100)}"`);
       if (programs.wineProgram.evidence.length > 0)
         console.log(`    wine evidence: "${programs.wineProgram.evidence[0]?.slice(0, 100)}"`);
+      if (!isReady) {
+        console.log(`    gate reasons:  ${gateReasons.join(", ")}`);
+      }
     }
 
     if (!dryRun) {

@@ -4,7 +4,7 @@ doc_type: knowledge-base
 status: active
 owner: Bobby Ciccaglione
 created: '2026-03-26'
-last_updated: '2026-03-26'
+last_updated: '2026-03-29'
 project_id: SAIKO
 systems:
   - data-pipeline
@@ -19,6 +19,7 @@ related_docs:
   - docs/architecture/entity-state-model-v1.md
   - docs/architecture/fields-era-overview-v1.md
   - docs/architecture/coverage-source-enrichment-v1.md
+  - docs/architecture/enrichment-orchestrator-v2-state-machine-spec.md
   - docs/ENRICHMENT-OPERATIONS-INVENTORY.md
   - docs/PIPELINE_COMMANDS.md
   - docs/DATA_PIPELINE_QUICK_START.md
@@ -104,9 +105,13 @@ The three-axis model is actively being implemented. Here is what's in place:
 
 ---
 
-## 3. The ERA Pipeline (7 Stages)
+## 3. The ERA Pipeline (7 Stages + Autocomplete Lane)
 
 ERA stands for "Enrichment & Retrieval Architecture." It's the core orchestrated pipeline that takes an entity through seven sequential enrichment stages. Each stage is idempotent — if the work is already done, the stage skips automatically. The pipeline can be run end-to-end, resumed from a specific stage, or stages can be run individually.
+
+For single-entity runs via `scripts/enrich-place.ts`, the system now appends an autocomplete lane after Stage 7 by default (coverage discovery/fetch/extract, offering assembly, and tagline refresh). This reduces manual handoff between enrichment and coverage.
+
+The v2 state-machine specification for this lane (states, block reasons, SLO denominators, cutover criteria) lives in `docs/architecture/enrichment-orchestrator-v2-state-machine-spec.md`.
 
 ### Stage 1 — Google Places Identity Commit
 
@@ -128,7 +133,7 @@ ERA stands for "Enrichment & Retrieval Architecture." It's the core orchestrated
 
 **Data written:** Rows in `merchant_surfaces` with `fetch_status: 'discovered'` for each found URL.
 
-**Skip condition:** Surfaces already exist for the entity, or entity has no website.
+**Skip condition:** Surfaces already exist for the entity, or entity has no website. Use discovery refresh mode (`run-surface-discovery --refresh`, or `enrich-place --force`) to re-run discovery for entities that already have homepage rows.
 
 **Cost:** Free (HTTP requests only).
 
@@ -164,6 +169,8 @@ ERA stands for "Enrichment & Retrieval Architecture." It's the core orchestrated
 
 **Quality gate:** Results below 0.4 confidence are held, not written. Results between 0.4-0.7 are written but flagged for review. Results above 0.7 are publishable.
 
+Confidence is calibrated from both model-reported confidence and extraction support quality (signal completeness + input quality + coverage context). Stored payload includes both `raw_extraction_confidence` and calibrated `extraction_confidence` to preserve auditability.
+
 **Cost:** ~$0.001/entity (Claude Haiku).
 
 **Requires:** Parsed surface content (>= 50 chars of usable text) or editorial coverage evidence. Entities with neither are skipped.
@@ -197,6 +204,8 @@ ERA stands for "Enrichment & Retrieval Architecture." It's the core orchestrated
 ### Pipeline Completion Marker
 
 An entity is considered "fully enriched" when the policy-driven completion gate (`isEntityEnriched()`) passes for all four enrichment layers: Identity, Access, Offering, and Interpretation. The `enrichmentStage` field on the entity tracks pipeline progress (values "1" through "7"), and `lastEnrichedAt` records when the pipeline last ran (observability only — not a completion signal).
+
+Operational note: autocomplete lane steps run after Stage 7 but do not currently advance `enrichmentStage` past `"7"`; completion is still determined exclusively by the policy gate, not by stage number.
 
 ### Four Enrichment Layers
 

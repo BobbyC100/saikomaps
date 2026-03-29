@@ -5,7 +5,8 @@
  * Fetches HTML menu pages discovered by the Merchant Surface Scanner and
  * stores durable raw text. Acquisition only — no parsing, no claims, no signals.
  *
- * Input:  merchant_surface_scans (latest successful scan, menu_format = 'html')
+ * Input:  merchant_surface_scans (preferred current-state source)
+ *         fallback: merchant_surfaces discovered/fetched menu-like URLs
  * Output: menu_fetches (append-only), R2 HTML receipts
  *
  * Usage:
@@ -17,6 +18,7 @@ import { createHash }           from "crypto";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { parse as parseHtml }   from "node-html-parser";
 import { randomUUID }           from "crypto";
+import { ORCHESTRATION_REASON } from "../lib/enrichment/orchestration-reasons";
 
 // ---------------------------------------------------------------------------
 // Config
@@ -58,10 +60,12 @@ interface FetchOutcome {
   resolvedUrl:        string;
   finalUrl:           string | null;
   httpStatus:         number | null;
+  contentType:        string | null;
   fetchDurationMs:   number | null;
   rawText:            string | null;
   contentHash:        string | null;
   rawHtmlPointer:    string | null;
+  failureReason:      string | null;
   error:               string | null;
 }
 
@@ -156,10 +160,12 @@ async function fetchMenu(target: MenuTarget): Promise<FetchOutcome> {
     resolvedUrl:      resolvedUrl,
     finalUrl:         null,
     httpStatus:       null,
+    contentType:      null,
     fetchDurationMs: null,
     rawText:          null,
     contentHash:      null,
     rawHtmlPointer:  null,
+    failureReason:    null,
     error:             null,
   };
 
@@ -182,8 +188,12 @@ async function fetchMenu(target: MenuTarget): Promise<FetchOutcome> {
     base.fetchDurationMs = Date.now() - t0;
     base.httpStatus = res.status;
     base.finalUrl   = res.url;
+    base.contentType = res.headers.get("content-type");
 
-    if (res.status >= 400) return base;
+    if (res.status >= 400) {
+      base.failureReason = ORCHESTRATION_REASON.MENU_FETCH_HTTP_ERROR;
+      return base;
+    }
 
     const html   = await res.text();
     const fetchedAt = new Date();
@@ -194,11 +204,15 @@ async function fetchMenu(target: MenuTarget): Promise<FetchOutcome> {
 
     // Write HTML receipt to R2 (non-blocking best-effort)
     base.rawHtmlPointer = await writeToR2(target.entityId, html, fetchedAt);
+    if (!base.rawText || base.rawText.length === 0) {
+      base.failureReason = ORCHESTRATION_REASON.MENU_FETCH_EMPTY_TEXT;
+    }
 
     return base;
   } catch (err) {
     base.fetchDurationMs = Date.now() - t0;
     base.error = err instanceof Error ? err.message : String(err);
+    base.failureReason = ORCHESTRATION_REASON.MENU_FETCH_FAILED;
     return base;
   } finally {
     clearTimeout(timer);
@@ -211,6 +225,9 @@ async function fetchMenu(target: MenuTarget): Promise<FetchOutcome> {
 
 async function writeFetch(outcome: FetchOutcome, dryRun: boolean): Promise<void> {
   if (dryRun) return;
+  const method = outcome.failureReason
+    ? `${TEXT_METHOD}|${outcome.failureReason}`
+    : TEXT_METHOD;
   await db.menu_fetches.create({
     data: {
       id:                    randomUUID(),
@@ -219,11 +236,12 @@ async function writeFetch(outcome: FetchOutcome, dryRun: boolean): Promise<void>
       finalUrl:             outcome.finalUrl ?? undefined,
       menuFormat:           "html",
       httpStatus:           outcome.httpStatus ?? undefined,
+      contentType:          outcome.contentType ?? undefined,
       fetchDurationMs:     outcome.fetchDurationMs ?? undefined,
       rawText:              outcome.rawText ?? undefined,
       contentHash:          outcome.contentHash ?? undefined,
       rawHtmlPointer:      outcome.rawHtmlPointer ?? undefined,
-      textExtractionMethod: TEXT_METHOD,
+      textExtractionMethod: method,
     },
   });
 }
@@ -265,6 +283,7 @@ async function main() {
 
   // ----- Resolve targets from current-state surface scans ------------------
   // "Current state" = latest successful scan per entity (http_status < 400)
+  // Fallback to discovered merchant_surfaces menu URLs when scan snapshots are absent.
   type RawTarget = { entityId: string; entityName: string; slug: string; sourceUrl: string; menuUrl: string };
 
   const rawTargets = slugArg
@@ -300,7 +319,7 @@ async function main() {
         ORDER BY mss.entity_id, mss.fetched_at DESC
         LIMIT ${limit}`;
 
-  const targets: MenuTarget[] = rawTargets.map((r) => ({
+  let targets: MenuTarget[] = rawTargets.map((r) => ({
     entityId:   r.entityId,
     entityName: r.entityName,
     slug:        r.slug,
@@ -308,7 +327,46 @@ async function main() {
     menuUrl:    r.menuUrl,
   }));
 
-  console.log(`${targets.length} HTML menu targets from surface scans\n`);
+  if (targets.length === 0) {
+    const fallbackTargets = slugArg
+      ? await db.$queryRaw<RawTarget[]>`
+          SELECT DISTINCT ON (ms.entity_id, ms.source_url)
+            e.id AS "entityId",
+            e.name AS "entityName",
+            e.slug,
+            COALESCE(NULLIF(e.website, ''), ms.source_url) AS "sourceUrl",
+            ms.source_url AS "menuUrl"
+          FROM merchant_surfaces ms
+          JOIN entities e ON e.id = ms.entity_id
+          WHERE e.slug = ${slugArg}
+            AND ms.source_url IS NOT NULL
+            AND ms.source_url ~* '/(menu|dinner|lunch|brunch|cafe|wine|drinks?)'
+          ORDER BY ms.entity_id, ms.source_url, ms.discovered_at DESC
+          LIMIT ${limit}`
+      : await db.$queryRaw<RawTarget[]>`
+          SELECT DISTINCT ON (ms.entity_id, ms.source_url)
+            e.id AS "entityId",
+            e.name AS "entityName",
+            e.slug,
+            COALESCE(NULLIF(e.website, ''), ms.source_url) AS "sourceUrl",
+            ms.source_url AS "menuUrl"
+          FROM merchant_surfaces ms
+          JOIN entities e ON e.id = ms.entity_id
+          WHERE ms.source_url IS NOT NULL
+            AND ms.source_url ~* '/(menu|dinner|lunch|brunch|cafe|wine|drinks?)'
+          ORDER BY ms.entity_id, ms.source_url, ms.discovered_at DESC
+          LIMIT ${limit}`;
+
+    targets = fallbackTargets.map((r) => ({
+      entityId:   r.entityId,
+      entityName: r.entityName,
+      slug:        r.slug,
+      sourceUrl:  r.sourceUrl,
+      menuUrl:    r.menuUrl,
+    }));
+  }
+
+  console.log(`${targets.length} HTML menu targets from scans/surfaces\n`);
 
   const outcomes: FetchOutcome[] = new Array(targets.length);
   let written = 0;
@@ -324,15 +382,17 @@ async function main() {
       const textLen   = outcome.rawText?.length ?? 0;
       const hashShort = outcome.contentHash?.slice(0, 8) ?? "—";
       const r2Str     = outcome.rawHtmlPointer ? "r2=✓" : "r2=—";
+      const reasonStr = outcome.failureReason ?? "OK";
 
       console.log(
         `  [${String(idx + 1).padStart(2)}] ${target.entityName.slice(0, 36).padEnd(36)} ` +
         `http=${statusStr} ${String(outcome.fetchDurationMs ?? 0).padStart(5)}ms ` +
-        `text=${String(textLen).padStart(6)}c hash=${hashShort} ${r2Str}`,
+        `text=${String(textLen).padStart(6)}c hash=${hashShort} ${r2Str} reason=${reasonStr}`,
       );
       if (outcome.error) console.log(`      error: ${outcome.error}`);
 
-      if (outcome.httpStatus && outcome.httpStatus < 400) {
+      // No silent drops: persist every attempted target as a row.
+      if (outcome.httpStatus !== null || outcome.error) {
         try {
           await writeFetch(outcome, dryRun);
           if (!dryRun) written++;
@@ -352,6 +412,7 @@ async function main() {
   const ok       = outcomes.filter((o) => o?.httpStatus && o.httpStatus < 400);
   const withText = ok.filter((o) => (o.rawText?.length ?? 0) > 50);
   const withR2   = ok.filter((o) => o.rawHtmlPointer);
+  const failures = outcomes.filter((o) => o?.failureReason !== null);
   const avgLen   = withText.length > 0
     ? Math.round(withText.reduce((s, o) => s + (o.rawText?.length ?? 0), 0) / withText.length)
     : 0;
@@ -362,6 +423,17 @@ async function main() {
   console.log(`Usable text (>50c):  ${withText.length} / ${ok.length}`);
   console.log(`Avg text length:     ${avgLen.toLocaleString()} chars`);
   console.log(`R2 receipts stored:  ${withR2.length} / ${ok.length}`);
+  if (failures.length > 0) {
+    const reasonCounts = new Map<string, number>();
+    for (const row of failures) {
+      const key = row.failureReason ?? "UNKNOWN";
+      reasonCounts.set(key, (reasonCounts.get(key) ?? 0) + 1);
+    }
+    console.log(`Failure reasons:`);
+    for (const [reason, count] of [...reasonCounts.entries()].sort((a, b) => b[1] - a[1])) {
+      console.log(`  ${reason.padEnd(26)} ${count}`);
+    }
+  }
   if (errors) console.log(`DB errors:           ${errors}`);
   if (dryRun) console.log(`\n[dry-run] No rows written.`);
   else        console.log(`\n${written} rows written to menu_fetches.`);

@@ -42,6 +42,7 @@ const RATE_LIMIT_MS  = 600;          // ms between API calls
 const CONCURRENCY    = 3;
 const MIN_TEXT_CHARS = 100;          // skip if menu text shorter than this
 const MAX_TEXT_CHARS = 15_000;       // cap to keep prompt within token budget
+const CORPUS_DOC_CAP = 6;            // most recent distinct menu surfaces per entity
 
 const SIGNAL_KEY     = "menu_identity";
 const SIGNAL_VERSION = "v1";
@@ -72,6 +73,7 @@ interface InterpretTarget {
   menuText:     string;
   menuFormat:   string;
   menuFetchId: string;
+  menuFetchIds: string[];
 }
 
 interface InterpretOutcome {
@@ -189,55 +191,123 @@ async function loadTargets(slugArg: string | undefined, limit: number, reprocess
     menuText:     string;
     menuFormat:   string;
     menuFetchId: string;
+    menuFetchIds: string[];
     hasSignal:    boolean;
   };
 
   // Build the "already has signal?" exclusion inline
   const rows = slugArg
     ? await db.$queryRaw<RawRow[]>`
-        SELECT DISTINCT ON (mf.entity_id)
-          e.id                          AS "entityId",
-          e.name                        AS "entityName",
+        WITH ranked AS (
+          SELECT
+            mf.id,
+            mf.entity_id,
+            mf.raw_text,
+            mf.menu_format,
+            mf.source_url,
+            mf.final_url,
+            mf.fetched_at,
+            COALESCE(NULLIF(mf.final_url, ''), mf.source_url) AS canonical_url,
+            ROW_NUMBER() OVER (
+              PARTITION BY mf.entity_id, COALESCE(NULLIF(mf.final_url, ''), mf.source_url)
+              ORDER BY mf.fetched_at DESC
+            ) AS rn_surface
+          FROM menu_fetches mf
+          JOIN entities e ON e.id = mf.entity_id
+          WHERE mf.http_status < 400
+            AND mf.raw_text IS NOT NULL
+            AND length(mf.raw_text) >= ${MIN_TEXT_CHARS}
+            AND e.slug = ${slugArg}
+        ),
+        corpus AS (
+          SELECT
+            r.*,
+            ROW_NUMBER() OVER (
+              PARTITION BY r.entity_id
+              ORDER BY r.fetched_at DESC, r.canonical_url ASC
+            ) AS rn_entity
+          FROM ranked r
+          WHERE r.rn_surface = 1
+        )
+        SELECT
+          e.id AS "entityId",
+          e.name AS "entityName",
           e.slug,
           e.description,
-          mf.raw_text                   AS "menuText",
-          mf.menu_format                AS "menuFormat",
-          mf.id                         AS "menuFetchId",
+          STRING_AGG(
+            CONCAT('[menu:', r.menu_format, ' url:', COALESCE(r.final_url, r.source_url), ']\n', r.raw_text),
+            E'\n\n-----\n\n'
+            ORDER BY r.fetched_at DESC
+          ) AS "menuText",
+          CASE WHEN COUNT(*) > 1 THEN 'multi' ELSE MAX(r.menu_format) END AS "menuFormat",
+          (ARRAY_AGG(r.id ORDER BY r.fetched_at DESC))[1] AS "menuFetchId",
+          ARRAY_AGG(r.id ORDER BY r.fetched_at DESC) AS "menuFetchIds",
           EXISTS (
             SELECT 1 FROM derived_signals ds
             WHERE ds.entity_id  = e.id
               AND ds.signal_key = ${SIGNAL_KEY}
               AND ds.signal_version = ${SIGNAL_VERSION}
-          )                             AS "hasSignal"
-        FROM menu_fetches mf
-        JOIN entities e ON e.id = mf.entity_id
-        WHERE mf.http_status < 400
-          AND mf.raw_text IS NOT NULL
-          AND length(mf.raw_text) >= ${MIN_TEXT_CHARS}
-          AND e.slug = ${slugArg}
-        ORDER BY mf.entity_id, mf.fetched_at DESC
+          ) AS "hasSignal"
+        FROM corpus r
+        JOIN entities e ON e.id = r.entity_id
+        WHERE r.rn_entity <= ${CORPUS_DOC_CAP}
+        GROUP BY e.id, e.name, e.slug, e.description
+        ORDER BY MAX(r.fetched_at) DESC
         LIMIT ${limit}`
     : await db.$queryRaw<RawRow[]>`
-        SELECT DISTINCT ON (mf.entity_id)
-          e.id                          AS "entityId",
-          e.name                        AS "entityName",
+        WITH ranked AS (
+          SELECT
+            mf.id,
+            mf.entity_id,
+            mf.raw_text,
+            mf.menu_format,
+            mf.source_url,
+            mf.final_url,
+            mf.fetched_at,
+            COALESCE(NULLIF(mf.final_url, ''), mf.source_url) AS canonical_url,
+            ROW_NUMBER() OVER (
+              PARTITION BY mf.entity_id, COALESCE(NULLIF(mf.final_url, ''), mf.source_url)
+              ORDER BY mf.fetched_at DESC
+            ) AS rn_surface
+          FROM menu_fetches mf
+          WHERE mf.http_status < 400
+            AND mf.raw_text IS NOT NULL
+            AND length(mf.raw_text) >= ${MIN_TEXT_CHARS}
+        ),
+        corpus AS (
+          SELECT
+            r.*,
+            ROW_NUMBER() OVER (
+              PARTITION BY r.entity_id
+              ORDER BY r.fetched_at DESC, r.canonical_url ASC
+            ) AS rn_entity
+          FROM ranked r
+          WHERE r.rn_surface = 1
+        )
+        SELECT
+          e.id AS "entityId",
+          e.name AS "entityName",
           e.slug,
           e.description,
-          mf.raw_text                   AS "menuText",
-          mf.menu_format                AS "menuFormat",
-          mf.id                         AS "menuFetchId",
+          STRING_AGG(
+            CONCAT('[menu:', r.menu_format, ' url:', COALESCE(r.final_url, r.source_url), ']\n', r.raw_text),
+            E'\n\n-----\n\n'
+            ORDER BY r.fetched_at DESC
+          ) AS "menuText",
+          CASE WHEN COUNT(*) > 1 THEN 'multi' ELSE MAX(r.menu_format) END AS "menuFormat",
+          (ARRAY_AGG(r.id ORDER BY r.fetched_at DESC))[1] AS "menuFetchId",
+          ARRAY_AGG(r.id ORDER BY r.fetched_at DESC) AS "menuFetchIds",
           EXISTS (
             SELECT 1 FROM derived_signals ds
             WHERE ds.entity_id  = e.id
               AND ds.signal_key = ${SIGNAL_KEY}
               AND ds.signal_version = ${SIGNAL_VERSION}
-          )                             AS "hasSignal"
-        FROM menu_fetches mf
-        JOIN entities e ON e.id = mf.entity_id
-        WHERE mf.http_status < 400
-          AND mf.raw_text IS NOT NULL
-          AND length(mf.raw_text) >= ${MIN_TEXT_CHARS}
-        ORDER BY mf.entity_id, mf.fetched_at DESC
+          ) AS "hasSignal"
+        FROM corpus r
+        JOIN entities e ON e.id = r.entity_id
+        WHERE r.rn_entity <= ${CORPUS_DOC_CAP}
+        GROUP BY e.id, e.name, e.slug, e.description
+        ORDER BY MAX(r.fetched_at) DESC
         LIMIT ${limit}`;
 
   return rows
@@ -250,6 +320,7 @@ async function loadTargets(slugArg: string | undefined, limit: number, reprocess
       menuText:     r.menuText,
       menuFormat:   r.menuFormat,
       menuFetchId: r.menuFetchId,
+      menuFetchIds: r.menuFetchIds,
     }));
 }
 
@@ -368,11 +439,12 @@ async function main() {
               ...signal,
               source:        "menu_fetches",
               menuFetchId: target.menuFetchId,
+              menuFetchIds: target.menuFetchIds,
               menuFormat:   target.menuFormat,
               menuChars:    textLen,
               interpretedAt: new Date().toISOString(),
             },
-            inputClaimIds: [target.menuFetchId],
+            inputClaimIds: target.menuFetchIds.length > 0 ? target.menuFetchIds : [target.menuFetchId],
           });
         } catch (err) {
           console.error(`    !! DB write failed for ${target.entityName}:`, err);

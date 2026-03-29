@@ -14,6 +14,8 @@
  *   meat_forward, fermentation_focus, pizza_program, raw_bar, bakery_program,
  *   pastry_program, sandwich_program, rotisserie_program, extensive_wine_list,
  *   natural_wine_presence, cocktail_program, beer_program, aperitif_focus,
+ *   coffee_program, espresso_program, tea_program, specialty_coffee_presence,
+ *   specialty_tea_presence, breakfast_service, brunch_service, morning_service,
  *   tasting_menu_present, prix_fixe_present,
  *   taco_program, street_food_program, tortilla_program
  *
@@ -43,6 +45,7 @@ const RATE_LIMIT_MS  = 600;
 const CONCURRENCY    = 3;
 const MIN_TEXT_CHARS = 100;
 const MAX_TEXT_CHARS = 15_000;
+const CORPUS_DOC_CAP = 6; // most recent distinct menu surfaces per entity
 
 const SIGNAL_KEY     = "menu_structure";
 const SIGNAL_VERSION = "v1";
@@ -66,6 +69,14 @@ const VALID_SIGNALS = new Set([
   "cocktail_program",
   "beer_program",
   "aperitif_focus",
+  "coffee_program",
+  "espresso_program",
+  "tea_program",
+  "specialty_coffee_presence",
+  "specialty_tea_presence",
+  "breakfast_service",
+  "brunch_service",
+  "morning_service",
   "tasting_menu_present",
   "prix_fixe_present",
   // WO-008: street-food vocabulary
@@ -73,6 +84,9 @@ const VALID_SIGNALS = new Set([
   "street_food_program",
   "tortilla_program",
 ]);
+
+const COCKTAIL_EXPLICIT_RE = /\b(cocktail|cocktails|cocktail menu|signature drinks?|house drinks?)\b/i;
+const COCKTAIL_DRINK_TOKEN_RE = /\b(negroni|martini|old fashioned|manhattan|margarita|spritz|mezcal|aperol|boulevardier|daiquiri|gimlet)\b/gi;
 
 // ---------------------------------------------------------------------------
 // Types
@@ -96,6 +110,43 @@ interface StructureTarget {
   menuText:     string;
   menuFormat:   string;
   menuFetchId: string;
+  menuFetchIds: string[];
+}
+
+function buildEvidenceSnippets(text: string, regex: RegExp, maxSnippets = 2): string[] {
+  const out: string[] = [];
+  const source = text ?? "";
+  const re = new RegExp(regex.source, regex.flags.includes("g") ? regex.flags : `${regex.flags}g`);
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(source)) !== null && out.length < maxSnippets) {
+    const idx = m.index ?? 0;
+    const start = Math.max(0, idx - 36);
+    const end = Math.min(source.length, idx + m[0].length + 36);
+    const snippet = source.slice(start, end).replace(/\s+/g, " ").trim();
+    if (snippet.length > 0) out.push(snippet.slice(0, 80));
+  }
+  return [...new Set(out)];
+}
+
+function applyCocktailFallback(menuText: string, entries: SignalEntry[]): SignalEntry[] {
+  if (entries.some((e) => e.signal === "cocktail_program")) return entries;
+  const text = menuText ?? "";
+  const explicit = COCKTAIL_EXPLICIT_RE.test(text);
+  const drinkHits = [...new Set([...text.matchAll(COCKTAIL_DRINK_TOKEN_RE)].map((m) => m[0].toLowerCase()))];
+  if (!explicit && drinkHits.length < 2) return entries;
+
+  const evidence = [
+    ...buildEvidenceSnippets(text, COCKTAIL_EXPLICIT_RE, 2),
+    ...buildEvidenceSnippets(text, /\b(negroni|martini|old fashioned|manhattan|margarita|spritz|mezcal|aperol|boulevardier|daiquiri|gimlet)\b/gi, 2),
+  ];
+
+  return [
+    ...entries,
+    {
+      signal: "cocktail_program",
+      evidence: [...new Set(evidence)].slice(0, 3),
+    },
+  ];
 }
 
 // ---------------------------------------------------------------------------
@@ -146,10 +197,18 @@ Beverage signals:
   • "cocktail_program" — a dedicated cocktails section or cocktail menu
   • "beer_program" — a dedicated beer list or multiple beer styles
   • "aperitif_focus" — explicit aperitif section or aperitivo-style service
+  • "coffee_program" — coffee appears as a dedicated beverage category
+  • "espresso_program" — explicit espresso drink list (espresso, cortado, cappuccino, latte, etc.)
+  • "tea_program" — tea appears as a dedicated beverage category
+  • "specialty_coffee_presence" — specialty/third-wave coffee cues
+  • "specialty_tea_presence" — curated/specialty tea cues
 
 Format signals:
   • "tasting_menu_present" — explicit tasting menu or omakase structure
   • "prix_fixe_present" — explicit prix fixe pricing structure
+  • "breakfast_service" — explicit breakfast section or breakfast-only service
+  • "brunch_service" — explicit brunch section/service
+  • "morning_service" — explicit morning/daytime service window
 
 General rules:
   • Only list signals with clear evidence in the provided text
@@ -240,54 +299,122 @@ async function loadTargets(
     menuText:     string;
     menuFormat:   string;
     menuFetchId: string;
+    menuFetchIds: string[];
     hasSignal:    boolean;
   };
 
   const rows = slugArg
     ? await db.$queryRaw<RawRow[]>`
-        SELECT DISTINCT ON (mf.entity_id)
-          e.id                          AS "entityId",
-          e.name                        AS "entityName",
+        WITH ranked AS (
+          SELECT
+            mf.id,
+            mf.entity_id,
+            mf.raw_text,
+            mf.menu_format,
+            mf.source_url,
+            mf.final_url,
+            mf.fetched_at,
+            COALESCE(NULLIF(mf.final_url, ''), mf.source_url) AS canonical_url,
+            ROW_NUMBER() OVER (
+              PARTITION BY mf.entity_id, COALESCE(NULLIF(mf.final_url, ''), mf.source_url)
+              ORDER BY mf.fetched_at DESC
+            ) AS rn_surface
+          FROM menu_fetches mf
+          JOIN entities e ON e.id = mf.entity_id
+          WHERE mf.http_status < 400
+            AND mf.raw_text IS NOT NULL
+            AND length(mf.raw_text) >= ${MIN_TEXT_CHARS}
+            AND e.slug = ${slugArg}
+        ),
+        corpus AS (
+          SELECT
+            r.*,
+            ROW_NUMBER() OVER (
+              PARTITION BY r.entity_id
+              ORDER BY r.fetched_at DESC, r.canonical_url ASC
+            ) AS rn_entity
+          FROM ranked r
+          WHERE r.rn_surface = 1
+        )
+        SELECT
+          e.id AS "entityId",
+          e.name AS "entityName",
           e.slug,
           e.description,
-          mf.raw_text                   AS "menuText",
-          mf.menu_format                AS "menuFormat",
-          mf.id                         AS "menuFetchId",
+          STRING_AGG(
+            CONCAT('[menu:', r.menu_format, ' url:', COALESCE(r.final_url, r.source_url), ']\n', r.raw_text),
+            E'\n\n-----\n\n'
+            ORDER BY r.fetched_at DESC
+          ) AS "menuText",
+          CASE WHEN COUNT(*) > 1 THEN 'multi' ELSE MAX(r.menu_format) END AS "menuFormat",
+          (ARRAY_AGG(r.id ORDER BY r.fetched_at DESC))[1] AS "menuFetchId",
+          ARRAY_AGG(r.id ORDER BY r.fetched_at DESC) AS "menuFetchIds",
           EXISTS (
             SELECT 1 FROM derived_signals ds
             WHERE ds.entity_id    = e.id
               AND ds.signal_key   = ${SIGNAL_KEY}
               AND ds.signal_version = ${SIGNAL_VERSION}
-          )                             AS "hasSignal"
-        FROM menu_fetches mf
-        JOIN entities e ON e.id = mf.entity_id
-        WHERE mf.http_status < 400
-          AND mf.raw_text IS NOT NULL
-          AND length(mf.raw_text) >= ${MIN_TEXT_CHARS}
-          AND e.slug = ${slugArg}
-        ORDER BY mf.entity_id, mf.fetched_at DESC
+          ) AS "hasSignal"
+        FROM corpus r
+        JOIN entities e ON e.id = r.entity_id
+        WHERE r.rn_entity <= ${CORPUS_DOC_CAP}
+        GROUP BY e.id, e.name, e.slug, e.description
+        ORDER BY MAX(r.fetched_at) DESC
         LIMIT ${limit}`
     : await db.$queryRaw<RawRow[]>`
-        SELECT DISTINCT ON (mf.entity_id)
-          e.id                          AS "entityId",
-          e.name                        AS "entityName",
+        WITH ranked AS (
+          SELECT
+            mf.id,
+            mf.entity_id,
+            mf.raw_text,
+            mf.menu_format,
+            mf.source_url,
+            mf.final_url,
+            mf.fetched_at,
+            COALESCE(NULLIF(mf.final_url, ''), mf.source_url) AS canonical_url,
+            ROW_NUMBER() OVER (
+              PARTITION BY mf.entity_id, COALESCE(NULLIF(mf.final_url, ''), mf.source_url)
+              ORDER BY mf.fetched_at DESC
+            ) AS rn_surface
+          FROM menu_fetches mf
+          WHERE mf.http_status < 400
+            AND mf.raw_text IS NOT NULL
+            AND length(mf.raw_text) >= ${MIN_TEXT_CHARS}
+        ),
+        corpus AS (
+          SELECT
+            r.*,
+            ROW_NUMBER() OVER (
+              PARTITION BY r.entity_id
+              ORDER BY r.fetched_at DESC, r.canonical_url ASC
+            ) AS rn_entity
+          FROM ranked r
+          WHERE r.rn_surface = 1
+        )
+        SELECT
+          e.id AS "entityId",
+          e.name AS "entityName",
           e.slug,
           e.description,
-          mf.raw_text                   AS "menuText",
-          mf.menu_format                AS "menuFormat",
-          mf.id                         AS "menuFetchId",
+          STRING_AGG(
+            CONCAT('[menu:', r.menu_format, ' url:', COALESCE(r.final_url, r.source_url), ']\n', r.raw_text),
+            E'\n\n-----\n\n'
+            ORDER BY r.fetched_at DESC
+          ) AS "menuText",
+          CASE WHEN COUNT(*) > 1 THEN 'multi' ELSE MAX(r.menu_format) END AS "menuFormat",
+          (ARRAY_AGG(r.id ORDER BY r.fetched_at DESC))[1] AS "menuFetchId",
+          ARRAY_AGG(r.id ORDER BY r.fetched_at DESC) AS "menuFetchIds",
           EXISTS (
             SELECT 1 FROM derived_signals ds
             WHERE ds.entity_id    = e.id
               AND ds.signal_key   = ${SIGNAL_KEY}
               AND ds.signal_version = ${SIGNAL_VERSION}
-          )                             AS "hasSignal"
-        FROM menu_fetches mf
-        JOIN entities e ON e.id = mf.entity_id
-        WHERE mf.http_status < 400
-          AND mf.raw_text IS NOT NULL
-          AND length(mf.raw_text) >= ${MIN_TEXT_CHARS}
-        ORDER BY mf.entity_id, mf.fetched_at DESC
+          ) AS "hasSignal"
+        FROM corpus r
+        JOIN entities e ON e.id = r.entity_id
+        WHERE r.rn_entity <= ${CORPUS_DOC_CAP}
+        GROUP BY e.id, e.name, e.slug, e.description
+        ORDER BY MAX(r.fetched_at) DESC
         LIMIT ${limit}`;
 
   return rows
@@ -300,6 +427,7 @@ async function loadTargets(
       menuText:     r.menuText,
       menuFormat:   r.menuFormat,
       menuFetchId: r.menuFetchId,
+      menuFetchIds: r.menuFetchIds,
     }));
 }
 
@@ -372,6 +500,17 @@ async function main() {
         error = err instanceof Error ? err.message : String(err);
       }
 
+      if (result) {
+        const withFallback = applyCocktailFallback(target.menuText, result.signals ?? []);
+        if (withFallback.length !== (result.signals ?? []).length) {
+          result = {
+            ...result,
+            signals: withFallback,
+            confidence: Math.min(1, Math.max(result.confidence, 0.72)),
+          };
+        }
+      }
+
       const entries  = result?.signals ?? [];
       const conf     = result ? Math.round(result.confidence * 100) : 0;
       const isEmpty  = entries.length === 0;
@@ -411,11 +550,12 @@ async function main() {
               confidence:     result.confidence,
               source:         "menu_fetches",
               menuFetchId:  target.menuFetchId,
+              menuFetchIds: target.menuFetchIds,
               menuFormat:    target.menuFormat,
               menuChars:     target.menuText.length,
               interpretedAt: new Date().toISOString(),
             },
-            inputClaimIds: [target.menuFetchId],
+            inputClaimIds: target.menuFetchIds.length > 0 ? target.menuFetchIds : [target.menuFetchId],
           });
           totalWritten++;
         } catch (err) {

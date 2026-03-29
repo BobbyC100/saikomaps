@@ -674,6 +674,60 @@ async function main() {
     }
   }
 
+  // Post-run orchestration scorecard (non-fatal)
+  if (!dryRun) {
+    console.log('\nOrchestration scorecard...');
+    try {
+      const result = spawnSync('node', ['-r', './scripts/load-env.js', TSX, 'scripts/enrichment-orchestration-scorecard.ts', `--slug=${entity.slug}`, '--json'], {
+        stdio: 'pipe',
+        env: process.env,
+        cwd: process.cwd(),
+      });
+      if (result.status !== 0) {
+        console.error('  Scorecard failed (non-fatal).');
+      } else {
+        const raw = result.stdout?.toString() ?? '';
+        try {
+          const payload = JSON.parse(raw) as {
+            rows?: Array<{ slug: string; offeringReady: boolean | null; gateReasons: string[] }>;
+            slo?: {
+              discoveryToFetchCoverage: { numerator: number; denominator: number; ratio: number | null };
+              fetchToInterpretCompletion: { numerator: number; denominator: number; ratio: number | null };
+              offeringAvailability: { numerator: number; denominator: number; ratio: number | null };
+            };
+          };
+          const row = (payload.rows ?? [])[0];
+          if (row) {
+            if (row.offeringReady === false) {
+              console.log(`  · Offering readiness blocked: ${row.gateReasons.join(', ') || 'unknown reasons'}`);
+            } else if (row.offeringReady === true) {
+              console.log('  ✓ Offering readiness passed');
+            }
+          }
+          if (payload.slo) {
+            const toPct = (x: number | null) => (x === null ? '—' : `${(x * 100).toFixed(1)}%`);
+            console.log(
+              `  · SLO discovery->fetch: ${payload.slo.discoveryToFetchCoverage.numerator}/${payload.slo.discoveryToFetchCoverage.denominator} (${toPct(payload.slo.discoveryToFetchCoverage.ratio)})`
+            );
+            console.log(
+              `  · SLO fetch->interpret: ${payload.slo.fetchToInterpretCompletion.numerator}/${payload.slo.fetchToInterpretCompletion.denominator} (${toPct(payload.slo.fetchToInterpretCompletion.ratio)})`
+            );
+            console.log(
+              `  · SLO offering availability: ${payload.slo.offeringAvailability.numerator}/${payload.slo.offeringAvailability.denominator} (${toPct(payload.slo.offeringAvailability.ratio)})`
+            );
+          }
+        } catch {
+          // Fall back to plain output if JSON parsing fails for any reason.
+          if (raw.trim()) {
+            console.log(raw.trim());
+          }
+        }
+      }
+    } catch (e) {
+      console.error('  Scorecard failed (non-fatal):', e);
+    }
+  }
+
   console.log(`\n${'═'.repeat(60)}`);
   console.log(`Enrichment summary: ${entity.name}`);
   console.log('═'.repeat(60));

@@ -114,6 +114,19 @@ interface LocationData {
   categorySlug?: string | null;
   marketSchedule?: unknown;
   coverageSources?: { sourceName: string; url: string; excerpt?: string | null; publishedAt?: string | null }[];
+  coverageHighlights?: {
+    sourceCount: number;
+    tier1Count: number;
+    tier2Count: number;
+    people: Array<{ name: string; role: string }>;
+    accolades: Array<{ name: string; year: number | null; type: string }>;
+    dishes: string[];
+    originStory: {
+      foundingYear: number | null;
+      founderNames: string[];
+      geographicOrigin: string | null;
+    } | null;
+  } | null;
   recognitions?: { name: string; source?: string; year?: string }[] | null;
   appearancesAsSubject?: {
     id: string;
@@ -299,11 +312,16 @@ const WINE_SIGNAL_PHRASES: Record<string, string> = {
   extensive_wine_list: 'an extensive list',
   natural_wine_presence: 'natural wine focus',
   aperitif_focus: 'aperitif-driven',
+  'coverage:wine_mentioned': 'wine throughout the menu',
+  'coverage:natural_wine_focus': 'a natural-wine leaning list',
+  'coverage:sommelier_noted': 'an identified wine lead',
 };
 
 /** Beer program signal → descriptive fragment (Locked v1) */
 const BEER_SIGNAL_PHRASES: Record<string, string> = {
   beer_program: 'beer on the menu',
+  'coverage:beer_mentioned': 'a beer list in rotation',
+  'coverage:craft_beer_selection': 'a craft-leaning selection',
   // Future v2 signals (vocabulary locked, detection pending):
   // craft_beer_presence: 'craft beer focus',
   // draft_beer_focus: 'a draft selection',
@@ -341,12 +359,28 @@ const COFFEE_TEA_SIGNAL_PHRASES: Record<string, string> = {
   specialty_coffee_presence: 'specialty coffee',
   tea_program: 'tea',
   specialty_tea_presence: 'a curated tea list',
+  breakfast_service: 'a breakfast service window',
+  brunch_service: 'a brunch service window',
+  morning_service: 'a morning service window',
   matcha_program: 'matcha',
   bubble_tea_program: 'boba',
   bubble_tea_chain: 'boba',
   tea_house_structure: 'tea house format',
   afternoon_tea_service: 'afternoon tea service',
   arabic_coffee_program: 'Arabic coffee',
+};
+
+/** Taco program signals surfaced in food specialty language */
+const TACO_SPECIALTY_SIGNAL_PHRASES: Record<string, string> = {
+  handmade_tortilla: 'house-made tortillas',
+  nixtamal_presence: 'nixtamal-forward masa',
+  heirloom_corn_presence: 'heirloom-corn tortillas',
+  al_pastor_presence: 'al pastor',
+  birria_presence: 'birria',
+  carnitas_presence: 'carnitas',
+  carne_asada_presence: 'carne asada',
+  seafood_taco_presence: 'seafood tacos',
+  salsa_program: 'a developed salsa program',
 };
 
 /** Cuisine posture → lead phrase for the food sentence */
@@ -425,6 +459,22 @@ function resolveSignalPhrases(
     .filter((phrase): phrase is string => !!phrase)
     .slice(0, cap);
 }
+
+function toTokenSet(values: string[]): Set<string> {
+  return new Set(values.map((v) => v.toLowerCase()));
+}
+
+function hasAnyToken(text: string, tokens: Set<string>): boolean {
+  for (const token of tokens) {
+    if (text.includes(token)) return true;
+  }
+  return false;
+}
+
+const BREAKFAST_TOKENS = [
+  'breakfast', 'brunch', 'morning',
+  'egg', 'eggs', 'toast', 'pastry', 'quiche', 'coffee',
+];
 
 function toSentenceList(items: string[]): string {
   if (items.length <= 1) return items[0] ?? '';
@@ -509,14 +559,23 @@ function buildOfferingLines(location: LocationData): { label: string; sentence: 
   const lines: { label: string; sentence: string }[] = [];
   const os = location.offeringSignals;
   const op = location.offeringPrograms;
+  const ch = location.coverageHighlights ?? null;
 
   const hasActiveProgram = (program: { maturity: string; signals: string[] } | undefined): boolean => {
     if (!program) return false;
     return ['incidental', 'considered', 'dedicated'].includes(program.maturity) || (program.signals?.length ?? 0) > 0;
   };
 
+  const buildTacoSpecialtyPhrase = (program: { signals: string[] } | undefined): string => {
+    const phrases = resolveSignalPhrases(program?.signals ?? [], TACO_SPECIALTY_SIGNAL_PHRASES, 2);
+    if (phrases.length > 0) {
+      return `tacos with ${toSentenceList(phrases)}`;
+    }
+    return 'tacos';
+  };
+
   const specialtyPrograms: Array<{ key: string; phrase: string; program: { maturity: string; signals: string[] } | undefined }> = [
-    { key: 'taco_program', phrase: 'tacos', program: op?.taco_program },
+    { key: 'taco_program', phrase: buildTacoSpecialtyPhrase(op?.taco_program), program: op?.taco_program },
     { key: 'pizza_program', phrase: 'pizza', program: op?.pizza_program },
     { key: 'dumpling_program', phrase: 'dumplings', program: op?.dumpling_program },
     { key: 'sushi_raw_fish_program', phrase: 'sushi and raw fish', program: op?.sushi_raw_fish_program },
@@ -589,18 +648,45 @@ function buildOfferingLines(location: LocationData): { label: string; sentence: 
   const wineMaturity = op?.wine_program?.maturity;
   const wineFragments = resolveSignalPhrases(wineSignals, WINE_SIGNAL_PHRASES);
   const wineIntent = os?.wineProgramIntent;
+  const hasNaturalWineSignal = wineSignals.includes('coverage:natural_wine_focus');
+  const hasSommelierSignal = wineSignals.includes('coverage:sommelier_noted');
+  const producerList = (location.keyProducers ?? []).slice(0, 3);
 
   if (wineIntent && wineIntent !== 'none' && WINE_INTENT_LEADS[wineIntent]) {
-    lines.push({
-      label: 'Wine',
-      sentence: composeSentence(WINE_INTENT_LEADS[wineIntent], wineFragments, 'with'),
-    });
+    const lead = hasSommelierSignal
+      ? 'Sommelier-shaped wine program'
+      : WINE_INTENT_LEADS[wineIntent];
+    const baseSentence = composeSentence(lead, wineFragments, 'with');
+    const producerClause = producerList.length > 0 ? `producers like ${toSentenceList(producerList)}` : '';
+    lines.push({ label: 'Wine', sentence: appendClause(baseSentence, producerClause) });
   } else if (wineMaturity && wineMaturity !== 'none' && wineMaturity !== 'unknown') {
     if (wineFragments.length > 0) {
+      if (hasSommelierSignal && producerList.length > 0) {
+        lines.push({
+          label: 'Wine',
+          sentence: `Sommelier-shaped wine program with producers like ${toSentenceList(producerList)}`,
+        });
+      } else if (hasSommelierSignal) {
+        lines.push({
+          label: 'Wine',
+          sentence: 'Sommelier-shaped wine program with an intentionally curated list',
+        });
+      } else if (hasNaturalWineSignal && producerList.length > 0) {
+        lines.push({
+          label: 'Wine',
+          sentence: `Considered wine program with a natural, small-producer focus including ${toSentenceList(producerList)}`,
+        });
+      } else if (hasNaturalWineSignal) {
+        lines.push({
+          label: 'Wine',
+          sentence: 'Considered wine program with a natural, small-producer focus',
+        });
+      } else {
       lines.push({
         label: 'Wine',
         sentence: composeSentence('Wine list', wineFragments, 'featuring'),
       });
+      }
     } else if ((location.keyProducers?.length ?? 0) > 0) {
       const producerList = toSentenceList((location.keyProducers ?? []).slice(0, 3));
       lines.push({
@@ -646,13 +732,18 @@ function buildOfferingLines(location: LocationData): { label: string; sentence: 
   const beerSignals = op?.beer_program?.signals ?? [];
   const beerMaturity = op?.beer_program?.maturity;
   const beerFragments = resolveSignalPhrases(beerSignals, BEER_SIGNAL_PHRASES);
+  const hasCraftBeerSignal = beerSignals.includes('coverage:craft_beer_selection');
 
   if (beerMaturity && beerMaturity !== 'none' && beerMaturity !== 'unknown') {
-    const lead = beerMaturity === 'dedicated'
-      ? 'Dedicated beer program'
-      : beerMaturity === 'considered'
-        ? 'Considered beer selection'
-        : 'Beer';
+    const lead = hasCraftBeerSignal
+      ? beerMaturity === 'dedicated'
+        ? 'Dedicated craft beer program'
+        : 'Considered craft beer selection'
+      : beerMaturity === 'dedicated'
+        ? 'Dedicated beer program'
+        : beerMaturity === 'considered'
+          ? 'Considered beer selection'
+          : 'Beer';
     lines.push({
       label: 'Beer',
       sentence: composeSentence(lead, beerFragments, 'with'),
@@ -690,17 +781,54 @@ function buildOfferingLines(location: LocationData): { label: string; sentence: 
   const ctSignals = op?.coffee_tea_program?.signals ?? [];
   const ctMaturity = op?.coffee_tea_program?.maturity;
   const ctFragments = resolveSignalPhrases(ctSignals, COFFEE_TEA_SIGNAL_PHRASES);
+  const breakfastEvidenceValues = [
+    ...(location.signatureDishes ?? []),
+    ...(ch?.dishes ?? []),
+    ...((ch?.accolades ?? []).map((a) => a.name)),
+  ];
+  const breakfastTokenSet = toTokenSet(BREAKFAST_TOKENS);
+  const hasBreakfastEvidence = breakfastEvidenceValues.some((v) => {
+    const lower = v.toLowerCase();
+    return hasAnyToken(lower, breakfastTokenSet);
+  });
+  const breakfastDishes = (location.signatureDishes ?? [])
+    .filter((dish) => {
+      const lower = dish.toLowerCase();
+      return hasAnyToken(lower, breakfastTokenSet);
+    })
+    .slice(0, 2);
+  const hasCoffeeSignal = ctSignals.some((s) => s.includes('coffee') || s.includes('espresso'));
+  const hasBreakfastSignal = ctSignals.some((s) => s.includes('breakfast') || s.includes('brunch') || s.includes('morning'));
+  const preferBreakfastLabel = hasBreakfastEvidence || hasBreakfastSignal;
 
   if (ctFragments.length > 0) {
     // Signals drive the sentence — maturity shapes the lead
-    const lead = ctMaturity === 'dedicated'
-      ? 'Dedicated coffee and tea program'
-      : ctMaturity === 'considered'
-        ? 'Considered coffee and tea selection'
-        : 'Coffee and tea';
+    const lead = preferBreakfastLabel
+      ? ctMaturity === 'dedicated'
+        ? 'Dedicated coffee and breakfast program'
+        : ctMaturity === 'considered'
+          ? 'Considered coffee and breakfast format'
+          : 'Coffee and breakfast'
+      : ctMaturity === 'dedicated'
+        ? 'Dedicated coffee and tea program'
+        : ctMaturity === 'considered'
+          ? 'Considered coffee and tea selection'
+          : 'Coffee and tea';
+    const sentence = composeSentence(lead, ctFragments, 'featuring');
+    const breakfastDishClause =
+      breakfastDishes.length > 0 ? `breakfast dishes like ${toSentenceList(breakfastDishes)}` : '';
     lines.push({
-      label: 'Coffee & Tea',
-      sentence: composeSentence(lead, ctFragments, 'featuring'),
+      label: preferBreakfastLabel ? 'Coffee & Breakfast' : 'Coffee & Tea',
+      sentence: appendClause(sentence, breakfastDishClause),
+    });
+  } else if (preferBreakfastLabel || hasCoffeeSignal) {
+    const breakfastDishClause =
+      breakfastDishes.length > 0 ? ` with dishes like ${toSentenceList(breakfastDishes)}` : '';
+    lines.push({
+      label: preferBreakfastLabel ? 'Coffee & Breakfast' : 'Coffee & Tea',
+      sentence: preferBreakfastLabel
+        ? `Breakfast and coffee are part of the format${breakfastDishClause}`
+        : 'Coffee and tea available',
     });
   } else if (ctMaturity && ctMaturity !== 'none' && ctMaturity !== 'unknown') {
     const sentence = ctMaturity === 'dedicated'
@@ -906,13 +1034,8 @@ export default function PlacePage() {
   const hasHours = fullWeekHours.length > 0;
   const todayDayName = new Date().toLocaleDateString('en-US', { weekday: 'long' });
 
-  // Sidebar: Links
-  // Instagram is shown in the header action row — exclude it here to avoid duplication
-  // Directions is a primary CTA (navigational intent), not a reference link — excluded from sidebar
-  const sidebarLinks: { label: string; url: string }[] = [];
-  if (location.menuUrl) sidebarLinks.push({ label: 'Menu', url: location.menuUrl });
-  if (location.winelistUrl) sidebarLinks.push({ label: 'Wine list', url: location.winelistUrl });
-  if (phoneUrl) sidebarLinks.push({ label: 'Call', url: phoneUrl });
+  // All outbound links (Menu, Wine list, Call) are folded into the primary action bar.
+  // No separate sidebar Links section.
 
   // Sidebar: Scene / Atmosphere / Ambiance
   // placePersonality is an internal classification token (e.g. "concept-driven") —
@@ -924,8 +1047,8 @@ export default function PlacePage() {
   const hasAtmosphere = atmosphereTags.length > 0;
   const hasEnergy = energyTags.length > 0;
 
-  // Primary CTAs (Directions is an action, lives here not in sidebar links)
-  const hasPrimaryCtas = !!(location.reservationUrl || location.website || location.instagram || location.tiktok || mapRefUrl);
+  // Primary CTAs — all outbound links live here (including Menu, Wine list, Call)
+  const hasPrimaryCtas = !!(location.reservationUrl || location.website || location.instagram || location.tiktok || mapRefUrl || location.menuUrl || location.winelistUrl || phoneUrl);
 
   // More Maps
   const moreMapsCards = appearsOn.slice(0, 3);
@@ -956,6 +1079,14 @@ export default function PlacePage() {
   const isThinEntity = contentDensityScore < 2;
   const shouldShowSidebar = !isThinEntity;
   const todayHours = fullWeekHours.find((row) => row.day === todayDayName) ?? null;
+  const cappedCoverageSources = (location.coverageSources ?? [])
+    .slice()
+    .sort((a, b) => {
+      if (!a.publishedAt) return 1;
+      if (!b.publishedAt) return -1;
+      return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
+    })
+    .slice(0, 5);
 
   return (
     <div style={{ background: '#F5F0E1', minHeight: '100vh' }}>
@@ -964,7 +1095,6 @@ export default function PlacePage() {
       <main id="place-page">
         <div id="document-frame">
           <div id="page-canvas">
-
             {/* ═══ TWO-COLUMN BODY ═══ */}
             <div id="two-column-body" className={isThinEntity ? 'thin-layout' : undefined}>
 
@@ -1013,6 +1143,15 @@ export default function PlacePage() {
                     )}
                     {mapRefUrl && (
                       <a href={mapRefUrl} target="_blank" rel="noopener noreferrer">Directions <span className="action-arrow">↗</span></a>
+                    )}
+                    {location.menuUrl && (
+                      <a href={location.menuUrl} target="_blank" rel="noopener noreferrer">Menu <span className="action-arrow">↗</span></a>
+                    )}
+                    {location.winelistUrl && (
+                      <a href={location.winelistUrl} target="_blank" rel="noopener noreferrer">Wine list <span className="action-arrow">↗</span></a>
+                    )}
+                    {phoneUrl && (
+                      <a href={phoneUrl}>Call <span className="action-arrow">↗</span></a>
                     )}
                   </div>
                 )}
@@ -1072,23 +1211,18 @@ export default function PlacePage() {
                   </>
                 )}
 
-                {(location.signatureDishes?.length || location.keyProducers?.length) ? (
+                {validPhotos.length > 0 && (
                   <>
-                    <div className="sk-section-header"><span>Known For</span></div>
-                    {location.signatureDishes && location.signatureDishes.length > 0 && (
-                      <p className="known-for-line">
-                        Signature dishes include {toSentenceList(location.signatureDishes.slice(0, 4))}.
-                      </p>
-                    )}
-                    {location.keyProducers && location.keyProducers.length > 0 && (
-                      <p id="key-producers" className="known-for-line">
-                        {(location.offeringSignals?.wineProgramIntent === 'natural_leaning' || location.offeringSignals?.wineProgramIntent === 'natural')
-                          ? `Natural wine focus includes producers like ${toSentenceList(location.keyProducers.slice(0, 4))}.`
-                          : `Wine focus includes producers like ${toSentenceList(location.keyProducers.slice(0, 4))}.`}
-                      </p>
-                    )}
+                    <div className="sk-section-header"><span>Photos</span></div>
+                    <div id="photos-grid">
+                      {validPhotos.slice(0, 6).map((url, i) => (
+                        <div key={url} className={`photo-tile photo-tile-${i + 1}`} role="button" tabIndex={0} onClick={() => openGallery(i)} onKeyDown={(e) => e.key === 'Enter' && openGallery(i)}>
+                          <img src={url} alt="" onError={() => handlePhotoError(url)} />
+                        </div>
+                      ))}
+                    </div>
                   </>
-                ) : null}
+                )}
 
                 {location.pullQuote && (
                   <>
@@ -1179,6 +1313,54 @@ export default function PlacePage() {
                 <aside id="sidebar-column">
                   <div className="sidebar-spacer" aria-hidden="true" />
 
+                {hasHours && (
+                  <>
+                    <div className="sk-section-header"><span>Hours</span></div>
+                    <div id="hours-block">
+                      <div className="hours-table">
+                        {fullWeekHours.map((row) => (
+                          <div key={row.day} className={`hours-row sk-utility sk-utility-tabular${row.day === todayDayName ? ' hours-row-today' : ''}`}>
+                            <span className="hours-day">{row.short}</span>
+                            <span className="hours-time">{row.hours}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {location.address && (
+                  <>
+                    <div className="sk-section-header"><span>Address</span></div>
+                    <div id="address-block">
+                      <p className="address-text">{location.address}</p>
+                      {mapRefUrl && (
+                        <a href={mapRefUrl} target="_blank" rel="noopener noreferrer" className="map-link">
+                          Map <span className="action-arrow">↗</span>
+                        </a>
+                      )}
+                    </div>
+                  </>
+                )}
+
+                {(location.signatureDishes?.length || location.keyProducers?.length) ? (
+                  <>
+                    <div className="sk-section-header"><span>Known For</span></div>
+                    {location.signatureDishes && location.signatureDishes.length > 0 && (
+                      <p className="known-for-line">
+                        Signature dishes include {toSentenceList(location.signatureDishes.slice(0, 4))}.
+                      </p>
+                    )}
+                    {location.keyProducers && location.keyProducers.length > 0 && (
+                      <p id="key-producers" className="known-for-line">
+                        {(location.offeringSignals?.wineProgramIntent === 'natural_leaning' || location.offeringSignals?.wineProgramIntent === 'natural')
+                          ? `Natural wine focus includes producers like ${toSentenceList(location.keyProducers.slice(0, 4))}.`
+                          : `Wine focus includes producers like ${toSentenceList(location.keyProducers.slice(0, 4))}.`}
+                      </p>
+                    )}
+                  </>
+                ) : null}
+
                 {hasAtmosphere && (
                   <>
                     <div className="sk-section-header"><span>Atmosphere</span></div>
@@ -1201,23 +1383,6 @@ export default function PlacePage() {
                   </>
                 )}
 
-                {sidebarLinks.filter(l => l.url !== phoneUrl).length > 0 && (
-                  <>
-                    <div className="sk-section-header"><span>Links</span></div>
-                    <div id="links-block">
-                      <ul className="links-list">
-                        {sidebarLinks.filter(l => l.url !== phoneUrl).map((link) => (
-                          <li key={link.label}>
-                            <a href={link.url} target="_blank" rel="noopener noreferrer">
-                              {link.label} <span className="action-arrow">↗</span>
-                            </a>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </>
-                )}
-
                 {hasScene && (
                   <>
                     <div className="sk-section-header"><span>Scene</span></div>
@@ -1229,11 +1394,11 @@ export default function PlacePage() {
                   </>
                 )}
 
-                {location.coverageSources && location.coverageSources.length > 0 && (
+                {cappedCoverageSources.length > 0 && (
                   <div id="appendix-coverage">
                     <div className="sk-section-header"><span>Coverage</span></div>
                     <ul className="coverage-entries">
-                      {location.coverageSources.map((cs) => (
+                      {cappedCoverageSources.map((cs) => (
                         <li key={cs.url} className="coverage-entry">
                           <span className="coverage-source-name">{cs.sourceName}</span>
                           {cs.excerpt && <p className="coverage-excerpt">{cs.excerpt}</p>}
@@ -1276,66 +1441,6 @@ export default function PlacePage() {
             </div>
 
             {/* ═══ FULL-WIDTH SECTIONS ═══ */}
-
-            {validPhotos.length > 0 && <hr className="heavy-rule" />}
-
-            {validPhotos.length > 0 && (
-              <section id="photos-section">
-                <h2 className="sk-section-header"><span>Photos</span></h2>
-                <div id="photos-grid">
-                  {validPhotos.slice(0, 6).map((url, i) => (
-                    <div key={url} className={`photo-tile photo-tile-${i + 1}`} role="button" tabIndex={0} onClick={() => openGallery(i)} onKeyDown={(e) => e.key === 'Enter' && openGallery(i)}>
-                      <img src={url} alt="" onError={() => handlePhotoError(url)} />
-                    </div>
-                  ))}
-                </div>
-
-                {/* ── Right utility rail: Hours → Address → Phone ── */}
-                <div id="photos-utility-rail">
-                  {/* Practical reference only — Links and Scene live in the sidebar above */}
-                  {hasHours && (
-                    <>
-                      <div className="sk-section-header"><span>Hours</span></div>
-                      <div id="hours-block">
-                        <div className="hours-table">
-                          {fullWeekHours.map((row) => (
-                            <div key={row.day} className={`hours-row sk-utility sk-utility-tabular${row.day === todayDayName ? ' hours-row-today' : ''}`}>
-                              <span className="hours-day">{row.short}</span>
-                              <span className="hours-time">{row.hours}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </>
-                  )}
-
-                  {location.address && (
-                    <>
-                      <div className="sk-section-header"><span>Address</span></div>
-                      <div id="address-block">
-                        <p className="address-text">{location.address}</p>
-                        {mapRefUrl && (
-                          <a href={mapRefUrl} target="_blank" rel="noopener noreferrer" className="map-link">
-                            Map <span className="action-arrow">↗</span>
-                          </a>
-                        )}
-                      </div>
-                    </>
-                  )}
-
-                  {phoneUrl && rawPhone && (
-                    <>
-                      <div className="sk-section-header"><span>Phone</span></div>
-                      <div id="phone-block">
-                        <a href={phoneUrl} className="phone-link">
-                          Call {rawPhone} <span className="action-arrow">↗</span>
-                        </a>
-                      </div>
-                    </>
-                  )}
-                </div>
-              </section>
-            )}
 
             {moreMapsCards.length > 0 && <hr className="heavy-rule" />}
 

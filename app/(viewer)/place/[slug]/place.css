@@ -203,12 +203,12 @@
   line-height: 1.4;
 }
 
-/* Primary CTAs (Reserve + Directions only) */
+/* Primary action bar — all outbound links (Reserve, Website, socials, Menu, etc.) */
 #primary-ctas {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 0 1.5em;
+  gap: 0.4em 1em;
   margin-top: 1.25em;
   padding: 10px 0;
   border-top: var(--pp-rule-weight-light) solid var(--pp-color-rule);
@@ -567,29 +567,6 @@
   text-underline-offset: 3px;
 }
 
-/* Links */
-#links-block .links-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-#links-block .links-list li {
-  margin-bottom: 6px;
-}
-
-#links-block .links-list a {
-  font-family: var(--pp-font-ui);
-  font-size: var(--pp-font-small);
-  color: var(--pp-color-link);
-  text-decoration: none;
-}
-
-#links-block .links-list a:hover {
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-
 /* Scene / Atmosphere / Ambiance tag blocks */
 .sidebar-tag-block p {
   margin: 0 0 0.35em;
@@ -608,29 +585,9 @@
 }
 
 /* ---------------------------------------------------------------------------
-   7. Photos Section — compact editorial preview (max 6 square tiles)
+   7. Photos Grid — compact editorial preview (max 6 square tiles)
    Layout: P1 (2×2 span) | P2+P3 stacked (1×1 each) | P4+P5+P6 bottom row
-   Two-column section: photo grid (≤640px) | utility rail (address/links/scene/hours)
    --------------------------------------------------------------------------- */
-#photos-section {
-  padding-top: var(--pp-section-pad);
-  display: grid;
-  grid-template-columns: minmax(0, 640px) 1fr;
-  column-gap: 32px;
-  align-items: start;
-}
-
-#photos-section h2 {
-  grid-column: 1 / -1;
-  font-size: var(--pp-font-micro);
-  font-weight: var(--pp-l1-weight);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--pp-color-text);
-  opacity: 0.7;
-  margin: 0 0 0.75em;
-}
-
 #photos-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -680,25 +637,6 @@
 
 /* P4, P5, P6: bottom row — handled by default flow in row 3 */
 
-/* ── Right utility rail (links / scene / hours / address / phone) ── */
-#photos-utility-rail {
-  min-width: 0;
-}
-
-/* Rail: tighter spacing + suppress rule (clean headers in narrow column) */
-#photos-utility-rail .sk-section-header {
-  margin-top: 1.25em;
-  margin-bottom: 0.9em;
-}
-
-#photos-utility-rail .sk-section-header:first-child {
-  margin-top: 0;
-}
-
-#photos-utility-rail .sk-section-header::after {
-  display: none;
-}
-
 /* Globe reference icon sitting inline with a labeled-divider span */
 .label-ref {
   display: inline-flex;
@@ -714,13 +652,6 @@
 .label-ref:hover { opacity: 0.7; }
 .label-ref svg { width: 12px; height: 12px; }
 
-/* Visual separator between editorial (links/scene) and utility (hours/address/phone) groups */
-.rail-divider {
-  border: none;
-  border-top: var(--pp-rule-weight-light) solid var(--pp-color-rule);
-  margin: 1.25em 0 0;
-}
-
 /* Hours: compact footprint in utility rail context */
 #hours-block .hours-table {
   font-size: var(--pp-font-micro);
@@ -728,20 +659,6 @@
 
 #hours-block .hours-row {
   padding: 3px 0;
-}
-
-/* Phone: link-style action matching map-link / links-list pattern */
-#phone-block .phone-link {
-  display: inline-block;
-  font-family: var(--pp-font-ui);
-  font-size: var(--pp-font-small);
-  color: var(--pp-color-link);
-  text-decoration: none;
-}
-
-#phone-block .phone-link:hover {
-  text-decoration: underline;
-  text-underline-offset: 3px;
 }
 
 /* ---------------------------------------------------------------------------
@@ -898,9 +815,7 @@
 
 /* Apply utility role to action links and sidebar content */
 #primary-ctas a,
-#links-block .links-list a,
-#address-block .map-link,
-#phone-block .phone-link {
+#address-block .map-link {
   font-size: var(--sk-type-utility-size);
   line-height: var(--sk-type-utility-line-height);
   font-weight: var(--sk-type-utility-weight);
@@ -1067,6 +982,7 @@
 
 .coverage-entry .coverage-excerpt {
   margin: 2px 0 4px;
+  max-width: 480px;
   opacity: 0.7;
   line-height: 1.4;
   font-style: italic;
@@ -1172,10 +1088,6 @@
   }
 
   #more-maps-grid {
-    grid-template-columns: 1fr;
-  }
-
-  #photos-section {
     grid-template-columns: 1fr;
   }
 
